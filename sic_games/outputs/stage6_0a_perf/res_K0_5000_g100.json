@@ -1,0 +1,1 @@
+{"label": "K0_5000_g100", "grid": 100, "init_n": 5000, "kappa": 0.0, "n_carry": 50000, "ms_mean": 734.4331462438277, "ms_sd": 278.45994609651274, "mean_occ": 1.6587119973847662, "peak_occ": 8, "n_occupied": 6118, "final_n": 10148, "cut_status": "ceiling-cut", "rail_status": "PASS", "occ_per_cell_all": 1.0148}

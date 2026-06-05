@@ -1,0 +1,30 @@
+# ── SiC-Games .gitignore (reorg baseline, 2026-06-05) ──
+# Principle: track docs + code + reports; never track backups, caches, or raw run binaries.
+
+# Backups & litter (never tracked) ----------------------------------------
+*.bak*
+# The supervisor's full manual mirror (recursive copy of the whole project)
+/backup 06.05.2026 2.37 pm/
+
+# Python caches -----------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Raw run data (reports = .html/.md ARE tracked; heavy binaries/caches are not) -
+*.parquet
+*.pkl
+*.npy
+*.npz
+*.prof
+# per-config / per-run logs under outputs
+sic_games/outputs/**/*.log
+sic_games/outputs/**/logs/
+
+# OS / editor -------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

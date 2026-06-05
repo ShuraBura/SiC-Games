@@ -1,0 +1,24 @@
+seed: 42
+world:
+  grid_size: [50, 50]
+  toroidal: true
+  sugar_peaks: [[10, 40], [40, 10]]
+  max_sugar_capacity: 4
+  band_width_k: 6
+  growth_rate_alpha: 1
+agents:
+  initial_population: 250
+  vision_dist: [1, 6]
+  metabolic_rate_dist: [1, 4]
+  max_age_dist: [60, 100]
+  initial_wealth_dist: [5, 25]
+decision:
+  strategy: "greedy"
+run:
+  n_steps: 1000
+  metrics_every: 1
+  output_dir: "outputs/stage1_baseline_seed42"
+visualization:
+  animate: true
+  frames_per_save: 5
+  save_static_plots: true

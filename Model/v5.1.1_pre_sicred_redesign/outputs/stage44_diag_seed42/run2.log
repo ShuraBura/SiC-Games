@@ -1,0 +1,76 @@
+============================================================
+Stage 4.4 Diagnostic: C Null Control Failure Analysis
+============================================================
+
+============================================================
+Run A — C bare (pool OFF, λ=0)
+============================================================
+  [A-p0.03] Loading cached: outputs\stage44_diag_seed42\A_p003\metrics.parquet
+    FAIL A-p0.03: N_late=[0,0] collapse=t216 iso@100=9.0% iso@300=0.0%
+  [A-p0.05] Loading cached: outputs\stage44_diag_seed42\A_p005\metrics.parquet
+    FAIL A-p0.05: N_late=[0,2] collapse=t468 iso@100=0.8% iso@300=14.3%
+  [A-p0.07] Loading cached: outputs\stage44_diag_seed42\A_p007\metrics.parquet
+    FAIL A-p0.07: N_late=[1437,1633] collapse=tNone iso@100=0.0% iso@300=0.0%
+  [A-p0.1] Running outputs\stage44_diag_seed42\configs\A_p01.yaml ...
+  [A-p0.1] BOMB at step 102: n=1132>800. Aborting.
+  [A-p0.1] Done. N=[255,1132]
+    FAIL A-p0.1: N_late=[0,0] collapse=tNone iso@100=0.0% iso@300=0.0%
+  [A-p0.15] Running outputs\stage44_diag_seed42\configs\A_p015.yaml ...
+  [A-p0.15] BOMB at step 102: n=2177>800. Aborting.
+  [A-p0.15] Done. N=[263,2177]
+    FAIL A-p0.15: N_late=[0,0] collapse=tNone iso@100=0.0% iso@300=0.0%
+
+============================================================
+Run B — C with pool ON, λ=0
+============================================================
+  [B-p0.03] Running outputs\stage44_diag_seed42\configs\B_p003.yaml ...
+  [B-p0.03] Done. N=[0,327]
+    FAIL B-p0.03: N_late=[0,0] collapse=t248 iso@100=8.5%
+  [B-p0.07] Running outputs\stage44_diag_seed42\configs\B_p007.yaml ...
+  [B-p0.07] BOMB at step 124: n=807>800. Aborting.
+  [B-p0.07] Done. N=[253,807]
+    FAIL B-p0.07: N_late=[0,0] collapse=tNone iso@100=0.0%
+  [B-p0.15] Running outputs\stage44_diag_seed42\configs\B_p015.yaml ...
+  [B-p0.15] BOMB at step 102: n=2500>800. Aborting.
+  [B-p0.15] Done. N=[267,2500]
+    FAIL B-p0.15: N_late=[0,0] collapse=tNone iso@100=0.0%
+
+============================================================
+Run C — C pool OFF, λ=0.1
+============================================================
+  [C-p0.03] Running outputs\stage44_diag_seed42\configs\C_p003.yaml ...
+  [C-p0.03] Done. N=[0,312]
+    FAIL C-p0.03: N_late=[0,0] collapse=t197 iso@100=9.9%
+  [C-p0.07] Running outputs\stage44_diag_seed42\configs\C_p007.yaml ...
+  [C-p0.07] BOMB at step 260: n=808>800. Aborting.
+  [C-p0.07] Done. N=[252,808]
+    FAIL C-p0.07: N_late=[0,0] collapse=tNone iso@100=0.0%
+  [C-p0.15] Running outputs\stage44_diag_seed42\configs\C_p015.yaml ...
+  [C-p0.15] BOMB at step 102: n=2500>800. Aborting.
+  [C-p0.15] Done. N=[263,2500]
+    FAIL C-p0.15: N_late=[0,0] collapse=tNone iso@100=0.0%
+
+============================================================
+Run D — C full (pool ON, λ=0.1) — replicates Stage 4.4
+============================================================
+  [D-p0.03] Running outputs\stage44_diag_seed42\configs\D_p003.yaml ...
+  [D-p0.03] Done. N=[0,326]
+    FAIL D-p0.03: N_late=[0,0] collapse=t242 iso@100=8.6%
+  [D-p0.07] Running outputs\stage44_diag_seed42\configs\D_p007.yaml ...
+  [D-p0.07] BOMB at step 136: n=808>800. Aborting.
+  [D-p0.07] Done. N=[253,808]
+    FAIL D-p0.07: N_late=[0,0] collapse=tNone iso@100=0.0%
+
+  Diagnosis: H_B_partial
+  C collapses at all tested p_max (0.03–0.15). Mean pre-collapse isolation = 4.9% (below Allee threshold 40.0%). Collapse is driven by age-out: initial realistic age distribution depletes faster than p_max generates new births. Raising p_max further or adjusting the initial age distribution may rescue C. Action: flag for Stage 4.5 carrying-cost redesign.
+
+=== Generating figures ===
+  Figures generated: ['runA_nt', 'runA_isolated', 'runA_dist', 'factorial_N']
+
+=== Writing report_diag.html ===
+  Report written: outputs\stage44_diag_seed42\report_diag.html
+
+============================================================
+Stage 4.4 Diagnostic complete.
+  Report: outputs\stage44_diag_seed42\report_diag.html
+============================================================

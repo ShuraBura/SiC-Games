@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 1290, in <module>
+    main()
+    ~~~~^^
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 1243, in main
+    task0 = task0_grid_calibration()
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 392, in task0_grid_calibration
+    df, _ = _run_or_load(cfg_path, f"C-k{locked_k}-p{p}")
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 225, in _run_or_load
+    n_col = "n_active_si" if is_si else "population"
+                             ^^^^^
+NameError: name 'is_si' is not defined
+============================================================
+Stage 4.4: Grid Rescaling + λ + ψ Redesign + Revised Sweep
+============================================================
+
+============================================================
+Task 0: Grid calibration
+============================================================
+
+[0.1] Si static null control — β=5, target N_active∈[150,400], dorm_rate<20%
+
+  k=4 (max_sugar=16, alpha=4)
+  [Si-k4-p0.055] Loading cached: outputs\stage44_seed42\si_static_k4_p0055\metrics.parquet
+    FAIL [Si-k4-p0.055] p=0.055: N_active=[2,64] perm_dorm=0.000 dorm_rate=15.7%
+  [Si-k4-p0.06] Loading cached: outputs\stage44_seed42\si_static_k4_p006\metrics.parquet
+    FAIL [Si-k4-p0.06] p=0.06: N_active=[9,302] perm_dorm=0.000 dorm_rate=10.1%
+  [Si-k4-p0.065] Loading cached: outputs\stage44_seed42\si_static_k4_p0065\metrics.parquet
+    ✓ PASS [Si-k4-p0.065] p=0.065: N_active=[174,364] perm_dorm=0.000 dorm_rate=5.1%
+  ✓ k=4 viable: locked p_fission_Si = 0.065, k_grid = 4
+
+[0.2] C static null control — k=4, target N∈[150,400], est_starv≤0.78
+  [C-k4-p0.011] Running outputs\stage44_seed42\configs\c_static_k4_p0011.yaml ...

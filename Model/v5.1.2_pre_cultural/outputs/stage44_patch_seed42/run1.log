@@ -1,0 +1,67 @@
+============================================================
+Stage 4.4 Patch: Age Init Fix + p_max Re-calibration
+============================================================
+
+============================================================
+Task 0 — Diagnose p_max=0.07 explosion (diagnostic parquet)
+============================================================
+  N at t=100: 417
+  N at t=500: 1464
+  N at t=1000: 1564  (N_late=[1437,1633])
+  Births/step (t≥500): 32.423
+  est_starv/step (t≥500): 0.750
+  Juv starvation/step (t≥500): 12.982
+  Senescence/step (t≥500): 17.178
+  Net growth ≈ 1.5130/step
+  Mean agent age at t=500: 38.1
+  Pool draw unmet %: 0.0%
+
+  Mechanism: OVERSHOOT (stable high-N equilibrium). births/step (32.4) ≈ total deaths/step (30.9), net growth ≈ 1.5130/step (≈0 → sta...
+
+============================================================
+Task 2 — Run A patch sweep (pool OFF, λ=0, age_init_upper_frac=0.25)
+============================================================
+  [pA-p0.03] Running outputs\stage44_patch_seed42\configs\pA_p003.yaml ...
+  [pA-p0.03] Done. N=[0,344]
+    FAIL pA-p0.03: N_late=[0,0] collapse=t216 est_starv=0.000 births=0.00/step senes=0.00/step
+  [pA-p0.04] Running outputs\stage44_patch_seed42\configs\pA_p004.yaml ...
+  [pA-p0.04] Done. N=[0,369]
+    FAIL pA-p0.04: N_late=[0,0] collapse=t351 est_starv=0.000 births=0.00/step senes=0.00/step
+  [pA-p0.05] Running outputs\stage44_patch_seed42\configs\pA_p005.yaml ...
+  [pA-p0.05] Done. N=[0,393]
+    FAIL pA-p0.05: N_late=[0,101] collapse=t657 est_starv=0.000 births=0.10/step senes=0.31/step
+  [pA-p0.06] Running outputs\stage44_patch_seed42\configs\pA_p006.yaml ...
+  [pA-p0.06] BOMB at step 405: n=806>800. Aborting.
+  [pA-p0.06] Done. N=[252,806]
+    FAIL pA-p0.06: N_late=[0,0] collapse=tNone est_starv=0.000 births=nan/step senes=nan/step
+  [pA-p0.065] Running outputs\stage44_patch_seed42\configs\pA_p0065.yaml ...
+  [pA-p0.065] BOMB at step 247: n=804>800. Aborting.
+  [pA-p0.065] Done. N=[252,804]
+    FAIL pA-p0.065: N_late=[0,0] collapse=tNone est_starv=0.000 births=nan/step senes=nan/step
+  [pA-p0.07] Running outputs\stage44_patch_seed42\configs\pA_p007.yaml ...
+  [pA-p0.07] BOMB at step 148: n=806>800. Aborting.
+  [pA-p0.07] Done. N=[252,806]
+    FAIL pA-p0.07: N_late=[0,0] collapse=tNone est_starv=0.000 births=nan/step senes=nan/step
+
+  WARNING: No p_max passed the gate. Escalation required.
+
+============================================================
+Task 3 — Runs B/C/D: pool and λ verification
+============================================================
+  SKIPPED — no locked p_max from Task 2 (gate not passed).
+
+=== Generating figures ===
+  task0_p007
+  pA_nt
+  pA_births_deaths
+  pA_mean_age
+  Figures generated: ['task0_p007', 'pA_nt', 'pA_births_deaths', 'pA_mean_age']
+
+=== Writing report_patch.html ===
+  Report written: outputs\stage44_patch_seed42\report_patch.html
+  ROADMAP updated: G:\My Drive\docs\SiC Games\ROADMAP.md
+
+============================================================
+Stage 4.4 Patch complete.
+  Report: outputs\stage44_patch_seed42\report_patch.html
+============================================================

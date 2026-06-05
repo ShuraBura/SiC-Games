@@ -1,0 +1,735 @@
+{
+  "profile_b0": {
+    "cum": [
+      {
+        "func": "_wrapped_step",
+        "file": "mesa/model.py",
+        "lineno": 202,
+        "ncalls": 200,
+        "tottime": 0.000398,
+        "cumtime": 5.669801,
+        "pct_tot": 0.01
+      },
+      {
+        "func": "_advance_time",
+        "file": "mesa/model.py",
+        "lineno": 206,
+        "ncalls": 200,
+        "tottime": 0.001607,
+        "cumtime": 5.669286,
+        "pct_tot": 0.03
+      },
+      {
+        "func": "execute",
+        "file": "time/events.py",
+        "lineno": 125,
+        "ncalls": 200,
+        "tottime": 0.000719,
+        "cumtime": 5.665152,
+        "pct_tot": 0.01
+      },
+      {
+        "func": "_execute_and_reschedule",
+        "file": "time/events.py",
+        "lineno": 278,
+        "ncalls": 200,
+        "tottime": 0.00134,
+        "cumtime": 5.663785,
+        "pct_tot": 0.03
+      },
+      {
+        "func": "_do_step",
+        "file": "mesa/model.py",
+        "lineno": 236,
+        "ncalls": 200,
+        "tottime": 0.01595,
+        "cumtime": 5.656054,
+        "pct_tot": 0.31
+      },
+      {
+        "func": "step",
+        "file": "sic_games/run.py",
+        "lineno": 404,
+        "ncalls": 200,
+        "tottime": 0.133888,
+        "cumtime": 5.639635,
+        "pct_tot": 2.56
+      },
+      {
+        "func": "act_harvest",
+        "file": "agents/base.py",
+        "lineno": 151,
+        "ncalls": 47698,
+        "tottime": 0.129363,
+        "cumtime": 2.929689,
+        "pct_tot": 2.47
+      },
+      {
+        "func": "build",
+        "file": "agents/perception.py",
+        "lineno": 46,
+        "ncalls": 47698,
+        "tottime": 0.698044,
+        "cumtime": 1.50997,
+        "pct_tot": 13.35
+      },
+      {
+        "func": "process_step",
+        "file": "sic_games/joint_task.py",
+        "lineno": 71,
+        "ncalls": 200,
+        "tottime": 0.805462,
+        "cumtime": 1.232655,
+        "pct_tot": 15.41
+      },
+      {
+        "func": "select_target",
+        "file": "strategies/softmax_base.py",
+        "lineno": 37,
+        "ncalls": 47698,
+        "tottime": 0.239169,
+        "cumtime": 1.228158,
+        "pct_tot": 4.58
+      },
+      {
+        "func": "compute_utilities",
+        "file": "strategies/carbon.py",
+        "lineno": 63,
+        "ncalls": 47698,
+        "tottime": 0.431554,
+        "cumtime": 0.869705,
+        "pct_tot": 8.26
+      },
+      {
+        "func": "compute_metrics",
+        "file": "sic_games/metrics.py",
+        "lineno": 280,
+        "ncalls": 200,
+        "tottime": 0.057489,
+        "cumtime": 0.603701,
+        "pct_tot": 1.1
+      },
+      {
+        "func": "attempt_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 225,
+        "ncalls": 47160,
+        "tottime": 0.012767,
+        "cumtime": 0.289296,
+        "pct_tot": 0.24
+      },
+      {
+        "func": "_carbon_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 244,
+        "ncalls": 47160,
+        "tottime": 0.087878,
+        "cumtime": 0.276529,
+        "pct_tot": 1.68
+      },
+      {
+        "func": "<method 'get' of 'dict' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 2500000,
+        "tottime": 0.268506,
+        "cumtime": 0.268506,
+        "pct_tot": 5.14
+      },
+      {
+        "func": "_normalize",
+        "file": "strategies/softmax_base.py",
+        "lineno": 13,
+        "ncalls": 95396,
+        "tottime": 0.155971,
+        "cumtime": 0.234297,
+        "pct_tot": 2.98
+      },
+      {
+        "func": "<built-in method builtins.sum>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 137009,
+        "tottime": 0.087335,
+        "cumtime": 0.222354,
+        "pct_tot": 1.67
+      },
+      {
+        "func": "<method 'append' of 'list' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 1559739,
+        "tottime": 0.166184,
+        "cumtime": 0.166184,
+        "pct_tot": 3.18
+      },
+      {
+        "func": "level",
+        "file": "sic_games/world.py",
+        "lineno": 71,
+        "ncalls": 639180,
+        "tottime": 0.156457,
+        "cumtime": 0.156457,
+        "pct_tot": 2.99
+      },
+      {
+        "func": "_c_prox",
+        "file": "agents/perception.py",
+        "lineno": 59,
+        "ncalls": 638780,
+        "tottime": 0.147495,
+        "cumtime": 0.147495,
+        "pct_tot": 2.82
+      }
+    ],
+    "own": [
+      {
+        "func": "process_step",
+        "file": "sic_games/joint_task.py",
+        "lineno": 71,
+        "ncalls": 200,
+        "tottime": 0.805462,
+        "cumtime": 1.232655,
+        "pct_tot": 15.41
+      },
+      {
+        "func": "build",
+        "file": "agents/perception.py",
+        "lineno": 46,
+        "ncalls": 47698,
+        "tottime": 0.698044,
+        "cumtime": 1.50997,
+        "pct_tot": 13.35
+      },
+      {
+        "func": "compute_utilities",
+        "file": "strategies/carbon.py",
+        "lineno": 63,
+        "ncalls": 47698,
+        "tottime": 0.431554,
+        "cumtime": 0.869705,
+        "pct_tot": 8.26
+      },
+      {
+        "func": "<method 'get' of 'dict' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 2500000,
+        "tottime": 0.268506,
+        "cumtime": 0.268506,
+        "pct_tot": 5.14
+      },
+      {
+        "func": "select_target",
+        "file": "strategies/softmax_base.py",
+        "lineno": 37,
+        "ncalls": 47698,
+        "tottime": 0.239169,
+        "cumtime": 1.228158,
+        "pct_tot": 4.58
+      },
+      {
+        "func": "<method 'append' of 'list' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 1559739,
+        "tottime": 0.166184,
+        "cumtime": 0.166184,
+        "pct_tot": 3.18
+      },
+      {
+        "func": "level",
+        "file": "sic_games/world.py",
+        "lineno": 71,
+        "ncalls": 639180,
+        "tottime": 0.156457,
+        "cumtime": 0.156457,
+        "pct_tot": 2.99
+      },
+      {
+        "func": "_normalize",
+        "file": "strategies/softmax_base.py",
+        "lineno": 13,
+        "ncalls": 95396,
+        "tottime": 0.155971,
+        "cumtime": 0.234297,
+        "pct_tot": 2.98
+      },
+      {
+        "func": "_c_prox",
+        "file": "agents/perception.py",
+        "lineno": 59,
+        "ncalls": 638780,
+        "tottime": 0.147495,
+        "cumtime": 0.147495,
+        "pct_tot": 2.82
+      },
+      {
+        "func": "_moran_W",
+        "file": "sic_games/metrics.py",
+        "lineno": 247,
+        "ncalls": 200,
+        "tottime": 0.140523,
+        "cumtime": 0.145372,
+        "pct_tot": 2.69
+      },
+      {
+        "func": "step",
+        "file": "sic_games/run.py",
+        "lineno": 404,
+        "ncalls": 200,
+        "tottime": 0.133888,
+        "cumtime": 5.639635,
+        "pct_tot": 2.56
+      },
+      {
+        "func": "act_harvest",
+        "file": "agents/base.py",
+        "lineno": 151,
+        "ncalls": 47698,
+        "tottime": 0.129363,
+        "cumtime": 2.929689,
+        "pct_tot": 2.47
+      },
+      {
+        "func": "c_spatial_density",
+        "file": "sic_games/metrics.py",
+        "lineno": 159,
+        "ncalls": 200,
+        "tottime": 0.113174,
+        "cumtime": 0.130616,
+        "pct_tot": 2.17
+      },
+      {
+        "func": "_carbon_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 244,
+        "ncalls": 47160,
+        "tottime": 0.087878,
+        "cumtime": 0.276529,
+        "pct_tot": 1.68
+      },
+      {
+        "func": "<built-in method builtins.sum>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 137009,
+        "tottime": 0.087335,
+        "cumtime": 0.222354,
+        "pct_tot": 1.67
+      },
+      {
+        "func": "step",
+        "file": "sic_games/support_pool.py",
+        "lineno": 72,
+        "ncalls": 200,
+        "tottime": 0.086327,
+        "cumtime": 0.131337,
+        "pct_tot": 1.65
+      },
+      {
+        "func": "<built-in method math.exp>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 768024,
+        "tottime": 0.077309,
+        "cumtime": 0.077309,
+        "pct_tot": 1.48
+      },
+      {
+        "func": "_toroidal_chebyshev",
+        "file": "agents/reproduction.py",
+        "lineno": 45,
+        "ncalls": 115149,
+        "tottime": 0.071827,
+        "cumtime": 0.118002,
+        "pct_tot": 1.37
+      },
+      {
+        "func": "<built-in method builtins.max>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 366277,
+        "tottime": 0.06811,
+        "cumtime": 0.06811,
+        "pct_tot": 1.3
+      },
+      {
+        "func": "w_C_eff",
+        "file": "strategies/carbon.py",
+        "lineno": 57,
+        "ncalls": 95353,
+        "tottime": 0.062188,
+        "cumtime": 0.128986,
+        "pct_tot": 1.19
+      }
+    ]
+  },
+  "profile_b1": {
+    "cum": [
+      {
+        "func": "_wrapped_step",
+        "file": "mesa/model.py",
+        "lineno": 202,
+        "ncalls": 200,
+        "tottime": 0.000461,
+        "cumtime": 29.377877,
+        "pct_tot": 0.0
+      },
+      {
+        "func": "_advance_time",
+        "file": "mesa/model.py",
+        "lineno": 206,
+        "ncalls": 200,
+        "tottime": 0.001483,
+        "cumtime": 29.377293,
+        "pct_tot": 0.01
+      },
+      {
+        "func": "execute",
+        "file": "time/events.py",
+        "lineno": 125,
+        "ncalls": 200,
+        "tottime": 0.000889,
+        "cumtime": 29.373118,
+        "pct_tot": 0.0
+      },
+      {
+        "func": "_execute_and_reschedule",
+        "file": "time/events.py",
+        "lineno": 278,
+        "ncalls": 200,
+        "tottime": 0.001777,
+        "cumtime": 29.371576,
+        "pct_tot": 0.01
+      },
+      {
+        "func": "_do_step",
+        "file": "mesa/model.py",
+        "lineno": 236,
+        "ncalls": 200,
+        "tottime": 0.0515,
+        "cumtime": 29.36155,
+        "pct_tot": 0.19
+      },
+      {
+        "func": "step",
+        "file": "sic_games/run.py",
+        "lineno": 404,
+        "ncalls": 200,
+        "tottime": 0.599825,
+        "cumtime": 29.309502,
+        "pct_tot": 2.16
+      },
+      {
+        "func": "act_harvest",
+        "file": "agents/base.py",
+        "lineno": 151,
+        "ncalls": 162555,
+        "tottime": 0.433935,
+        "cumtime": 10.161401,
+        "pct_tot": 1.56
+      },
+      {
+        "func": "compute_metrics",
+        "file": "sic_games/metrics.py",
+        "lineno": 280,
+        "ncalls": 200,
+        "tottime": 0.332925,
+        "cumtime": 6.87765,
+        "pct_tot": 1.2
+      },
+      {
+        "func": "build",
+        "file": "agents/perception.py",
+        "lineno": 46,
+        "ncalls": 162555,
+        "tottime": 2.419315,
+        "cumtime": 5.295493,
+        "pct_tot": 8.69
+      },
+      {
+        "func": "process_step",
+        "file": "sic_games/joint_task.py",
+        "lineno": 71,
+        "ncalls": 200,
+        "tottime": 3.271566,
+        "cumtime": 4.943636,
+        "pct_tot": 11.76
+      },
+      {
+        "func": "_moran_W",
+        "file": "sic_games/metrics.py",
+        "lineno": 247,
+        "ncalls": 200,
+        "tottime": 4.709767,
+        "cumtime": 4.724628,
+        "pct_tot": 16.92
+      },
+      {
+        "func": "select_target",
+        "file": "strategies/softmax_base.py",
+        "lineno": 37,
+        "ncalls": 162555,
+        "tottime": 0.820469,
+        "cumtime": 4.226726,
+        "pct_tot": 2.95
+      },
+      {
+        "func": "compute_utilities",
+        "file": "strategies/carbon.py",
+        "lineno": 63,
+        "ncalls": 162555,
+        "tottime": 1.47541,
+        "cumtime": 2.990337,
+        "pct_tot": 5.3
+      },
+      {
+        "func": "c_spatial_density",
+        "file": "sic_games/metrics.py",
+        "lineno": 159,
+        "ncalls": 200,
+        "tottime": 2.855111,
+        "cumtime": 2.959874,
+        "pct_tot": 10.26
+      },
+      {
+        "func": "attempt_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 225,
+        "ncalls": 160835,
+        "tottime": 0.042627,
+        "cumtime": 2.539205,
+        "pct_tot": 0.15
+      },
+      {
+        "func": "_carbon_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 244,
+        "ncalls": 160835,
+        "tottime": 0.559303,
+        "cumtime": 2.496578,
+        "pct_tot": 2.01
+      },
+      {
+        "func": "_toroidal_chebyshev",
+        "file": "agents/reproduction.py",
+        "lineno": 45,
+        "ncalls": 1655879,
+        "tottime": 1.031773,
+        "cumtime": 1.698055,
+        "pct_tot": 3.71
+      },
+      {
+        "func": "<method 'get' of 'dict' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 10000000,
+        "tottime": 1.118945,
+        "cumtime": 1.118945,
+        "pct_tot": 4.02
+      },
+      {
+        "func": "<built-in method builtins.sum>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 429426,
+        "tottime": 0.408892,
+        "cumtime": 0.99238,
+        "pct_tot": 1.47
+      },
+      {
+        "func": "morans_i",
+        "file": "sic_games/metrics.py",
+        "lineno": 206,
+        "ncalls": 800,
+        "tottime": 0.356418,
+        "cumtime": 0.808692,
+        "pct_tot": 1.28
+      }
+    ],
+    "own": [
+      {
+        "func": "_moran_W",
+        "file": "sic_games/metrics.py",
+        "lineno": 247,
+        "ncalls": 200,
+        "tottime": 4.709767,
+        "cumtime": 4.724628,
+        "pct_tot": 16.92
+      },
+      {
+        "func": "process_step",
+        "file": "sic_games/joint_task.py",
+        "lineno": 71,
+        "ncalls": 200,
+        "tottime": 3.271566,
+        "cumtime": 4.943636,
+        "pct_tot": 11.76
+      },
+      {
+        "func": "c_spatial_density",
+        "file": "sic_games/metrics.py",
+        "lineno": 159,
+        "ncalls": 200,
+        "tottime": 2.855111,
+        "cumtime": 2.959874,
+        "pct_tot": 10.26
+      },
+      {
+        "func": "build",
+        "file": "agents/perception.py",
+        "lineno": 46,
+        "ncalls": 162555,
+        "tottime": 2.419315,
+        "cumtime": 5.295493,
+        "pct_tot": 8.69
+      },
+      {
+        "func": "compute_utilities",
+        "file": "strategies/carbon.py",
+        "lineno": 63,
+        "ncalls": 162555,
+        "tottime": 1.47541,
+        "cumtime": 2.990337,
+        "pct_tot": 5.3
+      },
+      {
+        "func": "<method 'get' of 'dict' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 10000000,
+        "tottime": 1.118945,
+        "cumtime": 1.118945,
+        "pct_tot": 4.02
+      },
+      {
+        "func": "_toroidal_chebyshev",
+        "file": "agents/reproduction.py",
+        "lineno": 45,
+        "ncalls": 1655879,
+        "tottime": 1.031773,
+        "cumtime": 1.698055,
+        "pct_tot": 3.71
+      },
+      {
+        "func": "select_target",
+        "file": "strategies/softmax_base.py",
+        "lineno": 37,
+        "ncalls": 162555,
+        "tottime": 0.820469,
+        "cumtime": 4.226726,
+        "pct_tot": 2.95
+      },
+      {
+        "func": "step",
+        "file": "sic_games/run.py",
+        "lineno": 404,
+        "ncalls": 200,
+        "tottime": 0.599825,
+        "cumtime": 29.309502,
+        "pct_tot": 2.16
+      },
+      {
+        "func": "<method 'append' of 'list' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 5303671,
+        "tottime": 0.580919,
+        "cumtime": 0.580919,
+        "pct_tot": 2.09
+      },
+      {
+        "func": "level",
+        "file": "sic_games/world.py",
+        "lineno": 71,
+        "ncalls": 2178807,
+        "tottime": 0.569088,
+        "cumtime": 0.569088,
+        "pct_tot": 2.04
+      },
+      {
+        "func": "_carbon_birth",
+        "file": "agents/reproduction.py",
+        "lineno": 244,
+        "ncalls": 160835,
+        "tottime": 0.559303,
+        "cumtime": 2.496578,
+        "pct_tot": 2.01
+      },
+      {
+        "func": "_normalize",
+        "file": "strategies/softmax_base.py",
+        "lineno": 13,
+        "ncalls": 325110,
+        "tottime": 0.527761,
+        "cumtime": 0.794794,
+        "pct_tot": 1.9
+      },
+      {
+        "func": "_c_prox",
+        "file": "agents/perception.py",
+        "lineno": 59,
+        "ncalls": 2178407,
+        "tottime": 0.524216,
+        "cumtime": 0.524216,
+        "pct_tot": 1.88
+      },
+      {
+        "func": "act_harvest",
+        "file": "agents/base.py",
+        "lineno": 151,
+        "ncalls": 162555,
+        "tottime": 0.433935,
+        "cumtime": 10.161401,
+        "pct_tot": 1.56
+      },
+      {
+        "func": "<method 'reduce' of 'numpy.ufunc' objects>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 11600,
+        "tottime": 0.433837,
+        "cumtime": 0.433837,
+        "pct_tot": 1.56
+      },
+      {
+        "func": "<built-in method builtins.sum>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 429426,
+        "tottime": 0.408892,
+        "cumtime": 0.99238,
+        "pct_tot": 1.47
+      },
+      {
+        "func": "morans_i",
+        "file": "sic_games/metrics.py",
+        "lineno": 206,
+        "ncalls": 800,
+        "tottime": 0.356418,
+        "cumtime": 0.808692,
+        "pct_tot": 1.28
+      },
+      {
+        "func": "<built-in method builtins.max>",
+        "file": "~",
+        "lineno": 0,
+        "ncalls": 2504948,
+        "tottime": 0.343265,
+        "cumtime": 0.343265,
+        "pct_tot": 1.23
+      },
+      {
+        "func": "compute_metrics",
+        "file": "sic_games/metrics.py",
+        "lineno": 280,
+        "ncalls": 200,
+        "tottime": 0.332925,
+        "cumtime": 6.87765,
+        "pct_tot": 1.2
+      }
+    ]
+  },
+  "date": "2026-05-28"
+}

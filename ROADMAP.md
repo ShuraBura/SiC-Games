@@ -1,0 +1,495 @@
+# SiC Games — Master Roadmap & Deferred Items
+
+**Last updated:** Stage 5 Complete (2026-05-27)
+**Maintainer:** Claude Code updates this file at the end of every stage or directive.
+**Review protocol:** supervisor reviews this file at the start of every new stage conversation.
+
+---
+
+## ⚠️ CRITICAL DESIGN CONSTRAINTS (read before every stage)
+
+**C and Si are fundamentally different civilizations with different mechanics.**
+Before implementing ANY mechanic, check this table. Assigning a C mechanic to Si
+or vice versa without explicit supervisor approval is a design error.
+
+| Mechanic | C | Si | Notes |
+|---|---|---|---|
+| Decision noise | Status-coupled σ (Cred-driven) | Fixed σ_Si | Core hypothesis |
+| Cred type | Dominance/status from joint tasks | Reciprocal reputation (Stage 5+) | Different economies |
+| Reproduction | Biparental, proximity-based, wealth+Cred modulated | Single-parent fission, wealth-threshold only | NEVER biparental for Si |
+| Support structure | Self + proximity pool + status-mediated (L1+L2+L3) | Self + proximity pool only (L1+L2) | No status component for Si |
+| Trait vector | H_i = [φ,ψ,c1,c2] all active eventually | H_i carried, hooks deferred | Same fields, different activation |
+| ψ_i utility hook | Active (proximity term in utility) | Deferred to Stage 5+ | |
+| Wealth inheritance | λ fraction of mean parent wealth | λ=0 (no inheritance) | Si wealth is earned |
+| HiveMind | N/A | Skeleton only, Stage 7+ | Orthogonal to C mechanics |
+| Newborn Cred | f_C · mean_cred_C | 0 for now (Stage 5+ when Si Cred defined) | |
+
+**BUG HISTORY:** Stage 3.3 incorrectly implemented biparental reproduction for Si agents
+because the ReproductionCoordinator was not C/Si-aware. This was caught but cost a stage.
+Always check the C/Si distinction table above before implementing reproduction mechanics.
+
+---
+
+## Current status
+
+| Stage | Status | Key output |
+|---|---|---|
+| Stage 1 | ✓ Complete | Sugarscape substrate. Gini=0.47, N=250, peaks=63%. seed=42 confirmed. |
+| Stage 2 | ✓ Complete | Carbon decision + joint-task mechanic. κ=2.0 locked. |
+| Stage 2.1 | ✓ Complete | Behavioral mode switch (wealth velocity). v_tau=10, v_0=1.0 locked. |
+| Stage 2.2 | ✓ Complete | Baseline fix (BUG-001). κ sweep. σ_Si=1.051 (later updated). |
+| Stage 3 | ✓ Complete | Bounded-rational Si. f_C=0.25 locked. Newborn/established split added. |
+| Stage 3.1 | ✓ Complete | f_C sweep. f_C=0.25 locked. |
+| Stage 3.2 | ✓ Complete | Status amplification. β=1.0 locked. C** pinned to C*=10.0. |
+| Stage 3.3 | ✓ Complete | Trait vector H_i=[φ,ψ,c1,c2]. Biparental repro for C. Null Si Cred skeleton. |
+| Stage 3.4 | ✓ Complete | 2D scan κ×α. Cell (2,3) selected: κ=2.0, α=2.0, σ_Si=1.238 locked. |
+| Stage 4 | ✓ Complete | Seasonal oscillation A=0.5, T=200. N=250 fixed — no pop-level stress visible. |
+| Stage 4.1a | ✓ Complete | Variable population. Birth/death decoupled. p_max exploratory. |
+| Stage 4.1b | ✓ Complete (patched) | Age-efficiency ramp η(a). η_min=0.3 confirmed. P_max locked: C 0.12, Si 0.14, C seas 0.14, Si seas 0.17. |
+| Stage 4.1c | ✓ Complete (patched) | Proximity support pool. Juv starvation: 0.3% C / 0.0% Si. P_max retuned: C static 0.065, Si static 0.28, Si seasonal 0.35. C seasonal: Allee bistability — deferred. Established starvation FAIL flagged (τ_pool=0.10 too aggressive). Cred pool contribution = 0.0 flagged. Both carry to Stage 4.2. |
+| Stage 4.2 | ✓ Complete | τ_pool=0.05 locked (design tension — dual N-equilibrium role, see notes). γ=0.2 locked (Cred-modulated birth). BUG-003 fixed (cred_pool_contribution: 0→3.65/step). Seasonal sweep 8 runs. H1(ii): C collapses at T=200 (Allee+trough duration), survives T=100/T=50; Si survives all. Period-dependent bistability is primary finding. λ=0 (wealth inheritance) deferred to 4.3. Output: `outputs/stage42_seed42/`. |
+| Stage 4.3 | ✓ Complete | Si differential metabolism β=2.0 (grid-calibrated; blueprint β=5 infeasible on max_sugar=4 grid). Si dormancy mechanic (τ_trickle=0.3, k_reactivate=3.0, t_dormant_max=50). Pool carry-over ρ=0.3 + cap k=20. Per-agent death_events.parquet. ψ_i quartile analysis: flat distribution (Q25 flagged). T*∈(100,112). H1(ii) MIXED: Si 3/4 survived (A=0.5 all T; A=0.75 T=200 collapse), C 0/4. Locked: p_max_C=0.07, p_fission_Si=0.15. Output: `outputs/stage43_seed42/`. |
+| Stage 4.4 | ✓ Complete | β_Si=5.0 restored (grid rescaled k=4: max_sugar=16, α=4). λ=0.1 C wealth inheritance active. ψ redesigned: Beta(2,2) + c_proximity(r_pool=5). 8-run seasonal sweep: Si survives all conditions; C collapses all conditions (Allee bistability — see Diagnostic). H1(ii) result: Si-dominant. Locked: k_grid=4, p_fission_Si=0.065, p_max_C=0.03 (best effort). Output: `outputs/stage44_seed42/`. Report: `outputs/stage44_seed42/report.html`. |
+| Stage 4.4 Diag | ✓ Complete | Factorial Run A/B/C/D (pool×λ) to diagnose C null control failure at k=4. Spatial diagnostic (pct_isolated_C, mean_nearest_C_dist) added to metrics. **Finding: Hypothesis A (Allee dispersal) RULED OUT** — pct_isolated_C=4.9% (threshold 40%). **Hypothesis B (birth-rate/age-out) CONFIRMED.** C is bistable at k=4: p≤0.05 → collapse (age-out faster than births); p≥0.07 → explosion (N~1600, no carrying-capacity ceiling). No p_max gives stable N∈[150,400]. Root cause: k=4 grid (max_sugar=16) eliminates resource competition — agents never starve, so no natural N ceiling. Pool and λ do not change the outcome (Run D replicates Stage 4.4 failure). **Recommended action: density-dependent birth suppression for Stage 4.5 (carrying-cost redesign).** Output: `outputs/stage44_diag_seed42/`. Report: `outputs/stage44_diag_seed42/report_diag.html`. |
+| Stage 4.4 k=3 Feasibility | ⚠ Si Fail | k=3 Si population explosion + dorm_rate>20%: p=0.28:28%(bomb) p=0.35:32%(bomb) p=0.2:23%(bomb). k=4 minimum confirmed. |
+| Stage 4.5 Task 0 | ⚠ T0 fail | carry_discount N_carry=400 alpha=1.0. p_bare=None. p_final=None. Tasks 2-4 pending (historical intermediate note). |
+| Stage 4.5 | ✓ Complete | Carrying-cost birth ceiling. H_cc pre-registered. T*(C)>500, T*(Si)∈(68,87) at A=0.75. Seasonal sweep 10 runs. report_45.html. |
+| Stage 5 | ✓ Complete (2026-05-27) | Multi-seed ensemble (30 rows). A=0.9 sweep. Si T* tightened to (68,87). Si Cred activated. ψ co-evolution 3000-step probe. **H1(ii) ROBUST: C 5/5 vs Si 0/5 at A=0.75.** report_stage5.html. |
+| Stage 5.1 | ✓ Complete (2026-05-28) | Si Cred redesign: near-dormancy accumulation replaces surplus-based. accumulation_rate (r_cred_Si) retired; k_cred_band=1.0 locked. Counter-cyclicality gate PASSED both seeds (trough/peak: 1.13/0.49 seed=42, 1.58/0.66 seed=43). Null control gate PASSED (N_mean=335, dorm=4.9%, perm_deaths=0). 207 tests. report.html in outputs/stage51_sicred_redesign/. |
+| Stage 5.2 | ✓ Complete (2026-05-29) | Cultural dynamics: c2 defection (def_rate=3.74%, N stable), Deffuant updating (all 3 equiv gates PASS), sigma_inherit sweep (sigma*=0.10). Cell B: Deffuant partially re-collapses psi diversity. psi co-evolution viable at sigma*=0.10 but Deffuant is a contracting force. 233 tests. report.html in outputs/stage52_cultural/. |
+| R0 confound check | ✓ Complete (2026-06-02, supervisor-approved) | Seasonal-at-scale confound + marginal-distance diagnostic on 100×100/N_carry=4100, 12k/3-seed. Task 0 gate PASS (seasonal fires: CV≈0.42, trough phase-aligned at T/2). Task 1: settled≈2399 and est_starv=0.0000 PASS cleanly → **confound CLOSED on the est_starv=0.000 basis** (calibration confirmed STATIC). rel_std=0.0194 exceeded the old tolerance by ~2%; resolved as a **baseline correction** (old 0.014 was a single-run value with no distribution → corrected to 3-seed static rel_std≈0.019; tolerance widened ±0.005→±0.007). NOT a clean 3/3 match — confound closed on est_starv, with this minor rel_std caveat. **Headline: R1-LEADS** — est_starv rises 0.0000(static)→0.0000(A=0.5)→**0.0612(A=0.75, 3 seeds)**, monotonic threshold/cliff (only the deep trough engages mortality); D1 5th-pctile drops to ≈3.4 steps-to-starvation at trough and recovers at peak (margins breathe — rules out the buffered third outcome). Seasonal trough RESTORES resource-driven mortality at scale → design-doc spine leads with R1 (terrain); R2 (resource-lifetime) becomes enrichment. Diagnostic only — nothing locked changed; H1(ii) verdict untouched. report_r0.html. |
+| Stage 6.0a | ✓ Substrate built (2026-06-04) | Multi-occupancy substrate: cells hold many agents (K_cell ceiling), harvest resource-SPLIT (even κ=0 + Cred/φ contest κ>0), diffusion movement (von-Neumann r=1, per-capita-yield utility, neutral affinity/crowd hooks), ψ re-pointed to occupancy (held neutral), consumer ports (JT cohort, partner search → same-cell, offspring-on-parent-cell). **Recovery gate §7.1 PASS bit-identical** (K_cell=1/legacy → legacy model, 1e-9/integer/positions exact). §7.2 behavioural: C viable both κ (settles ~1080/1150), self-limiting; **density 0.0011 p/km² ~100× below ethnographic target → calibration flag** (reported to supervisor); no Matthew-runaway (Cov(φ,wealth)≈−0.11). 250 tests. Substrate opt-in (default off → legacy untouched). §8 report/docs pending density-flag review. |
+| Stage 6.0a-perf | ✓ Complete (2026-06-05) | Substrate perf reconnaissance (named exception — report IS deliverable). Cost surface across grid/N/occupancy; two-tier cutoff; flushed logs; 5 plausibility rails. Findings: N-exponent ≈1 (linear), grid-cells ≈0 (sub-dominant), **occupancy is the wall** (feasible ≤~2.3/cell; >~2.5/cell hard-infeasible via legacy JT-cohort O(grid×occ×cohort) blowup). Affordable ≤~300ms: low-occ N≤~10k @100×100 (≤~3–4k with O(N²) diagnostics on). **Proto-ag density NOT reachable on Python path** → needs array-restructuring + JT redesign + diagnostic subsampling (forward assessment, analysis only). Added `runtime_monitor` (wall-vs-CPU suspension detector). 256 tests. report_stage6_0a_perf.html. |
+| Stage 5.3 | ⏳ Pending | Terrain topography (6.0b — stands on the 6.0a substrate). |
+| Stage 5.x | ⏳ Pending | Full nD LHS scan (pyDOE2). c1/c2 hooks. Extended ψ co-evolution. Inter-pool connectivity. |
+| Stage 6 | ⏳ Pending — ⚠ NAMESPACE FLAG | "Statistical framework" entry is STALE: the resource-ecology arc (6.0a substrate, 6.0a-perf, 6.0b terrain) has taken over the Stage 6 number. The statistics framework needs renumbering to wherever statistics now belongs. **Flagged for supervisor resolution — not auto-renumbered.** |
+| Stage 7+ | ⏳ Pending | Heuristic drift, HiveMind, biparental for Si (if designed), full 100-world run. |
+
+---
+
+## Locked parameters (do not change without supervisor approval)
+
+| Parameter | Value | Locked at | Rationale |
+|---|---|---|---|
+| κ | 2.0 | Stage 2.2 | κ sweep |
+| σ_Si | 1.238 | Stage 3.4 | Recalibrated to cell (2,3) mean_sigma |
+| σ_base | 0.5 | Stage 2 | Default, not yet swept |
+| C* | 10.0 | Stage 2 | Default, not yet swept |
+| C** | 10.0 (=C*) | Stage 3.2 | Pinned — see deferred Q11 |
+| δ (Cred decay) | 0.01 | Stage 2 | Default, not yet swept |
+| α (Matthew power) | 2.0 | Stage 3.4 | 2D scan cell (2,3) |
+| ε (Laplace smoothing) | 0.01 | Stage 2 | Default |
+| velocity_tau | 10 | Stage 2.1 | Mode switch EMA window |
+| velocity_scale v_0 | 1.0 | Stage 2.1 | Mode switch sigmoid scale |
+| f_C | 0.25 | Stage 3.1 | f_C sweep |
+| β (status amplification) | 1.0 | Stage 3.2 | β sweep |
+| σ_inherit | 0.05 | Stage 3.3 | Biparental copy-error noise |
+| parent_radius r | 3 | Stage 3.3 | Proximity for parent selection |
+| τ_pool | 0.10 → 0.05 (design tension) | Stage 4.1c / Stage 4.2 | Pool contribution rate. Criterion 4 still fails at 0.05: τ_pool is entangled with N equilibrium (dual role: pool buffer + N suppressor). Cannot reduce independently without C Allee collapse or Si N overshoot. Full resolution deferred to Stage 4.3. |
+| γ (Cred-modulated birth, C only) | 0.2 | Stage 4.2 | P_birth_C × (1 + γ·tanh(𝒞/C***)); C***=C*=10.0. Boost mean ≈1.09 at steady state. No Cred runaway (growth <2%/100 steps). |
+| P_max_C (with pool τ=0.05, γ=0.2) | 0.07 | Stage 4.2 | Re-tuned: 0.075 overshoots with γ active; 0.07 → N∈[201,303] PASS. |
+| P_fission_Si (with pool τ=0.05) | 0.24 | Stage 4.2 | Reduced from 0.28: pool drain reduced → Si overshoots; 0.24 achievable without resolving design tension. |
+| β_Si (Si differential metabolism) | **5.0** | Stage 4.4 | Restored from Stage 4.3 interim β=2. Grid rescaled to k=4 (max_sugar=16) makes β=5 viable: mean Si harvest ~10–15/step vs cost_mean=12.5/step. Dormancy handles metabolic shortfall. Stage 4.3 β=2 was a grid workaround only. |
+| k_grid (grid scale factor) | 4 | Stage 4.4 | max_sugar=4×k=16, α=k=4. Minimum k where β=5 Si null control passes (N_active=[174,364], dorm_rate=5.1%). k=3 and below: Si permanent dormancy. |
+| p_fission_Si (Stage 4.4, β=5, k=4) | 0.065 | Stage 4.4 | N_active=[174,364], dorm_rate=5.1%, perm_dorm=0.0. Passes all gates. |
+| p_max_C (Stage 4.4, k=4) | 0.03 | Stage 4.4 | Best-effort: C null control FAILS all p values at k=4 (Allee bistability). 0.03 chosen as anchor for downstream tasks. Full resolution requires Stage 4.5 carrying-cost redesign. |
+| λ (C wealth inheritance) | 0.1 | Stage 4.4 | w_child += λ × mean_w_C at C birth. C-only; λ=0 for Si always. Default confirmed from Stage 4.1a; 0.1 activated in Stage 4.4. |
+| ψ distribution | Beta(2,2) + c_proximity(r_pool=5) | Stage 4.4 | Redesigned from Normal(0.5,0.2) + d=1 neighbor_count. Beta(2,2): std≈0.22 (vs ≈0.10 clipped Normal). c_proximity: C agents within Chebyshev r_pool=5 precomputed via c_prox_grid each step. |
+| P_fission_Si (Stage 4.3, β=2, dormancy enabled) | 0.15 | Stage 4.3 | Retuned: β=2 dynamics require lower p_fission than Stage 4.2's 0.24. Lower p needed due to larger equilibrium N at β=2. N_active=[285,404], dorm_rate=53% at quasi-static. |
+| τ_trickle (dormancy passive absorption) | 0.3 | Stage 4.3 | Blueprint specified 0.05; raised to 0.3 so dormant agents recover on partially-depleted cells. At max cell (sugar=4): 1.2/step, sufficient for all metabolisms to reactivate within t_dormant_max=50. |
+| ρ_carryover (pool carry-over fraction) | 0.3 | Stage 4.3 | Granary mechanism: pool_t+1 = 0.3×leftover_t + contributions. Intended to shift T* upward; instead T* narrowed (100,200)→(100,112) due to higher baseline C stress. |
+| k_pool_cap (pool cap multiplier) | 20.0 | Stage 4.3 | Cap = 20 × N_active_C × mean_metabolism. Non-limiting at observed N (~12,500 at N=250). Prevents unbounded accumulation. |
+| N_carry (C carrying capacity, 50×50) | 400 | Stage 4.5 | carry_discount(N_C)=max(0,1−N_C/N_carry). Counter-cyclical: as N_C falls, birth rises. Scale-setting calibration (numerical-stability band top), not ecological estimate. |
+| N_carry (C carrying capacity, 100×100) | 4100 | OWE-1.1 (2026-05-31) | Calibrated so settled N ≈ 2357 (target band 2000–3000) for ~20–60 ethnographic bands. Measured map: settled ≈ 0.754·N_carry − 566. Clean settle, est_starv=0. H1(ii) re-confirm pending (OWE-14). |
+| alpha_carry | 1.0 | Stage 4.5 | Linear discount. Confirmed non-linear alternatives unnecessary at current N range. |
+| p_max_C_bare | 0.11 | Stage 4.5 | C null control without pool/λ (carrying_cost only). Tuned in Stage 4.5 Task 0. |
+| p_max_C_final | 0.12 | Stage 4.5 | C final config with pool+λ+carrying_cost. Supersedes earlier Stage 4.2 (0.07) and Stage 4.4 (0.03) values for Stage 4.5+ runs. |
+| T*_C_A075 | > 500 | Stage 4.5 patch | C critical period at A=0.75. Binary search upper bound (C survived through end of sweep). Counterpart to Si T* ∈ (68,87). |
+| r_cred_Si (Si Cred accumulation rate) | **RETIRED** | Stage 5.1 | Replaced by binary near-dormancy trigger (k_cred_band). Parameter removed from SiCredConfig. |
+| k_cred_band (Si Cred near-dormancy band) | 1.0 | Stage 5.1 | Δsi_cred=1 if wealth ∈ [k_dormant, k_dormant+k_cred_band)×cost_i, else 0. Counter-cyclical gate PASSED both seeds at k=1.0. |
+| kappa_Si (Si σ modulation) | 0.5 | Stage 5 Task 3 | σ_Si_eff = σ_Si + κ_Si × tanh(si_cred/C*_Si). Smaller than C's κ=2.0 (no joint-task amplification). |
+| C*_Si (Si Cred ceiling) | 10.0 | Stage 5 Task 3 | Matches C*. si_cred clamped to [0, C*_Si]. |
+| Si T* (critical period at A=0.75) | (68, 87) | Stage 5 Task 2 | Binary search: T=125→C, T=87→C, T=68→S. Width=19≤25. C T*>500. |
+| c2_defection.enabled | True (verified stable) | Stage 5.2 Task 1 | defection_rate=3.74% at steady state; N∈[150,400] ✓ |
+| deffuant.epsilon | 0.2 | Stage 5.2 Task 2 | Confidence bound for cultural updating |
+| deffuant.mu | 0.3 | Stage 5.2 Task 2 | Base convergence rate |
+| deffuant.cred_weight | relative | Stage 5.2 Task 2 | w = cred_j / (cred_i + cred_j + eps_div) |
+| sigma_inherit (sigma_inherit*) | 0.10 | Stage 5.2 Task 3 | Lowest value sustaining Gini(psi) ≥ 0.15 in ≥1 seed with Deffuant OFF. Raised from 0.05 (Stage 3.3). |
+
+---
+
+## Population mechanics (PM) — full tracker
+
+### Implemented (C)
+- [x] Greedy decision (Stage 1)
+- [x] Softmax with Cred-coupled σ: σ_i = σ_base + κ·tanh(𝒞_i/C*) (Stage 2)
+- [x] φ_i born-trait in H_i vector (Stage 2, extended Stage 3.3)
+- [x] Cred state 𝒞_i with decay δ (Stage 2)
+- [x] Joint-task mechanic, Matthew partition α=2.0 (Stage 2, α updated Stage 3.4)
+- [x] Behavioral mode switch: w_C modulated by wealth velocity (Stage 2.1)
+- [x] Newborn Cred endowment f_C=0.25 (Stage 3)
+- [x] Status amplification β=1.0: w_C = φ·(1+β·tanh(𝒞/C**))·sigmoid(v/v_0) (Stage 3.2)
+- [x] Trait vector H_i = [φ_i, ψ_i, c1_i, c2_i] (Stage 3.3)
+- [x] ψ_i proximity utility term: U += ψ_i · N_hat_ij (Stage 3.3)
+- [x] Biparental reproduction: proximity r=3, arithmetic mean + noise σ_inherit (Stage 3.3)
+- [x] Wealth inheritance λ: w_child = w_floor + λ·mean(w_A, w_B) (Stage 4.1a — λ=0 default)
+
+### Implemented (Si)
+- [x] BoundedRationalSi with fixed σ_Si=1.238 (Stage 3, updated Stage 3.4)
+- [x] Trait vector H_i carried and inherited (Stage 3.3) — hooks INACTIVE
+- [x] Null Si Cred skeleton: si_cred field, config block, enabled=false (Stage 3.3)
+- [x] ReproductionCoordinator protocol with HiveMind skeleton (Stage 4.1a)
+- [x] Single-parent fission reproduction: wealth-threshold, near-copy + noise (Stage 4.1a)
+
+### Implemented — C (Stage 4.1x / 4.2)
+- [x] Variable population — birth/death decoupled (Stage 4.1a)
+  - DTM-based unimodal birth probability: P_birth(w_i) — wealth-dependent
+  - Reproductive age window [a_rep_min, a_rep_max]
+  - Population collapse to zero allowed — no N_min floor
+- [x] Age-efficiency ramp η(a) — Cobb-Douglas motivated (Stage 4.1b)
+  - η_min=0.3 at birth (juvenile), linear ramp to 1.0 at a_forage_min≈15
+  - η=1.0 during active adult phase
+  - η_old=0.4 at death, linear decline from a_forage_max=τ_max-10
+  - Asymmetric: elder decline shallower than juvenile ramp (skill retention)
+  - Literature: Gurven & Kaplan (2006) Cobb-Douglas P(x)=S(x)^α·K(x)^β
+- [x] Proximity support pool (τ_parent=0.10, τ_pool=0.05, k_reserve=5, k_draw=3). Stage 4.1c / Stage 4.2 recalibration.
+  - BUG-003 FIXED (Stage 4.2): `agent._cred_scale` was always missing → tanh=0 → zero above-base Cred pool contribution for all 4.1c runs. Fixed: read from `agent._decision.cred_scale`. cred_pool_contribution: 0.0 → 3.65/step.
+  - Criterion 4 (established starvation): still fails at τ_pool=0.05 — τ_pool is dual regulator (pool buffer + N equilibrium suppressor). Deferred to Stage 4.3.
+- [x] Cred-modulated birth: P_birth_C × (1 + γ·tanh(𝒞/C***)). γ=0.2. Stage 4.2.
+  - C only (NEVER Si). C***=C*=10.0. New metric: gamma_birth_boost (mean birth factor per step).
+  - γ boost mean ≈1.09 at steady state; no Cred runaway detected.
+
+### Implemented — Si (Stage 4.1x / 4.2 / 4.3)
+- [x] Single-parent fission birth rule (Stage 4.1a)
+  - Wealth-threshold only: w_i > θ_fission → reproduce with P_fission
+  - Near-copy: offspring H_i = parent H_i + ε, all non-trait attributes fresh
+  - No Cred modulation — Si reproduction is purely individual
+- [x] Si proximity support pool (Stage 4.1c)
+  - Same Level 1+2 as C (self-support + proximity pool)
+  - NO Level 3 (no status-mediated component)
+  - Reciprocal only: contribution history determines support priority
+  - This is the foundation for Si Cred economy (Stage 5+)
+- [x] Si differential metabolism β=2.0 (Stage 4.3)
+  - ScaledMetabolicCost(beta=2.0) in agents/costs.py — not hardcoded in BaseAgent
+  - C metabolism unchanged (β=1.0). β is a free parameter; sweep {2,5,10} in Stage 4.4.
+- [x] Si dormancy mechanic — replaces starvation death (Stage 4.3)
+  - Triggered: wealth < k_dormant×metabolism. Agent suspends instead of dying.
+  - Passive trickle absorption: τ_trickle×cell_sugar/step. Does NOT consume cell sugar.
+  - Reactivation: wealth ≥ k_reactivate×metabolism. Permanent death: >T_dormant_max steps.
+  - Parameters: k_dormant=1.0, τ_trickle=0.3, k_reactivate=3.0, T_dormant_max=50.
+  - C agents NEVER use dormancy (always starvation death).
+- [x] Si η=1.0 (no juvenile ramp) — Stage 4.3
+  - η(a) age-efficiency ramp is C-only from Stage 4.3. Si fission offspring start at η=1.0.
+  - _use_eta=False for all Si agents regardless of life_history config.
+- [x] Per-agent death_events.parquet (Stage 4.3)
+  - Schema: step, cause, age, wealth, psi, cred, agent_type, season_phase, dormancy_duration
+  - Causes: starvation, senescence, permanent_dormancy. psi/cred NaN for Si.
+- [x] Si Cred economy — near-dormancy accumulation, counter-cyclical (Stage 5.1)
+  - Stage 5 (surplus-based): si_cred_i += max(0, harvest−cost) × r_cred_Si — was PRO-CYCLICAL (cred fell in troughs)
+  - Stage 5.1 (near-dormancy): Δsi_cred=1 if wealth ∈ [k_dormant, k_dormant+k_cred_band)×cost_i else 0 — COUNTER-CYCLICAL
+  - σ_Si_eff_i = σ_Si + κ_Si × tanh(si_cred_i / C*_Si) — unchanged (high-Cred agents more explorative)
+  - Null control (Stage 5.1): N_mean=335, dorm=4.9%, si_cred_mean=0.97, σ_eff_mean=1.28 (>σ_Si=1.238) ✓
+  - Counter-cyclicality gate PASSED: trough/peak = 1.13/0.49 (seed=42), 1.58/0.66 (seed=43)
+  - Si still collapses at A=0.75 T=200 (H1(ii) inversion structural — dormancy cliff)
+  - H1(ii) inversion is structural (dormancy cliff), not a model artifact from missing Cred
+- [ ] Si ψ_i utility hook (Stage 5+)
+  - Currently ψ_i carried but inactive for Si
+  - Si sociability has different meaning: proximity to known-good foraging spots
+    not proximity to other agents
+- [ ] Si HiveMind reproduction coordinator (Stage 7+)
+  - Skeleton already in ReproductionCoordinator protocol
+  - Population-level collective reproduction decision
+  - Config: reproduction.coordinator="hivemind"
+  - Raises NotImplementedError until implemented
+  - Orthogonal to C mechanics — Si-only
+
+### Pending — both C and Si (Stage 4+)
+- [ ] c1_i behavioral hook: conformism→individualism axis (Stage 4+)
+  - Currently carried and inherited, not behaviorally active
+  - Hook: c1_i affects cultural transmission probability (Deffuant updating)
+  - Low c1 (conformist): copies nearby agents' traits more readily
+  - High c1 (individualist): resists copying, drifts independently
+  - Klemm prediction: C civilization bimodal c1 distribution at steady state
+- [ ] c2_i behavioral hook: cooperation→competition axis (Stage 4+)
+  - Currently carried and inherited, not behaviorally active
+  - Hook: c2_i modulates joint-task strategy
+  - Low c2 (cooperative): seeks joint tasks even at personal resource cost
+  - High c2 (competitive): defects from joint tasks when solo harvest > Matthew share
+  - Prerequisite for defection/criminal emergence mechanics (Stage 6+, TMTS now)
+- [ ] Deffuant-style bounded confidence cultural updating (Stage 4+)
+  - Agents update cultural traits toward neighbors within confidence bound
+  - For C: weighted by Cred (prestige bias — Boyd & Richerson)
+  - For Si: unweighted (egalitarian)
+  - Literature: Deffuant et al. (2000), Hegselmann & Krause (2002)
+- [ ] Prestige bias in cultural transmission (Stage 4+)
+  - C agents preferentially copy high-Cred neighbors' traits
+  - Connects Cred economy to cultural evolution
+  - Literature: Boyd & Richerson (1985) ch.5
+- [ ] Generational oscillation in cultural trait mean T(t) (Stage 5+)
+  - Intergenerational transmission with reactive bias
+  - Offspring partially react against parent extremes → damped oscillation
+  - Literature: Turchin secular cycles
+- [ ] Heuristic drift of φ_i (Stage 5+)
+  - Cultural transmission with copy-error across generations
+  - Needs high turnover (perturbations) to produce interpretable signal
+- [ ] β as per-agent born-trait (Stage 7+)
+  - Currently population-uniform
+- [ ] C** as independent parameter from C* (deferred Q11)
+  - Evaluate after Stage 4 data
+
+---
+
+## World mechanics (WM) — full tracker
+
+### Implemented
+- [x] 50×50 toroidal grid, twin sugar peaks (Stage 1)
+- [x] Growback rule G_α, α=1 (Stage 1)
+- [x] Replacement rule R — being replaced by variable population (Stage 4.1a)
+- [x] Joint-task detection: proximity-based, d=1, capacity threshold=4 (Stage 2)
+- [x] WorldPerturbation protocol: NullPerturbation, SeasonalOscillation (Stage 4)
+- [x] effective_capacity field on World (Stage 4)
+
+### Pending — Stage 4.1+
+- [ ] Variable population dynamics (Stage 4.1a)
+  - Fixed N=250 constraint removed
+  - Population can collapse to zero under extreme stress
+  - Season-by-season N(t) becomes primary H1(ii) diagnostic
+
+### Implemented — Stage 4.2
+- [x] Seasonal amplitude × period sweep: A∈{0.5,0.75} × T∈{50,100,200} + null controls (8 runs). Stage 4.2.
+  - H1(ii) primary finding: C collapses at T=200 (Allee+100-step trough), survives T=100/T=50. Si survives all.
+  - Period-dependent bistability: C's Allee mechanism is a period-selective vulnerability, not a general weakness.
+
+### Implemented — Stage 4.3 (pool)
+- [x] Pool carry-over ρ=0.3: pool_t+1 = ρ×leftover_t + contributions_t+1 (Stage 4.3)
+  - _balance persistent in SupportPool across steps
+  - ρ=0 recovers Stage 4.1c behaviour exactly
+  - Effect: T* narrowed (100,200)→(100,112); higher baseline C stress offset the buffering
+- [x] Pool cap k_pool_cap=20: cap = k×N_active_C×mean_metabolism_C (Stage 4.3)
+  - Available-room approach in contribution loop
+  - Non-limiting at observed N; prevents unbounded peak accumulation
+
+### Pending — Stage 4.4+
+- [ ] β sweep {2,5,10} for Si differential metabolism (Stage 4.4). β=2 grid-calibrated in 4.3; sweep to establish sensitivity.
+- [ ] λ>0 wealth inheritance (C only). (λ=0 default confirmed in 4.1a; deferred from 4.3.)
+- [ ] τ_pool architectural tension resolution. (Deferred from 4.3.)
+- [ ] Amplitude asymmetry sweep: longer trough than peak. (Deferred from 4.3.)
+- [ ] ψ_i hook redesign (Q25): flat quartile distribution found in Stage 4.3; ψ redesign required.
+- [ ] Mobile resources (Stage 4.4)
+- [ ] Scheduled shocks (Stage 4.4)
+
+### Pending — Stage 5+
+- [ ] Inter-pool connectivity / exchange (Stage 5+)
+  - Weak connectivity between proximity pools
+  - Foundation for inter-group trade mechanics
+  - TMTS until pool mechanics validated in Stage 4.1c
+- [ ] Connectivity sweep: Pangea ↔ Archipelago axis (Stage 5)
+- [ ] Multi-world batch runner (Stage 5)
+  - BatchRunner, Common-random-numbers (CRN) method
+
+### Pending — Stage 6
+- [ ] Statistical framework
+  - Pre-registered metrics, effect sizes, power analysis
+
+---
+
+## Life history mechanics — design decisions record
+
+These are design decisions made in conversation that must not be re-litigated or
+accidentally implemented differently.
+
+### Age windows
+- **Reproductive window** [a_rep_min, a_rep_max]: who can produce offspring
+  - a_rep_min ≈ 15 steps, a_rep_max = τ_max - 10 steps
+- **Active foraging window** [a_forage_min, a_forage_max]: full harvest efficiency
+  - a_forage_min ≈ 15 steps, a_forage_max = τ_max - 10 steps
+  - Outside this window: harvest at η(a) < 1 per Cobb-Douglas curve
+- These are TWO SEPARATE windows, not one. Reproductive senescence ≠ foraging senescence.
+
+### Birth rate model
+- DTM-based unimodal wealth-dependent function
+- Three regimes: starvation floor (P=0), stress zone (P=P_max), prosperity zone (declining)
+- Thresholds relative to mean population wealth, not absolute values
+- C birth additionally modulated by Cred (Turchin elite overproduction term γ)
+- Literature: Thompson-Notestein DTM, Turchin (2003), Sugarscape fertility ABM (arxiv 2406.13816)
+
+### Support structure
+- Three levels: (1) self, (2) proximity pool, (3) status-mediated (C only)
+- Pool is local (radius r=3), independent per cluster
+- Si: levels 1+2 only. No status component. Reciprocal priority for support.
+- C: levels 1+2+3. High-Cred agents contribute more and earn Cred for it.
+- Inter-pool connectivity: TMTS, Stage 5+
+
+### Secular cycles prediction (Turchin)
+- C civilizations should show more pronounced boom-bust cycles than Si
+- Mechanism: Cred-amplified reproduction → elite overproduction → resource compression → crisis → reset
+- Si civilizations: smoother dynamics (wealth-only reproduction, reciprocal not dominance Cred)
+- Testable in Stage 4.2+ with variable population and amplitude sweep
+
+---
+
+## Open design questions (unresolved)
+
+| Q | Topic | Status |
+|---|---|---|
+| Q6 | Cred_bonus_per_participant scaling | TBD — scale with cell capacity or sugar harvested? Stage 4+. |
+| Q11 | C** independent from C* | Deferred. Evaluate after Stage 4 data. |
+| Q15 | Amplitude A sweep values | Stage 4.2: {0.5, 0.75} |
+| Q16 | Period T sweep values | Stage 4.2: {50, 100, 200} |
+| Q17 | Asymmetry of seasonal cycle | Stage 4.2 |
+| Q18 | c1/c2 behavioral hooks design | Stage 4+ after c1/c2 Deffuant design |
+| Q19 | Prestige bias strength parameter ω | Stage 4+ |
+| Q20 | γ (Cred-modulated birth rate) value | ✓ Resolved Stage 4.2: γ=0.2 locked. Mean boost ≈1.09. Sweep to Stage 5+. |
+| Q21 | λ (wealth inheritance fraction) | Default λ=0 confirmed. Sweep Stage 4.3 (C only). |
+| Q22 | τ_pool recalibration | ✓ Partial resolution Stage 4.2: τ_pool halved 0.10→0.05. Criterion 4 still fails — design tension (dual regulator role). Full resolution deferred to Stage 4.3. |
+| Q28 | H1(ii) test at T=200 — C vs Si seasonal resilience | ✓ Stage 4.3 revised finding: C collapses all 4 seasonal conditions (A=0.5 and 0.75, T=50/100/200). Si survives 3/4 (A=0.5 any T; A=0.75 T=200 collapses). H1(ii) MIXED: Si dominates at moderate amplitude regardless of period; both collapse at high amplitude+long period. Stage 4.2 result superseded (equal-metabolism confound corrected). |
+| Q29 | ψ_i starvation quartile analysis | ✓ Stage 4.3: flat distribution across quartiles. Deaths perfectly split 25/25/25/25% across ψ quartiles. No mortality selection by ψ. Flagged for ψ redesign (Q25). |
+| Q30 | β_Si calibration — what value is scientifically valid? | Stage 4.3: β=5 (blueprint) infeasible on max_sugar=4 grid. β=2 locked as Stage 4.3 value. Sweep {2,5,10} planned Stage 4.4. Larger β requires grid parameter co-design. |
+| Q31 | T* narrowed under ρ=0.3 — unexpected fragility of Stage 4.3 C | T* narrowed from (100,200) to (100,112) despite pool carry-over. Root cause: higher baseline C starvation (est_starv=2.19 vs ~0.5 Stage 4.2) likely from η-ramp young-adult starvation. Investigate in Stage 4.4. |
+| Q32 | C bistability at k=4 — no stable N∈[150,400] achievable | Stage 4.4 Diagnostic: k=4 grid eliminates resource competition (max_sugar=16 → agents never starve at any N). Without a natural carrying-capacity ceiling, C is bistable: p≤0.05 → Allee collapse; p≥0.07 → explosion to N~1600. Solution requires density-dependent birth suppression (births decline as N approaches carrying capacity K). Design options: (a) logistic birth multiplier (1−N/K), (b) per-cell competition penalty, (c) resource-depletion ceiling at k=4. Decide at Stage 4.5. |
+| Q23 | θ_birth thresholds | DTM-motivated, relative to mean wealth |
+| Q24 | Si Cred accumulation mechanism | Literature search pending Stage 5+ |
+| Q25 | Si ψ_i meaning | "Proximity to good foraging spots" not "proximity to agents" |
+| Q26 | HiveMind coordination mechanism | Design pending Stage 7+ |
+| Q27 | Defection/criminal emergence | Requires c2 hook active. TMTS. Stage 6+. |
+
+---
+
+## Architecture hooks — built and pending
+
+| Hook | Status | Where | Stage |
+|---|---|---|---|
+| `WorldPerturbation` protocol | ✓ Built | world_perturbation.py | Stage 4 |
+| `ReproductionCoordinator` protocol | ✓ Built skeleton | reproduction.py | Stage 4.1a |
+| HiveMind coordinator stub | ✓ Built skeleton (Si only) | reproduction.py | Stage 4.1a |
+| `BatchRunner` for multi-world runs | ⏳ Pending | batch.py | Stage 5 |
+| Common-random-numbers RNG | ⏳ Pending | batch.py | Stage 5 |
+| c1/c2 behavioral hook points | ⏳ Pending | carbon.py, si_bounded.py | Stage 4+ |
+| Deffuant update protocol | ⏳ Pending | cultural.py (new) | Stage 4+ |
+| Inter-pool exchange protocol | ⏳ Pending | support_pool.py | Stage 5+ |
+
+---
+
+## Known bugs and data integrity notes
+
+| ID | Description | Resolution |
+|---|---|---|
+| BUG-001 | Stage 2 pre-patch baseline overwritten. Three key values hardcoded as _S2_PRE_SWITCH. | Load confirmed baselines from parquet always. |
+| BUG-002 | Stage 3.3 incorrectly applied biparental reproduction to Si agents. Si agents should use single-parent fission. | Fixed in Stage 4.1a. ReproductionCoordinator is now C/Si-aware. Always check C/Si distinction table before implementing reproduction mechanics. |
+| BUG-003 | `support_pool.py`: Cred-scaled pool contribution used `agent._cred_scale` (never existed on BaseAgent). `hasattr()` always returned False → tanh factor = 0 → zero above-base Cred pool contribution for all 4.1c runs. `cred_pool_contribution` was 0.0 in all 4.1c data. | Fixed Stage 4.2 Task 0: replaced with `getattr(getattr(agent, '_decision', None), 'cred_scale', 10.0)`. After fix: cred_pool_contribution = 3.65/step. All 4.1c parquets are silently invalid for Cred-scaled pool metrics. |
+
+---
+
+## Standing rules (apply to every stage)
+
+1. **Confirmed baseline parquets are read-only.** Load from parquet, never re-run.
+2. **New runs write to new output directories.** Never overwrite confirmed outputs.
+3. **One parameter per stage.** Each stage sweeps at most one new parameter.
+4. **Load before run.** If a config point exists in confirmed outputs, load it.
+5. **Report negative results.** Do not silently re-run until success.
+6. **Check C/Si distinction table before implementing any mechanic.**
+7. **Pre-registration discipline.** Stage 6 onwards strictly.
+8. **LITERATURE.md updated** whenever a paper, model, or mechanism is consulted.
+9. **ROADMAP.md updated** at the end of every stage or directive.
+10. **Report completeness.** Every report must include:
+    - A number for every success criterion — PASS/FAIL alone is not sufficient.
+    - All tuning attempts documented with values tried and outcomes observed.
+    - All diagnostic runs included with results, even if null.
+    - Seasonal vs static comparison table if both were run.
+    - Any parameter value that changed from the blueprint default, with justification.
+    - Full tuning history table for any parameter that required more than one attempt.
+    A report missing any of these is incomplete. Claude Code must append missing
+    sections before the supervisor reviews results.
+11. **Plot embedding (mandatory from Stage 4.2 onwards).** Every report.md must embed its diagnostic plots inline using relative paths. Plots must resolve when report.md is rendered — do not upload plots separately.
+
+    Required output structure:
+    ```
+    outputs/<run_name>/
+    ├── report.md
+    └── figures/
+        ├── <plot_name>.png
+        └── ...
+    ```
+
+    In report.md, reference plots as:
+    ```markdown
+    ![Caption](figures/plot_name.png)
+    ```
+
+    A `generate_figures.py` script (or equivalent) must exist that reads from parquets and writes all figures to `outputs/<run>/figures/`. This script must be runnable independently of the simulation (figures regenerable from cache without re-simulation).
+
+    A report without embedded, resolving plot references is incomplete per Rule 10.
+13. **HTML reports with base64-embedded figures (mandatory from Stage 4.4 onwards).** All stage reports must be single self-contained HTML files with figures embedded as base64 `<img src="data:image/png;base64,...">` — no external file dependencies. Output: `outputs/<stage_dir>/report.html`. Markdown reports (report.md) remain for diagnostic stages; full-stage reports must be HTML.
+12. **Pool gate criterion is mean-based.** `pool_draw_unmet_frac < 20%` is evaluated as the time-mean over t≥500 (or the quasi-stationary window for that stage). Instantaneous peaks above 20% do not constitute a gate failure but must be reported alongside the mean in the pool diagnostics table.
+
+    Pool diagnostics table format (mandatory when pool is active):
+
+    | Config | Mean contributed/step | Mean drawn/step | Mean unmet (t≥500) | Peak unmet (t≥500) | Gate (mean<20%) |
+    |---|---|---|---|---|---|
+    | *(populate with run data)* | | | | | |
+
+## Pre-registered Hypotheses
+| Hypothesis | Description | Registered | Status |
+|---|---|---|---|
+| H_cc | carry_discount counter-cyclical C recovery | Stage 4.5 patch | Pending Stage 5 |
+| H-ORTHOGONALITY | C and Si home-range distributions are orthogonal axes (C home-range is shaped by social pull; Si by foraging pull). Predicted to diverge measurably at medium-⟨ρ⟩ once movement decomposition diagnostic is built. | 2026-05-30 OWE-1 §3.6 | OPEN — pre-registration only; test requires OWE-13 |
+| H-instinct-debt | instinct-debt hypothesis (see HYPOTHESES.md §2): registered concept, details in HYPOTHESES.md | 2026-05-30 OWE-1 §0 | OPEN — see HYPOTHESES.md |
+
+---
+
+## Sweep-Matrix axes (planned for Stage 5.x LHS scan)
+
+The primary comparison sweep is: **⟨ρ⟩ × A × T × seeds × {C, Si}**
+
+| Axis | Symbol | Planned range | Notes |
+|---|---|---|---|
+| Population density (mean agents/cell) | ⟨ρ⟩ | low (~2%), medium (~5%), high (~10%) | Controls resource competition intensity and Allee dynamics |
+| Seasonal amplitude | A | {0.5, 0.75, 0.9} | As in Stage 4.2–5 sweeps |
+| Seasonal period | T | {50, 100, 200, T*±margin} | T* bracket confirmed in Stage 5 |
+| Seeds | — | ≥5 (CRN) | Common-random-numbers |
+| Strategy | — | {C, Si} | Matched worlds |
+
+⟨ρ⟩ is the **primary new axis added OWE-1 (2026-05-30)**: scaling from 50×50 to 100×100 at fixed density means ~2000 agents, and density-dependent dynamics (carrying-cost, Allee) need systematic ⟨ρ⟩ coverage to distinguish strategy effects from density effects.
+
+**Locked campaign run-length (OWE-1.1, supervisor 2026-05-31):** standard run-length =
+**12,000 steps** (1000 yr at 1 step = 1 month, ~4 secular cycles); **transient exclusion
+~500 steps** declared up front (~3.8 productive cycles, clears the ≥3-cycle bar for
+cycle-length/amplitude estimation). 24,000 held in reserve only if cycle-length estimation
+proves noisy. Applies to the H-EMERGE-1 / sweep campaign.
+
+**Target geometry (OWE-1, locked):** 100×100 cells, 1 step = 1 month. **N_carry = 4100
+for the 100×100 geometry** (OWE-1.1, 2026-05-31): measured N_carry→settled-N mapping
+settled ≈ 0.754·N_carry − 566 on 100×100; N_carry=4100 → settled N ≈ 2357 (within the
+2000–3000 target band), clean settle, est_starv = 0.000. **Static rel_std ≈ 0.019**
+(corrected 2026-06-02 from the OWE-1.1 single-run 0.014 to the R0 3-seed mean 0.0181/0.0196/0.0206;
+equivalence tolerance widened to ±0.007 to reflect measured seed scatter). N_carry is a
+scale-setting calibration choice, NOT an emergent prediction — set once, shared across C
+and Si arms, locked before examining H1(ii) at the new scale (OWE-14 re-confirms the
+inversion at this scale). Production 50×50 value remains N_carry=400.
+
+---
+
+## Owed items (tracked backlog)
+
+Items registered but not yet implemented. Checked each stage; cleared when done.
+
+| ID | Item | Source | Status |
+|---|---|---|---|
+| OWE-1 | Absolute-scale calibration: benchmark 100×100 geometry, assign cell→km and metabolic-unit→kcal under 1-step=1-month constraint | OWE-1 Blueprint 2026-05-30 | IN PROGRESS (this pass) |
+| OWE-2 | Terrain topography mechanic (spatially varying sugar + metabolism multiplier) | Stage 5.x agenda; chat_handoff §2 | OPEN |
+| OWE-3 | Stage 5.1 LHS parameter sensitivity scan (5D: A×T×N_carry×T_dormant_max×α_carry, ~30 pts) | chat_handoff §4 | OPEN |
+| OWE-4 | Davies/Loihi neuromorphic citation: confirm and add to LITERATURE.md (currently [INLINE] in MODEL_SPEC §9) | MODEL_SPEC §15.1 | OPEN |
+| OWE-5 | Si ψ utility hook: implement proximity-to-foraging-spots signal (distinct from C's agent-proximity signal) | ROADMAP "Pending — Si"; MODEL_SPEC §1.1 C2 flag | OPEN |
+| OWE-6 | Physical-channel inheritance: add metabolism/vision/max-age vertical transmission with control toggle | MODEL_SPEC §12.1-A; supervisor decision | OPEN — PROPOSED |
+| OWE-7 | HiveMind coordinator implementation (Si, collective reproduction decision) | MODEL_SPEC §13; Stage 7+ | DEFERRED |
+| OWE-8 | Movement-decomposition enumeration: difference-set axes for C vs Si foraging vs social displacement | OWE-1 §3.6; H-ORTHOGONALITY | OPEN |
+| OWE-9 | σ_inherit corrective sweep: target c1/c2 diversity (not ψ), ≥8 seeds, correct statistic (SD not Gini) | MODEL_SPEC §12.1-D | OPEN — corrective directive pending |
+| OWE-10 | Stage 6 statistical framework (power analysis, effect sizes, pre-registered metrics) | ROADMAP Stage 6 | OPEN |
+| OWE-11 | Larger-N feasibility check: measure N-scaling exponent at 100×100 to confirm "cheap lever" claim | OWE-1 Blueprint §6 | OPEN — measured in OWE-1 Task 1 |
+| OWE-12 | Minimum-band-size-in-trough diagnostic: log min per-band N in trough phase; raise N if Allee/finite-size artifacts | OWE-1 Blueprint §6 | OPEN — design stage |
+| OWE-13 | Movement-decomposition diagnostic: per-agent per-step decomposition of displacement into foraging-pull vs social-pull (ψ) | OWE-1 Blueprint §3.6 + §6 | OPEN — build at movement-instrumentation stage |
+| OWE-14 | Re-confirm H1(ii) inversion at calibrated N_carry (≥3 seeds, C vs Si) before trusting H1(ii) at the new 100×100 scale | OWE-1.1 Directive §B.3 (2026-05-31) | OPEN — authorised separate run, NOT yet run |
+
+---
+
+## Pre-registered Hypotheses

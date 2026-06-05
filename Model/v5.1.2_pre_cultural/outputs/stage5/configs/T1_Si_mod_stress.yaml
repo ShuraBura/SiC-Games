@@ -1,0 +1,141 @@
+seed: 42
+world:
+  grid_size:
+  - 50
+  - 50
+  toroidal: true
+  sugar_peaks:
+  - - 10
+    - 40
+  - - 40
+    - 10
+  max_sugar_capacity: 16
+  band_width_k: 6
+  growth_rate_alpha: 4
+agents:
+  initial_population: 250
+  vision_dist:
+  - 1
+  - 6
+  metabolic_rate_dist:
+  - 1
+  - 4
+  max_age_dist:
+  - 60
+  - 100
+  initial_wealth_dist:
+  - 25
+  - 75
+  phi_mean: 0.5
+  phi_std: 0.2
+  psi_mean: 0.5
+  psi_std: 0.2
+  psi_beta_a: 0.0
+  psi_beta_b: 0.0
+  c1_mean: 0.5
+  c1_std: 0.2
+  c2_mean: 0.5
+  c2_std: 0.2
+decision:
+  strategy: si_bounded
+carbon:
+  sigma_base: 0.5
+  kappa: 2.0
+  cred_scale: 10.0
+  cred_decay: 0.01
+  matthew_alpha: 2.0
+  epsilon: 0.01
+  cred_bonus_per_participant: 1.0
+  velocity_tau: 10
+  velocity_scale: 1.0
+  f_C: 0.25
+  status_amplification_beta: 1.0
+si_bounded:
+  sigma_si: 1.238
+  beta_metabolism: 5.0
+  k_carry: null
+  phi_carry: 0.02
+joint_task:
+  distance_d: 1
+  capacity_threshold: 4
+population:
+  mode: dynamic
+birth_c:
+  p_max: 0.03
+  tau_sub: 5.0
+  r_stress: 0.75
+  k_stress: 10.0
+  r_wealth: 0.5
+  rep_age_min: 15
+  rep_age_max: null
+  gamma: 0.2
+  c_star_birth: 10.0
+  carrying_cost:
+    enabled: false
+    N_carry: 400
+    alpha_carry: 1.0
+birth_si:
+  p_fission_max: 0.065
+  fission_wealth_mult: 1.5
+  rep_age_min: 15
+  rep_age_max: null
+reproduction:
+  mode: random
+  parent_radius: 3
+  inherit_sigma: 0.05
+  coordinator: individual
+  lambda_inheritance: 0.0
+si_cred:
+  enabled: false
+  accumulation_rate: 0.1
+  decay: 0.01
+  C_star_Si: 10.0
+  kappa_Si: 0.5
+dormancy:
+  enabled: true
+  k_dormant: 1.0
+  tau_trickle: 0.3
+  k_reactivate: 3.0
+  t_dormant_max: 50
+perturbation:
+  type: seasonal
+  amplitude: 0.5
+  period: 200
+  trough_fraction: 0.5
+initialization:
+  age_distribution: realistic
+  age_init_upper_frac: 0.5
+  wealth_init_scale_k: true
+  cluster_init: false
+  cluster_peak_index: 0
+  cluster_radius: 10
+life_history:
+  forage_age_min: 15
+  forage_age_max_offset: 10
+  eta_min: 0.3
+  eta_old: 0.4
+  eta_fission_offspring: 1.0
+support_pool:
+  enabled: true
+  r_pool: 5
+  tau_parent: 0.0
+  tau_pool: 0.05
+  k_reserve: 5.0
+  k_draw: 3.0
+  tau_cred: 0.5
+  tau_cred_reward: 0.1
+  rho_carryover: 0.3
+  k_pool_cap: 0.0
+  tau_pool_si: 0.05
+  dormant_can_draw: false
+run:
+  n_steps: 1000
+  metrics_every: 1
+  output_dir: ''
+  si_reference_dir: ''
+  c_reference_dir: ''
+visualization:
+  animate: false
+  frames_per_save: 5
+  save_static_plots: false
+  agent_color: ''

@@ -1,0 +1,164 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 1286, in <module>
+    main()
+    ~~~~^^
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 1268, in main
+    report_path = generate_html_report(
+        task0, task1, task2, task3_sweep,
+        psi_diagnosis_text, figure_paths, locked_k,
+    )
+  File "G:\My Drive\docs\SiC Games\sic_games\src\sic_games\stage44.py", line 1057, in generate_html_report
+    every C newborn an additional \u03bb�mean_w_{C} boost at birth, compressing the lower tail
+                                            ^
+NameError: name 'C' is not defined
+============================================================
+Stage 4.4: Grid Rescaling + λ + ψ Redesign + Revised Sweep
+============================================================
+
+============================================================
+Task 0: Grid calibration
+============================================================
+
+[0.1] Si static null control — β=5, target N_active∈[150,400], dorm_rate<20%
+
+  k=4 (max_sugar=16, alpha=4)
+  [Si-k4-p0.055] Loading cached: outputs\stage44_seed42\si_static_k4_p0055\metrics.parquet
+    FAIL [Si-k4-p0.055] p=0.055: N_active=[2,64] perm_dorm=0.000 dorm_rate=15.7%
+  [Si-k4-p0.06] Loading cached: outputs\stage44_seed42\si_static_k4_p006\metrics.parquet
+    FAIL [Si-k4-p0.06] p=0.06: N_active=[9,302] perm_dorm=0.000 dorm_rate=10.1%
+  [Si-k4-p0.065] Loading cached: outputs\stage44_seed42\si_static_k4_p0065\metrics.parquet
+    ✓ PASS [Si-k4-p0.065] p=0.065: N_active=[174,364] perm_dorm=0.000 dorm_rate=5.1%
+  ✓ k=4 viable: locked p_fission_Si = 0.065, k_grid = 4
+
+[0.2] C static null control — k=4, target N∈[150,400], est_starv≤0.78
+  [C-k4-p0.03] Running outputs\stage44_seed42\configs\c_static_k4_p003.yaml ...
+  [C-k4-p0.03] Done. N=[0,327]
+    FAIL [C-k4-p0.03] p=0.03: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+  [C-k4-p0.025] Running outputs\stage44_seed42\configs\c_static_k4_p0025.yaml ...
+  [C-k4-p0.025] Done. N=[0,317]
+    FAIL [C-k4-p0.025] p=0.025: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+  [C-k4-p0.04] Running outputs\stage44_seed42\configs\c_static_k4_p004.yaml ...
+  [C-k4-p0.04] Done. N=[0,358]
+    FAIL [C-k4-p0.04] p=0.04: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+  [C-k4-p0.02] Running outputs\stage44_seed42\configs\c_static_k4_p002.yaml ...
+  [C-k4-p0.02] Done. N=[0,305]
+    FAIL [C-k4-p0.02] p=0.02: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+  [C-k4-p0.05] Running outputs\stage44_seed42\configs\c_static_k4_p005.yaml ...
+  [C-k4-p0.05] Done. N=[0,386]
+    FAIL [C-k4-p0.05] p=0.05: N=[0,27] est_starv=0.000 juv%=0% pool_unmet=0.0%
+  ✗ C static: no p passed in [0.03, 0.025, 0.04, 0.02, 0.05]; using p=0.03
+
+  → Locked: k_grid=4, max_sugar=16, alpha=4, p_max_C=0.03, p_fission_Si=0.065, β_Si=5.0
+
+  [Gate 0 cleared] k=4, p_max_C=0.03, p_fission_Si=0.065
+
+============================================================
+Task 1: λ=0.1 wealth inheritance verification
+============================================================
+  [C-λ0.1-k4-p0.03] Running outputs\stage44_seed42\configs\c_lambda_k4_p003.yaml ...
+  [C-λ0.1-k4-p0.03] Done. N=[0,326]
+    FAIL [C-λ-p0.03] p=0.03: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    λ_boost_mean=0.000  gini_w=0.000
+  [C-λ0.1-k4-p0.025] Running outputs\stage44_seed42\configs\c_lambda_k4_p0025.yaml ...
+  [C-λ0.1-k4-p0.025] Done. N=[0,314]
+    FAIL [C-λ-p0.025] p=0.025: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    λ_boost_mean=0.000  gini_w=0.000
+  [C-λ0.1-k4-p0.035] Running outputs\stage44_seed42\configs\c_lambda_k4_p0035.yaml ...
+  [C-λ0.1-k4-p0.035] Done. N=[0,315]
+    FAIL [C-λ-p0.035] p=0.035: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    λ_boost_mean=0.000  gini_w=0.000
+  ✗ λ verification: no p passed; using p=0.03
+
+  [Gate 1 cleared] p_max_C with λ=0.1: 0.03
+
+[2.1] ψ Diagnosis (code inspection, no runs):
+ψ Diagnosis (Stage 4.3 → Stage 4.4)
+
+Current implementation (Stage 3.3–4.3, agents/strategies/carbon.py):
+  U_ij = w_R·R̂_ij + w_C·Ĉ_ij + ψ_i·N̂_ij
+where N̂_ij = neighbor_count_j / max(neighbor_count), and neighbor_count counts
+ALL agents (C+Si+dormant) within Chebyshev d=1 (8 surrounding cells).
+
+Distribution: ψ_i drawn from Normal(0.5, 0.2), clipped to [0,1].
+Observed Stage 4.3 range: [0.345, 0.655] — extremely narrow.
+
+Root cause of flat quartile distribution:
+  1. Normal(0.5, 0.2) clipped to [0,1] → most agents land in [0.3, 0.7].
+     True standard deviation ≈ 0.1 after clipping. Very little spread.
+  2. Chebyshev d=1 radius is too small: only 8 cells. In practice, 0–4
+     neighbors at a given cell. N̂_ij varies [0, 0.5] → ψ term contribution
+     ≈ 0.5 × ψ_i ≈ 0.25 per cell. Nearly constant across agents.
+  3. At this tiny spread, Q1 (mean ψ≈0.345) vs Q4 (mean ψ≈0.655) differ
+     by only ~0.31 in ψ, with max N̂=0.5 → utility difference ≈ 0.16.
+     Insufficient to produce differential survival outcomes.
+
+Redesign for Stage 4.4 (blueprint §3.2):
+  1. Use c_proximity: count of C agents within r_pool=5 (Chebyshev) radius,
+     precomputed via c_prox_grid each step. High-ψ agents prefer cells with
+     many nearby C agents → social clustering behaviour.
+  2. Draw ψ from Beta(2,2): range [0,1], peaked at 0.5, wider spread than
+     clipped Normal. std ≈ 0.22 (vs ≈0.10 before). Meaningful high/low-ψ
+     populations will emerge.
+  3. ψ remains C-only. Si ψ trait is carried but its hook is deferred.
+
+============================================================
+Task 2: ψ redesign verification
+============================================================
+  [C-ψBeta-k4-p0.03] Running outputs\stage44_seed42\configs\c_psi_k4_p003.yaml ...
+  [C-ψBeta-k4-p0.03] Done. N=[0,323]
+    FAIL [C-ψBeta-p0.03] p=0.03: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    psi_mean=0.000  psi_gini=0.000
+  [C-ψBeta-k4-p0.025] Running outputs\stage44_seed42\configs\c_psi_k4_p0025.yaml ...
+  [C-ψBeta-k4-p0.025] Done. N=[0,314]
+    FAIL [C-ψBeta-p0.025] p=0.025: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    psi_mean=0.000  psi_gini=0.000
+  [C-ψBeta-k4-p0.035] Running outputs\stage44_seed42\configs\c_psi_k4_p0035.yaml ...
+  [C-ψBeta-k4-p0.035] Done. N=[0,359]
+    FAIL [C-ψBeta-p0.035] p=0.035: N=[0,0] est_starv=0.000 juv%=0% pool_unmet=0.0%
+    psi_mean=0.000  psi_gini=0.000
+  ✗ ψ verification: no p passed; using p=0.03
+  [C-ψBeta null] Insufficient C starvation deaths for quartile analysis.
+
+  [Gate 2 cleared] p_max_C fully locked: 0.03
+
+============================================================
+Task 3: Revised seasonal sweep (H1(ii))
+============================================================
+  [4.4-C-A05-T200] Running outputs\stage44_seed42\configs\44_c_a05_t200.yaml ...
+  [4.4-C-A05-T200] Done. N=[0,319]
+  4.4-C-A05-T200: N_active=[0,319] → COLLAPSED
+  [4.4-Si-A05-T200] Running outputs\stage44_seed42\configs\44_si_a05_t200.yaml ...
+  [4.4-Si-A05-T200] Done. N=[98,377]
+  4.4-Si-A05-T200: N_active=[98,377] → SURVIVED
+  [4.4-C-A075-T200] Running outputs\stage44_seed42\configs\44_c_a075_t200.yaml ...
+  [4.4-C-A075-T200] Done. N=[0,317]
+  4.4-C-A075-T200: N_active=[0,317] → COLLAPSED
+  [4.4-Si-A075-T200] Running outputs\stage44_seed42\configs\44_si_a075_t200.yaml ...
+  [4.4-Si-A075-T200] Done. N=[0,391]
+  4.4-Si-A075-T200: N_active=[0,391] → SURVIVED
+  [4.4-C-A05-T100] Running outputs\stage44_seed42\configs\44_c_a05_t100.yaml ...
+  [4.4-C-A05-T100] Done. N=[0,315]
+  4.4-C-A05-T100: N_active=[0,315] → COLLAPSED
+  [4.4-Si-A05-T100] Running outputs\stage44_seed42\configs\44_si_a05_t100.yaml ...
+  [4.4-Si-A05-T100] Done. N=[248,397]
+  4.4-Si-A05-T100: N_active=[248,397] → SURVIVED
+  [4.4-C-A05-T050] Running outputs\stage44_seed42\configs\44_c_a05_t050.yaml ...
+  [4.4-C-A05-T050] Done. N=[0,349]
+  4.4-C-A05-T050: N_active=[0,349] → COLLAPSED
+  [4.4-Si-A05-T050] Running outputs\stage44_seed42\configs\44_si_a05_t050.yaml ...
+  [4.4-Si-A05-T050] Done. N=[248,685]
+  4.4-Si-A05-T050: N_active=[248,685] → SURVIVED
+
+  C collapsed at all seasonal conditions → T* re-search skipped.
+  Verdict: structural Allee fragility under current parameter set.
+
+  ψ quartile starvation (C seasonal A=0.5 T=200):
+  [4.4-C-A05-T200] Insufficient C starvation deaths for quartile analysis.
+
+=== Generating figures ===
+
+  Figures saved: ['si_null_k_comparison.png', 'c_null_locked_k.png', 'lambda_verification.png', 'psi_redesign_diagnostics.png', 'n_timeseries_period_sweep.png', 'n_timeseries_amplitude_sweep.png', 'dormancy_rate_seasonal.png']
+
+=== Writing report.html ===

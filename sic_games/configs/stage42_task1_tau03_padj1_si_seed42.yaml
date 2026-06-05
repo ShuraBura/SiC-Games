@@ -1,0 +1,91 @@
+seed: 42
+world:
+  grid_size:
+  - 50
+  - 50
+  toroidal: true
+  sugar_peaks:
+  - - 10
+    - 40
+  - - 40
+    - 10
+  max_sugar_capacity: 4
+  band_width_k: 6
+  growth_rate_alpha: 1
+agents:
+  initial_population: 250
+  vision_dist:
+  - 1
+  - 6
+  metabolic_rate_dist:
+  - 1
+  - 4
+  max_age_dist:
+  - 60
+  - 100
+  initial_wealth_dist:
+  - 5
+  - 25
+  phi_mean: 0.5
+  phi_std: 0.2
+  psi_mean: 0.5
+  psi_std: 0.2
+  c1_mean: 0.5
+  c1_std: 0.2
+  c2_mean: 0.5
+  c2_std: 0.2
+decision:
+  strategy: si_bounded
+si_bounded:
+  sigma_si: 1.238
+joint_task:
+  distance_d: 1
+  capacity_threshold: 4
+population:
+  mode: dynamic
+birth_c:
+  p_max: 0.02
+  tau_sub: 5.0
+  r_stress: 0.75
+  k_stress: 10.0
+  r_wealth: 0.5
+  rep_age_min: 15
+  rep_age_max: null
+  gamma: 0.0
+  c_star_birth: 10.0
+birth_si:
+  fission_wealth_mult: 1.5
+  rep_age_min: 15
+  rep_age_max: null
+  p_fission_max: 0.26
+reproduction:
+  mode: random
+  parent_radius: 3
+  inherit_sigma: 0.05
+  coordinator: individual
+  lambda_inheritance: 0.0
+perturbation:
+  type: 'null'
+initialization:
+  age_distribution: realistic
+life_history:
+  forage_age_min: 15
+  forage_age_max_offset: 10
+  eta_min: 0.3
+  eta_old: 0.4
+support_pool:
+  enabled: true
+  r_pool: 5
+  tau_parent: 0.1
+  k_reserve: 5.0
+  k_draw: 3.0
+  tau_cred: 0.5
+  tau_cred_reward: 0.1
+  tau_pool: 0.03
+run:
+  n_steps: 1000
+  metrics_every: 1
+  output_dir: outputs\stage42_seed42\task1_tau03_padj1_si_static
+visualization:
+  animate: false
+  save_static_plots: false

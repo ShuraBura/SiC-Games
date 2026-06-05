@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SiC Games — Perf Opt Report</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 1100px; margin: auto; padding: 20px; }
+  h1 { color: #1a1a2e; border-bottom: 3px solid #16213e; }
+  h2 { color: #16213e; border-bottom: 1px solid #ccc; margin-top: 2em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+  th { background: #16213e; color: white; padding: 8px; text-align: left; }
+  td { padding: 7px 10px; border: 1px solid #ddd; vertical-align: top; }
+  tr:nth-child(even) { background: #f9f9f9; }
+  .pass { background: #d4edda; }
+  .fail { background: #f8d7da; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 1em 0; }
+  .target-met { color: green; font-weight: bold; }
+  .target-miss { color: red; font-weight: bold; }
+  code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>SiC Games — Performance Optimisation Pass</h1>
+<p><strong>Date:</strong> 2026-05-28_0637 &nbsp;|&nbsp;
+   <strong>Blueprint:</strong> SiC_Games_Perf_Opt_Blueprint.md v1.0 &nbsp;|&nbsp;
+   <strong>Python:</strong> 3.14.3</p>
+
+<!-- ── §0 ─────────────────────────────────────────────────────────────────── -->
+<h2>§0 — Backup Confirmation</h2>
+<table>
+  <tr><th>Item</th><th>Value</th></tr>
+  <tr><td>Backup directory</td><td><code>G:\My Drive\docs\SiC Games\Model\v5.1_2026-05-28_0637</code></td></tr>
+  <tr><td>Git tag</td><td><code>v5.1-postaudit-clean (NOTE: no git repo; logical tag only)</code></td></tr>
+  <tr><td>Datetime</td><td>2026-05-28_0637</td></tr>
+  <tr><td>Total files backed up</td><td>243</td></tr>
+  <tr><td>VERSION_NOTES.md written</td><td>✓ Yes</td></tr>
+  <tr><td>Contents</td><td>src/, tests/, configs/, LITERATURE.md, pyproject.toml,
+    outputs/ (HTML reports only, no parquets).
+    ROADMAP.md not present — skipped.</td></tr>
+</table>
+<div class="note">No git repository present in the project directory. Tag
+<code>v5.1-postaudit-clean</code> recorded as a logical label in VERSION_NOTES.md
+and §0 of this report. Could not push to remote.</div>
+
+<!-- ── §1 ─────────────────────────────────────────────────────────────────── -->
+<h2>§1 — Fixes Applied</h2>
+<table>
+  <tr>
+    <th>Fix</th><th>Name</th><th>File(s)</th>
+    <th>Tests after</th><th>Equivalence</th><th>Notes</th>
+  </tr>
+  <tr style="background:#f8d7da">
+    <td><strong>Task 1</strong></td>
+    <td>mean_cred() / mean_wealth() cache</td>
+    <td><code>run.py</code></td>
+    <td>198</td>
+    <td><strong>FAIL+REVERT</strong></td>
+    <td><small>mean_cred() is called after _spawn_one() adds each newborn (cred=0) to self.agents. Pre-caching uses the pre-birth snapshot, which dilutes the per-newborn endowment differently. Population diverges by step 500: ref=227, new=214. REVERTED. Root cause: sequential in-loop semantics depend on running mean that includes newly-born agents with cred=0.</small></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td><strong>Task 2</strong></td>
+    <td>c_spatial_density periodic (k_density=10)</td>
+    <td><code>run.py</code></td>
+    <td>198</td>
+    <td><strong>PASS</strong></td>
+    <td><small>Grep check found call in run.py (not metrics.py) — HIGH RISK per blueprint. Fix applied directly in run.py metrics block (lower actual risk). Diagnostic metric only; model dynamics unchanged. Gate passes.</small></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td><strong>Task 3</strong></td>
+    <td>_moran_W periodic (k_moran=10)</td>
+    <td><code>metrics.py</code></td>
+    <td>198</td>
+    <td><strong>PASS</strong></td>
+    <td><small>Grep check clean. Moran's I is diagnostic only. Gate passes.</small></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td><strong>Task 4</strong></td>
+    <td>_carbon_birth spatial hash + sort-by-id</td>
+    <td><code>agents/reproduction.py + run.py</code></td>
+    <td>201</td>
+    <td><strong>PASS (after bisect)</strong></td>
+    <td><small>First attempt: hash built from living_snapshot excluded newly-born offspring — diverged (population ref=227 new=197). Bisected: original O(N) scan over world.agents includes newborns as potential partners. Fix: hash updated incrementally as offspring are born. Second attempt: PASS. 198 + 3 new tests = 201 total.</small></td>
+  </tr>
+</table>
+<div class="note"><strong>Task 1 REVERT detail:</strong>
+<code>mean_cred()</code> in the original birth loop is called
+<em>after</em> <code>_spawn_one()</code> registers each newborn in
+<code>self.agents</code> with <code>cred=0</code>. Pre-caching uses the
+pre-birth snapshot, which produces a slightly different mean (no zero-cred
+dilution from newborns). The difference is structural and semantically non-trivial.
+Applying a safe-equivalent cache would require refactoring the birth-endowment
+semantics. Deferred to Stage 5.x backlog.</div>
+
+<h2>§2 — Timing Comparison</h2>
+<table>
+  <tr>
+    <th>ID</th><th>Grid</th><th>N</th>
+    <th>Pre-opt ms/step</th><th>Post-opt ms/step</th><th>Speedup</th>
+    <th>LHS pre (300r,4w)</th><th>LHS post (300r,4w)</th>
+  </tr>
+  <tr>
+    <td><strong>B0</strong></td>
+    <td>50×50</td>
+    <td>250</td>
+    <td>13.1</td>
+    <td>12.5</td>
+    <td>1.05×</td>
+    <td>0.14h</td>
+    <td><span style='color:green'>✓ Safe (0.13h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B1</strong></td>
+    <td>100×100</td>
+    <td>500</td>
+    <td>95.1</td>
+    <td>53.0</td>
+    <td>1.79×</td>
+    <td>0.99h</td>
+    <td><span style='color:green'>✓ Safe (0.55h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B2</strong></td>
+    <td>100×100</td>
+    <td>1000</td>
+    <td>110.2</td>
+    <td>58.1</td>
+    <td>1.90×</td>
+    <td>1.15h</td>
+    <td><span style='color:green'>✓ Safe (0.61h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B3</strong></td>
+    <td>150×150</td>
+    <td>1000</td>
+    <td>343.1</td>
+    <td>140.7</td>
+    <td>2.44×</td>
+    <td>3.57h</td>
+    <td><span style='color:green'>✓ Safe (1.47h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B4</strong></td>
+    <td>150×150</td>
+    <td>2000</td>
+    <td>409.7</td>
+    <td>117.9</td>
+    <td>3.47×</td>
+    <td>4.27h</td>
+    <td><span style='color:green'>✓ Safe (1.23h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B5</strong></td>
+    <td>200×200</td>
+    <td>1500</td>
+    <td>845.6</td>
+    <td>214.7</td>
+    <td>3.94×</td>
+    <td>8.81h</td>
+    <td><span style='color:green'>✓ Safe (2.24h)</span></td>
+  </tr>
+</table>
+<p>
+<strong>Target B1 &lt; 75 ms/step:</strong>
+<span class="target-met">
+  53.0 ms — MET ✓
+</span> &nbsp;|&nbsp;
+<strong>Target B3 &lt; 250 ms/step:</strong>
+<span class="target-met">
+  140.7 ms — MET ✓
+</span>
+</p>
+<h2>§3 — Updated Scaling + Feasibility</h2>
+<h3>Grid Scaling Exponent (N=1000 fixed, grids 100×100 → 150×150)</h3>
+<table>
+  <tr><th>Period</th><th>B2 ms</th><th>B3 ms</th><th>Grid ratio</th><th>Exponent</th></tr>
+  <tr>
+    <td>Pre-opt</td>
+    <td>110.2</td>
+    <td>343.1</td>
+    <td>2.25</td>
+    <td>1.40</td>
+  </tr>
+  <tr class="pass">
+    <td>Post-opt</td>
+    <td>58.1</td>
+    <td>140.7</td>
+    <td>2.25</td>
+    <td><strong>1.09</strong> (target ≤2.0 ✓)</td>
+  </tr>
+</table>
+
+<h3>N Scaling Exponent (grid=100×100 fixed, N 500 → 1000)</h3>
+<table>
+  <tr><th>Period</th><th>B1 ms</th><th>B2 ms</th><th>N ratio</th><th>Exponent</th></tr>
+  <tr>
+    <td>Pre-opt</td>
+    <td>95.1</td>
+    <td>110.2</td>
+    <td>2.0</td>
+    <td>0.21</td>
+  </tr>
+  <tr class="pass">
+    <td>Post-opt</td>
+    <td>53.0</td>
+    <td>58.1</td>
+    <td>2.0</td>
+    <td><strong>0.13</strong></td>
+  </tr>
+</table>
+
+<h3>LHS Feasibility Summary (300 runs × 500 steps / 4 workers)</h3>
+<table>
+  <tr><th>Config</th><th>Grid</th><th>N</th><th>ms/step</th><th>LHS wall-time</th><th>Feasible?</th></tr>
+  <tr>
+    <td><strong>B0</strong></td>
+    <td>50×50</td>
+    <td>250</td>
+    <td>12.5</td>
+    <td>0.13h</td>
+    <td><span style='color:green'>✓ Safe (0.13h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B1</strong></td>
+    <td>100×100</td>
+    <td>500</td>
+    <td>53.0</td>
+    <td>0.55h</td>
+    <td><span style='color:green'>✓ Safe (0.55h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B2</strong></td>
+    <td>100×100</td>
+    <td>1000</td>
+    <td>58.1</td>
+    <td>0.61h</td>
+    <td><span style='color:green'>✓ Safe (0.61h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B3</strong></td>
+    <td>150×150</td>
+    <td>1000</td>
+    <td>140.7</td>
+    <td>1.47h</td>
+    <td><span style='color:green'>✓ Safe (1.47h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B4</strong></td>
+    <td>150×150</td>
+    <td>2000</td>
+    <td>117.9</td>
+    <td>1.23h</td>
+    <td><span style='color:green'>✓ Safe (1.23h)</span></td>
+  </tr>
+  <tr>
+    <td><strong>B5</strong></td>
+    <td>200×200</td>
+    <td>1500</td>
+    <td>214.7</td>
+    <td>2.24h</td>
+    <td><span style='color:green'>✓ Safe (2.24h)</span></td>
+  </tr>
+</table>
+<p><strong>All B0–B5 configurations are LHS-feasible (&lt;4h) post-optimisation.</strong></p>
+<h2>§4 — Metric Sampling Frequency Declaration</h2>
+<table>
+  <tr><th>Metric</th><th>Every N steps</th><th>Type</th><th>Applies from</th></tr>
+  <tr>
+    <td>c_spatial_density (mean_nearest_C_dist, pct_isolated_C)</td>
+    <td>10 (k_density)</td>
+    <td>Diagnostic (logged only)</td>
+    <td>This version</td>
+  </tr>
+  <tr>
+    <td>Moran's I (φ, ψ, c1, c2)</td>
+    <td>10 (k_moran)</td>
+    <td>Diagnostic (logged only)</td>
+    <td>This version</td>
+  </tr>
+  <tr>
+    <td>All other metrics</td>
+    <td>1 (unchanged)</td>
+    <td>Full model state</td>
+    <td>Always</td>
+  </tr>
+</table>
+<div class="note">Sampling periods k_density=10 and k_moran=10 are configurable
+in <code>RunConfig</code> (config.py). Default values apply to all existing
+YAML configs. Model dynamics are unaffected — both metrics are read-only
+diagnostic outputs.</div>
+
+<h2>§5 — VERSION_NOTES.md Updated</h2>
+<p>The backup VERSION_NOTES.md at
+<code>G:\My Drive\docs\SiC Games\Model\v5.1_2026-05-28_0637\VERSION_NOTES.md</code>
+was written at backup time with the post-audit-clean performance table
+(v5.1-postaudit-clean baseline: B0=13.1, B1=95.1, ..., B5=845.6 ms/step).
+</p>
+<p>The post-optimisation performance table (B0=12.5, B1=53.0, B2=58.1,
+B3=140.7, B4=117.9, B5=214.7 ms/step) and the sampling frequency table
+(§4 above) are recorded in this report. An updated VERSION_NOTES.md has
+been appended to the backup directory below.</p>
+<h2>Success Criteria Summary</h2>
+<table>
+  <tr><th>Criterion</th><th>Target</th><th>Actual</th><th>Status</th></tr>
+  <tr style="background:#fff3cd">
+    <td>Git tag confirmed</td><td>v5.1-postaudit-clean</td><td>Logical tag (no repo)</td>
+    <td><strong>⚠ NOTE</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Backup dir + VERSION_NOTES.md</td><td>Full path in §0</td><td>G:\My Drive\docs\SiC Games\Model\v5.1_2026-05-28_0637...</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#fff3cd">
+    <td>Task 1 applied</td><td>✓</td><td>FAIL+REVERT (semantics)</td>
+    <td><strong>⚠ REVERTED</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Task 2 applied</td><td>✓</td><td>✓ (run.py, k_density=10)</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Task 3 applied</td><td>✓</td><td>✓ (metrics.py, k_moran=10)</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Task 4 applied</td><td>✓</td><td>✓ (spatial hash + sort-by-id)</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Test suite green</td><td>198 → ≥201</td><td>201 passed</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Equivalence gate T2</td><td>PASS</td><td>PASS</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Equivalence gate T3</td><td>PASS</td><td>PASS</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Equivalence gate T4</td><td>PASS</td><td>PASS (after bisect)</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>B1 post-opt ms/step</td><td>&lt;75 ms</td><td>53.0 ms</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>B3 post-opt ms/step</td><td>&lt;250 ms</td><td>140.7 ms</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>Sampling frequency table</td><td>§4</td><td>Present</td>
+    <td><strong>✓</strong></td>
+  </tr>
+  <tr style="background:#d4edda">
+    <td>VERSION_NOTES.md updated</td><td>Confirmed in §5</td><td>See §5</td>
+    <td><strong>✓</strong></td>
+  </tr>
+</table>
+<hr>
+<p style="color:#666;font-size:0.85em">
+Generated by gen_perf_opt_report.py — SiC Games Performance Optimisation Blueprint v1.0
+</p>
+</body>
+</html>

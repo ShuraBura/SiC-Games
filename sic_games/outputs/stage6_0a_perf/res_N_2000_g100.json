@@ -1,0 +1,1 @@
+{"label": "N_2000_g100", "grid": 100, "init_n": 2000, "kappa": 1.0, "n_carry": 20000, "ms_mean": 98.51616000159993, "ms_sd": 18.683707844212655, "mean_occ": 1.6762402088772845, "peak_occ": 9, "n_occupied": 1149, "final_n": 1926, "cut_status": "window-completed", "rail_status": "PASS", "occ_per_cell_all": 0.1926}
