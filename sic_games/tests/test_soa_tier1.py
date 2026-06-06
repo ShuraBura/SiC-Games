@@ -17,6 +17,10 @@ from sic_games.soa import AgentArray
 from sic_games.soa_tier1 import (
     cred_decay,
     eta,
+    gini_vec,
+    harvest_split_segment,
+    mean_cred_vec,
+    mean_wealth_vec,
     metabolize_basic,
     metabolize_si_dormancy,
     si_cred_band,
@@ -321,6 +325,126 @@ def test_metabolize_si_dormancy_bit_identical():
     assert res["permanent_dormancy_deaths"] == perm
     # sanity: the setup actually exercised the interesting branches
     assert react > 0 and perm > 0
+
+
+# ── GATE A1: population-level reductions (Tier-2) ──────────────────────────────
+
+def test_mean_cred_vec_tier2():
+    """mean_cred_vec matches the oracle's mean_cred() within rtol 1e-9."""
+    m = _model("carbon", steps=5)
+    agents = _ordered(m)
+    arr = snapshot(m)
+    n = arr.n_slots
+    alive = arr.columns["alive"][:n]
+    oracle = m.mean_cred()
+    vec = mean_cred_vec(arr.columns["cred"][:n], alive)
+    assert abs(vec - oracle) <= 1e-9 * max(abs(oracle), 1e-30), (
+        f"mean_cred_vec={vec:.16g} oracle={oracle:.16g} delta={abs(vec-oracle):.3e}"
+    )
+
+
+def test_mean_wealth_vec_tier2():
+    """mean_wealth_vec matches the oracle's mean_wealth() within rtol 1e-9."""
+    m = _model("carbon", steps=5)
+    arr = snapshot(m)
+    n = arr.n_slots
+    alive = arr.columns["alive"][:n]
+    oracle = m.mean_wealth()
+    vec = mean_wealth_vec(arr.columns["wealth"][:n], alive)
+    assert abs(vec - oracle) <= 1e-9 * max(abs(oracle), 1e-30), (
+        f"mean_wealth_vec={vec:.16g} oracle={oracle:.16g} delta={abs(vec-oracle):.3e}"
+    )
+
+
+def test_gini_vec_tier2():
+    """gini_vec matches metrics.gini([a.wealth for a in agents]) within rtol 1e-9."""
+    from sic_games.metrics import gini as oracle_gini
+    m = _model("carbon", steps=5)
+    agents = _ordered(m)
+    arr = snapshot(m)
+    n = arr.n_slots
+    alive = arr.columns["alive"][:n]
+    oracle = oracle_gini([a.wealth for a in agents])
+    vec = gini_vec(arr.columns["wealth"][:n], alive)
+    assert abs(vec - oracle) <= 1e-9 * max(abs(oracle), 1e-30), (
+        f"gini_vec={vec:.16g} oracle={oracle:.16g} delta={abs(vec-oracle):.3e}"
+    )
+
+
+def test_harvest_split_even():
+    """harvest_split_segment (kappa=0) produces exact even split per cell."""
+    from sic_games.soa import AgentArray, STRATEGY_CARBON, STRATEGY_GREEDY
+    W, H = 5, 5
+    arr = AgentArray.empty(16, W, H)
+    n = 6
+    arr.n_slots = n
+    # 3 cells: (0,0)×2, (1,0)×3, (2,0)×1
+    arr.columns["pos_x"][:n] = [0, 0, 1, 1, 1, 2]
+    arr.columns["pos_y"][:n] = np.zeros(n, dtype=np.int64)
+    arr.columns["phi"][:n] = [0.5, 1.5, 0.8, 1.2, 0.3, 2.0]
+    arr.columns["strategy"][:n] = [STRATEGY_CARBON]*4 + [STRATEGY_GREEDY]*2
+    arr.columns["alive"][:n] = True
+    sugar_vals = np.array([6.0, 9.0, 4.0])   # one entry per unique cell in sorted order
+
+    buckets = arr.bucket_by_cell()
+    shares = harvest_split_segment(
+        buckets, sugar_vals,
+        arr.columns["phi"][:n], arr.columns["strategy"][:n],
+        kappa=0.0, phi_epsilon=0.1,
+    )
+    # cell (0,0): 2 agents → 3.0 each
+    assert np.isclose(shares[0], 3.0) and np.isclose(shares[1], 3.0)
+    # cell (1,0): 3 agents → 3.0 each
+    assert np.isclose(shares[2], 3.0) and np.isclose(shares[3], 3.0) and np.isclose(shares[4], 3.0)
+    # cell (2,0): 1 agent → 4.0
+    assert np.isclose(shares[5], 4.0)
+    assert np.isclose(shares[:n].sum(), 19.0)
+
+
+def test_harvest_split_contest():
+    """harvest_split_segment (kappa>0) matches per-cell compute_harvest_shares."""
+    from sic_games.soa import AgentArray, STRATEGY_CARBON, STRATEGY_GREEDY
+    from sic_games.substrate import compute_harvest_shares
+
+    class _FakeAgent:
+        """Minimal stand-in for compute_harvest_shares's duck-typed agent."""
+        def __init__(self, phi, strategy_str):
+            self.phi = phi
+            self.strategy = strategy_str
+
+    W, H = 5, 5
+    arr = AgentArray.empty(16, W, H)
+    n = 5
+    arr.n_slots = n
+    # 2 cells: (0,0)×3, (1,0)×2
+    arr.columns["pos_x"][:n] = [0, 0, 0, 1, 1]
+    arr.columns["pos_y"][:n] = np.zeros(n, dtype=np.int64)
+    phi_vals = np.array([0.5, 1.5, 0.8, 1.2, 0.3])
+    strat_vals = np.array([STRATEGY_CARBON, STRATEGY_CARBON, STRATEGY_GREEDY,
+                           STRATEGY_CARBON, STRATEGY_GREEDY], dtype=np.int64)
+    arr.columns["phi"][:n] = phi_vals
+    arr.columns["strategy"][:n] = strat_vals
+    arr.columns["alive"][:n] = True
+
+    kappa, phi_eps = 2.0, 0.1
+    sugar_vals = np.array([5.0, 3.0])
+    buckets = arr.bucket_by_cell()
+
+    vec_shares = harvest_split_segment(
+        buckets, sugar_vals, arr.columns["phi"][:n], arr.columns["strategy"][:n],
+        kappa=kappa, phi_epsilon=phi_eps,
+    )
+
+    # Oracle via compute_harvest_shares for each cell
+    strat_strs = ["carbon", "carbon", "greedy", "carbon", "greedy"]
+    occ_cell0 = [_FakeAgent(phi_vals[i], strat_strs[i]) for i in [0, 1, 2]]
+    occ_cell1 = [_FakeAgent(phi_vals[i], strat_strs[i]) for i in [3, 4]]
+    oracle_cell0 = compute_harvest_shares(occ_cell0, 5.0, kappa, phi_eps)
+    oracle_cell1 = compute_harvest_shares(occ_cell1, 3.0, kappa, phi_eps)
+
+    assert np.allclose([vec_shares[0], vec_shares[1], vec_shares[2]], oracle_cell0, rtol=1e-9)
+    assert np.allclose([vec_shares[3], vec_shares[4]], oracle_cell1, rtol=1e-9)
+    assert np.isclose(vec_shares[:n].sum(), 8.0)
 
 
 def test_metabolize_si_dormancy_kcarry_penalty():
