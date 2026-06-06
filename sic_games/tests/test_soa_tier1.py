@@ -18,6 +18,7 @@ from sic_games.soa_tier1 import (
     cred_decay,
     eta,
     metabolize_basic,
+    metabolize_si_dormancy,
     si_cred_band,
     temperature_carbon,
     temperature_si,
@@ -224,3 +225,126 @@ def test_eta_bit_identical():
     )
     oracle = np.array([a.eta() for a in agents])
     assert np.array_equal(vec, oracle)
+
+
+# ── Tier-1: Si dormancy-aware metabolize state machine (bit-identical) ──────────
+
+def _setup_si_dormancy_branches(agents, beta, k_dormant, k_reactivate, t_dormant_max):
+    """Assign states covering every branch of the Si dormancy state machine."""
+    for i, a in enumerate(agents):
+        a.age = 30
+        a.alive = True
+        a._last_moved = False
+        a._last_harvested = 0.0
+        cost = a.metabolism * beta
+        r = i % 7
+        if r == 0:    # dormant -> reactivate (wealth >= k_react*cost)
+            a.dormant, a.dormant_steps, a.wealth = True, 10, k_reactivate * cost + 1.0
+        elif r == 1:  # dormant -> permanent death (steps+1 > t_max, no reactivate)
+            a.dormant, a.dormant_steps, a.wealth = True, t_dormant_max + 1, 0.5 * cost
+        elif r == 2:  # dormant -> continue dormant
+            a.dormant, a.dormant_steps, a.wealth = True, 5, 0.5 * cost
+        elif r == 3:  # active -> enter dormancy (wealth < k_dormant*cost)
+            a.dormant, a.dormant_steps, a.wealth = False, 0, 0.5 * k_dormant * cost
+        elif r == 4:  # active -> normal, survive
+            a.dormant, a.dormant_steps, a.wealth = False, 0, 5.0 * cost
+        elif r == 5:  # active -> normal, starve (wealth == cost -> 0 after pay)
+            a.dormant, a.dormant_steps, a.wealth = False, 0, cost
+        else:         # active -> normal, senesce next step
+            a.dormant, a.dormant_steps, a.wealth = False, 0, 5.0 * cost
+            a.age = a.max_age - 1
+
+
+def _oracle_si_metabolize(agents, k_dormant, k_reactivate, t_dormant_max):
+    """Faithful transcription of run.py's Si dormancy metabolize block.
+
+    Uses the REAL cost model (agent._cost.step_cost) — only the branch control flow
+    is transcribed from run.py. Mutates agents; returns (reactivations, perm_deaths).
+    """
+    react = perm = 0
+    for a in agents:
+        cost = a._cost.step_cost(a, {"moved": a._last_moved, "harvested": a._last_harvested})
+        if a.dormant:
+            a.dormant_steps += 1
+            if a.wealth >= k_reactivate * cost:
+                a.dormant = False
+                a.dormant_steps = 0
+                react += 1
+            elif a.dormant_steps > t_dormant_max:
+                a.alive = False
+                perm += 1
+            a.age += 1
+            if a.age >= a.max_age:
+                a.alive = False
+        else:
+            if a.wealth < k_dormant * cost:
+                a.dormant = True
+                a.dormant_steps = 0
+                a.age += 1
+                if a.age >= a.max_age:
+                    a.alive = False
+            else:
+                a.wealth -= cost
+                a.age += 1
+                if a.wealth <= 0 or a.age >= a.max_age:
+                    a.alive = False
+    return react, perm
+
+
+def test_metabolize_si_dormancy_bit_identical():
+    m = _model("si_bounded", steps=2,
+               si_bounded={"beta_metabolism": 5.0},
+               dormancy={"enabled": True})
+    agents = _ordered(m)
+    beta = m._si_cost_model.beta
+    dc = m._dormancy_cfg
+    _setup_si_dormancy_branches(agents, beta, dc.k_dormant, dc.k_reactivate, dc.t_dormant_max)
+
+    arr = snapshot(m)
+    n = arr.n_slots
+    res = metabolize_si_dormancy(
+        arr.columns["wealth"][:n], arr.columns["age"][:n], arr.columns["max_age"][:n],
+        arr.columns["metabolism"][:n], arr.columns["dormant"][:n],
+        arr.columns["dormant_steps"][:n], arr.columns["alive"][:n],
+        beta, dc.k_dormant, dc.k_reactivate, dc.t_dormant_max,
+        k_carry=m._si_cost_model.k_carry, phi_carry=m._si_cost_model.phi_carry,
+    )
+
+    react, perm = _oracle_si_metabolize(agents, dc.k_dormant, dc.k_reactivate, dc.t_dormant_max)
+
+    assert np.array_equal(res["wealth"], np.array([a.wealth for a in agents]))
+    assert np.array_equal(res["age"], np.array([a.age for a in agents]))
+    assert np.array_equal(res["dormant"], np.array([a.dormant for a in agents]))
+    assert np.array_equal(res["dormant_steps"], np.array([a.dormant_steps for a in agents]))
+    assert np.array_equal(res["alive"], np.array([a.alive for a in agents]))
+    assert res["reactivations"] == react
+    assert res["permanent_dormancy_deaths"] == perm
+    # sanity: the setup actually exercised the interesting branches
+    assert react > 0 and perm > 0
+
+
+def test_metabolize_si_dormancy_kcarry_penalty():
+    # k_carry wealth-penalty side effect (Stage 4.5) must match step_cost exactly
+    m = _model("si_bounded", steps=1,
+               si_bounded={"beta_metabolism": 5.0, "k_carry": 2.0, "phi_carry": 0.02},
+               dormancy={"enabled": True})
+    agents = _ordered(m)
+    beta = m._si_cost_model.beta
+    dc = m._dormancy_cfg
+    for i, a in enumerate(agents):
+        a.age, a.alive, a.dormant, a.dormant_steps = 30, True, False, 0
+        a._last_moved, a._last_harvested = False, 0.0
+        a.wealth = float((i % 6) * 4 * a.metabolism)   # some above the k_carry ceiling
+
+    arr = snapshot(m)
+    n = arr.n_slots
+    res = metabolize_si_dormancy(
+        arr.columns["wealth"][:n], arr.columns["age"][:n], arr.columns["max_age"][:n],
+        arr.columns["metabolism"][:n], arr.columns["dormant"][:n],
+        arr.columns["dormant_steps"][:n], arr.columns["alive"][:n],
+        beta, dc.k_dormant, dc.k_reactivate, dc.t_dormant_max,
+        k_carry=m._si_cost_model.k_carry, phi_carry=m._si_cost_model.phi_carry,
+    )
+    _oracle_si_metabolize(agents, dc.k_dormant, dc.k_reactivate, dc.t_dormant_max)
+    assert np.array_equal(res["wealth"], np.array([a.wealth for a in agents]))
+    assert np.array_equal(res["alive"], np.array([a.alive for a in agents]))

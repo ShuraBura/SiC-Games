@@ -150,3 +150,84 @@ def eta(
     out = np.where(a < a_min, juv, out)
     out = np.where(a > a_max, elder, out)
     return out
+
+
+# ── Tier-1: Si dormancy-aware metabolize state machine (Stage 4.3) ─────────────
+
+def metabolize_si_dormancy(
+    wealth: np.ndarray,
+    age: np.ndarray,
+    max_age: np.ndarray,
+    metabolism: np.ndarray,
+    dormant: np.ndarray,
+    dormant_steps: np.ndarray,
+    alive: np.ndarray,
+    beta: float,
+    k_dormant: float,
+    k_reactivate: float,
+    t_dormant_max: int,
+    k_carry: float | None = None,
+    phi_carry: float = 0.02,
+) -> dict:
+    """Vectorised Si dormancy metabolize (run.py Phase-3 Si branch), bit-identical.
+
+    Per-agent independent state machine — each agent's transition depends only on
+    its own (wealth, age, dormant, dormant_steps) and the shared config, so
+    simultaneous == sequential. cost = metabolism·β (ScaledMetabolicCost), with the
+    optional Stage-4.5 k_carry wealth-penalty side effect applied first (to all
+    agents, dormant included — matching step_cost). Si uses velocity_tau=0 so
+    wealth_velocity is never touched here.
+
+    Returns dict of new columns: wealth, age, dormant, dormant_steps, alive, plus
+    scalar counters reactivations and permanent_dormancy_deaths (for metrics parity).
+    """
+    wealth = wealth.astype(np.float64).copy()
+    metab = metabolism.astype(np.float64)
+
+    # cost = step_cost: optional k_carry penalty (side effect on wealth), then metab·β
+    if k_carry is not None:
+        ceiling = k_carry * metab
+        over = wealth > ceiling
+        wealth = np.where(over, wealth - phi_carry * (wealth - ceiling), wealth)
+    cost = metab * beta
+
+    is_dorm = dormant.astype(bool)
+    active = ~is_dorm
+
+    # ── dormant branch: steps++, then reactivate (precedence) elif permanent death ──
+    stepped = np.where(is_dorm, dormant_steps + 1, dormant_steps)
+    reactivate = is_dorm & (wealth >= k_reactivate * cost)
+    perm_death = is_dorm & (~reactivate) & (stepped > t_dormant_max)
+
+    # ── active branch: enter dormancy if below floor, else pay cost (normal) ──
+    enter_dorm = active & (wealth < k_dormant * cost)
+    normal = active & (~enter_dorm)
+
+    new_wealth = np.where(normal, wealth - cost, wealth)
+
+    new_dormant = is_dorm.copy()
+    new_dormant = np.where(reactivate, False, new_dormant)
+    new_dormant = np.where(enter_dorm, True, new_dormant)
+
+    new_steps = stepped.copy()
+    new_steps = np.where(reactivate, 0, new_steps)
+    new_steps = np.where(enter_dorm, 0, new_steps)
+
+    new_age = age + 1
+    senesce = new_age >= max_age
+    starve = normal & (new_wealth <= 0)
+
+    alive_out = alive.astype(bool).copy()
+    alive_out = np.where(perm_death, False, alive_out)
+    alive_out = np.where(senesce, False, alive_out)
+    alive_out = np.where(starve, False, alive_out)
+
+    return {
+        "wealth": new_wealth,
+        "age": new_age,
+        "dormant": new_dormant,
+        "dormant_steps": new_steps,
+        "alive": alive_out,
+        "reactivations": int(reactivate.sum()),
+        "permanent_dormancy_deaths": int(perm_death.sum()),
+    }

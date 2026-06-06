@@ -29,7 +29,7 @@ as written. When in doubt about scope: stop and ask, do not improvise.
       carbon.py          — C decision
       silicon.py         — Si decision
       softmax_base.py    — shared softmax
-  tests/                 — 285 tests (must stay green)
+  tests/                 — 287 tests (must stay green)
   configs/               — YAML configs for all runs
   outputs/               — HTML reports + parquets
   BUGS.md                — known-issues ledger
@@ -73,7 +73,7 @@ python -m cProfile -s cumtime sic_games/run.py # profile
    to 1e-9 relative tolerance, deaths/births/positions exact integer match.
    If gate fails: revert immediately, bisect, flag in report.
 
-3. **Run full test suite after every code change.** All 285 tests must pass
+3. **Run full test suite after every code change.** All 287 tests must pass
    before proceeding. If a test breaks, fix it before the next step.
 
 4. **Implement and test before running simulations.** Never run a production

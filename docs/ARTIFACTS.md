@@ -29,6 +29,7 @@
 |---|---|---|---|---|---|
 | Stage 5.2 report (Cultural Dynamics) | 2026-05-29 | run report | Do c2 defection, Deffuant, and the σ_inherit sweep behave as designed? | Cultural layer stable; c2 defection rare (3.7%) and **uncorrelated with c2** (no selection differential); Deffuant homogenises ψ as designed; **σ*=0.10 selection was mis-gated on ψ — RETIRED** (see DEAD_ENDS, ARCHITECTURE §12.1-D). | `[CHAT-ONLY]` report.html — confirm repo location |
 | Perf Audit + Optimisation report | 2026-05-28 | benchmark + audit | Step-time breakdown; scaling exponents; feasible grid/N for LHS | LOW-risk fixes applied, **science unchanged to 1e-9**; **N exponent 1.05** (≈linear), **grid exponent 2.957** (near-cubic, target ≤2.0); B0(50²,250)=13 ms/step, B2(100²,1000)=110 ms/step, B4(150²,2000)=410 ms/step; LHS feasible to N=2000/150² as weekend batch. MED/HIGH-risk items deferred (§6 backlog). | `[CHAT-ONLY]` report_perf_audit.html — confirm repo location |
+| Stage 7.5 GATE A0 (array restructure) | 2026-06-06 | parity gate | Does the SoA+harness reproduce the oracle's per-agent updates? | **PASS.** SoA container + parity harness stood up; Tier-1 per-agent updates migrated bit-identically (cred decay, metabolize C/greedy + Si dormancy state machine, Si-cred band, η); σ is **Tier-2 (rtol 1e-9)** — finding: np.tanh ≠ math.tanh by ~1 ULP (ARCHITECTURE §12.1-G). Oracle untouched. Suite 287 passed. | `sic_games/outputs/stage7_5/gate_A0_report.md` |
 
 ## Key established numbers (quick reference — full context in the reports above)
 
