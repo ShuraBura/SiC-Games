@@ -169,3 +169,58 @@ See blueprint §10.9 for the maintenance protocol.
 **What was noted (for Stage 2+):**
 - Turchin finds stratification destabilizing in historical data — a competing prediction to the "Cred as adaptive mechanism" claim.
 - The Stage 6 statistical framework should explicitly test whether our model reproduces or contradicts Turchin's destabilization prediction.
+
+---
+
+> **Merge note (2026-06-05 reorg):** the section below was unified in from a second,
+> root-level LITERATURE.md (the focused "Si Cred mechanism" study) that the fuller
+> bibliography above did not contain. Where a source recurs (Epstein & Axtell;
+> Brock & Hommes), the entry above is the general home and the synthesis below cites
+> it for the Si-Cred-specific rationale. Source archived at
+> `archive/superseded/LITERATURE_root-SiCred_2026-06-05.md`.
+
+## Stage 5 — Task 3: Si Cred Mechanism
+
+**Question:** What mechanism governs how the Si "Cred" (performance-based
+reputation) accumulates and influences behaviour in bounded-rational agents?
+
+**Axelrod (1984) — *The Evolution of Cooperation*:**
+Repeated-game reputation (tit-for-tat) stabilises cooperation without central
+enforcement; reputation is *relational* (dyadic) and binary. Key insight adopted
+for Si Cred: *performance history creates a signal behaviour can condition on*.
+**Adopted:** the self-referential performance-feedback loop (agent adjusts its own
+temperature from its own recent harvest surplus) — *not* the dyadic reputational
+model, which needs interaction tracking deferred to Stage 5.x.
+
+**Nowak & May (1992) — spatial prisoner's dilemma:**
+Local-neighbourhood reputation drives spatial clusters of cooperators. Motivates
+keeping Si Cred a *local* signal rather than a global broadcast.
+**Rejected for Si Cred:** full neighbourhood reputational tracking adds O(N·r²)
+state per step; deferred to Stage 5.x.
+
+**Bounded-rationality / performance-modulated temperature (Brock & Hommes 1997
+*Econometrica*; Hommes 2006 *JEL*):** the Softmax/Boltzmann σ-temperature rule is
+standard, but there global temperature is *fixed*. Si Cred *personalises* it —
+high-surplus agents get higher σ_eff (more explorative), mirroring "confidence."
+**Adopted:** σ_Si_eff_i(t) = σ_Si + κ_Si · tanh(si_cred_i(t) / C*_Si),
+with κ_Si < C's κ because Si has no joint-task amplification channel.
+
+### Mechanism adopted (Stage 5 default — values are authoritative in PARAMETERS.md once split)
+
+```
+Δsi_cred_i(t) = max(0, harvest_i(t) − metabolism_i(t)) × r_cred_Si
+si_cred_i(t)  = si_cred_i(t−1) × (1 − δ) + Δsi_cred_i(t)
+σ_Si_eff_i(t) = σ_Si + κ_Si × tanh(si_cred_i(t) / C*_Si)
+```
+
+`enabled=False` recovers Stage 4.5 Si behaviour exactly.
+**Note (cross-ref CLAUDE.md param ledger):** `r_cred_Si` was subsequently
+**RETIRED** in the Stage 5.1 Si-Cred near-dormancy redesign — see the locked-param
+table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
+
+### Rejected alternatives
+- **Dyadic reputational Cred:** requires a pair-interaction log; deferred to Stage 5.x.
+- **Wealth-proportional Cred:** w_i/mean_w conflates stock and flow; surplus-flow
+  (harvest−metabolism) is cleaner — signals *current* foraging success, not
+  accumulated advantage.
+- **Binary high/low Cred:** loses gradient information that σ modulation uses.

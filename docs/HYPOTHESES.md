@@ -1,0 +1,89 @@
+# SiC Games — Pre-Registered Hypotheses
+
+**The ONE question:** "What did we predict *before looking*, and how did it resolve?" (charter §2, home 7).
+
+**Purpose:** The authoritative record of what the project *predicted before looking at the data*, and how each prediction resolved. This document exists to prevent HARKing (Hypothesising After Results are Known). A hypothesis written here *before* the run that tests it is a genuine prediction; a "hypothesis" written after seeing results is a description, and the project does not count it as confirmation.
+
+**Discipline (charter §1.4, §5):**
+- **Append-only.** Never edit a hypothesis after its test has run. Add a dated **Resolution** block beneath it instead.
+- Every entry has: an ID, the date registered, a falsifiable claim, the test specification (what run, what statistic, what threshold), the pre-committed interpretation of each outcome, and the stage/artifact that will test it.
+- Nothing enters here without a test spec + pre-committed interpretation. Aspirations live in **TARGETS.md** and *graduate* here only when they acquire a falsification spec (charter §5).
+
+**Status key:** `OPEN` (registered, not yet tested) · `RESOLVED-SUPPORTED` · `RESOLVED-REFUTED` · `RESOLVED-AMBIGUOUS` · `SUPERSEDED`.
+
+> **Triage note (2026-06-05 reorg):** this file was consolidated from two divergent copies.
+> Resolved/relocated entries were routed to their charter homes: **H1(ii) → RESULTS.md**
+> (resolved finding); **H-ORTHOGONALITY → TARGETS.md T-2** + a DEAD_ENDS note;
+> **H-instinct-debt → TARGETS.md T-3**. The three live, falsifiable, run-pending entries
+> below stay here. See `archive/superseded/` for the two source files + routing notes.
+
+---
+
+## H-EMERGE-1 — Emergent group structure from topographic heterogeneity
+
+**Registered:** 2026-05-29.
+**Status:** OPEN.
+**Centrality:** HIGH. This is a load-bearing pre-registration: the group-level dynamics the project intends to study later (differential cohesion, asabiyyah, between-group effects) are only legitimate to pursue if group structure *emerges* from existing mechanisms rather than being imposed. This hypothesis tests that precondition. It is registered now, before the terrain-topography stage exists, precisely because it would be tempting to assert after the fact ("groups emerged, as expected") — writing the prediction first is the honest order.
+
+**Claim (falsifiable):**
+On a single world with sufficiently large spatial extent and heterogeneous topography (distinct resource regimes — e.g. a highland regime and a valley regime), and at a population large enough to sustain a viable sub-population in each region, the existing mechanisms (local-neighbour Deffuant cultural transmission + spatial sorting + biparental/fission reproduction) will produce **spatially-partitioned cultural differentiation** — regions will develop measurably different distributions of the cohesion-relevant traits (c1, c2, and ψ) — **without any group-level mechanism being added.** Group structure is predicted to be an *emergent partition*, not a coded construct.
+
+**Mechanistic grounding (see LITERATURE.md):**
+- Epstein & Axtell (1996), Sugarscape "tribes": spatial structure + local interaction produces persistent cultural groups with no group-level rule. `[INLINE]`
+- Turchin (2003) asabiyyah-on-frontiers: cohesion differentiates most sharply at high-contrast regime boundaries — i.e. exactly where topography creates them. `[INLINE]`
+- Metapopulation / habitat-heterogeneity (population ecology): regions of differing carrying capacity structure local interaction and persistence. `[UNVERIFIED — general]`
+
+**Test specification:**
+- **Run:** the terrain-topography stage (roadmap: terrain → LHS → Stage 6), single world, heterogeneous topography with ≥2 distinct resource regimes, C strategy (and separately Si), Deffuant ON, existing mechanics only — **no group-membership code, no group-level cohesion variable, no between-group mechanism.**
+- **Scale (from the 2026-05-28 perf audit; superseded by the 2026-06-05 substrate perf recon — see ARTIFACTS.md):** the substrate perf recon (6.0a-perf) found occupancy is the cost wall and grid-cells are sub-dominant at low occupancy; re-derive the affordable grid/N before this run.
+- **Primary statistic:** Moran's I for c1, c2, ψ at steady state (diagnostic exists since Stage 3.3). High Moran's I = spatial autocorrelation = regional clustering of traits.
+- **Secondary statistic:** regional trait distributions — partition agents by topographic region and compare per-region trait means and dispersions (SD, not Gini). Bimodality *across* the world resolving into *unimodal-but-different* distributions *within* regions is the signature of emergent groups.
+- **Seeds:** ≥8 (a 2-seed result cannot distinguish genuine structure from a single lucky partition).
+
+**Pre-committed interpretation (state before the run):**
+- **Supported:** Moran's I for c1/c2 high and stable, regional trait distributions differ significantly and consistently across seeds, no group-level code present. → Emergent group structure is real on existing mechanisms; the asabiyyah / differential-cohesion programme is empirically grounded and may proceed to *measurement* (still not to imposed-group mechanisms).
+- **Refuted:** Moran's I stays low / traits stay well-mixed despite topography. → Interaction/movement ranges too long relative to world extent. The correct response is **geometric** (larger world or shorter interaction radius), **not** a new mechanism.
+- **Ambiguous:** structure in some seeds/regions but not others, or grid-size-sensitive. → Marginal-separation regime; characterise the dependence on grid/radius before any group-level work.
+
+**Explicitly NOT licensed (TMTS guard):** a *supported* result licenses **measuring** emergent group properties. It does **not** license adding hierarchical lumping / family-cell base units, group-membership tracking, group-level cohesion variables, or between-group competition. Those remain deferred and would each need their own registration.
+
+**Resolution:** *(none yet — OPEN)*
+
+---
+
+## H-SUBSTRATE-6.0a — Multi-occupancy substrate viability
+
+**Registered:** 2026-06-03.
+**Status:** OPEN — pre-registration; the §7.2 behavioural readings were taken (see ARTIFACTS.md / the Stage 6.0a checkpoint) but the formal resolution block is pending the supervisor's density-flag review.
+
+**Statement:** This is a substrate pre-registration, not a theory-bearing hypothesis. It records the sanity readings committed before the Stage 6.0a §7.2–7.4 behavioural numbers are seen, so a sane/insane substrate cannot be reinterpreted after the fact. The generalised multi-occupancy substrate (resource-split harvest, Cred-weighted contest for C, diffusion movement) is predicted to be a viable, physically-plausible generalisation of the one-agent-per-cell model.
+
+**Pre-committed readings (stated before the run):**
+1. **C viability (κ=0 and κ=1).** N(t) settles to a stable band — neither extinction nor unbounded growth — within the ≥2000-step run. Settles both κ → substrate viable; crashes/pins/explodes → broken or per-capita-need vs regrowth miscalibrated (blocking, investigate before 6.0b).
+2. **Self-limiting density.** Per-cell occupancy stabilises (per-capita intake → metabolic break-even), not unbounded crowding or overcrowding-collapse to zero.
+3. **Density vs ethnography (flat terrain).** Steady-state persons/km² (agents/cell ÷ 100) lands order ~0.1, within ~0.01–1. Inside → scale calibration sane for 6.0b; outside → per-capita-need vs sugar-regrowth miscalibrated for the declared 100 km²/cell (calibration flag, investigate before 6.0b).
+4. **Cred–wealth concentration (κ=1 only) — OBSERVE AND DEFER.** Cov(φ,wealth) and the Cred distribution logged. Rising covariance + collapsing Cred toward a single dominant high-φ lineage = a **Matthew-runaway flag**. 6.0a does NOT mitigate and this pre-registration does NOT pre-commit an interpretation: observed, magnitude reported, design response deferred.
+5. **N_carry / N ratio.** Settled N and whether it sits in a viable band reported as evidence toward the deferred N_carry reconciliation. No threshold pre-committed; descriptive only.
+
+**Test reference:** Stage 6.0a §7.2 (C-behavioural, κ=0 vs κ=1, ≥2000 steps), §7.3 (density validation), §7.4 (N_carry flag). Recovery gate §7.1 PASSED bit-identically.
+
+**Resolution:** *(pending supervisor density-flag review — the §7.2 readings: C viable both κ (settles ~1080/1150); self-limiting confirmed; density ~0.0011 p/km² ≈100× below band → calibration flag; no Matthew-runaway, Cov(φ,wealth)≈−0.11. See ARTIFACTS.md.)*
+
+---
+
+## H_cc — C carry-discount counter-cyclical recovery
+
+**Registered:** Stage 4.5 patch (2026-05-28).
+**Status:** OPEN (partially supported, single-seed) — KEPT live: the multi-seed A=0.9 run is still planned.
+
+**Claim (falsifiable):** The carry_discount birth ceiling (`max(0, 1 − N_C/N_carry)`) produces a counter-cyclical birth boost during troughs: as N_C falls during a trough, the discount decreases, P_birth rises, accelerating recovery. C trough-recovery speed is therefore faster than a DTM-formula-alone prediction.
+
+**Test specification:** regress C trough-recovery time on N_min/N_carry across seeds; predict a negative slope. Multi-seed at A=0.9 (≥5 seeds).
+
+**Status detail:** Regression-supported at Stage 5 (single-seed). Pending multi-seed at A=0.9.
+
+**Resolution:** *(none yet — single-seed supportive; multi-seed pending)*
+
+---
+
+*End of HYPOTHESES — consolidated 2026-06-05. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*

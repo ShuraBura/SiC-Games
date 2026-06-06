@@ -92,6 +92,17 @@ python -m cProfile -s cumtime sic_games/run.py # profile
 10. **Update ROADMAP.md at the end of every stage.** Mark stage complete,
     add locked parameter values, note deferred items.
 
+11. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
+    When any blueprint gate fails — *even by a small margin* — STOP and surface it for the
+    supervisor's call. Do NOT absorb a gate breach and proceed, and do NOT bundle a gating
+    task and the run it gates into one job so the gate cannot block. Gate-first means the
+    gate must be a *blocking checkpoint*: confirm PASS before launching the gated run. A small
+    breach may well be acceptable, but that judgment belongs to the supervisor, not the coding
+    agent. (Origin: in R0, the static equivalence gate's rel_std component was out of tolerance
+    by ~2%; CC had bundled Task 1 and Task 2 into one background job and let the seasonal
+    matrix proceed rather than stopping. The breach was benign and accepted, but the override
+    was the supervisor's to make.)
+
 ---
 
 ## Locked parameters — do not change without explicit instruction
@@ -120,9 +131,14 @@ python -m cProfile -s cumtime sic_games/run.py # profile
 | k_dormant | 1.0 | Stage 4.3 |
 | τ_trickle | 0.05 | Stage 4.3 |
 | k_reactivate | 3.0 | Stage 4.3 |
-| r_cred_Si | 0.1 | Stage 5 |
+| r_cred_Si | RETIRED (Stage 5.1) | replaced by binary near-dormancy trigger |
+| k_cred_band | 1.0 | Stage 5.1 |
 | κ_Si | 0.5 | Stage 5 |
 | C*_Si | 10.0 | Stage 5 |
+| c2_defection.enabled | True | Stage 5.2 |
+| deffuant.epsilon | 0.2 | Stage 5.2 |
+| deffuant.mu | 0.3 | Stage 5.2 |
+| sigma_inherit | 0.10 | Stage 5.2 (raised from 0.05) |
 | k_density (c_spatial_density period) | 10 | Perf opt pass |
 | k_moran (Moran's I period) | 10 | Perf opt pass |
 
@@ -181,3 +197,59 @@ Then provide a 3-bullet summary:
 - What was just done (files changed, tests added, parameters locked)
 - What the equivalence gate confirmed
 - What comes next (next blueprint or task)
+
+
+R1 — Terminal-state accounting (mandatory, in the MAIN result table)
+For every run, the primary results table (not an "informational" or
+"note only" table) must contain, per seed:
+FieldDefinitionsurvived_to_t_endtrue / falseextinction_stepfirst step t where N_active == 0; — if neverextinction_phaseseasonal phase at extinction_step (peak / trough), and trough index if in a trough; — if survivedN_active_t_endpopulation at the final stepN_min / N_min_steppopulation nadir and the step it occurred
+A run that ends in an absorbing state (extinction, population ceiling lock,
+total dormancy) must report the step at which it happened and the
+environmental conditions at that step. "Note only" is prohibited for any
+absorbing-state event.
+R2 — Gate-versus-finding separation
+A passed gate is not a finding. Every gate result is followed by one
+sentence stating what passing or failing means scientifically.
+If a gate passes while an adverse terminal event occurs in the same run
+(e.g. counter-cyclicality gate passes but the population goes extinct), the
+report MUST reconcile the two in prose, in the same section. A green checkmark
+may never stand alone next to an extinction or collapse. State plainly: "the
+mechanic worked as designed AND the outcome was X."
+R3 — Magnitude, not just direction
+For any directional gate (X > Y), report the magnitude (ratio or delta)
+and compare it to baseline so the reader can judge whether the effect is
+meaningful or negligible. "σ_eff rose during troughs ✓" is incomplete; "σ_eff
+rose by 0.04 above a baseline of 1.238 (≈3%)" is complete.
+R4 — Self-audit / anomaly section (mandatory)
+Every report contains an Anomalies & Open Questions section immediately
+before the synthesis. It lists: unexpected values, results that complicate the
+headline, missing items, internal inconsistencies, and any metric that the
+author had to reconcile. The author flags these proactively. If there are none,
+the section says "None identified" — it is never omitted.
+R5 — Synthesis is the deliverable
+Every report ends with a synthesis (≥150 words for routine stages, ≥250 for
+H1(ii)-relevant stages) that states: the claim, evidence for, evidence against,
+and a confidence level. "See table" is not an acceptable synthesis. The
+synthesis must explicitly address any adverse terminal event from R1.
+R6 — Required emitted tracking (code-level)
+The simulation/diagnostics layer must emit, per run, so that R1 can be filled:
+
+extinction_step — first t with N_active == 0, else null.
+seasonal_phase(t) at the extinction step (reuse the existing
+seasonal_phase metric from Stage 4.2: peak if sugar > 0.75×peak, trough if
+sugar < 0.25×peak, else transition) and the trough index.
+N_min and argmin_t N_active (nadir and its step).
+t_end value of N_active.
+
+These fields are emitted for all runs regardless of strategy or whether
+extinction is expected, so the schema is uniform across stages.
+R7 — Report self-check before writing the file
+Before producing report.html, confirm internally:
+
+Does every run have an R1 terminal-state row in the main table?
+Is every gate followed by an R2 interpretation sentence?
+Is any adverse terminal event reconciled with any passed gate (R2)?
+Are directional gates accompanied by magnitudes (R3)?
+Is the Anomalies section present (R4) and the synthesis present (R5)?
+
+If any answer is "no", fix it before writing the file.
