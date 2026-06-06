@@ -159,6 +159,26 @@ mortality), not the resource regime. See `outputs/r0_confound/report_r0.html`.
 **Method:** content moved verbatim, no facts altered; section numbers preserved across both files so every existing "MODEL_SPEC §N / §12.x / §15.x" pointer still resolves. PARAMETERS extraction (the other half of §6) is **not** part of this change — parameter values remain in the `sic_games/CLAUDE.md` locked-param table (the §14 pointer points there) until extracted.
 **Status:** done. INDEX.md, README.md, and `sic_games/CLAUDE.md` triggers updated to name the two homes.
 
+### §12.1-G — σ formula is Tier-2 (not Tier-1) under vectorised tanh (2026-06-06)
+
+**Finding (Stage 7.5 WS-A migration):** the blueprint §3 listed the decision-σ formula
+`σ = σ_base + κ·tanh(𝒞/C*)` (and `σ_Si_eff`, status amplification) under **Tier 1
+(bit-identical)**. Empirically, on **numpy 2.4.3 / this platform, `np.tanh` is NOT
+bit-identical to Python's `math.tanh`** — it differs by up to ~1 ULP (max relative
+~2.2e-16). (`np.exp` *is* bit-identical here, so the stress sigmoid is unaffected.)
+**Therefore the vectorised σ migration is Tier-2 (rtol ≈ 1e-9), not Tier-1** — it
+passes the 1e-9 gate with ~10⁷ margin, but cannot be claimed bit-identical without
+applying tanh scalar-wise (which forfeits the vectorisation that is the whole point).
+
+**Decision:** classify `temperature_carbon` / `temperature_si` / status-amplification as
+**Tier-2**; keep the genuinely pure-arithmetic per-agent updates (cred decay, metabolize,
+Si-cred band, η(a)) as **Tier-1 bit-identical** (verified). This is consistent with §3's
+own logic — Tier-2 is the home for "algebraically exact, FP differs"; transcendental-
+implementation divergence is the same class as reduction-order divergence. The σ value
+feeds a softmax; a ~1-ULP shift could in principle flip a movement tie with vanishing
+probability — folded into the Tier-3 statistical battery at the full-model gate. Code:
+`src/sic_games/soa_tier1.py`; parity tests: `tests/test_soa_tier1.py`.
+
 ---
 
 ## 13. Architecture seams
