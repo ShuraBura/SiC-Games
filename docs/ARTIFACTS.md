@@ -31,6 +31,7 @@
 | Perf Audit + Optimisation report | 2026-05-28 | benchmark + audit | Step-time breakdown; scaling exponents; feasible grid/N for LHS | LOW-risk fixes applied, **science unchanged to 1e-9**; **N exponent 1.05** (≈linear), **grid exponent 2.957** (near-cubic, target ≤2.0); B0(50²,250)=13 ms/step, B2(100²,1000)=110 ms/step, B4(150²,2000)=410 ms/step; LHS feasible to N=2000/150² as weekend batch. MED/HIGH-risk items deferred (§6 backlog). | `[CHAT-ONLY]` report_perf_audit.html — confirm repo location |
 | Stage 7.5 GATE A0 (array restructure) | 2026-06-06 | parity gate | Does the SoA+harness reproduce the oracle's per-agent updates? | **PASS.** SoA container + parity harness stood up; Tier-1 per-agent updates migrated bit-identically (cred decay, metabolize C/greedy + Si dormancy state machine, Si-cred band, η); σ is **Tier-2 (rtol 1e-9)** — finding: np.tanh ≠ math.tanh by ~1 ULP (ARCHITECTURE §12.1-G). Oracle untouched. Suite 287 passed. | `sic_games/outputs/stage7_5/gate_A0_report.md` |
 | Stage 7.5 GATE A1 (reductions) | 2026-06-06 | parity gate + N-scaling benchmark | Do vectorised reductions match the oracle at rtol 1e-9? Does killing mean_cred-per-birth eliminate the O(N²) tail? | **PASS.** `mean_cred_vec`, `mean_wealth_vec`, `gini_vec`, `harvest_split_segment` all Tier-2 (rtol 1e-9, actual deltas < 1e-13). **Oracle 10k→19k exponent: 2.055** (confirms O(N²)); **vec: 0.746** (sub-linear SIMD, hotspot gone). Speedup 26,635× at N=19k. Numba eligibility confirmed by inspection (no agent-object access). Oracle untouched. Suite 292 passed. | `sic_games/outputs/stage7_5/gate_A1_report.md` |
+| Stage 7.5 GATE B1 (VecJTM) | 2026-06-06 | parity gate + occupancy benchmark | Does VecJTM eliminate the occupancy cliff and achieve statistical equivalence? | **STOP — two gate failures.** OCC_1600: 115.5 ms/step (32% speedup vs oracle 170.6 ms). OCC_3200: hard-infeasible (both oracle and VecJTM) due to O(N²) BiparentalReproduction at high N (new bottleneck). Tier-3 battery FAIL: population extinct before WINDOW_START=251; min N(t) coverage = 0.845 < 0.90 threshold. **Undeclared behavioral difference found:** oracle allows agent double-participation across adjacent JT cells (processed_cells tracks cells not agents); VecJTM consumed mask prevents it. Supervisor decisions required: (A) match oracle semantics or accept improvement; (B) revise battery config; (C) performance path. Unit tests: 9 new pass; suite 301 total. | `sic_games/outputs/stage7_5/gate_B1_report.md` |
 
 ## Key established numbers (quick reference — full context in the reports above)
 
@@ -40,6 +41,9 @@
 | N-runtime exponent (post-audit) | 1.053 | Perf Audit 2026-05-28 |
 | mean_cred oracle hotspot 10k→19k exponent | 2.055 | Stage 7.5 GATE A1 2026-06-06 |
 | mean_cred vec 10k→19k exponent | 0.746 (sub-linear SIMD) | Stage 7.5 GATE A1 2026-06-06 |
+| OCC_1600_g40 VecJTM ms/step | 115.5 (vs oracle 170.6, −32%) | Stage 7.5 GATE B1 2026-06-06 |
+| OCC_3200_g40 VecJTM status | hard-infeasible (O(N²) biparental birth bottleneck) | Stage 7.5 GATE B1 2026-06-06 |
+| Tier-3 battery min N(t) coverage | 0.845 (FAIL; threshold 0.90) | Stage 7.5 GATE B1 2026-06-06 |
 | grid-runtime exponent (post-audit) | 2.957 | Perf Audit 2026-05-28 |
 | ms/step B2 (100×100, N=1000) | 110.2 | Perf Audit 2026-05-28 |
 | ms/step B4 (150×150, N=2000) | 409.7 | Perf Audit 2026-05-28 |

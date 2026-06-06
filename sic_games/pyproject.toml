@@ -31,3 +31,6 @@ select = ["E", "F", "W", "I"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: long-running tests (Tier-3 statistical batteries, perf benchmarks); run with -m slow",
+]
