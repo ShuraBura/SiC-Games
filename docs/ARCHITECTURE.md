@@ -192,6 +192,129 @@ one-liner `np.array_equal(np.tanh(x), [math.tanh(v) for v in x])` on the new bui
 this entry with the version + result. (Same spirit as the OWE-1 unit-convention guards:
 pin the thing that would otherwise cost someone an afternoon.)
 
+### §12.1-H — Tier-3 pre-registration: GATE B1 vectorised JT equivalence (2026-06-06)
+
+**Purpose of this entry.** Blueprint §3 mandates that Tier-3 equivalence criteria be
+*written down and committed before any comparison is run* — the same anti-HARKing discipline
+as the HYPOTHESES entries. This entry is that pre-registration. Nothing in §H was written
+after seeing any B1 output. The implementation proceeds only after this is committed.
+
+---
+
+#### H.1 — Vectorised JT scheme declaration
+
+The vectorised JT (`soa_jt.py`) adopts the following resolution scheme; deviations from the
+oracle's sequential Python loop are here *declared*, not discovered:
+
+| Aspect | Oracle (frozen) | Vec JT (B1) | Tier |
+|---|---|---|---|
+| Cluster definition | Agents within toroidal Euclidean distance d of qualifying cell | Same: agents in CellBuckets segments for cells within d | 3 — semantically equivalent |
+| Processing order | x-major (x=0..W-1, y=0..H-1) Python scan | Qualifying cells in ascending linear-index order (y\*W+x) — identical to oracle | 3 — matches oracle tie-breaking |
+| Agent exclusivity | `processed_cells` set prevents double-counting | Boolean `consumed` mask; agents absorbed by lowest-index qualifying cell first | 3 — matches oracle semantics |
+| Defection RNG | `agent._rng.random()` — per-agent Python RNG object, draw order = cluster order | `keyed_uniform(seed, step, agent_ids, "jt_c2_defect")` — order-independent per D2 | **3 — deliberate change** |
+| Matthew weights | `(a.cred + ε)^α` per agent in cluster — Python list comprehension | `(cred[cluster_slots] + ε)^α` — vectorised numpy op; same arithmetic | 2 — bit for bit (pure power) |
+| Sugar distribution | Immediate: `agent.wealth += share` in cluster loop | Gathered: `sugar_delta[slot] = share`; applied outside per-step | 1 — same arithmetic |
+| Cred delta | `agent._pending_cred_delta += delta` | `cred_delta[slot] += delta`; flushed same as oracle | 1 — same arithmetic |
+
+**The one deliberate semantic change (defection RNG):** the oracle's `agent._rng.random()` draws
+from each agent's own per-agent Python RNG stream, which advances independently of order. Under
+the oracle, draw order within a cluster doesn't affect each agent's own draw (each uses its own
+RNG), but the *sequence* of `agent._rng.random()` calls still differs from the keyed-uniform
+approach: the oracle's per-agent RNG carries state across steps, while D2's keyed RNG is
+stateless (derived entirely from seed, step, agent_id, stream). This means two runs with
+identical seeds and states but different JT cluster orderings will produce identical defection
+draws under D2 but potentially different draws under the oracle. This is a **deliberate Tier-3
+semantic**: the defection events are Bernoulli(c2_i) in both cases; the draws are from the same
+distribution but with different correlational structure across steps. Validated by the battery.
+
+---
+
+#### H.2 — Pre-registered acceptance criteria (GATE B1 statistical equivalence)
+
+**These thresholds are locked. They cannot be adjusted after the battery is run.**
+
+**Battery configuration:**
+- Seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51] — 10 matched pairs
+- Config: carbon strategy, 100×100 grid, `N_init=500`, `N_carry=800`, 400 steps,
+  `multi_occupancy.enabled=True`, `kappa=1.0`, `c2_defection.enabled=True`
+- Comparison: oracle model (run.py + oracle JointTaskManager) vs hybrid model
+  (run.py with `_jt_manager` replaced by `VecJointTaskManager` — same Python interface,
+  vectorised internals; oracle code is unchanged)
+- Statistics window: **last 150 steps** (steps 251–400) for steady-state comparisons;
+  full 400 steps for N(t) trajectory
+
+**Test 1 — N(t) trajectory envelope:**
+- Compute oracle mean(N(t)) and std(N(t)) across the 10 oracle runs at each step t
+- **Accept if:** for each of the 10 array runs, the array N(t) lies within
+  `mean_oracle(t) ± 2·std_oracle(t)` for ≥ **90% of steps** (t = 1..400)
+- Rationale: 2σ captures 95% of the oracle distribution; requiring 90% coverage on the
+  array trajectory allows for the natural sampling variation from scheme differences.
+
+**Test 2 — Steady-state distribution KS test (effect-size criterion):**
+- Pool: for each of oracle and array, pool all agent-level observations from the last 150
+  steps across all 10 seeds
+- Variables: `cred`, `wealth`, `phi`, `psi`, `c1`, `c2`
+- Statistic: **KS statistic** = max|CDF_array(x) − CDF_oracle(x)| (the Kolmogorov-Smirnov
+  maximum CDF discrepancy; NOT the p-value, which is trivially small at large N)
+- **Accept if:** KS statistic < **0.10** for all 6 variables
+- Rationale: KS = 0.10 means the two CDFs are at most 10 percentage points apart everywhere.
+  This is the effect-size criterion, not significance; a p-value threshold would reject any
+  real distribution at N~50k observations.
+
+**Test 3 — Per-seed moment check:**
+- For each of the 10 seed pairs: compute per-run means of `{mean_wealth, mean_cred,
+  gini_wealth, gini_cred, joint_task_count_per_step, defection_rate}` over the last 150 steps
+- Statistic: `|mean_array − mean_oracle| / max(|mean_oracle|, 1e-6)`
+- **Accept if:** relative difference < **0.10** (10%) for ≥ **8 of 10 seeds** on each metric
+- Rationale: allows 2 seeds to diverge due to path-dependence (defection RNG semantic); 8/10
+  is the minimum majority that still permits the scheme change to be the cause rather than a bug.
+
+**Test 4 — JT event rate:**
+- Per-seed mean JT events/step over the last 150 steps
+- **Accept if:** |mean_array − mean_oracle| / max(mean_oracle, 1e-6) < **0.20** (20%) for
+  ≥ 9/10 seeds
+- Rationale: JT event count is the most sensitive to the defection RNG change; a wider
+  tolerance of 20% is appropriate here. ≥9/10 seeds required.
+
+**Failure action (standing rule 11):** any single test failing is a STOP. Surface the failure
+with the specific metric and per-seed numbers before proceeding. Do not re-interpret criteria
+after seeing results. If the defection-RNG semantic change is causing divergence, the semantic
+must be revised (back toward oracle-compatible) and the full battery re-run.
+
+---
+
+#### H.3 — Performance gate (GATE B1 occupancy re-measure)
+
+The performance side of GATE B1 re-runs the same occupancy axis as the Stage 6.0a-perf recon
+to give a **direct, apples-to-apples comparison**:
+
+**Reference numbers (from `outputs/stage6_0a_perf/perf_results.json`, oracle JT):**
+
+| Label | Grid | N_init | Mean occ (settled) | ms/step (oracle) | Cut status |
+|---|---|---|---|---|---|
+| OCC_1600_g40 | 40×40 | 1,600 | 2.35/cell | 170.6 | window-completed |
+| OCC_3200_g40 | 40×40 | 3,200 | ~4.7 (projected) | hard-infeasible | cliff hit |
+| OCC_6400_g40 | 40×40 | 6,400 | ~9 (projected) | skipped-past-ceiling | — |
+| OCC_12800_g40 | 40×40 | 12,800 | ~18 (projected) | skipped-past-ceiling | — |
+
+**B1 re-run protocol:** same grid, same N_init, same measurement window (100 steps, 50-step
+warm-up, same `ms_mean` measurement), with vectorised JT replacing oracle JT.
+
+**B1 performance pass criterion (the go/no-go):**
+1. **OCC_3200_g40 must complete** the measurement window at < 300 ms/step (was hard-infeasible)
+2. **OCC_6400_g40 must be ≤ 500 ms/step** (extended affordable range)
+3. **Occupancy exponent** (log-log slope of ms/step vs mean occupancy): must be
+   consistent with O(N) or O(occupied cells) — exponent ≤ 1.5 on the vec JT alone
+   (was super-linear/cliff under oracle)
+
+If criterion 1 fails, the cliff is not gone — the JT redesign did not achieve its target. This
+is the GPU/JAX escalation trigger per blueprint §8: "If fail → Go/no-go: escalate to GPU/JAX
+tier or re-scope density."
+
+---
+
+*§12.1-H pre-registered 2026-06-06 before any B1 code was run. Criteria are locked.*
+
 ---
 
 ## 13. Architecture seams
