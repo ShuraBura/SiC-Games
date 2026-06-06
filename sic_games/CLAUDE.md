@@ -37,9 +37,11 @@ as written. When in doubt about scope: stop and ask, do not improvise.
 ```
 
 **Documentation lives in `../docs/` (the charter's 11 homes), not here.**
-ROADMAP, MODEL_SPEC, PARAMETERS, TARGETS, HYPOTHESES, RESULTS, ARTIFACTS,
-LITERATURE, DEAD_ENDS, INDEX + DOCS_CHARTER all moved to `../docs/` in the
-2026-06-05 reorg. Route via `../docs/INDEX.md`. Governance: `../docs/DOCS_CHARTER.md`.
+INDEX, ROADMAP, ARCHITECTURE, MECHANISMS, TARGETS, HYPOTHESES, RESULTS,
+ARTIFACTS, LITERATURE, DEAD_ENDS (+ DOCS_CHARTER) all live under `../docs/`
+(reorg 2026-06-05; MODEL_SPEC split into ARCHITECTURE + MECHANISMS 2026-06-06).
+PARAMETERS.md not yet extracted — interim param home is the locked-param table
+below. Route via `../docs/INDEX.md`. Governance: `../docs/DOCS_CHARTER.md`.
 
 ---
 
@@ -100,9 +102,10 @@ python -m cProfile -s cumtime sic_games/run.py # profile
       note deferred items). Parameter *values* are pointed to, not restated.
     - **Any parameter lock / sweep / retirement →** update `../docs/PARAMETERS.md`
       *(interim, until the §6 extraction: the locked-param table in THIS file below)*.
-    - **A construct introduced/redefined or a seam changes →** update
-      `../docs/MECHANISMS.md` / `../docs/ARCHITECTURE.md`
-      *(interim, until the §6 split: `../docs/MODEL_SPEC.md`)*.
+    - **A construct introduced/redefined or its lock status changes →** update
+      `../docs/MECHANISMS.md` (per-construct registry, §0–§11). **A seam, a
+      decomposition change, or a design decision →** `../docs/ARCHITECTURE.md`
+      (§12 decision-log is append-only; §13 seams; §15 gaps).
     - **Before any analysis that could HARK; on resolution →** `../docs/HYPOTHESES.md`
       (append-only). Aspirations without a test spec go to `../docs/TARGETS.md`.
     - **A finding is established →** `../docs/RESULTS.md` (append-only).

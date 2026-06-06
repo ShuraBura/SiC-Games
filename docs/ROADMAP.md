@@ -478,12 +478,12 @@ Items registered but not yet implemented. Checked each stage; cleared when done.
 | OWE-1 | Absolute-scale calibration: benchmark 100×100 geometry, assign cell→km and metabolic-unit→kcal under 1-step=1-month constraint | OWE-1 Blueprint 2026-05-30 | IN PROGRESS (this pass) |
 | OWE-2 | Terrain topography mechanic (spatially varying sugar + metabolism multiplier) | Stage 5.x agenda; chat_handoff §2 | OPEN |
 | OWE-3 | Stage 5.1 LHS parameter sensitivity scan (5D: A×T×N_carry×T_dormant_max×α_carry, ~30 pts) | chat_handoff §4 | OPEN |
-| OWE-4 | Davies/Loihi neuromorphic citation: confirm and add to LITERATURE.md (currently [INLINE] in MODEL_SPEC §9) | MODEL_SPEC §15.1 | OPEN |
-| OWE-5 | Si ψ utility hook: implement proximity-to-foraging-spots signal (distinct from C's agent-proximity signal) | ROADMAP "Pending — Si"; MODEL_SPEC §1.1 C2 flag | OPEN |
-| OWE-6 | Physical-channel inheritance: add metabolism/vision/max-age vertical transmission with control toggle | MODEL_SPEC §12.1-A; supervisor decision | OPEN — PROPOSED |
-| OWE-7 | HiveMind coordinator implementation (Si, collective reproduction decision) | MODEL_SPEC §13; Stage 7+ | DEFERRED |
+| OWE-4 | Davies/Loihi neuromorphic citation: confirm and add to LITERATURE.md (currently [INLINE] in MECHANISMS §9) | ARCHITECTURE §15.1 | OPEN |
+| OWE-5 | Si ψ utility hook: implement proximity-to-foraging-spots signal (distinct from C's agent-proximity signal) | ROADMAP "Pending — Si"; MECHANISMS §1.1 C2 flag | OPEN |
+| OWE-6 | Physical-channel inheritance: add metabolism/vision/max-age vertical transmission with control toggle | ARCHITECTURE §12.1-A; supervisor decision | OPEN — PROPOSED |
+| OWE-7 | HiveMind coordinator implementation (Si, collective reproduction decision) | ARCHITECTURE §13; Stage 7+ | DEFERRED |
 | OWE-8 | Movement-decomposition enumeration: difference-set axes for C vs Si foraging vs social displacement | OWE-1 §3.6; H-ORTHOGONALITY | OPEN |
-| OWE-9 | σ_inherit corrective sweep: target c1/c2 diversity (not ψ), ≥8 seeds, correct statistic (SD not Gini) | MODEL_SPEC §12.1-D | OPEN — corrective directive pending |
+| OWE-9 | σ_inherit corrective sweep: target c1/c2 diversity (not ψ), ≥8 seeds, correct statistic (SD not Gini) | ARCHITECTURE §12.1-D | OPEN — corrective directive pending |
 | OWE-10 | Stage 6 statistical framework (power analysis, effect sizes, pre-registered metrics) | ROADMAP Stage 6 | OPEN |
 | OWE-11 | Larger-N feasibility check: measure N-scaling exponent at 100×100 to confirm "cheap lever" claim | OWE-1 Blueprint §6 | OPEN — measured in OWE-1 Task 1 |
 | OWE-12 | Minimum-band-size-in-trough diagnostic: log min per-band N in trough phase; raise N if Allee/finite-size artifacts | OWE-1 Blueprint §6 | OPEN — design stage |

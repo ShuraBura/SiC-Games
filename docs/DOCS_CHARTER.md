@@ -13,7 +13,7 @@ The realised failures: a second `HYPOTHESES.md` that diverged from the first (ea
 a pre-registration the other lacked — `H-EMERGE-1` in one, the `H-ORTHOGONALITY /
 H-instinct-debt / H_cc / H-SUBSTRATE-6.0a` block in the other); `LITERATURE.md` and
 `CLAUDE.md` each existing in two or three folders at once; the τ_trickle / σ_inherit /
-p_fission_Si parameter discrepancies (MODEL_SPEC §15 D1–D3) caused by values living in
+p_fission_Si parameter discrepancies (ARCHITECTURE §15 D1–D3) caused by values living in
 both a doc and the ROADMAP table.
 
 The cure is not "more documents." It is a fixed set of homes, each answering exactly one
@@ -71,7 +71,9 @@ the enforced triggers, single master at the **code root**, carrying pointers *in
 ### 2.1 What changed from the pre-charter doc set
 - `MODEL_SPEC.md` **splits** into **ARCHITECTURE.md** (the "how the world works" half:
   old §0, §9, §13) and **MECHANISMS.md** (the per-mechanism registry: old §1–§8, §10). It
-  was a 583-line monolith doing two jobs.
+  was a 583-line monolith doing two jobs. *(Executed 2026-06-06 per this mapping — §12 design
+  log and §15 gaps → ARCHITECTURE; §11 metrics + §14 param index → MECHANISMS; section numbers
+  preserved. See ARCHITECTURE §12.1-F. PARAMETERS extraction still pending.)*
 - **TARGETS.md** is **new** — the project had no home for "expected emergent behaviour."
 - **PARAMETERS.md** becomes authoritative for values, retiring the ROADMAP locked-param
   table (the source of the D1–D3 drift); ROADMAP points to it.

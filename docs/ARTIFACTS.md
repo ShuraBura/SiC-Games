@@ -27,7 +27,7 @@
 
 | Artifact | Date | Type | Question answered | Headline result | Location |
 |---|---|---|---|---|---|
-| Stage 5.2 report (Cultural Dynamics) | 2026-05-29 | run report | Do c2 defection, Deffuant, and the σ_inherit sweep behave as designed? | Cultural layer stable; c2 defection rare (3.7%) and **uncorrelated with c2** (no selection differential); Deffuant homogenises ψ as designed; **σ*=0.10 selection was mis-gated on ψ — RETIRED** (see DEAD_ENDS, MODEL_SPEC §5.1-D). | `[CHAT-ONLY]` report.html — confirm repo location |
+| Stage 5.2 report (Cultural Dynamics) | 2026-05-29 | run report | Do c2 defection, Deffuant, and the σ_inherit sweep behave as designed? | Cultural layer stable; c2 defection rare (3.7%) and **uncorrelated with c2** (no selection differential); Deffuant homogenises ψ as designed; **σ*=0.10 selection was mis-gated on ψ — RETIRED** (see DEAD_ENDS, ARCHITECTURE §12.1-D). | `[CHAT-ONLY]` report.html — confirm repo location |
 | Perf Audit + Optimisation report | 2026-05-28 | benchmark + audit | Step-time breakdown; scaling exponents; feasible grid/N for LHS | LOW-risk fixes applied, **science unchanged to 1e-9**; **N exponent 1.05** (≈linear), **grid exponent 2.957** (near-cubic, target ≤2.0); B0(50²,250)=13 ms/step, B2(100²,1000)=110 ms/step, B4(150²,2000)=410 ms/step; LHS feasible to N=2000/150² as weekend batch. MED/HIGH-risk items deferred (§6 backlog). | `[CHAT-ONLY]` report_perf_audit.html — confirm repo location |
 
 ## Key established numbers (quick reference — full context in the reports above)
@@ -97,4 +97,21 @@ interim home and the CLAUDE.md locked-param table is the interim PARAMETERS home
 
 ---
 
-*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation appended 2026-06-05.*
+## MODEL_SPEC split (2026-06-06)
+
+The first half of charter §6 is **done**: `MODEL_SPEC.md` (v0.2 full extraction) was split
+into two charter homes ahead of the §7.5 array-restructure (which writes per-mechanic
+equivalence-tier classifications into MECHANISMS and decisions into the ARCHITECTURE log):
+- **`docs/MECHANISMS.md`** — construct registry: §0 classification, §1–§8, §10, §11, §14 param index.
+- **`docs/ARCHITECTURE.md`** — §0 principle, §9 world/resource substrate (charter §2.1 "how-the-
+  world-works half"), §12 decision-log (new entry §12.1-F records the split), §13 seams, §15 known-gaps.
+
+Method: content moved verbatim, no facts altered; section numbers preserved across both files
+so every existing "MODEL_SPEC §N / §12.x / §15.x" pointer still resolves. Live pointers updated
+(INDEX, ROADMAP OWE-4/5/6/7/9, CLAUDE rule 10, this index). Source archived at
+`archive/superseded/MODEL_SPEC_v0.2_pre-split_2026-06-06.md`. **Still open:** PARAMETERS
+extraction (the §6 second half) — interim home remains the CLAUDE.md locked-param table.
+
+---
+
+*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06.*
