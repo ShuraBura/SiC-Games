@@ -57,11 +57,17 @@ Recon: ms_mean=170.6, final_n=3183, mean_occ=2.35.
 
 ### OCC_3200 hang root cause
 
-OCC_3200 ran for >17 minutes before being killed. The issue is not VecJTM (which is O(N)+O(W×H)). The bottleneck is **`BiparentalReproduction.reproduce()`** which does an O(N) partner search per candidate agent, making the birth phase O(N²) per step. With n_carry=32000 and N_init=3200, the population grows to ~30,000 agents within 20 warmup steps. At N=30000, the birth phase alone takes minutes per step.
+OCC_3200 ran for >17 minutes before being killed. The issue is not VecJTM (which is O(N)+O(W×H)). The bottleneck is **`self.mean_cred()` called per newborn** at `run.py` line 784:
 
-Profile data (2 steps at OCC_3200, N~6000–9000): pending (profiler running). Will be reconciled here.
+```python
+offspring.cred = self._f_C * self.mean_cred()   # run.py line 784
+```
 
-**This is the same bottleneck that made oracle OCC_3200 hard-infeasible** — VecJTM eliminates the JT-specific O(occupancy) cost but does not address the O(N²) birth mechanism.
+`mean_cred()` iterates all living agents — O(N) per birth. With N_carry=32000, the population grows to ~30,000 agents within 20 warmup steps. Each step produces O(N_births) newborns; each triggers an O(N) mean_cred() scan → O(N_births × N) ≈ O(N²) per step. At N=30,000 this dominates completely.
+
+Note: the biparental *partner search* was already made O(r²) by the Task 4 spatial-hash fix (`_birth_spatial_hash` in run.py line 768–770). The partner search is **not** the bottleneck. The `mean_cred()` call on line 784 is.
+
+**This is the same GATE A1 hotspot** (previously measured: oracle N-exponent 2.055). VecJTM eliminates the JT-specific O(occupancy) cost but cannot address `mean_cred()` per birth because run.py is frozen (D4). The vectorised replacement `mean_cred_vec` exists (GATE A1 PASS) but is not yet wired into the oracle step loop.
 
 ---
 
