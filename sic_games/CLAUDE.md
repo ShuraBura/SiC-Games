@@ -29,13 +29,17 @@ as written. When in doubt about scope: stop and ask, do not improvise.
       carbon.py          — C decision
       silicon.py         — Si decision
       softmax_base.py    — shared softmax
-  tests/                 — 201 tests (must stay green)
+  tests/                 — 256 tests (must stay green)
   configs/               — YAML configs for all runs
   outputs/               — HTML reports + parquets
-  ROADMAP.md             — stage status + locked params
-  LITERATURE.md          — literature search log
-  VERSION_NOTES.md       — snapshot at v5.1-postaudit-clean
+  BUGS.md                — known-issues ledger
+  CLAUDE.md              — this file (master agent contract)
 ```
+
+**Documentation lives in `../docs/` (the charter's 11 homes), not here.**
+ROADMAP, MODEL_SPEC, PARAMETERS, TARGETS, HYPOTHESES, RESULTS, ARTIFACTS,
+LITERATURE, DEAD_ENDS, INDEX + DOCS_CHARTER all moved to `../docs/` in the
+2026-06-05 reorg. Route via `../docs/INDEX.md`. Governance: `../docs/DOCS_CHARTER.md`.
 
 ---
 
@@ -67,7 +71,7 @@ python -m cProfile -s cumtime sic_games/run.py # profile
    to 1e-9 relative tolerance, deaths/births/positions exact integer match.
    If gate fails: revert immediately, bisect, flag in report.
 
-3. **Run full test suite after every code change.** All 201 tests must pass
+3. **Run full test suite after every code change.** All 256 tests must pass
    before proceeding. If a test breaks, fix it before the next step.
 
 4. **Implement and test before running simulations.** Never run a production
@@ -89,8 +93,22 @@ python -m cProfile -s cumtime sic_games/run.py # profile
 9. **Do not add mechanics, parameters, or config keys not specified in the
    blueprint.** If something is missing from the spec, flag it — do not infer.
 
-10. **Update ROADMAP.md at the end of every stage.** Mark stage complete,
-    add locked parameter values, note deferred items.
+10. **Keep the docs homes current — one fact, one home (charter discipline).**
+    Each home in `../docs/` has an update trigger; honor it in the *same* change
+    that creates the fact. Pointers, not copies. Triggers (see `../docs/INDEX.md`):
+    - **End of every stage/directive →** update `../docs/ROADMAP.md` (mark complete,
+      note deferred items). Parameter *values* are pointed to, not restated.
+    - **Any parameter lock / sweep / retirement →** update `../docs/PARAMETERS.md`
+      *(interim, until the §6 extraction: the locked-param table in THIS file below)*.
+    - **A construct introduced/redefined or a seam changes →** update
+      `../docs/MECHANISMS.md` / `../docs/ARCHITECTURE.md`
+      *(interim, until the §6 split: `../docs/MODEL_SPEC.md`)*.
+    - **Before any analysis that could HARK; on resolution →** `../docs/HYPOTHESES.md`
+      (append-only). Aspirations without a test spec go to `../docs/TARGETS.md`.
+    - **A finding is established →** `../docs/RESULTS.md` (append-only).
+    - **An approach is retired →** `../docs/DEAD_ENDS.md` (append-only).
+    - **Any report/benchmark/diagnostic emitted →** `../docs/ARTIFACTS.md` (index + location).
+    - **A source consulted →** `../docs/LITERATURE.md`.
 
 11. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
     When any blueprint gate fails — *even by a small margin* — STOP and surface it for the

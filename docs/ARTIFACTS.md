@@ -51,4 +51,50 @@
 - Index any run parquets / batch outputs from Stages 4.x that established locked parameters (κ sweep, 2D κ×α scan, f_C sweep, β sweep) — these are referenced in PARAMETERS history but their artifacts aren't indexed.
 - Backfill dates for the undated directives above.
 
-*End of ARTIFACTS — seeded 2026-05-29, incomplete, awaiting Code reconciliation.*
+---
+
+## Reorg reconciliation report (2026-06-05)
+
+The whole project tree was reorganised into the DOCS_CHARTER structure. Every move
+was a history-preserving `git mv` (or, for gitignored `.bak` litter, a filesystem
+relocate) — **nothing was hard-deleted**. Baseline commit: `f31eebd`.
+
+**What moved where (homes):**
+| From | To | Note |
+|---|---|---|
+| `Model/ROADMAP.md`, `Model/MODEL_SPEC.md`, `Model/ARTIFACTS.md`, `Model/INDEX.md` | `docs/` | the four homes that were under `Model/` |
+| `ROADMAP.md` (root) | `docs/ROADMAP.md` | root duplicate folded in earlier in pass |
+| `SiC_Games_DOCS_CHARTER.md` | `docs/DOCS_CHARTER.md` | governance |
+| `SiC_Games_TARGETS_seed.md` | `docs/TARGETS.md` | seeded T-1/T-2/T-3 |
+| `sic_games/LITERATURE.md` (fuller) | `docs/LITERATURE.md` | promoted as unify base |
+| Carbon-Prototype `.md` | `origin/` | founding spec, canonical |
+
+**Homes created (new content this pass):** `docs/RESULTS.md` (R-1), `docs/DEAD_ENDS.md`
+(DE-1), `docs/HYPOTHESES.md` (consolidated). `docs/INDEX.md` rewritten to the 11-home
+routing table. `README.md` created at root.
+
+**Duplicates resolved:**
+- **HYPOTHESES** — two divergent copies (`./HYPOTHESES.md`, `Model/HYPOTHESES.md`)
+  consolidated into one `docs/HYPOTHESES.md` (3 live entries); H1(ii)→RESULTS R-1,
+  H-ORTHOGONALITY→TARGETS T-2 + DEAD_ENDS DE-1, H-instinct-debt→TARGETS T-3.
+- **LITERATURE** — two copies; fuller `sic_games/LITERATURE.md` promoted as base, the
+  root copy's unique Si-Cred synthesis appended (merge note in-file).
+- **CLAUDE.md** — root master kept; old `sic_games/CLAUDE.md` superseded; path-triggers
+  re-pointed into `../docs/`.
+
+**Archived (in `archive/superseded/`, never deleted):**
+`HYPOTHESES_root_2026-06-05.md`, `HYPOTHESES_Model-Hemerge_2026-06-05.md`,
+`LITERATURE_root-SiCred_2026-06-05.md`, `CLAUDE_sic_games-OLD_2026-06-05.md`,
+Carbon-Prototype `.pdf` (the `.md` is canonical in `origin/`). Pre-existing `.bak`
+litter and prior code snapshots (`archive/v5.1*`) retained as-is.
+
+**Stale path refs:** grep of the live homes found none broken; `sic_games/CLAUDE.md`
+tree + triggers updated to point at `../docs/`. Test count corrected (201→256).
+
+**Still open (charter §6, separate later directive):** split MODEL_SPEC →
+ARCHITECTURE + MECHANISMS; extract PARAMETERS. Until then MODEL_SPEC.md is their
+interim home and the CLAUDE.md locked-param table is the interim PARAMETERS home.
+
+---
+
+*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation appended 2026-06-05.*

@@ -1,61 +1,72 @@
 # SiC Games — Documentation Index
 
-**This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home. If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
+**This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-05-29.
+**Last updated:** 2026-06-05 (post-reorg). All eleven homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
 
 ---
 
-## The routing rule
+## The routing rule (the 11 homes)
 
 | If your question is about… | Go to | The "home" owns |
 |---|---|---|
-| Where am I, what's next, what's been tried/deferred | **ROADMAP.md** | Stage sequence, status, pending/deferred items, open questions (Q-list), architecture hooks |
-| What *is* this construct / how does this mechanism work | **MODEL_SPEC.md** | Definitions, ranges, inheritance channels, mechanism logic, the three-way C/Si classification, design-decisions log, architecture seams |
-| What is parameter X, its value, when it was locked, its sweep history | **PARAMETERS.md** | The authoritative value + lock/sweep/retire history of every parameter |
-| What did we predict (before seeing data), and how did it resolve | **HYPOTHESES.md** | Pre-registrations and their resolution status |
+| Where am I, what's next, what's been tried/deferred | **ROADMAP.md** | Stage sequence, status, pending/deferred items, open questions (Q-list) |
+| The big-picture structure / seams / how the pieces fit | **ARCHITECTURE.md** *(pending §6 split — see MODEL_SPEC.md)* | System decomposition, module seams, data flow, design-decisions log |
+| How a specific mechanism *works* (the rule/equation) | **MECHANISMS.md** *(pending §6 split — see MODEL_SPEC.md)* | Per-construct definitions, ranges, inheritance channels, mechanism logic, C/Si classification |
+| What is parameter X, its value, when it was locked, sweep history | **PARAMETERS.md** *(pending §6 extraction — interim: the locked-param table in `sic_games/CLAUDE.md`)* | The authoritative value + lock/sweep/retire history of every parameter |
+| What we *aspire* to show (no falsification spec yet) | **TARGETS.md** | Aspirations; each graduates to HYPOTHESES when it gets a test spec |
+| What did we predict (before seeing data), and how did it resolve | **HYPOTHESES.md** | Pre-registrations + resolution status (falsifiable, test-specced) |
 | What do we actually *know* (established findings) | **RESULTS.md** | Headline findings ledger, in prose |
-| Where is the run/report/benchmark that showed X | **ARTIFACTS.md** | Index of every report/benchmark/diagnostic + its location + headline |
+| Where is the run/report/benchmark that showed X | **ARTIFACTS.md** | Index of every report/benchmark/diagnostic + location + headline |
 | What grounds this mechanic in the literature | **LITERATURE.md** | Citations: what was lifted, what rejected, why |
 | Did we try X already, and why was it abandoned | **DEAD_ENDS.md** | Retired directions + the reason each was retired |
+| Which document owns this kind of fact | **INDEX.md** (this file) | The routing table itself |
+
+> **Interim note on the split:** ARCHITECTURE.md, MECHANISMS.md, and PARAMETERS.md are the three homes not yet physically created. The full **MODEL_SPEC.md** holds their content today; splitting it (ARCHITECTURE + MECHANISMS) and extracting PARAMETERS is charter §6 — a separate, later directive. Until then, route architecture/mechanism questions to **MODEL_SPEC.md** and parameter-value questions to the locked-param table in **`sic_games/CLAUDE.md`**.
 
 ---
 
 ## Authoritative-home discipline (read before editing any doc)
 
-1. **One fact, one home.** A parameter's value lives in PARAMETERS.md. ROADMAP, MODEL_SPEC, and blueprints *reference* it; they do not restate it. When a value changes, it changes in one place.
+1. **One fact, one home.** A parameter's value lives in PARAMETERS.md (interim: CLAUDE.md table). ROADMAP, MODEL_SPEC, and blueprints *reference* it; they do not restate it.
 2. **Pointers, not copies.** If document B needs a fact owned by document A, B writes "see A" — not the fact itself. Copies drift; pointers don't.
-3. **Update triggers are enforced in CLAUDE.md.** Each document below has an update trigger. Those triggers are encoded as report-standards in CLAUDE.md so the coding agent maintains them. A document with no enforced trigger will rot — if you add a document, add its trigger to CLAUDE.md in the same change.
-4. **Append, don't rewrite, the logs.** HYPOTHESES, RESULTS, DEAD_ENDS, and the MODEL_SPEC decisions-log are append-only ledgers. Supersede entries with a dated strike-through + note; never silently delete, or you lose the record of what was believed when.
-5. **Macro to micro.** ROADMAP is the macro view (where the project is going). MODEL_SPEC is the micro view (what every piece is). The other docs are the connective tissue (why, what was learned, where it lives, what was grounded, what failed).
+3. **Update triggers are enforced in CLAUDE.md.** Each home has an update trigger, mirrored as a pointer-trigger in `sic_games/CLAUDE.md` so the coding agent maintains it. Add a doc → add its trigger in the same change.
+4. **Append, don't rewrite, the logs.** HYPOTHESES, RESULTS, DEAD_ENDS, TARGETS, and the MODEL_SPEC decisions-log are append-only. Supersede with a dated note; never silently delete.
+5. **Macro to micro.** ROADMAP = where the project is going; ARCHITECTURE/MECHANISMS = what every piece is. The rest is connective tissue (why, what was learned, where it lives, what was grounded, what failed).
 
 ---
 
 ## Document registry
 
-| Document | Status | Maintainer | Update trigger |
+| Home | Status | Maintainer | Update trigger |
 |---|---|---|---|
-| INDEX.md | live | supervisor + Code | when a document is added or retired |
+| INDEX.md | live | supervisor + Code | a document is added or retired |
 | ROADMAP.md | live | Code (end of stage) | end of every stage / directive |
-| MODEL_SPEC.md | **pilot (v0.1)** — trait/inheritance/reproduction cluster only | Code + supervisor | construct introduced or redefined; lock-status change |
-| PARAMETERS.md | **pending extraction** | Code | any parameter lock, sweep, or retirement |
-| HYPOTHESES.md | live (seeded) | supervisor | before any analysis that could HARK; on resolution |
-| RESULTS.md | **pending backfill** | Code | when a finding is established |
-| ARTIFACTS.md | live (seeded) | Code | when any report/benchmark/diagnostic is emitted |
-| LITERATURE.md | live (thin — Si Cred only) | Code + supervisor | when a source is consulted |
-| DEAD_ENDS.md | **pending backfill** | Code + supervisor | when an approach is retired |
+| ARCHITECTURE.md | **pending §6 split** (content in MODEL_SPEC.md) | Code + supervisor | a seam/decomposition changes |
+| MECHANISMS.md | **pending §6 split** (content in MODEL_SPEC.md) | Code + supervisor | construct introduced or redefined; lock-status change |
+| PARAMETERS.md | **pending §6 extraction** (interim: CLAUDE.md table) | Code | any parameter lock, sweep, or retirement |
+| TARGETS.md | live (T-1, T-2, T-3) | supervisor + Code | an aspiration is added or graduates to HYPOTHESES |
+| HYPOTHESES.md | live (H-EMERGE-1, H-SUBSTRATE-6.0a, H_cc) | supervisor + Code | before any analysis that could HARK; on resolution |
+| RESULTS.md | live (R-1) | Code | when a finding is established |
+| ARTIFACTS.md | live | Code | when any report/benchmark/diagnostic is emitted |
+| LITERATURE.md | live (full bibliography + Si-Cred synthesis) | Code + supervisor | when a source is consulted |
+| DEAD_ENDS.md | live (DE-1) | Code + supervisor | when an approach is retired |
+
+*Also under `docs/`:* **MODEL_SPEC.md** (interim home for ARCHITECTURE+MECHANISMS+PARAMETERS until the §6 split) and **DOCS_CHARTER.md** (the governance document this index implements).
 
 ---
 
-## Build order (proposed)
+## Map of the repo (post-reorg, 2026-06-05)
 
-Three docs are seeded now (this file, HYPOTHESES, ARTIFACTS) because their content exists and needs no further decisions. The remaining four require an extraction or backfill pass:
-
-1. **PARAMETERS.md** — extract from ROADMAP's locked-param table + every blueprint's parameter blocks; make it authoritative; replace ROADMAP's table with a pointer. Mechanical, low-risk.
-2. **MODEL_SPEC.md full extraction** — extend the pilot across all stages per the pilot's §7 ordering. Largest single job.
-3. **RESULTS.md backfill** — extract established findings from the stage reports (needs ARTIFACTS.md first, to know which reports exist).
-4. **DEAD_ENDS.md backfill** — extract retired directions (σ*=0.10, r_cred_Si, the Stage-3.3 biparental-Si error, etc.) from blueprints, patches, and bug history.
-
-Each needs a matching CLAUDE.md trigger added in the same change so it stays maintained.
+```
+SiC-Games/
+├── README.md            one-screen orientation → points here
+├── docs/                the 11 homes (+ MODEL_SPEC, DOCS_CHARTER)  ← you are here
+├── blueprints/          supervisor directives, by stage (stage1…stage6, owe, perf, meta, resource-ecology)
+├── handoffs/            session/standing handoffs + project instructions
+├── origin/              the founding spec (Carbon-Prototype V1.3, canonical .md)
+├── sic_games/           the model code (untouched) + CLAUDE.md (master agent contract)
+└── archive/             superseded docs, .bak litter, prior code snapshots (never hard-deleted)
+```
 
 *End of INDEX.*
