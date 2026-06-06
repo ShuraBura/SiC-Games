@@ -179,6 +179,19 @@ feeds a softmax; a ~1-ULP shift could in principle flip a movement tie with vani
 probability — folded into the Tier-3 statistical battery at the full-model gate. Code:
 `src/sic_games/soa_tier1.py`; parity tests: `tests/test_soa_tier1.py`.
 
+**⚠ PLATFORM PIN (read before re-running the parity suite on a different build).** This
+classification is **platform-dependent**: it rests on the measured fact that, on
+**numpy 2.4.3** (the build this was migrated and gated on), **`np.tanh` differs from
+Python `math.tanh` by ~1 ULP** (max relative ≈ 2.2e-16) while **`np.exp` is bit-identical**.
+numpy can change its transcendental implementation in either direction across versions
+(SIMD libm swaps, accuracy fixes), so a future build could make `np.tanh` bit-identical
+(σ would then *also* pass the Tier-1 bit gate) **or** widen the gap. If someone re-runs the
+parity suite on a different numpy/CPU and sees σ's gate behave differently from this report,
+**this note is the explanation — it is expected, not a regression.** Re-confirm with the
+one-liner `np.array_equal(np.tanh(x), [math.tanh(v) for v in x])` on the new build and update
+this entry with the version + result. (Same spirit as the OWE-1 unit-convention guards:
+pin the thing that would otherwise cost someone an afternoon.)
+
 ---
 
 ## 13. Architecture seams
