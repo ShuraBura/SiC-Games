@@ -1,0 +1,131 @@
+{
+  "oracle_results": [
+    {
+      "label": "oracle_N500",
+      "n_init": 500,
+      "n_final": 500,
+      "ms_mean": 25.81115000260373,
+      "ms_moran": 24.793899967335165,
+      "ms_base": 25.924177784300237,
+      "overhead_pct": -4.359936991519834,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "oracle_N1000",
+      "n_init": 1000,
+      "n_final": 1000,
+      "ms_mean": 54.34107667533681,
+      "ms_moran": 52.863633376546204,
+      "ms_base": 54.505237041869094,
+      "overhead_pct": -3.01182740304728,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "oracle_N2000",
+      "n_init": 2000,
+      "n_final": 2000,
+      "ms_mean": 109.85659334110096,
+      "ms_moran": 81.84620000732441,
+      "ms_base": 112.96885926707613,
+      "overhead_pct": -27.549768548315477,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "oracle_N3000",
+      "n_init": 3000,
+      "n_final": 3000,
+      "ms_mean": 174.13636333464333,
+      "ms_moran": 125.89820000963907,
+      "ms_base": 179.49615925964383,
+      "overhead_pct": -29.860226241651514,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "oracle_N4000",
+      "n_init": 4000,
+      "n_final": 4000,
+      "ms_mean": 261.24470667370286,
+      "ms_moran": 141.3317333208397,
+      "ms_base": 274.56837037957655,
+      "overhead_pct": -48.525850546639475,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    }
+  ],
+  "soa_results": [
+    {
+      "label": "soa_N500",
+      "n_init": 500,
+      "n_final": 500,
+      "ms_mean": 33.0995766678825,
+      "ms_moran": 30.14883336921533,
+      "ms_base": 33.42743703440107,
+      "overhead_pct": -9.808121579323135,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "soa_N1000",
+      "n_init": 1000,
+      "n_final": 1000,
+      "ms_mean": 48.15148000683015,
+      "ms_moran": 42.15763334650546,
+      "ms_base": 48.817462969088446,
+      "overhead_pct": -13.642309979934911,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "soa_N2000",
+      "n_init": 2000,
+      "n_final": 2000,
+      "ms_mean": 104.71261333829413,
+      "ms_moran": 99.56510000241299,
+      "ms_base": 105.28455926450314,
+      "overhead_pct": -5.4323818250702205,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "soa_N3000",
+      "n_init": 3000,
+      "n_final": 3000,
+      "ms_mean": 152.30695666590086,
+      "ms_moran": 103.22810003223519,
+      "ms_base": 157.76016295853037,
+      "overhead_pct": -34.56643420216912,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    },
+    {
+      "label": "soa_N4000",
+      "n_init": 4000,
+      "n_final": 4000,
+      "ms_mean": 224.300033323622,
+      "ms_moran": 138.00139992963523,
+      "ms_base": 233.8887703673983,
+      "overhead_pct": -40.99699625900842,
+      "n_moran_steps": 3,
+      "n_base_steps": 27
+    }
+  ],
+  "gate_thresholds": {
+    "gate1_ms": 500.0,
+    "gate2_ms": 500.0,
+    "gate3_overhead_pct": 200.0
+  },
+  "gate_verdict": "PASS",
+  "gate_lines": [
+    "  Gate 1 (N=2000, diag on, both < 500 ms): oracle=109.9ms, SoA=104.7ms  [PASS]",
+    "  Gate 2 (N=4000, SoA < 500 ms, diag on): 224.3ms  [PASS]",
+    "  Gate 3 (N=500, SoA overhead < 200%): -10%  [PASS]",
+    "  Gate 3 (N=1000, SoA overhead < 200%): -14%  [PASS]",
+    "  Gate 3 (N=2000, SoA overhead < 200%): -5%  [PASS]",
+    "  Gate 3 (N=3000, SoA overhead < 200%): -35%  [PASS]",
+    "  Gate 3 (N=4000, SoA overhead < 200%): -41%  [PASS]"
+  ]
+}

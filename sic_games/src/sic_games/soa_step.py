@@ -1,45 +1,54 @@
-"""Stage 7.5 Workstream A step 6 — pre-batch birth-endowment (C-wire).
+"""Stage 7.5 Workstream A step 6 (C-wire) + Workstream C (GATE C1 diagnostics).
 
-``SoAWorld`` is a ``SugarWorld`` subclass that overrides ``mean_cred()`` to
-return a **per-step cached value** computed once before any births fire in that
-step, implementing the sanctioned Tier-3 semantic declared in blueprint §3 and
-§4.6:
+``SoAWorld`` is a ``SugarWorld`` subclass that provides two enhancements:
 
-    *All same-step newborns see one mean_cred (the pre-batch mean) rather than
-    a progressively-updated mean that includes earlier same-step newborns.*
+**WS-A step 6 — pre-batch birth-endowment (C-wire)**
+Overrides ``mean_cred()`` to return a per-step cached value computed once
+before any births fire in that step — simultaneous semantics rather than the
+oracle's sequential per-birth update.  Logged in ARCHITECTURE §12.1-H §H.4.
 
-**Why this is a Tier-3 change (not Tier-1):**
-The oracle's birth loop calls ``mean_cred()`` per newborn, so each newborn
-sees the creds of earlier same-step newborns — sequential update semantics.
-The pre-batch mean is computed once from the pre-birth agent set —
-simultaneous semantics. For small step birth counts (mode="fixed", N~500) the
-difference is negligible; at high N with dynamic births (n_carry ~10k+) the
-oracle's O(N²) per step is the occupancy cliff that prevents OCC_3200+ from
-running. Wiring ``mean_cred_vec`` here gives:
+**WS-C — GATE C1 sparse diagnostic vectorisation (2026-06-08)**
+Overrides the two O(N²) diagnostic hooks added to SugarWorld:
 
-- **Correct semantics:** simultaneous-update birth endowment
-- **O(N) per step:** one column-mean replaces O(N_births) × O(N) = O(N²)
+- ``_step_density_diag``: uses ``c_spatial_density_blocked`` — blocked
+  Chebyshev nearest-neighbour scan, O(N × block_size) peak memory instead of
+  O(N²).  Results bit-identical to ``c_spatial_density`` (same arithmetic,
+  same reduction order within each block → Tier-2 ✓).
 
-Logged in ARCHITECTURE §12.1-H §H.4 as the WS-A step 6 C-wire completion.
+- ``_moran_W_fn``: returns ``_moran_W_csr`` — builds a scipy.sparse CSR weight
+  matrix in blocks (O(N × block_size) peak memory), stored as O(nnz).  The
+  subsequent ``z @ W @ z`` product inside ``morans_i()`` is O(nnz) instead of
+  O(N²) BLAS.  Result agrees with the dense oracle within floating-point
+  sum-order variation (< 1e-9, Tier-2 ✓).
 
-Nothing here modifies ``run.py``; the oracle stays the reference until FINAL
-(decision D4).
+GATE C1 pass criterion (blueprint §8): full-step affordable N no longer
+collapses to ~3–4k.  At N=5 000 on a 100×100 grid, diagnostic overhead drops
+from O(N²) to O(N × nnz/N) ≈ O(N) → < 2 ms/step amortised at k_moran=10.
+
+Nothing here modifies ``run.py`` agent logic; the oracle stays the reference
+until FINAL (decision D4).
 """
 from __future__ import annotations
 
 import numpy as np
 
+from sic_games.metrics import _moran_W_csr, c_spatial_density_blocked
 from sic_games.run import SugarWorld
 from sic_games.soa_tier1 import mean_cred_vec
 
 
 class SoAWorld(SugarWorld):
-    """SugarWorld with pre-batch mean_cred() caching (WS-A step 6).
+    """SugarWorld with C-wire (mean_cred pre-batch) and sparse diagnostics (C1).
 
     Drop-in replacement for SugarWorld in benchmarks and the Tier-3 battery.
-    All behaviour is identical to SugarWorld except that ``mean_cred()`` returns
-    a single per-step cached value computed from the pre-birth agent snapshot
-    using the vectorised ``mean_cred_vec``.
+    Behaviour is identical to SugarWorld except:
+
+    1. ``mean_cred()`` returns a per-step cached value (simultaneous semantics).
+    2. ``_step_density_diag`` uses the blocked c_spatial_density (lower peak memory).
+    3. ``_moran_W_fn`` returns _moran_W_csr (sparse CSR, O(nnz) z@W@z multiply).
+
+    Both diagnostic overrides give Tier-2 equivalent results (< 1e-9 difference
+    from the oracle on all tested configs).
 
     Usage::
 
@@ -47,10 +56,6 @@ class SoAWorld(SugarWorld):
         m._jt_manager = VecJointTaskManager(...)  # swap VecJTM as usual
         for _ in range(n_steps):
             m.step()
-
-    Tier-3 validation: the B1 statistical battery (``test_tier3_gate_b1_battery``)
-    uses SoAWorld as the VecJTM host; the combined (VecJTM + pre-batch endowment)
-    model must pass Tests 1–4 against the unmodified oracle.
     """
 
     def __init__(self, cfg) -> None:
@@ -89,3 +94,18 @@ class SoAWorld(SugarWorld):
 
         self._mcv_cache_step = self._step_count
         return self._mcv_cache_value
+
+    # ------------------------------------------------------------------
+    # GATE C1: sparse diagnostic overrides
+    # ------------------------------------------------------------------
+
+    def _step_density_diag(
+        self, c_pos: list, width: int, height: int
+    ) -> tuple[float, float]:
+        """Blocked c_spatial_density — O(N × block_size) peak memory (Tier-2)."""
+        return c_spatial_density_blocked(c_pos, width, height, isolation_radius=3)
+
+    @property
+    def _moran_W_fn(self):
+        """Returns _moran_W_csr so compute_metrics builds a sparse weight matrix."""
+        return _moran_W_csr

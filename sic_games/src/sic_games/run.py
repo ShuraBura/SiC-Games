@@ -255,6 +255,24 @@ class SugarWorld(mesa.Model):
         self._density_cache: tuple[float, float] | None = None
 
     # ------------------------------------------------------------------
+    # GATE C1 diagnostic hooks — overridable in SoAWorld
+    # ------------------------------------------------------------------
+    # Default implementations delegate to the existing module-level functions,
+    # preserving oracle behaviour exactly.  SoAWorld overrides these with the
+    # sparse/blocked variants from metrics.py to eliminate the O(N²) memory wall.
+
+    def _step_density_diag(
+        self, c_pos: list, width: int, height: int
+    ) -> tuple[float, float]:
+        """Hook: compute c_spatial_density for the current step.  Overridable."""
+        return c_spatial_density(c_pos, width, height, isolation_radius=3)
+
+    @property
+    def _moran_W_fn(self):
+        """Hook: return the weight-matrix builder to pass to compute_metrics."""
+        return None   # None → compute_metrics uses its default _moran_W
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
@@ -952,7 +970,7 @@ class SugarWorld(mesa.Model):
                     c_pos = [a.pos for a in list(self.agents)
                              if a.strategy == "carbon" and not a.dormant]
                     _wg, _hg = self.cfg.world.grid_size
-                    self._density_cache = c_spatial_density(c_pos, _wg, _hg, isolation_radius=3)
+                    self._density_cache = self._step_density_diag(c_pos, _wg, _hg)
                 mean_nearest_C_dist, pct_isolated_C = self._density_cache
             else:
                 mean_nearest_C_dist = 0.0
@@ -963,6 +981,7 @@ class SugarWorld(mesa.Model):
                 agents=list(self.agents),
                 sugar_field=self.sugar_field,
                 k_moran=self.cfg.run.k_moran,
+                moran_W_fn=self._moran_W_fn,   # GATE C1 hook
                 deaths_starvation=deaths_starvation,
                 deaths_senescence=deaths_senescence,
                 deaths_starvation_newborn=deaths_starvation_newborn,
