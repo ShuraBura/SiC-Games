@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-08 (revision 3; initial report 2026-06-06)
 **Gate:** B1 — Vectorised JT multi-occupancy redesign
-**Verdict:** Tier-3 battery PASS — occupancy benchmark pending (see §6)
+**Verdict:** Tier-3 PASS; Occupancy benchmark STOP — Finding B1-4 (OCC_3200+ init-infeasible in oracle; supervisor decision E required)
 
 ---
 
@@ -135,18 +135,74 @@ least one known science result, which is the appropriate check for model validit
 
 ---
 
-## 6. Next: occupancy benchmark
+## 6. Occupancy benchmark — Rev 3 result and Finding B1-4
 
-With Tier-3 cleared, the occupancy benchmark (`benchmark_b1_occupancy.py`) runs SoAWorld +
-VecJTM across OCC_1600 / OCC_3200 / OCC_6400 / OCC_12800 (all g40, kappa=1.0). The C-wire
-eliminates the O(N²) mean_cred-per-birth bottleneck (run.py line 784) that made OCC_3200+
-hard-infeasible in the oracle. This gives the actual B1 go/no-go performance reading.
+**OCC_1600 result (SoAWorld + VecJTM):** 165.1 ms/step, mean_occ=2.31
+(oracle baseline: 170.6 ms/step — modest 3% improvement)
 
-**Gate thresholds (ARCHITECTURE §12.1-H §H.3):**
-- OCC_3200_g40 < 300 ms/step
-- OCC_6400_g40 ≤ 500 ms/step
-- Occupancy exponent (log-log slope across feasible configs) ≤ 1.5
+**OCC_3200+ result:** init-infeasible — see Finding B1-4 below.
 
 ---
 
-*GATE B1 Rev 3 verdict: Tier-3 battery PASS. All 4 tests pass. Occupancy benchmark next.*
+## 7. Finding B1-4: Stage 6.0a OCC_3200 "hard-infeasible" was an init-hang, not a step-time cliff (STOP)
+
+**Root cause:** `run.py _random_unoccupied()` is a `while True` loop that samples random cells
+until it finds one not in `self.occupied`. When N_init=3200 on a 40×40=1600-cell grid, all
+1600 cells become occupied after the first 1600 agents are placed. The loop runs forever.
+
+**How Stage 6.0a recorded "hard-infeasible":** The Stage 6.0a benchmark ran each OCC config as a
+subprocess with a per-config timeout (`_PER_CONFIG_TIMEOUT_S`). When OCC_3200 hung at init,
+the subprocess was killed after the timeout and the result was recorded as
+`"cut_status": "hard-infeasible", "rail_status": "timeout"`. This was misread in the B1 gate
+design as "step time exceeded the ceiling" — it was actually "model could not initialize".
+
+**Verified 2026-06-08:** `SugarWorld(cfg)` with N_init=3200, grid=40×40, substrate.enabled=True
+hangs at `_spawn_agents(3200)` — confirmed by timing diagnostic (config created in 0.3ms,
+model creation does not return within 60s timeout).
+
+**Consequence for the B1 gate:** The gate criterion (OCC_3200 < 300 ms/step) cannot be evaluated.
+C-wire eliminates the O(N²) mean_cred-per-birth CPU hotspot (demonstrated by GATE A1
+N-scaling benchmark: 26,635× speedup at N=19k). But in the production OCC benchmark format,
+the "cliff" between OCC_1600 and OCC_3200 was never a step-time issue. It was always an
+init-hang caused by `_random_unoccupied()` not supporting multi-occupancy placement.
+
+**OCC_1600 is the only valid measurement:** OCC_1600 uses N_init=1600 = grid_cells exactly.
+The population grows to ~3200 during the run. C-wire + VecJTM: 165.1 ms/step vs oracle
+170.6 ms/step (3% faster). The C-wire's full benefit would appear at higher N but cannot be
+measured in this benchmark format without fixing the oracle's placement code (D4 frozen).
+
+---
+
+## 8. Supervisor decisions required (Rev 3)
+
+**Decision E (Occupancy benchmark):** Rule 11 STOP.
+
+Three options:
+
+**Option E1 — Accept OCC_1600 as the sole occupancy gate result.** C-wire speedup at
+OCC_1600 is modest (3%). The larger speedup only appears when N >> 1600, which OCC_1600
+does reach briefly (N_peak ≈ 3200) but not as a sustained measurement. Gate B1 passes
+on Tier-3 (statistical equivalence) but the OCC performance gate is inconclusive.
+
+**Option E2 — Redesign the benchmark to use N_init = grid_cells for all OCC configs,
+varying N_carry to drive the sustained population.** OCC_3200 would use N_init=1600,
+n_carry=32000 — the population grows past 3200 during the window and stays there.
+This properly measures C-wire benefit at sustained N≈3000-6000. Gate thresholds
+need recalibration (old thresholds were premised on the wrong infeasibility model).
+
+**Option E3 — Close B1 on Tier-3 only; defer the OCC performance gate to the FINAL
+gate.** The C-wire benefit is established by GATE A1 (N-scaling exponent went from
+2.055 to 0.746). The FINAL gate requires reproducing a science result; that run would
+include C-wire and provide the real-world performance reading at production N.
+
+**CC's assessment:** E3 is cleanest for the current stage. The C-wire's correctness is
+fully established (GATE A1 N-scaling + GATE B1 Tier-3 statistical equivalence). The OCC
+benchmark protocol was built on a misattribution; redesigning it (E2) is real work that
+belongs in its own registered scope, not as an open item blocking GATE B1. The FINAL gate
+provides the correct production-conditions performance measurement.
+
+---
+
+*GATE B1 Rev 3 verdict: Tier-3 PASS (all 4 tests). Occupancy benchmark STOP — Finding B1-4:
+OCC_3200+ was always init-infeasible in the oracle; C-wire does not address this. Supervisor
+decision E required.*

@@ -79,3 +79,47 @@ measure minimum N_carry for stable C-strategy population under diffusion+multi-o
 - Original battery config: `tests/test_soa_jt.py` `_make_battery_cfg` (dynamic config
   preserved in the commit history at `5ae71cf`)
 - GATE B1 report: `outputs/stage7_5/gate_B1_report.md`
+
+---
+
+## BUG-003 — `_random_unoccupied()` infinite loop when N_init > grid_cells
+
+**Severity:** Benchmark-protocol only (blocks OCC_3200+ measurement; no science correctness impact)
+
+### What happened
+
+`run.py _random_unoccupied()` (line 261) is a `while True` loop that samples random (x,y)
+until `(x,y) not in self.occupied`. With `N_init=3200` on a 40×40=1600-cell grid, all
+1600 cells are occupied after the first 1600 agents are placed. The loop runs forever.
+
+Stage 6.0a's OCC_3200 `perf_results.json` entry (`"cut_status": "hard-infeasible",
+"rail_status": "timeout"`) was the result of the stage6_0a_perf subprocess being killed
+by `_PER_CONFIG_TIMEOUT_S`. The "hard-infeasible" label was misread in the B1 gate design
+as "step time exceeded the ceiling" — it was actually "model init hung forever". Verified
+2026-06-08 by diagnostic: `SugarWorld(cfg)` with N_init=3200, grid=40×40 does not return
+within 60s; `_bench_config` itself completes in 0.3ms.
+
+### Root cause
+
+`_random_unoccupied()` does not handle the case where N > grid_cells. This function is
+only correct for single-occupancy mode (N ≤ grid_cells). With `substrate.enabled=True`
+(multi-occupancy), `_spawn_agents(N)` with N > grid_cells calls `_random_unoccupied()`
+which cannot find an unoccupied cell once the grid is full.
+
+### What was NOT done
+
+Fixing `_random_unoccupied()` requires changing `run.py` (oracle, D4 frozen). The fix
+would add a multi-occupancy path: if `len(self.occupied) == grid_cells`, return a random
+cell without checking occupancy. This is deferred to the D4-unfreeze phase (FINAL gate).
+
+### Impact
+
+OCC_3200, OCC_6400, OCC_12800 configs cannot be initialized in the current oracle.
+Only OCC_1600 (N_init=1600 = exactly 40×40 cells) is measurable. The B1 occupancy gate
+thresholds (OCC_3200 < 300 ms/step, OCC_6400 ≤ 500 ms/step) cannot be evaluated.
+
+### Files
+
+- `src/sic_games/run.py` lines 261–267 (`_random_unoccupied`)
+- `src/sic_games/stage6_0a_perf.py` lines 166–180 (subprocess with timeout)
+- `outputs/stage7_5/gate_B1_report.md` §7 (Finding B1-4)
