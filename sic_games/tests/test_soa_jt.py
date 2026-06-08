@@ -485,8 +485,25 @@ def test_tier3_gate_b1_battery():
     Pre-registered thresholds (locked before any B1 code was written):
       Test 1: N(t) envelope -- min seed coverage >= 0.90 within oracle mean +/- 2sigma
       Test 2: KS statistic < 0.10 for all of {wealth, cred, phi, psi, c1, c2}
-      Test 3: moment diff < 10% for >= 8/10 seeds (all 5 moments)
-      Test 4: JT event rate within 20% for >= 9/10 seeds
+      Test 3: moment diff < 10% for >= 8/10 seeds (mean_wealth, gini_wealth, gini_cred)
+      Test 4: JT event rate within 20% for >= 14/15 seeds (extended; see D2 note below)
+
+    D2 amendment (supervisor decision 2026-06-08):
+      jt_per_step and mean_cred were removed from Test 3's MOMENTS tuple.
+      Rationale: both metrics are governed by the declared D2 keyed_uniform defection
+      RNG semantic (Tier-3 change), and jt_per_step is already gated by the dedicated
+      Test 4 at the appropriate 20% tolerance.  Including jt_per_step in Test 3 at 10%
+      was a double-count with inconsistent thresholds.
+
+      mean_cred removal is conditional on demonstrating the jt↔cred downstream linkage.
+      Verified 2026-06-08: Pearson r(jt_diff, mc_diff) = 0.927 (p=0.0001, R²=0.86),
+      sign agreement 9/10, non-noise seeds 7/7. The single sign-flip (seed 49) has
+      |jt_diff| = 2.3% — below the noise floor where cred variance is dominated by
+      other sources (C-wire simultaneous vs sequential birth semantics).
+
+      Test 4 extended: seeds 42-51 (original battery) + seeds 52-56 (new, condition 2
+      from supervisor decision D2). Criterion 14/15 = allows seed=44 (25.6% divergence)
+      as the sole outlier. If any additional seed >20%, the gate surfaces it here at B1.
     """
     oracle_runs: list[dict] = []
     vec_runs: list[dict] = []
@@ -540,8 +557,12 @@ def test_tier3_gate_b1_battery():
         + ", ".join(f"{v}={ks_stats[v]:.4f}" for v in failed_ks)
     )
 
-    # --- Test 3: per-seed moment check --------------------------------------
-    MOMENTS = ("mean_wealth", "mean_cred", "gini_wealth", "gini_cred", "jt_per_step")
+    # --- Test 3: per-seed moment check (D2 amended) -------------------------
+    # D2 removes jt_per_step and mean_cred: both are downstream of the declared
+    # D2 defection RNG semantic (Tier-3 change). jt_per_step is gated by Test 4
+    # at the appropriate 20% tolerance. mean_cred divergence is a downstream
+    # consequence of jt divergence (r=0.927, verified 2026-06-08).
+    MOMENTS = ("mean_wealth", "gini_wealth", "gini_cred")
     MOMENT_THRESH = 0.10
     MOMENT_MIN = 8
     moment_pass: dict[str, int] = {mk: 0 for mk in MOMENTS}
@@ -564,21 +585,53 @@ def test_tier3_gate_b1_battery():
         + ", ".join(f"{mk}({moment_pass[mk]}/10)" for mk in failed_moments)
     )
 
-    # --- Test 4: JT event rate ----------------------------------------------
+    # --- Test 4: JT event rate, extended to 15 seeds ------------------------
+    # Supervisor condition (D2): add seeds 52-56 to confirm seed=44 is a lone
+    # outlier at the 20% threshold. Criterion: 14/15 (allows seed=44 as sole
+    # failure). If any new seed also exceeds 20%, the gate stops here at B1.
+    SEEDS_EXTRA = [52, 53, 54, 55, 56]
+    print(f"\nTest 4 extended: running {len(SEEDS_EXTRA)} extra seeds to confirm seed=44 lone-outlier...")
+    oracle_ext: list[dict] = list(oracle_runs)
+    vec_ext: list[dict] = list(vec_runs)
+    for seed in SEEDS_EXTRA:
+        t0 = time.perf_counter()
+        o = _run_one(seed, use_vec_jt=False)
+        v = _run_one(seed, use_vec_jt=True)
+        dt = time.perf_counter() - t0
+        jt_d = abs(v["jt_per_step"] - o["jt_per_step"]) / max(o["jt_per_step"], 1e-6) * 100
+        print(
+            f"  seed={seed}  oracle_jt={o['jt_per_step']:.1f}/step  "
+            f"vec_jt={v['jt_per_step']:.1f}/step  diff={jt_d:.1f}%  ({dt:.1f}s)"
+        )
+        oracle_ext.append(o)
+        vec_ext.append(v)
+
     JT_THRESH = 0.20
-    JT_MIN = 9
-    jt_pass = sum(
-        1 for k in range(10)
-        if oracle_runs[k]["jt_per_step"] > 0.0
-        and (abs(vec_runs[k]["jt_per_step"] - oracle_runs[k]["jt_per_step"])
-             / max(oracle_runs[k]["jt_per_step"], 1e-6)) < JT_THRESH
-    )
+    JT_MIN_EXT = 14   # 14/15: allows seed=44 (25.6%) as the sole outlier
+    n_ext = len(oracle_ext)   # 15
+    jt_pass_ext = 0
+    jt_details: list[str] = []
+    for k in range(n_ext):
+        seed_k = (SEEDS + SEEDS_EXTRA)[k]
+        o_jt = oracle_ext[k]["jt_per_step"]
+        v_jt = vec_ext[k]["jt_per_step"]
+        if o_jt > 0.0:
+            diff = abs(v_jt - o_jt) / max(o_jt, 1e-6)
+            passed = diff < JT_THRESH
+            jt_pass_ext += int(passed)
+            jt_details.append(
+                f"seed={seed_k} diff={diff*100:.1f}% {'OK' if passed else 'FAIL'}"
+            )
     print(
-        f"\nTest 4 JT rate (<{JT_THRESH*100:.0f}% diff): {jt_pass}/10 seeds  "
-        f"{'PASS' if jt_pass >= JT_MIN else 'FAIL'}"
+        f"\nTest 4 JT rate (<{JT_THRESH*100:.0f}% diff): {jt_pass_ext}/{n_ext} seeds  "
+        f"{'PASS' if jt_pass_ext >= JT_MIN_EXT else 'FAIL'}"
     )
-    assert jt_pass >= JT_MIN, (
-        f"Test 4 FAIL: JT rate criterion met only {jt_pass}/10 seeds (need {JT_MIN})"
+    for line in jt_details:
+        print(f"  {line}")
+    assert jt_pass_ext >= JT_MIN_EXT, (
+        f"Test 4 FAIL: JT rate criterion met only {jt_pass_ext}/{n_ext} seeds "
+        f"(need {JT_MIN_EXT}); seed=44 is NOT the sole outlier — "
+        + ", ".join(d for d in jt_details if "FAIL" in d)
     )
 
     print("\nGATE B1 Tier-3 battery: ALL 4 TESTS PASS")
