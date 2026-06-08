@@ -21,7 +21,9 @@ W×H. The inner arithmetic is vectorised numpy — no Python loops over agent ob
 **Scheme declaration (Tier-3, ARCHITECTURE ss12.1-H, pre-registered 2026-06-06):**
   - Cluster: agents within toroidal Euclidean distance d of qualifying cell (same as oracle)
   - Processing order: qualifying cells in x-major ascending order (same as oracle scan)
-  - Agent exclusivity: consumed mask prevents double-counting (same semantics as oracle)
+  - Agent exclusivity: oracle semantics — `processed_cells` prevents a CELL from firing
+    twice; the same AGENT can appear in multiple events if it is within distance d of two
+    adjacent qualifying cells. VecJTM matches this: no consumed-agent mask (A-fix 2026-06-08).
   - Defection RNG: keyed_uniform(seed, step, unique_ids, "jt_c2_defect") — D2 counter-based;
     replaces per-agent Python RNG (deliberate Tier-3 change; see ARCHITECTURE ss12.1-H)
   - Matthew arithmetic: identical to oracle (same formula, same epsilon, same alpha)
@@ -152,20 +154,21 @@ class VecJointTaskManager:
             pos_to_slots[key].append(i)
 
         # ── 6. Process qualifying cells ───────────────────────────────────────
-        consumed = np.zeros(n, dtype=bool)
+        # Oracle semantics: processed_cells prevents a CELL from firing twice
+        # but does NOT prevent an agent from appearing in multiple adjacent events.
+        # No consumed-agent mask here — matches oracle behavior.
         wealth_delta = np.zeros(n, dtype=np.float64)
         cred_delta = np.zeros(n, dtype=np.float64)
         events: list[JointTaskEvent] = []
 
         for cx, cy in zip(xs_q.tolist(), ys_q.tolist()):
-            # Collect unconsumed cluster from neighbourhood
+            # Collect ALL agents from neighbourhood (including those in prior events)
             cluster_list: list[int] = []
             for dx, dy in self._offsets:
                 nx = (cx + dx) % w
                 ny = (cy + dy) % h
                 for slot in pos_to_slots.get((nx, ny), []):
-                    if not consumed[slot]:
-                        cluster_list.append(slot)
+                    cluster_list.append(slot)
 
             if len(cluster_list) < 2:
                 continue
@@ -203,7 +206,6 @@ class VecJointTaskManager:
                 cooperator_arr = cluster_arr[~defects]
 
                 if len(cooperator_arr) < 2:
-                    consumed[cluster_arr] = True
                     continue  # no JT event — all fell through to solo
 
                 total_cred_bonus = self.cred_bonus_per_participant * len(cooperator_arr)
@@ -223,8 +225,7 @@ class VecJointTaskManager:
             np.add.at(wealth_delta, cooperator_arr, sugar_shares)
             np.add.at(cred_delta, cooperator_arr, cred_shares_arr)
 
-            # Mark cluster consumed; zero cell in local copy + field
-            consumed[cluster_arr] = True
+            # Zero the cell in local copy + field (prevents double-counting the same CELL)
             sugar_field.sugar[cx, cy] = 0.0
             sug_local[cy, cx] = 0.0   # keep local copy in sync for subsequent events
 

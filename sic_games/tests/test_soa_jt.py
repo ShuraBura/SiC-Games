@@ -26,9 +26,7 @@ from scipy.stats import ks_2samp
 
 from sic_games.config import (
     AgentsConfig,
-    BirthCConfig,
     C2DefectionConfig,
-    CarryingCostConfig,
     Config,
     DecisionConfig,
     JointTaskConfig,
@@ -40,6 +38,7 @@ from sic_games.config import (
 from sic_games.joint_task import JointTaskEvent, JointTaskManager, matthew_shares
 from sic_games.run import SugarWorld
 from sic_games.soa_jt import VecJointTaskManager
+from sic_games.soa_step import SoAWorld
 
 
 # ---------------------------------------------------------------------------
@@ -222,8 +221,13 @@ def test_vec_jt_sugar_conservation():
     )
 
 
-def test_vec_jt_no_double_count():
-    """Each agent participates in at most one JT event per step."""
+def test_vec_jt_each_cell_fires_once():
+    """Each qualifying cell fires at most once per step (oracle cell-exclusivity semantics).
+
+    Oracle semantics: processed_cells prevents a CELL from firing twice, but the
+    same AGENT can appear in multiple adjacent cells' events (A-fix 2026-06-08).
+    VecJTM processes each qualifying cell exactly once by construction.
+    """
     m = _make_model(seed=99, steps=3, n_agents=20, grid=(10, 10),
                     peaks=[(2, 2), (8, 8)])
     agents = list(m.agents)
@@ -233,13 +237,70 @@ def test_vec_jt_no_double_count():
     vtm = _vec_jt_for_model(m)
     events = vtm.process_step(m.sugar_field, agents, None)
 
-    seen_ids: set[int] = set()
+    seen_cells: set[tuple[int, int]] = set()
     for ev in events:
-        for a in ev.cluster:
-            assert a.unique_id not in seen_ids, (
-                f"Agent {a.unique_id} appeared in multiple JT events"
-            )
-            seen_ids.add(a.unique_id)
+        assert ev.cell not in seen_cells, (
+            f"Cell {ev.cell} appeared in multiple JT events"
+        )
+        seen_cells.add(ev.cell)
+
+
+def test_vec_jt_agent_can_appear_in_multiple_events():
+    """An agent near two adjacent qualifying cells can appear in both events.
+
+    Oracle semantics: an agent at position P can be in the cluster of qualifying
+    cell Q1 AND qualifying cell Q2 if both are within distance d of P (A-fix).
+    The agent accumulates payoffs from both events. This is a deliberate match
+    to the oracle's processed_cells behaviour (which only prevents double-cell,
+    not double-agent participation).
+    """
+    # Controlled setup: 8x8 grid, zero ALL sugar, then set exactly two adjacent
+    # qualifying cells (3,3) and (4,3). Capacity forced to 4 on those two only.
+    m = _make_model(seed=7, n_agents=6, grid=(8, 8), peaks=[(3, 3)],
+                    multi_occ=True, kappa=0.0)
+
+    # Zero all sugar so only our two target cells can qualify
+    m.sugar_field.sugar[:] = 0.0
+    m.sugar_field.capacity[:] = 0  # no other cell qualifies (cap < threshold=4)
+
+    m.sugar_field.sugar[3, 3] = 4.0
+    m.sugar_field.capacity[3, 3] = 4
+    m.sugar_field.sugar[4, 3] = 4.0
+    m.sugar_field.capacity[4, 3] = 4
+
+    # Place 3 agents at (3,3) and 3 at (4,3): both cells see ≥2 agents in
+    # neighbourhood and both qualify (cap≥4, sugar>0, neigh≥2)
+    agents = list(m.agents)
+    for a in agents[:3]:
+        a.pos = (3, 3)
+    for a in agents[3:6]:
+        a.pos = (4, 3)
+
+    vtm = _vec_jt_for_model(m)
+    events = vtm.process_step(m.sugar_field, agents, None)
+
+    # Both cells should fire (exactly 2 events, no other qualifying cells)
+    assert len(events) == 2, (
+        f"Expected 2 events for adjacent qualifying cells, got {len(events)}: "
+        f"{[ev.cell for ev in events]}"
+    )
+
+    # Find agent IDs in each event; sort by cell x-coordinate (x-major order)
+    events_sorted = sorted(events, key=lambda e: e.cell[0])
+    ev_33 = events_sorted[0]   # cell (3,3)
+    ev_43 = events_sorted[1]   # cell (4,3)
+
+    ids_33 = {a.unique_id for a in ev_33.cluster}
+    ids_43 = {a.unique_id for a in ev_43.cluster}
+
+    # With d=1, agents at (3,3) are in (4,3)'s neighbourhood too (|Δx|=1, Δy=0)
+    # and vice versa — both clusters overlap
+    overlap = ids_33 & ids_43
+    assert len(overlap) >= 1, (
+        "Expected at least one agent in both adjacent JT events "
+        f"(oracle multi-participation semantics); "
+        f"ev(3,3)={ids_33}, ev(4,3)={ids_43}"
+    )
 
 
 def test_vec_jt_step_counter_advances():
@@ -267,6 +328,48 @@ def test_vec_jt_replaces_oracle_smoke():
     assert m.metrics_log[-1].population > 0
 
 
+def test_soa_world_mean_cred_pre_batch():
+    """SoAWorld.mean_cred() returns the same value for all newborns in one step.
+
+    The pre-batch semantic (C-wire, WS-A step 6): all calls to mean_cred()
+    within one step return the same cached value computed from the pre-birth
+    agent snapshot. Verified by running SoAWorld for several steps and confirming
+    that per-step mean_cred calls are consistent, and that the cache updates
+    between steps.
+    """
+    cfg = _make_cfg(seed=42, n_steps=5, n_agents=30, grid=(20, 20))
+    m = SoAWorld(cfg)
+
+    # Record the cached value after a step vs. direct computation
+    values_after_step: list[float] = []
+    for _ in range(5):
+        m.step()
+        # After the step, the cache is from this step's _step_count
+        # (which was the value during the birth phase)
+        values_after_step.append(m._mcv_cache_value)
+
+    # All cached values should be non-negative
+    for v in values_after_step:
+        assert v >= 0.0, f"Negative cached mean_cred: {v}"
+
+    # Calling mean_cred() multiple times within the same notional step
+    # (same _step_count) returns the same value each time
+    mc1 = m.mean_cred()
+    mc2 = m.mean_cred()
+    assert mc1 == mc2, f"mean_cred() returned different values in same step: {mc1} vs {mc2}"
+
+    # SoAWorld mean_cred matches soa_tier1.mean_cred_vec
+    from sic_games.soa_tier1 import mean_cred_vec
+    import numpy as np
+    agents = list(m.agents)
+    cred_arr = np.fromiter((a.cred for a in agents), dtype=np.float64, count=len(agents))
+    alive_arr = np.ones(len(agents), dtype=bool)
+    expected = mean_cred_vec(cred_arr, alive_arr)
+    assert abs(mc1 - expected) < 1e-12, (
+        f"SoAWorld.mean_cred()={mc1} but mean_cred_vec={expected}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Tier-3 statistical battery (GATE B1 -- ARCHITECTURE ss12.1-H)
 # ---------------------------------------------------------------------------
@@ -277,12 +380,16 @@ WINDOW_START = 251   # steps 251..400 = last 150 steps for steady-state pool
 
 
 def _make_battery_cfg(seed: int) -> Config:
-    """Config as pre-registered in ARCHITECTURE ss12.1-H.
+    """Config for GATE B1 Tier-3 battery (B-fixed: fixed population to isolate JT).
 
-    NOTE: This config leads to population extinction before step 254 under
-    diffusion+multi-occ at N_carry=800, so the WINDOW_START=251 sampling
-    window is never reached.  The battery test FAILS with this config.
-    This is an open finding requiring supervisor direction (see GATE B1 report).
+    B-fixed decision (2026-06-08): uses mode="fixed" (no dynamic births/deaths) to
+    remove the demographic confound from the JT parity test. The original pre-registered
+    config (mode="dynamic", N_carry=800) caused population extinction before
+    WINDOW_START=251, making the sampling window unreachable. Supervisor direction:
+    a JT parity test should isolate JT mechanics from demographic dynamics.
+
+    See ARCHITECTURE §12.1-H §H.2 (updated) and GATE B1 report for history.
+    The original dynamic-mode config is preserved in BUGS.md (BUG-002).
     """
     return Config(
         seed=seed,
@@ -301,18 +408,20 @@ def _make_battery_cfg(seed: int) -> Config:
             movement_mode="diffusion",
             contest_exponent=1.0,
         ),
-        population=PopulationConfig(mode="dynamic"),
-        birth_c=BirthCConfig(
-            carrying_cost=CarryingCostConfig(enabled=True, N_carry=800),
-        ),
+        population=PopulationConfig(mode="fixed"),
     )
 
 
 def _run_one(seed: int, use_vec_jt: bool) -> dict:
-    """Run a full battery simulation; return trajectory + steady-state stats."""
-    m = SugarWorld(_make_battery_cfg(seed))
+    """Run a full battery simulation; return trajectory + steady-state stats.
 
+    oracle run:   plain SugarWorld (oracle JT, sequential mean_cred per birth)
+    VecJTM run:   SoAWorld (oracle semantics JT + pre-batch mean_cred C-wire)
+    """
+    cfg = _make_battery_cfg(seed)
     if use_vec_jt:
+        # C-wire: SoAWorld caches mean_cred() once per step (pre-batch semantic)
+        m = SoAWorld(cfg)
         jt = m._jt_manager
         m._jt_manager = VecJointTaskManager(
             distance_d=jt.distance_d,
@@ -323,6 +432,8 @@ def _run_one(seed: int, use_vec_jt: bool) -> dict:
             seed=seed,
             c2_defection_enabled=jt.c2_defection_enabled,
         )
+    else:
+        m = SugarWorld(cfg)
 
     pop_traj: list[int] = []
     w_pool, c_pool, phi_pool, psi_pool, c1_pool, c2_pool = [], [], [], [], [], []

@@ -208,9 +208,9 @@ oracle's sequential Python loop are here *declared*, not discovered:
 
 | Aspect | Oracle (frozen) | Vec JT (B1) | Tier |
 |---|---|---|---|
-| Cluster definition | Agents within toroidal Euclidean distance d of qualifying cell | Same: agents in CellBuckets segments for cells within d | 3 — semantically equivalent |
+| Cluster definition | Agents within toroidal Euclidean distance d of qualifying cell | Same: agents in pos_to_slots dict for cells within d | 3 — semantically equivalent |
 | Processing order | x-major (x=0..W-1, y=0..H-1) Python scan | Qualifying cells in ascending linear-index order (y\*W+x) — identical to oracle | 3 — matches oracle tie-breaking |
-| Agent exclusivity | `processed_cells` set prevents double-counting | Boolean `consumed` mask; agents absorbed by lowest-index qualifying cell first | 3 — matches oracle semantics |
+| Agent exclusivity | `processed_cells` set prevents a **cell** from firing twice; the **same agent** can appear in multiple adjacent events (no agent-level mask in oracle) | No consumed-agent mask; oracle semantics exactly: each agent may participate in any qualifying cell within d, regardless of prior events in the same step. **A-fix 2026-06-08** (original VecJTM had a `consumed` mask that erroneously blocked agent re-participation) | 3 — matches oracle |
 | Defection RNG | `agent._rng.random()` — per-agent Python RNG object, draw order = cluster order | `keyed_uniform(seed, step, agent_ids, "jt_c2_defect")` — order-independent per D2 | **3 — deliberate change** |
 | Matthew weights | `(a.cred + ε)^α` per agent in cluster — Python list comprehension | `(cred[cluster_slots] + ε)^α` — vectorised numpy op; same arithmetic | 2 — bit for bit (pure power) |
 | Sugar distribution | Immediate: `agent.wealth += share` in cluster loop | Gathered: `sugar_delta[slot] = share`; applied outside per-step | 1 — same arithmetic |
@@ -227,19 +227,34 @@ draws under D2 but potentially different draws under the oracle. This is a **del
 semantic**: the defection events are Bernoulli(c2_i) in both cases; the draws are from the same
 distribution but with different correlational structure across steps. Validated by the battery.
 
+**A-fix note (2026-06-08):** The original VecJTM (commit `5ae71cf`) had a `consumed` boolean
+mask that absorbed agents into the first qualifying cell they appeared in. This was a
+**pre-registration error** — §H.1 stated "same semantics as oracle" for agent exclusivity but
+the consumed mask was strictly stricter than oracle behavior. The A-fix removes the consumed
+mask entirely. The downstream effect was VecJTM OCC_1600 final_n=5233 vs oracle 3183 — the
+direction inverted from expectation because VecJTM was distributing LESS sugar per agent
+(consumed mask) while oracle multi-participation distributes more, but the population dynamics
+responded non-linearly. After A-fix the trajectories align.
+
 ---
 
 #### H.2 — Pre-registered acceptance criteria (GATE B1 statistical equivalence)
 
 **These thresholds are locked. They cannot be adjusted after the battery is run.**
 
-**Battery configuration:**
+**Battery configuration (B-fixed update 2026-06-08):**
 - Seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51] — 10 matched pairs
-- Config: carbon strategy, 100×100 grid, `N_init=500`, `N_carry=800`, 400 steps,
-  `multi_occupancy.enabled=True`, `kappa=1.0`, `c2_defection.enabled=True`
-- Comparison: oracle model (run.py + oracle JointTaskManager) vs hybrid model
-  (run.py with `_jt_manager` replaced by `VecJointTaskManager` — same Python interface,
-  vectorised internals; oracle code is unchanged)
+- Config: carbon strategy, 100×100 grid, `N_init=500`, `mode="fixed"` (no dynamic
+  births, one-for-one replacement), `multi_occupancy.enabled=True`, `kappa=1.0`,
+  `c2_defection.enabled=True`, 400 steps
+- **B-fixed rationale:** the original pre-registered config used `mode="dynamic"` with
+  `N_carry=800`. Under diffusion+multi-occ the population went extinct before step 254,
+  so WINDOW_START=251 was never reached (GATE B1 FAIL, 2026-06-06). A JT parity test
+  should isolate JT mechanics from demographic dynamics; fixed population removes the
+  confound. See BUGS.md BUG-002 for the extinction observation.
+- Comparison: oracle model (SugarWorld + oracle JointTaskManager, sequential mean_cred
+  per birth) vs array model (SoAWorld with VecJointTaskManager + pre-batch mean_cred
+  C-wire; see §H.4). Oracle code is unchanged.
 - Statistics window: **last 150 steps** (steps 251–400) for steady-state comparisons;
   full 400 steps for N(t) trajectory
 
@@ -313,7 +328,38 @@ tier or re-scope density."
 
 ---
 
-*§12.1-H pre-registered 2026-06-06 before any B1 code was run. Criteria are locked.*
+#### H.4 — C-wire: WS-A step 6 completion — pre-batch birth endowment (2026-06-08)
+
+**Workstream A step 6 (blueprint §4.6):** "Births/deaths (mask + capacity + the pre-batch
+endowment semantic) → Tier-3."
+
+**What was wired:** `SoAWorld` (new class in `soa_step.py`) subclasses `SugarWorld` and
+overrides `mean_cred()` to return a **per-step cached value** computed once before any births
+fire in that step. All same-step newborns see the same pre-birth mean (simultaneous semantics)
+vs the oracle's sequential update where each newborn sees earlier same-step newborns' creds.
+
+**This is the sanctioned Tier-3 semantic change from blueprint §3:**
+
+> *"Biparental reproduction: parent pairing is the relational step; the per-birth endowment
+> now uses the pre-batch mean_cred (all same-step newborns see one mean) — a conscious semantic
+> change from 'each newborn sees earlier same-step newborns' (report §4)."*
+
+**Why C-wire belongs here (not GATE C1):** GATE C1 is the diagnostics workstream (Moran's I,
+c_spatial_density). C-wire is finishing WS-A step 6. The supervisor's scope correction
+(2026-06-08) moved this out of the C1 bucket. It is validated in the B1 Tier-3 battery.
+
+**Performance impact:** the oracle calls `mean_cred()` O(N_births) times per step, each O(N),
+total O(N²/step). C-wire collapses this to O(N) once per step. This removes the birth-phase
+bottleneck that made OCC_3200+ hard-infeasible. Validated by re-running the occupancy
+benchmark (see GATE B1 report, updated 2026-06-08).
+
+**Validation:** The Tier-3 statistical battery (`test_tier3_gate_b1_battery`) tests the
+combined (VecJTM + C-wire) model against the unmodified oracle across Tests 1–4 of §H.2.
+
+---
+
+*§12.1-H pre-registered 2026-06-06 before any B1 code was run. H.1 A-fix correction, H.2
+B-fixed update, and H.4 C-wire addition logged 2026-06-08 after GATE B1 STOP review.*
 
 ---
 

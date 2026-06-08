@@ -35,8 +35,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from sic_games.config import SubstrateConfig
 from sic_games.owe1_calibration import _bench_config
-from sic_games.run import SugarWorld
 from sic_games.soa_jt import VecJointTaskManager
+from sic_games.soa_step import SoAWorld
 
 _WARMUP = 10
 _WINDOW = 80
@@ -74,7 +74,10 @@ def _run_config(label: str, grid: int, init_n: int, kappa: float) -> dict:
         "metrics_every": 9999, "k_moran": 9999, "k_density": 9999,
     })})
 
-    m = SugarWorld(cfg)
+    # C-wire: SoAWorld caches mean_cred() pre-batch per step, eliminating
+    # the O(N²) mean_cred-per-birth bottleneck (run.py line 784) that made
+    # OCC_3200+ hard-infeasible. VecJTM eliminates the JT O(occupancy) cost.
+    m = SoAWorld(cfg)
     # Swap in VecJointTaskManager
     jt = m._jt_manager
     m._jt_manager = VecJointTaskManager(
