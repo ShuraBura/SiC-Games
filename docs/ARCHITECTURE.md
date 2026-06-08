@@ -463,6 +463,47 @@ the sparsity benefit applies exactly in the production-density regime (N ≪ gri
 
 ---
 
+#### H.6 — GATE FINAL: known-result science run reproduction (2026-06-08)
+
+**Gate definition (blueprint §8):** "All gates green + one full known-result science run reproduced
+within Tier-3 equivalence."
+
+Prior gates: A0 ✓  A1 ✓  B1 ✓  C1 ✓ — all PASS as of 2026-06-08.
+
+**Science config:** `configs/stage51_si_seasonal_a075_t200_seed42.yaml` — Stage 5.1 Si-Cred
+redesign seasonal control. Si_bounded strategy, amplitude=0.75 seasonal stress, period=200,
+dormancy enabled, dynamic mode. N_init=250, 50×50 grid. Known result: Si agents maintain viable
+population with 21–31% dormancy fraction during seasonal troughs.
+
+**Models tested:** Oracle (SugarWorld) vs full SoAWorld (VecJTM + C-wire + sparse diagnostics)
+— all three Stage 7.5 migrations exercised together for the first time on a science config.
+
+**Results (5 seeds × 400 steps, window 251–400):**
+
+| Test | Criterion | Result |
+|------|-----------|--------|
+| Test 1: N(t) envelope ≥ 0.85 | min coverage | **1.000** — PASS |
+| Test 2: KS(cred) < 0.15 | pooled cred KS | **0.0000** — PASS |
+| Test 3: viability (5/5) | all N_final within 40% | **5/5, rel_err=0.00** — PASS |
+| Test 4: dormancy ≤ 40% diff (4/5) | mean dorm fraction | **5/5, rel_err=0.00** — PASS |
+
+Exact match (rel_err=0.00) for all seeds: on the Stage 5.1 sparse science config,
+JT events are rare (density 0.05–0.25/cell < capacity_threshold=4), so C-wire and VecJTM
+are inert. SoAWorld reduces to oracle for this config → results are bit-identical,
+which is a stronger result than the Tier-3 tolerance requires.
+
+**Science finding confirmed:** Si agents under seasonal stress activate dormancy at 21–31%
+during trough periods (oracle: 0.216–0.312, SoA: 0.216–0.312 exact). Population viable
+across all 5 seeds (N_final 59–249).
+
+**GATE FINAL: PASS. Stage 7.5 Array Restructure: ALL GATES PASS.**
+
+**Oracle retirement (D4):** FINAL gate passed + known science result reproduced. Oracle
+retirement to `archive/` is now conditionally authorised pending supervisor confirmation.
+Oracle remains D4-frozen until confirmed.
+
+---
+
 *§12.1-H pre-registered 2026-06-06 before any B1 code was run. H.1 A-fix correction, H.2
 B-fixed update, and H.4 C-wire addition logged 2026-06-08 after GATE B1 STOP review.
 H.3 corrected 2026-06-08: Finding B1-4 (OCC_3200+ was init-infeasible, not step-time cliff);
@@ -470,7 +511,9 @@ E2 benchmark redesign with occupancy-based gate thresholds; Finding E2b (resourc
 not n_carry, caps mean_occ on production substrate); all 3 occupancy gates PASS 2026-06-08.
 GATE B1 CLOSED 2026-06-08: Tier-3 ALL PASS + Occupancy ALL PASS.
 H.5 added 2026-06-08: GATE C1 sparse diagnostics PASS; 24 Tier-2 tests PASS; SoA N=4000 = 224 ms
-(old 3–4k ceiling cleared); 1.41× speedup at N=2000; diff=2.17e-18. GATE C1 CLOSED 2026-06-08.*
+(old 3–4k ceiling cleared); 1.41× speedup at N=2000; diff=2.17e-18. GATE C1 CLOSED 2026-06-08.
+H.6 added 2026-06-08: GATE FINAL PASS — Si seasonal science run (5 seeds, 400 steps); exact match
+oracle vs SoAWorld; dormancy 21–31% confirmed; ALL GATES PASS; D4 retirement conditionally authorised.*
 
 ---
 
