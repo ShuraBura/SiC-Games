@@ -203,6 +203,12 @@ sugar availability is the binding constraint.
 Stress configs use 2× and 4× resource density to push mean_occ into the 3–5 range. This is
 benchmark calibration — the production substrate parameters are not changed.
 
+**Perf-vs-science distinction (explicit):** The hires configs prove the *array model can run*
+at occ≈3–5 without hitting a step-time wall. They do NOT say production science runs will
+reach that density. The calibration pass starts from "tractable at high density" — not from
+"calibrate to occ=4.8." What density production runs actually achieve is a calibration-pass
+question, not a performance-gate question.
+
 ---
 
 ## 9. GATE B1 final verdict
