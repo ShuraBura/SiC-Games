@@ -77,12 +77,19 @@ _GATE_EXP_LIMIT  = 1.5     # occupancy exponent (log-log slope) <= 1.5
 
 
 def _run_config(label: str, grid: int, init_n: int, n_carry: int,
-                kappa: float) -> dict:
+                kappa: float, max_sugar_cap: int = 16) -> dict:
     """Run one config with VecJTM + SoAWorld; return timing + occupancy stats.
 
     n_carry is explicit — the caller controls the target population ceiling.
     init_n must satisfy init_n <= grid*grid to avoid the _random_unoccupied()
     infinite loop in the frozen oracle (Finding B1-4 / BUG-003).
+
+    max_sugar_cap: overrides _bench_config's default of 16 (growth_rate_alpha
+    is scaled proportionally: alpha = 4 * max_sugar_cap / 16).  The reference
+    config (recon comparison) uses 16; high-density stress configs use 32 or 64
+    to break the resource ceiling that otherwise caps mean_occ at ~2.7 on g40.
+    (Finding E2b: on 2-peak 40x40, resources — not n_carry — are the binding
+    constraint at equilibrium; n_carry alone cannot push mean_occ past ~2.7.)
     """
     import numpy as np
 
@@ -92,6 +99,15 @@ def _run_config(label: str, grid: int, init_n: int, n_carry: int,
 
     cfg = _bench_config(grid, grid, init_n, _WARMUP + _WINDOW + 5, seed=_SEED,
                         n_carry_override=n_carry)
+
+    # Resource override for stress configs (max_sugar_cap > production default of 16)
+    if max_sugar_cap != 16:
+        alpha_scaled = 4 * max_sugar_cap // 16   # grow_rate_alpha scales proportionally
+        cfg = cfg.model_copy(update={"world": cfg.world.model_copy(update={
+            "max_sugar_capacity": max_sugar_cap,
+            "growth_rate_alpha": alpha_scaled,
+        })})
+
     cfg = cfg.model_copy(update={"substrate": SubstrateConfig(
         enabled=True, k_cell=0, movement_mode="diffusion",
         contest_exponent=kappa, move_cost_flat=0.0,
@@ -185,20 +201,33 @@ def _log_log_exp(x_vals: list[float], y_vals: list[float]) -> float:
 
 def main() -> None:
     # E2 configs: N_init=1600 (= 40x40 cells) for all — no init hang.
-    # n_carry climbs to drive sustained occupancy through 2 → 3 → 4+ agents/cell.
-    # Labels encode the n_carry in thousands (nc20k, nc40k, nc80k).
+    #
+    # Finding E2b (2026-06-08): on the 2-peak 40x40 substrate with the
+    # production sugar parameters (max_sugar_cap=16, alpha=4), the equilibrium
+    # population is resource-limited, NOT n_carry-limited.  Even with n_carry up
+    # to 80000, equilibrium N ≈ 3900 → mean_occ ≈ 2.73 (resource ceiling).
+    # n_carry=80000 represents only 4.9% of the equilibrium fraction; the
+    # logistic carrying-cost term has < 6% effect on birth probability at this N.
+    #
+    # Fix: the reference config uses production parameters (max_sugar_cap=16) for
+    # direct recon comparison.  Stress configs increase max_sugar_capacity (and
+    # growth_rate_alpha proportionally) to break the resource ceiling and push
+    # mean_occ into the 3–5 range.  This is benchmark calibration, not a
+    # production-parameter change.
     configs = [
-        # label,                grid, init_n, n_carry,  kappa
-        ("OCC_1600_g40",          40,  1600,  20000,    1.0),  # reference: matches recon
-        ("OCC_1600_nc40k_g40",    40,  1600,  40000,    1.0),  # target mean_occ ~ 3
-        ("OCC_1600_nc80k_g40",    40,  1600,  80000,    1.0),  # target mean_occ ~ 4+
+        # label,                   grid, init_n, n_carry,  kappa, max_sugar_cap
+        ("OCC_1600_g40",             40,  1600,  20000,    1.0,   16),  # reference: matches recon
+        ("OCC_1600_hires1_g40",      40,  1600,  40000,    1.0,   32),  # 2x resources → target occ≈3
+        ("OCC_1600_hires2_g40",      40,  1600,  80000,    1.0,   64),  # 4x resources → target occ≈5
     ]
 
     results = []
-    for label, grid, init_n, n_carry, kappa in configs:
-        print(f"\n=== {label} (grid={grid}, N_init={init_n}, n_carry={n_carry}) ===",
+    for label, grid, init_n, n_carry, kappa, max_sugar_cap in configs:
+        print(f"\n=== {label} (grid={grid}, N_init={init_n}, n_carry={n_carry}, "
+              f"max_sugar_cap={max_sugar_cap}) ===",
               flush=True)
-        res = _run_config(label, grid, init_n, n_carry, kappa)
+        res = _run_config(label, grid, init_n, n_carry, kappa, max_sugar_cap)
+        res["max_sugar_cap"] = max_sugar_cap
         results.append(res)
         ms_str  = f"{res['ms_mean']:.1f}" if not math.isnan(res['ms_mean']) else "N/A"
         occ_str = f"{res['mean_occ']:.2f}" if res['mean_occ'] > 0 else "N/A"

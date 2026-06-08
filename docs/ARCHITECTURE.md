@@ -336,13 +336,20 @@ original OCC benchmark never ran OCC_3200 steps at all.
 | OCC_6400_g40 | 6,400 | 1,600 | skipped-past-ceiling | init hang (downstream) |
 | OCC_12800_g40 | 12,800 | 1,600 | skipped-past-ceiling | init hang (downstream) |
 
+**Finding E2b (2026-06-08):** On the 2-peak 40×40 substrate with production parameters
+(max_sugar_cap=16, growth_rate_alpha=4), the equilibrium population is **resource-limited**,
+not n_carry-limited. n_carry values up to 80,000 (50× equilibrium N) capped mean_occ at 2.73;
+the logistic carrying-cost term suppressed birth by only 6% at equilibrium. Fix: reference
+config keeps production parameters for direct recon comparison; stress configs use 2× and 4×
+resource density (max_sugar_cap=32 and 64) to push mean_occ into the 3–5 range.
+
 **E2 benchmark configs (all g40, N_init=1600 ≤ 1600 cells, kappa=1.0):**
 
-| Label | n_carry | Target mean_occ |
-|---|---|---|
-| OCC_1600_g40 | 20,000 | ~2.3 (matches recon reference) |
-| OCC_1600_nc40k_g40 | 40,000 | ~3 (Gate 2 target occupancy) |
-| OCC_1600_nc80k_g40 | 80,000 | ~4+ (stress test) |
+| Label | n_carry | max_sugar_cap | Achieved mean_occ | ms/step |
+|---|---|---|---|---|
+| OCC_1600_g40 (ref) | 20,000 | 16 (production) | 2.31 | **129.5** |
+| OCC_1600_hires1_g40 | 40,000 | 32 (2×) | 3.39 | **139.1** |
+| OCC_1600_hires2_g40 | 80,000 | 64 (4×) | 4.79 | **158.5** |
 
 **Why E2 and not E3:** FINAL gate is a science-result reproduction gate, not structured as
 the architecture-vs-escalation decision point. If proto-ag occupancy walls at FINAL, the
@@ -352,13 +359,20 @@ tractable: the restructure worked. If it walls: that is a clean GPU/JAX signal, 
 A-fix, C-wire, and JT redesign have each been individually cleared, and a remaining wall
 can only be the array model's fundamental occupancy scaling.
 
-**B1 performance pass criterion (E2 restatement):**
-1. **occ ≥ 2: step time < 300 ms** (ref config achieves mean_occ≈2.3)
-2. **occ ≥ 3: step time ≤ 500 ms** (nc40k or nc80k config achieves mean_occ≈3+)
-3. **Occupancy exponent ≤ 1.5** (log-log slope across feasible configs)
+**Gate results (E2, 2026-06-08):**
 
-GPU/JAX escalation trigger (unchanged from original): if Gate 2 fails, the array model
-cannot sustain proto-ag-adjacent occupancy levels on CPU — escalate per blueprint §8.
+| Gate | Criterion | Measurement | Verdict |
+|---|---|---|---|
+| Gate 1 | occ ≥ 2: step time < 300 ms | 129.5 ms @ mean_occ=2.31 | **PASS** |
+| Gate 2 | occ ≥ 3: step time ≤ 500 ms | 158.5 ms @ mean_occ=4.79 | **PASS** (68% below ceiling) |
+| Gate 3 | exponent ≤ 1.5 | **0.276** (across 2.31–4.79) | **PASS** (strongly sub-linear) |
+
+**Occupancy exponent 0.276** (step time ∝ occ^0.28) — essentially flat across the full
+2.3–4.8 agents/cell range. At mean_occ=4.79, step time = 158.5 ms. numpy-CPU is not
+approaching a performance wall at proto-ag-adjacent occupancy. GPU/JAX escalation is
+**not triggered**. The restructure worked.
+
+**GATE B1 OCCUPANCY: PASS. GATE B1: CLOSED.**
 
 ---
 
@@ -398,7 +412,9 @@ combined (VecJTM + C-wire) model against the unmodified oracle across Tests 1–
 *§12.1-H pre-registered 2026-06-06 before any B1 code was run. H.1 A-fix correction, H.2
 B-fixed update, and H.4 C-wire addition logged 2026-06-08 after GATE B1 STOP review.
 H.3 corrected 2026-06-08: Finding B1-4 (OCC_3200+ was init-infeasible, not step-time cliff);
-E2 benchmark redesign with occupancy-based gate thresholds.*
+E2 benchmark redesign with occupancy-based gate thresholds; Finding E2b (resource ceiling,
+not n_carry, caps mean_occ on production substrate); all 3 occupancy gates PASS 2026-06-08.
+GATE B1 CLOSED 2026-06-08: Tier-3 ALL PASS + Occupancy ALL PASS.*
 
 ---
 

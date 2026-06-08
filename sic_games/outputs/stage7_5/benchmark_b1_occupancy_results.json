@@ -1,0 +1,70 @@
+{
+  "vec_results": [
+    {
+      "label": "OCC_1600_g40",
+      "grid": 40,
+      "init_n": 1600,
+      "n_carry": 20000,
+      "kappa": 1.0,
+      "final_n": 3187,
+      "ms_mean": 129.4915625039721,
+      "ms_sd": 33.9098607468978,
+      "mean_occ": 2.3094202898550726,
+      "peak_occ": 9,
+      "occ_per_cell_all": 1.991875,
+      "status": "window-completed",
+      "max_sugar_cap": 16
+    },
+    {
+      "label": "OCC_1600_hires1_g40",
+      "grid": 40,
+      "init_n": 1600,
+      "n_carry": 40000,
+      "kappa": 1.0,
+      "final_n": 5122,
+      "ms_mean": 139.14061750110704,
+      "ms_sd": 41.046619994543065,
+      "mean_occ": 3.3853271645736944,
+      "peak_occ": 10,
+      "occ_per_cell_all": 3.20125,
+      "status": "window-completed",
+      "max_sugar_cap": 32
+    },
+    {
+      "label": "OCC_1600_hires2_g40",
+      "grid": 40,
+      "init_n": 1600,
+      "n_carry": 80000,
+      "kappa": 1.0,
+      "final_n": 7596,
+      "ms_mean": 158.52902500337223,
+      "ms_sd": 48.694626235639035,
+      "mean_occ": 4.7894073139974775,
+      "peak_occ": 18,
+      "occ_per_cell_all": 4.7475,
+      "status": "window-completed",
+      "max_sugar_cap": 64
+    }
+  ],
+  "recon_baseline": {
+    "OCC_1600_g40": {
+      "ms_mean": 170.593,
+      "ms_sd": 57.54,
+      "mean_occ": 2.354,
+      "status": "window-completed",
+      "note": "valid \u2014 N_init=1600 = 40x40 cells"
+    }
+  },
+  "gate_thresholds": {
+    "occ_ge2_ms": 300.0,
+    "occ_ge3_ms": 500.0,
+    "exp_limit": 1.5
+  },
+  "gate_verdict": "PASS",
+  "gate_lines": [
+    "  Gate 1 occ>=2 < 300 ms/step: 129.5 ms @ mean_occ=2.31  [PASS]",
+    "  Gate 2 occ>=3 <= 500 ms/step: 158.5 ms @ mean_occ=4.79  [PASS]",
+    "  Gate 3 occ exponent <= 1.5: 0.276  [PASS]"
+  ],
+  "finding_b1_4": "OCC_3200/6400/12800 were init-infeasible in the oracle: _random_unoccupied() hangs when N_init > grid_cells. Stage 6.0a hard-infeasible labels were subprocess init timeouts, not step-time ceiling hits. E2: N_init fixed at grid_cells=1600; n_carry varied to drive occupancy."
+}

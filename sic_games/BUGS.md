@@ -115,11 +115,46 @@ cell without checking occupancy. This is deferred to the D4-unfreeze phase (FINA
 ### Impact
 
 OCC_3200, OCC_6400, OCC_12800 configs cannot be initialized in the current oracle.
-Only OCC_1600 (N_init=1600 = exactly 40×40 cells) is measurable. The B1 occupancy gate
-thresholds (OCC_3200 < 300 ms/step, OCC_6400 ≤ 500 ms/step) cannot be evaluated.
+Only OCC_1600 (N_init=1600 = exactly 40×40 cells) is measurable. The E2 benchmark
+redesign works around this by using N_init=1600 for all configs and varying resource
+density to push mean_occ into the 3–5 range (see gate_B1_report.md §6 and §8).
 
 ### Files
 
 - `src/sic_games/run.py` lines 261–267 (`_random_unoccupied`)
 - `src/sic_games/stage6_0a_perf.py` lines 166–180 (subprocess with timeout)
 - `outputs/stage7_5/gate_B1_report.md` §7 (Finding B1-4)
+
+---
+
+## Finding E2b — Resource ceiling limits mean_occ on 2-peak 40×40 substrate
+
+**Severity:** Benchmark-calibration finding (not a bug; documents a substrate equilibrium property)
+
+### What was found
+
+On the 2-peak 40×40 substrate with production parameters (max_sugar_capacity=16,
+growth_rate_alpha=4), the equilibrium population is **resource-limited, not n_carry-limited**.
+With n_carry up to 80,000 (50× the equilibrium N≈3900), mean_occ reached only 2.73.
+The logistic carrying-cost term suppressed birth by < 6% at equilibrium (N/n_carry≈0.049).
+Sugar availability — not the logistic ceiling — is the binding constraint.
+
+### Why it matters for the E2 benchmark
+
+E2 assumed n_carry would drive sustained occupancy into the 3–4/cell band. It does not
+on this substrate. Gate 2 (mean_occ≥3 at ≤500 ms) could not be evaluated with n_carry
+variation alone.
+
+### Fix applied (E2 benchmark, 2026-06-08)
+
+Reference config keeps production parameters (max_sugar_cap=16) for direct recon comparison.
+Stress configs use 2× and 4× resource density (max_sugar_cap=32, 64) to break the ceiling:
+- OCC_1600_hires1_g40 (sugar=32): mean_occ=3.39, ms/step=139.1
+- OCC_1600_hires2_g40 (sugar=64): mean_occ=4.79, ms/step=158.5
+All 3 gates PASS. GATE B1 CLOSED 2026-06-08.
+
+### Files
+
+- `outputs/stage7_5/benchmark_b1_occupancy.py` (Finding E2b comment in `main()`)
+- `outputs/stage7_5/gate_B1_report.md` §8
+- `docs/ARCHITECTURE.md` §12.1-H §H.3
