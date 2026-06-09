@@ -498,9 +498,12 @@ across all 5 seeds (N_final 59–249).
 
 **GATE FINAL: PASS. Stage 7.5 Array Restructure: ALL GATES PASS.**
 
-**Oracle retirement (D4):** FINAL gate passed + known science result reproduced. Oracle
-retirement to `archive/` is now conditionally authorised pending supervisor confirmation.
-Oracle remains D4-frozen until confirmed.
+**Oracle retirement (D4): COMPLETE (2026-06-08).** FINAL gate passed + known science result
+reproduced. SugarWorld moved from `run.py` to `sic_games/oracle.py` (the archive home).
+`run.py` is now a thin backward-compat re-export (`from sic_games.oracle import SugarWorld`).
+Parity suite: 48/48 pass pre-move, 48/48 pass post-move; full suite 328/328 pass.
+SugarWorld is D4-frozen: no new features; bug fixes only if they affect oracle correctness as
+a reference. `sic_games.oracle` is the canonical import; `sic_games.run` re-exports for compat.
 
 ---
 
@@ -513,7 +516,9 @@ GATE B1 CLOSED 2026-06-08: Tier-3 ALL PASS + Occupancy ALL PASS.
 H.5 added 2026-06-08: GATE C1 sparse diagnostics PASS; 24 Tier-2 tests PASS; SoA N=4000 = 224 ms
 (old 3–4k ceiling cleared); 1.41× speedup at N=2000; diff=2.17e-18. GATE C1 CLOSED 2026-06-08.
 H.6 added 2026-06-08: GATE FINAL PASS — Si seasonal science run (5 seeds, 400 steps); exact match
-oracle vs SoAWorld; dormancy 21–31% confirmed; ALL GATES PASS; D4 retirement conditionally authorised.*
+oracle vs SoAWorld; dormancy 21–31% confirmed; ALL GATES PASS; D4 retirement conditionally authorised.
+D4 archival complete 2026-06-08: SugarWorld moved to sic_games.oracle; run.py is backward-compat
+re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 ---
 
