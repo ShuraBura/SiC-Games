@@ -54,7 +54,7 @@ On a single world with sufficiently large spatial extent and heterogeneous topog
 ## H-SUBSTRATE-6.0a — Multi-occupancy substrate viability
 
 **Registered:** 2026-06-03.
-**Status:** OPEN — pre-registration; the §7.2 behavioural readings were taken (see ARTIFACTS.md / the Stage 6.0a checkpoint) but the formal resolution block is pending the supervisor's density-flag review.
+**Status:** RESOLVED-SUPPORTED (density-calibration flag raised) — 2026-06-08.
 
 **Statement:** This is a substrate pre-registration, not a theory-bearing hypothesis. It records the sanity readings committed before the Stage 6.0a §7.2–7.4 behavioural numbers are seen, so a sane/insane substrate cannot be reinterpreted after the fact. The generalised multi-occupancy substrate (resource-split harvest, Cred-weighted contest for C, diffusion movement) is predicted to be a viable, physically-plausible generalisation of the one-agent-per-cell model.
 
@@ -67,7 +67,23 @@ On a single world with sufficiently large spatial extent and heterogeneous topog
 
 **Test reference:** Stage 6.0a §7.2 (C-behavioural, κ=0 vs κ=1, ≥2000 steps), §7.3 (density validation), §7.4 (N_carry flag). Recovery gate §7.1 PASSED bit-identically.
 
-**Resolution:** *(pending supervisor density-flag review — the §7.2 readings: C viable both κ (settles ~1080/1150); self-limiting confirmed; density ~0.0011 p/km² ≈100× below band → calibration flag; no Matthew-runaway, Cov(φ,wealth)≈−0.11. See ARTIFACTS.md.)*
+**Resolution (2026-06-08):** RESOLVED-SUPPORTED — density-calibration flag raised.
+
+Full §8 report: `outputs/stage6_0a_substrate/gate_6_0a_report.md`.
+
+| Pre-registration | Outcome |
+|-----------------|---------|
+| C viability (κ=0 and κ=1) | **SUPPORTED.** Settles ~1080/1150 both κ. Self-limiting. No extinction. |
+| Self-limiting density | **SUPPORTED.** Per-cell occupancy stabilises; no crowding-collapse. |
+| Density vs ethnography (0.01–1 p/km²) | **CALIBRATION FLAG.** ~0.001–0.014 p/km²; lower tail ≈100× below band → hands to resource-economy calibration pass. |
+| Cov(φ,wealth) — observe and defer | **OPEN-PENDING-CALIBRATION.** Cov≈−0.11; negative (not Matthew-runaway). Re-measure at production density. |
+| N_carry / N ratio — descriptive | Settled/N_carry≈2.7–2.9 (multi-occ decouples from N_carry; descriptive only). |
+
+Occupancy-cliff finding (6.0a-perf): recorded as **superseded-premise correction** — Stage 7.5
+array restructure (VecJTM + C1 diagnostic vectorisation, GATE FINAL PASS 2026-06-08) cleared
+the Python-path infeasibility. Proto-ag density is no longer blocked by the legacy O(N²) paths.
+
+Parameter references: all values in `docs/PARAMETERS.md` (authoritative, extracted 2026-06-08).
 
 ---
 
