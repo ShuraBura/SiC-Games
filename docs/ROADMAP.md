@@ -67,54 +67,17 @@ Always check the C/Si distinction table above before implementing reproduction m
 
 ---
 
-## Locked parameters (do not change without supervisor approval)
+## Locked parameters
 
-| Parameter | Value | Locked at | Rationale |
-|---|---|---|---|
-| κ | 2.0 | Stage 2.2 | κ sweep |
-| σ_Si | 1.238 | Stage 3.4 | Recalibrated to cell (2,3) mean_sigma |
-| σ_base | 0.5 | Stage 2 | Default, not yet swept |
-| C* | 10.0 | Stage 2 | Default, not yet swept |
-| C** | 10.0 (=C*) | Stage 3.2 | Pinned — see deferred Q11 |
-| δ (Cred decay) | 0.01 | Stage 2 | Default, not yet swept |
-| α (Matthew power) | 2.0 | Stage 3.4 | 2D scan cell (2,3) |
-| ε (Laplace smoothing) | 0.01 | Stage 2 | Default |
-| velocity_tau | 10 | Stage 2.1 | Mode switch EMA window |
-| velocity_scale v_0 | 1.0 | Stage 2.1 | Mode switch sigmoid scale |
-| f_C | 0.25 | Stage 3.1 | f_C sweep |
-| β (status amplification) | 1.0 | Stage 3.2 | β sweep |
-| σ_inherit | 0.05 | Stage 3.3 | Biparental copy-error noise |
-| parent_radius r | 3 | Stage 3.3 | Proximity for parent selection |
-| τ_pool | 0.10 → 0.05 (design tension) | Stage 4.1c / Stage 4.2 | Pool contribution rate. Criterion 4 still fails at 0.05: τ_pool is entangled with N equilibrium (dual role: pool buffer + N suppressor). Cannot reduce independently without C Allee collapse or Si N overshoot. Full resolution deferred to Stage 4.3. |
-| γ (Cred-modulated birth, C only) | 0.2 | Stage 4.2 | P_birth_C × (1 + γ·tanh(𝒞/C***)); C***=C*=10.0. Boost mean ≈1.09 at steady state. No Cred runaway (growth <2%/100 steps). |
-| P_max_C (with pool τ=0.05, γ=0.2) | 0.07 | Stage 4.2 | Re-tuned: 0.075 overshoots with γ active; 0.07 → N∈[201,303] PASS. |
-| P_fission_Si (with pool τ=0.05) | 0.24 | Stage 4.2 | Reduced from 0.28: pool drain reduced → Si overshoots; 0.24 achievable without resolving design tension. |
-| β_Si (Si differential metabolism) | **5.0** | Stage 4.4 | Restored from Stage 4.3 interim β=2. Grid rescaled to k=4 (max_sugar=16) makes β=5 viable: mean Si harvest ~10–15/step vs cost_mean=12.5/step. Dormancy handles metabolic shortfall. Stage 4.3 β=2 was a grid workaround only. |
-| k_grid (grid scale factor) | 4 | Stage 4.4 | max_sugar=4×k=16, α=k=4. Minimum k where β=5 Si null control passes (N_active=[174,364], dorm_rate=5.1%). k=3 and below: Si permanent dormancy. |
-| p_fission_Si (Stage 4.4, β=5, k=4) | 0.065 | Stage 4.4 | N_active=[174,364], dorm_rate=5.1%, perm_dorm=0.0. Passes all gates. |
-| p_max_C (Stage 4.4, k=4) | 0.03 | Stage 4.4 | Best-effort: C null control FAILS all p values at k=4 (Allee bistability). 0.03 chosen as anchor for downstream tasks. Full resolution requires Stage 4.5 carrying-cost redesign. |
-| λ (C wealth inheritance) | 0.1 | Stage 4.4 | w_child += λ × mean_w_C at C birth. C-only; λ=0 for Si always. Default confirmed from Stage 4.1a; 0.1 activated in Stage 4.4. |
-| ψ distribution | Beta(2,2) + c_proximity(r_pool=5) | Stage 4.4 | Redesigned from Normal(0.5,0.2) + d=1 neighbor_count. Beta(2,2): std≈0.22 (vs ≈0.10 clipped Normal). c_proximity: C agents within Chebyshev r_pool=5 precomputed via c_prox_grid each step. |
-| P_fission_Si (Stage 4.3, β=2, dormancy enabled) | 0.15 | Stage 4.3 | Retuned: β=2 dynamics require lower p_fission than Stage 4.2's 0.24. Lower p needed due to larger equilibrium N at β=2. N_active=[285,404], dorm_rate=53% at quasi-static. |
-| τ_trickle (dormancy passive absorption) | 0.3 | Stage 4.3 | Blueprint specified 0.05; raised to 0.3 so dormant agents recover on partially-depleted cells. At max cell (sugar=4): 1.2/step, sufficient for all metabolisms to reactivate within t_dormant_max=50. |
-| ρ_carryover (pool carry-over fraction) | 0.3 | Stage 4.3 | Granary mechanism: pool_t+1 = 0.3×leftover_t + contributions. Intended to shift T* upward; instead T* narrowed (100,200)→(100,112) due to higher baseline C stress. |
-| k_pool_cap (pool cap multiplier) | 20.0 | Stage 4.3 | Cap = 20 × N_active_C × mean_metabolism. Non-limiting at observed N (~12,500 at N=250). Prevents unbounded accumulation. |
-| N_carry (C carrying capacity, 50×50) | 400 | Stage 4.5 | carry_discount(N_C)=max(0,1−N_C/N_carry). Counter-cyclical: as N_C falls, birth rises. Scale-setting calibration (numerical-stability band top), not ecological estimate. |
-| N_carry (C carrying capacity, 100×100) | 4100 | OWE-1.1 (2026-05-31) | Calibrated so settled N ≈ 2357 (target band 2000–3000) for ~20–60 ethnographic bands. Measured map: settled ≈ 0.754·N_carry − 566. Clean settle, est_starv=0. H1(ii) re-confirm pending (OWE-14). |
-| alpha_carry | 1.0 | Stage 4.5 | Linear discount. Confirmed non-linear alternatives unnecessary at current N range. |
-| p_max_C_bare | 0.11 | Stage 4.5 | C null control without pool/λ (carrying_cost only). Tuned in Stage 4.5 Task 0. |
-| p_max_C_final | 0.12 | Stage 4.5 | C final config with pool+λ+carrying_cost. Supersedes earlier Stage 4.2 (0.07) and Stage 4.4 (0.03) values for Stage 4.5+ runs. |
-| T*_C_A075 | > 500 | Stage 4.5 patch | C critical period at A=0.75. Binary search upper bound (C survived through end of sweep). Counterpart to Si T* ∈ (68,87). |
-| r_cred_Si (Si Cred accumulation rate) | **RETIRED** | Stage 5.1 | Replaced by binary near-dormancy trigger (k_cred_band). Parameter removed from SiCredConfig. |
-| k_cred_band (Si Cred near-dormancy band) | 1.0 | Stage 5.1 | Δsi_cred=1 if wealth ∈ [k_dormant, k_dormant+k_cred_band)×cost_i, else 0. Counter-cyclical gate PASSED both seeds at k=1.0. |
-| kappa_Si (Si σ modulation) | 0.5 | Stage 5 Task 3 | σ_Si_eff = σ_Si + κ_Si × tanh(si_cred/C*_Si). Smaller than C's κ=2.0 (no joint-task amplification). |
-| C*_Si (Si Cred ceiling) | 10.0 | Stage 5 Task 3 | Matches C*. si_cred clamped to [0, C*_Si]. |
-| Si T* (critical period at A=0.75) | (68, 87) | Stage 5 Task 2 | Binary search: T=125→C, T=87→C, T=68→S. Width=19≤25. C T*>500. |
-| c2_defection.enabled | True (verified stable) | Stage 5.2 Task 1 | defection_rate=3.74% at steady state; N∈[150,400] ✓ |
-| deffuant.epsilon | 0.2 | Stage 5.2 Task 2 | Confidence bound for cultural updating |
-| deffuant.mu | 0.3 | Stage 5.2 Task 2 | Base convergence rate |
-| deffuant.cred_weight | relative | Stage 5.2 Task 2 | w = cred_j / (cred_i + cred_j + eps_div) |
-| sigma_inherit (sigma_inherit*) | 0.10 | Stage 5.2 Task 3 | Lowest value sustaining Gini(psi) ≥ 0.15 in ≥1 seed with Deffuant OFF. Raised from 0.05 (Stage 3.3). |
+> **Authoritative home: `docs/PARAMETERS.md`** (extracted 2026-06-08, charter §6).
+> This section previously held the interim locked-param table. It has been replaced by a
+> pointer now that PARAMETERS.md is live. Do NOT restate parameter values here — that creates
+> two-homes drift. For any parameter value, lock date, sweep history, or status, see PARAMETERS.md.
+
+The full authoritative table is in **`docs/PARAMETERS.md`**, organised by mechanism section
+(§1 World/substrate · §2 Decision/σ · §3 Deffuant · §4 Joint task · §5 Cred economy ·
+§6 Support pool · §7 Reproduction · §8 Dormancy · §9 Initialization · §10 Diagnostics).
+Discrepancy resolution log (D1–D3 + two new items) is in PARAMETERS.md final section.
 
 ---
 

@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-06-05 (post-reorg). All eleven homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
+**Last updated:** 2026-06-08 (PARAMETERS.md extracted). All eleven homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
 
 ---
 
@@ -13,7 +13,7 @@
 | Where am I, what's next, what's been tried/deferred | **ROADMAP.md** | Stage sequence, status, pending/deferred items, open questions (Q-list) |
 | The big-picture structure / seams / how the pieces fit | **ARCHITECTURE.md** | System decomposition, module seams, data flow, design-decisions log |
 | How a specific mechanism *works* (the rule/equation) | **MECHANISMS.md** | Per-construct definitions, ranges, inheritance channels, mechanism logic, C/Si classification |
-| What is parameter X, its value, when it was locked, sweep history | **PARAMETERS.md** *(pending §6 extraction — interim: the locked-param table in `sic_games/CLAUDE.md`, indexed by mechanism in MECHANISMS §14)* | The authoritative value + lock/sweep/retire history of every parameter |
+| What is parameter X, its value, when it was locked, sweep history | **PARAMETERS.md** | The authoritative value + lock/sweep/retire history of every parameter |
 | What we *aspire* to show (no falsification spec yet) | **TARGETS.md** | Aspirations; each graduates to HYPOTHESES when it gets a test spec |
 | What did we predict (before seeing data), and how did it resolve | **HYPOTHESES.md** | Pre-registrations + resolution status (falsifiable, test-specced) |
 | What do we actually *know* (established findings) | **RESULTS.md** | Headline findings ledger, in prose |
@@ -22,7 +22,7 @@
 | Did we try X already, and why was it abandoned | **DEAD_ENDS.md** | Retired directions + the reason each was retired |
 | Which document owns this kind of fact | **INDEX.md** (this file) | The routing table itself |
 
-> **§6 status (2026-06-06):** the MODEL_SPEC split is **done** — ARCHITECTURE.md and MECHANISMS.md now exist as separate homes (see ARCHITECTURE §12.1-F; the original MODEL_SPEC v0.2 is archived at `archive/superseded/`). **PARAMETERS.md is still pending extraction** — until then, route parameter-value questions to the locked-param table in **`sic_games/CLAUDE.md`** (indexed by mechanism in MECHANISMS §14).
+> **§6 status (2026-06-08):** the MODEL_SPEC split is **done** — ARCHITECTURE.md and MECHANISMS.md now exist as separate homes (see ARCHITECTURE §12.1-F; the original MODEL_SPEC v0.2 is archived at `archive/superseded/`). **PARAMETERS.md is now live** (extracted 2026-06-08) — route all parameter-value questions to **`docs/PARAMETERS.md`**. The interim locked-param tables in ROADMAP.md and CLAUDE.md have been replaced with pointers.
 
 ---
 
@@ -44,7 +44,7 @@
 | ROADMAP.md | live | Code (end of stage) | end of every stage / directive |
 | ARCHITECTURE.md | live (§0 principle, §9 world substrate, §12 decision-log, §13 seams, §15 gaps) | Code + supervisor | a seam/decomposition/world-substrate change; a design decision is taken |
 | MECHANISMS.md | live (§0–§8, §10–§11 construct registry, §14 param index) | Code + supervisor | construct introduced or redefined; lock-status change |
-| PARAMETERS.md | **pending §6 extraction** (interim: CLAUDE.md table) | Code | any parameter lock, sweep, or retirement |
+| PARAMETERS.md | **live** (extracted 2026-06-08; supersedes CLAUDE.md + ROADMAP.md interim tables) | Code | any parameter lock, sweep, or retirement |
 | TARGETS.md | live (T-1, T-2, T-3) | supervisor + Code | an aspiration is added or graduates to HYPOTHESES |
 | HYPOTHESES.md | live (H-EMERGE-1, H-SUBSTRATE-6.0a, H_cc) | supervisor + Code | before any analysis that could HARK; on resolution |
 | RESULTS.md | live (R-1) | Code | when a finding is established |

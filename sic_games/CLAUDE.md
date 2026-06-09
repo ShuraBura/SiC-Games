@@ -128,40 +128,15 @@ python -m cProfile -s cumtime sic_games/run.py # profile
 
 ## Locked parameters — do not change without explicit instruction
 
-| Parameter | Value | Locked at |
-|---|---|---|
-| k_grid | 4 | Stage 4.4 |
-| β_Si | 5.0 | Stage 4.4 |
-| p_fission_Si | 0.28 | Stage 4.3 |
-| p_max_C | 0.12 | Stage 4.5 Task 1 |
-| N_carry | 400 | Stage 4.5 Task 0 |
-| α_carry | 1.0 | Stage 4.5 Task 0 |
-| τ_pool | 0.05 | Stage 4.3 |
-| ρ (pool carryover) | 0.3 | Stage 4.3 |
-| λ (wealth inheritance) | 0.1 | Stage 4.5 Task 1 |
-| σ_Si | 1.238 | Stage 3.4 |
-| κ (Cred-σ coupling) | 2.0 | Stage 3.4 |
-| α (Matthew partition) | 2.0 | Stage 3.4 |
-| β (status amplification) | 1.0 | Stage 3 |
-| f_C (newborn Cred endowment) | 0.25 | Stage 3 |
-| σ_inherit (trait noise) | 0.05 | Stage 3 |
-| age_init_upper_frac | 0.25 | Stage 4.4 patch |
-| wealth_init_scale_k | True | Stage 4.4 patch |
-| cluster_init (C only) | True, peak_index=0, radius=10 | Stage 4.4 patch |
-| T_dormant_max | 50 | Stage 4.3 |
-| k_dormant | 1.0 | Stage 4.3 |
-| τ_trickle | 0.05 | Stage 4.3 |
-| k_reactivate | 3.0 | Stage 4.3 |
-| r_cred_Si | RETIRED (Stage 5.1) | replaced by binary near-dormancy trigger |
-| k_cred_band | 1.0 | Stage 5.1 |
-| κ_Si | 0.5 | Stage 5 |
-| C*_Si | 10.0 | Stage 5 |
-| c2_defection.enabled | True | Stage 5.2 |
-| deffuant.epsilon | 0.2 | Stage 5.2 |
-| deffuant.mu | 0.3 | Stage 5.2 |
-| sigma_inherit | 0.10 | Stage 5.2 (raised from 0.05) |
-| k_density (c_spatial_density period) | 10 | Perf opt pass |
-| k_moran (Moran's I period) | 10 | Perf opt pass |
+> **Authoritative home: `docs/PARAMETERS.md`** (extracted 2026-06-08, charter §6).
+> This table has been superseded. **Do NOT edit this section** — any parameter change goes
+> into PARAMETERS.md, not here. The stale values that were here (p_fission_Si=0.28,
+> τ_trickle=0.05, σ_inherit=0.05, age_init_upper_frac=0.25) have been corrected in
+> PARAMETERS.md as part of D1–D3 discrepancy resolution.
+
+For any parameter value, lock date, sweep history, or status: → **`docs/PARAMETERS.md`**
+(organised by: §1 World · §2 Decision/σ · §3 Deffuant · §4 Joint task · §5 Cred ·
+§6 Pool · §7 Reproduction · §8 Dormancy · §9 Initialization · §10 Diagnostics).
 
 ---
 

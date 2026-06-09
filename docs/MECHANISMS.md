@@ -350,7 +350,7 @@ Pool gate criterion (ROADMAP Rule 12): `pool_draw_unmet_frac < 20%` evaluated as
 
 ## 14. Parameter registry (pointer)
 
-**Authoritative parameter values + lock/sweep history: the locked-parameter table in `sic_games/CLAUDE.md`** (interim home until `PARAMETERS.md` is extracted — charter §6). Do NOT copy parameter values into this section; that would create two-homes drift.
+**Authoritative parameter values + lock/sweep history: `docs/PARAMETERS.md`** (extracted 2026-06-08, charter §6 — supersedes the former interim table in `sic_games/CLAUDE.md`). Do NOT copy parameter values into this section; that would create two-homes drift.
 
 **Index of parameter names by owning mechanism section:**
 
