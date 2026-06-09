@@ -75,7 +75,7 @@ Full §8 report: `outputs/stage6_0a_substrate/gate_6_0a_report.md`.
 |-----------------|---------|
 | C viability (κ=0 and κ=1) | **SUPPORTED.** Settles ~1080/1150 both κ. Self-limiting. No extinction. |
 | Self-limiting density | **SUPPORTED.** Per-cell occupancy stabilises; no crowding-collapse. |
-| Density vs ethnography (0.01–1 p/km²) | **CALIBRATION FLAG.** ~0.001–0.014 p/km²; lower tail ≈100× below band → hands to resource-economy calibration pass. |
+| Density vs ethnography (0.01–1 p/km²) | **CALIBRATION FLAG.** 0.00108–0.00115 p/km² (pkl, κ=0/1, 100×100 grid, final-step snapshot); ≈9× below band lower bound, ≈90× below expected ~0.1 → hands to calibration pass. |
 | Cov(φ,wealth) — observe and defer | **OPEN-PENDING-CALIBRATION.** Cov≈−0.11; negative (not Matthew-runaway). Re-measure at production density. |
 | N_carry / N ratio — descriptive | Settled/N_carry≈2.7–2.9 (multi-occ decouples from N_carry; descriptive only). |
 

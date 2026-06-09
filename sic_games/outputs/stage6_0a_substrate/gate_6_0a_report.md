@@ -13,14 +13,16 @@ All parameter values below are authoritative in `docs/PARAMETERS.md`; this repor
 
 | Item | Value | PARAMETERS.md ref |
 |------|-------|-------------------|
-| Grid | 50×50 | §1 |
+| Grid | **100×100** | §1 |
+| N_init | 2250 | §7 |
+| n_steps | 2000 | — |
 | cell_area_km2 | 100.0 | §1 |
 | k_grid | 4 | §1 |
 | max_sugar_capacity | 16 | §1 |
 | κ (Cred-σ coupling, C) | 0 and 1 (sweep) | §2 |
 | α_matthew | 2.0 | §4 |
 | ε_laplace | 0.01 | §4 |
-| N_carry (50×50) | 400 | §7 |
+| N_carry (100×100) | **4100** | §7 |
 
 κ settings: two runs — κ=0 (no Cred-weighted contest; even split scramble) and κ=1 (partial
 Cred-weighted contest) — to test whether social mechanic coupling destabilises the substrate.
@@ -67,38 +69,30 @@ this was measured is not the production regime.
 ## 4. Density validation (§7.3)
 
 **Pre-registered sanity band:** ~0.01–1 persons/km² (flat terrain, 100 km²/cell).
+The pre-registration expected "order ~0.1" p/km² as the target.
 
-**Observed:** settled N ≈ 1080–1150 agents on 50×50 = 2500 cells.
+**Observed (from `behavioural_partial.pkl`, final-step snapshot, step 2000):**
 
-```
-occupancy = 1080 / 2500 = 0.432 agents/cell
-density = 0.432 / 100 km² = 0.00432 agents/km² ≈ 0.00432 p/km²
-```
+| κ | final_n | n_cells | agents/cell (all) | persons/km² |
+|---|---------|---------|-------------------|-------------|
+| κ=0 | 1076 | 10 000 | 0.1076 | **0.001076** |
+| κ=1 | 1154 | 10 000 | 0.1154 | **0.001154** |
 
-Wait — this is the aggregate mean across all cells including uninhabited cells in the Sugarscape
-trough region. Settling in the peak zones:
+The density is `agents_per_cell_all = final_n / n_cells`; `persons_per_km2 = agents_per_cell_all / cell_area_km2`.
+These are the stored values — read directly from the pkl, not re-derived.
 
-```
-~1100 agents, peak zones ≈ 2 × 20² = 800 cells (rough estimate)
-occupancy in peaks ≈ 1100 / 800 ≈ 1.375 agents/cell
-density in peaks ≈ 1.375 / 100 ≈ 0.0138 p/km²
-```
+**Sanity band: 0.01–1 p/km².** Both readings fall below the lower bound.
 
-Using the grid-wide aggregate:
-```
-density = 1100 / 2500 / 100 = 0.0044 p/km²
-```
+- vs lower bound (0.01): ≈9.3× below (κ=0), ≈8.7× below (κ=1).
+- vs pre-registered expected order-of-magnitude (~0.1): ≈93× below (κ=0), ≈87× below (κ=1).
 
-The ROADMAP notes this as `~0.0011 p/km²`, which was the lower-end reading at a snapshot during
-the 2000-step run (not the final settled value). The order-of-magnitude is consistent:
+The ROADMAP summary `~0.0011 p/km² ≈100× below band` was reading the pkl value correctly (using
+~0.1 as the comparison point). The "100×" shorthand refers to the ≈90× miss vs the expected
+order-of-magnitude, not vs the lower bound.
 
-**Observed density: ~0.001–0.014 p/km² depending on measurement basis.**
-**Sanity band: 0.01–1 p/km².**
-
-**Status: CALIBRATION FLAG RAISED.** The lower tail of the observed range (≈0.0011 p/km²)
-is ≈100× below the ethnographic lower bound. The upper tail (≈0.014 p/km² in peak zones) just
-reaches the band. The substrate is not definitively out of band, but it is in the sensitive
-region. **This flag is the primary calibration input for the next chapter: the resource-economy
+**Status: CALIBRATION FLAG RAISED.** Both κ readings are below the sanity band; neither
+reaches the 0.01 floor. The miss is ≈9× vs band entry and ≈90× vs the expected proto-ag target.
+**This flag is the primary calibration input for the next chapter: the resource-economy
 calibration pass.**
 
 The ethnographic target for proto-agricultural density is the project's original question. This
@@ -109,16 +103,16 @@ answer.
 
 ## 5. N_carry / N ratio (§7.4) — descriptive
 
-N_carry (50×50) = 400 (see PARAMETERS.md §7). Settled N ≈ 1080–1150 under multi-occupancy.
-Ratio settled/N_carry ≈ 2.7–2.9.
+N_carry (100×100) = 4100 (see PARAMETERS.md §7). Settled N ≈ 1076–1154 under multi-occupancy.
+Ratio settled/N_carry ≈ 0.26–0.28 (settled population runs at ~27% of the carrying cap).
 
-**Note:** This ratio reflects the multi-occupancy dynamics — multiple agents per cell means
-total population is not bounded by N_carry the same way as in one-agent-per-cell mode.
-N_carry was calibrated for the one-agent-per-cell legacy model (Stage 4.5). Under multi-occupancy,
-the effective carrying capacity is a function of (K_cell × n_peak_cells × harvest_per_agent /
-metabolic_cost), not N_carry directly. The N_carry reconciliation was flagged in the Stage 6.0a
-blueprint (§10: "N_carry re-derivation → design-doc reconciliation, not here") and remains deferred
-to the calibration pass.
+**Note:** The carry_discount birth ceiling (`max(0, 1 − N_C/N_carry)`) uses N_carry=4100 for the
+100×100 grid; at settled N≈1100, the discount is ≈0.73 — the ceiling is not the binding
+constraint here. The flat-terrain substrate disperses agents across 10 000 cells at mean
+occupancy ≈0.11/cell, well within the feasible occupancy range identified by the 6.0a-perf recon
+(≤~2.3/cell). The N_carry reconciliation was flagged in the Stage 6.0a blueprint (§10:
+"N_carry re-derivation → design-doc reconciliation, not here") and remains deferred to the
+calibration pass.
 
 ---
 
@@ -184,9 +178,9 @@ Per blueprint §5: the minimal trait-semantics ruling for Stage 6.0a.
 |-----------------|---------|--------|
 | C viability (κ=0 and κ=1) | Settles ~1080/1150, both κ. Self-limiting. | SUPPORTED |
 | Self-limiting density | Per-cell occupancy stabilises; no overcrowding-collapse | SUPPORTED |
-| Density vs ethnography (~0.01–1 p/km²) | ~0.001–0.014 p/km²; lower tail ≈100× below band | CALIBRATION FLAG |
+| Density vs ethnography (~0.01–1 p/km²) | 0.00108–0.00115 p/km² (pkl); ≈9× below band lower bound (0.01), ≈90× below expected ~0.1 | CALIBRATION FLAG |
 | Cov(φ,wealth) — observe and defer | Cov ≈ −0.11; no Matthew-runaway | OBSERVED, OPEN-PENDING-CALIBRATION |
-| N_carry / N ratio — descriptive | Settled/N_carry ≈ 2.7–2.9; multi-occ changes the relationship | DESCRIPTIVE (no threshold pre-committed) |
+| N_carry / N ratio — descriptive | Settled/N_carry ≈ 0.26–0.28 (100×100, N_carry=4100); carry-discount not binding | DESCRIPTIVE (no threshold pre-committed) |
 
 **Viability verdict:** The multi-occupancy substrate is a viable, physically-plausible
 generalisation of the one-agent-per-cell model. Recovery gate passed bit-identically. Both κ
@@ -194,12 +188,14 @@ settings produce stable populations. No runaway pathology. The substrate is clea
 as the floor for Stage 6.0b (terrain topography).
 
 **Density flag:** The density calibration flag is raised and handed to the resource-economy
-calibration pass (the "real next chapter"). Hitting proto-ag density on the array model is where
-the project's original question gets answered. The flag is not a blocker for substrate viability.
+calibration pass. Both κ readings (0.00108, 0.00115 p/km²) miss the sanity band by ≈9×;
+both miss the expected proto-ag order-of-magnitude (~0.1 p/km²) by ≈90×. Hitting that
+target is the project's original question and the first task of the calibration pass.
+The flag is not a blocker for substrate viability.
 
 **Cov note:** −0.11 covariance is logged as open-pending-calibration. Recalibrate and re-measure
 once the density calibration pass has the model running at the target density regime; the Matthew-
-runaway question is moot at ≈100× below target density.
+runaway question is moot at ≈90× below target density.
 
 **Occupancy cliff:** Recorded as superseded-premise correction (§7 above). Stage 7.5 clears it.
 
@@ -220,3 +216,4 @@ runaway question is moot at ≈100× below target density.
 | Rev | Date | Change |
 |-----|------|--------|
 | 1 | 2026-06-08 | Initial — supervisor-directed, post-Stage-7.5 density-flag review |
+| 2 | 2026-06-09 | Corrected §1 grid (50×50 → 100×100, N_init=250→2250, N_carry=400→4100); rewrote §4 density calculation from pkl values (0.00108–0.00115 p/km²), removing wrong 2500-cell arithmetic and peak-zone estimate; corrected §5 N_carry/N ratio (2.7–2.9 → 0.26–0.28); updated §9 summary table and density note accordingly |
