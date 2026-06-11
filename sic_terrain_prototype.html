@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SiC Games — Terrain Generator Prototype</title>
+<style>
+  :root {
+    --bg: #1a1a18; --panel: #232320; --ink: #e8e6df; --muted: #9b988d;
+    --line: rgba(255,255,255,0.12); --accent: #5dcaa5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 18px; }
+  h1 { font-size: 19px; font-weight: 500; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .layout { display: grid; grid-template-columns: 290px 1fr; gap: 18px; align-items: start; }
+  .panel { background: var(--panel); border: 0.5px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .panel h2 { font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 12px; }
+  .ctrl { margin-bottom: 13px; }
+  .ctrl label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .ctrl label span:last-child { color: var(--accent); font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select, button { font: inherit; color: var(--ink); background: #2c2c28; border: 0.5px solid var(--line); border-radius: 8px; padding: 7px 10px; width: 100%; }
+  button { cursor: pointer; margin-top: 4px; }
+  button:hover { background: #36362f; }
+  button.primary { background: #0f6e56; border-color: #0f6e56; }
+  button.primary:hover { background: #12866a; }
+  .seedrow { display: flex; gap: 8px; }
+  .seedrow input { flex: 1; font: inherit; color: var(--ink); background: #2c2c28; border: 0.5px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+  .canvas-area { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .mapcard { background: var(--panel); border: 0.5px solid var(--line); border-radius: 12px; padding: 12px; }
+  .mapcard h3 { font-size: 13px; font-weight: 500; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; }
+  .mapcard h3 .hint { color: var(--muted); font-weight: 400; font-size: 11px; }
+  canvas.map { width: 100%; image-rendering: pixelated; border-radius: 6px; display: block; background: #000; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .stats { margin-top: 14px; }
+  .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+  .stat { background: #2c2c28; border-radius: 8px; padding: 9px 11px; }
+  .stat .k { font-size: 11px; color: var(--muted); }
+  .stat .v { font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .stat .v.warn { color: #ef9f27; }
+  .stat .v.bad { color: #e24b4a; }
+  .stat .v.ok { color: #5dcaa5; }
+  .checkrow { font-size: 12px; margin-top: 4px; color: var(--muted); }
+  .full { grid-column: 1 / -1; }
+  .biomebars { display: flex; height: 22px; border-radius: 5px; overflow: hidden; margin-top: 6px; border: 0.5px solid var(--line); }
+  .biomebars div { height: 100%; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .canvas-area { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SiC Games — terrain generator prototype</h1>
+  <p class="sub">Derive-from-primitives: elevation → flow-accumulation water → forage / game / cost / risk fields. Judgment tool, not the production algorithm.</p>
+  <div class="layout">
+    <div>
+      <div class="panel">
+        <h2>Knobs</h2>
+        <div class="ctrl"><label>Mountainousness <span id="v_relief">0.55</span></label><input type="range" id="relief" min="0" max="1" step="0.01" value="0.55"></div>
+        <div class="ctrl"><label>Roughness (detail) <span id="v_rough">0.50</span></label><input type="range" id="rough" min="0" max="1" step="0.01" value="0.50"></div>
+        <div class="ctrl"><label>Water abundance <span id="v_water">0.50</span></label><input type="range" id="water" min="0" max="1" step="0.01" value="0.50"></div>
+        <div class="ctrl"><label>Forest coverage <span id="v_forest">0.50</span></label><input type="range" id="forest" min="0" max="1" step="0.01" value="0.50"></div>
+        <div class="ctrl"><label>Aridity <span id="v_arid">0.35</span></label><input type="range" id="arid" min="0" max="1" step="0.01" value="0.35"></div>
+        <div class="ctrl">
+          <label>Seed</label>
+          <div class="seedrow"><input type="text" id="seed" value="42"><button id="rand" style="width:auto;padding:7px 12px">↻</button></div>
+        </div>
+        <button class="primary" id="gen">Regenerate</button>
+        <div class="note">Grid 100×100 (matches the locked world). Each cell = 100 km².</div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h2>View</h2>
+        <select id="overlay">
+          <option value="biome">Biome (terrain types)</option>
+          <option value="elev">Elevation</option>
+          <option value="forage">Forage capacity</option>
+          <option value="game">Game capacity</option>
+          <option value="wateracc">Water accessibility</option>
+          <option value="cost">Movement cost</option>
+          <option value="risk">Base mortality risk</option>
+        </select>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="canvas-area">
+        <div class="mapcard">
+          <h3>Primary view <span class="hint" id="primlbl">biome</span></h3>
+          <canvas class="map" id="cMain" width="100" height="100"></canvas>
+          <div class="legend" id="mainlegend"></div>
+        </div>
+        <div class="mapcard">
+          <h3>Biome reference</h3>
+          <canvas class="map" id="cBiome" width="100" height="100"></canvas>
+          <div class="legend" id="biomelegend"></div>
+        </div>
+      </div>
+
+      <div class="panel stats">
+        <h2>Feasibility readouts</h2>
+        <div class="statgrid" id="statgrid"></div>
+
+        <div class="full" style="margin-top:14px">
+          <div class="stat" style="background:transparent;padding:0">
+            <div class="k">Biome composition</div>
+            <div class="biomebars" id="biomebars"></div>
+            <div class="legend" id="complegend"></div>
+          </div>
+        </div>
+
+        <details open>
+          <summary>Game–forage relationship (should be hump-shaped, peaking at moderate forage)</summary>
+          <canvas id="cScatter" width="520" height="180" style="width:100%;max-width:520px;margin-top:8px;background:#1a1a18;border-radius:6px"></canvas>
+          <div class="note" id="humpverdict"></div>
+        </details>
+
+        <details>
+          <summary>Slope distribution (real terrain is heavy-tailed: mostly gentle, rare steep)</summary>
+          <canvas id="cSlope" width="520" height="140" style="width:100%;max-width:520px;margin-top:8px;background:#1a1a18;border-radius:6px"></canvas>
+        </details>
+
+        <details>
+          <summary>Elevation hypsometry (cumulative area vs elevation)</summary>
+          <canvas id="cHyps" width="520" height="140" style="width:100%;max-width:520px;margin-top:8px;background:#1a1a18;border-radius:6px"></canvas>
+        </details>
+
+        <details style="margin-top:14px">
+          <summary>Diagnosed map parameters (the vector saved with this map)</summary>
+          <div class="note" style="margin:6px 0">This is the per-map characterization that travels with the map; downstream model runs validate against it.</div>
+          <button id="exportDiag" style="width:auto;padding:6px 12px">Copy map vector (JSON)</button>
+          <pre id="diagJSON" style="white-space:pre-wrap;font-size:11px;color:#cfccc2;background:#1a1a18;border-radius:6px;padding:10px;margin-top:8px;max-height:220px;overflow:auto"></pre>
+        </details>
+
+        <details style="margin-top:14px">
+          <summary>Parametric sweep — coexistence band (Latin hypercube over all 5 knobs)</summary>
+          <div class="note" style="margin:6px 0">Samples the whole knob space × seeds, measures where forest &amp; savanna both clear a threshold. The acceptable band emerges from the threshold curve, not an assumed cutoff.</div>
+          <div class="seedrow" style="gap:8px">
+            <label style="font-size:12px">samples <input type="text" id="swN" value="200" style="width:60px"></label>
+            <label style="font-size:12px">seeds/sample <input type="text" id="swS" value="5" style="width:50px"></label>
+            <button class="primary" id="runSweep" style="width:auto;padding:7px 14px">Run sweep</button>
+          </div>
+          <div class="note" id="sweepStatus" style="margin-top:8px"></div>
+          <pre id="sweepJSON" style="white-space:pre-wrap;font-size:11px;color:#cfccc2;background:#1a1a18;border-radius:6px;padding:10px;margin-top:8px;max-height:340px;overflow:auto"></pre>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const N = 100;
+const $ = id => document.getElementById(id);
+
+// ---------- deterministic PRNG (mulberry32) ----------
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function hashSeed(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+
+// ---------- value-noise with fractal octaves ----------
+function makeNoise(rng){
+  const G=257; const grid=new Float32Array(G*G);
+  for(let i=0;i<grid.length;i++) grid[i]=rng();
+  function smooth(t){return t*t*(3-2*t);}
+  function at(x,y){
+    const xi=Math.floor(x), yi=Math.floor(y);
+    const xf=x-xi, yf=y-yi;
+    const a=grid[((yi%G+G)%G)*G+((xi%G+G)%G)];
+    const b=grid[((yi%G+G)%G)*G+(((xi+1)%G+G)%G)];
+    const c=grid[(((yi+1)%G+G)%G)*G+((xi%G+G)%G)];
+    const d=grid[(((yi+1)%G+G)%G)*G+(((xi+1)%G+G)%G)];
+    const u=smooth(xf), v=smooth(yf);
+    return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v;
+  }
+  return at;
+}
+function fbm(noise,x,y,oct,lac,gain){
+  let amp=1,freq=1,sum=0,norm=0;
+  for(let o=0;o<oct;o++){sum+=amp*noise(x*freq,y*freq);norm+=amp;amp*=gain;freq*=lac;}
+  return sum/norm;
+}
+
+// ---------- field containers ----------
+let F = {};
+
+function generate(){
+  const knobs={
+    relief: +$('relief').value,
+    rough:  +$('rough').value,
+    waterK: +$('water').value,
+    forestK:+$('forest').value,
+    aridK:  +$('arid').value,
+    seedStr: $('seed').value || '0',
+  };
+  F = computeWorld(knobs);
+  draw();
+  computeStats();
+}
+
+// Pure world generation: takes knob values, returns the field set. No DOM, no
+// draw — so the parametric sweep can call it thousands of times headlessly and
+// the interactive path and the sweep share ONE generation code path.
+function computeWorld(knobs){
+  const seedStr = knobs.seedStr!==undefined ? String(knobs.seedStr) : '0';
+  const seed = hashSeed(seedStr);
+  const rng = mulberry32(seed);
+  const noise = makeNoise(rng);
+  const noise2 = makeNoise(mulberry32(seed^0x9e3779b9));
+
+  const relief = knobs.relief;     // overall amplitude of high ground
+  const rough  = knobs.rough;      // octave gain → detail
+  const waterK = knobs.waterK;     // sea/water level + rainfall
+  const forestK= knobs.forestK;    // forest bias
+  const aridK  = knobs.aridK;      // suppresses productivity globally
+
+  const oct = 5;
+  const gain = 0.35 + rough*0.45;        // higher = rougher
+  const scale = 3.2;                     // base feature size across grid
+
+  const elev = new Float32Array(N*N);
+  const moist = new Float32Array(N*N);
+  let emin=1e9, emax=-1e9;
+
+  // large-scale continental shape: a soft radial + low-freq fbm so we get
+  // a coherent landmass with an interior, not uniform noise.
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const nx=x/N*scale, ny=y/N*scale;
+    let e = fbm(noise,nx,ny,oct,2.0,gain);
+    // ridge component for mountains, weighted by relief
+    const ridge = 1-Math.abs(2*fbm(noise2,nx*1.3+10,ny*1.3+10,4,2.0,0.5)-1);
+    e = e*(1-relief*0.6) + ridge*relief*0.6;
+    elev[y*N+x]=e;
+    if(e<emin)emin=e; if(e>emax)emax=e;
+    // moisture: independent low-freq field (rainfall pattern)
+    moist[y*N+x]=fbm(noise2,nx*0.8+5,ny*0.8+5,4,2.0,0.45);
+  }
+  // --- ABSOLUTE RELIEF (physical scale, declared from the relief knob) ---
+  // The normalized 0..1 field below discards magnitude, so a flat world and a
+  // mountainous world look identical in any auto-stretched overlay. To give the
+  // eye (and the eventual acceptance gate) a real-units answer, we DECLARE the
+  // vertical relief envelope as an explicit function of the relief knob — the
+  // same thing the production generator will have to fix. relief=0 → gentle
+  // rolling interior; relief=1 → genuine mountains.
+  const RELIEF_FLOOR_M = 120;    // peak-to-trough span at relief=0 (gentle)
+  const RELIEF_CEIL_M  = 2500;   // peak-to-trough span at relief=1 (mountainous)
+  const SEA_LEVEL_M    = 0;      // datum: normalized 0 maps here on land worlds
+  const reliefAmpM = RELIEF_FLOOR_M + (RELIEF_CEIL_M-RELIEF_FLOOR_M)*relief;
+  const rawSpan = (emax-emin);   // pre-normalization span (diagnostic only)
+
+  // normalise elevation 0..1
+  for(let i=0;i<elev.length;i++) elev[i]=Math.max(0,Math.min(1,(elev[i]-emin)/(emax-emin+1e-9)));
+
+  // water level: cells below threshold are open water (lakes/sea).
+  // waterK=0 → no standing water; mild ease so the knob is responsive across
+  // its whole range (the old waterK*waterK squaring suppressed water to <10%
+  // until waterK≈1, making "mixed" misleadingly dry).
+  const waterLevel = Math.pow(waterK,1.2)*0.42;
+  const isWater = new Uint8Array(N*N);
+  for(let i=0;i<elev.length;i++) isWater[i] = elev[i] < waterLevel ? 1:0;
+
+  // ---------- flow accumulation (water primitive → rivers) ----------
+  // D8-ish: each land cell drains to lowest neighbour; accumulate upstream count.
+  const order = [...Array(N*N).keys()].filter(i=>!isWater[i]);
+  order.sort((a,b)=>elev[b]-elev[a]); // high to low
+  const flow = new Float32Array(N*N).fill(1);
+  const nbr=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[-1,1],[1,-1]];
+  for(const i of order){
+    const x=i%N, y=(i/N|0);
+    let lowest=-1, le=elev[i];
+    for(const [dx,dy] of nbr){
+      const xx=x+dx, yy=y+dy;
+      if(xx<0||yy<0||xx>=N||yy>=N) continue;
+      const j=yy*N+xx;
+      if(elev[j]<le){le=elev[j];lowest=j;}
+    }
+    if(lowest>=0) flow[lowest]+=flow[i];
+  }
+  // river = high flow accumulation on land
+  let fmax=0; for(let i=0;i<flow.length;i++) if(!isWater[i]&&flow[i]>fmax)fmax=flow[i];
+  // sparse channels: only the strongly-accumulated cells are rivers, and fewer
+  // when water abundance is low. Keeps dry interiors genuinely dry.
+  const riverThresh = fmax*(0.10 - waterK*0.06);
+  const isRiver = new Uint8Array(N*N);
+  for(let i=0;i<flow.length;i++) isRiver[i] = (!isWater[i] && flow[i]>riverThresh)?1:0;
+
+  // ---------- water accessibility: distance-decayed from any water/river ----------
+  // multi-source BFS distance, then exp decay.
+  const dist = new Float32Array(N*N).fill(Infinity);
+  let q=[];
+  for(let i=0;i<N*N;i++) if(isWater[i]||isRiver[i]){dist[i]=0;q.push(i);}
+  // simple BFS on 4-neighbourhood (Chebyshev-ish via repeated)
+  const nb4=[[-1,0],[1,0],[0,-1],[0,1]];
+  let head=0;
+  while(head<q.length){
+    const i=q[head++]; const x=i%N,y=(i/N|0); const d=dist[i];
+    for(const[dx,dy] of nb4){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=N||yy>=N)continue;const j=yy*N+xx;if(dist[j]>d+1){dist[j]=d+1;q.push(j);}}
+  }
+  const wateracc = new Float32Array(N*N);
+  const decay = 0.30 + (1-waterK)*0.22;
+  for(let i=0;i<N*N;i++){ wateracc[i]= isWater[i]?1: Math.exp(-decay*dist[i]); }
+
+  // ---------- slope (gradient of elevation) ----------
+  const slope = new Float32Array(N*N);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const i=y*N+x;
+    const xl=x>0?elev[i-1]:elev[i], xr=x<N-1?elev[i+1]:elev[i];
+    const yu=y>0?elev[i-N]:elev[i], yd=y<N-1?elev[i+N]:elev[i];
+    slope[i]=Math.sqrt((xr-xl)*(xr-xl)+(yd-yu)*(yd-yu))*0.5;
+  }
+  let smax=0; for(let i=0;i<slope.length;i++) if(slope[i]>smax)smax=slope[i];
+  for(let i=0;i<slope.length;i++) slope[i]/=(smax+1e-9);
+
+  // ---------- absolute slope in degrees ----------
+  // Cell = 100 km² → 10 km (10000 m) edge. Rise over run uses the PHYSICAL
+  // elevation = elev_norm * reliefAmpM, run = cell edge between samples.
+  const CELL_EDGE_M = 10000;
+  const slopeDeg = new Float32Array(N*N);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const i=y*N+x;
+    const xl=x>0?elev[i-1]:elev[i], xr=x<N-1?elev[i+1]:elev[i];
+    const yu=y>0?elev[i-N]:elev[i], yd=y<N-1?elev[i+N]:elev[i];
+    const dzx=(xr-xl)*reliefAmpM/(2*CELL_EDGE_M);
+    const dzy=(yd-yu)*reliefAmpM/(2*CELL_EDGE_M);
+    slopeDeg[i]=Math.atan(Math.sqrt(dzx*dzx+dzy*dzy))*180/Math.PI;
+  }
+
+  // ---------- effective moisture = rainfall + water proximity − aridity ----------
+  const wet = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    wet[i] = Math.max(0, Math.min(1, (0.45*moist[i] + 0.55*wateracc[i])*(1-aridK*0.92)));
+  }
+
+  // ---------- NPP proxy (productivity) = f(moisture, not too high elevation, not too steep) ----------
+  const npp = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){npp[i]=0;continue;}
+    const elevPenalty = 1-Math.max(0, elev[i]-0.6)/0.4;       // high alt cuts NPP
+    const slopePenalty = 1-slope[i]*0.7;
+    npp[i] = Math.max(0, wet[i]*elevPenalty*slopePenalty);
+  }
+
+  // ---------- forest mask: high NPP + enough moisture + forest knob ----------
+  // forestiness: where productivity is high AND moisture high → trees; drier high-NPP → grass
+  const forestness = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){forestness[i]=0;continue;}
+    const treeBias = wet[i]*0.7 + forestK*0.5 - elev[i]*0.3;
+    forestness[i]=Math.max(0,Math.min(1,treeBias));
+  }
+
+  // ---------- FORAGE capacity: tracks NPP, boosted in forest/wetland ----------
+  const forage = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){forage[i]=0;continue;}
+    forage[i]=Math.min(1, npp[i]*(0.6+0.6*forestness[i]));
+  }
+
+  // ---------- GAME capacity: HUMP-shaped in NPP, peaks at savanna/edge ----------
+  // palatable-grass + turnover: high where productivity is MODERATE and it's
+  // open (low forest) — i.e. grassland/savanna; suppressed in dense forest & desert.
+  const game = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){game[i]=0;continue;}
+    const p = npp[i];
+    const hump = Math.exp(-Math.pow((p-0.5)/0.22,2));   // peak at moderate NPP
+    const openness = 1-forestness[i];                    // grass, not woodland
+    // ecotone bonus: near forest edge (some forestness gradient) game gathers
+    game[i]=Math.min(1, hump*(0.35+0.75*openness));
+  }
+
+  // ---------- movement cost: slope-driven, water impassable-ish ----------
+  const cost = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    cost[i]= isWater[i] ? 1 : Math.min(1, 0.15 + slope[i]*0.85 + (elev[i]>0.7?(elev[i]-0.7):0));
+  }
+
+  // ---------- base mortality risk (terrain-derived, agent-agnostic) ----------
+  // exposure: high on steep/high terrain (falls, cold), high far from water,
+  // elevated near deep water edges (drowning), low in sheltered productive valleys.
+  const risk = new Float32Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){risk[i]=0.85;continue;}
+    const exposure = slope[i]*0.5 + Math.max(0,elev[i]-0.55)*0.6;
+    const thirst = (1-wateracc[i])*0.4;
+    const shelter = forestness[i]*0.15;                 // cover lowers risk slightly
+    risk[i]=Math.max(0.02,Math.min(1, 0.12 + exposure + thirst - shelter));
+  }
+
+  // ---------- biome classification (woody-cover ladder + water) ----------
+  // 0 water,1 wetland,2 forest,3 savanna/woodland,4 grassland,5 desert,6 mountain
+  //
+  // Forest, savanna/woodland and grassland are three points on ONE woody-cover
+  // axis (forestness), per the forest–savanna mosaic literature: grassland (low
+  // woody) → savanna/woodland (medium woody, ~5–30% canopy) → forest (high
+  // woody). Game is NOT used to define savanna — it is a cell PROPERTY that
+  // already peaks in open moderate-NPP cells, so the open→closed woody gradient
+  // is automatically the gatherer(forest)↔hunter(open) resource gradient.
+  // This removes the old artifact where savanna was gated behind game>0.45 and
+  // everything else defaulted to "steppe", flooding the map with grassland.
+  const W_FOREST = 0.45;   // forestness ≥ this → closed canopy (forest)
+  const W_SAV    = 0.18;   // forestness in [W_SAV, W_FOREST) → savanna/woodland
+                           // forestness < W_SAV → open grassland
+  const mtnElevThresh = 0.72 + (1-relief)*0.5;   // relief=0 → unreachable → no mountains
+  const mtnSlopeThresh = 0.18 + (1-relief)*0.4;
+  const biome = new Uint8Array(N*N);
+  for(let i=0;i<N*N;i++){
+    if(isWater[i]){biome[i]=0;continue;}
+    if(elev[i]>mtnElevThresh && slope[i]>mtnSlopeThresh){biome[i]=6;continue;} // mountain
+    if(npp[i]<0.10){biome[i]=5;continue;}                               // desert (dead-dry)
+    if(dist[i]<=2 && npp[i]>0.45 && slope[i]<0.12){biome[i]=1;continue;} // wetland/floodplain
+    // woody-cover ladder over the remaining vegetated land:
+    if(forestness[i]>=W_FOREST){biome[i]=2;continue;}                   // forest (closed canopy)
+    if(forestness[i]>=W_SAV){biome[i]=3;continue;}                      // savanna / woodland (mosaic matrix)
+    biome[i]=4;                                                          // open grassland
+  }
+
+  const field={elev,slope,slopeDeg,wateracc,isWater,isRiver,forage,game,cost,risk,biome,npp,forestness,reliefAmpM,rawSpan,SEA_LEVEL_M};
+  return field;
+}
+
+// ---------- color ramps ----------
+function ramp(v,lo,hi){ // returns [r,g,b] along a perceptual-ish ramp
+  v=Math.max(0,Math.min(1,(v-lo)/(hi-lo+1e-9)));
+  // dark teal -> green -> amber -> white
+  const stops=[[10,30,40],[15,110,86],[150,196,89],[239,159,39],[245,240,220]];
+  const t=v*(stops.length-1); const i=Math.floor(t); const f=t-i;
+  const a=stops[i], b=stops[Math.min(i+1,stops.length-1)];
+  return [a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f, a[2]+(b[2]-a[2])*f];
+}
+const BIOME_COL = {
+  0:[24,72,120],   // water - blue
+  1:[29,158,117],  // wetland - teal-green
+  2:[23,80,30],    // forest - dark green
+  3:[186,150,40],  // savanna/edge - amber-gold
+  4:[170,185,105], // grassland - pale olive
+  5:[216,170,120], // desert - tan
+  6:[120,118,112], // mountain - grey
+};
+const BIOME_NAME={0:'water',1:'wetland',2:'forest',3:'savanna/woodland',4:'grassland',5:'desert',6:'mountain'};
+
+function drawField(canvas, fld, mode){
+  const ctx=canvas.getContext('2d');
+  const img=ctx.createImageData(N,N);
+  for(let i=0;i<N*N;i++){
+    let r,g,b;
+    if(mode==='biome'){const c=BIOME_COL[fld[i]];r=c[0];g=c[1];b=c[2];}
+    else if(mode==='wateracc'){const c=ramp(fld[i],0,1);
+      if(F.isWater[i]){r=24;g=72;b=120;} else if(F.isRiver[i]){r=60;g=140;b=200;} else {r=c[0]*0.4+30;g=c[1]*0.5+60;b=c[2]*0.6+90;}}
+    else if(mode==='risk'){ // red ramp
+      const v=Math.max(0,Math.min(1,fld[i]));
+      r=40+v*200; g=60-v*30+20; b=60-v*40+20; if(F.isWater[i]){r=24;g=72;b=120;}}
+    else if(mode==='cost'){const v=fld[i]; r=40+v*160;g=40+v*120;b=50+v*80; if(F.isWater[i]){r=24;g=72;b=120;}}
+    else { const c=ramp(fld[i],0,1); r=c[0];g=c[1];b=c[2]; if(F.isWater[i]){r=24;g=72;b=120;} }
+    img.data[i*4]=r; img.data[i*4+1]=g; img.data[i*4+2]=b; img.data[i*4+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+function draw(){
+  const ov=$('overlay').value;
+  $('primlbl').textContent = ({biome:'biome',elev:'elevation',forage:'forage',game:'game',wateracc:'water accessibility',cost:'movement cost',risk:'base risk'})[ov];
+  const fieldMap={elev:F.elev,forage:F.forage,game:F.game,wateracc:F.wateracc,cost:F.cost,risk:F.risk,biome:F.biome};
+  drawField($('cMain'), fieldMap[ov], ov);
+  drawField($('cBiome'), F.biome, 'biome');
+  // legends
+  const ml=$('mainlegend'); ml.innerHTML='';
+  if(ov==='biome'){ml.innerHTML=biomeLegendHTML();}
+  else {
+    const labels={elev:['low','high'],forage:['barren','rich'],game:['none','abundant'],wateracc:['dry','water'],cost:['easy','hard'],risk:['safe','deadly']};
+    ml.innerHTML=`<span><i style="background:#0a1e28"></i>${labels[ov][0]}</span><span><i style="background:#eff0dc"></i>${labels[ov][1]}</span>`;
+    if(ov==='risk') ml.innerHTML=`<span><i style="background:#283c3c"></i>safe</span><span><i style="background:#e24b4a"></i>deadly</span>`;
+    if(ov==='cost') ml.innerHTML=`<span><i style="background:#283246"></i>easy</span><span><i style="background:#c8a050"></i>hard</span>`;
+  }
+  $('biomelegend').innerHTML=biomeLegendHTML();
+}
+function biomeLegendHTML(){
+  return Object.keys(BIOME_NAME).map(k=>{const c=BIOME_COL[k];return `<span><i style="background:rgb(${c[0]},${c[1]},${c[2]})"></i>${BIOME_NAME[k]}</span>`;}).join('');
+}
+
+// ---------- stats ----------
+function computeStats(){
+  const n=N*N;
+  let landCount=0, waterCount=0;
+  const counts={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  let forageSum=0, gameSum=0, riskSum=0, costSum=0;
+  for(let i=0;i<n;i++){
+    counts[F.biome[i]]++;
+    if(F.isWater[i])waterCount++; else {landCount++; forageSum+=F.forage[i]; gameSum+=F.game[i]; riskSum+=F.risk[i]; costSum+=F.cost[i];}
+  }
+  const pct=v=>Math.round(v/n*100);
+  const sg=$('statgrid'); sg.innerHTML='';
+  const waterPct=pct(waterCount);
+  const riverCount=F.isRiver.reduce((a,b)=>a+b,0);
+  const meanForage=(forageSum/landCount);
+  const meanGame=(gameSum/landCount);
+  const meanRisk=(riskSum/landCount);
+  // drainage density proxy
+  const drainage=(riverCount/landCount*100);
+
+  // --- absolute relief / slope statistics (real units) ---
+  // Land elevations in metres = elev_norm * reliefAmpM + sea level.
+  let eMinM=Infinity, eMaxM=-Infinity, eSumM=0;
+  let slopeSum=0, slopeMax=0, steepCount=0; // steep = >15° (hard to traverse)
+  for(let i=0;i<n;i++){
+    if(F.isWater[i]) continue;
+    const m=F.elev[i]*F.reliefAmpM + F.SEA_LEVEL_M;
+    if(m<eMinM)eMinM=m; if(m>eMaxM)eMaxM=m; eSumM+=m;
+    const sd=F.slopeDeg[i]; slopeSum+=sd; if(sd>slopeMax)slopeMax=sd; if(sd>15)steepCount++;
+  }
+  const eMeanM=eSumM/landCount;
+  const reliefM=eMaxM-eMinM;
+  const meanSlopeDeg=slopeSum/landCount;
+  const steepPct=steepCount/landCount*100;
+
+  function cls(v, warnLo, badLo){ if(v<badLo)return 'bad'; if(v<warnLo)return 'warn'; return 'ok'; }
+
+  const cells=[
+    ['water %', waterPct+'%', waterPct>60?'bad':(waterPct<3?'warn':'ok')],
+    ['land cells', landCount, ''],
+    ['rivers (cells)', riverCount, riverCount<5?'warn':'ok'],
+    ['drainage density', drainage.toFixed(1)+'%', ''],
+    ['relief envelope', Math.round(reliefM)+' m', ''],
+    ['elev min / max', Math.round(eMinM)+' / '+Math.round(eMaxM)+' m', ''],
+    ['mean elevation', Math.round(eMeanM)+' m', ''],
+    ['mean slope', meanSlopeDeg.toFixed(1)+'°', meanSlopeDeg>20?'bad':(meanSlopeDeg>10?'warn':'ok')],
+    ['max slope', slopeMax.toFixed(1)+'°', ''],
+    ['steep land (>15°)', steepPct.toFixed(1)+'%', ''],
+    ['mean forage', meanForage.toFixed(2), ''],
+    ['mean game', meanGame.toFixed(2), ''],
+    ['mean risk', meanRisk.toFixed(2), meanRisk>0.6?'bad':(meanRisk>0.45?'warn':'ok')],
+  ];
+  cells.forEach(([k,v,c])=>{ sg.insertAdjacentHTML('beforeend',`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`); });
+
+  // biome composition bar
+  const bb=$('biomebars'); bb.innerHTML='';
+  const cl=$('complegend'); cl.innerHTML='';
+  Object.keys(counts).forEach(k=>{
+    const p=counts[k]/n*100; if(p<0.1)return;
+    const c=BIOME_COL[k];
+    bb.insertAdjacentHTML('beforeend',`<div style="width:${p}%;background:rgb(${c[0]},${c[1]},${c[2]})" title="${BIOME_NAME[k]} ${p.toFixed(0)}%"></div>`);
+    cl.insertAdjacentHTML('beforeend',`<span><i style="background:rgb(${c[0]},${c[1]},${c[2]})"></i>${BIOME_NAME[k]} ${p.toFixed(0)}%</span>`);
+  });
+
+  drawScatter();
+  drawSlope();
+  drawHyps();
+
+  // refresh the durable per-map diagnostic vector
+  window._lastMapVector = characterizeMap(F);
+  const dj=$('diagJSON'); if(dj) dj.textContent = JSON.stringify(window._lastMapVector, null, 2);
+}
+
+function drawScatter(){
+  const cv=$('cScatter'), ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+  const W=cv.width,H=cv.height,pad=24;
+  // bin forage(npp) into 20 bins, plot mean game per bin → should be hump
+  const bins=20; const sum=new Float32Array(bins), cnt=new Float32Array(bins);
+  for(let i=0;i<N*N;i++){ if(F.isWater[i])continue; const b=Math.min(bins-1,Math.floor(F.npp[i]*bins)); sum[b]+=F.game[i]; cnt[b]++; }
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.beginPath();
+  ctx.moveTo(pad,H-pad); ctx.lineTo(W-6,H-pad); ctx.moveTo(pad,H-pad); ctx.lineTo(pad,6); ctx.stroke();
+  ctx.fillStyle='#9b988d'; ctx.font='10px sans-serif';
+  ctx.fillText('game →', 4, 12); ctx.fillText('NPP / forage →', W-90, H-6);
+  // scatter raw (subsample)
+  ctx.fillStyle='rgba(93,202,165,0.18)';
+  for(let i=0;i<N*N;i+=3){ if(F.isWater[i])continue; const x=pad+F.npp[i]*(W-pad-10); const y=(H-pad)-F.game[i]*(H-pad-8); ctx.fillRect(x,y,1.5,1.5); }
+  // binned mean line
+  ctx.strokeStyle='#ef9f27'; ctx.lineWidth=2; ctx.beginPath(); let started=false; let peakBin=-1,peakV=-1;
+  for(let b=0;b<bins;b++){ if(cnt[b]<3)continue; const m=sum[b]/cnt[b]; if(m>peakV){peakV=m;peakBin=b;} const x=pad+(b+0.5)/bins*(W-pad-10); const y=(H-pad)-m*(H-pad-8); if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y); }
+  ctx.stroke(); ctx.lineWidth=1;
+  // verdict
+  const peakPos=peakBin/bins;
+  let verdict;
+  if(peakBin<0) verdict='Not enough land to assess.';
+  else if(peakPos>0.25 && peakPos<0.72) verdict=`✓ Hump peaks at moderate NPP (~${(peakPos).toFixed(2)}) — game concentrates in savanna/grassland, not max-forage forest. Matches the ecology.`;
+  else if(peakPos>=0.72) verdict=`⚠ Game peaks at high NPP (~${peakPos.toFixed(2)}) — leaning toward forest. Lower forest knob or check game hump width.`;
+  else verdict=`⚠ Game peaks at low NPP (~${peakPos.toFixed(2)}) — too arid. Game should center on grassland.`;
+  $('humpverdict').textContent=verdict;
+}
+
+function drawSlope(){
+  const cv=$('cSlope'),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+  const W=cv.width,H=cv.height,pad=18,bins=30;const hist=new Float32Array(bins);
+  // bin by absolute slope in degrees, 0..45° range (clamp above)
+  const MAXDEG=45;
+  for(let i=0;i<N*N;i++){if(F.isWater[i])continue;const b=Math.min(bins-1,Math.floor(F.slopeDeg[i]/MAXDEG*bins));hist[b]++;}
+  let mx=0;for(const v of hist)if(v>mx)mx=v;
+  ctx.fillStyle='#5dcaa5';
+  for(let b=0;b<bins;b++){const h=hist[b]/mx*(H-pad-6);const x=pad+b/bins*(W-pad-6);ctx.fillRect(x,H-pad-h,(W-pad-6)/bins-1,h);}
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.beginPath();ctx.moveTo(pad,H-pad);ctx.lineTo(W-4,H-pad);ctx.stroke();
+  ctx.fillStyle='#9b988d';ctx.font='10px sans-serif';ctx.fillText('0°',pad,H-4);ctx.fillText('≥'+MAXDEG+'°',W-34,H-4);
+}
+
+function drawHyps(){
+  const cv=$('cHyps'),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+  const W=cv.width,H=cv.height,pad=18;
+  const es=[];for(let i=0;i<N*N;i++)if(!F.isWater[i])es.push(F.elev[i]);
+  es.sort((a,b)=>a-b);
+  ctx.strokeStyle='#378add';ctx.lineWidth=2;ctx.beginPath();
+  for(let k=0;k<es.length;k++){const x=pad+k/es.length*(W-pad-6);const y=(H-pad)-es[k]*(H-pad-6);if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.beginPath();ctx.moveTo(pad,H-pad);ctx.lineTo(W-4,H-pad);ctx.moveTo(pad,H-pad);ctx.lineTo(pad,6);ctx.stroke();
+  // absolute-metre axis labels (top = max relief, bottom = sea level)
+  const topM=Math.round(F.reliefAmpM+F.SEA_LEVEL_M), botM=Math.round(F.SEA_LEVEL_M);
+  ctx.fillStyle='#9b988d';ctx.font='10px sans-serif';
+  ctx.fillText(topM+' m',pad+2,12);
+  ctx.fillText(botM+' m',pad+2,H-pad-2);
+  ctx.fillText('area cumulative →',W-110,H-4);
+}
+
+// ---------- per-map characterization (durable mechanic) ----------
+// Given a generated field set, return the diagnostic vector that travels WITH
+// the map. Downstream model runs validate against these saved parameters.
+// This is the same measurement whether run interactively or in the sweep.
+function characterizeMap(Fld){
+  const n=N*N;
+  let land=0, water=0;
+  const counts=[0,0,0,0,0,0,0]; // by biome code 0..6
+  let slopeSum=0, slopeMax=0, steep=0;
+  let eMin=Infinity,eMax=-Infinity,eSum=0;
+  let river=0;
+  for(let i=0;i<n;i++){
+    const b=Fld.biome[i]; counts[b]++;
+    if(Fld.isWater[i]){water++; continue;}
+    land++;
+    if(Fld.isRiver[i])river++;
+    const sd=Fld.slopeDeg[i]; slopeSum+=sd; if(sd>slopeMax)slopeMax=sd; if(sd>15)steep++;
+    const m=Fld.elev[i]*Fld.reliefAmpM+Fld.SEA_LEVEL_M;
+    if(m<eMin)eMin=m; if(m>eMax)eMax=m; eSum+=m;
+  }
+  // biome fractions as % of LAND (water reported separately)
+  const fr=b=> land>0 ? counts[b]/land*100 : 0;
+  const frac={ wetland:fr(1), forest:fr(2), savanna:fr(3), grassland:fr(4), desert:fr(5), mountain:fr(6) };
+
+  // biome adjacency matrix (shared-edge counts, 4-neighbour, land-land only).
+  // adj[a][b] = number of shared edges between biome a and biome b.
+  // This quantifies spatial structure like "steppe encloses forest".
+  const adj=Array.from({length:7},()=>new Array(7).fill(0));
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const i=y*N+x, bi=Fld.biome[i];
+    if(x+1<N){const j=i+1,bj=Fld.biome[j]; adj[bi][bj]++; adj[bj][bi]++;}
+    if(y+1<N){const j=i+N,bj=Fld.biome[j]; adj[bi][bj]++; adj[bj][bi]++;}
+  }
+  // forest's neighbour profile: of all edges a forest cell has to a *different*
+  // biome, what fraction touch savanna/woodland vs grassland vs other? In a
+  // woody-cover ladder we EXPECT forest to border savanna/woodland (the next
+  // rung down), so a healthy mosaic shows high forest↔savanna adjacency.
+  let fEdgeGrass=adj[2][4], fEdgeSav=adj[2][3], fEdgeOther=0;
+  for(let b=0;b<7;b++) if(b!==2) fEdgeOther+=adj[2][b];
+  const forestTouchGrassland = fEdgeOther>0 ? fEdgeGrass/fEdgeOther : 0;
+  const forestTouchSavanna   = fEdgeOther>0 ? fEdgeSav/fEdgeOther : 0;
+
+  // game-hump peak position (NPP bin where mean game is maximal)
+  const bins=20, gsum=new Float32Array(bins), gcnt=new Float32Array(bins);
+  for(let i=0;i<n;i++){ if(Fld.isWater[i])continue; const bb=Math.min(bins-1,Math.floor(Fld.npp[i]*bins)); gsum[bb]+=Fld.game[i]; gcnt[bb]++; }
+  let peakBin=-1,peakV=-1; for(let b=0;b<bins;b++){ if(gcnt[b]<3)continue; const m=gsum[b]/gcnt[b]; if(m>peakV){peakV=m;peakBin=b;} }
+  const gameHumpPeak = peakBin>=0 ? peakBin/bins : null;
+
+  return {
+    waterPct: water/n*100,               // open water (sea/lake) as % of ALL cells
+    riverPct: land>0 ? river/land*100 : 0,// river cells as % of land
+    wetlandPct: frac.wetland,             // wetland biome as % of land
+    hydratedPct: n>0 ? (water + river + counts[1])/n*100 : 0, // open water + rivers + wetland, % of all cells
+    landCells: land,
+    riverCells: river,
+    drainagePct: land>0 ? river/land*100 : 0,
+    reliefEnvelopeM: eMax-eMin,
+    elevMinM: eMin, elevMaxM: eMax, elevMeanM: eSum/Math.max(1,land),
+    meanSlopeDeg: slopeSum/Math.max(1,land), maxSlopeDeg: slopeMax,
+    steepLandPct: steep/Math.max(1,land)*100,
+    biomeFrac: frac,
+    gameHumpPeak,
+    adjacency: adj,
+    forestTouchSavanna,        // 0..1: fraction of forest's external edges touching savanna/woodland (mosaic health)
+    forestTouchGrassland,      // 0..1: fraction touching open grassland
+    forestSavannaSharedEdges: adj[2][3], // raw edge count (for later interface work)
+  };
+}
+
+// ---------- derive the habitable envelope (measured, not guessed) ----------
+// Sweep aridity alone and relief alone (others mid, averaged over seeds) and
+// find where a single DEAD biome (desert for aridity, mountain for relief)
+// exceeds the dominance line. That crossing becomes the knob cap the LHS uses,
+// so degenerate all-desert / all-mountain worlds are never sampled. The full
+// curves are returned so the crossing is auditable and the line is movable.
+function deriveHabitableEnvelope(dominanceLine=50, steps=21, nSeeds=3){
+  const mid={relief:0.5,rough:0.5,waterK:0.5,forestK:0.5,aridK:0.35};
+  function sweepAxis(axis, deadBiome){
+    const curve=[];
+    for(let s=0;s<steps;s++){
+      const v=s/(steps-1);
+      let dead=0;
+      for(let k=0;k<nSeeds;k++){
+        const knobs={...mid, seedStr:'env_'+axis+'_'+s+'_'+k};
+        knobs[axis]=v;
+        const c=characterizeMap(computeWorld(knobs));
+        dead += c.biomeFrac[deadBiome]/nSeeds;
+      }
+      curve.push({value:+v.toFixed(3), deadPct:+dead.toFixed(1)});
+    }
+    // cap = first knob value whose dead-biome share exceeds the dominance line;
+    // if never exceeded, cap = 1 (whole range habitable for this axis).
+    let cap=1;
+    for(const pt of curve){ if(pt.deadPct>dominanceLine){ cap=pt.value; break; } }
+    return {curve, cap};
+  }
+  const arid = sweepAxis('aridK','desert');
+  const relief = sweepAxis('relief','mountain');
+  return {
+    dominanceLine,
+    ariditySweep: arid.curve, aridityCap: arid.cap,
+    reliefSweep: relief.curve, reliefCap: relief.cap,
+  };
+}
+
+// ---------- Latin hypercube parametric sweep ----------
+// Samples the HABITABLE knob box (relief & aridity capped by the derived
+// envelope; rough/water/forest full range) × seeds, characterizes each, and
+// reports where forest and savanna COEXIST (whole-map) vs threshold t. The
+// acceptable band emerges from the threshold curve, over habitable worlds only.
+function latinHypercube(nSamples, dims, rng){
+  const pts=Array.from({length:nSamples},()=>new Array(dims));
+  for(let d=0;d<dims;d++){
+    const perm=[...Array(nSamples).keys()];
+    for(let i=nSamples-1;i>0;i--){const j=Math.floor(rng()*(i+1));[perm[i],perm[j]]=[perm[j],perm[i]];}
+    for(let s=0;s<nSamples;s++) pts[s][d]=(perm[s]+rng())/nSamples;
+  }
+  return pts;
+}
+
+function runSweep(nSamples, nSeeds, envelope){
+  const t0=performance.now();
+  const env = envelope || deriveHabitableEnvelope();
+  const rng=mulberry32(0xC0FFEE);
+  const pts=latinHypercube(nSamples,5,rng);
+  // scale unit samples into the habitable box per axis
+  const cap={ relief:env.reliefCap, rough:1, waterK:1, forestK:1, aridK:env.aridityCap };
+  const thresholds=[5,10,15,20,25]; // % of land, for BOTH forest and savanna
+  const coexCount=new Array(thresholds.length).fill(0);
+  const KNOBS=['relief','rough','waterK','forestK','aridK'];
+  const knobBins=KNOBS.map(()=>({inBand:new Array(5).fill(0), total:new Array(5).fill(0)}));
+  const biomeAcc={wetland:0,forest:0,savanna:0,grassland:0,desert:0,mountain:0};
+  let enclosureSum=0, enclosureN=0;
+
+  for(let s=0;s<pts.length;s++){
+    const u=pts[s];
+    const relief=u[0]*cap.relief, rough=u[1]*cap.rough, water=u[2]*cap.waterK, forest=u[3]*cap.forestK, arid=u[4]*cap.aridK;
+    const meanFrac={wetland:0,forest:0,savanna:0,grassland:0,desert:0,mountain:0};
+    let coexAtT=new Array(thresholds.length).fill(true);
+    let encl=0;
+    for(let k=0;k<nSeeds;k++){
+      const c=characterizeMap(computeWorld({relief,rough,waterK:water,forestK:forest,aridK:arid,seedStr:'sweep_'+s+'_'+k}));
+      for(const b in meanFrac) meanFrac[b]+=c.biomeFrac[b]/nSeeds;
+      encl+=c.forestTouchSavanna/nSeeds;
+      for(let ti=0;ti<thresholds.length;ti++){
+        if(!(c.biomeFrac.forest>=thresholds[ti] && c.biomeFrac.savanna>=thresholds[ti])) coexAtT[ti]=false;
+      }
+    }
+    for(const b in biomeAcc) biomeAcc[b]+=meanFrac[b];
+    enclosureSum+=encl; enclosureN++;
+    for(let ti=0;ti<thresholds.length;ti++) if(coexAtT[ti]) coexCount[ti]++;
+    const knobVals=[relief,rough,water,forest,arid];
+    for(let ki=0;ki<5;ki++){ const bin=Math.min(4,Math.floor(knobVals[ki]*5)); knobBins[ki].total[bin]++; if(coexAtT[1]) knobBins[ki].inBand[bin]++; }
+  }
+  const dt=((performance.now()-t0)/1000).toFixed(1);
+  return {
+    nSamples, nSeeds, generations:nSamples*nSeeds + (nSamples?0:0), seconds:+dt,
+    habitableEnvelope:{ dominanceLine:env.dominanceLine, aridityCap:env.aridityCap, reliefCap:env.reliefCap },
+    coexistenceFractionByThreshold: thresholds.map((t,i)=>({thresholdPct:t, coexistFraction:+(coexCount[i]/nSamples).toFixed(3)})),
+    meanBiomeCoverage: Object.fromEntries(Object.entries(biomeAcc).map(([k,v])=>[k,+(v/nSamples).toFixed(1)])),
+    meanForestTouchSavanna: +(enclosureSum/enclosureN).toFixed(3),
+    knobSensitivityAtT10: KNOBS.map((name,ki)=>({ knob:name, bandFractionByQuintile: knobBins[ki].inBand.map((v,bi)=> knobBins[ki].total[bi]>0 ? +(v/knobBins[ki].total[bi]).toFixed(2):0) })),
+  };
+}
+['relief','rough','water','forest','arid'].forEach(id=>{
+  $(id).addEventListener('input',e=>{ $('v_'+({relief:'relief',rough:'rough',water:'water',forest:'forest',arid:'arid'})[id]).textContent=(+e.target.value).toFixed(2); });
+});
+$('gen').addEventListener('click',generate);
+$('overlay').addEventListener('change',draw);
+$('rand').addEventListener('click',()=>{ $('seed').value=Math.floor(Math.random()*100000); generate(); });
+
+$('exportDiag').addEventListener('click',()=>{
+  const txt=JSON.stringify(window._lastMapVector||{},null,2);
+  navigator.clipboard?.writeText(txt).then(
+    ()=>{ $('exportDiag').textContent='Copied ✓'; setTimeout(()=>$('exportDiag').textContent='Copy map vector (JSON)',1200); },
+    ()=>{ $('exportDiag').textContent='Copy failed'; }
+  );
+});
+
+$('runSweep').addEventListener('click',()=>{
+  const N_=Math.max(10,Math.min(1000,parseInt($('swN').value)||200));
+  const S_=Math.max(1,Math.min(15,parseInt($('swS').value)||5));
+  $('sweepStatus').textContent=`Deriving habitable envelope, then running ${N_}×${S_} = ${N_*S_} generations…`;
+  $('runSweep').disabled=true;
+  setTimeout(()=>{
+    try{
+      const env=deriveHabitableEnvelope();
+      $('sweepStatus').textContent=`Habitable caps: aridity ≤ ${env.aridityCap}, relief ≤ ${env.reliefCap}. Running ${N_}×${S_}…`;
+      setTimeout(()=>{
+        const r=runSweep(N_,S_,env);
+        r.habitableEnvelopeCurves={ariditySweep:env.ariditySweep, reliefSweep:env.reliefSweep};
+        $('sweepStatus').textContent=`Done: ${r.generations} sweep generations in ${r.seconds}s (plus envelope probe).`;
+        $('sweepJSON').textContent=JSON.stringify(r,null,2);
+      },20);
+    }catch(e){ $('sweepStatus').textContent='Sweep error: '+e.message; $('runSweep').disabled=false; }
+    finally{ setTimeout(()=>{$('runSweep').disabled=false;},50); }
+  },30);
+});
+
+generate();
+</script>
+</body>
+</html>

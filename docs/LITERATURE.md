@@ -224,3 +224,57 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
   (harvest−metabolism) is cleaner — signals *current* foraging success, not
   accumulated advantage.
 - **Binary high/low Cred:** loses gradient information that σ modulation uses.
+
+---
+
+## Stage 7 — Terrain Generator
+
+### Morin, Bird, Winterhalder & Bliege Bird (2024). "Why Do Humans Hunt Cooperatively? Ethnohistoric Data Reveal the Contexts, Advantages, and Evolutionary Importance of Communal Hunting." *Current Anthropology* 65(5):876–921. DOI 10.1086/732354. `[VERIFIED]`
+
+**Role:** Savanna-game / communal-drive-hunt (CDH) anchor — grounds the soft-gate (steep-but-finite, not hard step) for open-ground game.
+
+**What was lifted:**
+- Ungulate CDH success rate **67.2%** (85% CI 56.5–80.1) vs **42%** encounter (CI 36.1–49.0).
+- Flight-initiation distance at 40 kg: **177 m** (ungulates) vs **45 m** (non-ungulates); escape velocity 59 vs 39 km/h.
+- Herding roughly **doubles** CDH probability (0.76 vs 0.41 at 40 kg).
+- Patch-creation framing: open environments = steering herds to vulnerable locations; forests = funnel/beater patch-creation.
+- CDH advantage is **episodic / seasonal-aggregation-dependent**, not a steady tap.
+
+**Provenance:** Full text read in chat session; tables 1, 4, 5, figs 5–8. `[VERIFIED]` authorised on this provenance.
+
+**What was rejected / deferred:**
+- Game-field rework tying game to savanna/open-woody herd-density: deferred to Stage 7.2 (see §12 pre-registered finding, terrain blueprint).
+
+---
+
+### Janssen, M. A. & Hill, K. (2014). "An agent-based model of resource distribution and cooperative hunting among Aché hunter-gatherers of Paraguay." *Human Ecology* 42(6):849–868. DOI 10.1007/s10745-014-9693-1. `[VERIFIED]`
+
+**Role:** Forest-game anchor (Aché cooperative hunting in closed canopy).
+
+**CORRECTED reading (supersedes any prior abstract-only summary):**
+- Cooperative hunting is **net slightly negative on mean yield (~−4%)**, positive only on **variance reduction**.
+- The ~7–8 agent optimal-band figure is a **smooth risk/return tradeoff tangent, NOT a feasibility threshold**.
+- There is **no access gate** anywhere in the model — solo hunting works, just worse.
+- Any concept-map text treating cooperative hunting as yield-superadditive is wrong.
+
+**What was lifted:**
+- Variance-reduction framing for cooperative hunting: mean yield is approximately flat; the benefit is reduced harvest failure probability, not increased mean return.
+- Solo-viable principle: cooperative hunting is always an option (not gated), but carries coordination cost vs. variance benefit.
+
+**Provenance:** Full text read in chat session. `[VERIFIED]` authorised on this provenance.
+
+---
+
+### Forest–savanna mosaic / woody-cover coverage anchor. (Ecoregion + savanna-ecology literature; e.g. WWF forest–savanna mosaic ecoregions; savanna woody-cover definitions.) `[SECONDARY]`
+
+**Role:** Terrain coverage target and biome-classifier grounding for the woody-cover ladder (Stage 7 terrain generator).
+
+**What was lifted:**
+- Savanna = wooded grassland on a continuous woody-cover axis; mosaic = savanna/woodland matrix + minority gallery/patch forest + grassland.
+- Approximate canopy cover: savanna ~5–10% lower / ~25–30% upper; forest above.
+- **Foragers span the full gradient** (closed-forest Aché through woodland-savanna Hadza) — do not force forest as a minority.
+
+**Provenance:** Secondary/encyclopedic + ecology web sources. Tag `[SECONDARY]` — do **NOT** mark `[VERIFIED]` (no single primary full-text read). Flag for a future primary-source pass if a hard numeric cutoff is ever locked.
+
+**What was rejected:**
+- Specific canopy-cover percentages used as hard thresholds in the classifier — translated to dimensionless `W_FOREST=0.45 / W_SAV=0.18` on the `forestness` axis (locked in terrain blueprint §2.9); not a direct canopy-cover literal.

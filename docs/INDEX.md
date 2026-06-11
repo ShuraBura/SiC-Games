@@ -54,6 +54,16 @@
 
 *Also under `docs/`:* **DOCS_CHARTER.md** (the governance document this index implements). The former MODEL_SPEC.md was split into ARCHITECTURE + MECHANISMS on 2026-06-06 and archived.
 
+**Stage 7 terrain routing (added 2026-06-10):**
+| Question | Home |
+|---|---|
+| Terrain pipeline locked spec (knobs, waterLevel formula, biome ladder, relief envelope, cell size) | **ARCHITECTURE.md §9.5** |
+| Terrain generator `generate_world` / `characterize_map` constructs | **MECHANISMS.md** (future §9 stub) |
+| Oracle battery, equivalence/acceptance gate results, biome map artifacts | **ARTIFACTS.md** |
+| Morin 2024 (CDH), J&H 2014 (forest hunting), forest-savanna mosaic sources | **LITERATURE.md** (Stage 7 section) |
+| Game-field openness inertia pre-registered finding; Stage 7.2 scope | **ARCHITECTURE.md §9.5 PROVISIONAL note** + Stage 7 blueprint §12 |
+| Forest/savanna bistability watch-item | **ARCHITECTURE.md §15.6** |
+
 ---
 
 ## Map of the repo (post-reorg, 2026-06-05)

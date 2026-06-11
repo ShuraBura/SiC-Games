@@ -113,7 +113,16 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     - **Any report/benchmark/diagnostic emitted →** `../docs/ARTIFACTS.md` (index + location).
     - **A source consulted →** `../docs/LITERATURE.md`.
 
-11. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
+11. **Citation-tag discipline (added 2026-06-10, Stage 7).**
+    Tags: `[VERIFIED]` = full primary text read and logged in LITERATURE.md with stated provenance.
+    `[SECONDARY]` = secondary/encyclopedic source, no single full-text read. `[INLINE]` = cited
+    in a blueprint but not yet in LITERATURE.md. `[UNVERIFIED]` = Claude's prior knowledge only.
+    **CC must NOT self-upgrade `[SECONDARY]` → `[VERIFIED]`** without a logged primary full-text
+    read in the same session. For Stage 7 sources: Morin 2024 and J&H 2014 are `[VERIFIED]`
+    (full text read, provenance stated in LITERATURE.md). The forest–savanna mosaic anchor is
+    `[SECONDARY]` — do not promote. No other Stage 7 source is authorised for `[VERIFIED]`.
+
+12. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
     When any blueprint gate fails — *even by a small margin* — STOP and surface it for the
     supervisor's call. Do NOT absorb a gate breach and proceed, and do NOT bundle a gating
     task and the run it gates into one job so the gate cannot block. Gate-first means the

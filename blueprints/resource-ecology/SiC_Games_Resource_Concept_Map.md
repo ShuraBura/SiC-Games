@@ -33,7 +33,7 @@ the chain with lags; disasters split into field-editing vs converter-editing.
 |---|---|---|---|---|---|---|
 | **Base (diffuse)** | Solar, gleaning | Low | Individual, immediate | **None** — no coop benefit | Static | 🟡 DISCUSSED |
 | **Foraging** | Vegetation | Moderate | Individual, immediate | **Multiplier** — coop *increases* gain, solo still works | Static | 🟡 (current single resource ≈ this, but untiered) |
-| **Foraging (mobile)** | Game | Moderate–high, high-variance | Individual, immediate | **Multiplier** — strongest here (cooperative hunting) | **Mobile** — migrates | 🟡 DISCUSSED |
+| **Foraging (mobile)** | Game | Moderate–high, high-variance | Individual, immediate | **Variance-reduction** — cooperative hunting: coop mean yield ~−4% (J&H 2014 `[VERIFIED]`); benefit = reduced failure variance, NOT yield gain. Solo viable, just riskier. | **Mobile** — migrates | 🟡 DISCUSSED |
 | **Cultivation** | Agriculture | High | **Gated** — requires sociality + settlement to unlock at all | **Prerequisite** — mandatory, not optional | Static (tied to settlement) | 🟡 DISCUSSED |
 
 **Key distinction (the thing that was being conflated):** coordination plays a *different
@@ -64,7 +64,7 @@ no coordination coupling. Everything in the table above is the *target*, not the
 | Mechanism | Applies to | What it requires | Reality |
 |---|---|---|---|
 | **Immediate individual access** | Base, foraging | Nothing — agent forages on arrival | 🟢 (current model) |
-| **Coordination multiplier** | Foraging (esp. mobile game) | Joint-task machinery; more agents → higher per-agent yield; solo still viable | 🟡 (joint-task mechanic 🟢 exists, not coupled to resources) |
+| **Coordination multiplier** | Foraging (esp. mobile game) | Joint-task machinery; **variance-reduction, NOT yield gain** (~−4% mean yield for hunting, J&H 2014 `[VERIFIED]`); solo viable, just riskier. The coordination benefit is reduced harvest failure probability. | 🟡 (joint-task mechanic 🟢 exists, not coupled to resources) |
 | **Access gate** | Cultivation | Sociality threshold + **sustained settlement** (long residence) | 🟡 DISCUSSED |
 | **Heritable affinity** | All tiers | Birth trait biasing which tier an agent engages when multiple attainable | 🟡 (trait vector H_i 🟢 exists; affinity = new component) |
 | **Per-tier skill (experience)** | All tiers | Working a tier improves skill at *that* tier (per-agent, per-tier state) | 🟡 DISCUSSED (new state) |
@@ -77,7 +77,7 @@ no coordination coupling. Everything in the table above is the *target*, not the
 |---|---|---|---|
 | **Base (solar)** | Usable, low priority | **Primary** | Diffuse, no coop needed |
 | **Foraging** | Usable + **gets the coop multiplier** | Usable, **solo only** (no joint-task machinery) | C has joint-task/Cred; Si doesn't |
-| **Mobile game** | Cooperative hunting (multiplier) | Solo only | Same |
+| **Mobile game** | Cooperative hunting (**variance-reduction**, J&H 2014 `[VERIFIED]` — mean ~−4%, benefit = risk reduction, not yield) | Solo only | Same |
 | **Cultivation** | **Can pay the gate** (sociality + settlement) | **Structurally closed** until Si sociality designed | C has the social apparatus; Si doesn't (yet) |
 | **Skill transmission** | Prestige-weighted (fast, concentrating) | Egalitarian/reciprocal (slow, flat) — when Si Cred exists | C Cred = dominance; Si Cred = reciprocity (ROADMAP table) |
 

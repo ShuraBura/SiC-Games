@@ -1,0 +1,785 @@
+[
+  {
+    "label": "mosaic_mid",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 5.3,
+        "savanna": 76,
+        "grassland": 5.1,
+        "wetland": 1.1,
+        "desert": 12.6,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 4.6,
+      "wetlandPct": 1.1,
+      "hydratedPct": 7.9,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.2,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.83
+    }
+  },
+  {
+    "label": "mosaic_mid",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 6.2,
+        "savanna": 80.6,
+        "grassland": 4,
+        "wetland": 1.8,
+        "desert": 7.5,
+        "mountain": 0
+      },
+      "waterPct": 2.7,
+      "riverPct": 7.1,
+      "wetlandPct": 1.8,
+      "hydratedPct": 11.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.22,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.84
+    }
+  },
+  {
+    "label": "mosaic_mid",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 4.3,
+        "savanna": 66.2,
+        "grassland": 5.5,
+        "wetland": 0.9,
+        "desert": 23.1,
+        "mountain": 0
+      },
+      "waterPct": 3.3,
+      "riverPct": 5.3,
+      "wetlandPct": 0.9,
+      "hydratedPct": 9.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.21,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.85
+    }
+  },
+  {
+    "label": "forest_dom",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 1,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 86.9,
+        "savanna": 4.5,
+        "grassland": 0,
+        "wetland": 2.7,
+        "desert": 5.9,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 4.6,
+      "wetlandPct": 2.7,
+      "hydratedPct": 9.5,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.2,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.29
+    }
+  },
+  {
+    "label": "forest_dom",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 1,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 89.2,
+        "savanna": 3.4,
+        "grassland": 0,
+        "wetland": 3.6,
+        "desert": 3.9,
+        "mountain": 0
+      },
+      "waterPct": 2.7,
+      "riverPct": 7.1,
+      "wetlandPct": 3.6,
+      "hydratedPct": 13.1,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.22,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.27
+    }
+  },
+  {
+    "label": "forest_dom",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 1,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 79.8,
+        "savanna": 5.8,
+        "grassland": 0,
+        "wetland": 1.8,
+        "desert": 12.7,
+        "mountain": 0
+      },
+      "waterPct": 3.3,
+      "riverPct": 5.3,
+      "wetlandPct": 1.8,
+      "hydratedPct": 10.2,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.21,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.37
+    }
+  },
+  {
+    "label": "savanna_dom",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.25,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0.2,
+        "savanna": 36.6,
+        "grassland": 49.5,
+        "wetland": 1.1,
+        "desert": 12.6,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 4.6,
+      "wetlandPct": 1.1,
+      "hydratedPct": 7.9,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.2,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.92
+    }
+  },
+  {
+    "label": "savanna_dom",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.25,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0,
+        "savanna": 42.8,
+        "grassland": 47.9,
+        "wetland": 1.8,
+        "desert": 7.5,
+        "mountain": 0
+      },
+      "waterPct": 2.7,
+      "riverPct": 7.1,
+      "wetlandPct": 1.8,
+      "hydratedPct": 11.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.22,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.88
+    }
+  },
+  {
+    "label": "savanna_dom",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0.25,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0.1,
+        "savanna": 28.5,
+        "grassland": 47.3,
+        "wetland": 0.9,
+        "desert": 23.1,
+        "mountain": 0
+      },
+      "waterPct": 3.3,
+      "riverPct": 5.3,
+      "wetlandPct": 0.9,
+      "hydratedPct": 9.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.21,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.9
+    }
+  },
+  {
+    "label": "grassland_dom",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0,
+        "savanna": 8,
+        "grassland": 78.3,
+        "wetland": 1.1,
+        "desert": 12.6,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 4.6,
+      "wetlandPct": 1.1,
+      "hydratedPct": 7.9,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.2,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0
+    }
+  },
+  {
+    "label": "grassland_dom",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0,
+        "savanna": 9.1,
+        "grassland": 81.6,
+        "wetland": 1.8,
+        "desert": 7.5,
+        "mountain": 0
+      },
+      "waterPct": 2.7,
+      "riverPct": 7.1,
+      "wetlandPct": 1.8,
+      "hydratedPct": 11.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.22,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0
+    }
+  },
+  {
+    "label": "grassland_dom",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.5,
+      "forestK": 0,
+      "aridK": 0.35
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0,
+        "savanna": 5.9,
+        "grassland": 70.1,
+        "wetland": 0.9,
+        "desert": 23.1,
+        "mountain": 0
+      },
+      "waterPct": 3.3,
+      "riverPct": 5.3,
+      "wetlandPct": 0.9,
+      "hydratedPct": 9.3,
+      "reliefEnvelopeM": 876,
+      "meanSlopeDeg": 0.21,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0
+    }
+  },
+  {
+    "label": "wet_lakes",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.3,
+      "rough": 0.5,
+      "waterK": 1,
+      "forestK": 0.5,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 36.8,
+        "savanna": 54.7,
+        "grassland": 0,
+        "wetland": 6.3,
+        "desert": 2.3,
+        "mountain": 0
+      },
+      "waterPct": 30.8,
+      "riverPct": 14.3,
+      "wetlandPct": 6.3,
+      "hydratedPct": 45,
+      "reliefEnvelopeM": 484,
+      "meanSlopeDeg": 0.15,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.64
+    }
+  },
+  {
+    "label": "wet_lakes",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.3,
+      "rough": 0.5,
+      "waterK": 1,
+      "forestK": 0.5,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 36.4,
+        "savanna": 55.2,
+        "grassland": 0,
+        "wetland": 5.9,
+        "desert": 2.5,
+        "mountain": 0
+      },
+      "waterPct": 30.8,
+      "riverPct": 15.7,
+      "wetlandPct": 5.9,
+      "hydratedPct": 45.7,
+      "reliefEnvelopeM": 484,
+      "meanSlopeDeg": 0.16,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.64
+    }
+  },
+  {
+    "label": "wet_lakes",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.3,
+      "rough": 0.5,
+      "waterK": 1,
+      "forestK": 0.5,
+      "aridK": 0.1
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 28.8,
+        "savanna": 63.9,
+        "grassland": 0.2,
+        "wetland": 2.9,
+        "desert": 4.2,
+        "mountain": 0
+      },
+      "waterPct": 18,
+      "riverPct": 11.7,
+      "wetlandPct": 2.9,
+      "hydratedPct": 29.9,
+      "reliefEnvelopeM": 484,
+      "meanSlopeDeg": 0.15,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.72
+    }
+  },
+  {
+    "label": "dry_edge",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.3,
+      "forestK": 0.5,
+      "aridK": 0.6
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0.3,
+        "savanna": 50,
+        "grassland": 7.7,
+        "wetland": 0,
+        "desert": 42,
+        "mountain": 0
+      },
+      "waterPct": 0.9,
+      "riverPct": 4.1,
+      "wetlandPct": 0,
+      "hydratedPct": 4.9,
+      "reliefEnvelopeM": 966,
+      "meanSlopeDeg": 0.2,
+      "gameHumpPeak": 0.35,
+      "forestTouchSavanna": 0.97
+    }
+  },
+  {
+    "label": "dry_edge",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.3,
+      "forestK": 0.5,
+      "aridK": 0.6
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0,
+        "savanna": 44.1,
+        "grassland": 4.8,
+        "wetland": 0,
+        "desert": 51,
+        "mountain": 0
+      },
+      "waterPct": 0.7,
+      "riverPct": 2.9,
+      "wetlandPct": 0,
+      "hydratedPct": 3.6,
+      "reliefEnvelopeM": 966,
+      "meanSlopeDeg": 0.22,
+      "gameHumpPeak": 0.35,
+      "forestTouchSavanna": 1
+    }
+  },
+  {
+    "label": "dry_edge",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.4,
+      "rough": 0.5,
+      "waterK": 0.3,
+      "forestK": 0.5,
+      "aridK": 0.6
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 0.3,
+        "savanna": 40.6,
+        "grassland": 6,
+        "wetland": 0,
+        "desert": 53.1,
+        "mountain": 0
+      },
+      "waterPct": 0.9,
+      "riverPct": 4.6,
+      "wetlandPct": 0,
+      "hydratedPct": 5.4,
+      "reliefEnvelopeM": 966,
+      "meanSlopeDeg": 0.21,
+      "gameHumpPeak": 0.35,
+      "forestTouchSavanna": 0.95
+    }
+  },
+  {
+    "label": "mountainous",
+    "seed": "42",
+    "knobs": {
+      "relief": 1,
+      "rough": 0.7,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 11,
+        "savanna": 57.4,
+        "grassland": 2.3,
+        "wetland": 2.1,
+        "desert": 6.5,
+        "mountain": 20.7
+      },
+      "waterPct": 0.6,
+      "riverPct": 5.7,
+      "wetlandPct": 2.1,
+      "hydratedPct": 8.3,
+      "reliefEnvelopeM": 2042,
+      "meanSlopeDeg": 0.6,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.8
+    }
+  },
+  {
+    "label": "mountainous",
+    "seed": "7",
+    "knobs": {
+      "relief": 1,
+      "rough": 0.7,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 11.9,
+        "savanna": 68.4,
+        "grassland": 1.5,
+        "wetland": 2,
+        "desert": 4.3,
+        "mountain": 11.9
+      },
+      "waterPct": 4.4,
+      "riverPct": 6.4,
+      "wetlandPct": 2,
+      "hydratedPct": 12.4,
+      "reliefEnvelopeM": 2042,
+      "meanSlopeDeg": 0.7,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.75
+    }
+  },
+  {
+    "label": "mountainous",
+    "seed": "1001",
+    "knobs": {
+      "relief": 1,
+      "rough": 0.7,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 9.5,
+        "savanna": 56.9,
+        "grassland": 2.1,
+        "wetland": 2.4,
+        "desert": 7.3,
+        "mountain": 21.7
+      },
+      "waterPct": 0.8,
+      "riverPct": 5.3,
+      "wetlandPct": 2.4,
+      "hydratedPct": 8.4,
+      "reliefEnvelopeM": 2042,
+      "meanSlopeDeg": 0.64,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.78
+    }
+  },
+  {
+    "label": "flat_gentle",
+    "seed": "42",
+    "knobs": {
+      "relief": 0,
+      "rough": 0.3,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 12.3,
+        "savanna": 72.7,
+        "grassland": 3.6,
+        "wetland": 2.2,
+        "desert": 9.2,
+        "mountain": 0
+      },
+      "waterPct": 3.9,
+      "riverPct": 4.9,
+      "wetlandPct": 2.2,
+      "hydratedPct": 10.8,
+      "reliefEnvelopeM": 98,
+      "meanSlopeDeg": 0.02,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.75
+    }
+  },
+  {
+    "label": "flat_gentle",
+    "seed": "7",
+    "knobs": {
+      "relief": 0,
+      "rough": 0.3,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 6.4,
+        "savanna": 69.9,
+        "grassland": 4.7,
+        "wetland": 1.1,
+        "desert": 17.9,
+        "mountain": 0
+      },
+      "waterPct": 1.6,
+      "riverPct": 3.7,
+      "wetlandPct": 1.1,
+      "hydratedPct": 6.3,
+      "reliefEnvelopeM": 98,
+      "meanSlopeDeg": 0.02,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.85
+    }
+  },
+  {
+    "label": "flat_gentle",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0,
+      "rough": 0.3,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.2
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 8.3,
+        "savanna": 66.6,
+        "grassland": 4.6,
+        "wetland": 1,
+        "desert": 19.4,
+        "mountain": 0
+      },
+      "waterPct": 3.9,
+      "riverPct": 4.7,
+      "wetlandPct": 1,
+      "hydratedPct": 9.4,
+      "reliefEnvelopeM": 98,
+      "meanSlopeDeg": 0.02,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.85
+    }
+  },
+  {
+    "label": "rough_detail",
+    "seed": "42",
+    "knobs": {
+      "relief": 0.5,
+      "rough": 1,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.3
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 11,
+        "savanna": 79.9,
+        "grassland": 2.4,
+        "wetland": 2,
+        "desert": 4.7,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 6.4,
+      "wetlandPct": 2,
+      "hydratedPct": 10.5,
+      "reliefEnvelopeM": 1070,
+      "meanSlopeDeg": 0.35,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.8
+    }
+  },
+  {
+    "label": "rough_detail",
+    "seed": "7",
+    "knobs": {
+      "relief": 0.5,
+      "rough": 1,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.3
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 13,
+        "savanna": 80.6,
+        "grassland": 1.2,
+        "wetland": 2,
+        "desert": 3.2,
+        "mountain": 0
+      },
+      "waterPct": 2.4,
+      "riverPct": 11,
+      "wetlandPct": 2,
+      "hydratedPct": 15,
+      "reliefEnvelopeM": 1070,
+      "meanSlopeDeg": 0.39,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.86
+    }
+  },
+  {
+    "label": "rough_detail",
+    "seed": "1001",
+    "knobs": {
+      "relief": 0.5,
+      "rough": 1,
+      "waterK": 0.5,
+      "forestK": 0.5,
+      "aridK": 0.3
+    },
+    "vector": {
+      "biomeFrac": {
+        "forest": 10.8,
+        "savanna": 76.3,
+        "grassland": 2.2,
+        "wetland": 1.5,
+        "desert": 9.2,
+        "mountain": 0
+      },
+      "waterPct": 4,
+      "riverPct": 7.7,
+      "wetlandPct": 1.5,
+      "hydratedPct": 12.8,
+      "reliefEnvelopeM": 1070,
+      "meanSlopeDeg": 0.41,
+      "gameHumpPeak": 0.45,
+      "forestTouchSavanna": 0.81
+    }
+  }
+]

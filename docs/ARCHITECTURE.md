@@ -39,6 +39,49 @@ The Sugarscape substrate is canonical Epstein & Axtell (1996). `[VERIFIED]` Epst
 
 **The k_grid=4 rescale** (Stage 4.4) was the minimum grid scale where β_Si=5 Si differential metabolism becomes viable. At k=1, max_sugar=4 and mean harvest is ~2–3/step, but Si cost at β=5 is 5–20/step — permanently dormant population. At k=4, max_sugar=16 and mean harvest ~10–15/step vs Si cost_mean ~12.5/step, with dormancy handling shortfalls. Stage 4.4 confirmed: k=3 Si population explosion (Stage 4.4 k=3 Feasibility note in ROADMAP). Rationale: the k_grid rescale is a grid parameter co-design with β_Si; the two are coupled (neither is independently free) (Stage 4.4 Q30). `[INLINE]` Si energy budget rationale cited Stage 4.3 §1.1 (Davies et al. 2018 Loihi, neuromorphic silicon energy efficiency); not in LITERATURE.md (OWE-4).
 
+### 9.5 Terrain generator — Stage 7 (locked substrate)
+
+**Status:** LOCKED (Stage 7, 2026-06-10). Gate-green: §5 unit tests 16/16; §6 equivalence gate 27/27; §7 acceptance A7.1–A7.4 all pass.
+
+**Grid:** N=100 (100×100 cells). Each cell = 100 km², cell edge = 10 000 m.
+
+**Knobs (all in [0,1]):**
+
+| Knob | Symbol | Meaning |
+|---|---|---|
+| Mountainousness | `relief` | amplitude of high ground |
+| Roughness | `rough` | octave gain / high-frequency detail |
+| Water abundance | `waterK` | open-water level + rainfall contribution |
+| Forest coverage | `forestK` | tree bias on the woody-cover axis |
+| Aridity | `aridK` | global productivity suppressor |
+| Seed | `seedStr` | RNG seed (string → FNV-1a uint32 → mulberry32 PRNG) |
+
+**Locked formulas (do NOT change — verified byte-identical to JS prototype):**
+
+```
+waterLevel = (waterK ** 1.2) * 0.42      # power 1.2, NOT waterK**2 (linearisation fix)
+W_FOREST   = 0.45                         # forestness >= this → forest
+W_SAV      = 0.18                         # forestness in [W_SAV, W_FOREST) → savanna/woodland
+CELL_EDGE_M = 10000                       # 10 km cell edge
+RELIEF_FLOOR_M = 120; RELIEF_CEIL_M = 2500
+reliefAmpM = 120 + (2500 − 120) * relief
+```
+
+**Biome ladder (evaluation order is mandatory):**
+1. water (`elev < waterLevel`)
+2. mountain (`elev > 0.72+(1−relief)*0.5` AND `slope > 0.18+(1−relief)*0.4`)
+3. desert (`npp < 0.10`)
+4. wetland (`dist <= 2` AND `npp > 0.45` AND `slope < 0.12`)
+5. forest (`forestness >= W_FOREST`)
+6. savanna/woodland (`forestness >= W_SAV`)
+7. grassland (remainder)
+
+**PROVISIONAL field — `game`:** marked PROVISIONAL per Stage 7 §12 pre-registered finding. NPP and forestness are positively coupled through moisture; openness term is mechanically near-inert; game peaks in forest, not open ground. Reworked in Stage 7.2. Do not treat game as a hunter/gatherer separation gate until reworked.
+
+**Module location:** `sic_games/src/sic_games/terrain.py`. Oracle battery: `SiC_Games_Terrain_Oracle_Battery.json` (27 reference worlds, D4-frozen).
+
+---
+
 ### 9.3 Physical-unit calibration (OWE-1, 2026-05-30)
 
 **STANDING CONSTRAINT (from OWE-1 Blueprint §3, supervisor decision 2026-05-30):**
@@ -594,6 +637,14 @@ The following citations appear in blueprints but were NOT in the focused LITERAT
 *(Pilot §6 statistic note preserved verbatim.)*
 
 ψ, c1, c2 are bounded `[0,1]` traits initialised at mean 0.5 with SD 0.2. **Gini is the wrong dispersion measure** for a bounded, mean-0.5 trait. Use **SD (or variance)** referenced to the initial SD=0.2; a collapse to SD < ~0.05 is a meaningful homogenisation signal. The Stage 5.2 report's Gini(ψ) ≥ 0.15 floor was arbitrary partly *because* it was the wrong statistic. (Operative rule also stated at MECHANISMS §11.3.)
+
+### 15.6 Stage 7 watch-item: forest/savanna bistability (log as a question, not a finding)
+
+**Watch-item (Stage 7, 2026-06-10):** Forest and savanna are alternative stable states in the medium-tree-cover zone, mediated by fire feedback (savanna fire suppresses tree recruitment; forest dampens fire). This produces **vegetation bistability** in the same parameter region (moderate `forestK`, moderate moisture) where civilizational strategy coexistence is studied.
+
+**Why this matters:** the substrate may exhibit vegetation bistability in the same region where C/Si strategy coexistence is studied. This could be a **thematic resonance** (the physical world mirrors the social dynamics) or a **confound** (biome fluctuations near the threshold may drive apparent strategy outcomes). It is not a finding — it is a question to revisit when the model begins comparative C/Si runs on the terrain substrate.
+
+**Action:** Do NOT act on it now. Log as a pending question. Revisit before Stage 7.2+ comparative runs on the terrain substrate.
 
 ### 15.5 NOT-YET-ADOPTED literature
 
