@@ -1,0 +1,38 @@
+abstract: Using an empirically grounded model of hunter-gatherer foraging strategies
+  we examine how different resource distributions affect op-timal group size, movement
+  frequency and average daily return rate per hunter. The total amount of resource
+  in the environment re-mained the same, but are varied to be more dispersed or more
+  clumped resource distributions, and vegetation types are located in a less or more
+  patchy environment.  The results show that the optimal group size is not affected
+  by resource distributions. However, more clumped resources in a more patchy environment
+  lead to much high-er return rates compared to more dispersed and less patchy environ-ments.
+  The more clumped and patchy environment also favor more complex strategies where
+  camps are moved in an adaptive fashion to specific locations in the landscape. Human
+  foragers, by knowing the landscape and the spatial location of better habitats,
+  and moving to facilitate hunting in those areas, gain a substantial advantage from
+  that knowledge.
+authors:
+- affiliation: School of Sustainability
+  email: marco.janssen@asu.edu
+  family-names: Janssen
+  given-names: Marco
+  orcid: https://orcid.org/0000-0002-1240-9052
+- family-names: Hill
+  given-names: Kim
+cff-version: 1.2.0
+date-released: '2017-01-27'
+identifiers:
+- type: url
+  value: https://www.comses.net/codebases/4538/releases/1.0.0/
+keywords:
+- ache
+- anthropology
+- hunting
+- optimal foraging theory
+- resource distribution
+license: GPL-3.0
+message: If you use this software, please cite it using the metadata from this file.
+title: Resource distribution effects on optimal foraging theory
+type: software
+url: https://www.comses.net/codebases/4538/releases/1.0.0/
+version: 1.0.0

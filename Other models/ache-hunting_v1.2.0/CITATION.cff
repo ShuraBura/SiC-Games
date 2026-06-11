@@ -1,0 +1,32 @@
+abstract: We develop an agent based model of foraging behavior based on parameters
+  of the environment and prey characteristics found in the Mbaracayu Reserve Paraguay.  We
+  then compare predicted human foraging behavior in our model to actual ethnographically
+  observed behavior of Ache hunter-gatherers who inhabit the region.  A useful and
+  realistic model should produce outcomes that closely match those actually observed
+  for Ache hunters.   We show that our model meets such criteria and then use the
+  model to explore the consequences of cooperative vs. solitary hunting, small vs.
+  larger group sizes, and mobile vs. more sedentary hunting bands.  These simulations
+  allow us to draw conclusions about the benefits of social for hunter-gatherers living
+  under Ache-like ecological conditions.
+authors:
+- affiliation: School of Sustainability
+  email: marco.janssen@asu.edu
+  family-names: Janssen
+  given-names: Marco
+  orcid: https://orcid.org/0000-0002-1240-9052
+- family-names: Hill
+  given-names: Kim
+cff-version: 1.2.0
+date-released: '2018-12-21'
+doi: 10.25937/66d6-kz70
+keywords:
+- cooperation
+- hunter-gatherer
+- optimal foraging theory
+- predator-prey
+license: GPL-3.0
+message: If you use this software, please cite it using the metadata from this file.
+title: Ache hunting
+type: software
+url: https://doi.org/10.25937/66d6-kz70
+version: 1.2.0
