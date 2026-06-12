@@ -208,7 +208,7 @@ This is dual inheritance theory done properly. `[UNVERIFIED]` Richerson & Boyd 2
 
 | Level | Description | C | Si | Category | Provenance |
 |---|---|---|---|---|---|
-| L1 Parental transfer | At birth: offspring += τ_parent · mean(w_A,w_B) | τ_parent=0.1 | τ_parent=0.1 | C1 | Stage 4.1c §1.1 |
+| L1 Parental transfer | At birth: offspring += τ_parent · mean(w_A,w_B) | τ_parent=0.0 | τ_parent=0.0 | C1 | Stage 4.1c §1.1 |
 | L2 Proximity pool contribution | Active adults contribute τ_pool·surplus to local pool | τ_pool=0.05 (locked Stage 4.2) | τ_pool_si=0.05 (flat, no Cred scaling) | **C2** (Cred-scaled vs flat) | Stage 4.1c §1.2; Stage 4.2 |
 | L2 Pool draw | Non-active agents draw up to k_draw=3 steps of metabolism from pool | Same | Same (dormant_can_draw=False by default) | C1 | Stage 4.1c §1.2 |
 | L3 Status contribution | C: contribution += τ_cred·tanh(𝒞/C*) · surplus (high-Cred contributes more) | Enabled (τ_cred=0.5) | **NOT IMPLEMENTED — Si has no status component** | **C2** | Stage 4.1c §1.3; ROADMAP C/Si table |

@@ -45,17 +45,17 @@ class CarbonConfig(BaseModel):
     kappa: float = Field(2.0, ge=0.0)
     cred_scale: float = Field(10.0, gt=0.0)
     cred_decay: float = Field(0.01, gt=0.0, lt=1.0)
-    matthew_alpha: float = Field(1.5, gt=0.0)
+    matthew_alpha: float = Field(2.0, gt=0.0)
     epsilon: float = Field(0.01, gt=0.0)
     cred_bonus_per_participant: float = Field(1.0, ge=0.0)
     velocity_tau: int = Field(10, ge=0)
     velocity_scale: float = Field(1.0, gt=0.0)
-    f_C: float = Field(0.0, ge=0.0, le=1.0)  # newborn Cred endowment fraction
+    f_C: float = Field(0.25, ge=0.0, le=1.0)  # newborn Cred endowment fraction
     status_amplification_beta: float = Field(0.0, ge=0.0)  # β — Stage 3.2
 
 
 class SiBoundedConfig(BaseModel):
-    sigma_si: float = Field(1.051, gt=0.0)  # fixed temperature from Stage 2.2 kappa=2.0
+    sigma_si: float = Field(1.238, gt=0.0)  # Si base exploration temperature; locked Stage 3.4 2D scan (σ_Si_eff = σ_Si + κ_Si·tanh(si_cred/C*_Si))
     # Stage 4.3: Si differential metabolism multiplier (β=5 default; C always β=1.0)
     beta_metabolism: float = Field(1.0, ge=1.0)
     # Stage 4.5 Task 3: per-agent wealth carrying cost (Si only).

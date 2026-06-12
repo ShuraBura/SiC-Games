@@ -14,26 +14,42 @@ as written. When in doubt about scope: stop and ask, do not improvise.
 ## File structure
 
 ```
-[repo root]/
-  src/sic_games/         — core simulation
-    run.py               — main step loop
-    world.py             — grid, sugar, growback
-    metrics.py           — all logged metrics
-    joint_task.py        — JT manager (spatial hash)
-    batch.py             — BatchRunner (CRN, parallel)
+sic_games/
+  src/sic_games/              — core simulation package
+    config.py                 — Pydantic config models
+    world.py                  — grid, sugar, growback
+    world_perturbation.py     — seasonal oscillation protocol
+    metrics.py                — all logged metrics
+    joint_task.py             — JT manager (spatial hash)
+    support_pool.py           — L1/L2/L3 pool mechanics
+    substrate.py              — multi-occupancy spatial substrate (Stage 6.0a)
+    oracle.py                 — archival SugarWorld (D4 backward-compat target)
+    run.py                    — 16-line backward-compat re-export
+    soa.py                    — SoA data structures
+    soa_jt.py                 — vectorised JT manager (VecJTM)
+    soa_step.py               — SoAWorld production model
+    soa_tier1.py              — Tier-1 determinism helpers
+    terrain.py                — Stage 7 terrain generator
+    batch.py                  — BatchRunner (CRN, parallel)
+    report.py                 — HTML report generator
     agents/
-      base.py            — BaseAgent
-      perception.py      — LocalVisionPerception
-      reproduction.py    — biparental + fission
+      base.py                 — BaseAgent
+      costs.py                — per-agent metabolic costs
+      decision.py             — decision dispatch
+      perception.py           — LocalVisionPerception
+      reproduction.py         — biparental + fission
+      traits.py               — cultural trait vector H_i
     strategies/
-      carbon.py          — C decision
-      silicon.py         — Si decision
-      softmax_base.py    — shared softmax
-  tests/                 — 303 tests (must stay green)
-  configs/               — YAML configs for all runs
-  outputs/               — HTML reports + parquets
-  BUGS.md                — known-issues ledger
-  CLAUDE.md              — this file (master agent contract)
+      carbon.py               — C decision
+      si_bounded.py           — Si decision
+      softmax_base.py         — shared softmax
+      greedy.py               — greedy baseline
+  tests/                      — full test suite
+  configs/                    — YAML run configs
+  scripts/                    — sweep and calibration scripts
+  BUGS.md                     — known-issues ledger
+  CLAUDE.md                   — this file (master agent contract)
+  pyproject.toml              — package metadata
 ```
 
 **Documentation lives in `../docs/` (the charter's 11 homes), not here.**
@@ -73,7 +89,7 @@ python -m cProfile -s cumtime sic_games/run.py # profile
    to 1e-9 relative tolerance, deaths/births/positions exact integer match.
    If gate fails: revert immediately, bisect, flag in report.
 
-3. **Run full test suite after every code change.** All 303 tests must pass
+3. **Run full test suite after every code change.** All tests must pass
    before proceeding. If a test breaks, fix it before the next step.
 
 4. **Implement and test before running simulations.** Never run a production

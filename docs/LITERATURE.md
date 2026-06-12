@@ -247,21 +247,55 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 ---
 
-### Janssen, M. A. & Hill, K. (2014). "An agent-based model of resource distribution and cooperative hunting among Aché hunter-gatherers of Paraguay." *Human Ecology* 42(6):849–868. DOI 10.1007/s10745-014-9693-1. `[VERIFIED]`
+### Janssen, M. A. & Hill, K. (2014). "An agent-based model of resource distribution and cooperative hunting among Aché hunter-gatherers of Paraguay." *Human Ecology* 42:823–835. DOI 10.1007/s10745-014-9693-1. `[VERIFIED]`
+
+**Full citation:** Marco A. Janssen & Kim Hill (2014). *Human Ecology* 42, 823–835. DOI 10.1007/s10745-014-9693-1. CoMSES model codebase: 3902.
 
 **Role:** Forest-game anchor (Aché cooperative hunting in closed canopy).
 
+**Model environment:** Mbaracayu Reserve, Paraguay (tropical forest). 100 replicate runs per condition over 1 simulated year; 100 simulated years for group-size sweep.
+
 **CORRECTED reading (supersedes any prior abstract-only summary):**
-- Cooperative hunting is **net slightly negative on mean yield (~−4%)**, positive only on **variance reduction**.
-- The ~7–8 agent optimal-band figure is a **smooth risk/return tradeoff tangent, NOT a feasibility threshold**.
+- Cooperative hunting (CCSP model) yields **−4% mean harvest vs solitary** (2.82 vs 2.95 kg/day/hunter).
+- Risk reduction is large: zero-return day probability **83% lower** (9% cooperative camp vs 52% solitary).
+- Optimal band size of **7–8 hunters** is a smooth budget-constraint tangent (Fig. 7 indifference curve), **not** a threshold cliff or access gate.
+- The −4% mean-yield cost and 83% risk-reduction are net effects of the full CCSP strategy (coordinated search + cooperative pursuit) relative to solitary IRM(depletion); the intermediate CUS step (group living, uncoordinated) itself drops yield further, and cooperative pursuit partially recovers it (+17% over CUS).
+- No hard threshold or access-gate exists in the model. Group-size effects are smooth and monotonic in the relevant range.
+- Recruitment distance Dmax ~200 m (2 cells); rarely larger.
 - There is **no access gate** anywhere in the model — solo hunting works, just worse.
 - Any concept-map text treating cooperative hunting as yield-superadditive is wrong.
 
 **What was lifted:**
-- Variance-reduction framing for cooperative hunting: mean yield is approximately flat; the benefit is reduced harvest failure probability, not increased mean return.
+- Variance-reduction framing for cooperative hunting: mean yield is approximately flat (net −4%); the primary benefit is reduced harvest failure probability (83% fewer zero-return days).
 - Solo-viable principle: cooperative hunting is always an option (not gated), but carries coordination cost vs. variance benefit.
+- 7–8 hunter optimal band figure is a smooth indifference-curve tangent (Fig. 7), not a feasibility threshold.
 
-**Provenance:** Full text read in chat session. `[VERIFIED]` authorised on this provenance.
+**Provenance:** Full text read in chat session; tables and figures verified. `[VERIFIED]` authorised on this provenance.
+
+---
+
+### Janssen, M. A. & Hill, K. (2016). "An Agent-Based Model of Resource Distribution on Hunter-Gatherer Foraging Strategies: Clumped Habitats Favor Lower Mobility, but Result in Higher Foraging Returns." Chapter 3 in J.A. Barceló & F. Del Castillo (Eds.), *Simulating Prehistoric and Ancient Worlds* (Computational Social Sciences). Springer International Publishing, pp. 159–174. DOI 10.1007/978-3-319-31481-5_3. `[VERIFIED]`
+
+**Full citation:** Marco A. Janssen & Kim Hill (2016). Chapter 3 in J.A. Barceló & F. Del Castillo (Eds.), *Simulating Prehistoric and Ancient Worlds*. Springer. pp. 159–174. DOI 10.1007/978-3-319-31481-5_3. CoMSES model codebase: 4538.
+
+**Role:** Extension of J&H 2014 — landscape heterogeneity and clumpiness axes; targeted mobility benefit in patchy terrain. Terrain-generator relevance and candidate mechanism for C-agent advantage in clumped habitats.
+
+**Design/scope:** Extends the Mbaracayu landscape along two axes: habitat clumpiness (three levels — 30%, 60% [original], 90% same-vegetation neighbour fraction) and between-habitat prey-density variation (Original vs High, ~10× difference between richest and poorest habitat, total biomass held constant). Six landscape types: O30, O60, O90, H30, H60, H90. 64,800 simulations total (100 runs × 108 camp-mobility configs × 6 landscapes). All runs use cooperative hunting with coordinated search. Camp mobility varies along: targeted vs random relocation, and adaptive (threshold-based) vs non-adaptive (fixed-interval) movement.
+
+**Findings:**
+- **Optimal group size robust at 7 hunters across all six landscapes** — unaffected by clumpiness or prey-variation manipulations; consistent with J&H 2014 (7–8 optimum).
+- **Mobility largely stable under natural conditions:** moving camp every day remains optimal for O-series landscapes and low/medium clumpiness, matching Ache ethnographic observation. Only under H90 (high prey-variation + high clumpiness) does optimal mean camp-staying time rise to **2.1 days** (vs ~1 day baseline).
+- **Headline result is targeted movement, not group size or raw mobility.** In clumped, heterogeneous landscapes (H60/H90), targeted camp relocation achieves **~30% higher return rates** than random relocation. Combining targeted movement + adaptive staying yields up to **35% higher mean daily return** in H90 vs O60 — despite identical total prey biomass.
+- **Table 3.3 quantitative anchors:** O60 non-targeted/non-adaptive ≈ 2.835 kg/hunter/day, zero-meat fraction = 0.041. H90 targeted/adaptive = 3.836 kg/hunter/day, zero-meat = 0.026. H90 targeted/non-adaptive = 3.789, 0.032.
+- **Targeting can be worse than random** in O30 (low between-habitat variation, dispersed): targeting only pays when habitats differ substantially AND are spatially clumped.
+- **No cost-of-movement term** in model — hunters hunt en route regardless of strategy; return comparisons reflect foraging tradeoffs only, not travel cost.
+
+**What was lifted:**
+- Literature-grounded mechanism by which terrain/biome clumpiness → foraging-return differentials: payoff from spatial targeting scales with both clumpiness and between-habitat productivity variance.
+- Candidate mechanism for C-agent advantage in clumped/patchy terrain (information-sharing supports targeted relocation), independent of the existing seasonal-shock resilience finding (H1(ii)).
+- 7-hunter optimum confirmed landscape-invariant; group-size robustness is not a terrain artefact.
+
+**Provenance:** Full text read in chat session (2026-06-11); findings extracted directly from source. `[VERIFIED]` authorised on this provenance.
 
 ---
 
