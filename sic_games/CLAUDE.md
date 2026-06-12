@@ -138,7 +138,14 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     (full text read, provenance stated in LITERATURE.md). The forest–savanna mosaic anchor is
     `[SECONDARY]` — do not promote. No other Stage 7 source is authorised for `[VERIFIED]`.
 
-12. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
+12. **Phase/stage disambiguation (added 2026-06-12, Phase boundary declaration).**
+    Bare "Stage N" references in documents dated before the Phase-1 boundary (2026-06-12),
+    or in `archive/`, are **Phase 0** (Social Mechanics, Stages 1–7.5, complete).
+    New work is **Phase 1** (Terrain & Resource Ecology) and must carry the "Phase 1 Stage N"
+    marker. Blueprints live in `blueprints/phase0/` (historical) and `blueprints/phase1/`
+    (active). When in doubt, ask — do not assume.
+
+13. **A failed gate is a STOP, not a judgment call (added 2026-06-02, R0 process flag).**
     When any blueprint gate fails — *even by a small margin* — STOP and surface it for the
     supervisor's call. Do NOT absorb a gate breach and proceed, and do NOT bundle a gating
     task and the run it gates into one job so the gate cannot block. Gate-first means the

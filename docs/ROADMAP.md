@@ -6,6 +6,24 @@
 
 ---
 
+## Phase boundary (declared 2026-06-12)
+
+**Phase 0 — Social Mechanics: Stages 1–7.5 (complete, 2026-06-11).**
+Built on the Epstein & Axtell Sugarscape base model. Historical stage numbers (Stage 1
+through Stage 7.5) in all existing docs refer to this phase. Blueprint folder:
+`blueprints/phase0/`. Do not retroactively rename Phase 0 stage numbers.
+
+**Phase 1 — Terrain & Resource Ecology: Stage 1 onward (active).**
+Fresh terrain-driven foundation; stage numbering restarts at 1. Active blueprint:
+`blueprints/phase1/SiC_Games_Phase1_Stage1_ForageField_TerrainDiagnostics_Blueprint.md`.
+All new blueprints and directives are Phase 1 unless explicitly marked otherwise.
+
+**Disambiguation rule:** bare "Stage N" in documents dated before this boundary, or in
+`archive/`, refers to Phase 0. New work carries the "Phase 1 Stage N" marker. When in
+doubt, ask — do not assume.
+
+---
+
 ## ⚠️ CRITICAL DESIGN CONSTRAINTS (read before every stage)
 
 **C and Si are fundamentally different civilizations with different mechanics.**
