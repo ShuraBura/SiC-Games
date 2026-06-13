@@ -636,6 +636,20 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 ---
 
+### §12.1-I — Rivers not a distinct terrain feature (§DECISION-NO-RIVERS, 2026-06-13)
+
+**Decision:** Rivers are **not** implemented as a distinct terrain feature or mechanic. Channel-like patterns produced by the flow-accumulation algorithm (`isRiver`) are classified as interior or exterior water by the standard 4-connectivity boundary rule — they carry no special label and receive no special treatment.
+
+**Rationale:** A river's only model-relevant function over generic interior water is as a movement barrier or corridor. No movement/traversal mechanic exists or is planned in the current arc (Phase 1). Absent that mechanic, a river cell is mechanically identical to narrow interior water. Riparian productivity is preserved via the existing shore-forage modifier on water-edge land cells (+1491.5 kcal/hr from `SHORE_BONUS_KCAL`).
+
+**Consequence for the water diagnostic (P1S1b):** `isRiver` cells are treated as water for connectivity purposes and labelled interior/exterior by boundary contact, exactly like any other water cell. No river-tracing or crossing logic is added.
+
+**Revisit condition:** Only when a movement/traversal stage is designed, at which point channels are traced against that model's actual crossing requirements. Do NOT add river labels or crossing logic before that stage.
+
+**Logged:** P1S1b blueprint §2 §DECISION-NO-RIVERS directive; 2026-06-13.
+
+---
+
 ## 13. Architecture seams
 
 *(Pilot §5.2 preserved verbatim.)*

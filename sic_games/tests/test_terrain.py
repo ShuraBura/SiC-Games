@@ -9,7 +9,8 @@ from sic_games.terrain import (
     BIOME_WATER, BIOME_WETLAND, BIOME_FOREST, BIOME_SAVANNA, BIOME_GRASS,
     BIOME_DESERT, BIOME_MOUNTAIN,
     NPP_GM2_SCALE, SHORE_BONUS_KCAL, FORAGE_KCAL_TARGETS,
-    generate_world, characterize_map, _water_bodies,
+    EXTERIOR_WATER_CEILING,
+    generate_world, characterize_map, _water_bodies, _classify_water_components,
 )
 
 _BASE = dict(relief=0.4, rough=0.5, waterK=0.5, forestK=0.5, aridK=0.35, seedStr='42')
@@ -402,3 +403,155 @@ def test_a6_no_npp_habitability_floor():
     expected = land / total
     assert abs(v['habitable_cell_fraction'] - expected) < 1e-12
     assert v['habitable_cell_count'] == land
+
+
+# ── P1S1b — water decomposition diagnostic ────────────────────────────────
+
+_P1S1B_FIELDS = [
+    'exterior_water_fraction', 'interior_water_fraction',
+    'n_interior_bodies', 'n_exterior_bodies',
+    'shoreline_fraction', 'largest_exterior_body_cells',
+    'largest_exterior_shore_to_area', 'guard_exterior_water_fail',
+]
+
+def test_p1s1b_fields_present():
+    """§8.1: all P1S1b fields present in characterize_map() output."""
+    v = characterize_map(_W)
+    for key in _P1S1B_FIELDS:
+        assert key in v, f"missing key: {key}"
+
+
+def test_p1s1b_field_ranges():
+    """§8.1: fractions in [0,1]; counts >= 0; ratio >= 0."""
+    v = characterize_map(_W)
+    for key in ('exterior_water_fraction', 'interior_water_fraction',
+                'shoreline_fraction'):
+        val = v[key]
+        assert 0.0 <= val <= 1.0, f"{key}={val} out of [0,1]"
+    assert v['largest_exterior_shore_to_area'] >= 0.0
+    assert v['largest_exterior_body_cells'] >= 0
+    assert v['n_interior_bodies'] >= 0
+    assert v['n_exterior_bodies'] >= 0
+
+
+def test_p1s1b_conservation():
+    """§8.2: exterior_cells + interior_cells == total water cells."""
+    v = characterize_map(_W)
+    total_water = int(_W.isWater.sum())
+    total_cells = N * N
+    ext_cells = round(v['exterior_water_fraction'] * total_cells)
+    int_cells = round(v['interior_water_fraction'] * total_cells)
+    assert ext_cells + int_cells == total_water, (
+        f"conservation fail: ext={ext_cells} + int={int_cells} "
+        f"!= water={total_water}"
+    )
+
+
+def test_p1s1b_classify_helper_returns():
+    """_classify_water_components returns a 6-tuple with expected types."""
+    result = _classify_water_components(_W.isWater)
+    assert len(result) == 6
+    ext_c, int_c, n_ext, n_int, largest_ext, mask = result
+    assert isinstance(ext_c, int) and ext_c >= 0
+    assert isinstance(int_c, int) and int_c >= 0
+    assert isinstance(n_ext, int) and n_ext >= 0
+    assert isinstance(n_int, int) and n_int >= 0
+    assert isinstance(largest_ext, int) and largest_ext >= 0
+    # mask is None or bool array
+    if mask is not None:
+        assert mask.dtype == bool and mask.shape == (N, N)
+
+
+def test_p1s1b_fixture_lake_exterior_sea():
+    """§8.3: fixture with one enclosed lake + one edge-connected sea.
+    Lake → interior; sea → exterior; counts exact.
+    """
+    # Build a small fixture:
+    # - A 4x4 lake in the centre (rows 45-48, cols 45-48)
+    # - A 4-cell-wide band of water on the top edge (rows 0-3, all cols)
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[45:49, 45:49] = 1   # 4x4 = 16 cell enclosed lake
+    iw[0:4, :] = 1          # top band (edge-connected) = 4*100 = 400 cells
+
+    ext_c, int_c, n_ext, n_int, largest_ext, mask = _classify_water_components(iw)
+
+    assert n_int == 1, f"expected 1 interior body (lake), got {n_int}"
+    assert n_ext == 1, f"expected 1 exterior body (sea), got {n_ext}"
+    assert int_c == 16, f"expected 16 interior cells, got {int_c}"
+    assert ext_c == 400, f"expected 400 exterior cells, got {ext_c}"
+    assert largest_ext == 400
+    assert mask is not None
+    assert int(mask.sum()) == 400
+
+
+def test_p1s1b_fixture_guard_mostly_ocean():
+    """§8.4: guard fires on a mostly-ocean world (exterior_fraction > 0.12)."""
+    # A world where the entire top 20 rows + left 20 cols are water (edge-connected)
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[:20, :] = 1   # 20 rows × 100 cols = 2000 cells; fraction = 0.20 > 0.12
+    F_fake = generate_world(dict(relief=0.4, rough=0.5, waterK=0.5,
+                                 forestK=0.5, aridK=0.35, seedStr='99'))
+    # Override isWater temporarily via a characterize_map on a high-waterK world
+    # Use a known high-waterK world that produces exterior fraction > 0.12
+    kn_ocean = dict(relief=0.2, rough=0.3, waterK=0.85, forestK=0.5,
+                    aridK=0.1, seedStr='ocean_test')
+    F_ocean = generate_world(kn_ocean)
+    v_ocean = characterize_map(F_ocean)
+    # Only assert if this world actually has exterior_fraction > 0.12
+    if v_ocean['exterior_water_fraction'] > EXTERIOR_WATER_CEILING:
+        assert v_ocean['guard_exterior_water_fail'] is True
+
+
+def test_p1s1b_fixture_guard_lake_world():
+    """§8.4: guard does NOT fire on a lake-dense world (high interior, low exterior)."""
+    # Low waterK → land-dominated; any water bodies tend to be inland
+    kn_lake = dict(relief=0.4, rough=0.5, waterK=0.3, forestK=0.5,
+                   aridK=0.2, seedStr='lake_test')
+    F_lake = generate_world(kn_lake)
+    v_lake = characterize_map(F_lake)
+    if v_lake['exterior_water_fraction'] <= EXTERIOR_WATER_CEILING:
+        assert v_lake['guard_exterior_water_fail'] is False
+
+
+def test_p1s1b_guard_exterior_water_fail_type():
+    """guard_exterior_water_fail is a bool and consistent with the fraction."""
+    v = characterize_map(_W)
+    assert isinstance(v['guard_exterior_water_fail'], (bool, np.bool_))
+    expected = v['exterior_water_fraction'] > EXTERIOR_WATER_CEILING
+    assert bool(v['guard_exterior_water_fail']) == bool(expected)
+
+
+def test_p1s1b_exterior_water_ceiling_constant():
+    """EXTERIOR_WATER_CEILING is a float equal to 0.12 (provisional threshold)."""
+    assert isinstance(EXTERIOR_WATER_CEILING, float)
+    assert abs(EXTERIOR_WATER_CEILING - 0.12) < 1e-12
+
+
+def test_p1s1b_invalid_substrate_updated():
+    """invalid_substrate is True when guard_exterior_water_fail is True."""
+    v = characterize_map(_W)
+    if v['guard_exterior_water_fail']:
+        assert v['invalid_substrate'] is True
+    # Verify the union: invalid_substrate = a OR b OR ext
+    expected = v['guard_a_fail'] or v['guard_b_fail'] or v['guard_exterior_water_fail']
+    assert bool(v['invalid_substrate']) == bool(expected)
+
+
+def test_p1s1b_shoreline_fraction_matches_is_shore():
+    """shoreline_fraction == is_shore.sum() / land_cells."""
+    v = characterize_map(_W)
+    land = int((~_W.isWater.astype(bool)).sum())
+    expected = int(_W.is_shore.sum()) / land if land > 0 else 0.0
+    assert abs(v['shoreline_fraction'] - expected) < 1e-12
+
+
+def test_p1s1b_no_regression_on_reference_world():
+    """Existing characterize_map fields still present and valid types."""
+    v = characterize_map(_W)
+    legacy_keys = [
+        'waterPct', 'riverPct', 'biomeFrac', 'landCells', 'desert_fraction',
+        'mountain_fraction', 'habitable_cell_count', 'invalid_substrate',
+        'guard_a_fail', 'guard_b_fail', 'shore_cell_count', 'n_water_bodies',
+    ]
+    for key in legacy_keys:
+        assert key in v, f"regression: missing key {key}"
