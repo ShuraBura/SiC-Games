@@ -102,4 +102,35 @@ Parameter references: all values in `docs/PARAMETERS.md` (authoritative, extract
 
 ---
 
+## H-TERRAIN-ASYMMETRY — Generator reachable world-space is biome-asymmetric
+
+**Registered:** 2026-06-13.
+**Status:** RESOLVED-CONFIRMED (structural; not an empirical claim requiring a run).
+**Category:** Generator design note — pre-registered as a finding to prevent future "mountain-dominant worlds" from being interpreted as achievable calibration targets.
+
+**Claim:** The terrain generator's reachable world-space is *asymmetrically bounded* in biome dominance. Specifically:
+- `desert_fraction` can reach ≥ 0.76 (aridK near max saturates the NPP floor).
+- `mountain_fraction` is structurally capped at ≈ **0.317** and cannot exceed this ceiling regardless of knob values.
+
+**Structural cause (verified 2026-06-13, coarse ceiling search):**
+Mountain classification requires the *joint* condition `elev > 0.72 AND slope > 0.18` (at relief=1.0). Under spatially autocorrelated FBM elevation:
+- High plateaus satisfy `elev > 0.72` but are flat → fail `slope > 0.18`.
+- Steep valley flanks satisfy `slope > 0.18` but are low → fail `elev > 0.72`.
+- Only the narrow set of high-and-steep cells satisfies both; spatial autocorrelation makes that set self-limiting.
+- High waterK raises mountain_fraction by flooding low/mid-elevation land (reducing the land-cell denominator), but cannot push the joint-condition fraction past ≈ 0.317.
+
+**Ceiling search (Step 1 of CC_A8_Mountain_Ceiling_Directions.md, 2026-06-13):**
+Grid: relief=1.0 (pinned) × rough=[0,0.33,0.67,1] × waterK=[0.1,0.4,0.7,0.99] × aridK=[0,0.33,0.67,1] × 7 seeds = 448 worlds.
+Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, aridK=0.0 (aridK irrelevant). Ceiling held across 7 seeds (mean≈0.225; max=0.317 is genuinely the ceiling, not one lucky draw).
+
+**Consequence:** mountain-dominant worlds (mountain_fraction >> 0.3) are **not producible** by this generator. Any hypothesis or analysis that requires a mountain-dominant world is blocked until either (a) the generator is redesigned (out of scope for Phase 1) or (b) the question is reframed around the achievable range [0, 0.317].
+
+**A8 acceptance criterion:** `mountain_fraction ≥ 0.9 × mtn_ceiling = 0.285`. Desert stays absolute ≥ 0.5.
+
+**Out of scope (do NOT):** lower `mtn_elev_thresh` / `mtn_slope_thresh` to hit a coverage number — that redefines "mountain" and corrupts a terrain primitive.
+
+**Resolution:** RESOLVED-CONFIRMED (structural finding, coarse grid search 2026-06-13).
+
+---
+
 *End of HYPOTHESES — consolidated 2026-06-05. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*

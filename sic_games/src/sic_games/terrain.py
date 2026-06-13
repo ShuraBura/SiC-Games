@@ -32,6 +32,21 @@ BIOME_GRASS    = 4
 BIOME_DESERT   = 5
 BIOME_MOUNTAIN = 6
 
+# ── Phase 1 Stage 1 constants ──────────────────────────────────────────────
+# All forage values trace to LITERATURE.md Survey A (canonical home).
+NPP_GM2_SCALE = 3400.0        # npp_gm2 = npp * NPP_GM2_SCALE
+                               # Anchor: generator forest-onset (npp≈0.4) →
+                               # Tallavaara 2018 saturation ~1360 g/m²/yr (single-point assertion)
+SHORE_BONUS_KCAL = 1491.5     # Bird 1997 Meriam reef-flat intertidal mean (kcal/forager-hr)
+FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
+    BIOME_WETLAND:  1428.3,   # Cunningham, Okavango "Wet"
+    BIOME_FOREST:   2630.0,   # Hill 1987, Ache palm
+    BIOME_SAVANNA:   257.7,   # Berbesque & Marlowe 2009, Hadza tuber (Table 4)
+    BIOME_GRASS:    1125.0,   # Hurtado & Hill 1987, Cuiva root collecting
+    BIOME_DESERT:   1200.0,   # PROVISIONAL; O'Connell & Hawkes 1984 range 650-1925
+    BIOME_MOUNTAIN: 5387.0,   # Rhode & Rhode 2015, limber pine unhulled
+}
+
 _NOISE_G = 257  # noise grid side (wraps on itself)
 
 # ── PRNG (mulberry32 + FNV-1a hashSeed) ───────────────────────────────────
@@ -129,17 +144,44 @@ class WorldFields:
     wateracc:      np.ndarray   # (N,N) float64 [0,1]
     isWater:       np.ndarray   # (N,N) uint8  {0,1}
     isRiver:       np.ndarray   # (N,N) uint8  {0,1}
-    forage:        np.ndarray   # (N,N) float64 [0,1]
+    forage:        np.ndarray   # (N,N) float64 [0,1] (original normalised field)
     game:          np.ndarray   # (N,N) float64 [0,1]
     cost:          np.ndarray   # (N,N) float64 [0,1]
     neighbour_cost: np.ndarray  # (N,N,4) float64; d=0 N, d=1 S, d=2 W, d=3 E
     risk:          np.ndarray   # (N,N) float64 [0.02,1]
-    biome:         np.ndarray   # (N,N) uint8  biome codes 0–6
+    biome:         np.ndarray   # (N,N) uint8  biome codes 0-6
     npp:           np.ndarray   # (N,N) float64 [0,1]
     forestness:    np.ndarray   # (N,N) float64 [0,1]
     dist:          np.ndarray   # (N,N) float64 BFS distance from water/river
     reliefAmpM:    float
     SEA_LEVEL_M:   float = 0.0
+    # Phase 1 Stage 1 fields (added 2026-06-12)
+    forage_kcal:   np.ndarray = None  # (N,N) float64 kcal/forager-hr (per-biome + shore bonus)
+    npp_gm2:       np.ndarray = None  # (N,N) float64 g/m2/yr (Tallavaara 2018 anchor)
+    is_shore:      np.ndarray = None  # (N,N) uint8 land cells with >=1 water nbr (4-nbr)
+
+
+# ── Water-body connected components (Task 2) ──────────────────────────────
+
+def _water_bodies(isWater: np.ndarray) -> tuple[int, int]:
+    """Return (n_bodies, largest_body_size) using 4-neighbor BFS on water mask."""
+    visited = np.zeros((N, N), dtype=bool)
+    n_bodies = 0; largest = 0
+    for r0 in range(N):
+        for c0 in range(N):
+            if not isWater[r0, c0] or visited[r0, c0]:
+                continue
+            n_bodies += 1; size = 0
+            q: deque = deque([(r0, c0)])
+            visited[r0, c0] = True
+            while q:
+                r, c = q.popleft(); size += 1
+                for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    nr, nc_ = r + dr, c + dc
+                    if 0 <= nr < N and 0 <= nc_ < N and isWater[nr, nc_] and not visited[nr, nc_]:
+                        visited[nr, nc_] = True; q.append((nr, nc_))
+            if size > largest: largest = size
+    return n_bodies, largest
 
 
 # ── Main generator ─────────────────────────────────────────────────────────
@@ -312,6 +354,32 @@ def generate_world(knobs: dict) -> WorldFields:
     biome[is_savanna] = BIOME_SAVANNA
     biome[is_grass]   = BIOME_GRASS
 
+    # ── NPP physical units (Task 4 — Tallavaara 2018 single-point anchor) ──
+    # Anchor: generator forest-onset npp≈0.4 → empirical saturation ~1360 g/m²/yr.
+    # Linear transfer: npp_gm2 = npp * (1360/0.4) = npp * 3400. Land-only interpretation;
+    # water cells have npp=0, so npp_gm2=0 is consistent (no meaning on water).
+    npp_gm2 = npp * NPP_GM2_SCALE
+
+    # ── Shore mask: land cells with >=1 water neighbor (4-nbr, non-toroidal) ─
+    padded_w = np.pad(isWater, 1, mode='constant', constant_values=0)
+    has_water_nbr = ((padded_w[:-2, 1:-1] | padded_w[2:, 1:-1] |
+                      padded_w[1:-1, :-2] | padded_w[1:-1, 2:]) > 0)
+    is_shore = ((isWater == 0) & has_water_nbr).astype(np.uint8)
+
+    # ── forage_kcal: per-biome mean-scaling (Task 1) + shore bonus (Task 3) ─
+    # Original normalised forage[] is preserved. forage_kcal is a separate field.
+    forage_kcal = np.zeros((N, N), dtype=np.float64)
+    for b_code, target_mean in FORAGE_KCAL_TARGETS.items():
+        mask = (biome == b_code)
+        if not mask.any():
+            continue                       # absent biome: cells stay 0, logged in characterize_map
+        mean_norm = float(forage[mask].mean())
+        if mean_norm == 0.0:
+            continue                       # zero-mean biome: avoid divide-by-zero; stays 0
+        forage_kcal[mask] = forage[mask] * (target_mean / mean_norm)
+    # Shore modifier: additive bonus on land-shore cells (1491.5 kcal/hr; Bird 1997)
+    forage_kcal += is_shore.astype(np.float64) * SHORE_BONUS_KCAL
+
     # ── Neighbour cost (N,N,4): d=0 N, d=1 S, d=2 W, d=3 E ────────────
     nc = np.ones((N, N, 4), dtype=np.float64)   # sentinel = 1.0 at edges
     nc[1:, :, 0]  = cost[:-1, :]   # north: target (y-1, x)
@@ -321,7 +389,8 @@ def generate_world(knobs: dict) -> WorldFields:
 
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
-                forage, game, cost, nc, risk, biome, npp, forestness, dist):
+                forage, game, cost, nc, risk, biome, npp, forestness, dist,
+                npp_gm2, is_shore, forage_kcal):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -330,15 +399,17 @@ def generate_world(knobs: dict) -> WorldFields:
         forage=forage, game=game, cost=cost, neighbour_cost=nc,
         risk=risk, biome=biome, npp=npp, forestness=forestness,
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
+        forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
     )
 
 
 # ── characterize_map ────────────────────────────────────────────────────────
 
-def characterize_map(F: WorldFields) -> dict:
+def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
     """Per-map diagnostic vector. Saved alongside every generated map.
 
     Vector keys match the oracle battery JSON exactly.
+    initial_agent_count: used for Task 6 Guard A (habitable_cell_count >= max(N_init, 50)).
     """
     n = N * N
     land = 0; water = 0; river = 0
@@ -411,11 +482,33 @@ def characterize_map(F: WorldFields) -> dict:
         if m > peak_v: peak_v = m; peak_bin = b
     game_hump_peak = peak_bin / bins if peak_bin >= 0 else None
 
+    # Task 2: coast/water-body diagnostics ─────────────────────────────
+    n_wb, largest_wb = _water_bodies(F.isWater)
+    shore_count = int(F.is_shore.sum()) if F.is_shore is not None else 0
+    total_cells = N * N
+
+    # Task 5: habitability coordinates ─────────────────────────────────
+    desert_frac   = counts[BIOME_DESERT]   / land if land > 0 else 0.0
+    mountain_frac = counts[BIOME_MOUNTAIN] / land if land > 0 else 0.0
+    habitable_cell_count = land              # land = land-only; water excluded
+    habitable_cell_frac  = land / total_cells
+    mean_npp_gm2 = (float(F.npp_gm2[~F.isWater.astype(bool)].mean())
+                    if F.npp_gm2 is not None and land > 0 else 0.0)
+
+    # forage_kcal absent-biome log ─────────────────────────────────────
+    absent_biomes = [b for b in FORAGE_KCAL_TARGETS if counts[b] == 0]
+
+    # Task 6: validity guards ──────────────────────────────────────────
+    floor = max(initial_agent_count, 50)
+    guard_a_fail = habitable_cell_count < floor
+    guard_b_fail = any(counts[b] / total_cells >= 0.95 for b in range(7))
+    invalid_substrate = guard_a_fail or guard_b_fail
+
     return {
-        'waterPct':        water / n * 100,
+        'waterPct':        water / total_cells * 100,
         'riverPct':        river / land * 100 if land > 0 else 0.0,
         'wetlandPct':      frac['wetland'],
-        'hydratedPct':     (water + river + int(counts[BIOME_WETLAND])) / n * 100,
+        'hydratedPct':     (water + river + int(counts[BIOME_WETLAND])) / total_cells * 100,
         'landCells':       land,
         'riverCells':      river,
         'drainagePct':     river / land * 100 if land > 0 else 0.0,
@@ -432,4 +525,21 @@ def characterize_map(F: WorldFields) -> dict:
         'forestTouchSavanna':       forest_touch_sav,
         'forestTouchGrassland':     forest_touch_grass,
         'forestSavannaSharedEdges': adj[BIOME_FOREST][BIOME_SAVANNA],
+        # Task 2 — coast/water-body diagnostics
+        'shore_cell_count':    shore_count,
+        'shore_cell_fraction': shore_count / total_cells,
+        'n_water_bodies':      n_wb,
+        'largest_body_fraction': largest_wb / total_cells,
+        # Task 5 — habitability coordinates
+        'desert_fraction':         desert_frac,
+        'mountain_fraction':       mountain_frac,
+        'mean_npp_gm2':            mean_npp_gm2,
+        'habitable_cell_fraction': habitable_cell_frac,
+        'habitable_cell_count':    habitable_cell_count,
+        # Task 6 — validity guards
+        'invalid_substrate': invalid_substrate,
+        'guard_a_fail':      guard_a_fail,
+        'guard_b_fail':      guard_b_fail,
+        # forage_kcal diagnostics
+        'absent_biomes_forage': absent_biomes,
     }

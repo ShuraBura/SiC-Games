@@ -1,6 +1,6 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-06-13
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 
@@ -17,6 +17,19 @@ through Stage 7.5) in all existing docs refer to this phase. Blueprint folder:
 Fresh terrain-driven foundation; stage numbering restarts at 1. Active blueprint:
 `blueprints/phase1/SiC_Games_Phase1_Stage1_ForageField_TerrainDiagnostics_Blueprint.md`.
 All new blueprints and directives are Phase 1 unless explicitly marked otherwise.
+
+### Phase 1 Stage 1 — ForageField + Terrain Diagnostics (complete 2026-06-13)
+
+Status: **COMPLETE — all A-gates GREEN.** Acceptance: `outputs/phase1_stage1/acceptance_and_artifacts.py`.
+
+New fields: `forage_kcal` (per-biome mean-scaled kcal/forager-hr + shore bonus), `npp_gm2` (npp × 3400 g/m²/yr), `is_shore` (land cells with ≥1 water neighbor). Coast diagnostics and validity guards in `characterize_map()`.
+
+**Deferred items from Phase 1 Stage 1:**
+- **Offshore/boat-fishing (Task 3.4):** water-cell foraging via boats deferred. Current model: foraging reward is zero for water cells (not modelled). Shore bonus (+1491.5 kcal/hr, Bird 1997) covers reef/littoral foraging from land. Open-ocean / deep-sea boat fishing is a distinct mechanic; leave for a dedicated stage when social structures that support it (C multi-family coordination or Si information-sharing) are implemented.
+- **Desert provisionally uninhabitable (Task 1.4):** desert cells are excluded from `habitable_cell_count` as a baseline. This is PROVISIONAL — see `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` and the desert flag. Revisit when agent movement and metabolism on desert terrain is calibrated.
+- **Mountain foray-not-residence (Task 1.5):** mountain cells currently included in habitability. Pre-registration that mountain cells are visited but not permanently inhabited (foray model) deferred to Stage 2 movement mechanics.
+
+**Generator design note:** mountain_fraction is structurally capped at ≈ 0.317 (mtn_ceiling). See `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` and `ARCHITECTURE.md § 9.5.1`.
 
 **Disambiguation rule:** bare "Stage N" in documents dated before this boundary, or in
 `archive/`, refers to Phase 0. New work carries the "Phase 1 Stage N" marker. When in

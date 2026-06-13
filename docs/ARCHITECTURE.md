@@ -80,6 +80,66 @@ reliefAmpM = 120 + (2500 − 120) * relief
 
 **Module location:** `sic_games/src/sic_games/terrain.py`. Oracle battery: `SiC_Games_Terrain_Oracle_Battery.json` (27 reference worlds, D4-frozen).
 
+#### 9.5.1 Generator design note — biome reachability asymmetry (pre-registered 2026-06-13)
+
+The generator's reachable world-space is *asymmetrically bounded* in biome dominance. This is a structural property of the joint mountain classification condition, not a calibration failure:
+
+- **Desert:** `desert_fraction` can reach ≥ 0.76 (aridK near max saturates the NPP floor).
+- **Mountain:** `mountain_fraction` is structurally capped at **≈ 0.317** (mtn_ceiling).
+
+**Cause:** Mountain classification requires the *joint* condition `elev > 0.72 AND slope > 0.18`. Under spatially autocorrelated FBM elevation, high plateaus satisfy elevation but are flat; steep valley flanks satisfy slope but are low. Only the narrow high-and-steep set satisfies both. High waterK helps by flooding low/mid-elevation land (shrinking the land denominator) but cannot push past the ceiling.
+
+**Ceiling search (2026-06-13):** 448 worlds (relief=1.0 pinned × rough=[0,0.33,0.67,1] × waterK=[0.1,0.4,0.7,0.99] × aridK=[0,0.33,0.67,1] × 7 seeds). mtn_ceiling = 0.317; best knobs: rough=1.0, waterK=0.99 (aridK irrelevant). Held across 7 seeds (mean≈0.225).
+
+**Consequence:** mountain-dominant worlds are not producible. Hypotheses requiring `mountain_fraction >> 0.3` must be reframed or deferred to a redesigned generator.
+
+**A8 criterion (Phase 1 Stage 1):** `mountain_fraction ≥ 0.9 × mtn_ceiling = 0.285`. Desert stays absolute ≥ 0.5.
+
+**Do NOT** lower `mtn_elev_thresh` / `mtn_slope_thresh` — that redefines "mountain" and corrupts the terrain primitive.
+
+See also: `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` (full pre-registration).
+
+#### 9.5.2 Phase 1 Stage 1 — ForageField + Terrain Diagnostics (2026-06-13)
+
+**Status:** COMPLETE (Phase 1 Stage 1, 2026-06-13). All A-gates GREEN. Acceptance script: `outputs/phase1_stage1/acceptance_and_artifacts.py`.
+
+**New WorldFields added to `terrain.py`:**
+
+| Field | Shape | Unit | Description |
+|---|---|---|---|
+| `forage_kcal` | (N,N) float64 | kcal/forager-hr | Per-biome mean-scaled foraging return; shore bonus included |
+| `npp_gm2` | (N,N) float64 | g/m²/yr | NPP in physical units (npp × NPP_GM2_SCALE=3400) |
+| `is_shore` | (N,N) uint8 | 0/1 | Land cells with ≥1 water neighbor (4-neighbor, non-toroidal) |
+
+**forage_kcal construction:**
+Per biome b: `forage_kcal[mask_b] = forage[mask_b] × (target_mean_b / mean(forage[mask_b]))`. Target means (FORAGE_KCAL_TARGETS, from Marlowe 2010 + Bird & Bliege Bird 1997 synthesis):
+
+| Biome | Target kcal/forager-hr |
+|---|---|
+| Wetland | 1428.3 |
+| Forest | 2630.0 |
+| Savanna | 257.7 |
+| Grassland | 1125.0 |
+| Desert | 1200.0 |
+| Mountain | 5387.0 |
+
+Shore bonus: +1491.5 kcal/hr (Bird 1997 reef foraging). Applied after per-biome scaling, so the mean guarantee holds for the non-shore portion of each biome. Original `forage[]` [0,1] retained separately.
+
+**npp_gm2:** `npp × NPP_GM2_SCALE` (NPP_GM2_SCALE=3400.0). Single-point Tallavaara 2018 anchor: forest-onset npp≈0.4 → 1360 g/m²/yr saturation. Linear transfer, no habitability floor imposed here.
+
+**is_shore:** 4-neighbor non-toroidal: land cell with ≥1 water neighbor. Computed via padded isWater mask.
+
+**characterize_map() additions (Phase 1 Stage 1):**
+Task 2: `shore_cell_count`, `shore_cell_fraction`, `n_water_bodies`, `largest_body_fraction`.
+Task 5: `desert_fraction`, `mountain_fraction`, `mean_npp_gm2`, `habitable_cell_fraction`, `habitable_cell_count`.
+Task 6: `invalid_substrate`, `guard_a_fail`, `guard_b_fail`, `absent_biomes_forage`.
+
+**Validity guards:**
+- Guard A: `habitable_cell_count ≥ max(initial_agent_count=500, 50)`.
+- Guard B: no biome occupies ≥ 95% of total cells.
+
+**Habitability:** `habitable = ~isWater & (biome != BIOME_DESERT)` (desert excluded as uninhabitable baseline; provisional per Task 1.4 — mountain classification as foray-not-residence per Task 1.5 is deferred).
+
 ---
 
 ### 9.3 Physical-unit calibration (OWE-1, 2026-05-30)

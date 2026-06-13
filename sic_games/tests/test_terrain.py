@@ -8,7 +8,8 @@ from sic_games.terrain import (
     N, W_FOREST, W_SAV,
     BIOME_WATER, BIOME_WETLAND, BIOME_FOREST, BIOME_SAVANNA, BIOME_GRASS,
     BIOME_DESERT, BIOME_MOUNTAIN,
-    generate_world, characterize_map,
+    NPP_GM2_SCALE, SHORE_BONUS_KCAL, FORAGE_KCAL_TARGETS,
+    generate_world, characterize_map, _water_bodies,
 )
 
 _BASE = dict(relief=0.4, rough=0.5, waterK=0.5, forestK=0.5, aridK=0.35, seedStr='42')
@@ -185,3 +186,219 @@ def test_biome_fracs_sum_to_100():
     v = characterize_map(_W)
     total = sum(v['biomeFrac'].values())
     assert abs(total - 100.0) < 0.5, f"biomeFrac sums to {total:.2f}"
+
+
+# ── Phase 1 Stage 1 — forage_kcal field (Task 1) ─────────────────────────
+
+def test_forage_kcal_field_present():
+    assert _W.forage_kcal is not None
+    assert _W.forage_kcal.shape == (N, N)
+    assert np.all(np.isfinite(_W.forage_kcal))
+
+
+def test_forage_kcal_non_negative():
+    assert _W.forage_kcal.min() >= 0.0
+
+
+def test_forage_kcal_water_is_zero():
+    mask = _W.isWater.astype(bool)
+    # water cells have zero biome forage; shore bonus only on land; so water = 0
+    assert np.all(_W.forage_kcal[mask] == 0.0), "forage_kcal nonzero on water"
+
+
+def test_forage_kcal_original_forage_preserved():
+    """Original normalised forage[] must be unchanged (separate field, not overwritten)."""
+    assert _W.forage.min() >= 0.0 and _W.forage.max() <= 1.0
+    assert not _W.forage.flags.writeable
+
+
+def test_forage_kcal_biome_means_match_targets():
+    """Each present biome's mean (pre-shore-bonus) forage_kcal must equal its target
+    within ±0.1 kcal/hr. Shore bonus is subtracted before checking."""
+    shore_bonus = _W.is_shore.astype(np.float64) * SHORE_BONUS_KCAL
+    forage_pre_shore = _W.forage_kcal - shore_bonus
+    for b_code, target in FORAGE_KCAL_TARGETS.items():
+        mask = (_W.biome == b_code)
+        if not mask.any():
+            continue  # absent biome — skip
+        mean_val = float(forage_pre_shore[mask].mean())
+        assert abs(mean_val - target) < 0.11, (
+            f"biome {b_code} mean forage_kcal {mean_val:.2f} != target {target} (tol 0.1)")
+
+
+def test_forage_kcal_within_biome_variance_nonzero():
+    """Texture must be preserved: within-biome forage_kcal variance must be > 0
+    wherever the source normalised forage had variance > 0."""
+    for b_code in FORAGE_KCAL_TARGETS:
+        mask = (_W.biome == b_code)
+        if mask.sum() < 4:
+            continue
+        src_var = float(_W.forage[mask].var())
+        if src_var < 1e-12:
+            continue  # source was flat — nothing to check
+        assert float(_W.forage_kcal[mask].var()) > 0.0, \
+            f"biome {b_code}: forage_kcal variance is zero but source had variance"
+
+
+def test_forage_kcal_frozen():
+    assert not _W.forage_kcal.flags.writeable
+
+
+# ── Phase 1 Stage 1 — npp_gm2 field (Task 4) ──────────────────────────────
+
+def test_npp_gm2_field_present():
+    assert _W.npp_gm2 is not None
+    assert _W.npp_gm2.shape == (N, N)
+
+
+def test_npp_gm2_transfer():
+    """npp_gm2 = npp * NPP_GM2_SCALE on all cells."""
+    assert np.allclose(_W.npp_gm2, _W.npp * NPP_GM2_SCALE)
+
+
+def test_npp_gm2_forest_near_anchor():
+    """Forest-cell mean npp_gm2 should be near 1360 g/m2/yr (anchor)."""
+    forest_mask = (_W.biome == BIOME_FOREST)
+    if not forest_mask.any():
+        pytest.skip("no forest cells in reference world")
+    mean_val = float(_W.npp_gm2[forest_mask].mean())
+    assert 900 < mean_val < 1700, f"forest npp_gm2 mean {mean_val:.0f} far from anchor 1360"
+
+
+def test_npp_gm2_frozen():
+    assert not _W.npp_gm2.flags.writeable
+
+
+# ── Phase 1 Stage 1 — is_shore field (Task 2/3) ───────────────────────────
+
+def test_is_shore_field_present():
+    assert _W.is_shore is not None
+    assert _W.is_shore.shape == (N, N)
+    assert np.all((_W.is_shore == 0) | (_W.is_shore == 1))
+
+
+def test_is_shore_only_on_land():
+    shore_on_water = _W.is_shore.astype(bool) & _W.isWater.astype(bool)
+    assert not shore_on_water.any(), "shore cell on water"
+
+
+def test_is_shore_adjacent_to_water():
+    """Every is_shore cell must have at least one water neighbor (4-nbr)."""
+    padded = np.pad(_W.isWater, 1, mode='constant', constant_values=0)
+    has_water_nbr = ((padded[:-2, 1:-1] | padded[2:, 1:-1] |
+                      padded[1:-1, :-2] | padded[1:-1, 2:]) > 0)
+    assert np.all(~_W.is_shore.astype(bool) | has_water_nbr), \
+        "shore cell without water neighbor"
+
+
+def test_is_shore_frozen():
+    assert not _W.is_shore.flags.writeable
+
+
+def test_shore_bonus_added():
+    """Shore cells forage_kcal > non-shore cells in same biome (when biome has nonzero forage)."""
+    for b_code in FORAGE_KCAL_TARGETS:
+        shore_mask  = (_W.biome == b_code) & _W.is_shore.astype(bool)
+        inland_mask = (_W.biome == b_code) & ~_W.is_shore.astype(bool)
+        if not shore_mask.any() or not inland_mask.any():
+            continue
+        shore_mean  = float(_W.forage_kcal[shore_mask].mean())
+        inland_mean = float(_W.forage_kcal[inland_mask].mean())
+        assert shore_mean > inland_mean, \
+            f"biome {b_code}: shore mean {shore_mean:.1f} not > inland mean {inland_mean:.1f}"
+
+
+# ── Phase 1 Stage 1 — characterize_map new fields ─────────────────────────
+
+_CM = characterize_map(_W)
+
+
+def test_characterize_map_new_keys():
+    required = (
+        'shore_cell_count', 'shore_cell_fraction', 'n_water_bodies',
+        'largest_body_fraction',
+        'desert_fraction', 'mountain_fraction', 'mean_npp_gm2',
+        'habitable_cell_fraction', 'habitable_cell_count',
+        'invalid_substrate', 'guard_a_fail', 'guard_b_fail',
+        'absent_biomes_forage',
+    )
+    for k in required:
+        assert k in _CM, f"characterize_map missing key '{k}'"
+
+
+def test_characterize_map_shore_count_consistent():
+    assert _CM['shore_cell_count'] == int(_W.is_shore.sum())
+    assert abs(_CM['shore_cell_fraction'] - _CM['shore_cell_count'] / (N * N)) < 1e-12
+
+
+def test_characterize_map_n_water_bodies():
+    n_wb, largest = _water_bodies(_W.isWater)
+    assert _CM['n_water_bodies'] == n_wb
+    assert abs(_CM['largest_body_fraction'] - largest / (N * N)) < 1e-12
+
+
+def test_characterize_map_habitability_fracs():
+    assert 0.0 <= _CM['desert_fraction']   <= 1.0
+    assert 0.0 <= _CM['mountain_fraction'] <= 1.0
+    assert 0.0 <= _CM['habitable_cell_fraction'] <= 1.0
+    assert _CM['habitable_cell_count'] == _CM['landCells']
+
+
+def test_characterize_map_mean_npp_gm2():
+    land = ~_W.isWater.astype(bool)
+    expected = float(_W.npp_gm2[land].mean())
+    assert abs(_CM['mean_npp_gm2'] - expected) < 1.0
+
+
+def test_characterize_map_validity_guards_type():
+    assert isinstance(_CM['invalid_substrate'], (bool, np.bool_))
+    assert isinstance(_CM['guard_a_fail'], (bool, np.bool_))
+    assert isinstance(_CM['guard_b_fail'], (bool, np.bool_))
+
+
+# ── _water_bodies helper ───────────────────────────────────────────────────
+
+def test_water_bodies_single_lake():
+    """Synthetic: one central water rectangle = 1 body."""
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[40:60, 40:60] = 1
+    n, largest = _water_bodies(iw)
+    assert n == 1, f"expected 1 body, got {n}"
+    assert largest == 20 * 20
+
+
+def test_water_bodies_two_lakes():
+    """Synthetic: two disconnected rectangles = 2 bodies."""
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[10:20, 10:20] = 1   # 100 cells
+    iw[70:80, 70:80] = 1   # 100 cells
+    n, largest = _water_bodies(iw)
+    assert n == 2, f"expected 2 bodies, got {n}"
+    assert largest == 100
+
+
+# ── A3 acceptance check (hand-verifiable) ─────────────────────────────────
+
+def test_a3_characterize_map_returns_coast_fields():
+    """A3: characterize_map returns shore_cell_fraction, shore_cell_count,
+    n_water_bodies, largest_body_fraction."""
+    v = characterize_map(_W)
+    assert 'shore_cell_fraction' in v
+    assert 'shore_cell_count' in v
+    assert 'n_water_bodies' in v
+    assert 'largest_body_fraction' in v
+    assert v['shore_cell_count'] >= 0
+    assert 0.0 <= v['shore_cell_fraction'] <= 1.0
+    assert v['n_water_bodies'] >= 0
+
+
+# ── A6 acceptance check ────────────────────────────────────────────────────
+
+def test_a6_no_npp_habitability_floor():
+    """A6: habitable_cell_fraction = land/total; no per-cell NPP cutoff."""
+    v = characterize_map(_W)
+    land = int((~_W.isWater.astype(bool)).sum())
+    total = N * N
+    expected = land / total
+    assert abs(v['habitable_cell_fraction'] - expected) < 1e-12
+    assert v['habitable_cell_count'] == land
