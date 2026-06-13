@@ -650,6 +650,16 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 ---
 
+### §12.1-J — §H-NO-COASTAL-MORPHOLOGY: original finding + RETRACTION (2026-06-13)
+
+**Original finding (Stage 1b M2 analysis, 2026-06-13):** The M2 scatter (`largest_exterior_shore_to_area` vs `exterior_water_fraction`) showed one continuous smear with no gap or bimodality. Inferred: the generator produces no distinct coastal morphology; a shape-aware guard is not warranted; the simple raw-fraction guard stands.
+
+**RETRACTED (Stage 1b correction, 2026-06-13).** The inference is invalid. `largest_exterior_shore_to_area` = shoreline ÷ body-area, so a large exterior sea with a genuinely long coastline scores **low** s2a because the denominator (body area) is large — not because the coast is short. The "smear" at low s2a for high exterior fraction is an artifact of the s2a metric, not evidence of absent coastal structure. Direct supervisor map observation confirms long coastlines occur at high waterK. s2a measures crinkliness-per-unit-water (body shape), not coastline length; it was the wrong construct for "coastal morphology." No claim about generator coastal capability is currently logged. The correct coastal statistic (absolute exterior shoreline length, with a minimum-body-size noise gate) is deferred to §STAGE-GEOSTRUCT.
+
+**Preserved per project norms:** do not delete adverse results including retracted ones.
+
+---
+
 ## 13. Architecture seams
 
 *(Pilot §5.2 preserved verbatim.)*

@@ -574,6 +574,12 @@ def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
         largest_exterior_shore_to_area = int(adj_land.sum()) / largest_ext_cells
     else:
         largest_exterior_shore_to_area = 0.0
+    # NOTE: largest_exterior_shore_to_area measures crinkliness-per-unit-water
+    # (shoreline / body-area ratio), NOT coastline length. A large sea with a
+    # long coast scores LOW s2a because the body-area denominator is large.
+    # Do NOT use s2a to infer presence/absence of coastal morphology.
+    # Absolute exterior shoreline (deferred to §STAGE-GEOSTRUCT) is the correct
+    # coastline-length statistic.
 
     # Task 5: habitability coordinates ─────────────────────────────────
     desert_frac   = counts[BIOME_DESERT]   / land if land > 0 else 0.0

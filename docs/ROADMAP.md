@@ -31,6 +31,39 @@ New fields: `forage_kcal` (per-biome mean-scaled kcal/forager-hr + shore bonus),
 
 **Generator design note:** mountain_fraction is structurally capped at ≈ 0.317 (mtn_ceiling). See `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` and `ARCHITECTURE.md § 9.5.1`.
 
+### Phase 1 Stage 1b — Water Decomposition Diagnostic (complete 2026-06-13)
+
+Status: **COMPLETE — A1-A6 GREEN.** Acceptance: `outputs/phase1_stage1b/acceptance_and_artifacts.py`.
+
+Exterior/interior water decomposition: `_classify_water_components()` 4-nbr BFS; new `characterize_map()` fields (`exterior_water_fraction`, `interior_water_fraction`, `n_interior/exterior_bodies`, `shoreline_fraction`, `largest_exterior_body_cells`, `largest_exterior_shore_to_area`). Exterior-water validity guard: `EXTERIOR_WATER_CEILING = 0.12` (PROVISIONAL — see below). Sweep: waterK [0,1], 21 steps × 5 seeds = 105 maps; guard onset at waterK≈0.80 (12/105 fires).
+
+**Open items from Stage 1b:**
+- **Exterior-water threshold (PROVISIONAL, not locked):** Task 2.2 analysis (Stage 1b correction) found the 0.12 crossing falls within the interior-collapse merge regime (interior peaks at waterK≈0.70; first exterior crossing at waterK≈0.80; merge transition spans waterK≈0.75–0.85). Threshold STAYS PROVISIONAL pending supervisor decision. Values: interior_fraction peak = 0.048 at waterK=0.70 (mean, 5 seeds); first exterior crossing of 0.12 at waterK=0.80 (seeds 42, 13); separation = +0.10 waterK, not clearly outside the merge regime.
+- **§H-NO-COASTAL-MORPHOLOGY RETRACTED:** the M2 finding ("no coastal morphology, simple guard stands") was based on `largest_exterior_shore_to_area` which measures crinkliness-per-unit-water, not coastline length. Retracted per Stage 1b correction; see `ARCHITECTURE.md § 12.1-J`.
+- **§STAGE-GEOSTRUCT deferred** (see below).
+
+### §STAGE-GEOSTRUCT — Geographic-structure generation (DEFERRED, stage number TBD)
+
+**Status:** Deferred. On the roadmap as a committed-but-unscheduled destination. Do NOT build now.
+
+**Scope decision (supervisor, 2026-06-13):** The current arc stays **continental** — interior water (lakes) only; no ocean/sea coast; no exterior coastline generation. The `EXTERIOR_WATER_CEILING = 0.12` guard enforces this by intent; excluding coastal/ocean worlds is the desired behaviour for the current arc.
+
+Geographic-structure generation is a large deliverable and is deferred to its own stage, to be built **only alongside the dynamics that make geographic structure meaningful** (seafaring / tier-3 offshore resources, regional connectivity, traversal). Consistent with §DECISION-NO-RIVERS: terrain is not built ahead of its mechanic.
+
+**Contemplated content (reference map, not a build commitment):**
+- **Continental-margin / long-coastline generator** — decouples sea extent from the `waterK` knob; controllable exterior coastline with land behind it. Requires independent control of exterior water morphology (a boundary-distance bias in the elevation primitive so low ground concentrates against chosen edges, rather than exterior sea emerging incidentally from `waterK`).
+- **Archipelago generator** — multiple land bodies separated by sea; high coastline, fragmented land.
+
+**Diagnostics deferred with this stage:**
+- Replace `largest_exterior_shore_to_area` (confirmed unfit for coastline measurement: it is shoreline / body-area, not shoreline length) with **absolute exterior shoreline length** + a minimum-exterior-body-size gate to exclude sub-5-cell edge noise.
+- Target-statistic benchmarks (coastline-length distribution, land-body-count/size, exterior/interior split) to make generator builds CC-iterable to convergence.
+
+**Methodological boundary (pre-registered):**
+- World *generation* (terrain to spec) is assertable and CC-iterable against target statistics.
+- *Dynamics* that make geographic features meaningful (seafaring, traversal, regional shock response) are model science — NOT one-prompted or iterated-to-convergence. Each enters as its own pre-registered stage with its own hypothesis and gate. Geostruct terrain sits inert as substrate until its dynamics stage arrives.
+
+---
+
 **Disambiguation rule:** bare "Stage N" in documents dated before this boundary, or in
 `archive/`, refers to Phase 0. New work carries the "Phase 1 Stage N" marker. When in
 doubt, ask — do not assume.
