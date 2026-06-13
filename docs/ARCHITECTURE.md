@@ -660,6 +660,33 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 ---
 
+### §12.1-K — §DECISION-LAKE-BODY-GUARD: largest-body guard replaces exterior-water guard (Stage 1c, 2026-06-13)
+
+**Context:** Stage 1b installed `exterior_water_fraction > EXTERIOR_WATER_CEILING (0.12)` as a world-acceptance guard. Stage 1c M1 sweep data showed this guard fires at waterK≈0.80, which is within the interior-collapse merge regime (waterK 0.75–0.85), not at a clean gap. The guard is an area measure (total exterior cells / total cells) that fires on an edge-connectivity event (interior lakes merging to the map boundary as waterK rises). It over-rejects valid large-lake continental worlds and has no ecological interpretation.
+
+**Replacement (Stage 1c):** `largest_water_body_fraction > LARGE_BODY_CEILING` is the sole large-water acceptance guard. This cuts on the single largest connected water body (4-nbr BFS, same connectivity as Stage 1b helpers). `LARGE_BODY_CEILING = 0.10` (provisional) ≈ 100,000 km² at 100 km²/cell — larger than Lake Superior; unambiguously inland-sea class.
+
+**Ecological rationale:** A body this large cannot be walked around and produces coastal dynamics (fetch, boat-crossing, regional fragmentation) that the continental arc does not implement. Deferral, not exclusion — such worlds are committed to §STAGE-GEOSTRUCT where coastal dynamics will be toggled on.
+
+**Implementation (terrain.py):**
+- New constant: `LARGE_BODY_CEILING = 0.10`
+- New helper: `_component_sizes(mask: np.ndarray) -> list[int]` — generic 4-nbr BFS returning list of component sizes for any boolean mask. Used for both water-body sizing and land-patch (interlake) sizing.
+- `characterize_map()` additions: `largest_water_body_fraction` (guard stat), `water_body_count`, `characteristic_water_body_size` (median, cells), `characteristic_interlake_patch_size` (median land component, cells).
+- `guard_exterior_water_fail` stays in return dict as a **diagnostic** (not in `invalid_substrate`). `guard_large_body_fail` replaces it in `invalid_substrate`.
+- `EXTERIOR_WATER_CEILING` retained as a named constant (not removed) to preserve Stage 1b diagnostic tests.
+
+**Stage 1c sweep findings (ARTIFACT 1, 5 seeds × 21 waterK steps):**
+- Guard fires first at waterK=0.85 (seeds 42, 7). No fires at wK≤0.80.
+- Mean `largest_water_body_fraction` at wK=0.80 = 0.064 (well below 0.10); at wK=0.85 = 0.100.
+- The 0.10 crossing is at wK=0.85 for the most water-sensitive seeds. The distribution at wK=0.85 is seed-spread (seed 13 at 0.034, seed 42 at 0.141).
+- **Ceiling PROVISIONAL.** Supervisor must confirm LARGE_BODY_CEILING against the seen ARTIFACT 1 distribution. CC does not lock it.
+
+**Known scope gap (on record):** large-water-barrier worlds (single dominant body separating populations) are excluded from C vs Si comparison in this arc. The relevant hypothesis (does a large interior barrier differentially constrain Si self-reliance vs C coordination?) is deferred to §STAGE-GEOSTRUCT.
+
+**Forward note (flood dynamics):** a future stochastic-shock stage must define flooded cells as transient wetland/swamp state, NOT as a water body. A flood event must not trip the single-body guard. The guard operates on the static terrain isWater mask; seasonal/catastrophe floods are a terrain state separate from the generator water assignment.
+
+---
+
 ## 13. Architecture seams
 
 *(Pilot §5.2 preserved verbatim.)*

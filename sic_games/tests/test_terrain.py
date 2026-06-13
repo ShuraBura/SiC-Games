@@ -9,8 +9,9 @@ from sic_games.terrain import (
     BIOME_WATER, BIOME_WETLAND, BIOME_FOREST, BIOME_SAVANNA, BIOME_GRASS,
     BIOME_DESERT, BIOME_MOUNTAIN,
     NPP_GM2_SCALE, SHORE_BONUS_KCAL, FORAGE_KCAL_TARGETS,
-    EXTERIOR_WATER_CEILING,
+    EXTERIOR_WATER_CEILING, LARGE_BODY_CEILING,
     generate_world, characterize_map, _water_bodies, _classify_water_components,
+    _component_sizes,
 )
 
 _BASE = dict(relief=0.4, rough=0.5, waterK=0.5, forestK=0.5, aridK=0.35, seedStr='42')
@@ -528,12 +529,12 @@ def test_p1s1b_exterior_water_ceiling_constant():
 
 
 def test_p1s1b_invalid_substrate_updated():
-    """invalid_substrate is True when guard_exterior_water_fail is True."""
+    """invalid_substrate is driven by guard_large_body_fail (Stage 1c), not exterior guard."""
     v = characterize_map(_W)
-    if v['guard_exterior_water_fail']:
+    if v['guard_large_body_fail']:
         assert v['invalid_substrate'] is True
-    # Verify the union: invalid_substrate = a OR b OR ext
-    expected = v['guard_a_fail'] or v['guard_b_fail'] or v['guard_exterior_water_fail']
+    # Stage 1c: invalid_substrate = a OR b OR large_body (exterior guard removed from union)
+    expected = v['guard_a_fail'] or v['guard_b_fail'] or v['guard_large_body_fail']
     assert bool(v['invalid_substrate']) == bool(expected)
 
 
@@ -555,3 +556,121 @@ def test_p1s1b_no_regression_on_reference_world():
     ]
     for key in legacy_keys:
         assert key in v, f"regression: missing key {key}"
+
+
+# ── Phase 1 Stage 1c — Largest-lake-body guard ────────────────────────────
+
+
+def test_p1s1c_large_body_ceiling_constant():
+    """LARGE_BODY_CEILING is 0.10 (provisional scope ceiling)."""
+    assert isinstance(LARGE_BODY_CEILING, float)
+    assert abs(LARGE_BODY_CEILING - 0.10) < 1e-12
+
+
+def test_p1s1c_new_fields_present():
+    """§5.3/5.4/5.5: all Stage 1c fields present in characterize_map output."""
+    v = characterize_map(_W)
+    for key in ('largest_water_body_fraction', 'water_body_count',
+                'characteristic_water_body_size', 'characteristic_interlake_patch_size',
+                'guard_large_body_fail'):
+        assert key in v, f"Stage 1c: missing key '{key}'"
+
+
+def test_p1s1c_largest_water_body_fraction_is_single_max():
+    """§5.3: largest_water_body_fraction equals max-component/total, NOT sum.
+    Fixture: 3 disjoint blobs of sizes 100, 200, 50.
+    """
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[5:15, 5:15]   = 1   # 10×10 = 100 cells
+    iw[20:40, 20:30] = 1   # 20×10 = 200 cells (largest)
+    iw[60:65, 60:65] = 1   # 5×5   = 50 cells
+    # Use _component_sizes directly
+    sizes = _component_sizes(iw.astype(bool))
+    assert len(sizes) == 3, f"expected 3 bodies, got {len(sizes)}"
+    largest_frac = max(sizes) / (N * N)
+    sum_frac = sum(sizes) / (N * N)
+    assert abs(largest_frac - 200 / (N * N)) < 1e-12
+    assert largest_frac != sum_frac, "largest_frac should not equal sum_frac"
+
+
+def test_p1s1c_water_body_count_4connectivity():
+    """§5.4: diagonal neighbors are NOT connected under 4-connectivity.
+    Fixture: 2 blobs (100+200) + 2 diagonal-only-touching single cells.
+    Under 4-connectivity: diagonal pair = 2 separate bodies.
+    """
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[5:15, 5:15]   = 1   # blob 1: 100 cells
+    iw[20:40, 20:30] = 1   # blob 2: 200 cells
+    iw[50, 50] = 1          # cell A
+    iw[51, 51] = 1          # cell B — diagonal from A, NOT 4-connected
+    sizes = _component_sizes(iw.astype(bool))
+    # Under 4-connectivity: A and B are separate bodies (no shared 4-nbr edge)
+    assert len(sizes) == 4, f"expected 4 bodies under 4-connectivity, got {len(sizes)}"
+    assert sorted(sizes) == [1, 1, 100, 200]
+
+
+def test_p1s1c_characteristic_sizes_use_median():
+    """§5.5: characteristic sizes use median (not mean) — differs on heavy-tailed input."""
+    # Sizes: [1, 1, 1, 1, 1000] — median=1, mean=200.8
+    iw = np.zeros((N, N), dtype=np.uint8)
+    iw[0, 0] = 1; iw[0, 2] = 1; iw[0, 4] = 1; iw[0, 6] = 1   # 4 singleton cells
+    iw[10:50, 10:35] = 1  # ~1000 cells
+    sizes = _component_sizes(iw.astype(bool))
+    median_val = float(np.median(sizes))
+    mean_val = float(np.mean(sizes))
+    assert median_val != mean_val, "median == mean on heavy-tailed distribution"
+    assert median_val == 1.0, f"expected median=1, got {median_val}"
+
+
+def test_p1s1c_guard_swap_exterior_no_longer_gates():
+    """§5.6: exterior_water_fraction > 0.12 no longer gates invalid_substrate."""
+    v = characterize_map(_W)
+    # Confirm guard_exterior_water_fail is NOT included in invalid_substrate formula
+    # (even if it fires, invalid_substrate should equal a OR b OR large_body)
+    expected = v['guard_a_fail'] or v['guard_b_fail'] or v['guard_large_body_fail']
+    assert bool(v['invalid_substrate']) == bool(expected)
+    # Confirm guard_exterior_water_fail is still reported (diagnostic)
+    assert 'guard_exterior_water_fail' in v
+
+
+def test_p1s1c_guard_large_body_fail_gates_substrate():
+    """§5.6: guard_large_body_fail drives invalid_substrate."""
+    v = characterize_map(_W)
+    assert isinstance(v['guard_large_body_fail'], (bool, np.bool_))
+    expected = v['largest_water_body_fraction'] > LARGE_BODY_CEILING
+    assert bool(v['guard_large_body_fail']) == bool(expected)
+    if v['guard_large_body_fail']:
+        assert v['invalid_substrate'] is True
+
+
+def test_p1s1c_largest_water_body_fraction_consistent():
+    """largest_water_body_fraction == largest_body_fraction (backward-compat alias)."""
+    v = characterize_map(_W)
+    assert abs(v['largest_water_body_fraction'] - v['largest_body_fraction']) < 1e-12
+
+
+def test_p1s1c_water_body_count_consistent():
+    """water_body_count == n_water_bodies (backward-compat alias)."""
+    v = characterize_map(_W)
+    assert v['water_body_count'] == v['n_water_bodies']
+
+
+def test_p1s1c_characteristic_sizes_nonnegative():
+    """characteristic_water_body_size and characteristic_interlake_patch_size >= 0."""
+    v = characterize_map(_W)
+    assert v['characteristic_water_body_size'] >= 0.0
+    assert v['characteristic_interlake_patch_size'] >= 0.0
+
+
+def test_p1s1c_component_sizes_empty_mask():
+    """_component_sizes on an all-False mask returns empty list."""
+    mask = np.zeros((N, N), dtype=bool)
+    sizes = _component_sizes(mask)
+    assert sizes == []
+
+
+def test_p1s1c_component_sizes_all_true():
+    """_component_sizes on all-True mask returns single component of size N*N."""
+    mask = np.ones((N, N), dtype=bool)
+    sizes = _component_sizes(mask)
+    assert sizes == [N * N]

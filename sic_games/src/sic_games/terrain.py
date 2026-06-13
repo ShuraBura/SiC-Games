@@ -52,8 +52,15 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 # Derivation (P1S1b blueprint §3): for N=100 with a t-cell ocean rim,
 # rim cells = N² − (N−2t)²:  t=1→396 (0.040), t=2→784 (0.078), t=3→1164 (0.116).
 # A 2–3 cell rim allows naturalistic edge roughness; threshold = 0.12 (t=3 bound).
-# PROVISIONAL — confirm against sweep distribution before treating as final.
+# RETIRED as acceptance guard by Stage 1c. Kept as a diagnostic constant.
 EXTERIOR_WATER_CEILING = 0.12
+
+# ── Phase 1 Stage 1c constants ─────────────────────────────────────────────
+# Single-largest-water-body ceiling (§DECISION-LAKE-BODY-GUARD).
+# Provisional 0.10 ≈ 100,000 km² at 100 km²/cell; larger than Lake Superior.
+# A body this large is inland-sea class and deferred to §STAGE-GEOSTRUCT.
+# This is a logged scope decision, not a discovered threshold.
+LARGE_BODY_CEILING = 0.10
 
 _NOISE_G = 257  # noise grid side (wraps on itself)
 
@@ -190,6 +197,29 @@ def _water_bodies(isWater: np.ndarray) -> tuple[int, int]:
                         visited[nr, nc_] = True; q.append((nr, nc_))
             if size > largest: largest = size
     return n_bodies, largest
+
+
+def _component_sizes(mask: np.ndarray) -> list[int]:
+    """Return list of connected-component sizes (4-nbr) for all True cells in mask."""
+    visited = np.zeros((N, N), dtype=bool)
+    sizes: list[int] = []
+    for r0 in range(N):
+        for c0 in range(N):
+            if not mask[r0, c0] or visited[r0, c0]:
+                continue
+            size = 0
+            q: deque = deque([(r0, c0)])
+            visited[r0, c0] = True
+            while q:
+                r, c = q.popleft()
+                size += 1
+                for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    nr, nc_ = r + dr, c + dc
+                    if 0 <= nr < N and 0 <= nc_ < N and mask[nr, nc_] and not visited[nr, nc_]:
+                        visited[nr, nc_] = True
+                        q.append((nr, nc_))
+            sizes.append(size)
+    return sizes
 
 
 def _classify_water_components(
@@ -549,7 +579,13 @@ def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
     game_hump_peak = peak_bin / bins if peak_bin >= 0 else None
 
     # Task 2: coast/water-body diagnostics ─────────────────────────────
-    n_wb, largest_wb = _water_bodies(F.isWater)
+    water_mask_bool = F.isWater.astype(bool)
+    water_sizes = _component_sizes(water_mask_bool)
+    n_wb = len(water_sizes)
+    largest_wb = max(water_sizes) if water_sizes else 0
+    char_water_body_size = float(np.median(water_sizes)) if water_sizes else 0.0
+    land_sizes = _component_sizes(~water_mask_bool)
+    char_interlake_size = float(np.median(land_sizes)) if land_sizes else 0.0
     shore_count = int(F.is_shore.sum()) if F.is_shore is not None else 0
     total_cells = N * N
 
@@ -592,14 +628,16 @@ def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
     # forage_kcal absent-biome log ─────────────────────────────────────
     absent_biomes = [b for b in FORAGE_KCAL_TARGETS if counts[b] == 0]
 
-    # Task 6 + P1S1b: validity guards ────────────────────────────────────
+    # Task 6 + P1S1b + Stage 1c: validity guards ─────────────────────────
     floor = max(initial_agent_count, 50)
     guard_a_fail = habitable_cell_count < floor
     guard_b_fail = any(counts[b] / total_cells >= 0.95 for b in range(7))
-    # Exterior-water guard (P1S1b): maps with mostly-ocean are not a testbed.
-    # PROVISIONAL threshold — see EXTERIOR_WATER_CEILING constant comment.
+    # Exterior-water guard (P1S1b): kept as diagnostic; no longer gates acceptance.
+    # Retired by Stage 1c (mis-specified: area measure firing on edge-connectivity event).
     guard_exterior_water_fail = exterior_water_frac > EXTERIOR_WATER_CEILING
-    invalid_substrate = guard_a_fail or guard_b_fail or guard_exterior_water_fail
+    # Largest-body guard (Stage 1c, §DECISION-LAKE-BODY-GUARD): rejects inland-sea worlds.
+    guard_large_body_fail = (largest_wb / total_cells) > LARGE_BODY_CEILING
+    invalid_substrate = guard_a_fail or guard_b_fail or guard_large_body_fail
 
     return {
         'waterPct':        water / total_cells * 100,
@@ -626,7 +664,12 @@ def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
         'shore_cell_count':    shore_count,
         'shore_cell_fraction': shore_count / total_cells,
         'n_water_bodies':      n_wb,
-        'largest_body_fraction': largest_wb / total_cells,
+        'largest_body_fraction': largest_wb / total_cells,   # backward-compat alias
+        # Stage 1c — largest-body guard descriptors (§DECISION-LAKE-BODY-GUARD)
+        'largest_water_body_fraction':     largest_wb / total_cells,
+        'water_body_count':                n_wb,
+        'characteristic_water_body_size':  char_water_body_size,
+        'characteristic_interlake_patch_size': char_interlake_size,
         # P1S1b — exterior/interior water decomposition
         'exterior_water_fraction':        exterior_water_frac,
         'interior_water_fraction':        interior_water_frac,
@@ -641,11 +684,12 @@ def characterize_map(F: WorldFields, initial_agent_count: int = 500) -> dict:
         'mean_npp_gm2':            mean_npp_gm2,
         'habitable_cell_fraction': habitable_cell_frac,
         'habitable_cell_count':    habitable_cell_count,
-        # Task 6 + P1S1b — validity guards
+        # Task 6 + P1S1b + Stage 1c — validity guards
         'invalid_substrate':          invalid_substrate,
         'guard_a_fail':               guard_a_fail,
         'guard_b_fail':               guard_b_fail,
-        'guard_exterior_water_fail':  guard_exterior_water_fail,
+        'guard_exterior_water_fail':  guard_exterior_water_fail,  # diagnostic; not in invalid_substrate
+        'guard_large_body_fail':      guard_large_body_fail,
         # forage_kcal diagnostics
         'absent_biomes_forage': absent_biomes,
     }

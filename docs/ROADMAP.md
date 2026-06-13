@@ -37,16 +37,42 @@ Status: **COMPLETE — A1-A6 GREEN.** Acceptance: `outputs/phase1_stage1b/accept
 
 Exterior/interior water decomposition: `_classify_water_components()` 4-nbr BFS; new `characterize_map()` fields (`exterior_water_fraction`, `interior_water_fraction`, `n_interior/exterior_bodies`, `shoreline_fraction`, `largest_exterior_body_cells`, `largest_exterior_shore_to_area`). Exterior-water validity guard: `EXTERIOR_WATER_CEILING = 0.12` (PROVISIONAL — see below). Sweep: waterK [0,1], 21 steps × 5 seeds = 105 maps; guard onset at waterK≈0.80 (12/105 fires).
 
-**Open items from Stage 1b:**
-- **Exterior-water threshold (PROVISIONAL, not locked):** Task 2.2 analysis (Stage 1b correction) found the 0.12 crossing falls within the interior-collapse merge regime (interior peaks at waterK≈0.70; first exterior crossing at waterK≈0.80; merge transition spans waterK≈0.75–0.85). Threshold STAYS PROVISIONAL pending supervisor decision. Values: interior_fraction peak = 0.048 at waterK=0.70 (mean, 5 seeds); first exterior crossing of 0.12 at waterK=0.80 (seeds 42, 13); separation = +0.10 waterK, not clearly outside the merge regime.
-- **§H-NO-COASTAL-MORPHOLOGY RETRACTED:** the M2 finding ("no coastal morphology, simple guard stands") was based on `largest_exterior_shore_to_area` which measures crinkliness-per-unit-water, not coastline length. Retracted per Stage 1b correction; see `ARCHITECTURE.md § 12.1-J`.
+**Open items from Stage 1b (resolved in Stage 1c):**
+- **Exterior-water threshold (RESOLVED — guard retired):** exterior_water_fraction guard was mis-specified (area measure on edge-connectivity event). Replaced in Stage 1c by `largest_water_body_fraction > LARGE_BODY_CEILING`. `EXTERIOR_WATER_CEILING` stays as a diagnostic constant.
+- **§H-NO-COASTAL-MORPHOLOGY RETRACTED:** the M2 finding was based on `largest_exterior_shore_to_area` (crinkliness-per-unit-water, not coastline length). Retracted; see `ARCHITECTURE.md § 12.1-J`.
 - **§STAGE-GEOSTRUCT deferred** (see below).
+
+### Phase 1 Stage 1c — Largest-Lake-Body Guard (complete 2026-06-13)
+
+Status: **COMPLETE — A1-A8 GREEN.** Acceptance: `outputs/phase1_stage1c/acceptance_and_artifacts.py`.
+
+**Guard swap:** replaced `exterior_water_fraction > EXTERIOR_WATER_CEILING (0.12)` with `largest_water_body_fraction > LARGE_BODY_CEILING (0.10)` as the sole large-water world-acceptance guard. Old guard retired: it was an area measure firing on an edge-connectivity event (interior lakes merging to the boundary), so it over-rejected valid large-lake continental worlds. New guard cuts on the single largest connected water body — the ecologically meaningful statistic (body too large to walk around → inland-sea class → deferred to §STAGE-GEOSTRUCT).
+
+**New `characterize_map()` fields:** `largest_water_body_fraction`, `water_body_count`, `characteristic_water_body_size` (median, cells), `characteristic_interlake_patch_size` (median land-component size, cells). Helper `_component_sizes(mask)` added (4-nbr BFS, generic boolean mask). `guard_exterior_water_fail` kept as diagnostic (not in `invalid_substrate`). `guard_large_body_fail` added to `invalid_substrate`.
+
+**Discovery branch 1B:** `largest_body_fraction` pre-existed from `_water_bodies()`. Exposed canonically as `largest_water_body_fraction`; `largest_body_fraction` kept as backward-compat alias.
+
+**Sweep:** waterK [0,1], 21 steps × 5 seeds. Guard fires at waterK=0.85 (seeds 42, 7 first). Guard does NOT fire at wK=0.80 under new metric (contrast: old exterior guard fired there). ARTIFACT 1 in sweep output shows the full distribution; ceiling pending supervisor decision.
+
+**Open items from Stage 1c:**
+- **LARGE_BODY_CEILING = 0.10 (PROVISIONAL, not locked):** the 0.10 ceiling is a scope decision, not a discovered threshold. See §DECISION-LAKE-BODY-GUARD below. Supervisor must confirm the ceiling value against the seen ARTIFACT 1 curve. Candidate values 0.08/0.10/0.12 all cross in the wK=0.80–0.90 band.
+- **Forward note (flood dynamics):** flooded cells must NOT trip the single-body guard. A flood event is a transient wetland/swamp state, not a water body. Handled when stochastic-shock stage is built.
+
+### §DECISION-LAKE-BODY-GUARD (decisions register, 2026-06-13)
+
+**Decision:** Replace `exterior_water_fraction` guard with `largest_water_body_fraction > LARGE_BODY_CEILING` (Stage 1c). See `ARCHITECTURE.md § 12.1-K`.
+
+**Rationale:** exterior_water_fraction fires when interior lakes merge to the map boundary (edge-connectivity event, not ecological). The correct criterion is a single water body large enough to be functionally an inland sea (Lake Superior class — cannot be walked around; produces coastal dynamics not yet implemented in this arc).
+
+**Provisional ceiling:** LARGE_BODY_CEILING = 0.10 (≈100,000 km² at 100 km²/cell). **PROVISIONAL — supervisor decision required.**
+
+**Known scope gap:** excluding single-body-dominated worlds removes large-water-barrier geography from the C vs Si comparison. Deferred to §STAGE-GEOSTRUCT.
 
 ### §STAGE-GEOSTRUCT — Geographic-structure generation (DEFERRED, stage number TBD)
 
 **Status:** Deferred. On the roadmap as a committed-but-unscheduled destination. Do NOT build now.
 
-**Scope decision (supervisor, 2026-06-13):** The current arc stays **continental** — interior water (lakes) only; no ocean/sea coast; no exterior coastline generation. The `EXTERIOR_WATER_CEILING = 0.12` guard enforces this by intent; excluding coastal/ocean worlds is the desired behaviour for the current arc.
+**Scope decision (supervisor, 2026-06-13):** The current arc stays **continental** — interior water (lakes) only; no ocean/sea coast; no exterior coastline generation. The `LARGE_BODY_CEILING` guard (Stage 1c) enforces this by rejecting inland-sea worlds; excluding coastal/ocean worlds is the desired behaviour for the current arc. (Note: `EXTERIOR_WATER_CEILING = 0.12` is retained as a diagnostic constant but no longer gates world acceptance.)
 
 Geographic-structure generation is a large deliverable and is deferred to its own stage, to be built **only alongside the dynamics that make geographic structure meaningful** (seafaring / tier-3 offshore resources, regional connectivity, traversal). Consistent with §DECISION-NO-RIVERS: terrain is not built ahead of its mechanic.
 
