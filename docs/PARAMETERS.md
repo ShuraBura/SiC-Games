@@ -216,7 +216,7 @@ Cell values use the **lognormal `(mean, std)`** draw (MECHANISMS §9a.6). `FORAG
 |------|--------|------|------|--------|--------|
 | NPP scale factor | NPP_GM2_SCALE | **3400.0** | — | LOCKED | npp_gm2 = npp × 3400. Tallavaara 2018 anchor: npp≈0.4 → 1360 g/m²/yr (2026-06-13). |
 | Shore bonus | SHORE_BONUS_KCAL | **1491.5** | — | LOCKED | Bird 1997 Meriam reef-flat intertidal mean; additive on land-shore cells (2026-06-13). |
-| Wetland forage | — | **1428.3** | **142.8** [10%-DEFAULT] | LOCKED (mean) | Cunningham, Okavango "Wet." Std: 10% default (source not in repo). |
+| Wetland forage | FORAGE_KCAL_STD[WETLAND] | **1428.3** | **3362** [LIT] | LOCKED (mean) | Cunningham diss (A1.4): mean(Wet)=1428.3, median(Wet)=558.7 (n≈286, skewed) → lognormal std (CV 2.35). Real USO-foraging spread (2026-06-15). |
 | Forest forage | FORAGE_KCAL_STD[FOREST] | **2630.0** | **600** [LIT] | LOCKED (mean) | Hill 1987, Ache palm. Std = spread across palm-product rates {2356,3219,2436,2243,1331} (p.20). |
 | Savanna forage | — | **257.7** | **25.8** [10%-DEFAULT] | LOCKED (mean) | Berbesque & Marlowe 2009, Hadza tuber. Std: 10% default (source not in repo). |
 | Grassland forage | — | **1125.0** | **112.5** [10%-DEFAULT] | LOCKED (mean) | Hurtado & Hill 1987, Cuiva root. Std: 10% default (source not in repo). |

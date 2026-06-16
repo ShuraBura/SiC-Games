@@ -52,9 +52,10 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 # None → std not yet anchored in literature → falls back to the terrain field's natural
 # spread (legacy mean-only scaling), tagged PENDING. See MECHANISMS §9a.6.
 FORAGE_KCAL_STD = {
+    BIOME_WETLAND: 3362.0,    # Cunningham diss: mean(Wet)=1428.3, median=558.7 → lognormal std (CV 2.35, skewed USO returns) [LIT]
     BIOME_FOREST:   600.0,    # std across Hill 1987 palm-product rates {2356,3219,2436,2243,1331} [LIT]
     BIOME_DESERT:   368.0,    # O'Connell & Hawkes 1984 range 650–1925 → uniform std=(1925-650)/√12 [RANGE-DERIVED]
-    # WETLAND / SAVANNA / GRASS / MOUNTAIN absent → DEFAULT_STD_FRAC fallback (10% of mean)
+    # SAVANNA / GRASS / MOUNTAIN absent → DEFAULT_STD_FRAC fallback (10% of mean; source papers not in repo)
 }
 
 # ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
