@@ -47,6 +47,17 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
     BIOME_MOUNTAIN: 5387.0,   # Rhode & Rhode 2015, limber pine unhulled
 }
 
+# ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
+# [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
+# Per-biome target means (kcal/forager-hr) from SiC_Games_Game_Return_Rate_Table.md §F.2.
+# Wetland, Mountain, Water: UNANCHORED → game_kcal zeroed (not present in this dict).
+GAME_KCAL_TARGETS = {
+    BIOME_FOREST:  7749.0,   # Hill et al. 1987 Table 2 mean of 7 species [NATIVE, handling-only]
+    BIOME_SAVANNA:  518.0,   # Hawkes et al. 1991 all-seasons encounter/scavenge [CONVERTED]
+    BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 [NATIVE kcal/hr stated]
+    BIOME_DESERT:  1201.0,   # Bird et al. 2009 Table 1 mid-range [NATIVE]
+}
+
 # ── Phase 1 Stage 1b constants ─────────────────────────────────────────────
 # Provisional exterior-water guard threshold.
 # Derivation (P1S1b blueprint §3): for N=100 with a t-cell ocean rim,
@@ -56,11 +67,11 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 EXTERIOR_WATER_CEILING = 0.12
 
 # ── Phase 1 Stage 1c constants ─────────────────────────────────────────────
-# Single-largest-water-body ceiling (§DECISION-LAKE-BODY-GUARD).
-# Provisional 0.10 ≈ 100,000 km² at 100 km²/cell; larger than Lake Superior.
-# A body this large is inland-sea class and deferred to §STAGE-GEOSTRUCT.
-# This is a logged scope decision, not a discovered threshold.
-LARGE_BODY_CEILING = 0.10
+# Single-largest-water-body ceiling (§DECISION-LAKE-BODY-CEILING).
+# 0.08 ≈ 80,000 km² at 100 km²/cell — just below Lake Superior (~82,000 km²).
+# Conservative-side choice: reject at inland-sea scale, not above it.
+# A body this large produces coastal dynamics deferred to §STAGE-GEOSTRUCT.
+LARGE_BODY_CEILING = 0.08
 
 _NOISE_G = 257  # noise grid side (wraps on itself)
 
@@ -174,6 +185,9 @@ class WorldFields:
     forage_kcal:   np.ndarray = None  # (N,N) float64 kcal/forager-hr (per-biome + shore bonus)
     npp_gm2:       np.ndarray = None  # (N,N) float64 g/m2/yr (Tallavaara 2018 anchor)
     is_shore:      np.ndarray = None  # (N,N) uint8 land cells with >=1 water nbr (4-nbr)
+    # Phase 1 Blueprint A fields (added 2026-06-14)
+    # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
+    game_kcal:     np.ndarray = None  # (N,N) float64 kcal/forager-hr; 0 at wetland/mountain/water
 
 
 # ── Water-body connected components ───────────────────────────────────────
@@ -476,6 +490,20 @@ def generate_world(knobs: dict) -> WorldFields:
     # Shore modifier: additive bonus on land-shore cells (1491.5 kcal/hr; Bird 1997)
     forage_kcal += is_shore.astype(np.float64) * SHORE_BONUS_KCAL
 
+    # ── game_kcal: per-biome mean-scaling of normalized game[] field ────
+    # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
+    # Wetland (UNANCHORED), Mountain (UNANCHORED), Water (out of scope) → stay 0.
+    # Non-rivalrous (each agent gets full rate); depletion OFF (GD-1 seam).
+    game_kcal = np.zeros((N, N), dtype=np.float64)
+    for b_code, target_mean in GAME_KCAL_TARGETS.items():
+        mask = (biome == b_code)
+        if not mask.any():
+            continue
+        mean_norm = float(game[mask].mean())
+        if mean_norm == 0.0:
+            continue
+        game_kcal[mask] = game[mask] * (target_mean / mean_norm)
+
     # ── Neighbour cost (N,N,4): d=0 N, d=1 S, d=2 W, d=3 E ────────────
     nc = np.ones((N, N, 4), dtype=np.float64)   # sentinel = 1.0 at edges
     nc[1:, :, 0]  = cost[:-1, :]   # north: target (y-1, x)
@@ -486,7 +514,7 @@ def generate_world(knobs: dict) -> WorldFields:
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
-                npp_gm2, is_shore, forage_kcal):
+                npp_gm2, is_shore, forage_kcal, game_kcal):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -496,6 +524,7 @@ def generate_world(knobs: dict) -> WorldFields:
         risk=risk, biome=biome, npp=npp, forestness=forestness,
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
+        game_kcal=game_kcal,
     )
 
 

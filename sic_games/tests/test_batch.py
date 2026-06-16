@@ -59,7 +59,8 @@ _BASE_C = dict(
                         cluster_peak_index=0, cluster_radius=5),
     life_history=dict(forage_age_min=0, forage_age_max_offset=5,
                       eta_min=1.0, eta_old=1.0, eta_fission_offspring=1.0),
-    dormancy=dict(enabled=False),
+    dormancy=dict(enabled=False, tau_trickle=0.3),
+    c2_defection=dict(enabled=True),
     support_pool=dict(enabled=False, r_pool=3, tau_parent=0.0, tau_pool=0.0,
                       k_reserve=5.0, k_draw=3.0, tau_cred=0.0, tau_cred_reward=0.0,
                       rho_carryover=0.0, k_pool_cap=0.0),
@@ -67,10 +68,9 @@ _BASE_C = dict(
     visualization=dict(animate=False, save_static_plots=False),
 )
 
-_BASE_SI = dict(**_BASE_C)
 _BASE_SI = {**_BASE_C, "decision": dict(strategy="si_bounded"),
             "si_bounded": dict(sigma_si=1.051, beta_metabolism=1.0),
-            "dormancy": dict(enabled=False)}
+            "dormancy": dict(enabled=False, tau_trickle=0.3)}
 
 
 def _write_cfg(cfg_dict: dict, path: Path) -> Path:

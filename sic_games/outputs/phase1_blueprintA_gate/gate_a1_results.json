@@ -1,0 +1,42 @@
+{
+  "gate": "A-1",
+  "status": "PASS",
+  "L_short": 500,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "occ_cap_loose": 10,
+  "explosion_bound": 100000,
+  "n_agents_init": 250,
+  "results": [
+    {
+      "seed": 42,
+      "final_pop": 241,
+      "min_pop": 241,
+      "max_pop": 250,
+      "found_alive_below_floor": false,
+      "max_mean_reserve": 100000.0,
+      "reserve_full": 100000.0
+    },
+    {
+      "seed": 43,
+      "final_pop": 243,
+      "min_pop": 243,
+      "max_pop": 250,
+      "found_alive_below_floor": false,
+      "max_mean_reserve": 100000.0,
+      "reserve_full": 100000.0
+    },
+    {
+      "seed": 44,
+      "final_pop": 240,
+      "min_pop": 240,
+      "max_pop": 250,
+      "found_alive_below_floor": false,
+      "max_mean_reserve": 100000.0,
+      "reserve_full": 100000.0
+    }
+  ]
+}

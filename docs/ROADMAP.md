@@ -1,6 +1,6 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-06-13
+**Last updated:** 2026-06-14
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 
@@ -52,11 +52,31 @@ Status: **COMPLETE — A1-A8 GREEN.** Acceptance: `outputs/phase1_stage1c/accept
 
 **Discovery branch 1B:** `largest_body_fraction` pre-existed from `_water_bodies()`. Exposed canonically as `largest_water_body_fraction`; `largest_body_fraction` kept as backward-compat alias.
 
-**Sweep:** waterK [0,1], 21 steps × 5 seeds. Guard fires at waterK=0.85 (seeds 42, 7 first). Guard does NOT fire at wK=0.80 under new metric (contrast: old exterior guard fired there). ARTIFACT 1 in sweep output shows the full distribution; ceiling pending supervisor decision.
+**Sweep:** waterK [0,1], 21 steps × 5 seeds. Guard fires at waterK=0.85 (seeds 42, 7 first). Guard does NOT fire at wK=0.80 under new metric (contrast: old exterior guard fired there). ARTIFACT 1 in sweep output shows the full distribution; ceiling confirmed by supervisor.
 
 **Open items from Stage 1c:**
-- **LARGE_BODY_CEILING = 0.10 (PROVISIONAL, not locked):** the 0.10 ceiling is a scope decision, not a discovered threshold. See §DECISION-LAKE-BODY-GUARD below. Supervisor must confirm the ceiling value against the seen ARTIFACT 1 curve. Candidate values 0.08/0.10/0.12 all cross in the wK=0.80–0.90 band.
+- ~~**LARGE_BODY_CEILING = 0.10 (PROVISIONAL):**~~ **Resolved 2026-06-13: supervisor-locked at 0.08.** See §DECISION-LAKE-BODY-CEILING below.
 - **Forward note (flood dynamics):** flooded cells must NOT trip the single-body guard. A flood event is a transient wetland/swamp state, not a water body. Handled when stochastic-shock stage is built.
+
+### Phase 1 Blueprint A — Agent-Terrain Migration + Static Game (complete 2026-06-14)
+
+Status: **COMPLETE — Gate A-1 GREEN (all 4 rails), A-2 blocks GREEN, 430 tests.** Gate: `outputs/phase1_blueprintA_gate/gate_a1.py`. Results: `outputs/phase1_blueprintA_gate/gate_a1_results.json`.
+
+**Phase A-1: C agent substrate migration.** SugarField removed from the C harvest path. C agents now harvest from `forage_kcal` (WorldFields) via `TerrainField` adapter. kcal economy: burn=75,000 kcal/step (2,500 kcal/day × 30 days/step [NOMINAL]), intake=rate_kcal/hr × 180 kcal/step (6 hr/day × 30 days [NOMINAL]). Reserve: `reserve_full=100,000 kcal` [PLACEHOLDER MR-1], `reserve_floor=20,000 kcal` [PLACEHOLDER MR-1]. Non-rivalrous harvest [PROVISIONAL, CC-1 seam]. New: `TerrainField` adapter (`terrain_field.py`), `TerrainWorld` Mesa model (`phase1_model.py`), `KcalBurnModel` (`agents/costs.py`), `KcalEconomyConfig` (`config.py`). Old Sugarscape sugar-cluster constants declared DORMANT-SUPERSEDED-FOR-C (PARAMETERS.md §13.1; ARCHITECTURE.md §12.1-L).
+
+**Phase A-2: Static game mechanics.** `game_kcal` field in `WorldFields` (biome-scaled via `GAME_KCAL_TARGETS`; zeroed at water/wetland/mountain; tagged PROVISIONAL). `sex` attribute on `BaseAgent` ("female"/"male"; A2.1). Sex-based stream selection: female default=forage; male default=game; switch only under deficit when other stream covers better (A2.2). Child age-gate binary: intake=0 below `age_productive_min=15` [JV-1 seam] (A2.4). Three seams registered in DEFERRED_MECHANICS.md: GD-1 (game depletion), CC-1 (non-rivalrous cap + kcal re-derivation), JV-1 (juvenile curve).
+
+**Gate A-1 rails (correctness-only, forage-only path):** L_short=500 steps, S=3 seeds (42/43/44), n_agents=250, occ_cap_loose=10/cell. RAIL 1: pop>0 ✓ (240–243); RAIL 2: pop≤100,000 ✓ (max=250); RAIL 3a: no alive-below-floor ✓; RAIL 3b: max_mean_reserve<10×reserve_full ✓ (capped at 100,000).
+
+**Architecture notes:** `lifespan_months=900` [PLACEHOLDER] added to `KcalEconomyConfig` to resolve max_age unit-conversion conflict (legacy Sugarscape `max_age_dist` was in steps, not months; 80 steps at 1 step=1 month = 6.7 years → all agents extinct by step 80). ARCHITECTURE.md §15.7. 7 agreed-but-deferred mechanics in DEFERRED_MECHANICS.md.
+
+**Deferred items from Blueprint A:**
+- **GD-1 (game depletion):** `game_kcal` per-cell field is read-only (non-destructive harvest). Stock + regrowth mechanic deferred. DEFERRED_MECHANICS.md GD-1.
+- **CC-1 (non-rivalrous cap):** Each agent gets full per-cell rate independently (no sharing). Rivalry and NPP ceiling re-derivation deferred. DEFERRED_MECHANICS.md CC-1.
+- **JV-1 (juvenile income curve):** Binary gate only (0 below 15, full adult above). Graded age curve deferred. DEFERRED_MECHANICS.md JV-1.
+- **RS-1 (risk-sensitivity), MR-1/MR-2 (reserve anchoring/provision), PL-1 (pool scale):** In DEFERRED_MECHANICS.md.
+- **A-3 performance audit:** Separate blueprint. TerrainWorld step-time profiling at Phase 1 agent counts needed before long campaigns. Not started.
+- **Seasonal forage:** Amplitude modulation on `forage_kcal` (and `game_kcal`); deferred to a future stage.
 
 ### §DECISION-LAKE-BODY-GUARD (decisions register, 2026-06-13)
 
@@ -64,9 +84,33 @@ Status: **COMPLETE — A1-A8 GREEN.** Acceptance: `outputs/phase1_stage1c/accept
 
 **Rationale:** exterior_water_fraction fires when interior lakes merge to the map boundary (edge-connectivity event, not ecological). The correct criterion is a single water body large enough to be functionally an inland sea (Lake Superior class — cannot be walked around; produces coastal dynamics not yet implemented in this arc).
 
-**Provisional ceiling:** LARGE_BODY_CEILING = 0.10 (≈100,000 km² at 100 km²/cell). **PROVISIONAL — supervisor decision required.**
-
 **Known scope gap:** excluding single-body-dominated worlds removes large-water-barrier geography from the C vs Si comparison. Deferred to §STAGE-GEOSTRUCT.
+
+### §DECISION-LAKE-BODY-CEILING (decisions register, 2026-06-13)
+
+**Decision (supervisor-locked 2026-06-13):** LARGE_BODY_CEILING = **0.08**. See `PARAMETERS.md §12.3` for the parameter entry; `ARCHITECTURE.md §12.1-K` for implementation detail.
+
+**Rationale:** 0.08 ≈ 80,000 km² at 100 km²/cell — just below Lake Superior (~82,000 km²). A single connected water body exceeding 0.08 of map area is rejected as functionally an inland sea: it cannot be walked around and produces coastal dynamics (fetch, boat-crossing, regional fragmentation) this continental arc does not implement. Conservative-side choice: reject at below-Superior scale, not above it. The Stage 1c sweep showed the guard fires at wK=0.85 under this ceiling (waterK range in which no scientifically meaningful world is lost); at wK=0.80 the guard does not fire. This is deferral, not exclusion — large-water dynamics committed to §STAGE-GEOSTRUCT.
+
+**Guard logic (single condition):** `largest_water_body_fraction > LARGE_BODY_CEILING`. NO conjunctive condition; no dominance/body-count term. A single body large enough is rejected regardless of surrounding lakes.
+
+### §STAGE-RECAL — Recalibration on rebuilt substrate (DEFERRED, committed)
+
+**Status:** Deferred. Pre-registered, gated recalibration stage. Do NOT build now.
+
+**Scope:** After continental terrain + resource ecology are built, §STAGE-RECAL re-derives the PROVISIONAL (dormant) parameter set on the new substrate and re-tests superseded hypotheses (including H1(ii) — see `HYPOTHESES.md §H1ii-RETEST`).
+
+**What §STAGE-RECAL must do:**
+1. **Re-derive DORMANT parameters**: τ_parent (0.0) and k_pool_cap (0.0) were set against inactive mechanics in Phase 0. Once terrain makes those mechanics fire for the first time, their values must be calibrated against observed behavior, not inherited from inactive-mechanic runs.
+2. **Re-test H1(ii)**: The Sugarscape-era inversion finding (C > Si at A=0.75/T=T*) does not carry forward as confirmed on the terrain substrate. The re-test is pre-registered in `HYPOTHESES.md §H1ii-RETEST`.
+3. **Confirm ACTIVE guideposts**: ACTIVE locked params (τ_trickle, σ_inherit, p_fission_Si, p_max_C, c2_defection) are guideposts, not re-derived from scratch — sanity-check they remain plausible at the new substrate scale.
+
+**What §STAGE-RECAL is NOT:**
+- NOT open knob-tuning. Each parameter must have a pre-committed calibration target and an acceptance check. Recalibration must not be a free search.
+- NOT the writing of document updates. Document rewrites flow FROM the stage's results, not from deliberation or web search (web supplies calibration *anchors* only).
+- NOT reachable until the mechanics those parameters govern actually fire in terrain runs.
+
+**Pre-registration requirement:** before §STAGE-RECAL runs, the following must be pre-committed: which parameters are targets, the calibration target per parameter, and the acceptance check. This pre-commitment must be logged in HYPOTHESES.md before the stage executes.
 
 ### §STAGE-GEOSTRUCT — Geographic-structure generation (DEFERRED, stage number TBD)
 

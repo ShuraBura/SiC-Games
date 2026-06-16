@@ -37,6 +37,8 @@ class BaseAgent(mesa.Agent):
         traits: TraitVector | None = None,
         strategy: str = "greedy",
         lh_config=None,
+        reserve_floor: float = 0.0,
+        sex: str = "female",
     ) -> None:
         super().__init__(model)
         self.vision = vision
@@ -46,6 +48,9 @@ class BaseAgent(mesa.Agent):
         self.age = 0
         self.alive = True
         self.strategy = strategy  # Stage 4.1a: "carbon", "si_bounded", or "greedy"
+        # Phase 1 Blueprint A: kcal economy fields (default 0.0 = backward-compatible)
+        self.reserve_floor: float = reserve_floor
+        self.sex: str = sex  # "female" or "male"; A2.1
 
         # Stage 4.1b: age-efficiency ramp η(a). lh_config=None → η=1.0 always.
         if lh_config is not None:
@@ -224,5 +229,5 @@ class BaseAgent(mesa.Agent):
 
         self.age += 1
 
-        if self.wealth <= 0 or self.age >= self.max_age:
+        if self.wealth <= self.reserve_floor or self.age >= self.max_age:
             self.alive = False

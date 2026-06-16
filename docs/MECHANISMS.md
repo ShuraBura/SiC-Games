@@ -10,7 +10,7 @@
 
 **Provenance discipline:** Every factual row carries a provenance tag pointing at the source blueprint + section. Citations are tagged `[VERIFIED]` (present in `LITERATURE.md`), `[INLINE]` (cited in a blueprint but *not* in `LITERATURE.md`), or `[UNVERIFIED]` (Claude believes this is the source but it has not been confirmed against the paper — **must be checked before use in any write-up**).
 
-**Parameter values:** authoritative values + lock/sweep history live in the parameter registry (interim: the locked-param table in `sic_games/CLAUDE.md`; → `PARAMETERS.md` when extracted). This file *references* values; §14 indexes parameter names by owning mechanism section. Do not restate values as facts here.
+**Parameter values:** authoritative values + lock/sweep history live in **`docs/PARAMETERS.md`** (extracted 2026-06-08, supersedes all interim tables). This file *references* values; §14 indexes parameter names by owning mechanism section. Do not restate values as facts here.
 
 ---
 
@@ -257,7 +257,7 @@ The C-vs-Si reproduction difference is **mostly C1**: same machinery with differ
 
 **Age-efficiency ramp η(a)** (Stage 4.1b, C only from Stage 4.3): juvenile agents at age<15 harvest at η_min=0.3, linearly rising to 1.0 at a_forage_min=15; elder agents decline from 1.0 at a_forage_max toward η_old=0.4 at τ_max. Si fission offspring start at η=1.0 (fully capable — fission produces a near-copy of an established adult). `[INLINE]` Gurven & Kaplan 2006 — cited Stage 4.1b §1.2, not in LITERATURE.md.
 
-**σ_inherit note (`ARCHITECTURE.md` §12.1-D):** the σ_inherit lock at 0.10 (Stage 5.2) is under review. The Stage 5.2 Task 3 selection gate used Gini(ψ) — the wrong statistic for a bounded [0,1] trait (use SD) and the wrong target trait (c1/c2 carry the theory, not ψ). σ_inherit=0.10 should be treated as **OPEN/under review** pending a corrective directive targeting c1/c2 diversity. See `ARCHITECTURE.md` §12.1-D.
+**σ_inherit (PARAMETERS.md §7, LOCKED at 0.10).** The Stage 5.2 Task 3 gate used Gini(ψ) — the wrong statistic (use SD) and the wrong target trait (c1/c2 carry the theory, not ψ). This is a known methodology problem recorded in `ARCHITECTURE.md` §12.1-D and OWE-9; the corrective sweep (targeting c1/c2 diversity, ≥8 seeds) is on the backlog. However the LOCKED status stands — PARAMETERS.md is authoritative, and the corrective sweep is how the value is *confirmed or revised*, not a reason to treat it as unlocked. See `ARCHITECTURE.md` §12.1-D for the full design-log entry.
 
 ---
 
@@ -282,6 +282,59 @@ The C-vs-Si reproduction difference is **mostly C1**: same machinery with differ
 **Critical period T\* analysis:** the main scientific outcome of Stages 4.2–4.5 is the T* bracketing — the period at which C transitions from survival to collapse (T* > 500 for C at A=0.75) and Si collapses earlier (T*_Si ∈ (68,87) at A=0.75, Stage 5). H1(ii) inversion finding: C survives where Si collapses, at high-amplitude long-period shocks.
 
 ---
+
+## 9a. kcal economy (Phase 1 Blueprint A, 2026-06-14)
+
+**Supersedes the Sugarscape sugar economy for C agents.** See ARCHITECTURE.md §12.1-L for the dated decision-log entry and PARAMETERS.md §13 for all tagged values. Summary here; authoritative values in PARAMETERS.md.
+
+### 9a.1 Per-month conversion (LOCKED: 1 step = 1 month)
+
+| Quantity | Conversion | Result | Tag |
+|---|---|---|---|
+| Burn per step | 2,500 kcal/day × 30 days | 75,000 kcal/step | [NOMINAL] |
+| Intake per step | rate_kcal/hr × 6 hr/day × 30 days | rate × 180 kcal/step | [NOMINAL, 6 hrs/day] |
+| Lifespan | 60–100 years × 12 months/year | 720–1,200 steps; placeholder 900 | [PLACEHOLDER] |
+
+Temporal resolution `1 step = 1 month` is a STANDING CONSTRAINT (ARCH §9.3 OWE-1). All kcal quantities must be expressed per-step for integration.
+
+### 9a.2 Reserve integration
+
+```
+reserve_t+1 = min(reserve_t + intake_t, reserve_full)  − burn_per_step
+death:  reserve ≤ reserve_floor   (reserve_floor = 20,000 kcal [PLACEHOLDER MR-1])
+```
+
+- `reserve_full = 100,000 kcal` [PLACEHOLDER MR-1] — physiological estimate; see PARAMETERS.md §13.2
+- `reserve_floor = 20,000 kcal` [PLACEHOLDER MR-1] — starvation floor estimate
+- `reserve_floor` attribute on `BaseAgent`; default 0.0 (backward-compatible for Sugarscape runs)
+
+### 9a.3 Sex-based stream selection (A2.2, C only)
+
+**Category: C1** (shared machinery, sex as a parameter-like switch).
+
+| Sex | Default stream | Switch condition | Switch target |
+|---|---|---|---|
+| Female | Forage (forage_kcal) | forage_rate_step < burn AND game_rate_step > forage_rate_step | Game (if covers deficit better) |
+| Male | Game (game_kcal) | game_rate_step < burn AND forage_rate_step > game_rate_step | Forage (if covers deficit better) |
+| Either | Default | Both streams < burn AND neither covers better than other | Hold default; fall to floor; mortality handles it |
+
+No new tunable threshold beyond the A-1 placeholders. Risk-sensitivity (variance-reduction) deferred to RS-1 (DEFERRED_MECHANICS.md).
+
+### 9a.4 Three seams
+
+| Seam ID | What is deferred | Hook | Status |
+|---|---|---|---|
+| GD-1 | Game depletion | `game_kcal` per-cell field (read-only → writeable stock + regrowth) | Depletion OFF; field exposed. DEFERRED_MECHANICS.md. |
+| CC-1 | Non-rivalrous cap; kcal ceiling re-derivation | `terrain_field.py harvest()/game_level()` returns full per-agent rate; rivalry switches on here | Rivalry OFF [PROVISIONAL]. DEFERRED_MECHANICS.md. |
+| JV-1 | Age-graded juvenile curve | `is_juvenile()` hook in step loop; binary gate now | Binary gate (0 below a_forage_min=15; full above). DEFERRED_MECHANICS.md. |
+
+### 9a.5 forage_kcal and game_kcal computation (terrain.py)
+
+Both fields computed by biome mean-scaling the underlying normalized terrain field:
+- `forage_kcal[mask] = forage[mask] × (FORAGE_KCAL_TARGETS[biome] / mean_norm(forage[mask]))`
+- `game_kcal[mask]  = game[mask]  × (GAME_KCAL_TARGETS[biome] / mean_norm(game[mask]))`
+
+Biomes NOT in the target dict (water, wetland for game; only water for forage at 0) stay at 0. All cell values PROVISIONAL pending CC-1. See PARAMETERS.md §12.4 (forage) and §13.3 (game) for the anchored biome values.
 
 ## 9. World / resource substrate → see `ARCHITECTURE.md` §9
 

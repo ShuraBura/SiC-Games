@@ -256,6 +256,11 @@ def test_si_cred_stays_zero(tmp_path):
         "decision": {"strategy": "greedy"},
         "agents": {"initial_population": 20},
         "si_cred": {"enabled": False},
+        "dormancy": {"tau_trickle": 0.3},
+        "reproduction": {"inherit_sigma": 0.10},
+        "birth_si": {"p_fission_max": 0.065},
+        "birth_c": {"p_max": 0.12},
+        "c2_defection": {"enabled": True},
     }
     cfg_path = tmp_path / "cfg.yaml"
     cfg_path.write_text(yaml.dump(cfg_data))

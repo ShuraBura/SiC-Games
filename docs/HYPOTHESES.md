@@ -133,4 +133,31 @@ Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, ar
 
 ---
 
-*End of HYPOTHESES — consolidated 2026-06-05. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*
+---
+
+## §H1ii-RETEST — H1(ii) re-test on rebuilt terrain + resource substrate (pre-registered)
+
+**Registered:** 2026-06-13 (Consolidated Reconciliation directive).
+**Status:** OPEN — pre-registered for re-test. NOT a standing confirmed result.
+
+**Background:** H1(ii) (Si is more resilient than C under periodic resource shocks) was confirmed INVERTED in Phase 0 Sugarscape-era runs (Stage 4.2–Stage 5.1): C persisted at A=0.75/T=200; Si collapsed (dormancy cliff). The Stage 5 ensemble confirmed the inversion 5/5 seeds. The Sugarscape-era finding is recorded in `RESULTS.md R-1`.
+
+**Why the prior confirmation does NOT carry forward:** The Phase 0 confirmation was on the homogeneous flat Sugarscape substrate with no terrain. Phase 1 rebuilds the resource ecology on a continental terrain generator (heterogeneous biomes, realistic foraging returns, spatial structure). The terrain substrate is expected to qualitatively alter the resource-access dynamics that drove the dormancy cliff. A finding on the old substrate does not pre-commit the result on the new substrate — it is a prior, not a standing fact. The inversion may hold, deepen, reverse, or become parameter-dependent under terrain. Pre-registering the re-test here (before running) is the anti-HARKing discipline.
+
+**What is pre-committed:**
+- **Claim:** The strategy resilience inversion (C > Si at A=0.75/T=T*) either holds, reverses, or becomes conditional on terrain type under Phase 1 terrain + resource ecology.
+- **Test specification:** Multi-seed (≥5 seeds, CRN), C vs Si matched worlds, Phase 1 terrain substrate active, at least two amplitude/period combinations bracketing the Phase 0 T* = (68,87) window. Statistic: proportion of seeds where C survives to t=1500 vs Si extinct.
+- **Calibration prerequisite:** OWE-14 (re-confirm at calibrated N_carry=4100, ≥3 seeds) must complete before this re-test is authoritative at the 100×100 scale.
+- **Pre-committed outcomes:**
+  - **Holds:** C survives, Si collapses, same mechanism (dormancy cliff) → terrain does not rescue Si; original finding extends to new substrate.
+  - **Reverses:** Si survives, C collapses → terrain creates a resource regime where C's JT-based clustering becomes a liability; requires mechanism explanation.
+  - **Conditional:** outcome depends on terrain type (biome mix, water coverage) → terrain is a moderator; report the conditioning variable.
+  - **Indeterminate:** neither pure collapse/survival → parameter-dependent; report the T*/A* shift and mechanism.
+
+**Adjudication stage:** §STAGE-RECAL (ROADMAP, DEFERRED). This re-test is one of the targets for that stage.
+
+**Resolution:** *(none yet — OPEN, pre-registered 2026-06-13)*
+
+---
+
+*End of HYPOTHESES — consolidated 2026-06-05; §H1ii-RETEST appended 2026-06-13. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*

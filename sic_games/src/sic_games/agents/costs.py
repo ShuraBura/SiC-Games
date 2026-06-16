@@ -18,6 +18,20 @@ class MetabolicOnly:
         return float(agent.metabolism)
 
 
+class KcalBurnModel:
+    """Phase 1 Blueprint A: kcal burn per step.
+
+    burn_per_step = burn_kcal_per_day * days_per_month
+    [NOMINAL — adult HG expenditure ~2500 kcal/day; tunable, grounding pending MR-1]
+    """
+
+    def __init__(self, burn_kcal_per_day: float = 2_500.0, days_per_month: int = 30) -> None:
+        self.burn_per_step = float(burn_kcal_per_day) * days_per_month
+
+    def step_cost(self, agent: "BaseAgent", actions_taken: dict) -> float:
+        return self.burn_per_step
+
+
 class ScaledMetabolicCost:
     """Stage 4.3: Si differential metabolism — cost = metabolism × beta.
 

@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-06-08 (PARAMETERS.md extracted). All eleven homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
+**Last updated:** 2026-06-14 (MODEL_SPEC.md created — resource-layer methodology home; game return-rate table added). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
 
 ---
 
@@ -11,6 +11,7 @@
 | If your question is about… | Go to | The "home" owns |
 |---|---|---|
 | Where am I, what's next, what's been tried/deferred | **ROADMAP.md** | Stage sequence, status, pending/deferred items, open questions (Q-list) |
+| What mechanics are agreed but deferred (seam placed, literature anchor exists) | **DEFERRED_MECHANICS.md** | Named deferred mechanics with seam + literature anchor + status |
 | The big-picture structure / seams / how the pieces fit | **ARCHITECTURE.md** | System decomposition, module seams, data flow, design-decisions log |
 | How a specific mechanism *works* (the rule/equation) | **MECHANISMS.md** | Per-construct definitions, ranges, inheritance channels, mechanism logic, C/Si classification |
 | What is parameter X, its value, when it was locked, sweep history | **PARAMETERS.md** | The authoritative value + lock/sweep/retire history of every parameter |
@@ -19,6 +20,7 @@
 | What do we actually *know* (established findings) | **RESULTS.md** | Headline findings ledger, in prose |
 | Where is the run/report/benchmark that showed X | **ARTIFACTS.md** | Index of every report/benchmark/diagnostic + location + headline |
 | What grounds this mechanic in the literature | **LITERATURE.md** | Citations: what was lifted, what rejected, why |
+| How were literature values processed into resource-layer inputs; seasonal architecture | **MODEL_SPEC.md** | Resource-layer methodology record: formula, denominator rules, unanchored policy, seasonal signal architecture, star-mechanics seam, catastrophe seam stub |
 | Did we try X already, and why was it abandoned | **DEAD_ENDS.md** | Retired directions + the reason each was retired |
 | Which document owns this kind of fact | **INDEX.md** (this file) | The routing table itself |
 
@@ -51,8 +53,26 @@
 | ARTIFACTS.md | live | Code | when any report/benchmark/diagnostic is emitted |
 | LITERATURE.md | live (full bibliography + Si-Cred synthesis) | Code + supervisor | when a source is consulted |
 | DEAD_ENDS.md | live (DE-1) | Code + supervisor | when an approach is retired |
+| MODEL_SPEC.md | **live** (created 2026-06-14; resource-layer methodology only) | Code + supervisor | when a resource-layer formula, denominator rule, or seasonal seam changes |
+| SiC_Games_Game_Return_Rate_Table.md | **live** (created 2026-06-14; derived view) | Code | when a game biome cell is anchored, updated, or unanchored policy changes |
+| DEFERRED_MECHANICS.md | **live** (created 2026-06-14; 7 entries: GD-1 through PL-1) | Code + supervisor | when a mechanic is deferred here, promoted to a blueprint, or its seam changes |
 
-*Also under `docs/`:* **DOCS_CHARTER.md** (the governance document this index implements). The former MODEL_SPEC.md was split into ARCHITECTURE + MECHANISMS on 2026-06-06 and archived.
+*Also under `docs/`:* **DOCS_CHARTER.md** (the governance document this index implements). The former MODEL_SPEC v0.2 was split into ARCHITECTURE + MECHANISMS on 2026-06-06 and is archived at `archive/superseded/`. The new MODEL_SPEC.md is scoped to resource-layer methodology only and does not reconstitute v0.2.
+
+**Phase 1 resource-layer routing (added 2026-06-14):**
+| Question | Home |
+|---|---|
+| Game return rates by biome (kcal/hr, cell values, UNANCHORED gaps) | **SiC_Games_Game_Return_Rate_Table.md** |
+| Forage return rates by biome | **SiC_Games_Forage_Return_Rate_Table.md** |
+| Resource-layer formula, constants (edible_fraction, energy_density) | **MODEL_SPEC.md §4.1.1** |
+| Denominator standardisation rule; forest construct-seam | **MODEL_SPEC.md §4.1.2** |
+| Unanchored cell policy (wetland, mountain) | **MODEL_SPEC.md §4.1.3** |
+| Forage seasonal signal architecture; empirical anchors by biome | **MODEL_SPEC.md §4.1.4** |
+| Game seasonal signal (fat-value vs. aggregation-access) | **MODEL_SPEC.md §4.1.5** |
+| Star-mechanics seam; amplitude coupling point | **MODEL_SPEC.md §4.1.6** |
+| Climate catastrophe seam (STUB) | **MODEL_SPEC.md §4.1.7** |
+| Survey B game sources (Hawkes 1991, Bird 2009, Bliege Bird 2001, etc.) | **LITERATURE.md §Survey B** |
+| Locked parameter values (energy_density, edible_fraction, forage kcal targets) | **PARAMETERS.md** |
 
 **Stage 7 terrain routing (added 2026-06-10):**
 | Question | Home |
@@ -78,5 +98,7 @@ SiC-Games/
 ├── sic_games/           the model code (untouched) + CLAUDE.md (master agent contract)
 └── archive/             superseded docs, .bak litter, prior code snapshots (never hard-deleted)
 ```
+
+`context/` (non-canonical) — derived chat-bridge artifacts: `CANONICAL_FACTS.md` (fact-file cache, regenerated by CC from docs/ homes) + `PENDING_CC.md` (pending-delta buffer, append-only). NON-AUTHORITATIVE; on any conflict, the eleven `docs/` homes win. See `context/README.md` and CLAUDE.md rules 14–15.
 
 *End of INDEX.*

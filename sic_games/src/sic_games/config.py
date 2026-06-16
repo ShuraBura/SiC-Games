@@ -73,11 +73,12 @@ class JointTaskConfig(BaseModel):
 class C2DefectionConfig(BaseModel):
     """Stage 5.2 Task 1: c2 joint-task defection hook (C only).
 
-    enabled=False (default) preserves bit-identical behaviour to Stage 5.1.
+    enabled=True (LOCKED Stage 5.2, PARAMETERS.md §4). Default changed from
+    False (Stage 5.1 backward-compat) to True to match the locked production value.
     When enabled: C agents may defect from a joint task when their solo harvest
     exceeds their Matthew share. p_defect_i = c2_i in that case, else 0.
     """
-    enabled: bool = False
+    enabled: bool = True
 
 
 class DeffuantConfig(BaseModel):
@@ -147,7 +148,7 @@ class CarryingCostConfig(BaseModel):
 
 
 class BirthCConfig(BaseModel):
-    p_max: float = Field(0.02, gt=0.0, le=1.0)
+    p_max: float = Field(0.12, gt=0.0, le=1.0)  # LOCKED 0.12 Stage 4.5 full config (PARAMETERS.md §7)
     tau_sub: float = Field(5.0, gt=0.0)           # subsistence floor = metabolism * tau_sub
     r_stress: float = Field(0.75, gt=0.0)          # legacy: stress zone boundary = r_stress * mean_w
     k_stress: Optional[float] = None              # Stage 4.1b: stress zone = theta_sub + k_stress*metabolism
@@ -163,7 +164,7 @@ class BirthCConfig(BaseModel):
 
 
 class BirthSiConfig(BaseModel):
-    p_fission_max: float = Field(0.02, gt=0.0, le=1.0)
+    p_fission_max: float = Field(0.065, gt=0.0, le=1.0)  # LOCKED 0.065 Stage 4.4 (PARAMETERS.md §7)
     fission_wealth_mult: float = Field(1.5, gt=0.0)  # theta_fission = mean_wealth * mult
     rep_age_min: int = Field(15, ge=0)
     rep_age_max: Optional[int] = None
@@ -172,7 +173,7 @@ class BirthSiConfig(BaseModel):
 class ReproductionConfig(BaseModel):
     mode: Literal["random", "biparental"] = "random"
     parent_radius: int = Field(3, ge=1)
-    inherit_sigma: float = Field(0.05, ge=0.0)
+    inherit_sigma: float = Field(0.10, ge=0.0)  # LOCKED 0.10 Stage 5.2 (PARAMETERS.md §7)
     coordinator: Literal["individual", "hivemind"] = "individual"
     lambda_inheritance: float = Field(0.0, ge=0.0, le=1.0)  # wealth inheritance (0=none)
 
@@ -195,6 +196,31 @@ class PerturbationConfig(BaseModel):
     # 0.5 = symmetric (default, preserves prior behaviour).
     # 0.6 = trough phase 60% of period, peak recovery 40%.
     trough_fraction: float = Field(0.5, ge=0.0, le=1.0)
+
+
+class KcalEconomyConfig(BaseModel):
+    """Phase 1 Blueprint A: kcal economy parameters.
+
+    Supersedes the Sugarscape sugar economy for C agents (PARAMETERS.md §13).
+    Placeholders tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring).
+    Nominals tagged [NOMINAL] are pending literature grounding.
+    Full ceiling re-derivation is CC-1 (DEFERRED_MECHANICS.md).
+    """
+    # Reserve (body-fat store) — [PLACEHOLDER pending MR-1]
+    reserve_full_kcal: float = Field(100_000.0, gt=0.0)   # kcal; physiological estimate
+    reserve_floor_kcal: float = Field(20_000.0, ge=0.0)   # kcal; starvation floor (~40% BW loss)
+    # Burn — [NOMINAL adult HG expenditure]
+    burn_kcal_per_day: float = Field(2_500.0, gt=0.0)     # kcal/day nominal adult expenditure
+    days_per_month: int = Field(30, ge=1)                  # 1 step = 1 month (LOCKED ARCH §9.3)
+    # Intake conversion — [NOMINAL time-allocation]
+    foraging_hours_per_day: float = Field(6.0, gt=0.0)    # hrs/day [NOMINAL Ache/Hadza active hrs]
+    # Sex ratio (A2.1)
+    p_female: float = Field(0.5, ge=0.0, le=1.0)          # P(sex=female) at init; 0.5 neutral
+    # Lifespan — unit-conversion of legacy max_age_dist from steps→months (1 step=1 month LOCKED)
+    # Legacy Sugarscape: Uniform(60,100) steps. At 1 step=1 month: ~5-8 years (wrong for human HG).
+    # Phase 1 conversion: 60-100 years × 12 months/year = 720-1200 months [PLACEHOLDER]
+    # Conflict surfaced in ARCHITECTURE.md §15 (2026-06-14).
+    lifespan_months: int = Field(900, gt=0)                # ~75-year HG lifespan [PLACEHOLDER]
 
 
 class VisualizationConfig(BaseModel):
@@ -245,7 +271,7 @@ class DormancyConfig(BaseModel):
     """
     enabled: bool = False
     k_dormant: float = Field(1.0, gt=0.0)      # wealth < k_dormant × metabolism → enter dormancy
-    tau_trickle: float = Field(0.05, ge=0.0)   # passive absorption rate (fraction of cell sugar) while dormant
+    tau_trickle: float = Field(0.3, ge=0.0)    # LOCKED 0.3 Stage 4.3 (PARAMETERS.md §8); passive absorption rate while dormant
     k_reactivate: float = Field(3.0, gt=0.0)   # wealth ≥ k_reactivate × metabolism → reactivate
     t_dormant_max: int = Field(50, ge=1)        # max dormancy steps before permanent death
 
@@ -273,6 +299,7 @@ class Config(BaseModel):
     support_pool: SupportPoolConfig = SupportPoolConfig()
     run: RunConfig = RunConfig()
     visualization: VisualizationConfig = VisualizationConfig()
+    kcal_economy: KcalEconomyConfig = KcalEconomyConfig()  # Phase 1 Blueprint A
 
     @model_validator(mode="after")
     def _check_peaks_in_grid(self) -> "Config":
@@ -283,7 +310,41 @@ class Config(BaseModel):
         return self
 
 
+# Locked parameters that must be explicit in every YAML config (PARAMETERS.md).
+# If any of these fall through to the code default, the run is refused.
+# Format: (sub_config_attr, field_name, locked_value, params_ref)
+_LOCKED_PARAMS: list[tuple[str, str, object, str]] = [
+    ("dormancy",     "tau_trickle",    0.3,   "PARAMETERS.md §8"),
+    ("reproduction", "inherit_sigma",  0.10,  "PARAMETERS.md §7"),
+    ("birth_si",     "p_fission_max",  0.065, "PARAMETERS.md §7"),
+    ("birth_c",      "p_max",          0.12,  "PARAMETERS.md §7"),
+    ("c2_defection", "enabled",        True,  "PARAMETERS.md §4"),
+]
+
+
 def load_config(path: str | Path) -> Config:
     with open(path) as f:
         raw = yaml.safe_load(f)
-    return Config.model_validate(raw)
+    cfg = Config.model_validate(raw)
+    _assert_locked_params_explicit(cfg)
+    return cfg
+
+
+def _assert_locked_params_explicit(cfg: Config) -> None:
+    errors: list[str] = []
+    for sub_attr, field_name, locked_val, ref in _LOCKED_PARAMS:
+        sub_cfg = getattr(cfg, sub_attr)
+        if field_name not in sub_cfg.model_fields_set:
+            actual = getattr(sub_cfg, field_name)
+            errors.append(
+                f"  {sub_attr}.{field_name}: LOCKED={locked_val!r} ({ref})"
+                f" — not explicit in YAML; code default {actual!r} would be used"
+            )
+    if errors:
+        raise RuntimeError(
+            "Run refused: LOCKED parameter(s) not explicitly set in YAML config:\n"
+            + "\n".join(errors)
+            + "\n\nAll LOCKED parameters (see PARAMETERS.md) must appear explicitly in the "
+            "config YAML. Past runs that omit these fields cannot be audited for which value "
+            "they used. Add each missing field to your YAML before running."
+        )

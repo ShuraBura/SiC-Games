@@ -239,6 +239,7 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 - Herding roughly **doubles** CDH probability (0.76 vs 0.41 at 40 kg).
 - Patch-creation framing: open environments = steering herds to vulnerable locations; forests = funnel/beater patch-creation.
 - CDH advantage is **episodic / seasonal-aggregation-dependent**, not a steady tap.
+- Per-capita CDH return rates by species available in Table 1 (e.g. elephant: 4,939 kcal/hr/capita). **Not the primary kcal/hr savanna anchor** — Hawkes et al. 1991 holds that role. Morin 2024 is used for cooperation mechanic parameterisation only (soft-gate sigmoid shape for group-size effect on savanna yield).
 
 **Provenance:** Full text read in chat session; tables 1, 4, 5, figs 5–8. `[VERIFIED]` authorised on this provenance.
 
@@ -330,6 +331,8 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 **What was rejected:** Whole-diet aggregate (1339/1221) as the forest cell value — rejected in favour of the activity-specific palm rate for consistency with the other activity-specific cells.
 
+**Game role (Survey B, 2026-06-14):** Forest biome game anchor — post-encounter return rates by species, Table 2 [NATIVE]. Handling-only denominator (construct-seam exception: "Includes time spent in acquisition attempts plus all relevant processing" per Table 2 footnote a — search time excluded; all other game biomes are search-inclusive). energy_density = 1,460 kcal/kg from fn 3 (same constant as forage role above). Seven game species extracted from Table 2 (see `SiC_Games_Game_Return_Rate_Table.md §F.3`). Dual-value entries: footnote d (white-lipped peccary — first value includes tracking time; second from point animal is heard/seen); footnote e (armadillo — first value = surface encounter; second = burrow excavation). Note: tapir mentioned in text as hunted but not in Table 2 (sample insufficient or excluded).
+
 ---
 
 ### Hurtado, A.M. & Hill, K. (1987). "Early Dry Season Subsistence Ecology of Cuiva (Hiwi) Foragers of Venezuela." *Human Ecology*, 15(2), 163–187. `[VERIFIED]`
@@ -340,6 +343,8 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 **Source location:** Table II ("The Sexual Division of Labor among the Cuiva"), p.178; rate stated in text p.179 ("women's returns per hour of root collecting were only 1125 calories per hour").
 
 **What was rejected:** Men's hunting return (3001) — this is game, not forage; belongs to the game field (Stage 2), not the forage field.
+
+**Game role (Survey B, 2026-06-14):** Grassland biome game anchor: **3,001 kcal/hr** (hunting, men; search-inclusive, whole-activity denominator). Source of edible_fraction = **0.50** (conservative/consumed fraction; used across all game biomes). High-amplitude seasonal anchor: ~90% of annual rain (~1,665 mm) in wet season (May–Nov); wet=lean (flood suppresses access); dry=game-fat via prey aggregation (caiman: 44→489 kg/km², ~11× wet→dry swing). Corroborated by Gurven & Hill 2009 at ~2,700 kcal/hr (see Survey B entry).
 
 ---
 
@@ -438,3 +443,114 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 **Why parked, not used now:** Honey is excluded from the Stage 1 savanna baseline cell (see Berbesque & Marlowe 2009 rejection note). This paper is the home for the honey mechanic if/when a bonus-resource stage is built.
 
 **Provenance:** Full text read in chat session (2026-06-12). `[VERIFIED]`.
+
+---
+
+## Survey B: Game Return-Rate Sources (per-biome kcal/hr)
+
+> **Canonical-home note (2026-06-14):** LITERATURE.md is the bibliography of record for all Survey B game sources. `SiC_Games_Game_Return_Rate_Table.md` is the derived view — it carries the kcal/hr values inline for use, but authoritative citations and source locations live here. Correct citation details here first; the table follows.
+
+---
+
+### Hawkes, K., O'Connell, J.F., & Blurton Jones, N.G. (1991). "Hunting income patterns among the Hadza: big game, common goods, foraging goals and the evolution of the human diet." *Philosophical Transactions of the Royal Society B*, 334, 243–251. DOI: 10.1098/rstb.1991.0106.
+
+**Role:** Savanna biome game anchor [CONVERTED]. Primary kcal/hr anchor for savanna cell.
+
+**Values lifted (raw kg/hr, from Survey A session read):**
+- Encounter/scavenge — all seasons: ~0.71 kg/hr
+- Encounter — late dry season: ~0.45 kg/hr
+- Intercept (night, at water blinds) — dry season only: ~1.02 kg/hr (~7.5 kg/hunter-night)
+
+**Converted via formula (edible_fraction = 0.50, energy_density = 1,460 kcal/kg):**
+- Encounter/scavenge, all seasons: **518 kcal/hr**
+- Encounter, late dry: **329 kcal/hr**
+- Intercept, dry season: **745 kcal/hr**
+
+**Seasonal mechanism confirmed:** Intercept hunting practiced ONLY in late dry season (Aug–Oct) at shrinking water sources — second independent confirmation (cf. Hiwi caiman ~11× swing) of dry-season prey aggregation as the savanna game access mechanism. Wet-season encounter rate: 1 animal/37 hunter-days; late-dry encounter: 1/53 days, supplemented by high-yield intercept.
+
+**What was rejected:** Big-game collective-action / PD-framing content — forward-relevant to Cred/pool layer, not folded into resource build at this stage.
+
+---
+
+### Gurven, M. & Hill, K. (2009). "Why Do Men Hunt? A Reevaluation of 'Man the Hunter' and the Sexual Division of Labor." *Current Anthropology*, 50(1), 51–74. DOI: 10.1086/596611.
+
+**Role:** Grassland game corroboration only. Hiwi grassland hunting ~2,700 kcal/hr, consistent with Hurtado & Hill 1987 anchor (3,001 kcal/hr). Theory/review paper — no new energetics data; does not replace the primary anchor.
+
+**Checked for wetland game kcal/hr: negative.** Does not supply time-denominated energetics data for wetland or aquatic prey. Does not anchor wetland.
+
+**Citation tag:** [CORROBORATION — do not use as primary anchor; wetland negative]
+
+---
+
+### Bird, D.W., Bird, R.B., & Parker, C.H. (2009). "Martu hunting strategies and the evolution of human capacities for niche construction." *Journal of Human Evolution*, 57, 217–233. DOI: 10.1016/j.jhevol.2008.11.004.
+
+**Role:** Desert biome game anchor [NATIVE]. Primary anchor for desert cell. Per-species post-encounter return rates from Table 1 entered directly without formula conversion.
+
+**Values lifted (Table 1, search-inclusive denominator):**
+- Species range: 641–1,761 kcal/hr (reflects prey composition — reptiles at low end, larger game at high end).
+- Rates taken [NATIVE] — no formula conversion applied.
+
+**Denominator:** Search-inclusive (time from departure to return, including travel and search). Consistent with all non-forest game biomes.
+
+**What was rejected:** Formula re-conversion — rates are already reported in kcal/hr.
+
+---
+
+### Ugan, A. & Simms, S.R. (2012). "Prey Mobility, Prey Rank, and the Foraging Goals of Early Americans." *Journal of Ethnobiology*, 32(2), 163–181. DOI: 10.2993/0278-0771-32.2.163.
+
+**Role:** Construct-reconciliation rule. Grounds the forage≠game distinction — mobile prey ranks differ from sedentary resource ranks because prey mobility and detectability factor into encounter rates independently of caloric yield. Anchors the biome-binning rule: why game peaks at savanna/edge rather than forest, despite forest having higher NPP (prey detectability-constrained in dense canopy, not energy-constrained).
+
+**What was lifted:** Methodological principle only — encounter rate for mobile prey must be distinguished from handling-time return rate; the two denominators produce different biome rankings.
+
+**What was rejected:** Specific numeric values — used as methodological anchor only, not as a caloric rate source for any biome cell.
+
+---
+
+### Bliege Bird, R., Smith, E.A., & Bird, D.W. (2001). "The hunting handicap: costly signaling in human foraging strategies." *Behavioral Ecology and Sociobiology*, 50, 9–19. DOI: 10.1007/s002650100338.
+
+**Role:** Intertidal biome game anchor [NATIVE]. Gross pre-sharing turtle hunting return rate 4,653 ± 1,213 kcal/hr (hunting season, search-inclusive, Table 2).
+
+**MANDATORY CAVEAT:** Cell value represents gross pre-sharing return rate only. Net hunter consumption is near zero — turtle meat is shared broadly in a costly-signaling context; hunting functions as reputation signal, not caloric acquisition. **Do not use as a functional forager net-yield figure for this biome without explicit justification.** If the model uses net yield, intertidal game is functionally ≈0.
+
+**Values lifted:** 4,653 ± 1,213 kcal/hr (hunting season, Table 2, search-inclusive).
+
+**What was rejected:** Net consumption rate — conceptually inappropriate given the costly-signaling context.
+
+---
+
+### Smith, E.A. & Bliege Bird, R. (2000). "Turtle hunting and tombstoning on Mer: These are the data." *Current Anthropology*, 41(4), 587–609. DOI: 10.1086/317987.
+
+**Role:** Intertidal yield corroboration only. Confirms mean edible turtle yield ~50.1 kg per hunt. No hunt-time denominator reported — cannot compute an independent kcal/hr rate from this source alone. Superseded for rate purposes by Bliege Bird et al. 2001.
+
+**Citation tag:** [CORROBORATION — rate superseded by Bliege Bird et al. 2001; mass cross-check only]
+
+---
+
+### Hill, K., Padwe, J., Bejyvagi, C., Bepurangi, A., Jakugi, F., Tykuarangi, R., & Tykuarangi, T. (1997). "Impact of hunting on large vertebrates in the Mbaracayu Reserve, Paraguay." *Conservation Biology*, 11(6), 1339–1353. DOI: 10.1046/j.1523-1739.1997.96048.x.
+
+**Checked for wetland game kcal/hr: negative** — paper contains zero time-denominated energetics data. Caiman appears as trace Ache prey (5 individuals, 25 kg total over study period) with no time denominator; cannot yield a kcal/hr rate. Does not anchor wetland or any other biome.
+
+**What was lifted:** Corroborates Ache forest prey composition (species lists); confirms caiman as low-frequency, low-mass Ache game item.
+
+**Citation tag:** [CHECKED — negative for wetland kcal/hr; forest prey composition corroboration only]
+
+---
+
+### Redford, K.H. & Robinson, J.G. (1987). "The game of choice: Patterns of Indian and colonist hunting in the Neotropics." *American Anthropologist*, 89(3), 650–667. DOI: 10.1525/aa.1987.89.3.02a00070.
+
+**Checked for wetland game kcal/hr: negative** — paper's primary metric is a dimensionless Harvest Rate (animals killed per consumer per year), not a time-denominated energetics figure. Capybara (*Hydrochaeris hydrochaeris*) harvest rate = 0.154 animals/consumer-year (range 0.013–0.580, n=5 studies); caiman appears in qualitative species rankings only. No kcal/hr data for any species. Cannot feed the return-rate conversion formula.
+
+**Citation tag:** [CHECKED — negative for wetland kcal/hr; offtake index only, no energetics]
+
+---
+
+### De Vynck, J.C., Cowling, R.M., Potts, A.J., & Marean, C.W. (2016). "Seasonal availability of edible underground carbohydrates in South African fynbos." DOI: [confirm with PDF — South African Journal of Science or similar]. Read: Survey A session, pre-2026-06-14.
+
+**Role:** Forage seasonality anchor for the phenomenological seasonal curve (fynbos/Cape Floristic Region shrubland biome, South Africa).
+
+**Values lifted:**
+- USO availability peaks in ~6-month window: July–December (southern hemisphere winter through early summer).
+- Lean season: December–February (hot-dry austral summer — the 3 most stressful months).
+- Amplitude: moderate (not the flat-forest extreme, not the high-llanos extreme). The fynbos biome sits in the middle of the empirical amplitude range.
+
+**What was rejected:** DOI not confirmed from PDF (file not in project as of 2026-06-14). Entry relies on Survey A session read. DOI requires verification from the source PDF before use in any write-up.

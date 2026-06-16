@@ -56,8 +56,7 @@ sic_games/
 INDEX, ROADMAP, ARCHITECTURE, MECHANISMS, TARGETS, HYPOTHESES, RESULTS,
 ARTIFACTS, LITERATURE, DEAD_ENDS (+ DOCS_CHARTER) all live under `../docs/`
 (reorg 2026-06-05; MODEL_SPEC split into ARCHITECTURE + MECHANISMS 2026-06-06).
-PARAMETERS.md not yet extracted — interim param home is the locked-param table
-below. Route via `../docs/INDEX.md`. Governance: `../docs/DOCS_CHARTER.md`.
+**PARAMETERS.md extracted 2026-06-08** — authoritative home for all parameter values, lock history, and status. Route via `../docs/PARAMETERS.md`. Governance: `../docs/DOCS_CHARTER.md`.
 
 ---
 
@@ -156,6 +155,20 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     matrix proceed rather than stopping. The breach was benign and accepted, but the override
     was the supervisor's to make.)
 
+14. **Drain the pending-delta buffer on every run (added 2026-06-14).** At the start of any
+    blueprint/directive execution, read `context/PENDING_CC.md`. For each `[PENDING]` entry,
+    reconcile it into its home-target: if it agrees with the home, mark `[DRAINED <date>]`;
+    if it **conflicts** with a home, do NOT silently resolve — surface it to the supervisor
+    (charter §1 conflict-surfacing) and leave it `[PENDING]` with a `[CONFLICT]` tag. Never
+    promote a pending delta into canon without it agreeing with, or being adjudicated into,
+    its home.
+
+15. **Regenerate the fact-file and prompt re-upload (added 2026-06-14).** Whenever a run
+    changes any fact projected in `context/CANONICAL_FACTS.md`, regenerate that file from the
+    homes as part of the same change, then **STOP and prompt the supervisor to re-upload the
+    regenerated `context/CANONICAL_FACTS.md` into the Claude.ai project knowledge.** The file
+    is a cache; it must never be hand-edited to diverge from the homes.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction
@@ -175,7 +188,8 @@ For any parameter value, lock date, sweep history, or status: → **`docs/PARAME
 ## Pre-registered hypotheses — do not modify or ignore
 
 **H1(ii):** Si is more resilient than C under periodic resource shocks.
-*Status: INVERTED (robust, 5/5 seeds). C survives A=0.75; Si collapses.*
+*Phase 0 Sugarscape result: INVERTED (robust, 5/5 seeds). C survives A=0.75; Si collapses.*
+**⚠ NOT a standing confirmed result on Phase 1 substrate.** Pre-registered for re-test — see `HYPOTHESES.md §H1ii-RETEST` and `RESULTS.md R-1`. The prior confirmation is Sugarscape-era; Phase 1 terrain changes the resource-access dynamics. Do not cite as currently confirmed.
 
 **H_cc:** C's trough recovery speed is faster than DTM formula alone predicts,
 due to carry_discount counter-cyclical birth boost (N_C↓ → discount↑ → p_birth↑).

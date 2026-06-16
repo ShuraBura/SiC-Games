@@ -562,9 +562,9 @@ def test_p1s1b_no_regression_on_reference_world():
 
 
 def test_p1s1c_large_body_ceiling_constant():
-    """LARGE_BODY_CEILING is 0.10 (provisional scope ceiling)."""
+    """LARGE_BODY_CEILING is 0.08 (§DECISION-LAKE-BODY-CEILING, supervisor-locked)."""
     assert isinstance(LARGE_BODY_CEILING, float)
-    assert abs(LARGE_BODY_CEILING - 0.10) < 1e-12
+    assert abs(LARGE_BODY_CEILING - 0.08) < 1e-12
 
 
 def test_p1s1c_new_fields_present():

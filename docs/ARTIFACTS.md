@@ -59,6 +59,8 @@
 | Si extinction (A=0.75/T=200) | both seeds, by t≈1500 | Stage 5.1 (confirm artifact) |
 | c2 defection rate (steady state) | 0.0374, defector-c2 ≈ cooperator-c2 | Stage 5.2 report |
 | test count (Stage 5.2) | 233 passed | Stage 5.2 report |
+| test count (Phase 1 Stage 1c + guard + config guard) | **404 passed** (2026-06-13) | Full suite post-directive |
+| test count (Blueprint A complete) | **430 passed** (2026-06-14) | Full suite post-Blueprint A |
 
 ---
 
@@ -131,4 +133,22 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 
 ---
 
-*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06.*
+---
+
+## Phase 1 Artifacts (Phase 1 Stage 1 onward, 2026-06-13)
+
+| Artifact | Date | Type | Question answered | Headline result | Location |
+|---|---|---|---|---|---|
+| Phase 1 Stage 1 acceptance | 2026-06-13 | gate script | ForageField + TerrainDiagnostics: all A-gates GREEN? | A1–A7 all GREEN. forage_kcal, npp_gm2, is_shore live. | `outputs/phase1_stage1/acceptance_and_artifacts.py` |
+| Phase 1 Stage 1b acceptance | 2026-06-13 | gate script | Water decomposition diagnostic: A1–A6 GREEN? | A1–A6 GREEN. exterior/interior BFS, shoreline, diagnostic guard. | `outputs/phase1_stage1b/acceptance_and_artifacts.py` |
+| Stage 1b waterK sweep (M1/M2) | 2026-06-13 | sweep | Where does exterior guard fire? Is coastline morphology detectable? | Guard fires at wK≈0.80. M2 finding retracted (s2a = crinkliness/area, not coastline length). | `outputs/phase1_stage1b/` |
+| Phase 1 Stage 1c acceptance | 2026-06-13 | gate script | Largest-lake-body guard: A1–A8 GREEN? | A1–A8 all GREEN. Guard fires at wK=0.85 under LARGE_BODY_CEILING=0.08; does NOT fire at wK=0.80. | `outputs/phase1_stage1c/acceptance_and_artifacts.py` |
+| Stage 1c waterK sweep (ARTIFACT 1) | 2026-06-13 | sweep | Largest-body distribution vs waterK; ceiling sensitivity | Guard fires wK=0.85 (seeds 42, 7 first). Ceiling 0.08 confirmed conservative (well below any wK≤0.80 world). | `outputs/phase1_stage1c/` |
+| Mountain ceiling coarse search | 2026-06-13 | sweep | What is the structural mtn_ceiling? | mtn_ceiling = 0.317; held across 7 seeds (mean≈0.225). Structural property of joint mtn condition. | `outputs/phase1_stage1/` (A8 sweep) |
+| Docs lint pass | 2026-06-13 | REPORT-ONLY | Consistency across 12 authoritative docs: 5 check types | 15 findings; 5 C-type categories. No docs modified. | `outputs/docs_lint_20260613/lint_report.md` |
+| Consolidated Reconciliation directive | 2026-06-13 | maintenance | Config default reconciliation, guard finalization, param triage, single-home consolidation | Tasks 1–11 complete. 5 C2-1 defaults reconciled; LOCKED guard added; terrain §12; PROVISIONAL marks; §STAGE-RECAL stub. See triage table. | `outputs/docs_lint_20260613/triage_table.md` |
+| Blueprint A Gate A-1 | 2026-06-14 | gate run | Do C agents survive 500 steps on terrain kcal with burn=75k/step, reserve_full=100k, forage-only (3 seeds)? | **PASS — all 4 rails GREEN.** pop 240–243 (RAIL 1); max=250 (RAIL 2); no alive-below-floor (RAIL 3a); max_mean_res=100,000 (RAIL 3b). 430 tests passing. | `outputs/phase1_blueprintA_gate/gate_a1_results.json` |
+
+---
+
+*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14.*

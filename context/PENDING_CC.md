@@ -1,0 +1,28 @@
+# PENDING_CC — chat-side delta buffer (append-only, NON-AUTHORITATIVE)
+
+> Append-only. Each entry is `[PENDING]` until CC drains it into its home-target (then `[DRAINED <date>]`, struck-through, never deleted). On conflict with a home, CC tags `[CONFLICT]` and surfaces to supervisor — never resolves unilaterally. The eleven `docs/` homes are the sole authority.
+
+Format: `- [PENDING] <date> | <type> | <statement> | home-target: <doc>`
+type ∈ {decision, deferral, hypothesis-sketch, sequencing, correction, flag}
+
+## Entries
+
+- ~~[DRAINED 2026-06-15] 2026-06-14 | correction | σ_inherit (locked 0.10, Stage 5.2) may have RUN at 0.05 through Stage 5.2-era sims via config mismatch — i.e. locked value possibly UNEXERCISED. UNCONFIRMED. CC: check Stage 5.2-era YAML; log value found + UNEXERCISED-or-false verdict. | home-target: PARAMETERS §7~~ — **DRAINED 2026-06-15:** YAML key is `inherit_sigma`. Stage 5.2 Tasks 1+2 (c2 defection, Deffuant gates) all ran at `inherit_sigma: 0.05`; σ_inherit=0.10 exercised only in Task 3 sweep cells. Verdict: PARTIALLY UNEXERCISED. Logged in PARAMETERS §7 with CAVEAT entry.
+
+- ~~[DRAINED 2026-06-15] 2026-06-14 | flag | The inbound 2026-06-14 chat handoff (static-game blueprint / seasonal-forage next / p_female / kcal energy-balance / DEFERRED_MECHANICS.md / 430 tests / "CC returned green") does NOT match committed repo state (frontier = Phase 1 Stage 1c, 2026-06-13). Must not be inherited as fact by future chats. | home-target: none (flag only)~~ — **DRAINED 2026-06-15:** Blueprint A now complete and committed to docs in the 2026-06-15 session (ROADMAP, ARTIFACTS, MECHANISMS updated; 430 tests passing). The former phantom state is now real committed state.
+
+- [PENDING] 2026-06-14 | deferral | "DORMANT–UNWIRED / build-or-cut" framing for τ_parent=0.0 and k_pool_cap=0.0 is a chat-side idea, uncommitted. Register for supervisor decision at recal-time; do not action. | home-target: PARAMETERS §6 / ROADMAP
+
+- ~~[DRAINED 2026-06-15] 2026-06-14 | decision | Context-sync system adopted: derived fact-file + this buffer live in non-canonical context/, NOT as charter homes (DOCS_CHARTER §1.3 closed set preserved). | home-target: docs/INDEX.md (pointer) + CLAUDE.md (rules 14/15)~~ — **DRAINED 2026-06-15:** context/README.md created; INDEX.md pointer added; CLAUDE.md rules 14+15 added; CANONICAL_FACTS.md generated. DIRECTIVE_context_sync fully implemented.
+
+<!-- Appended per DIRECTIVE_P1_Recon_GameTable_StateOfRepo (R1/R2), 2026-06-15.
+     NOTE: directive named context/PENDING_CC.v0.md as the append target; that file was
+     finalized into this PENDING_CC.md by the prior context_sync directive. Appended here
+     (the live buffer) instead. -->
+
+- [PENDING] 2026-06-15 | flag | Repo frontier (real, repo-grounded): Phase 1 Stage 1c (largest-lake-body water guard) complete 2026-06-13; continental scope (interior lakes only, no ocean/coast). Next queued model work: prototype forest<->savanna tradeoff verdict (supervisor eyeball), then production terrain-generator blueprint, then wire to world; seasonal/temporal arc after that. Do NOT inherit the earlier phantom "static-game / seasonal-forage / p_female / kcal / 430-tests" handoff — it does not match the repo. Still open: k_pool_cap/tau_parent build-or-cut (deferred to recal-time) and the Stage 6 namespace collision (awaiting supervisor renumber). | home-target: ROADMAP (frontier note) + PARAMETERS §6 (build-or-cut) + ROADMAP (Stage 6 collision)
+- [PENDING] 2026-06-15 | decision | LARGE_BODY_CEILING confirmed = 0.08 (was PROVISIONAL 0.10, Stage 1c). Supervisor eyeball call on ARTIFACT 1 curve. | home-target: PARAMETERS (terrain guards) + ARCHITECTURE §12.1-K + ROADMAP §DECISION-LAKE-BODY-GUARD
+
+- [PENDING] [CONFLICT] 2026-06-15 | correction | **The "phantom kcal" framing in the R1 flag above is contradicted by this session's recon of the LOCAL WORKING TREE.** The static-game / kcal / game_kcal / DEFERRED_MECHANICS / rules-14-15 work is NOT phantom on the local tree — it is PRESENT as uncommitted changes (`git status`: terrain.py/config.py/base.py/costs.py modified; phase1_model.py, terrain_field.py, test_phase1_kcal.py, test_config.py untracked; docs/DEFERRED_MECHANICS.md, docs/SiC_Games_Game_Return_Rate_Table.md, context/ untracked; outputs/phase1_blueprintA_gate/ untracked). "Does not match the repo" is true ONLY for the committed/public snapshot; locally, Blueprint A landed. The "430 tests passing" claim is from this session's pre-compaction summary and was NOT independently re-verified in this recon (pytest not run, per recon scope). Surfaced per Rule 14 (conflict, not silently resolved). | home-target: supervisor adjudication — commit/keep/discard Blueprint A working-tree changes
+
+- ~~[DRAINED 2026-06-15] 2026-06-15 | correction | σ_inherit verdict (R2): locked 0.10 but Stage 5.2 headline configs ran at inherit_sigma=0.05; only Task 3 sweep cells used 0.10. Status PARTIALLY UNEXERCISED; DECISION: PARKED — sensitivity re-run deferred to RECAL (σ_inherit re-derived on new substrate anyway). | home-target: PARAMETERS §7 (caveat)~~ — **DRAINED 2026-06-15:** PARAMETERS §7 σ_inherit row already carries the CAVEAT (PARTIALLY UNEXERCISED, verified 2026-06-15) from the prior context_sync directive. R2 verdict + PARKED decision recorded here; no further action (re-run deferred to RECAL).

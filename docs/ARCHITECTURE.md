@@ -97,7 +97,7 @@ The generator's reachable world-space is *asymmetrically bounded* in biome domin
 
 **Do NOT** lower `mtn_elev_thresh` / `mtn_slope_thresh` — that redefines "mountain" and corrupts the terrain primitive.
 
-See also: `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` (full pre-registration).
+**Canonical homes:** mtn_ceiling = 0.317 is recorded in `PARAMETERS.md §12.2` (canonical parameter home) and `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` (full pre-registration). This section provides mechanism context only; values are pointers.
 
 #### 9.5.2 Phase 1 Stage 1 — ForageField + Terrain Diagnostics (2026-06-13)
 
@@ -664,12 +664,12 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 **Context:** Stage 1b installed `exterior_water_fraction > EXTERIOR_WATER_CEILING (0.12)` as a world-acceptance guard. Stage 1c M1 sweep data showed this guard fires at waterK≈0.80, which is within the interior-collapse merge regime (waterK 0.75–0.85), not at a clean gap. The guard is an area measure (total exterior cells / total cells) that fires on an edge-connectivity event (interior lakes merging to the map boundary as waterK rises). It over-rejects valid large-lake continental worlds and has no ecological interpretation.
 
-**Replacement (Stage 1c):** `largest_water_body_fraction > LARGE_BODY_CEILING` is the sole large-water acceptance guard. This cuts on the single largest connected water body (4-nbr BFS, same connectivity as Stage 1b helpers). `LARGE_BODY_CEILING = 0.10` (provisional) ≈ 100,000 km² at 100 km²/cell — larger than Lake Superior; unambiguously inland-sea class.
+**Replacement (Stage 1c):** `largest_water_body_fraction > LARGE_BODY_CEILING` is the sole large-water acceptance guard. This cuts on the single largest connected water body (4-nbr BFS, same connectivity as Stage 1b helpers). `LARGE_BODY_CEILING = 0.08` (supervisor-locked 2026-06-13, §DECISION-LAKE-BODY-CEILING) ≈ 80,000 km² at 100 km²/cell — just below Lake Superior (~82,000 km²).
 
 **Ecological rationale:** A body this large cannot be walked around and produces coastal dynamics (fetch, boat-crossing, regional fragmentation) that the continental arc does not implement. Deferral, not exclusion — such worlds are committed to §STAGE-GEOSTRUCT where coastal dynamics will be toggled on.
 
 **Implementation (terrain.py):**
-- New constant: `LARGE_BODY_CEILING = 0.10`
+- New constant: `LARGE_BODY_CEILING = 0.08` (supervisor-locked 2026-06-13)
 - New helper: `_component_sizes(mask: np.ndarray) -> list[int]` — generic 4-nbr BFS returning list of component sizes for any boolean mask. Used for both water-body sizing and land-patch (interlake) sizing.
 - `characterize_map()` additions: `largest_water_body_fraction` (guard stat), `water_body_count`, `characteristic_water_body_size` (median, cells), `characteristic_interlake_patch_size` (median land component, cells).
 - `guard_exterior_water_fail` stays in return dict as a **diagnostic** (not in `invalid_substrate`). `guard_large_body_fail` replaces it in `invalid_substrate`.
@@ -677,13 +677,37 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 **Stage 1c sweep findings (ARTIFACT 1, 5 seeds × 21 waterK steps):**
 - Guard fires first at waterK=0.85 (seeds 42, 7). No fires at wK≤0.80.
-- Mean `largest_water_body_fraction` at wK=0.80 = 0.064 (well below 0.10); at wK=0.85 = 0.100.
-- The 0.10 crossing is at wK=0.85 for the most water-sensitive seeds. The distribution at wK=0.85 is seed-spread (seed 13 at 0.034, seed 42 at 0.141).
-- **Ceiling PROVISIONAL.** Supervisor must confirm LARGE_BODY_CEILING against the seen ARTIFACT 1 distribution. CC does not lock it.
+- Mean `largest_water_body_fraction` at wK=0.80 = 0.064; at wK=0.85 = 0.100.
+- The 0.08 crossing is at wK=0.85 for the most water-sensitive seeds. The distribution at wK=0.85 is seed-spread (seed 13 at 0.034, seed 42 at 0.141).
+- **Ceiling supervisor-locked 2026-06-13 at 0.08.** See `ROADMAP.md §DECISION-LAKE-BODY-CEILING` and `PARAMETERS.md §12.3`.
 
 **Known scope gap (on record):** large-water-barrier worlds (single dominant body separating populations) are excluded from C vs Si comparison in this arc. The relevant hypothesis (does a large interior barrier differentially constrain Si self-reliance vs C coordination?) is deferred to §STAGE-GEOSTRUCT.
 
 **Forward note (flood dynamics):** a future stochastic-shock stage must define flooded cells as transient wetland/swamp state, NOT as a water body. A flood event must not trip the single-body guard. The guard operates on the static terrain isWater mask; seasonal/catastrophe floods are a terrain state separate from the generator water assignment.
+
+---
+
+### §12.1-L — Sugar→kcal economy supersession for C agents (Blueprint A, 2026-06-14)
+
+**Decision:** The Sugarscape sugar economy (`c_max=16, α_growback=4, k_grid=4` and sugar-denominated `k_reserve`, `k_draw`) is **SUPERSEDED-FOR-C** as of Phase 1 Blueprint A. The kcal economy runs in its place; the old cluster is declared DORMANT-SUPERSEDED (not deleted). See PARAMETERS.md §13.1 for the per-parameter record.
+
+**Rationale:** Moving to a terrain kcal economy is not a unit rename. The existing sugar cluster is a locked, co-designed set (`c_max=16=4·k_grid`, `α_growback=4=k_grid`) tuned together with `β_Si=5` for the Sugarscape substrate. Sugar and kcal cannot be integrated — they are incommensurable quantities (dimensionless sugar vs physical kcal). Running agents on `forage_kcal` (kcal/hr, biome-grounded) while paying `metabolism` in sugar units would produce nonsensical wealth dynamics. The supersession was the only coherent path.
+
+**Scope:** C agents only this round. Si is out of scope for Blueprint A. The `β_Si` coupling and Si pool parameters that depend on the sugar cluster are DORMANT (not exercised), not touched.
+
+**Full ceiling re-derivation:** The resource ceiling that `c_max` provided (maximum harvestable sugar per cell) has no kcal analogue in Blueprint A — the current biome-scaled `forage_kcal` and `game_kcal` are PROVISIONAL. The literal replacement (a literature-grounded extractable kcal rate per cell, with rivalry) is **CC-1 (RECAL-ADJACENT)**, documented in DEFERRED_MECHANICS.md. Do not treat the Blueprint A yield values as the permanent resource ceiling.
+
+**What was NOT done:** No parameters deleted; no `β_Si` changed; no Si code touched; no pool mechanic re-derived. All old cluster entries preserved in PARAMETERS.md §1 and §13.1 with DORMANT-SUPERSEDED status.
+
+**Code changes (2026-06-14):**
+- `terrain.py`: added `game_kcal` field + `GAME_KCAL_TARGETS` (biome-scaled game yields)
+- `agents/costs.py`: added `KcalBurnModel` (burn_per_step = burn_kcal/day × days/month)
+- `agents/base.py`: added `reserve_floor: float = 0.0` (death at `wealth ≤ reserve_floor`); added `sex: str = "female"` (A2.1)
+- `config.py`: added `KcalEconomyConfig` (reserve placeholders, burn nominal, hours nominal, p_female, lifespan_months)
+- `terrain_field.py`: created TerrainField (drop-in SugarField adapter; level/harvest → forage_kcal per-step; game_level → game_kcal per-step; non-rivalrous)
+- `phase1_model.py`: created TerrainWorld(mesa.Model) — C agents on terrain kcal economy; forage-only (A-1) + sex-based game/forage stream (A-2) + binary child age-gate (A-2)
+
+**Gate A-1 result (2026-06-14):** PASS — seeds [42,43,44], 500 steps, forage-only. Rails: no extinction (pop 240–243), no explosion, economy coherent (reserve stable at ~25k kcal), existing suite 430/430 green.
 
 ---
 
@@ -713,15 +737,15 @@ The following citations appear in blueprints but were NOT in the focused LITERAT
 
 | Citation | Mechanism | Blueprint(s) | Current tag |
 |---|---|---|---|
-| Deffuant et al. (2000), *Mixing beliefs among interacting agents* | Deffuant bounded-confidence updating (MECHANISMS §3.3) | Stage 3.3 §0; 5.2 §3 | `[INLINE]` |
-| Hegselmann & Krause (2002) — HK opinion dynamics | Deffuant alternative form | Stage 3.3 §0 | `[INLINE]` |
-| Boyd & Richerson (1985), ch. 5 — prestige bias | Cred-weighted Deffuant; dual inheritance | Stage 3.3 §0; ROADMAP | `[INLINE]` |
-| Turchin (2003) — secular cycles | Cred-modulated C birth (elite overproduction) | ROADMAP; Stage 4.1a | `[INLINE]` |
-| Epstein & Axtell (1996), ch. 3 — Sugarscape cultural transmission | World substrate; endowment distributions | Stage 1 §1; LITERATURE.md (partial) | `[VERIFIED]` for substrate; `[INLINE]` for cultural chapter specifically |
-| Axelrod (1997) — Dissemination of Culture | Between-run diversity frame | Stage 1 §1.4 | `[INLINE]` |
-| Klemm et al. (2003) — noise non-monotonic effect on cultural diversity | Project contribution frame | Stage 1 §1.4 | `[INLINE]` |
-| Gurven & Kaplan (2006) — Longevity Among Hunter-Gatherers | η(a) age-efficiency ramp | Stage 4.1b §1.2 | `[INLINE]` |
-| Davies et al. (2018), Loihi — neuromorphic silicon | Si β=5 energy ratio | Stage 4.3 §1.1 | `[INLINE]` |
+| Deffuant et al. (2000), *Mixing beliefs among interacting agents* | Deffuant bounded-confidence updating (MECHANISMS §3.3) | Stage 3.3 §0; 5.2 §3 | `[VERIFIED]` — in LITERATURE.md (Stage 3.3 search; key finding and mechanism noted) |
+| Hegselmann & Krause (2002) — HK opinion dynamics | Deffuant alternative form | Stage 3.3 §0 | `[VERIFIED]` — in LITERATURE.md (Stage 3.3 search; HK vs Deffuant contrast noted) |
+| Boyd & Richerson (1985), ch. 5 — prestige bias | Cred-weighted Deffuant; dual inheritance | Stage 3.3 §0; ROADMAP | `[VERIFIED]` — in LITERATURE.md (Stage 3.3 search; prestige-bias mechanism noted) |
+| Turchin (2003) — secular cycles | Cred-modulated C birth (elite overproduction) | ROADMAP; Stage 4.1a | `[VERIFIED]` — in LITERATURE.md (Stage 2+ note; stratification finding and Stage 6 test registered) |
+| Epstein & Axtell (1996), ch. 3 — Sugarscape cultural transmission | Cultural tag inheritance + biparental reproduction | Stage 1 §1; LITERATURE.md | `[VERIFIED]` — in LITERATURE.md (Stage 3.3; specific elements lifted: tag inheritance, biparental protocol, σ_inherit=0.05 origin, fallback rule) |
+| Axelrod (1997) — Dissemination of Culture | Between-run diversity frame | Stage 1 §1.4 | `[INLINE]` — NOT in LITERATURE.md; stays [INLINE] |
+| Klemm et al. (2003) — noise non-monotonic effect on cultural diversity | Project contribution frame | Stage 1 §1.4 | `[VERIFIED]` — in LITERATURE.md (key finding and project framing noted) |
+| Gurven & Kaplan (2006) — Longevity Among Hunter-Gatherers | η(a) age-efficiency ramp | Stage 4.1b §1.2 | `[VERIFIED]` — in LITERATURE.md (Stage 4.1b; specific findings lifted: juvenile deficit, elder decline, η_min=0.3 grounding) |
+| Davies et al. (2018), Loihi — neuromorphic silicon | Si β=5 energy ratio | Stage 4.3 §1.1 | `[INLINE]` — NOT in LITERATURE.md; stays [INLINE] (OWE-4) |
 | Brock & Hommes (1997) — Boltzmann decision rule | Si Cred σ-modulation form | LITERATURE.md (cited) | `[VERIFIED]` |
 | Axelrod (1984) — Evolution of Cooperation | Si Cred self-referential loop | LITERATURE.md | `[VERIFIED]` |
 | Nowak & May (1992) — spatial prisoner's dilemma | Si Cred rejected alternative | LITERATURE.md | `[VERIFIED]` (rejected) |
@@ -767,6 +791,18 @@ The following citations appear in blueprints but were NOT in the focused LITERAT
 **Why this matters:** the substrate may exhibit vegetation bistability in the same region where C/Si strategy coexistence is studied. This could be a **thematic resonance** (the physical world mirrors the social dynamics) or a **confound** (biome fluctuations near the threshold may drive apparent strategy outcomes). It is not a finding — it is a question to revisit when the model begins comparative C/Si runs on the terrain substrate.
 
 **Action:** Do NOT act on it now. Log as a pending question. Revisit before Stage 7.2+ comparative runs on the terrain substrate.
+
+### 15.7 Blueprint A (2026-06-14): max_age unit-conversion conflict
+
+**Conflict:** The legacy Sugarscape `max_age_dist = (60, 100)` is denominated in sugar-time **steps**, not months. At the locked 1 step = 1 month (PARAMETERS.md §1), these values give a lifespan of 60–100 months = 5–8 years — biologically nonsensical for human HG agents.
+
+**Discovery:** Blueprint A Gate A-1 initially failed RAIL 1 (extinction on all seeds) because all agents died within 80 steps. At 1 step = 1 month, 80 months = 6.7 years.
+
+**Resolution applied (2026-06-14):** `KcalEconomyConfig.lifespan_months = 900` added as a PLACEHOLDER (≈ 75-year lifespan in months). This value replaces `max_age` for TerrainWorld agents. The legacy `max_age_dist = (60, 100)` in `AgentsConfig` is NOT touched — it remains the Sugarscape max_age in steps for any run that does not use the kcal economy.
+
+**Consequence:** the kcal economy has its own lifespan parameter (`KcalEconomyConfig.lifespan_months`); the legacy Sugarscape max_age retains its original meaning (steps, for Sugarscape runs). The two are not the same quantity. PARAMETERS.md §13.2 records the conversion.
+
+**Open question:** should lifespan_months be sampled per-agent (Uniform(720, 1200) matching legacy Uniform(60,100) converted to months)? Deferred — a single placeholder value is sufficient for Blueprint A correctness gate. Resolve before any demographic analysis that depends on the age distribution.
 
 ### 15.5 NOT-YET-ADOPTED literature
 
