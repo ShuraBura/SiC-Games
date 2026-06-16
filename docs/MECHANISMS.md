@@ -330,11 +330,25 @@ No new tunable threshold beyond the A-1 placeholders. Risk-sensitivity (variance
 
 ### 9a.5 forage_kcal and game_kcal computation (terrain.py)
 
-Both fields computed by biome mean-scaling the underlying normalized terrain field:
-- `forage_kcal[mask] = forage[mask] × (FORAGE_KCAL_TARGETS[biome] / mean_norm(forage[mask]))`
-- `game_kcal[mask]  = game[mask]  × (GAME_KCAL_TARGETS[biome] / mean_norm(game[mask]))`
+Each biome's cell values are drawn from a **literature-anchored distribution** with a per-biome `(mean, std)`. Two regimes, by whether the std is anchored:
 
-Biomes NOT in the target dict (water, wetland for game; only water for forage at 0) stay at 0. All cell values PROVISIONAL pending CC-1. See PARAMETERS.md §12.4 (forage) and §13.3 (game) for the anchored biome values.
+**(a) std anchored in literature → terrain-coupled lognormal (the §9a.6 mechanic).**
+**(b) std not yet anchored (`None`) → legacy mean-only scaling** (fallback): `field_kcal[mask] = field[mask] × (mean / mean_norm(field[mask]))` — spread is whatever the terrain field gives, tagged PENDING-std.
+
+Biomes NOT in the target dict (water; wetland/mountain for game) stay at 0. All cell values PROVISIONAL pending CC-1. Means/stds: PARAMETERS.md §12.4 (forage) and §13.3 (game); derivations: `SiC_Games_Game_Return_Rate_Table.md §F.2.1`.
+
+### 9a.6 Terrain-coupled lognormal cell-value draw (2026-06-15)
+
+**Category: shared world machinery (C and Si read the same fields).** Supervisor-directed 2026-06-15. Replaces single-point biome values with a draw from a literature-anchored **lognormal**, while preserving the terrain field's spatial structure.
+
+**Mechanic** (`terrain.py:_lognormal_rescale`, deterministic — no RNG):
+1. Within a biome, rank the cells by their normalized terrain field value (`forage`/`game`); convert ranks to Hazen quantiles `q = (rank + 0.5)/n ∈ (0,1)`.
+2. Lognormal params from the literature `(mean, std)`: `σ² = ln(1 + (std/mean)²)`, `μ = ln(mean) − σ²/2`.
+3. `value = exp(μ + σ · Φ⁻¹(q))`, then re-normalised so the realised biome mean equals `mean` exactly.
+
+**Properties:** positive-only (no negative kcal); right-skewed (matches foraging-return data, e.g. the bustard tail); realised biome mean exact, std within ~1% of target; **terrain coupling preserved** (high-terrain-field cells get high values — "game peaks in forest" survives); **deterministic / reproducible** (same `(knobs, seedStr)` → byte-identical field), so the equivalence-gate discipline is intact.
+
+**Distribution-family choice = lognormal; spatial choice = terrain-coupled rescale** (supervisor, 2026-06-15) — see ARCHITECTURE.md §12.1-N. Where a biome's literature std is not yet sourced, the field falls back to legacy mean-only scaling (PENDING-std) — see PARAMETERS.md for which biomes are anchored vs PENDING.
 
 ## 9. World / resource substrate → see `ARCHITECTURE.md` §9
 

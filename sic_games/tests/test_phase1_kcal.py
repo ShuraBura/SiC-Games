@@ -28,6 +28,7 @@ from sic_games.terrain import (
     BIOME_WATER,
     BIOME_WETLAND,
     GAME_KCAL_TARGETS,
+    GAME_KCAL_STD,
     generate_world,
 )
 from sic_games.terrain_field import TerrainField
@@ -101,10 +102,27 @@ def test_game_kcal_mean_near_target(fields):
         if not mask.any():
             continue
         mean_val = float(fields.game_kcal[mask].mean())
-        # Within 1% of target (mean-scaling property)
+        # Within 1% of target (mean-scaling property; lognormal rescale re-normalises to exact mean)
         assert abs(mean_val - target) / target < 0.01, (
             f"biome {b_code}: game_kcal mean {mean_val:.1f} != target {target:.1f}"
         )
+
+
+def test_game_kcal_std_near_target(fields):
+    # Biomes with a literature-anchored std use the terrain-coupled lognormal draw;
+    # the realised within-biome std should match the target spread (within 10%).
+    for b_code, target_std in GAME_KCAL_STD.items():
+        if target_std is None:
+            continue
+        mask = fields.biome == b_code
+        if not mask.any():
+            continue
+        std_val = float(fields.game_kcal[mask].std())
+        assert abs(std_val - target_std) / target_std < 0.10, (
+            f"biome {b_code}: game_kcal std {std_val:.1f} != target {target_std:.1f}"
+        )
+        # lognormal draw is positive-only
+        assert float(fields.game_kcal[mask].min()) > 0.0
 
 
 # ── A1.3: KcalBurnModel ────────────────────────────────────────────────────

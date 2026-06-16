@@ -65,9 +65,11 @@ UNANCHORED cells are accepted gaps, not errors. They carry `—` in the cell val
 
 ---
 
-## §F.2.1 Representative-value derivation (feeds `GAME_KCAL_TARGETS`)
+## §F.2.1 Representative-value derivation (feeds `GAME_KCAL_TARGETS` + `GAME_KCAL_STD`)
 
-Each biome's single **representative value** — the number `terrain.py:GAME_KCAL_TARGETS` scales toward — is derived here with explicit arithmetic, mirroring the forage layer's per-cell working. **This subsection is the authoritative home for the matching code constant** (reconcile directive §5). Every value carries `[PROVISIONAL — pending CC-1 ceiling]` until CC-1 lands.
+Each biome's resource cells are **drawn from a literature-anchored lognormal `(mean, std)`** (terrain-coupled, deterministic — MECHANISMS §9a.6 / ARCHITECTURE §12.1-N). This subsection derives both moments with explicit arithmetic. **It is the authoritative home for `GAME_KCAL_TARGETS` (mean) and `GAME_KCAL_STD` (std).** Anchored stds so far: **forest 4,043, desert 210**; savanna/grass stds are **PENDING** (single-source means — fall back to terrain-spread until sourced). Every value carries `[PROVISIONAL — pending CC-1 ceiling]` until CC-1 lands.
+
+**Std summary:** forest = weighted std of the 7 species rates = **4,043** (CV 0.73); desert = weighted std of the 3 hunt-type rates {641,765,1300} = **210** (CV 0.29). Derivations inline below.
 
 ### Forest — encounter(pursuit)-weighted mean  [method LOCKED by supervisor]
 

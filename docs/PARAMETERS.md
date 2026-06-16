@@ -210,16 +210,18 @@ Recorded here as reference for the calibration pass.
 
 ### §12.4 — Foraging returns (Phase 1 Stage 1)
 
-| Name | Symbol | Value | Unit | Status | Source | Lock history |
-|------|--------|-------|------|--------|--------|-------------|
-| NPP scale factor | NPP_GM2_SCALE | **3400.0** | g/m²/yr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): npp_gm2 = npp × 3400. Single-point Tallavaara 2018 anchor: forest-onset npp≈0.4 → 1360 g/m²/yr. |
-| Shore bonus | SHORE_BONUS_KCAL | **1491.5** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Bird 1997 Meriam reef-flat intertidal mean. Applied to land cells with ≥1 water neighbor. |
-| Wetland forage target | — | **1428.3** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Cunningham, Okavango "Wet." |
-| Forest forage target | — | **2630.0** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Hill 1987, Ache palm. |
-| Savanna forage target | — | **257.7** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Berbesque & Marlowe 2009, Hadza tuber (Table 4). |
-| Grassland forage target | — | **1125.0** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Hurtado & Hill 1987, Cuiva root collecting. |
-| Desert forage target | — | **1200.0** | kcal/forager-hr | PROVISIONAL | terrain.py | Phase 1 Stage 1 (2026-06-13): O'Connell & Hawkes 1984 range 650–1925. Midpoint used; range too wide to lock without further grounding. |
-| Mountain forage target | — | **5387.0** | kcal/forager-hr | LOCKED | terrain.py | Phase 1 Stage 1 (2026-06-13): Rhode & Rhode 2015, limber pine unhulled. |
+Cell values use the **lognormal `(mean, std)`** draw (MECHANISMS §9a.6); `FORAGE_KCAL_STD[b]` = std, **PENDING** where not yet literature-sourced (→ legacy mean-only fallback).
+
+| Name | Symbol | Mean | Std (kcal/hr) | Status | Source / lock history |
+|------|--------|------|------|--------|--------|
+| NPP scale factor | NPP_GM2_SCALE | **3400.0** | — | LOCKED | npp_gm2 = npp × 3400. Tallavaara 2018 anchor: npp≈0.4 → 1360 g/m²/yr (2026-06-13). |
+| Shore bonus | SHORE_BONUS_KCAL | **1491.5** | — | LOCKED | Bird 1997 Meriam reef-flat intertidal mean; additive on land-shore cells (2026-06-13). |
+| Wetland forage | — | **1428.3** | **PENDING** | LOCKED (mean) | Cunningham, Okavango "Wet." Std not yet sourced. |
+| Forest forage | — | **2630.0** | **PENDING** | LOCKED (mean) | Hill 1987, Ache palm. Std not yet sourced. |
+| Savanna forage | — | **257.7** | **PENDING** | LOCKED (mean) | Berbesque & Marlowe 2009, Hadza tuber (Table 4). Std not yet sourced. |
+| Grassland forage | — | **1125.0** | **PENDING** | LOCKED (mean) | Hurtado & Hill 1987, Cuiva root collecting. Std not yet sourced. |
+| Desert forage | FORAGE_KCAL_STD[DESERT] | **1200.0** | **368** [RANGE-DERIVED] | PROVISIONAL | O'Connell & Hawkes 1984 range 650–1925. Midpoint mean; std = (1925−650)/√12 (uniform-range) — 2026-06-15. |
+| Mountain forage | — | **5387.0** | **PENDING** | LOCKED (mean) | Rhode & Rhode 2015, limber pine unhulled. Std not yet sourced. |
 
 ---
 
@@ -260,12 +262,14 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 **Value home (one-fact-one-home):** the authoritative derivation of every value below is `SiC_Games_Game_Return_Rate_Table.md §F.2.1` (Representative-value derivation). This table restates the resulting number with a pointer; it does not lead. Reconciled 2026-06-15 (reconcile directive §2/§5).
 
-| Name | Symbol | Value | Unit | Status | Source |
-|------|--------|-------|------|--------|--------|
-| Forest game target | GAME_KCAL_TARGETS[FOREST] | **5,541** | kcal/forager-hr | PROVISIONAL [NATIVE, handling-only] | **2026-06-15: 7,749 → 5,541** (flat-mean → pursuit-weighted mean, 1,462,745/264). Derivation: §F.2.1. Median cross-check 6,120; both << retired flat-mean 7,749 |
-| Savanna game target | GAME_KCAL_TARGETS[SAVANNA] | **518** | kcal/forager-hr | PROVISIONAL [CONVERTED] | All-seasons base encounter (static cell); 745 dry-season intercept = seasonality hook, not static. Derivation: §F.2.1 |
-| Grassland game target | GAME_KCAL_TARGETS[GRASS] | **3,001** | kcal/forager-hr | PROVISIONAL [NATIVE] | Hurtado & Hill 1987 direct lift. Derivation: §F.2.1 |
-| Desert game target | GAME_KCAL_TARGETS[DESERT] | **1,201** | kcal/forager-hr | PROVISIONAL — **desert method pending supervisor + Bird 2009 Fig 4 (PDF absent from repo)** | Bare midpoint of 641–1,761; **NOT a defensible median**. Bird 2009 (Am. Antiquity 74(1)) read via image render: search-inclusive *overall hunt-type* rates are the correct desert basis (§F.1). **Proposed ≈730 kcal/hr** = bout-frequency-weighted mean of sand monitor (641, n=612), perentie (765, n=78), bustard (~1,300, n=91) = 570,262/781; median 765. Both ≈750, far below 1,201. NOT locked — bustard qualitative, hill kangaroo excluded; supervisor confirms basis + collapse. Unchanged pending supervisor. Derivation: §F.2.1 |
+**Cell-value distribution (2026-06-15, supervisor-directed):** each biome's cells are drawn from a literature-anchored **lognormal `(mean, std)`** via a terrain-coupled deterministic rescale — see MECHANISMS §9a.6 / ARCHITECTURE §12.1-N. `GAME_KCAL_TARGETS[b]` = mean; `GAME_KCAL_STD[b]` = std. Where std is **PENDING** (not yet sourced) the field falls back to legacy mean-only scaling.
+
+| Name | Symbol | Mean | Std (kcal/hr) | Status | Source |
+|------|--------|------|------|--------|--------|
+| Forest game | GAME_KCAL_TARGETS / STD[FOREST] | **5,541** | **4,043** [NATIVE] | PROVISIONAL [NATIVE, handling-only] | Mean: pursuit-weighted of 7 Hill 1987 species (1,462,745/264). Std: weighted std of the 7 species (CV 0.73). §F.2.1 |
+| Savanna game | GAME_KCAL_TARGETS[SAVANNA] | **518** | **PENDING** | PROVISIONAL [CONVERTED] | Mean: all-seasons base encounter (745 dry-season = seasonality hook). Std: single-source, not yet anchored. §F.2.1 |
+| Grassland game | GAME_KCAL_TARGETS[GRASS] | **3,001** | **PENDING** | PROVISIONAL [NATIVE] | Mean: Hurtado & Hill 1987 direct lift. Std: single-source, not yet anchored. §F.2.1 |
+| Desert game | GAME_KCAL_TARGETS / STD[DESERT] | **730** | **210** | **SET 2026-06-15 (supervisor-approved)**; PROVISIONAL pending CC-1 | **1,201 → 730:** bout-frequency-weighted mean of search-incl. overall hunt-type rates — sand monitor (641, n=612), perentie (765, n=78), bustard (~1,300, n=91) = 570,262/781 (median 765). Std: weighted std of the 3 rates (CV 0.29). Bird 2009 (Am. Antiquity 74(1)), read via image render. §F.2.1 |
 | ~~Intertidal game~~ | — | — | — | **RECLASSIFIED → FORAGE (2026-06-15)** | Intertidal shellfishing is forage, not game (double-count fix); see SHORE_BONUS_KCAL=1491.5 and game table §F.2/§F.2.1. No GAME_KCAL_TARGETS key |
 | Wetland game | — | **0** (UNANCHORED) | — | UNANCHORED | No source found (SiC_Games_Game_Return_Rate_Table.md §F.2) |
 | Mountain game | — | **0** (UNANCHORED permanent) | — | UNANCHORED-PERMANENT | No source exists in HG literature |

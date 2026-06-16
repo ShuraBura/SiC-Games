@@ -721,6 +721,18 @@ re-export; parity suite 48/48 pass pre+post move; full suite 328/328 pass.*
 
 **Scope:** value reconciliation only — the `game_kcal` *computation* (biome mean-scaling) is unchanged. No mechanic change. pytest 430/430 green after the forest constant change (test reads the dict dynamically; no hardcoded assertion). Value home: game table §F.2.1; PARAMETERS §13.3 points there.
 
+### §12.1-N — Resource cells drawn from a literature-anchored lognormal (2026-06-15)
+
+**Decision (supervisor-directed):** each biome's resource cell value (forage_kcal, game_kcal) is no longer a single point — it is **drawn from a literature-anchored distribution** with a per-biome `(mean, std)`. Two design choices were taken (supervisor, 2026-06-15):
+1. **Spatial: terrain-coupled rescale** (not independent random draws). The terrain field's within-biome spatial ordering is preserved; only the marginal is re-anchored. Chosen to keep the deliberate terrain coupling ("game peaks in forest") and to stay **deterministic** — no new RNG, so the §0/§9 determinism contract and the equivalence-gate discipline (CLAUDE.md rule 2) are intact.
+2. **Family: lognormal** (not normal/truncated-normal). Positive-only and right-skewed — matches foraging-return data (e.g. the desert bustard tail) and cannot produce negative kcal.
+
+**Mechanic:** `terrain.py:_lognormal_rescale` — rank biome cells by terrain value → Hazen quantiles → lognormal `ppf` (`exp(μ + σ·Φ⁻¹(q))`, params from `(mean,std)`) → re-normalise to exact mean. See MECHANISMS §9a.6.
+
+**Desert value also SET this pass:** `GAME_KCAL_TARGETS[DESERT]` 1,201 → **730** (supervisor-approved; the §12.1-M frequency-weighted value), std 210.
+
+**Std sourcing status:** literature-anchored stds — game forest (4,043), game desert (210), forage desert (368). All other biomes' stds are **PENDING** (fall back to legacy mean-only scaling until each source's spread is mined). pytest **431/431** (mean exact, realised std within ~1% of target; new std test added). Homes: MECHANISMS §9a.6, PARAMETERS §12.4 / §13.3, game table §F.2.1.
+
 ---
 
 ## 13. Architecture seams

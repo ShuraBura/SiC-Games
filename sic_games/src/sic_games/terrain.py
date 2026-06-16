@@ -9,10 +9,12 @@ Determinism contract: same (knobs, seedStr) → byte-identical arrays.
 """
 from __future__ import annotations
 
+import math
 from collections import deque
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.special import ndtri   # inverse normal CDF Φ⁻¹ (deterministic; used for lognormal rescale)
 
 # ── Constants ─────────────────────────────────────────────────────────────
 
@@ -46,6 +48,13 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
     BIOME_DESERT:   1200.0,   # PROVISIONAL; O'Connell & Hawkes 1984 range 650-1925
     BIOME_MOUNTAIN: 5387.0,   # Rhode & Rhode 2015, limber pine unhulled
 }
+# Per-biome literature spread (std, kcal/forager-hr) for the lognormal cell-value draw.
+# None → std not yet anchored in literature → falls back to the terrain field's natural
+# spread (legacy mean-only scaling), tagged PENDING. See MECHANISMS §9a.6.
+FORAGE_KCAL_STD = {
+    BIOME_DESERT:   368.0,    # O'Connell & Hawkes 1984 range 650–1925 → uniform std=(1925-650)/√12 [RANGE-DERIVED]
+    # WETLAND / FOREST / SAVANNA / GRASS / MOUNTAIN: std PENDING literature (sources in literature/)
+}
 
 # ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
 # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
@@ -53,11 +62,47 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 # (the authoritative home for each value; this dict follows the table, never leads it).
 # Wetland, Mountain, Water: UNANCHORED → game_kcal zeroed (not present in this dict).
 GAME_KCAL_TARGETS = {
-    BIOME_FOREST:  5541.0,   # 7749.0 → 5541.0: flat-mean → pursuit-weighted mean (1,462,745/264). Table §F.2.1 [NATIVE, handling-only, PROVISIONAL]
+    BIOME_FOREST:  5541.0,   # 7-species pursuit-weighted mean (Hill 1987; 1,462,745/264). Table §F.2.1 [NATIVE, handling-only, PROVISIONAL]
     BIOME_SAVANNA:  518.0,   # all-seasons base encounter (static cell; 745 dry-season = seasonality hook). Table §F.2.1 [CONVERTED, PROVISIONAL]
     BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 direct lift. Table §F.2.1 [NATIVE, PROVISIONAL]
-    BIOME_DESERT:  1201.0,   # [PROVISIONAL — desert method pending supervisor + Bird 2009 Fig 4 (PDF absent)]; bare midpoint of 641–1,761, NOT a defensible median. Table §F.2.1
+    BIOME_DESERT:   730.0,   # 1201→730: bout-frequency-weighted mean of search-incl. overall hunt-type rates (Bird 2009; 570,262/781). Table §F.2.1 [supervisor-approved 2026-06-15, PROVISIONAL]
 }
+# Per-biome literature spread (std, kcal/forager-hr) for the lognormal cell-value draw.
+# None → std not yet anchored → terrain-field-spread fallback, tagged PENDING. MECHANISMS §9a.6.
+GAME_KCAL_STD = {
+    BIOME_FOREST:  4043.0,   # weighted std of the 7 Hill 1987 species rates (CV 0.73). Table §F.2.1 [NATIVE]
+    BIOME_DESERT:   210.0,   # weighted std of the 3 Bird 2009 hunt-type rates {641,765,1300} (CV 0.29). Table §F.2.1
+    # SAVANNA / GRASS: std PENDING literature (single-source means; no spread yet anchored)
+}
+
+# ── Lognormal cell-value rescale (Phase 1, 2026-06-15) ─────────────────────
+def _lognormal_rescale(field_norm: np.ndarray, mask: np.ndarray,
+                       mean: float, std: float) -> np.ndarray:
+    """Map a biome's terrain-field cells onto a lognormal(mean, std), preserving
+    spatial ordering. Deterministic (no RNG): each cell's value is the lognormal
+    quantile at the cell's rank within the biome, so high-terrain cells get high
+    values (terrain coupling) while the realised marginal is the literature-anchored
+    lognormal — positive-only, right-skewed. Re-normalised to hit `mean` exactly.
+
+    Returns the rescaled values for the masked cells (1-D, in mask order).
+    """
+    vals = field_norm[mask]
+    n = vals.size
+    if n == 0:
+        return vals
+    if n == 1 or std <= 0.0 or mean <= 0.0:
+        return np.full(n, mean, dtype=np.float64)
+    # rank → Hazen plotting-position quantiles in (0,1); stable sort = deterministic ties
+    ranks = np.argsort(np.argsort(vals, kind="stable"), kind="stable")
+    q = (ranks.astype(np.float64) + 0.5) / n
+    # lognormal parameters from (mean, std)
+    sigma2 = math.log(1.0 + (std / mean) ** 2)
+    sigma = math.sqrt(sigma2)
+    mu = math.log(mean) - 0.5 * sigma2
+    out = np.exp(mu + sigma * ndtri(q))
+    out *= mean / float(out.mean())     # exact biome mean (scaling preserves CV & positivity)
+    return out
+
 
 # ── Phase 1 Stage 1b constants ─────────────────────────────────────────────
 # Provisional exterior-water guard threshold.
@@ -484,10 +529,15 @@ def generate_world(knobs: dict) -> WorldFields:
         mask = (biome == b_code)
         if not mask.any():
             continue                       # absent biome: cells stay 0, logged in characterize_map
+        std = FORAGE_KCAL_STD.get(b_code)
+        if std is not None and target_mean > 0.0:
+            # literature-anchored spread: terrain-coupled lognormal(mean, std)
+            forage_kcal[mask] = _lognormal_rescale(forage, mask, target_mean, std)
+            continue
         mean_norm = float(forage[mask].mean())
         if mean_norm == 0.0:
             continue                       # zero-mean biome: avoid divide-by-zero; stays 0
-        forage_kcal[mask] = forage[mask] * (target_mean / mean_norm)
+        forage_kcal[mask] = forage[mask] * (target_mean / mean_norm)   # std PENDING: terrain-spread fallback
     # Shore modifier: additive bonus on land-shore cells (1491.5 kcal/hr; Bird 1997)
     forage_kcal += is_shore.astype(np.float64) * SHORE_BONUS_KCAL
 
@@ -500,10 +550,15 @@ def generate_world(knobs: dict) -> WorldFields:
         mask = (biome == b_code)
         if not mask.any():
             continue
+        std = GAME_KCAL_STD.get(b_code)
+        if std is not None and target_mean > 0.0:
+            # literature-anchored spread: terrain-coupled lognormal(mean, std)
+            game_kcal[mask] = _lognormal_rescale(game, mask, target_mean, std)
+            continue
         mean_norm = float(game[mask].mean())
         if mean_norm == 0.0:
             continue
-        game_kcal[mask] = game[mask] * (target_mean / mean_norm)
+        game_kcal[mask] = game[mask] * (target_mean / mean_norm)   # std PENDING: terrain-spread fallback
 
     # ── Neighbour cost (N,N,4): d=0 N, d=1 S, d=2 W, d=3 E ────────────
     nc = np.ones((N, N, 4), dtype=np.float64)   # sentinel = 1.0 at edges
