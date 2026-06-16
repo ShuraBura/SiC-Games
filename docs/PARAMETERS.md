@@ -258,12 +258,15 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
 
+**Value home (one-fact-one-home):** the authoritative derivation of every value below is `SiC_Games_Game_Return_Rate_Table.md §F.2.1` (Representative-value derivation). This table restates the resulting number with a pointer; it does not lead. Reconciled 2026-06-15 (reconcile directive §2/§5).
+
 | Name | Symbol | Value | Unit | Status | Source |
 |------|--------|-------|------|--------|--------|
-| Forest game target | GAME_KCAL_TARGETS[FOREST] | **7,749** | kcal/forager-hr | PROVISIONAL [NATIVE, handling-only] | Hill et al. 1987 Table 2 — mean of 7 species (post-encounter rates; handling-only denominator; construct-seam exception per SiC_Games_Game_Return_Rate_Table.md §F.2) |
-| Savanna game target | GAME_KCAL_TARGETS[SAVANNA] | **518** | kcal/forager-hr | PROVISIONAL [CONVERTED] | Hawkes et al. 1991 all-seasons encounter/scavenge rate |
-| Grassland game target | GAME_KCAL_TARGETS[GRASS] | **3,001** | kcal/forager-hr | PROVISIONAL [NATIVE] | Hurtado & Hill 1987 |
-| Desert game target | GAME_KCAL_TARGETS[DESERT] | **1,201** | kcal/forager-hr | PROVISIONAL [NATIVE, mid-range] | Bird et al. 2009 Table 1 range 641–1,761; midpoint used |
+| Forest game target | GAME_KCAL_TARGETS[FOREST] | **5,541** | kcal/forager-hr | PROVISIONAL [NATIVE, handling-only] | **2026-06-15: 7,749 → 5,541** (flat-mean → pursuit-weighted mean, 1,462,745/264). Derivation: §F.2.1. Median cross-check 6,120; both << retired flat-mean 7,749 |
+| Savanna game target | GAME_KCAL_TARGETS[SAVANNA] | **518** | kcal/forager-hr | PROVISIONAL [CONVERTED] | All-seasons base encounter (static cell); 745 dry-season intercept = seasonality hook, not static. Derivation: §F.2.1 |
+| Grassland game target | GAME_KCAL_TARGETS[GRASS] | **3,001** | kcal/forager-hr | PROVISIONAL [NATIVE] | Hurtado & Hill 1987 direct lift. Derivation: §F.2.1 |
+| Desert game target | GAME_KCAL_TARGETS[DESERT] | **1,201** | kcal/forager-hr | PROVISIONAL — **desert method pending supervisor + Bird 2009 Fig 4 (PDF absent from repo)** | Bare midpoint of 641–1,761; **NOT a defensible median** (per-species figures unavailable — no Bird 2009 Martu source in the literature/ folder). Unchanged pending supervisor. Derivation: §F.2.1 |
+| ~~Intertidal game~~ | — | — | — | **RECLASSIFIED → FORAGE (2026-06-15)** | Intertidal shellfishing is forage, not game (double-count fix); see SHORE_BONUS_KCAL=1491.5 and game table §F.2/§F.2.1. No GAME_KCAL_TARGETS key |
 | Wetland game | — | **0** (UNANCHORED) | — | UNANCHORED | No source found (SiC_Games_Game_Return_Rate_Table.md §F.2) |
 | Mountain game | — | **0** (UNANCHORED permanent) | — | UNANCHORED-PERMANENT | No source exists in HG literature |
 | Water game | — | **0** (out of scope) | — | OUT-OF-SCOPE | Fish/aquatic game out of model scope |

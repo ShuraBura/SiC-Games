@@ -26,12 +26,13 @@
   - Stage 1 — ForageField + terrain diagnostics — complete 2026-06-13. forage_kcal, npp_gm2, is_shore live. → ROADMAP
   - Stage 1b — water decomposition diagnostic — complete 2026-06-13. exterior/interior BFS, shoreline, diagnostic guard. → ROADMAP
   - Stage 1c — largest-lake-body guard (`largest_water_body_fraction > LARGE_BODY_CEILING=0.08`; continental scope, interior lakes only, no ocean/coast) — complete 2026-06-13. → ROADMAP / ARCH §12.1-K
-  - **Blueprint A — Agent-Terrain Migration + Static Game — complete 2026-06-14. Gate A-1 GREEN (4 rails), 430 tests.**
+  - **Blueprint A — Agent-Terrain Migration + Static Game — complete 2026-06-14; COMMITTED to origin/main `1447c75` on 2026-06-15. Gate A-1 GREEN (4 rails); pytest 430/430 VERIFIED.**
     - A-1: C agents on terrain kcal (forage_kcal via TerrainField); SugarField DORMANT-SUPERSEDED-FOR-C.
     - A-2: game_kcal field; sex attribute; sex-based stream selection; binary child age-gate.
     - Three seams: GD-1, CC-1, JV-1 in DEFERRED_MECHANICS.md.
     - lifespan_months=900 [PLACEHOLDER], reserve_full=100k [PLACEHOLDER MR-1], reserve_floor=20k [PLACEHOLDER MR-1].
     - Gate result: pop 240–243 (seeds 42/43/44), 500 steps, forage-only. → ROADMAP / ARTIFACTS.md / ARCH §12.1-L / ARCH §15.7
+  - **Game-table representative-value reconcile (2026-06-15):** `GAME_KCAL_TARGETS` now follows game table §F.2.1 derivations. Forest **7,749 → 5,541** (flat-mean → pursuit-weighted mean). Intertidal **reclassified game → forage** (double-count fix; SHORE_BONUS_KCAL). Savanna 518 / Grass 3,001 unchanged (derivation-pointed). Desert 1,201 **PROVISIONAL, unchanged** — Bird 2009 Fig 4 PDF absent from repo. All game values PROVISIONAL pending CC-1. → game table §F.2.1 / PARAMETERS §13.3 / ARCH §12.1-M
 - **Next:** A-3 perf audit (separate blueprint); then seasonal-forage. → ROADMAP (Blueprint A deferred items)
 
 ---

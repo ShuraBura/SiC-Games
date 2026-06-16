@@ -49,13 +49,14 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 
 # ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
 # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
-# Per-biome target means (kcal/forager-hr) from SiC_Games_Game_Return_Rate_Table.md §F.2.
+# Per-biome representative values derived in SiC_Games_Game_Return_Rate_Table.md §F.2.1
+# (the authoritative home for each value; this dict follows the table, never leads it).
 # Wetland, Mountain, Water: UNANCHORED → game_kcal zeroed (not present in this dict).
 GAME_KCAL_TARGETS = {
-    BIOME_FOREST:  7749.0,   # Hill et al. 1987 Table 2 mean of 7 species [NATIVE, handling-only]
-    BIOME_SAVANNA:  518.0,   # Hawkes et al. 1991 all-seasons encounter/scavenge [CONVERTED]
-    BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 [NATIVE kcal/hr stated]
-    BIOME_DESERT:  1201.0,   # Bird et al. 2009 Table 1 mid-range [NATIVE]
+    BIOME_FOREST:  5541.0,   # 7749.0 → 5541.0: flat-mean → pursuit-weighted mean (1,462,745/264). Table §F.2.1 [NATIVE, handling-only, PROVISIONAL]
+    BIOME_SAVANNA:  518.0,   # all-seasons base encounter (static cell; 745 dry-season = seasonality hook). Table §F.2.1 [CONVERTED, PROVISIONAL]
+    BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 direct lift. Table §F.2.1 [NATIVE, PROVISIONAL]
+    BIOME_DESERT:  1201.0,   # [PROVISIONAL — desert method pending supervisor + Bird 2009 Fig 4 (PDF absent)]; bare midpoint of 641–1,761, NOT a defensible median. Table §F.2.1
 }
 
 # ── Phase 1 Stage 1b constants ─────────────────────────────────────────────

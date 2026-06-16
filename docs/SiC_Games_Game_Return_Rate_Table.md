@@ -6,6 +6,8 @@
 **Derived from:** LITERATURE.md Survey B entries. All authoritative citations live in LITERATURE.md; this document is the derived view. Correct citation details in LITERATURE.md first; this table follows.  
 **Companion document:** `SiC_Games_Forage_Return_Rate_Table.md` (forage layer; this document is game only)
 
+**Forage vs game category boundary (added 2026-06-15):** terrestrial vertebrate prey (hunting) = **game**; intertidal/shellfishing, roots, tubers, and plant resources = **forage**. Intertidal is therefore NOT a game cell — see the struck Intertidal row in §F.2 and §F.2.1.
+
 ---
 
 ## §F.1 Methodology
@@ -58,8 +60,56 @@ UNANCHORED cells are accepted gaps, not errors. They carry `—` in the cell val
 | Desert | LOCKED | 641–1,761 kcal/hr by species | Search-inclusive | Bird et al. 2009, Table 1 [NATIVE] | Range reflects prey species composition. Individual species rates in Table 1 of source. Reptiles at low end; larger game at high end. |
 | Wetland | UNANCHORED | — | — | — | No journal-article kcal/hr source found. Three candidates checked (Hill et al. 1997, Gurven & Hill 2009, Redford & Robinson 1987): all negative for time-denominated energetics. Gap accepted; cell remains empty at model-build time. |
 | Mountain | UNANCHORED (permanent) | — | — | — | No source exists in the HG literature for mountain-specific game return rates. Permanent gap; fill requires primary-source discovery. |
-| Intertidal | LOCKED | 4,653 ± 1,213 kcal/hr | Search-inclusive | Bliege Bird et al. 2001, Table 2 [NATIVE] | **MANDATORY CAVEAT:** gross pre-sharing rate only. Net hunter yield ≈ 0 (costly-signaling context — hunters retain no meat). Do not use as functional forager return rate without explicit justification. |
+| ~~Intertidal~~ | **NOT GAME → FORAGE** | — | — | ~~Bliege Bird et al. 2001~~ (cross-ref only) | **RECLASSIFIED 2026-06-15 (reconcile directive §4).** Intertidal foraging (shellfishing) is **forage**, not game — anchored in the forage layer (Bird 1997 Meriam) and applied in code as `SHORE_BONUS_KCAL = 1491.5` on `forage_kcal` (terrain.py:40). Holding it as a game cell **double-counts the same activity** across both fields. Provenance preserved: Bliege Bird et al. 2001, Table 2 reported 4,653 ± 1,213 kcal/hr [NATIVE], **gross pre-sharing only — net hunter yield ≈ 0** (costly-signaling; hunters retain no meat). Excluded from the game field; `GAME_KCAL_TARGETS` has no intertidal key. |
 | Open water | ZERO — model scope | — | — | — | Fish/aquatic game outside current model scope. No source required until water-game stage is scheduled. |
+
+---
+
+## §F.2.1 Representative-value derivation (feeds `GAME_KCAL_TARGETS`)
+
+Each biome's single **representative value** — the number `terrain.py:GAME_KCAL_TARGETS` scales toward — is derived here with explicit arithmetic, mirroring the forage layer's per-cell working. **This subsection is the authoritative home for the matching code constant** (reconcile directive §5). Every value carries `[PROVISIONAL — pending CC-1 ceiling]` until CC-1 lands.
+
+### Forest — encounter(pursuit)-weighted mean  [method LOCKED by supervisor]
+
+Table 2 (§F.3) reports per-species **pursuit counts `n`** = encounter frequencies, so the supervisor-locked method applies: weight each species' post-encounter rate by its pursuit count (a flat mean of the 1,370–15,398 spread overstates typical yield).
+
+Dual-value resolution (Table 2 denominator, footnote a = "acquisition attempts plus all relevant processing"; search excluded):
+- **White-lipped peccary → 5,323** (footnote d: "includes time spent following tracks"). Tracking is part of the *acquisition attempt*, so 5,323 matches the table-wide denominator; the alternative 8,755 ("only after animal is heard or seen") uses a narrower post-detection denominator and is rejected for consistency.
+- **9-banded armadillo → kept as two genuine encounter modes**: surface 13,782 (n=26) and burrow 2,662 (n=31); both are post-encounter handling rates.
+
+| Species | rate (kcal/hr) | n (pursuits) | rate × n |
+|---|---|---|---|
+| White-lipped peccary | 5,323 | 21 | 111,783 |
+| Deer (red brocket) | 15,398 | 12 | 184,776 |
+| Collared peccary | 6,120 | 51 | 312,120 |
+| Paca | 4,705 | 53 | 249,365 |
+| 9-banded armadillo (surface) | 13,782 | 26 | 358,332 |
+| 9-banded armadillo (burrow) | 2,662 | 31 | 82,522 |
+| Coati | 7,547 | 11 | 83,017 |
+| Capuchin monkey | 1,370 | 59 | 80,830 |
+| **Σ** | | **264** | **1,462,745** |
+
+**Weighted mean = 1,462,745 / 264 = 5,540.7 ≈ 5,541 kcal/hr**  `[NATIVE, handling-only, PROVISIONAL]`.
+
+*Cross-check (median):* 7 single-species values (armadillo internally pursuit-weighted to (13,782·26 + 2,662·31)/57 = 7,734) ranked = {1,370; 4,705; 5,323; 6,120; 7,547; 7,734; 15,398} → **median = 6,120**. The encounter-weighted mean (5,541) sits **below** the median because the most-frequently-pursued species (capuchin n=59 @ 1,370; paca n=53 @ 4,705; collared peccary n=51 @ 6,120) are mid-to-low value — weighting by how often each is actually hunted pulls the representative rate down, exactly the tail-resistance intended. Both 5,541 and 6,120 are far below the retired flat-mean 7,749.
+
+**Result: forest representative value 7,749 → 5,541 kcal/hr.**
+
+### Savanna — base encounter rate is the static cell  [CONVERTED]
+
+Two figures exist (§F.2): base encounter/scavenge **~518 kcal/hr** (all seasons) and dry-season intercept **~745 kcal/hr** (Aug–Oct, water-aggregation sites only). The **static cell = 518** (all-seasons base, [CONVERTED] via mass × edible_fraction 0.50 × energy_density 1460 at Survey-B time). The 745 dry-season intercept is a **seasonality hook** — it gates on at aggregation sites in the late dry season (§F.4) — not the static value. No constant change (already 518.0).
+
+### Grassland — direct lift  [NATIVE]
+
+**3,001 kcal/hr** stated directly as kcal/hr in Hurtado & Hill 1987 (single source, no spread, no arithmetic — direct lift). Corroborated ~2,700 by Gurven & Hill 2009 but not blended. No constant change (already 3001.0).
+
+### Desert — TO RESOLVE; left PROVISIONAL (supervisor-deferred)
+
+The current constant **1,201** is the bare midpoint of the Bird et al. 2009 (Martu) 641–1,761 species range. Reconcile directive §3 instructed reading **Bird et al. 2009 Figure 4** for the per-species post-encounter rates, to apply the same encounter-weighted method as forest. **No Bird et al. 2009 (Martu desert) source is available** — the `literature/` folder (added by the supervisor 2026-06-15) contains Hill 1987, Bird 1997 (Meriam intertidal), O'Connell & Hawkes Alyawara, and ~25 others, but **no Bird 2009 Martu game paper**. The per-species figures therefore cannot be extracted, and a species-median or encounter-weighted desert value cannot be computed in this pass. Pending the figure, the midpoint 1,201 is a **placeholder, not a defensible median**. Desert stays at 1,201 tagged `[PROVISIONAL — desert method pending supervisor + Bird 2009 Fig 4 (PDF absent from repo)]`; **the code constant is not changed**. Recommended method once the figure is available: encounter/pursuit-weighted mean over the plotted species (hill kangaroo, sand monitor, perentie, bustard, python, …), mirroring forest; O'Connell & Hawkes 1984 (Alyawara sandplain ~3,200 / mulga ~650) usable only as a patch-level sanity band, never an override of the Martu species-resolved value.
+
+### Wetland / Mountain — UNANCHORED → 0
+
+No journal kcal/hr source (§F.2, §F.5). `game_kcal = 0` at these biomes is a **gap (absence of data), not a measured zero**. Neither appears in `GAME_KCAL_TARGETS`; the mean-scaling loop (terrain.py:498) zeroes any biome absent from the dict.
 
 ---
 
