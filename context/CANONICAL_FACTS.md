@@ -32,7 +32,7 @@
     - Three seams: GD-1, CC-1, JV-1 in DEFERRED_MECHANICS.md.
     - lifespan_months=900 [PLACEHOLDER], reserve_full=100k [PLACEHOLDER MR-1], reserve_floor=20k [PLACEHOLDER MR-1].
     - Gate result: pop 240–243 (seeds 42/43/44), 500 steps, forage-only. → ROADMAP / ARTIFACTS.md / ARCH §12.1-L / ARCH §15.7
-  - **Game-table representative-value reconcile (2026-06-15):** `GAME_KCAL_TARGETS` now follows game table §F.2.1 derivations. Forest **7,749 → 5,541** (flat-mean → pursuit-weighted mean). Intertidal **reclassified game → forage** (double-count fix; SHORE_BONUS_KCAL). Savanna 518 / Grass 3,001 unchanged (derivation-pointed). Desert 1,201 **PROVISIONAL, unchanged** — Bird 2009 Fig 4 PDF absent from repo. All game values PROVISIONAL pending CC-1. → game table §F.2.1 / PARAMETERS §13.3 / ARCH §12.1-M
+  - **Game-table representative-value reconcile (2026-06-15):** `GAME_KCAL_TARGETS` now follows game table §F.2.1 derivations. Forest **7,749 → 5,541** (flat-mean → pursuit-weighted mean). Intertidal **reclassified game → forage** (double-count fix; SHORE_BONUS_KCAL). Savanna 518 / Grass 3,001 unchanged (derivation-pointed). Desert 1,201 **PROVISIONAL, unchanged** — Bird 2009 Martu source now in literature/ but per-species rates are box-plot figures (need image read; spread ≈641 sand monitor → 100,000+ bustard confirms midpoint indefensible); pending supervisor read of Fig 4. All game values PROVISIONAL pending CC-1. → game table §F.2.1 / PARAMETERS §13.3 / ARCH §12.1-M
 - **Next:** A-3 perf audit (separate blueprint); then seasonal-forage. → ROADMAP (Blueprint A deferred items)
 
 ---
