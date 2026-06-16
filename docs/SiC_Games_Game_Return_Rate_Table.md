@@ -113,7 +113,20 @@ Two figures exist (§F.2): base encounter/scavenge **~518 kcal/hr** (all seasons
 
 Hunted (game) species in the source: sand monitor (*Varanus gouldii*), perentie, python, blue-tongue/skink, feral cat, bustard, hill kangaroo (euro). (Cossid larvae, honey, bush tomato/raisin, grass seed, pencil yam = *collected* → forage, not game.)
 
-**Verdict:** the **1,201 midpoint remains indefensible**, but for the right reason — the principled value is a **frequency-weighted mean (or median) of the search-inclusive *overall hunt-type* rates**, not the post-encounter figures. Because sand-monitor hunting is the single most common activity (≈ 641), a frequency-weighted value skews **below** the midpoint, likely ≈ 700–900 kcal/hr. Firm read so far: sand monitor ≈ 641; the per-hunt-type overall rates for perentie/bustard/kangaroo/cat still need extraction from the paper's results text before a number can be proposed. **Desert constant left UNCHANGED at 1,201 PROVISIONAL** (§3.4 supervisor-gated) — recommend the supervisor confirm the search-inclusive basis and the collapse rule (frequency-weighted vs median). O'Connell & Hawkes 1984 (Alyawara sandplain ~3,200 / mulga ~650; `Alyawara_plant_use_and_optimal_foraging.pdf` in `literature/`) is a patch-level sanity band only, never an override.
+**Verdict:** the **1,201 midpoint remains indefensible** — the principled value is a **bout-frequency-weighted mean of the search-inclusive *overall hunt-type* rates** (not the post-encounter figures).
+
+**Per-hunt-type overall (search-inclusive) rates, read from the results text (p.13–14):**
+
+| Hunt type | Overall rate (kcal/hr) | n (bouts) | rate × n | Source / note |
+|---|---|---|---|---|
+| Sand monitor | 641 | 612 | 392,292 | All-seasons average (519 kcal/hr search+handling, n=612); the most common activity [NATIVE] |
+| Perentie | 765 | 78 | 59,670 | Bout-weighted of 507 (May–Nov, n=22) and 867 (Dec–Apr, n=56) [NATIVE] |
+| Bustard | 1,300 | 91 | 118,300 | "Nearly double… sand monitor or perentie hunting" (p.14) → ≈2×~650; aligns with the cited 1,761 upper. n=91 is the failure-bout count (lower bound) [ESTIMATED from qualitative ratio] |
+| **Σ** | | **781** | **570,262** | |
+
+**Bout-frequency-weighted mean = 570,262 / 781 = ≈ 730 kcal/hr** `[PROVISIONAL]`. Median of the three hunt-type rates {641, 765, 1,300} = **765**. Both ≈ **750**, dominated by sand-monitor hunting (n=612 of 781). **Excluded:** hill kangaroo (high-variance, 56% failure, n=289; overall rate not stated cleanly — would raise the estimate toward ≈ 900 if included at a plausible overall rate) and feral cat (opportunistic, no standalone hunt rate).
+
+**Proposed desert value ≈ 730 kcal/hr** (range ≈ 730–940 depending on hill-kangaroo treatment) — vs the current 1,201. **NOT LOCKED:** bustard rests on a qualitative "nearly double," and hill kangaroo is excluded for lack of a clean overall rate; the supervisor must confirm (a) the search-inclusive basis, (b) the bustard rate / whether to include hill kangaroo, and (c) frequency-weighted vs median, before this enters `GAME_KCAL_TARGETS`. **Desert constant left UNCHANGED at 1,201 PROVISIONAL** (§3.4). O'Connell & Hawkes 1984 (Alyawara sandplain ~3,200 / mulga ~650; `Alyawara_plant_use_and_optimal_foraging.pdf` in `literature/`) is a patch-level sanity band only, never an override.
 
 ### Wetland / Mountain — UNANCHORED → 0
 
