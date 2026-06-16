@@ -260,18 +260,18 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
 
-**Value home (one-fact-one-home):** the authoritative derivation of every value below is `SiC_Games_Game_Return_Rate_Table.md §F.2.1` (Representative-value derivation). This table restates the resulting number with a pointer; it does not lead. Reconciled 2026-06-15 (reconcile directive §2/§5).
+**Value home (one-fact-one-home):** the authoritative derivation of every value below is `SiC_Games_Resource_Return_Rate_Table.md §3.2` (Representative-value derivation). This table restates the resulting number with a pointer; it does not lead. Reconciled 2026-06-15 (reconcile directive §2/§5).
 
 **Cell-value distribution (2026-06-15, supervisor-directed):** each biome's cells are drawn from a literature-anchored **lognormal `(mean, std)`** via a terrain-coupled deterministic rescale — see MECHANISMS §9a.6 / ARCHITECTURE §12.1-N. `GAME_KCAL_TARGETS[b]` = mean; `GAME_KCAL_STD[b]` = std. Where std is **PENDING** (not yet sourced) the field falls back to legacy mean-only scaling.
 
 | Name | Symbol | Mean | Std (kcal/hr) | Status | Source |
 |------|--------|------|------|--------|--------|
-| Forest game | GAME_KCAL_TARGETS / STD[FOREST] | **5,541** | **4,043** [NATIVE] | PROVISIONAL [NATIVE, handling-only] | Mean: pursuit-weighted of 7 Hill 1987 species (1,462,745/264). Std: weighted std of the 7 species (CV 0.73). §F.2.1 |
-| Savanna game | GAME_KCAL_TARGETS / STD[SAVANNA] | **518** | **1158** [LIT-DERIVED] | PROVISIONAL [CONVERTED] | Mean: all-seasons base encounter (745 dry-season = seasonality hook). Std: Hawkes 1991 small-game income 0.162±0.362 animals/day → CV 2.24 × mean (hunting is high-variance; 10% would understate). **Supervisor-review** — derived from income variance, not a direct rate-SD. §F.2.1 |
-| Grassland game | GAME_KCAL_TARGETS[GRASS] | **3,001** | **300.1** [10%-DEFAULT] | PROVISIONAL [NATIVE] | Mean: Hurtado & Hill 1987 direct lift. Std: 10% default (single-source mean, no spread). §F.2.1 |
-| Desert game | GAME_KCAL_TARGETS / STD[DESERT] | **730** | **210** | **SET 2026-06-15 (supervisor-approved)**; PROVISIONAL pending CC-1 | **1,201 → 730:** bout-frequency-weighted mean of search-incl. overall hunt-type rates — sand monitor (641, n=612), perentie (765, n=78), bustard (~1,300, n=91) = 570,262/781 (median 765). Std: weighted std of the 3 rates (CV 0.29). Bird 2009 (Am. Antiquity 74(1)), read via image render. §F.2.1 |
-| ~~Intertidal game~~ | — | — | — | **RECLASSIFIED → FORAGE (2026-06-15)** | Intertidal shellfishing is forage, not game (double-count fix); see SHORE_BONUS_KCAL=1491.5 and game table §F.2/§F.2.1. No GAME_KCAL_TARGETS key |
-| Wetland game | — | **0** (UNANCHORED) | — | UNANCHORED | No source found (SiC_Games_Game_Return_Rate_Table.md §F.2) |
+| Forest game | GAME_KCAL_TARGETS / STD[FOREST] | **5,541** | **4,043** [NATIVE] | PROVISIONAL [NATIVE, handling-only] | Mean: pursuit-weighted of 7 Hill 1987 species (1,462,745/264). Std: weighted std of the 7 species (CV 0.73). §3.2 |
+| Savanna game | GAME_KCAL_TARGETS / STD[SAVANNA] | **518** | **1158** [LIT-DERIVED] | PROVISIONAL [CONVERTED] | Mean: all-seasons base encounter (745 dry-season = seasonality hook). Std: Hawkes 1991 small-game income 0.162±0.362 animals/day → CV 2.24 × mean (hunting is high-variance; 10% would understate). **Supervisor-review** — derived from income variance, not a direct rate-SD. §3.2 |
+| Grassland game | GAME_KCAL_TARGETS[GRASS] | **3,001** | **300.1** [10%-DEFAULT] | PROVISIONAL [NATIVE] | Mean: Hurtado & Hill 1987 direct lift. Std: 10% default (single-source mean, no spread). §3.2 |
+| Desert game | GAME_KCAL_TARGETS / STD[DESERT] | **730** | **210** | **SET 2026-06-15 (supervisor-approved)**; PROVISIONAL pending CC-1 | **1,201 → 730:** bout-frequency-weighted mean of search-incl. overall hunt-type rates — sand monitor (641, n=612), perentie (765, n=78), bustard (~1,300, n=91) = 570,262/781 (median 765). Std: weighted std of the 3 rates (CV 0.29). Bird 2009 (Am. Antiquity 74(1)), read via image render. §3.2 |
+| ~~Intertidal game~~ | — | — | — | **RECLASSIFIED → FORAGE (2026-06-15)** | Intertidal shellfishing is forage, not game (double-count fix); see SHORE_BONUS_KCAL=1491.5 and game table §3.1/§3.2. No GAME_KCAL_TARGETS key |
+| Wetland game | — | **0** (UNANCHORED) | — | UNANCHORED | No source found (SiC_Games_Resource_Return_Rate_Table.md §3.1) |
 | Mountain game | — | **0** (UNANCHORED permanent) | — | UNANCHORED-PERMANENT | No source exists in HG literature |
 | Water game | — | **0** (out of scope) | — | OUT-OF-SCOPE | Fish/aquatic game out of model scope |
 

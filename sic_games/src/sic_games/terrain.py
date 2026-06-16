@@ -35,7 +35,8 @@ BIOME_DESERT   = 5
 BIOME_MOUNTAIN = 6
 
 # ── Phase 1 Stage 1 constants ──────────────────────────────────────────────
-# All forage values trace to LITERATURE.md Survey A (canonical home).
+# All forage values trace to LITERATURE.md (canonical home); derivations in
+# SiC_Games_Resource_Return_Rate_Table.md §2.2 (forage) / §3.2 (game).
 NPP_GM2_SCALE = 3400.0        # npp_gm2 = npp * NPP_GM2_SCALE
                                # Anchor: generator forest-onset (npp≈0.4) →
                                # Tallavaara 2018 saturation ~1360 g/m²/yr (single-point assertion)
@@ -48,9 +49,8 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
     BIOME_DESERT:   1200.0,   # PROVISIONAL; O'Connell & Hawkes 1984 range 650-1925
     BIOME_MOUNTAIN: 5387.0,   # Rhode & Rhode 2015, limber pine unhulled
 }
-# Per-biome literature spread (std, kcal/forager-hr) for the lognormal cell-value draw.
-# None → std not yet anchored in literature → falls back to the terrain field's natural
-# spread (legacy mean-only scaling), tagged PENDING. See MECHANISMS §9a.6.
+# Per-biome literature spread (std) for the lognormal cell-value draw. Biomes absent
+# here use DEFAULT_STD_FRAC (10% of mean). Derivations: Resource table §2.2; MECHANISMS §9a.6.
 FORAGE_KCAL_STD = {
     BIOME_WETLAND: 3362.0,    # Cunningham diss: mean(Wet)=1428.3, median=558.7 → lognormal std (CV 2.35, skewed USO returns) [LIT]
     BIOME_FOREST:   600.0,    # std across Hill 1987 palm-product rates {2356,3219,2436,2243,1331} [LIT]
@@ -61,21 +61,21 @@ FORAGE_KCAL_STD = {
 
 # ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
 # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
-# Per-biome representative values derived in SiC_Games_Game_Return_Rate_Table.md §F.2.1
+# Per-biome representative values derived in SiC_Games_Resource_Return_Rate_Table.md §3.2
 # (the authoritative home for each value; this dict follows the table, never leads it).
 # Wetland, Mountain, Water: UNANCHORED → game_kcal zeroed (not present in this dict).
 GAME_KCAL_TARGETS = {
-    BIOME_FOREST:  5541.0,   # 7-species pursuit-weighted mean (Hill 1987; 1,462,745/264). Table §F.2.1 [NATIVE, handling-only, PROVISIONAL]
-    BIOME_SAVANNA:  518.0,   # all-seasons base encounter (static cell; 745 dry-season = seasonality hook). Table §F.2.1 [CONVERTED, PROVISIONAL]
-    BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 direct lift. Table §F.2.1 [NATIVE, PROVISIONAL]
-    BIOME_DESERT:   730.0,   # 1201→730: bout-frequency-weighted mean of search-incl. overall hunt-type rates (Bird 2009; 570,262/781). Table §F.2.1 [supervisor-approved 2026-06-15, PROVISIONAL]
+    BIOME_FOREST:  5541.0,   # 7-species pursuit-weighted mean (Hill 1987; 1,462,745/264). Resource table §3.2 [NATIVE, handling-only, PROVISIONAL]
+    BIOME_SAVANNA:  518.0,   # all-seasons base encounter (static cell; 745 dry-season = seasonality hook). Resource table §3.2 [CONVERTED, PROVISIONAL]
+    BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 direct lift. Resource table §3.2 [NATIVE, PROVISIONAL]
+    BIOME_DESERT:   730.0,   # 1201→730: bout-frequency-weighted mean of search-incl. overall hunt-type rates (Bird 2009; 570,262/781). Resource table §3.2 [supervisor-approved 2026-06-15, PROVISIONAL]
 }
-# Per-biome literature spread (std, kcal/forager-hr) for the lognormal cell-value draw.
-# None → std not yet anchored → terrain-field-spread fallback, tagged PENDING. MECHANISMS §9a.6.
+# Per-biome literature spread (std). Biomes absent here use DEFAULT_STD_FRAC (10% of mean).
+# Derivations: Resource table §3.2; MECHANISMS §9a.6.
 GAME_KCAL_STD = {
-    BIOME_FOREST:  4043.0,   # weighted std of the 7 Hill 1987 species rates (CV 0.73). Table §F.2.1 [NATIVE]
+    BIOME_FOREST:  4043.0,   # weighted std of the 7 Hill 1987 species rates (CV 0.73). Resource table §3.2 [NATIVE]
     BIOME_SAVANNA: 1158.0,   # Hawkes 1991: small-game income 0.162±0.362 animals/day → CV 2.24 × mean 518 [LIT-DERIVED, supervisor-review — hunting is high-variance; 10% understates]
-    BIOME_DESERT:   210.0,   # weighted std of the 3 Bird 2009 hunt-type rates {641,765,1300} (CV 0.29). Table §F.2.1
+    BIOME_DESERT:   210.0,   # weighted std of the 3 Bird 2009 hunt-type rates {641,765,1300} (CV 0.29). Resource table §3.2
     # GRASS absent → DEFAULT_STD_FRAC fallback (10% of mean; Hurtado & Hill 1987 variance source not in repo)
 }
 

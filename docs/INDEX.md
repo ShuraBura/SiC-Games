@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-06-14 (MODEL_SPEC.md created — resource-layer methodology home; game return-rate table added). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
+**Last updated:** 2026-06-16 (unified **Resource Return-Rate Table** created — forage + game in one derived view; the game-only table retired to a stub). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
 
 ---
 
@@ -54,7 +54,8 @@
 | LITERATURE.md | live (full bibliography + Si-Cred synthesis) | Code + supervisor | when a source is consulted |
 | DEAD_ENDS.md | live (DE-1) | Code + supervisor | when an approach is retired |
 | MODEL_SPEC.md | **live** (created 2026-06-14; resource-layer methodology only) | Code + supervisor | when a resource-layer formula, denominator rule, or seasonal seam changes |
-| SiC_Games_Game_Return_Rate_Table.md | **live** (created 2026-06-14; derived view) | Code | when a game biome cell is anchored, updated, or unanchored policy changes |
+| SiC_Games_Resource_Return_Rate_Table.md | **live** (created 2026-06-16; derived view, forage + game) | Code | when any forage/game biome cell mean or std is anchored, updated, or unanchored policy changes |
+| SiC_Games_Game_Return_Rate_Table.md | **RETIRED 2026-06-16** → merged into the unified Resource table (stub redirect kept) | — | — |
 | DEFERRED_MECHANICS.md | **live** (created 2026-06-14; 7 entries: GD-1 through PL-1) | Code + supervisor | when a mechanic is deferred here, promoted to a blueprint, or its seam changes |
 
 *Also under `docs/`:* **DOCS_CHARTER.md** (the governance document this index implements). The former MODEL_SPEC v0.2 was split into ARCHITECTURE + MECHANISMS on 2026-06-06 and is archived at `archive/superseded/`. The new MODEL_SPEC.md is scoped to resource-layer methodology only and does not reconstitute v0.2.
@@ -62,8 +63,9 @@
 **Phase 1 resource-layer routing (added 2026-06-14):**
 | Question | Home |
 |---|---|
-| Game return rates by biome (kcal/hr, cell values, UNANCHORED gaps) | **SiC_Games_Game_Return_Rate_Table.md** |
-| Forage return rates by biome | **SiC_Games_Forage_Return_Rate_Table.md** |
+| Game return rates by biome (mean, std, derivations, UNANCHORED gaps) | **SiC_Games_Resource_Return_Rate_Table.md §3** |
+| Forage return rates by biome (mean, std, derivations) | **SiC_Games_Resource_Return_Rate_Table.md §2** |
+| Cell-value distribution (lognormal draw, 10% std rule) | **SiC_Games_Resource_Return_Rate_Table.md §1.5–1.6** / MECHANISMS §9a.6 |
 | Resource-layer formula, constants (edible_fraction, energy_density) | **MODEL_SPEC.md §4.1.1** |
 | Denominator standardisation rule; forest construct-seam | **MODEL_SPEC.md §4.1.2** |
 | Unanchored cell policy (wetland, mountain) | **MODEL_SPEC.md §4.1.3** |

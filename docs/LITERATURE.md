@@ -331,7 +331,7 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 **What was rejected:** Whole-diet aggregate (1339/1221) as the forest cell value — rejected in favour of the activity-specific palm rate for consistency with the other activity-specific cells.
 
-**Game role (Survey B, 2026-06-14):** Forest biome game anchor — post-encounter return rates by species, Table 2 [NATIVE]. Handling-only denominator (construct-seam exception: "Includes time spent in acquisition attempts plus all relevant processing" per Table 2 footnote a — search time excluded; all other game biomes are search-inclusive). energy_density = 1,460 kcal/kg from fn 3 (same constant as forage role above). Seven game species extracted from Table 2 (see `SiC_Games_Game_Return_Rate_Table.md §F.3`). Dual-value entries: footnote d (white-lipped peccary — first value includes tracking time; second from point animal is heard/seen); footnote e (armadillo — first value = surface encounter; second = burrow excavation). Note: tapir mentioned in text as hunted but not in Table 2 (sample insufficient or excluded).
+**Game role (Survey B, 2026-06-14):** Forest biome game anchor — post-encounter return rates by species, Table 2 [NATIVE]. Handling-only denominator (construct-seam exception: "Includes time spent in acquisition attempts plus all relevant processing" per Table 2 footnote a — search time excluded; all other game biomes are search-inclusive). energy_density = 1,460 kcal/kg from fn 3 (same constant as forage role above). Seven game species extracted from Table 2 (see `SiC_Games_Resource_Return_Rate_Table.md §3.3`). Dual-value entries: footnote d (white-lipped peccary — first value includes tracking time; second from point animal is heard/seen); footnote e (armadillo — first value = surface encounter; second = burrow excavation). Note: tapir mentioned in text as hunted but not in Table 2 (sample insufficient or excluded).
 
 ---
 
@@ -448,7 +448,7 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 ## Survey B: Game Return-Rate Sources (per-biome kcal/hr)
 
-> **Canonical-home note (2026-06-14):** LITERATURE.md is the bibliography of record for all Survey B game sources. `SiC_Games_Game_Return_Rate_Table.md` is the derived view — it carries the kcal/hr values inline for use, but authoritative citations and source locations live here. Correct citation details here first; the table follows.
+> **Canonical-home note (2026-06-14):** LITERATURE.md is the bibliography of record for all Survey B game sources. `SiC_Games_Resource_Return_Rate_Table.md` is the derived view — it carries the kcal/hr values inline for use, but authoritative citations and source locations live here. Correct citation details here first; the table follows.
 
 ---
 

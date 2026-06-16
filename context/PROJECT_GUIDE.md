@@ -71,10 +71,10 @@ These are standing invariants. Changing any of them requires explicit supervisor
 | Doc | Owns | Note |
 |---|---|---|
 | **MODEL_SPEC.md** | Resource-layer methodology: kcal formula, edible_fraction/energy_density, denominator rules, UNANCHORED policy, seasonal-signal architecture | §4.1.x; the "how literature → resource inputs" record |
-| **SiC_Games_Game_Return_Rate_Table.md** | Game return rates by biome — **§F.2.1 derives `GAME_KCAL_TARGETS` (mean) + `GAME_KCAL_STD` (std)** | Derived view; LITERATURE.md owns the citations |
+| **SiC_Games_Resource_Return_Rate_Table.md** | **The exhaustive resource table (forage + game).** §1 shared methodology, §2 forage (mean/std/derivations), §3 game (mean/std/derivations, per-species), §4 combined source list. Feeds `FORAGE/GAME_KCAL_TARGETS` + `_STD` | Derived view; LITERATURE.md owns citations, PARAMETERS owns the value mirror. (Former game-only table retired → stub redirect.) |
 | **DEFERRED_MECHANICS.md** | The 7 agreed-but-deferred mechanics (seam + literature anchor + status) | GD-1, JV-1, CC-1, RS-1, MR-1, MR-2, PL-1 |
 
-*(Forage return values live in code `terrain.py:FORAGE_KCAL_TARGETS/_STD` + PARAMETERS §12.4; there is no standalone forage-table file despite older pointers.)*
+*(Forage + game return values are now consolidated in the unified Resource Return-Rate Table above, with the value mirror in PARAMETERS §12.4 (forage) / §13.3 (game) and the constants in `terrain.py`.)*
 
 ### 4.3 The `context/` layer (non-canonical — bridges chat-to-chat)
 

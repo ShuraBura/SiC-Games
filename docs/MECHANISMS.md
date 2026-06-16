@@ -335,7 +335,7 @@ Each biome's cell values are drawn from a **literature-anchored distribution** w
 **(a) std anchored in literature → terrain-coupled lognormal (the §9a.6 mechanic).**
 **(b) std not yet anchored (`None`) → legacy mean-only scaling** (fallback): `field_kcal[mask] = field[mask] × (mean / mean_norm(field[mask]))` — spread is whatever the terrain field gives, tagged PENDING-std.
 
-Biomes NOT in the target dict (water; wetland/mountain for game) stay at 0. All cell values PROVISIONAL pending CC-1. Means/stds: PARAMETERS.md §12.4 (forage) and §13.3 (game); derivations: `SiC_Games_Game_Return_Rate_Table.md §F.2.1`.
+Biomes NOT in the target dict (water; wetland/mountain for game) stay at 0. All cell values PROVISIONAL pending CC-1. Means/stds: PARAMETERS.md §12.4 (forage) and §13.3 (game); derivations: `SiC_Games_Resource_Return_Rate_Table.md §3.2`.
 
 ### 9a.6 Terrain-coupled lognormal cell-value draw (2026-06-15)
 
