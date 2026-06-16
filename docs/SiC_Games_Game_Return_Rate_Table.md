@@ -67,7 +67,7 @@ UNANCHORED cells are accepted gaps, not errors. They carry `—` in the cell val
 
 ## §F.2.1 Representative-value derivation (feeds `GAME_KCAL_TARGETS` + `GAME_KCAL_STD`)
 
-Each biome's resource cells are **drawn from a literature-anchored lognormal `(mean, std)`** (terrain-coupled, deterministic — MECHANISMS §9a.6 / ARCHITECTURE §12.1-N). This subsection derives both moments with explicit arithmetic. **It is the authoritative home for `GAME_KCAL_TARGETS` (mean) and `GAME_KCAL_STD` (std).** Anchored stds so far: **forest 4,043, desert 210**; savanna/grass stds are **PENDING** (single-source means — fall back to terrain-spread until sourced). Every value carries `[PROVISIONAL — pending CC-1 ceiling]` until CC-1 lands.
+Each biome's resource cells are **drawn from a literature-anchored lognormal `(mean, std)`** (terrain-coupled, deterministic — MECHANISMS §9a.6 / ARCHITECTURE §12.1-N). This subsection derives both moments with explicit arithmetic. **It is the authoritative home for `GAME_KCAL_TARGETS` (mean) and `GAME_KCAL_STD` (std).** Std sourcing rule (supervisor, 2026-06-15): mine from literature where the source reports a spread; **else std = 10% of the mean**. Literature-anchored game stds: **forest 4,043, desert 210**; savanna/grass use the **10% default** (51.8 / 300.1). Every value carries `[PROVISIONAL — pending CC-1 ceiling]` until CC-1 lands.
 
 **Std summary:** forest = weighted std of the 7 species rates = **4,043** (CV 0.73); desert = weighted std of the 3 hunt-type rates {641,765,1300} = **210** (CV 0.29). Derivations inline below.
 

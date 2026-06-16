@@ -348,7 +348,9 @@ Biomes NOT in the target dict (water; wetland/mountain for game) stay at 0. All 
 
 **Properties:** positive-only (no negative kcal); right-skewed (matches foraging-return data, e.g. the bustard tail); realised biome mean exact, std within ~1% of target; **terrain coupling preserved** (high-terrain-field cells get high values — "game peaks in forest" survives); **deterministic / reproducible** (same `(knobs, seedStr)` → byte-identical field), so the equivalence-gate discipline is intact.
 
-**Distribution-family choice = lognormal; spatial choice = terrain-coupled rescale** (supervisor, 2026-06-15) — see ARCHITECTURE.md §12.1-N. Where a biome's literature std is not yet sourced, the field falls back to legacy mean-only scaling (PENDING-std) — see PARAMETERS.md for which biomes are anchored vs PENDING.
+**Distribution-family choice = lognormal; spatial choice = terrain-coupled rescale** (supervisor, 2026-06-15) — see ARCHITECTURE.md §12.1-N.
+
+**Std sourcing rule (supervisor, 2026-06-15):** each biome's std is mined from the literature where the source reports a spread/SD/range; **where the literature std is unavailable, std = 10% of the mean** (`DEFAULT_STD_FRAC = 0.10`). So **every** biome uses the lognormal draw — none fall back to mean-only scaling. Literature-anchored stds: game forest (4,043), game desert (210), forage forest (600), forage desert (368); all other biomes use the 10% default. See PARAMETERS.md §12.4 / §13.3 for the per-biome tag ([LIT] vs [10%-DEFAULT]).
 
 ## 9. World / resource substrate → see `ARCHITECTURE.md` §9
 
