@@ -54,8 +54,9 @@ FORAGE_KCAL_TARGETS = {       # per-biome target means (kcal/forager-hr)
 FORAGE_KCAL_STD = {
     BIOME_WETLAND: 3362.0,    # Cunningham diss: mean(Wet)=1428.3, median=558.7 → lognormal std (CV 2.35, skewed USO returns) [LIT]
     BIOME_FOREST:   600.0,    # std across Hill 1987 palm-product rates {2356,3219,2436,2243,1331} [LIT]
+    BIOME_SAVANNA:  182.1,    # Berbesque & Marlowe 2009 Table 4: female tuber mean 257.7, SD 182.1 (CV 0.71) [LIT, direct SD]
     BIOME_DESERT:   368.0,    # O'Connell & Hawkes 1984 range 650–1925 → uniform std=(1925-650)/√12 [RANGE-DERIVED]
-    # SAVANNA / GRASS / MOUNTAIN absent → DEFAULT_STD_FRAC fallback (10% of mean; source papers not in repo)
+    # GRASS / MOUNTAIN absent → DEFAULT_STD_FRAC fallback (10% of mean; no usable spread in source)
 }
 
 # ── Phase 1 Blueprint A game_kcal constants ────────────────────────────────
@@ -73,8 +74,9 @@ GAME_KCAL_TARGETS = {
 # None → std not yet anchored → terrain-field-spread fallback, tagged PENDING. MECHANISMS §9a.6.
 GAME_KCAL_STD = {
     BIOME_FOREST:  4043.0,   # weighted std of the 7 Hill 1987 species rates (CV 0.73). Table §F.2.1 [NATIVE]
+    BIOME_SAVANNA: 1158.0,   # Hawkes 1991: small-game income 0.162±0.362 animals/day → CV 2.24 × mean 518 [LIT-DERIVED, supervisor-review — hunting is high-variance; 10% understates]
     BIOME_DESERT:   210.0,   # weighted std of the 3 Bird 2009 hunt-type rates {641,765,1300} (CV 0.29). Table §F.2.1
-    # SAVANNA / GRASS absent → DEFAULT_STD_FRAC fallback (10% of mean)
+    # GRASS absent → DEFAULT_STD_FRAC fallback (10% of mean; Hurtado & Hill 1987 variance source not in repo)
 }
 
 # Fallback spread when a biome's std is NOT literature-anchored: std = DEFAULT_STD_FRAC × mean.

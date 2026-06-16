@@ -218,7 +218,7 @@ Cell values use the **lognormal `(mean, std)`** draw (MECHANISMS §9a.6). `FORAG
 | Shore bonus | SHORE_BONUS_KCAL | **1491.5** | — | LOCKED | Bird 1997 Meriam reef-flat intertidal mean; additive on land-shore cells (2026-06-13). |
 | Wetland forage | FORAGE_KCAL_STD[WETLAND] | **1428.3** | **3362** [LIT] | LOCKED (mean) | Cunningham diss (A1.4): mean(Wet)=1428.3, median(Wet)=558.7 (n≈286, skewed) → lognormal std (CV 2.35). Real USO-foraging spread (2026-06-15). |
 | Forest forage | FORAGE_KCAL_STD[FOREST] | **2630.0** | **600** [LIT] | LOCKED (mean) | Hill 1987, Ache palm. Std = spread across palm-product rates {2356,3219,2436,2243,1331} (p.20). |
-| Savanna forage | — | **257.7** | **25.8** [10%-DEFAULT] | LOCKED (mean) | Berbesque & Marlowe 2009, Hadza tuber. Std: 10% default (source not in repo). |
+| Savanna forage | FORAGE_KCAL_STD[SAVANNA] | **257.7** | **182.1** [LIT] | LOCKED (mean) | Berbesque & Marlowe 2009 Table 4: female tuber mean 257.7, **SD 182.1** (CV 0.71) — direct literature SD (2026-06-16). |
 | Grassland forage | — | **1125.0** | **112.5** [10%-DEFAULT] | LOCKED (mean) | Hurtado & Hill 1987, Cuiva root. Std: 10% default (source not in repo). |
 | Desert forage | FORAGE_KCAL_STD[DESERT] | **1200.0** | **368** [RANGE-DERIVED] | PROVISIONAL | O'Connell & Hawkes 1984 range 650–1925. Midpoint mean; std = (1925−650)/√12 (uniform-range) — 2026-06-15. |
 | Mountain forage | — | **5387.0** | **538.7** [10%-DEFAULT] | LOCKED (mean) | Rhode & Rhode 2015, limber pine unhulled. Std: 10% default (source not in repo). |
@@ -267,7 +267,7 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | Name | Symbol | Mean | Std (kcal/hr) | Status | Source |
 |------|--------|------|------|--------|--------|
 | Forest game | GAME_KCAL_TARGETS / STD[FOREST] | **5,541** | **4,043** [NATIVE] | PROVISIONAL [NATIVE, handling-only] | Mean: pursuit-weighted of 7 Hill 1987 species (1,462,745/264). Std: weighted std of the 7 species (CV 0.73). §F.2.1 |
-| Savanna game | GAME_KCAL_TARGETS[SAVANNA] | **518** | **51.8** [10%-DEFAULT] | PROVISIONAL [CONVERTED] | Mean: all-seasons base encounter (745 dry-season = seasonality hook). Std: 10% default (no literature spread; source not in repo). §F.2.1 |
+| Savanna game | GAME_KCAL_TARGETS / STD[SAVANNA] | **518** | **1158** [LIT-DERIVED] | PROVISIONAL [CONVERTED] | Mean: all-seasons base encounter (745 dry-season = seasonality hook). Std: Hawkes 1991 small-game income 0.162±0.362 animals/day → CV 2.24 × mean (hunting is high-variance; 10% would understate). **Supervisor-review** — derived from income variance, not a direct rate-SD. §F.2.1 |
 | Grassland game | GAME_KCAL_TARGETS[GRASS] | **3,001** | **300.1** [10%-DEFAULT] | PROVISIONAL [NATIVE] | Mean: Hurtado & Hill 1987 direct lift. Std: 10% default (single-source mean, no spread). §F.2.1 |
 | Desert game | GAME_KCAL_TARGETS / STD[DESERT] | **730** | **210** | **SET 2026-06-15 (supervisor-approved)**; PROVISIONAL pending CC-1 | **1,201 → 730:** bout-frequency-weighted mean of search-incl. overall hunt-type rates — sand monitor (641, n=612), perentie (765, n=78), bustard (~1,300, n=91) = 570,262/781 (median 765). Std: weighted std of the 3 rates (CV 0.29). Bird 2009 (Am. Antiquity 74(1)), read via image render. §F.2.1 |
 | ~~Intertidal game~~ | — | — | — | **RECLASSIFIED → FORAGE (2026-06-15)** | Intertidal shellfishing is forage, not game (double-count fix); see SHORE_BONUS_KCAL=1491.5 and game table §F.2/§F.2.1. No GAME_KCAL_TARGETS key |
