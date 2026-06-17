@@ -1,7 +1,7 @@
-"""phase1_model.py — TerrainWorld: Mesa model for Phase 1 Blueprint A.
+"""phase1_model.py — TerrainWorld: Mesa model for Phase 1.
 
 Replaces the Sugarscape SugarField harvest path with terrain kcal economy.
-C agents only. Si excluded (Blueprint A scope).
+C agents only. Si excluded (Phase 1 terrain path).
 
 Economy (A-1, kcal):
   burn_per_step  = burn_kcal_per_day × days_per_month                     [NOMINAL]
@@ -10,23 +10,39 @@ Economy (A-1, kcal):
   reserve capped at reserve_full                                            [PLACEHOLDER MR-1]
 
 Sex-based stream selection (A-2):
-  female default → forage_kcal stream
-  male   default → game_kcal stream
-  switch (energy-balance, no new tunable): deviate from default only under deficit pressure
-    male switch condition:  game_rate_step < burn AND forage_rate_step > game_rate_step
-    female switch condition: forage_rate_step < burn AND game_rate_step > forage_rate_step
-    if both streams fail to cover burn: hold default (fall to floor; existing mortality handles it)
-  [PROVISIONAL — non-rivalrous harvest; rivalry deferred to CC-1]
+  female default → forage_kcal stream; male default → game_kcal stream;
+  switch only under deficit pressure (no new tunable). [non-rivalrous; CC-1 deferred]
 
-Child age-gate (A-2, binary):
-  below age_productive_min (= lh_config.forage_age_min = 15) → intake = 0
-  at/above → full adult income
-  [JV-1 seam: graded curve deferred]
+Child age-gate (A-2, binary): below age_productive_min → intake = 0. [JV-1 seam]
+
+Multi-occupancy rivalry (A-3, opt-in `substrate_cfg`, supervisor-directed 2026-06-16):
+  The default Blueprint-A path is NON-rivalrous (each agent gets the full cell rate) and
+  has no density-dependence, so reproduction would explode with no carrying capacity.
+  When a `SubstrateConfig` is supplied (enabled), the model adopts the Stage-6.0a
+  multi-occupancy substrate on the terrain field:
+    - movement: `diffusion_select_target` (von-Neumann r=1, per-capita-yield utility,
+      self-limiting — a mobbed rich cell offers a small share so it stops attracting).
+    - harvest: the cell's total return rate S = forage_level(cell) is SPLIT among its
+      occupants via `compute_harvest_shares` (κ=contest_exponent: 0 → even split /
+      "Cred=1 for all"; κ>0 → share ∝ (φ+ε)^κ). Affinity/crowd hooks held neutral (=1).
+  Density-dependence (hence a terrain-discovered carrying capacity ≈ Σ S_cell/burn over
+  survivable cells) emerges from rivalry, NOT an imposed N_carry. This is a minimal
+  PROVISIONAL preview of CC-1; S = forage-rate-as-cell-total under-estimates the true
+  NPP-derived extractable rate (CC-1 deferred) — the *dynamics* are the finding, the
+  absolute capacity is provisional. Forage-only (game stream off) for this shakedown.
+
+Demographic layer (A-3, opt-in `reproduction=True`):
+  Blueprint A shipped death-only. A minimal PROVISIONAL reproduction rule is added so the
+  population can settle: eligible = alive, age ≥ repro_min_age, reserve ≥ birth_threshold;
+  then reproduce with prob p_birth. On birth the parent pays birth_cost; the child is
+  placed on the parent's cell (multi-occupancy; it disperses via diffusion), age 0,
+  reserve = child_endowment. NOT the full C biparental/Cred reproduction (deferred to the
+  Phase-1 demographic stage / RECAL). All repro params are [PROVISIONAL — shakedown].
+
+Placement: pass `placement_positions` (a list of (x,y), len = n_agents) to use a
+deterministic founder-cluster layout instead of random land sampling.
 """
 from __future__ import annotations
-
-import random as _random
-from typing import Sequence
 
 import mesa
 
@@ -35,7 +51,8 @@ from sic_games.agents.costs import KcalBurnModel
 from sic_games.agents.perception import LocalVisionPerception
 from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
-from sic_games.config import KcalEconomyConfig, LifeHistoryConfig
+from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
+from sic_games.substrate import compute_harvest_shares, diffusion_select_target
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
 
@@ -50,12 +67,12 @@ _DEFAULT_KNOBS: dict = {
 }
 
 
+
 class TerrainWorld(mesa.Model):
     """Mesa model: C agents on a terrain kcal economy.
 
-    No reproduction (Blueprint A scope). No SugarField in the C harvest path.
-    Gate A-1 uses this model with game_stream=False (forage only).
-    Gate A-2 exercises game_stream=True and the sex-based switch.
+    Death-only by default (Blueprint A). Set `reproduction=True` for the A-3
+    demographic layer. No SugarField in the C harvest path.
     """
 
     def __init__(
@@ -67,6 +84,15 @@ class TerrainWorld(mesa.Model):
         lh_cfg: LifeHistoryConfig | None = None,
         game_stream: bool = True,
         seed: int = 42,
+        placement_positions: list[tuple[int, int]] | None = None,
+        substrate_cfg: SubstrateConfig | None = None,
+        # ── A-3 demographic layer (opt-in; PROVISIONAL shakedown params) ──
+        reproduction: bool = False,
+        repro_min_age: int = 15,
+        birth_threshold: float = 80_000.0,
+        birth_cost: float = 40_000.0,
+        child_endowment: float = 40_000.0,
+        p_birth: float = 0.10,
     ) -> None:
         super().__init__(seed=seed)
 
@@ -80,11 +106,26 @@ class TerrainWorld(mesa.Model):
         self._reserve_floor = kcal_cfg.reserve_floor_kcal
         self._game_stream = game_stream
         self._lh_cfg = lh_cfg
-
         self._carbon_cfg = carbon_cfg
+        self._placement_positions = placement_positions
+        self._substrate_cfg = substrate_cfg
+        self._rivalrous = substrate_cfg is not None and substrate_cfg.enabled
+
+        # demographic layer
+        self._reproduction = reproduction
+        self._repro_min_age = repro_min_age
+        self._birth_threshold = birth_threshold
+        self._birth_cost = birth_cost
+        self._child_endowment = child_endowment
+        self._p_birth = p_birth
+
         self.agent_list: list[BaseAgent] = []
         self.occupied: set[tuple[int, int]] = set()
         self.step_count: int = 0
+        # per-step demographic counters (read by diagnostics each step)
+        self.births_this_step: int = 0
+        self.deaths_starv_this_step: int = 0
+        self.deaths_senesc_this_step: int = 0
 
         self._init_agents(n_agents, kcal_cfg, lh_cfg)
 
@@ -96,21 +137,24 @@ class TerrainWorld(mesa.Model):
         kcal_cfg: KcalEconomyConfig,
         lh_cfg: LifeHistoryConfig | None,
     ) -> None:
-        land_cells = [
-            (x, y)
-            for y in range(N)
-            for x in range(N)
-            if self._fields.isWater[y, x] == 0
-        ]
-        n_place = min(n, len(land_cells))
-        positions: list[tuple[int, int]] = self.random.sample(land_cells, n_place)
+        if self._placement_positions is not None:
+            positions: list[tuple[int, int]] = list(self._placement_positions)
+        else:
+            land_cells = [
+                (x, y)
+                for y in range(N)
+                for x in range(N)
+                if self._fields.isWater[y, x] == 0
+            ]
+            n_place = min(n, len(land_cells))
+            positions = self.random.sample(land_cells, n_place)
 
         for pos in positions:
             sex = "female" if self.random.random() < kcal_cfg.p_female else "male"
             agent = self._make_agent(sex=sex, lh_cfg=lh_cfg)
             agent.pos = pos
             self.agent_list.append(agent)
-            self.occupied.add(pos)
+            self.occupied.add(pos)   # set: founder stacking (many agents, one cell) is allowed
 
     def _make_agent(self, sex: str, lh_cfg: LifeHistoryConfig | None) -> BaseAgent:
         from sic_games.agents.strategies.greedy import GreedyMaximizer
@@ -135,8 +179,6 @@ class TerrainWorld(mesa.Model):
             days_per_month=self._kcal_cfg.days_per_month,
         )
 
-        perception = LocalVisionPerception()
-
         agent = BaseAgent(
             model=self,
             vision=3,
@@ -144,7 +186,7 @@ class TerrainWorld(mesa.Model):
             max_age=self._kcal_cfg.lifespan_months,  # in steps=months (1 step=1 month LOCKED)
             initial_wealth=self._reserve_full,
             decision_logic=decision,
-            perception_builder=perception,
+            perception_builder=LocalVisionPerception(),
             cost_model=cost,
             traits=TraitVector(phi=0.5, psi=0.5, c1=0.5, c2=0.5),
             strategy="carbon" if self._carbon_cfg else "greedy",
@@ -158,19 +200,91 @@ class TerrainWorld(mesa.Model):
 
     def step(self) -> None:
         self.step_count += 1
-        agents = list(self.agent_list)
-        self.random.shuffle(agents)
+        self.births_this_step = 0
+        self.deaths_starv_this_step = 0
+        self.deaths_senesc_this_step = 0
 
-        for agent in agents:
-            if not agent.alive:
-                continue
-            self._step_agent(agent)
+        if self._rivalrous:
+            self._step_rivalrous()
+        else:
+            agents = list(self.agent_list)
+            self.random.shuffle(agents)
+            for agent in agents:
+                if not agent.alive:
+                    continue
+                self._step_agent(agent)
 
         # Prune dead agents
         for a in self.agent_list:
             if not a.alive:
                 self.occupied.discard(a.pos)
         self.agent_list = [a for a in self.agent_list if a.alive]
+
+        # Demographic layer: births (opt-in)
+        if self._reproduction:
+            self._do_births()
+        self.occupied = {a.pos for a in self.agent_list}
+
+    def _step_rivalrous(self) -> None:
+        """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
+        Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
+        sc = self._substrate_cfg
+        kappa = sc.contest_exponent
+        phi_eps = sc.phi_epsilon
+        tf = self.terrain_field
+
+        # 1. occupancy maps
+        occ_count: dict[tuple[int, int], int] = {}
+        occ_wsum: dict[tuple[int, int], float] | None = {} if kappa > 0.0 else None
+        for a in self.agent_list:
+            occ_count[a.pos] = occ_count.get(a.pos, 0) + 1
+            if occ_wsum is not None:
+                wt = (a.phi + phi_eps) ** kappa if a.strategy == "carbon" else 1.0
+                occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
+
+        # 2. diffusion movement (per-capita-yield, self-limiting)
+        agents = list(self.agent_list)
+        self.random.shuffle(agents)
+        for agent in agents:
+            old = agent.pos
+            temp = None
+            tfn = getattr(agent._decision, "temperature", None)
+            if callable(tfn):
+                temp = tfn(agent)
+            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp)
+            if target != old:
+                occ_count[old] -= 1
+                if occ_count[old] == 0:
+                    del occ_count[old]
+                occ_count[target] = occ_count.get(target, 0) + 1
+                if occ_wsum is not None:
+                    wt = (agent.phi + phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
+                    occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
+                    occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
+                agent.pos = target
+        self.occupied = set(occ_count.keys())
+
+        # 3. per-cell harvest split (forage-only; S = cell total return rate, flow)
+        occ_lists: dict[tuple[int, int], list[BaseAgent]] = {}
+        for a in self.agent_list:
+            occ_lists.setdefault(a.pos, []).append(a)
+        for (cx, cy), occ in occ_lists.items():
+            S = tf.forage_level(cx, cy)
+            shares = compute_harvest_shares(occ, S, kappa, phi_eps)
+            for a, sh in zip(occ, shares):
+                intake = 0.0 if a.is_juvenile() else sh
+                a.wealth = min(a.wealth + intake, self._reserve_full)
+
+        # 4. metabolism: burn + age + mortality (cause-attributed)
+        for a in self.agent_list:
+            a.wealth -= self._burn
+            a.age += 1
+            if a.wealth <= a.reserve_floor:
+                a.alive = False
+                self.deaths_starv_this_step += 1
+            elif a.age >= a.max_age:
+                a.alive = False
+                self.deaths_senesc_this_step += 1
 
     def _step_agent(self, agent: BaseAgent) -> None:
         tf = self.terrain_field
@@ -188,7 +302,6 @@ class TerrainWorld(mesa.Model):
 
         # 2. A2.4 child age-gate: binary [JV-1: graded curve deferred]
         if agent.is_juvenile():
-            # zero subsistence below age_productive_min [PROVISIONAL JV-1 seam]
             rate_step = 0.0
         else:
             # 3. A2.2 sex-based stream selection (game_stream only if enabled)
@@ -197,43 +310,62 @@ class TerrainWorld(mesa.Model):
                 game_step = tf.game_level(x, y)
                 rate_step = self._select_stream(agent.sex, forage_step, game_step)
             else:
-                # A-1 forage-only path
-                rate_step = tf.forage_level(x, y)
+                rate_step = tf.forage_level(x, y)   # A-1 forage-only path
 
         # 4. Intake + reserve cap [PLACEHOLDER MR-1]
-        intake = rate_step  # rate already in kcal/step; η not applied (no age ramp in kcal)
-        agent.wealth = min(agent.wealth + intake, self._reserve_full)
+        agent.wealth = min(agent.wealth + rate_step, self._reserve_full)
 
-        # 5. Burn + age + mortality
+        # 5. Burn + age + mortality (with cause attribution)
         agent.wealth -= self._burn
         agent.age += 1
-        if agent.wealth <= agent.reserve_floor or agent.age >= agent.max_age:
+        if agent.wealth <= agent.reserve_floor:
             agent.alive = False
+            self.deaths_starv_this_step += 1
+        elif agent.age >= agent.max_age:
+            agent.alive = False
+            self.deaths_senesc_this_step += 1
 
     def _select_stream(self, sex: str, forage_step: float, game_step: float) -> float:
-        """A2.2 energy-balance stream selection. No new tunable beyond A-1 placeholders.
-
-        Switch condition (male): game_rate < burn AND forage_rate > game_rate → use forage
-        Switch condition (female): forage_rate < burn AND game_rate > forage_rate → use game
-        When both streams cover burn comfortably: hold sex default.
-        When both streams fail burn: hold sex default (fall to floor; mortality handles it).
-        [RS-1 seam: risk/variance calc deferred]
-        """
+        """A2.2 energy-balance stream selection. No new tunable beyond A-1 placeholders."""
         burn = self._burn
         if sex == "male":
             if game_step >= burn:
-                return game_step                     # default covers burn
+                return game_step
             if forage_step > game_step:
-                return forage_step                   # switch: forage covers better
-            return game_step                         # both fail; hold default
+                return forage_step
+            return game_step
         else:
             if forage_step >= burn:
-                return forage_step                   # default covers burn
+                return forage_step
             if game_step > forage_step:
-                return game_step                     # switch: game covers better
-            return forage_step                       # both fail; hold default
+                return game_step
+            return forage_step
 
-    # ── Diagnostics ────────────────────────────────────────────────────────
+    # ── Demographic layer (A-3) ──────────────────────────────────────────────
+
+    def _do_births(self) -> None:
+        """Asexual, reserve-gated reproduction [PROVISIONAL shakedown]. Child is placed on
+        the parent's cell (multi-occupancy allowed); density-dependence comes from rivalry
+        (crowded cells → small per-capita share → starvation), not from space. The child
+        disperses next step via diffusion movement. Deterministic agent_list order."""
+        newborns: list[BaseAgent] = []
+        for agent in self.agent_list:
+            if agent.age < self._repro_min_age:
+                continue
+            if agent.wealth < self._birth_threshold:
+                continue
+            if self.random.random() < self._p_birth:
+                agent.wealth -= self._birth_cost
+                sex = "female" if self.random.random() < self._kcal_cfg.p_female else "male"
+                child = self._make_agent(sex=sex, lh_cfg=self._lh_cfg)
+                child.pos = agent.pos
+                child.wealth = self._child_endowment
+                child.age = 0
+                newborns.append(child)
+                self.births_this_step += 1
+        self.agent_list.extend(newborns)
+
+    # ── Diagnostics ──────────────────────────────────────────────────────────
 
     def population(self) -> int:
         return len(self.agent_list)
@@ -242,6 +374,11 @@ class TerrainWorld(mesa.Model):
         if not self.agent_list:
             return 0.0
         return sum(a.wealth for a in self.agent_list) / len(self.agent_list)
+
+    def mean_age(self) -> float:
+        if not self.agent_list:
+            return 0.0
+        return sum(a.age for a in self.agent_list) / len(self.agent_list)
 
     def any_alive_below_floor(self) -> bool:
         return any(a.wealth < self._reserve_floor for a in self.agent_list)
