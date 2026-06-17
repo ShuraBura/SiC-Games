@@ -86,6 +86,7 @@ class TerrainWorld(mesa.Model):
         seed: int = 42,
         placement_positions: list[tuple[int, int]] | None = None,
         substrate_cfg: SubstrateConfig | None = None,
+        harvest_field=None,   # CC-1: swap the rivalrous cell yield (default = terrain_field forage)
         # ── A-3 demographic layer (opt-in; PROVISIONAL shakedown params) ──
         reproduction: bool = False,
         repro_min_age: int = 15,
@@ -110,6 +111,7 @@ class TerrainWorld(mesa.Model):
         self._placement_positions = placement_positions
         self._substrate_cfg = substrate_cfg
         self._rivalrous = substrate_cfg is not None and substrate_cfg.enabled
+        self._harvest_field = harvest_field if harvest_field is not None else self.terrain_field
 
         # demographic layer
         self._reproduction = reproduction
@@ -231,7 +233,7 @@ class TerrainWorld(mesa.Model):
         sc = self._substrate_cfg
         kappa = sc.contest_exponent
         phi_eps = sc.phi_epsilon
-        tf = self.terrain_field
+        tf = self._harvest_field   # CC-1 capacity field (or terrain forage if none)
 
         # 1. occupancy maps
         occ_count: dict[tuple[int, int], int] = {}
@@ -252,6 +254,8 @@ class TerrainWorld(mesa.Model):
             if callable(tfn):
                 temp = tfn(agent)
             target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp)
+            if target != old and self._fields.isWater[target[1], target[0]] != 0:
+                target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
                 occ_count[old] -= 1
                 if occ_count[old] == 0:
@@ -269,7 +273,7 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             occ_lists.setdefault(a.pos, []).append(a)
         for (cx, cy), occ in occ_lists.items():
-            S = tf.forage_level(cx, cy)
+            S = tf.level(cx, cy)
             shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             for a, sh in zip(occ, shares):
                 intake = 0.0 if a.is_juvenile() else sh
