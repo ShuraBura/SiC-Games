@@ -317,7 +317,7 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
   g/m²/yr and in the tropics. *Same paper as the CC-1 NPP anchor.* Data/script: Zenodo 1069787.
 - **Guernier, Hochberg & Guégan 2004**, "Ecology Drives the Worldwide Distribution of Human
   Diseases", PLoS Biol 2(6):e141 — pathogen richness ∝ temperature + precipitation, ↓ latitude.
-- **Dunn 1968** (in *Man the Hunter*) + **Houldcroft 2023** (Am J Biol Anthropol) — Paleolithic/HG
+- **Dunn 1968** (in *Man the Hunter*) + **Houldcroft & Underdown 2023** (Am J Biol Anthropol) — Paleolithic/HG
   disease-scape is **zoonotic/vector-borne/environmental, not crowd-epidemic** (crowd diseases need
   large populations and post-date agriculture). Bounds the density-disease channel (§3.2).
 - Malaria thermal/hydrological suitability (vector lit) — transmission ~16–36 °C; standing-water

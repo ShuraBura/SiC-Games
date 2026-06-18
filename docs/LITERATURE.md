@@ -577,7 +577,7 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 ---
 
-### Dunn, F.L. (1968) "Epidemiological factors: Health and disease in hunter-gatherers" (in *Man the Hunter*); Houldcroft, C.J. (2023) "Infectious disease in the Pleistocene: Old friends or old foes?" *Am. J. Biol. Anthropol.*
+### Dunn, F.L. (1968) "Epidemiological factors: Health and disease in hunter-gatherers" (in *Man the Hunter*); Houldcroft, C.J. & Underdown, S.J. (2023) "Infectious disease in the Pleistocene: Old friends or old foes?" *Am. J. Biol. Anthropol.* [Houldcroft & Underdown 2023 in lit folder; Dunn 1968 NOT filed — redundant with Houldcroft for our use]
 
 **What was lifted:** the Paleolithic/HG disease-scape is **zoonotic / vector-borne / environmental, NOT crowd-epidemic** — crowd diseases (measles, influenza) need large host pools and post-date agriculture. Bounds the model's density-disease channel to *endemic/zoonotic* transmission rising modestly with aggregation, not epidemic crowd disease (Demography blueprint §3.2).
 
@@ -596,6 +596,6 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 **Use:** Siler coefficients FIXED as constants (M-1), converted per-month (÷12). G&K Table 2 is both-sexes; sex-specific + maternal-removed (M-3) fits to come from Hill & Hurtado.
 
-**Provenance:** extracted from the open-access PDF (Table 2) this session via pdfplumber word-coordinate reconstruction (table rendered RTL); **re-verify against the filed PDF before locking coefficients.**
+**Provenance:** extracted from the open-access PDF (Table 2) via pdfplumber word-coordinate reconstruction (table rendered RTL), cross-checked two independent ways. PDF now filed in `literature/` (`Gurven and Kaplan - 2007 - Longevity...pdf`) — treat as confirmed; spot-check at final lock.
 
 **Citation tag:** [USED — demographic Siler anchor (M-1); coefficients pending re-verification vs filed PDF]
