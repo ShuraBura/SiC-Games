@@ -554,3 +554,31 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 - Amplitude: moderate (not the flat-forest extreme, not the high-llanos extreme). The fynbos biome sits in the middle of the empirical amplitude range.
 
 **What was rejected:** DOI not confirmed from PDF (file not in project as of 2026-06-14). Entry relies on Survey A session read. DOI requires verification from the source PDF before use in any write-up.
+
+---
+
+### Tallavaara, M., Eronen, J.T. & Luoto, M. (2018). "Productivity, biodiversity, and pathogens influence the global hunter-gatherer population density." *PNAS* 115(6):1232–1237. Data/script: Zenodo record 1069787.
+
+**What was lifted:**
+- **CC-1 capacity (NPP→density):** HG population density rises with net primary productivity; the low/high-productivity break is at **NPP = 1,360 g/m²/yr**. Basis for the provisional CC-1 cell-capacity field: density = min(0.5, 0.3·npp_gm2/1360) people/km².
+- **Pathogen stress (demographic stage):** pathogen stress is a major driver that **lowers** HG density, **dominant in high-productivity regions (NPP > 1,360) and the tropics** (structural-equation model; biodiversity dominates in low-productivity regions). Anchors the terrain pathogen field (Demography blueprint §3.3) — penalty bites hardest in high-NPP cells. NOTE (red-team m-1): the SEM path is a *continuous* coefficient, not a step at 1360 — use a smooth NPP weighting, not a hard gate.
+
+**To extract (Step-2 calibration):** standardized SEM coefficients for the pathogen-stress path (Zenodo 1069787) to set pathogen-field magnitude.
+
+**Citation tag:** [USED — CC-1 NPP anchor; pathogen-field anchor]
+
+---
+
+### Guernier, V., Hochberg, M.E. & Guégan, J.-F. (2004). "Ecology Drives the Worldwide Distribution of Human Diseases." *PLoS Biology* 2(6):e141.
+
+**What was lifted:** human pathogen species richness rises with **temperature and precipitation** (precipitation range the single best predictor) and falls with latitude. Justifies the terrain pathogen field's warmth + standing-water drivers (Demography blueprint §3.3).
+
+**Citation tag:** [USED — pathogen-field climate driver]
+
+---
+
+### Dunn, F.L. (1968) "Epidemiological factors: Health and disease in hunter-gatherers" (in *Man the Hunter*); Houldcroft, C.J. (2023) "Infectious disease in the Pleistocene: Old friends or old foes?" *Am. J. Biol. Anthropol.*
+
+**What was lifted:** the Paleolithic/HG disease-scape is **zoonotic / vector-borne / environmental, NOT crowd-epidemic** — crowd diseases (measles, influenza) need large host pools and post-date agriculture. Bounds the model's density-disease channel to *endemic/zoonotic* transmission rising modestly with aggregation, not epidemic crowd disease (Demography blueprint §3.2).
+
+**Citation tag:** [USED — bounds density-disease channel]

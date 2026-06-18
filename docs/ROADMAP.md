@@ -140,6 +140,14 @@ doubt, ask — do not assume.
 
 ---
 
+### Phase 1 — A-3 First-Light Shakedown (exploratory, 2026-06-18)
+
+Status: **DONE (not a gate).** C agents on Phase-1 terrain, rivalrous Stage-6.0a multi-occupancy on a CC-1 cell-capacity field (Tallavaara NPP density, PROVISIONAL), opt-in reproduction. Found a **placement-independent food-capacity ceiling ~133.4k** on 100×100 (RESULTS R-2), but a **demographically frozen equilibrium** (births=deaths=0; no baseline mortality). Harness: `outputs/phase1_a3_firstlight/run_a3.py`. Bugs fixed: per-forager-rate-as-cell-total (→ CC-1 cell capacity), water-blind diffusion movement (→ water guard).
+
+### Phase 1 — Demographic Mechanics stage (DRAFTED + red-teamed, 2026-06-18)
+
+Status: **BLUEPRINT DRAFTED, independent red-team done — pending one revision pass + supervisor lock.** `blueprints/phase1/SiC_Games_P1_Demography_Siler_Blueprint.md`. Sex-specific **Siler 3-term mortality** (Aché-anchored) replacing the hard age-cap and supplying baseline mortality; disease via density + terrain-pathogen channels (flagged; pathogen anchored to Tallavaara 2018 / Guernier 2004); nutrition×disease synergy (flagged); **female-only IBI-gated reproduction** + maternal mortality + SRB 0.512 + infanticide flag; staggered founder ages; **two-step staging** (non-spatial Aché calibration → terrain). GATES on reproducing the Aché life table. Red-team flagged: verify Aché e₁₅/modal-death numbers, fix Siler coeffs from a published fit (don't re-fit), hazard units (annual→monthly), Step-2 re-balance framing, maternal-mortality double-count. Stage number TBD by supervisor.
+
 ## ⚠️ CRITICAL DESIGN CONSTRAINTS (read before every stage)
 
 **C and Si are fundamentally different civilizations with different mechanics.**

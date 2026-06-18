@@ -1,7 +1,8 @@
 # SiC Games — Phase 1 Demographic Mechanics Blueprint
 ## Siler Mortality + IBI Reproduction + Terrain-Modulated Hazard
 
-**Status:** DRAFT — for supervisor review and an independent red-team pass before lock.
+**Status:** DRAFT v2 (independently red-teamed 2026-06-18) — for supervisor review and lock. Inline
+errors caught by the red-team are corrected; remaining open items + dispositions are in §13.
 **Created:** 2026-06-18
 **Phase:** 1 (Terrain & Resource Ecology). Stage number to be assigned by the supervisor.
 **Precursor:** A-3 First-Light Shakedown (`SiC_Games_P1_A3_FirstLight_Shakedown.md`) and
@@ -50,6 +51,11 @@ month (rate→probability conversion; keeps small-rate additivity). Cause attrib
 terms separable for diagnostics (`deaths_infant`, `deaths_baseline`, `deaths_senesc`), plus the
 existing `deaths_starv` (hard energetic floor, retained as a backstop).
 
+> **UNITS (red-team M-4 — guards a classic ×12 bug):** `a` is in **months**; {a1,a2,a3} are
+> **per-month** rates and {b1,b3} per-month. Published Aché / Gurven-&-Kaplan coefficients are
+> **annual** — convert before use (`a_month = a_year/12`; keep `b·a` in consistent per-month units).
+> A unit test must assert the integrated monthly hazard reproduces the published annual `l(x)`.
+
 **Parameterization (LOCKED to Aché; exact coefficients fit in Step-1 calibration, §9):**
 Targets the schedule must reproduce (Hill & Hurtado 1996; Gurven & Kaplan 2007):
 
@@ -57,8 +63,8 @@ Targets the schedule must reproduce (Hill & Hurtado 1996; Gurven & Kaplan 2007):
 |---|---|
 | Life expectancy at birth e₀ | ≈ 35–37 yr (low — dominated by infant term) |
 | Survival to age 15 | ≈ 55–60% |
-| Life expectancy at 15, e₁₅ | ≈ 50 further yr (→ modal adult lifespan) |
-| Modal adult age at death | ≈ 70–72 yr; **females outlive males ~2–5 yr** |
+| Life expectancy at 15, e₁₅ | **≈ 37–40 *remaining* years** (VERIFY vs Hill & Hurtado; gate band ±3). NOT "50 further". |
+| Modal adult age at death | ≈ 70–72 yr (weak statistic — gate on the l(x) curve, not this); **females outlive males ~2–5 yr (verify in Aché — maternal mortality can reverse it)** |
 | Senescence onset | gradual; **NOT a 75-yr cap** — the trap A-3 would otherwise repeat |
 
 > **Demographic trap to avoid:** the ~35-yr "life expectancy" is low *only because of infant
@@ -90,19 +96,38 @@ Crowding raises transmission. Driven by **within-cell occupancy** `ρ` (simplest
 saturating:  `D(ρ) = 1 + δ · ρ / (ρ + ρ_half)`. `δ` (max excess) and `ρ_half` are **free knobs**.
 Gives a second density-dependent population check beyond starvation.
 
-### 3.3 Terrain pathogen field — `P(cell)` (flag: `enable_terrain_pathogen`, **OFF by default**)
-A **new** terrain field, separate from `risk`. **Least literature-anchored piece** — there is no
-HG disease-ecology paper in the lit folder yet, and terrain has no temperature field. Provisional
-form, pending the open lit search (§10):
+> **Scope (Dunn 1968; Houldcroft 2023):** HG bands are too small to sustain crowd/epidemic
+> diseases (measles, influenza need large host pools and post-date agriculture). So this channel
+> represents **endemic/zoonotic transmission rising modestly with local aggregation**, not
+> epidemic crowd disease. Keep `δ` modest — a gentle density check, not a population crash.
+
+### 3.3 Terrain pathogen field — `P(cell)` (flag: `enable_terrain_pathogen`)
+A **new** terrain field, separate from `risk`. **Now literature-anchored** (lit search 2026-06-18):
+
+- **Tallavaara et al. 2018 PNAS** — the *same* framework we already use for the CC-1 NPP→density
+  anchor — finds **pathogen stress is a major driver that lowers HG population density, dominant in
+  high-productivity regions (NPP > 1,360 g/m²/yr, our exact CC-1 threshold) and the tropics**,
+  while NPP/biodiversity dominate in low-productivity/high-latitude regions. So the pathogen penalty
+  should bite hardest in our **high-NPP cells (wetland, forest)** — making them a genuine
+  productivity-vs-disease tradeoff, not a free lunch.
+- **Guernier et al. 2004 (PLoS Biol)** — human pathogen richness rises with **temperature and
+  precipitation** (precipitation range the single best predictor) and falls with latitude.
+- **Vector/water mechanism** — malaria transmission is temperature-bounded (~16–36 °C) and needs
+  **standing water** breeding habitat; waterborne load tracks water contact.
+
+Operationalized from the terrain's available proxies (no explicit temperature field):
 
 ```
-pathogen ∝ wateracc (standing water → malaria/waterborne)
-         + wetland indicator
-         + low-elev/high-npp warmth-proxy
-         − aridity
+pathogen_raw ∝  wateracc                    (standing water → vector/waterborne habitat; primary driver)
+P(cell) = 1 + π · normalize(pathogen_raw) · s(NPP),   s(NPP) = NPP / (NPP + NPP_half)
 ```
-Ships **off** and sensitivity-tested until anchored. If adopted, wetlands become a
-productivity-vs-disease tradeoff. Terrain-generator change (`terrain.py`).
+`s(NPP)` is a **smooth** NPP weighting — NOT a hard step at 1360 (red-team m-1: Tallavaara's path is
+a *continuous* SEM coefficient, pathogen load is not zero below the threshold). The NPP-derived
+"warmth proxy" of v1 is **dropped** (red-team m-2: it was circular with NPP, collapsing four knobs to
+one axis). Pathogen is held to **≤2 free knobs** (`π` and `NPP_half`), driven by `wateracc` × `s(NPP)`.
+Magnitude calibrated against Tallavaara's SEM coefficients (Zenodo 1069787) in Step 2.
+Terrain-generator change (`terrain.py`). Anchored — **may be ON in Step 2** with a flag-off ablation
+and sensitivity sweep.
 
 ### 3.4 Nutrition × disease synergy — `M(reserve)` (flag: `enable_nutrition_synergy`)
 Undernutrition amplifies infectious mortality (the dominant real HG death pathway is *infection in
@@ -142,9 +167,12 @@ flag because it is a choice, not biology.
 
 Seed founders from the **Siler-implied stable age distribution** (derived from the calibrated
 mortality+fertility schedule), so the founding population is demographically self-consistent and
-starts near-stationary — no synchronized senescence wave, no multi-generation warm-up. Interim
-fallback if the stable solve is not ready: the Aché empirical age pyramid (young; ~40% under 15,
-median ≈ 20).
+starts near-stationary — no synchronized senescence wave, no multi-generation warm-up.
+
+**Bootstrap resolution (red-team m-4):** the stable distribution depends on the calibrated schedule,
+which itself seeds founders from that distribution — chicken-and-egg. Resolve by using the **Aché
+empirical age pyramid (young; ~40% under 15, median ≈ 20) as the Step-1 default**, and deriving the
+true Siler-stable distribution only after the schedule locks (for Step 2).
 
 ---
 
@@ -199,10 +227,16 @@ removes that risk from the calibration loop.
 
 GREEN requires **all**:
 
-1. **Continuous turnover at equilibrium: births ≈ deaths > 0** (direct fix to the A-3 finding —
-   frozen → flowing).
-2. **Stable population, growth rate r ≈ 0** at carrying capacity (Step 1; and bounded on terrain).
-3. **e₀ ≈ 35**, survival-to-15 ≈ 55–60%, **e₁₅ ≈ 50 further yr**, **modal adult death ≈ 70–72**.
+1. **Continuous turnover at equilibrium: births ≈ deaths > 0**, with a **crude death rate in the
+   Aché stationary band (~40–60 per 1,000/yr)** over a fixed measurement window ± tolerance — not a
+   few-events/yr trickle (red-team m-5). Direct fix to the A-3 finding (frozen → flowing).
+2. **Growth rate r ≈ 0.** In Step 1 this is a *fertility-shape* check; on terrain the baseline/
+   fertility scaler is **re-balanced** to restore r≈0 — Step-1's equilibrium does NOT transfer
+   unchanged, because the all-≥1 modulators raise mean hazard (red-team M-2; see §7).
+3. **Full survivorship curve l(x) matches the Aché H&H life table** (RMSE / max-deviation at decadal
+   ages) — not just scalar summaries (red-team B-2). Anchor points: **e₀ ≈ 35**, survival-to-15
+   ≈ 55–60%, **e₁₅ ≈ 37–40 remaining yr (VERIFY vs H&H)**, Gompertz mortality-rate-doubling-time
+   ~7–8 yr.
 4. **Age pyramid** matches the Aché shape (young, ~40% under 15).
 5. **Realized IBI ≈ 37 mo** and **TFR ≈ 8** (Aché), within band.
 6. **Sex-specific mortality** ordered correctly (females outlive males).
@@ -231,7 +265,7 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
 
 | Item | State |
 |---|---|
-| Terrain pathogen formula | **PENDING disease-ecology lit search** — ships OFF until anchored; sensitivity-tested |
+| Terrain pathogen field | **ANCHORED** (Tallavaara 2018 / Guernier 2004, lit search 2026-06-18); structure fixed; magnitude (`π`, `w_*`) from Tallavaara SEM coefficients (Zenodo 1069787) in Step 2 |
 | Exact Siler coefficients | fit from Hill & Hurtado Aché life table in Step 1 |
 | Free wiring knobs (`risk_ref`, δ, ρ_half, μ_max) | calibrated in Step 2 vs r≈0 |
 | Stage number | supervisor-assigned |
@@ -246,7 +280,18 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
 - **Gurven & Kaplan 2007**, "Longevity Among Hunter-Gatherers" (*Pop. Dev. Rev.*) — cross-HG
   mortality composite; modal adult lifespan ≈ 68–78. *(Confirm availability / add to LITERATURE.md.)*
 - **Howell** (!Kung), **Blurton Jones** (Hadza) — IBI and fertility comparanda.
-- Disease-ecology anchor for the pathogen field — **TO FIND** (open action).
+
+**Disease ecology (lit search 2026-06-18 — pathogen field anchor):**
+- **Tallavaara, Eronen & Luoto 2018**, PNAS 115(6):1232–1237 — productivity + biodiversity +
+  pathogen stress drive global HG population density; pathogen stress dominant where NPP > 1,360
+  g/m²/yr and in the tropics. *Same paper as the CC-1 NPP anchor.* Data/script: Zenodo 1069787.
+- **Guernier, Hochberg & Guégan 2004**, "Ecology Drives the Worldwide Distribution of Human
+  Diseases", PLoS Biol 2(6):e141 — pathogen richness ∝ temperature + precipitation, ↓ latitude.
+- **Dunn 1968** (in *Man the Hunter*) + **Houldcroft 2023** (Am J Biol Anthropol) — Paleolithic/HG
+  disease-scape is **zoonotic/vector-borne/environmental, not crowd-epidemic** (crowd diseases need
+  large populations and post-date agriculture). Bounds the density-disease channel (§3.2).
+- Malaria thermal/hydrological suitability (vector lit) — transmission ~16–36 °C; standing-water
+  breeding habitat. Supports the pathogen-field water + warmth drivers.
 
 ---
 
@@ -261,5 +306,51 @@ not over-fit; (b) the free-knob set is truly minimal; (c) the Step-1/Step-2 deco
 
 ---
 
-*Phase 1 Demographic Mechanics Blueprint · DRAFT 2026-06-18 · C-only, forage-only · Siler mortality
-locked to Aché; pathogen layer provisional pending literature; all flags decoupled for ablation.*
+## 13. Red-team revision log (v2 — independent review 2026-06-18)
+
+An independent, repo-grounded red-team reviewed v1. **Verdict: direction sound; NOT lockable as v1 —
+one revision pass.** Dispositions:
+
+**Applied in this v2 (inline):**
+- **B-1 — e₁₅ wrong/inconsistent.** v1 said "e₁₅ ≈ 50 further yr" (progress report said ~70).
+  Corrected to **≈37–40 *remaining* years**, flagged VERIFY vs Hill & Hurtado, gate band ±3 (§2, §8).
+- **B-2 — gate too weak to falsify.** Added **full survivorship-curve l(x)** comparison + Gompertz
+  mortality-rate-doubling-time to the gate; modal-death demoted to a weak secondary (§8.3).
+- **M-4 — rate-unit ×12 bug.** Hazard stated **per-month**; annual→monthly conversion documented;
+  unit test required (§2).
+- **M-2 — Step-1→Step-2 not transferable.** Reframed: Step-1 locks intrinsic terms + fertility
+  shape; baseline/fertility **re-balanced in Step-2** (all modulators ≥1 raise mean hazard → r<0 on
+  terrain otherwise) (§8.2).
+- **m-1 — pathogen hard gate mis-cites Tallavaara.** Replaced step at 1360 with **smooth** `s(NPP)`
+  (§3.3).
+- **m-2 — pathogen knobs collapse to NPP axis.** Dropped the circular warmth proxy; pathogen ≤2
+  knobs (§3.3).
+- **m-4 — founder bootstrap.** Aché pyramid is the **Step-1 default**; Siler-stable derived
+  post-lock (§5).
+- **m-5 — turnover untestable.** Gate now requires a **crude death rate in the Aché band
+  (~40–60/1000/yr)** over a window (§8.1).
+
+**Accepted — resolve at implementation / supervisor lock:**
+- **M-1 — over-fitting (~20 fitted+free DOF vs ~6 targets).** **FIX Siler coefficients from a
+  published Aché competing-hazard fit (H&H / Gurven & Kaplan) as constants — do NOT re-fit.** Add a
+  fitted-vs-fixed table; require free params ≤ independent gate targets.
+  **[SUPERVISOR: confirm we adopt published coefficients rather than fitting our own.]**
+- **M-3 — maternal-mortality double-count.** The Aché life table is all-cause, so a separate
+  `deaths_maternal` term on top double-counts. **Choose:** (a) fit the female Siler to a
+  maternal-removed schedule and add maternal back explicitly, or (b) fold maternal into the female
+  baseline and drop the separate term. **[SUPERVISOR DECISION — recommend (a) for transparency.]**
+- **M-5 — `_do_births` is a rewrite, not wiring.** Reclassify §9 as a full reproduction-engine
+  rewrite with its own tests; **maternal-death draw must occur AFTER the child is created/counted.**
+
+**Minor/nits noted:** n-1 cap `a2_eff` (or final monthly `p`) against pathological spikes in a
+crowded/high-risk/high-pathogen/low-reserve cell; n-2 verify **females>males survival holds in the
+Aché data** before gating (§2 note added); n-3 confirm Gurven & Kaplan 2007 is in the lit folder
+before relying on it; m-3 add an SRB×infanticide orthogonality test.
+
+Full critique archived with this session's transcript.
+
+---
+
+*Phase 1 Demographic Mechanics Blueprint · DRAFT **v2** 2026-06-18 (red-teamed) · C-only, forage-only ·
+Siler mortality anchored to Aché (coefficients to be FIXED from a published fit, not re-fit); pathogen
+layer anchored (Tallavaara 2018 / Guernier 2004); all flags decoupled for ablation. Open items: §13.*

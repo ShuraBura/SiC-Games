@@ -126,9 +126,9 @@ Full spec in the blueprint; summary of what the supervisor approved in this sess
 6. **Two-step staging:** (1) calibrate pure demography in a fast non-spatial harness against the
    Aché life table; (2) lock it, then layer terrain modulators on the full 100×100 world. This
    also de-risks the scale/runtime problem.
-7. **Validation gate = reproduce the Aché**: e₀≈35, e₁₅≈70, modal adult death ≈70–72, age
-   pyramid, IBI/TFR in band, growth r≈0, and **births ≈ deaths > 0 at equilibrium** (the direct
-   antidote to the frozen-equilibrium finding).
+7. **Validation gate = reproduce the Aché**: e₀≈35, e₁₅≈37–40 *remaining* yr (verify vs H&H), the
+   full survivorship curve l(x), age pyramid, IBI/TFR in band, growth r≈0, and **births ≈ deaths > 0
+   at equilibrium** (the direct antidote to the frozen-equilibrium finding).
 
 ---
 
