@@ -599,3 +599,16 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 **Provenance:** extracted from the open-access PDF (Table 2) via pdfplumber word-coordinate reconstruction (table rendered RTL), cross-checked two independent ways. PDF now filed in `literature/` (`Gurven and Kaplan - 2007 - Longevity...pdf`) — treat as confirmed; spot-check at final lock.
 
 **Citation tag:** [USED — demographic Siler anchor (M-1); coefficients pending re-verification vs filed PDF]
+
+---
+
+### Howell, N. (2010 [1979]). *Demography of the Dobe !Kung*, 2nd ed. — and Blurton Jones, N. (2016). *Demography and Evolutionary Ecology of Hadza Hunter-Gatherers*, Cambridge Univ. Press.
+
+**Role:** IBI/TFR **comparanda** — cross-checks, NOT anchors (Step-1 calibrates to the Aché). Values lifted:
+- !Kung (Howell): inter-birth interval ≈ 44 mo; completed TFR ≈ 4.7.
+- Hadza (Blurton Jones): IBI ≈ 38 mo; TFR ≈ 6.2.
+- Aché (our anchor; Hill & Hurtado): IBI ≈ 37 mo; TFR ≈ 8.
+
+Our Step-1 realized **IBI 37.0 / TFR 7.9** sits at the high-fertility (Aché) end of this HG range — as intended (we calibrate to the Aché, not the cross-HG mean).
+
+**Citation tag:** [COMPARANDUM — IBI/TFR cross-check; books, may reside in the G: drive lit store rather than repo `literature/`]
