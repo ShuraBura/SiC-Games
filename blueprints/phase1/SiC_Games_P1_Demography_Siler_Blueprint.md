@@ -68,13 +68,29 @@ schedule must reproduce these Aché anchors at the validation gate (§8 — a *c
 |---|---|
 | Life expectancy at birth e₀ | ≈ 35–37 yr (low — dominated by infant term) |
 | Survival to age 15 | ≈ 55–60% |
-| Life expectancy at 15, e₁₅ | **≈ 37–40 *remaining* years** (VERIFY vs Hill & Hurtado; gate band ±3). NOT "50 further". |
+| Life expectancy at 15, e₁₅ | **38.5 *remaining* years** (Gurven & Kaplan 2007 Table 2, Aché forest — VERIFIED; confirms NOT "50 further"). |
 | Modal adult age at death | ≈ 70–72 yr (weak statistic — gate on the l(x) curve, not this); **females outlive males ~2–5 yr (verify in Aché — maternal mortality can reverse it)** |
 | Senescence onset | gradual; **NOT a 75-yr cap** — the trap A-3 would otherwise repeat |
 
 > **Demographic trap to avoid:** the ~35-yr "life expectancy" is low *only because of infant
 > mortality*. The senescence term must anchor to **modal adult death (~70)**, not the ~35 mean,
 > or the population dies decades too young.
+
+**SOURCED — Aché forest-period Siler coefficients (Gurven & Kaplan 2007, Table 2; both sexes;
+ANNUAL units, age `x` in years):**
+
+| param | value | meaning |
+|---|---|---|
+| a1 | 0.157 /yr | initial infant mortality rate |
+| b1 | 0.721 /yr | infant-mortality decline rate |
+| a2 | 0.013 /yr | **Makeham age-independent ("exogenous, environmental") — the term the world modulates** |
+| a3 | 4.80×10⁻⁵ /yr | Gompertz initial adult mortality |
+| b3 | 0.103 /yr | Gompertz rate (MRDT = ln2/b3 ≈ 6.7 yr) |
+
+Realized anchors (same table): e₀ = 37, **e₁₅ = 38.5 remaining yr**, e₄₅ = 21.1, survival-to-15 =
+0.66, survival 15→45 = 0.43, modal adult death = 71. **Convert to per-month (÷12) before use** (UNITS
+box above). **Sex note:** G&K Table 2 is both-sexes; the sex-specific split and the maternal-removed
+female fit (M-3) come from Hill & Hurtado's sex-specific Aché tables — a Step-1 sub-task.
 
 ---
 

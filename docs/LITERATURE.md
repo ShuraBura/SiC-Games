@@ -582,3 +582,20 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 **What was lifted:** the Paleolithic/HG disease-scape is **zoonotic / vector-borne / environmental, NOT crowd-epidemic** — crowd diseases (measles, influenza) need large host pools and post-date agriculture. Bounds the model's density-disease channel to *endemic/zoonotic* transmission rising modestly with aggregation, not epidemic crowd disease (Demography blueprint §3.2).
 
 **Citation tag:** [USED — bounds density-disease channel]
+
+---
+
+### Gurven, M. & Kaplan, H. (2007). "Longevity Among Hunter-Gatherers: A Cross-Cultural Examination." *Population and Development Review* 33(2):321–365. DOI 10.1111/j.1728-4457.2007.00171.x. Open-access PDF: gurven.anth.ucsb.edu.
+
+**Role:** the **M-1 anchor** for the demographic stage — published Siler competing-hazard fits per HG population. Siler form `h(x) = a1·exp(−b1·x) + a2 + a3·exp(b3·x)`; `a2` = age-independent (Makeham) "exogenous mortality due to environmental conditions" (the term the model's terrain/disease modulators act on).
+
+**What was lifted — Aché forest-period coefficients (Table 2; both sexes; ANNUAL, x in years):**
+- a1 = 0.157, b1 = 0.721, a2 = 0.013, a3 = 4.80×10⁻⁵, b3 = 0.103 (MRDT = ln2/b3 ≈ 6.7 yr).
+- Realized: e₀ = 37, **e₁₅ = 38.5 remaining yr**, e₄₅ = 21.1, survival-to-15 = 0.66, survival 15→45 = 0.43, modal adult death = 71 (forest) / 78 (settled). Adult baseline ~1%/yr to age ~40, then Gompertz. Aché a1 ≈ half of other foragers (higher child survivorship).
+- Cross-HG: e₀ 21–37; modal adult death avg 72; adaptive lifespan 68–78.
+
+**Use:** Siler coefficients FIXED as constants (M-1), converted per-month (÷12). G&K Table 2 is both-sexes; sex-specific + maternal-removed (M-3) fits to come from Hill & Hurtado.
+
+**Provenance:** extracted from the open-access PDF (Table 2) this session via pdfplumber word-coordinate reconstruction (table rendered RTL); **re-verify against the filed PDF before locking coefficients.**
+
+**Citation tag:** [USED — demographic Siler anchor (M-1); coefficients pending re-verification vs filed PDF]
