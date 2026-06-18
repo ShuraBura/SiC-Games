@@ -1,8 +1,9 @@
 # SiC Games — Phase 1 Demographic Mechanics Blueprint
 ## Siler Mortality + IBI Reproduction + Terrain-Modulated Hazard
 
-**Status:** DRAFT v2 (independently red-teamed 2026-06-18) — for supervisor review and lock. Inline
-errors caught by the red-team are corrected; remaining open items + dispositions are in §13.
+**Status:** **v3 — LOCKED for implementation (supervisor 2026-06-18).** Independently red-teamed; all
+blocker/major items resolved and folded into the body (§13). **Step-1 (non-spatial Aché calibration)
+is the next build.**
 **Created:** 2026-06-18
 **Phase:** 1 (Terrain & Resource Ecology). Stage number to be assigned by the supervisor.
 **Precursor:** A-3 First-Light Shakedown (`SiC_Games_P1_A3_FirstLight_Shakedown.md`) and
@@ -56,8 +57,12 @@ existing `deaths_starv` (hard energetic floor, retained as a backstop).
 > **annual** — convert before use (`a_month = a_year/12`; keep `b·a` in consistent per-month units).
 > A unit test must assert the integrated monthly hazard reproduces the published annual `l(x)`.
 
-**Parameterization (LOCKED to Aché; exact coefficients fit in Step-1 calibration, §9):**
-Targets the schedule must reproduce (Hill & Hurtado 1996; Gurven & Kaplan 2007):
+**Parameterization — coefficients FIXED from a published Aché fit, NOT re-fit (M-1, supervisor 2026-06-18):**
+The Siler coefficients {a1,b1,a2,a3,b3} per sex are taken as **constants** from a published Aché
+competing-hazard fit (Gurven & Kaplan 2007), or — if only a life table is published — fit **ONCE** to
+Hill & Hurtado's Aché `l(x)` and then **frozen**. They are NOT free parameters in any calibration
+loop. The female `a2` is fit to a **maternal-mortality-removed** schedule (M-3, §4). The fixed
+schedule must reproduce these Aché anchors at the validation gate (§8 — a *check*, not a fit target):
 
 | Quantity | Aché / HG anchor |
 |---|---|
@@ -151,8 +156,11 @@ The kcal reserve-threshold is the wrong primitive. Reframe to the real HG fertil
   depress fertility without a hard cliff.
 - **Sex ratio at birth:** SRB = **0.512 male** (anchored human constant ~105:100; confirm Aché
   figure from Hill & Hurtado in calibration).
-- **Maternal mortality:** per-birth female hazard ≈ 1–1.5% (natural-fertility populations) — couples
-  fertility to female mortality. Counts as `deaths_maternal`.
+- **Maternal mortality (approach (a), supervisor 2026-06-18):** the female Siler is fit to a
+  **maternal-mortality-REMOVED** Aché schedule, and maternal mortality is added back here as an
+  **explicit** per-birth hazard (`deaths_maternal`) — avoids double-counting the all-cause life table
+  (red-team M-3). Per-birth female hazard ≈ 1–1.5% (verify the Aché figure from Hill & Hurtado). The
+  draw occurs **AFTER** the birth is counted (M-5).
 - **Calibration target:** realized **TFR ≈ 8 (Aché)**, IBI in band, age-specific fertility curve.
 
 ### 4.1 Infanticide (flag: `enable_infanticide`, OFF by default)
@@ -182,7 +190,8 @@ All flags independent; all-off = pure Aché schedule + IBI fertility.
 
 ```
 DemographyConfig:
-  # mortality (Siler, sex-specific; LOCKED to Aché after Step-1)
+  # mortality (Siler, sex-specific) — FIXED constants from a published Aché fit, NOT re-fit (M-1)
+  #   female a2 fit to a MATERNAL-REMOVED schedule; maternal added back at birth (M-3 approach (a))
   siler: {a1,b1,a2,a3,b3} per sex
   # baseline modulators (each flagged)
   enable_terrain_risk:      bool   # wire dormant risk field; free knob risk_ref
@@ -199,9 +208,10 @@ DemographyConfig:
   founder_age_source: "siler_stable" | "ache_pyramid"
 ```
 
-**Degrees-of-freedom discipline:** everything in `siler` and the fertility block is **locked to
-the Aché life table**. Only the wiring multipliers — `risk_ref`, `δ`, `ρ_half`, `μ_max`, and (if
-used) pathogen slope — are **free knobs**, calibrated in Step 2 against r≈0. Keep free knobs minimal.
+**Degrees-of-freedom discipline (M-1):** the `siler` block is **fixed constants from a published
+Aché fit — zero free parameters.** The fertility block is anchored to Aché IBI/TFR. The ONLY free
+knobs are the Step-2 wiring multipliers — `risk_ref`, `δ`, `ρ_half`, `μ_max`, `π`, `NPP_half` —
+calibrated against r≈0. **Required invariant: # free knobs ≤ # independent gate targets.**
 
 ---
 
@@ -209,8 +219,9 @@ used) pathogen slope — are **free knobs**, calibrated in Step 2 against r≈0.
 
 **Step 1 — Pure demography (non-spatial / small harness, fast, NO terrain).**
 A well-mixed population (or a tiny grid) under Siler + IBI fertility, all baseline modulators OFF.
-Tune `siler` + fertility until the Aché targets (§8) are met and growth r≈0. Cheap — no 100k-agent
-terrain runs. This is where the schedule is fit and **locked**.
+With the `siler` coefficients FIXED from the published Aché fit (M-1), tune only the **fertility**
+parameters (IBI, energetic slope) until Aché IBI/TFR and growth r≈0 are met, and VERIFY the fixed
+Siler schedule reproduces the Aché `l(x)`. Cheap — no 100k-agent terrain runs.
 
 **Step 2 — Terrain layer (full 100×100 world).**
 Lock Step-1 params; enable the baseline modulators (`risk`, density-disease, synergy; pathogen if
@@ -252,8 +263,10 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
 - **`phase1_model.py` metabolism/mortality block (`_step_rivalrous` §4, `_step_agent` §5):** replace
   the `wealth ≤ floor` / `age ≥ max_age` branch with the Siler hazard draw + retained starvation
   backstop + cause attribution. Add per-agent `months_since_birth`, `sex` already present.
-- **`_do_births`:** replace reserve-threshold rule with female-only + fertile-window + IBI + energetic
-  modifier + SRB + maternal-mortality + optional infanticide.
+- **`_do_births` (FULL REWRITE, not wiring — M-5):** replace the asexual reserve-threshold rule with
+  female-only + fertile-window + IBI refractory + energetic modifier + SRB + maternal-mortality +
+  optional infanticide. **The maternal-death draw happens AFTER the child is created and counted**
+  (else the birth is lost). Own unit tests: IBI enforced, window boundaries, realized SRB, draw order.
 - **`_init_agents`:** founder age sampling from the stable distribution.
 - **`terrain.py`:** new `pathogen` field (flagged); `risk` field already exists (wire-only).
 - **`config.py`:** `DemographyConfig`.
@@ -266,7 +279,8 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
 | Item | State |
 |---|---|
 | Terrain pathogen field | **ANCHORED** (Tallavaara 2018 / Guernier 2004, lit search 2026-06-18); structure fixed; magnitude (`π`, `w_*`) from Tallavaara SEM coefficients (Zenodo 1069787) in Step 2 |
-| Exact Siler coefficients | fit from Hill & Hurtado Aché life table in Step 1 |
+| Exact Siler coefficients | **RESOLVED (M-1, 2026-06-18):** FIXED constants from a published Aché fit (Gurven & Kaplan 2007; or fit once to H&H l(x) then frozen) — not re-fit |
+| Maternal mortality | **RESOLVED (M-3, 2026-06-18):** approach (a) — female Siler fit maternal-removed; maternal added back explicitly |
 | Free wiring knobs (`risk_ref`, δ, ρ_half, μ_max) | calibrated in Step 2 vs r≈0 |
 | Stage number | supervisor-assigned |
 
@@ -295,7 +309,7 @@ report shows each mechanic's isolated contribution to equilibrium turnover.
 
 ---
 
-## 12. Independent-review checkpoint (required before lock)
+## 12. Independent-review checkpoint — **COMPLETE (2026-06-18; findings in §13)**
 
 Per the workflow agreed 2026-06-18: this blueprint must pass an **independent, repo-grounded
 red-team** before any code is written — a fresh-context reviewer (fresh CC session, spawned
@@ -330,17 +344,14 @@ one revision pass.** Dispositions:
 - **m-5 — turnover untestable.** Gate now requires a **crude death rate in the Aché band
   (~40–60/1000/yr)** over a window (§8.1).
 
-**Accepted — resolve at implementation / supervisor lock:**
-- **M-1 — over-fitting (~20 fitted+free DOF vs ~6 targets).** **FIX Siler coefficients from a
-  published Aché competing-hazard fit (H&H / Gurven & Kaplan) as constants — do NOT re-fit.** Add a
-  fitted-vs-fixed table; require free params ≤ independent gate targets.
-  **[SUPERVISOR: confirm we adopt published coefficients rather than fitting our own.]**
-- **M-3 — maternal-mortality double-count.** The Aché life table is all-cause, so a separate
-  `deaths_maternal` term on top double-counts. **Choose:** (a) fit the female Siler to a
-  maternal-removed schedule and add maternal back explicitly, or (b) fold maternal into the female
-  baseline and drop the separate term. **[SUPERVISOR DECISION — recommend (a) for transparency.]**
-- **M-5 — `_do_births` is a rewrite, not wiring.** Reclassify §9 as a full reproduction-engine
-  rewrite with its own tests; **maternal-death draw must occur AFTER the child is created/counted.**
+**Supervisor decisions (RESOLVED 2026-06-18) — folded into the body:**
+- **M-1 — over-fitting (~20 fitted+free DOF vs ~6 targets). RESOLVED: YES** — fix Siler coefficients
+  from a published Aché fit as constants, do NOT re-fit (Gurven & Kaplan 2007; or fit once to H&H
+  l(x) then freeze); free knobs ≤ gate targets. → §2, §6, §7, §10.
+- **M-3 — maternal-mortality double-count. RESOLVED: approach (a)** — fit the female Siler to a
+  maternal-removed schedule and add maternal back explicitly as `deaths_maternal`. → §4, §10.
+- **M-5 — `_do_births` is a rewrite, not wiring. ACKNOWLEDGED** — full reproduction-engine rewrite;
+  maternal-death draw occurs AFTER the child is created/counted. → §9.
 
 **Minor/nits noted:** n-1 cap `a2_eff` (or final monthly `p`) against pathological spikes in a
 crowded/high-risk/high-pathogen/low-reserve cell; n-2 verify **females>males survival holds in the
@@ -351,6 +362,7 @@ Full critique archived with this session's transcript.
 
 ---
 
-*Phase 1 Demographic Mechanics Blueprint · DRAFT **v2** 2026-06-18 (red-teamed) · C-only, forage-only ·
-Siler mortality anchored to Aché (coefficients to be FIXED from a published fit, not re-fit); pathogen
-layer anchored (Tallavaara 2018 / Guernier 2004); all flags decoupled for ablation. Open items: §13.*
+*Phase 1 Demographic Mechanics Blueprint · **v3 — LOCKED 2026-06-18** (red-teamed; supervisor decisions
+M-1/M-3/M-5 resolved) · C-only, forage-only · Siler mortality FIXED from a published Aché fit (female
+maternal-removed); pathogen anchored (Tallavaara 2018 / Guernier 2004); all flags decoupled for
+ablation. Next build: Step-1 non-spatial Aché calibration.*
