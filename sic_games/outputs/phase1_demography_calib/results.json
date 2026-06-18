@@ -1,0 +1,124 @@
+{
+  "metrics": {
+    "fecundability": 0.11991050720214841,
+    "r_per_yr": 0.03301336695805894,
+    "e0": 36.516939298477716,
+    "e15": 38.308246308388405,
+    "e45": 21.254595279945164,
+    "modal_adult_death": 71.35,
+    "ibi_mean": 37.042167959943995,
+    "tfr_completed": 7.946795434591747,
+    "crude_birth_rate_per1000": 60.91340101489003,
+    "crude_death_rate_per1000": 27.293363659292954,
+    "final_pop": 6000
+  },
+  "targets": {
+    "e0": 37.0,
+    "e15": 38.5,
+    "e45": 21.1,
+    "mode": 71.0,
+    "ibi": 37.0,
+    "tfr": 8.0
+  },
+  "config": {
+    "siler_a1": 0.157,
+    "siler_b1": 0.721,
+    "siler_a2": 0.013,
+    "siler_a3": 4.8e-05,
+    "siler_b3": 0.103,
+    "menarche_months": 180,
+    "menopause_months": 504,
+    "ibi_refractory_months": 30,
+    "fecundability": 0.12,
+    "srb_male": 0.512,
+    "maternal_mortality_per_birth": 0.012,
+    "enable_terrain_risk": false,
+    "enable_density_disease": false,
+    "enable_terrain_pathogen": false,
+    "enable_nutrition_synergy": false,
+    "enable_infanticide": false
+  },
+  "calibration_history": [
+    [
+      0.315,
+      32.1,
+      0.0393
+    ],
+    [
+      0.1725,
+      34.6,
+      0.0362
+    ],
+    [
+      0.1012,
+      38.4,
+      0.0314
+    ],
+    [
+      0.1369,
+      36.0,
+      0.0344
+    ],
+    [
+      0.1191,
+      37.1,
+      0.0335
+    ],
+    [
+      0.128,
+      36.6,
+      0.0337
+    ],
+    [
+      0.1235,
+      36.8,
+      0.0332
+    ],
+    [
+      0.1213,
+      36.9,
+      0.0331
+    ],
+    [
+      0.1202,
+      36.9,
+      0.033
+    ],
+    [
+      0.1196,
+      37.0,
+      0.033
+    ],
+    [
+      0.1199,
+      37.1,
+      0.0323
+    ],
+    [
+      0.12,
+      37.0,
+      0.0331
+    ],
+    [
+      0.12,
+      37.0,
+      0.0337
+    ],
+    [
+      0.1199,
+      37.0,
+      0.0331
+    ],
+    [
+      0.1199,
+      37.0,
+      0.0332
+    ],
+    [
+      0.1199,
+      37.0,
+      0.0338
+    ]
+  ],
+  "elapsed_sec": 17.568326711654663
+}
