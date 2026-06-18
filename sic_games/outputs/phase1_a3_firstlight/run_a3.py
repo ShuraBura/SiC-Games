@@ -15,7 +15,7 @@ Run:  py -3 outputs/phase1_a3_firstlight/run_a3.py
 Out:  outputs/phase1_a3_firstlight/report.html  +  results.json
 """
 from __future__ import annotations
-import base64, io, json, os, time
+import base64, gc, io, json, os, time
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -28,7 +28,7 @@ from sic_games.terrain import (N, generate_world, BIOME_WETLAND, BIOME_FOREST,
     BIOME_SAVANNA, BIOME_GRASS, BIOME_DESERT, BIOME_MOUNTAIN)
 
 OUT = os.path.dirname(os.path.abspath(__file__))
-SEEDS = [42, 43, 44]
+SEEDS = [42]                   # A-3 reduced sweep: 6 combos x 1 seed (robust, recoverable re-run)
 COMBOS = [(4, 3), (4, 5), (6, 3), (6, 5), (8, 3), (8, 5)]   # (n_clusters, patch_size)
 TOTAL_N = 1000
 STEPS = 1500
@@ -200,14 +200,29 @@ def main():
     determinism_ok = (a == b)
     print(f"        determinism: {'PASS' if determinism_ok else 'FAIL'}")
 
-    print("[A-3] 18-run sweep (6 combos x 3 seeds x 1500 steps, ~138k agents)...")
+    total = len(COMBOS) * len(SEEDS)
+    print(f"[A-3] {total}-run sweep ({len(COMBOS)} combos x {len(SEEDS)} seed(s) x {STEPS} steps, ~138k agents)...", flush=True)
     runs = {}
+    done = 0
+    prog_path = os.path.join(OUT, "progress.txt")
     for (nc, pt) in COMBOS:
         for sd in SEEDS:
             r = run_one(sd, nc, pt, collect_grids=(nc, pt) == (4, 3))
             runs[(nc, pt, sd)] = r
-            print(f"        ({nc},{pt}) s{sd}: final~{r['final_pop']:.0f} onset~{r['onset']} "
-                  f"rails={'ok' if not any(r['rails'].values()) else r['rails']}  [{time.time()-t0:.0f}s]")
+            done += 1
+            el = time.time() - t0
+            eta = el / done * (total - done)
+            line = (f"({nc},{pt}) s{sd}: final~{r['final_pop']:.0f} onset~{r['onset']} "
+                    f"rails={'ok' if not any(r['rails'].values()) else r['rails']}")
+            print(f"  [{done}/{total}] {line}  elapsed {el/60:.0f}m eta ~{eta/60:.0f}m", flush=True)
+            with open(prog_path, "w") as pf:   # overwrite — a live progress indicator the chat can Read
+                pf.write(f"A-3 sweep: run {done}/{total} done | elapsed {el/60:.1f}m | "
+                         f"eta ~{eta/60:.1f}m | last: {line}\n")
+            # crash-safety: persist finals so far, then force-reclaim the run's world memory
+            with open(os.path.join(OUT, "partial_finals.json"), "w") as pf:
+                json.dump({f"{k[0]}c_{k[1]}p_s{k[2]}": v["final_pop"]
+                           for k, v in runs.items()}, pf, indent=2)
+            gc.collect()
     elapsed = time.time() - t0
 
     finals = {k: v["final_pop"] for k, v in runs.items()}
@@ -229,13 +244,13 @@ def main():
         ax.set_title(f"{c[0]} clusters, {c[1]}x{c[1]} patch", fontsize=10)
         ax.axvline(WINDOW_START, color="#999", ls=":", lw=0.8); ax.grid(alpha=0.25)
     axes.flat[0].legend(fontsize=8, loc="lower right")
-    fig.suptitle("Settling population — 18 runs (CC-1 capacity economy)", fontsize=12)
+    fig.suptitle(f"Settling population — {len(COMBOS)*len(SEEDS)} runs (CC-1 capacity economy)", fontsize=12)
     fig.text(0.5, 0.04, "step (month)", ha="center"); fig.text(0.06, 0.5, "population", va="center", rotation=90)
     figs["settling"] = fig_b64(fig)
     # 2 convergence
     fig, ax = plt.subplots(figsize=(9, 4.2)); xs = np.arange(len(COMBOS))
     for j, s in enumerate(SEEDS):
-        ax.bar(xs + (j - 1) * 0.25, [by_combo[c][j] for c in COMBOS], width=0.25, color=cols[s], label=f"seed {s}")
+        ax.bar(xs + (j - (len(SEEDS)-1)/2) * 0.25, [by_combo[c][j] for c in COMBOS], width=0.25, color=cols[s], label=f"seed {s}")
     ax.axhline(cap_mean, color="k", ls="--", lw=1, label=f"mean {cap_mean:.0f}")
     ax.set_xticks(xs); ax.set_xticklabels([f"{c[0]}c/{c[1]}p" for c in COMBOS])
     ax.set_ylabel("final population (last-500 mean)"); ax.legend(fontsize=8)
@@ -315,9 +330,9 @@ table{{border-collapse:collapse;margin:10px 0}} td,th{{border:1px solid #cbd5e0;
 td:first-child,th:first-child{{text-align:left}} code{{background:#edf2f7;padding:1px 5px;border-radius:3px}} .fig{{margin:18px 0;text-align:center}}
 </style></head><body>
 <h1>A-3 First-Light Shakedown — Phase 1 terrain, C-only</h1>
-<p><b>6 placement combos x 3 seeds x {R['config']['steps']} steps, 100x100, RIVALROUS multi-occupancy on a
+<p><b>{len(R['config']['combos'])} placement combos x {len(R['config']['seeds'])} seed(s) x {R['config']['steps']} steps, 100x100, RIVALROUS multi-occupancy on a
 CC-1 cell-capacity field.</b> Not a gate — findings are shapes; rails are bug-catchers. Ran in {R['elapsed_sec']:.0f}s
-(~{R['elapsed_sec']/3600:.1f} h).</p>
+(~{R['elapsed_sec']/3600:.1f} h). <i>Reduced robust re-run (1 seed); full 3-seed replication deferred to the scaling stage.</i></p>
 
 <div class="box ok"><b>CC-1 cell capacity (the headline model addition, supervisor-directed 2026-06-16).</b>
 A 100 km2 cell supports a <b>band</b>, not one forager. The earlier non-rivalrous run wrongly used the
@@ -335,7 +350,7 @@ ethnographically realistic for a savanna-dominated landscape). Land cells with K
 
 <h2>Headline</h2>
 <div class="box"><b>Discovered carrying capacity: {R['capacity_mean']:.0f} ± {R['capacity_std']:.0f} agents</b>
-(mean of 18 runs; spread {R['capacity_spread_pct']:.1f}%) = ~{R['capacity_mean']/total_cap*100:.0f}% of the terrain's
+(mean of {len(R['config']['combos'])*len(R['config']['seeds'])} runs across placements; spread {R['capacity_spread_pct']:.1f}%) = ~{R['capacity_mean']/total_cap*100:.0f}% of the terrain's
 total support ({total_cap:.0f}).<br>
 <b>Convergence:</b> {'strong — placement leaves little fingerprint at t=1500 (terrain-driven attractor).' if R['capacity_spread_pct']<12 else 'partial — placement leaves a visible fingerprint at t=1500.'}<br>
 Supersedes the stale N_carry=400 (a Sugarscape/50<sup>2</sup> value) — <b>PROPOSED, not locked</b>.</div>
