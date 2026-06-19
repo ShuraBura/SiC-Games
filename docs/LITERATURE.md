@@ -612,3 +612,21 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 Our Step-1 realized **IBI 37.0 / TFR 7.9** sits at the high-fertility (Aché) end of this HG range — as intended (we calibrate to the Aché, not the cross-HG mean).
 
 **Citation tag:** [COMPARANDUM — IBI/TFR cross-check; books, may reside in the G: drive lit store rather than repo `literature/`]
+
+---
+
+### Hill, K., Hurtado, A.M. & Walker, R.S. (2007). "High adult mortality among Hiwi hunter-gatherers: Implications for human evolution." *J. Human Evolution* 52:443–454. FILED `literature/` 2026-06-19.
+
+**What was lifted:** accidental death ≈ **10% of all deaths** across age groups (Hiwi accidental ~297/100k person-yr; ~1.1%/yr combat+homicide+accident pre-contact). Anchors the **terrain risk-scale** (Demography Step-2): the risk multiplier is calibrated so terrain accident-mortality ≈ 10% of baseline `a2` in average-risk terrain. See MODEL_SPEC §4.3.3.
+
+**Citation tag:** [USED — terrain risk-scale anchor (Step-2)]
+
+---
+
+### Pelletier, D.L. (1994). "The Potentiating Effects of Malnutrition on Child Mortality: Epidemiologic Evidence and Policy Implications." *Nutrition Reviews* 52(12):409–415. (cf. Scrimshaw, Taylor & Gordon 1968.)
+
+**What was lifted:** malnutrition **multiplicatively** (not additively) potentiates infectious mortality; mild-to-moderate malnutrition ≈ 2× mortality risk, severe higher. Anchors the **nutrition×disease synergy `μ_max ≈ 2–3`** (Demography Step-2; MODEL_SPEC §4.3.3).
+
+**Status:** **NOT yet in `literature/`** (paywalled — supervisor to fetch). `μ_max` PROVISIONAL pending the filed paper + the RR-by-severity table; the RR is child-mortality data extrapolated to adult reserve depletion.
+
+**Citation tag:** [USED — nutrition-synergy μ_max anchor (Step-2); PROVISIONAL, source not yet filed]

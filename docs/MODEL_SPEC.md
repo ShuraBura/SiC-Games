@@ -233,10 +233,27 @@ temperature ~14 °C; near-surface relative humidity land-ish ~70%. PLACEHOLDER s
 deferred climate-season stage (`DEFERRED_MECHANICS` CL-1; Berger 1978 / ENSO / Holocene). Exists so the
 Step-2 **pathogen field** reads real T/humidity rather than a `wateracc × NPP` proxy.
 
-### §4.3.3 Pending Step-2 anchors
-Pathogen (`π, NPP_half`): Tallavaara SEM coefficients — **TO EXTRACT** (Zenodo 1069787). Synergy (`μ_max`):
-undernutrition×infection relative-risk — **TO SOURCE**. Terrain risk scale: accident-mortality elevation
-in rugged terrain — **TO SOURCE**.
+### §4.3.3 Step-2 `a2`-modulator anchors (2026-06-19)
+- **Nutrition × disease synergy `μ_max`:** undernutrition **multiplicatively** potentiates mortality
+  (not additive) — **Pelletier 1994** (*Nutrition Reviews* 52(12):409–415); Scrimshaw et al. 1968.
+  Mild-to-moderate malnutrition ≈ **2× mortality risk**, severe higher. **Value: `μ_max ≈ 2–3`** (the
+  multiplier on `a2` rising from 1 at full reserve to `μ_max` near the floor). **[PROVISIONAL — Pelletier
+  1994 NOT yet in `literature/` (paywalled; supervisor to fetch); the RR is child-mortality data
+  extrapolated to adult reserve depletion; confirm the RR-by-severity table.]**
+- **Terrain risk scale `R`:** accidents ≈ **10% of all HG deaths** — **Hill, Hurtado & Walker 2007**
+  (*J. Hum. Evol.* 52:443–454, Hiwi: accidental ~297/100k person-yr; FILED `literature/`), corroborated
+  by Gurven & Kaplan 2007 cause-of-death. **Calibration:** set the (max-capped) risk multiplier so
+  terrain accident-mortality ≈ **10% of baseline `a2`** in average-risk terrain, scaling with the `risk`
+  field. Pins the risk *scale*, not just the mean (red-team M-2).
+- **Density-disease `D` (`δ, ρ_half`):** the **free calibration lever** (endemic/zoonotic transmission;
+  Dunn 1968 / Houldcroft & Underdown 2023 — modest, not crowd-epidemic). No external anchor — calibrated
+  to the spatial equilibrium. `ρ` defined as **agents/km²** (red-team m-3), not raw cell occupancy.
+- **Pathogen field `P` (`π, NPP_half`): DEFERRED — OFF in 2b.** Tallavaara's standardized SEM
+  coefficients live in **Fig. 3 (PDF p3) + Table S1 (SI)** — a figure + an SI table (the SI is NOT in the
+  filed 6-page main-text PDF, and figure arrow-labels are not text-extractable). Rather than force the SEM
+  onto the `wateracc × NPP` proxy (dimensionally questionable — red-team M-2), the pathogen field is
+  anchored to **real temperature/humidity** (Guernier 2004 climate drivers) when the **climate-season
+  stage** lands (DEFERRED_MECHANICS CL-1; §4.3.2). 2b runs with pathogen OFF.
 
 ---
 
