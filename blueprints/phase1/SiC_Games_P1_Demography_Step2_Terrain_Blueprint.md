@@ -1,7 +1,10 @@
 # SiC Games — Phase 1 Demographic Stage · STEP 2 Blueprint
 ## Terrain-Modulated Demography on the Full World
 
-**Status:** DRAFT — for supervisor review and an independent red-team pass before lock.
+**Status:** DRAFT v2 (independently red-teamed 2026-06-18) — for supervisor review. Red-team found a
+**BLOCKER** (the food→stable-r≈0 claim is unproven; A-3 was a frozen fill, not a growing population
+hitting a wall) + majors; dispositions in §11. **NOT lockable until (a) the 2a-pre stability test (§5)
+is run empirically and (b) the M-3 sex-split lands.**
 **Created:** 2026-06-18
 **Phase:** 1 (Terrain & Resource Ecology). Builds directly on Step 1.
 **Precursors:** `SiC_Games_P1_Demography_Siler_Blueprint.md` (the locked stage spec) and Step-1
@@ -60,62 +63,94 @@ capped (n-1). With all flags off → the pure Aché schedule (= Step-1 on terrai
 
 | Modulator | form | knob | how the knob is set |
 |---|---|---|---|
-| Terrain risk `R` | `risk(cell)/risk_ref` | `risk_ref` | **PINNED** = mean land risk (normalization, ≈1 average); not free |
-| Density-disease `D` | `1 + δ·ρ/(ρ+ρ_half)` | `δ, ρ_half` | the **primary free lever** (endemic/zoonotic; Dunn/Houldcroft — modest) |
-| Pathogen `P` | `1 + π·norm(wateracc)·s(NPP)` | `π, NPP_half` | **PINNED** to Tallavaara 2018 SEM coefficients (Zenodo 1069787) |
-| Nutrition synergy `M` | `1+(μ_max−1)(1−clamp(reserve))` | `μ_max` | **PINNED** to the undernutrition×infection lit (~2–3×) |
+| Terrain risk `R` | `risk(cell)/risk_ref`, **max-capped** | `risk_ref`, max-cap | mean PINNED (norm ≈1); but the risk *scale/gradient* must ALSO be pinned — cap the max risk multiplier to a lit accident-mortality elevation (red-team M-2) |
+| Density-disease `D` | `1 + δ·ρ/(ρ+ρ_half)`, **ρ = agents/km²** | `δ, ρ_half` | **primary free lever** (endemic/zoonotic; modest — Dunn/Houldcroft). ρ as DENSITY not raw occupancy (red-team m-3: occupancy is cell-size-dependent) |
+| Pathogen `P` | `1 + π·norm(wateracc)·s(NPP)` | `π, NPP_half` | **FREE until extracted** — Tallavaara SEM coeffs (Zenodo 1069787) not yet pulled; mapping onto the `wateracc` proxy (no temp field) unproven (red-team M-2) |
+| Nutrition synergy `M` | `1+(μ_max−1)(1−clamp(reserve))` | `μ_max` | **soft-free** — lit gives a *range* (~2–3×), reference still to find; 2× vs 3× moves the CC (red-team M-2) |
 
-**Degrees-of-freedom discipline (M-1 invariant):** three of four modulators are pinned by their lit
-anchors; the density-disease pair is the only genuinely free lever, calibrated against the r→0
-equilibrium. **# free knobs (≤2) ≤ # gate targets.** New terrain `pathogen` field added to `terrain.py`.
+**Degrees-of-freedom discipline — RED-TEAM M-2 CORRECTION.** The earlier "3-of-4 pinned, ≤2 free" claim
+was overstated. Honest count: `risk_ref` pins only the *mean* (not the risk scale/gradient that drives
+the sorting); `π, NPP_half, μ_max` are *aspirationally* pinned but their anchors are still §8 open items
+(so **free until extracted**); plus `fertility_energetic_slope` (§7). **Realistic free/soft-free count ≈ 6,
+not 2.** To lock: either extract the pathogen + synergy anchors NOW (move out of §8) and pin the risk
+scale, OR reclassify them free and add enough independent *quantitative* gate targets (§6) so that
+**# free knobs ≤ # independent gate targets** holds honestly. New terrain `pathogen` field added to
+`terrain.py`.
 
 ---
 
 ## 4. How r→0 emerges (the mechanism — read before the gate)
 
-**r→0 does NOT require the modulators.** The CC-1 cell capacity already makes food density-dependent:
-as local density rises, the per-capita harvest share falls below maintenance → reserves drop →
-(a) the nutrition-synergy raises `a2`, and (b) at the extreme, the starvation backstop fires. So even
-with all modulators OFF, the growing Aché population is checked by **food** at ≈ the A-3 food ceiling —
-but now with continuous turnover (not frozen). The modulators then shift the equilibrium **downward**:
+**HYPOTHESIS — to be tested empirically (red-team B-1), NOT assumed:** that density-dependent food
+checks the growth at a *stable* equilibrium. The CC-1 cell capacity makes food density-dependent —
+per-capita share `S/n` (scramble competition, **no per-capita floor**) falls as local density rises →
+reserves drain → nutrition-synergy raises `a2` and, at the extreme, the starvation backstop fires.
+**BUT** this is a system with a **mortality lag** (~`reserve_full/burn` steps): an intrinsic +3.3%/yr
+growth + a saturating resource + a lagged mortality response is the textbook recipe for
+**overshoot-and-collapse or oscillation**, NOT guaranteed smooth logistic settling. A-3's clean 133k
+attractor is **no evidence** — it was a *frozen, non-reproducing fill* (births=deaths=0), not a growing
+population hitting a wall. **§5 stage 2a-pre tests this empirically before anything else.** If 2a-pre
+shows collapse/oscillation, the modulators become load-bearing for *stability*, not just for shifting
+the equilibrium down — which changes §3's whole free-knob framing. IF settling is stable, the
+modulators then shift the equilibrium **downward**:
 - terrain risk → high-exposure cells under-populated;
 - density-disease → crowding penalized before starvation;
 - pathogen → high-NPP (wetland/forest) cells become productivity-vs-disease tradeoffs.
 
-So Step 2 is **not** "tune knobs until r=0" (r→0 is guaranteed by density-dependent food). It is "the
-lit-anchored modulators set *how far below the food ceiling* the demographic carrying capacity sits, and
-*how the population sorts* across terrain." The deliverable is that number and that spatial structure.
+**IF 2a-pre confirms stable settling**, Step 2 is **not** "tune knobs until r=0" — it is "the
+lit-anchored modulators set *how far below the food ceiling* the carrying capacity sits, and *how the
+population sorts* across terrain." The deliverable is that number, that spatial structure, **and the
+demonstrated stability**.
 
 ---
 
 ## 5. Staging within Step 2
 
-- **2a — demography on terrain, modulators OFF.** Confirms the population grows from staggered founders
-  to a turnover equilibrium at ≈ the A-3 food ceiling (sanity: Step-1 vital rates survive the spatial
-  economy; r→0 via food; births≈deaths>0). Establishes the *upper bound*.
-- **2b — modulators ON (ablation).** Enable each flag in turn (risk, density-disease, pathogen,
-  synergy), then all together. Measure each one's downward shift of the carrying capacity and its
-  spatial fingerprint. Calibrate the density-disease lever.
-- **Scale discipline:** the full 100×100 (~10⁵ agents, multi-generation) is heavy (A-3: 2.8 GB, OOM
-  risk). **Calibrate 2b on a smaller grid (e.g. 50×50) first**, then one confirmation run at 100×100.
-  Use the A-3 harness lessons: `progress.txt`, crash-safe incremental saves, unbuffered output.
+- **2a-pre — STABILITY TEST (red-team B-1; do FIRST).** Run the Step-1 demography on a *small* terrain,
+  modulators OFF, and **plot the population trajectory**: does the +3.3%/yr population settle smoothly, or
+  overshoot → oscillate / collapse against the food wall? Resolves the §4 hypothesis *empirically* before
+  any modulator work. **Gate: bounded settling** (post-peak trough not below a pre-registered % of
+  equilibrium; no extinction across seeds). If it collapses/oscillates, **STOP** and redesign (per-capita
+  harvest floor? movement damping? modulators promoted to stabilizers) before proceeding.
+- **2a — demography on terrain, modulators OFF.** With stability established, confirm Step-1 vital rates
+  survive the spatial economy and the **modulators-off equilibrium lands within a tight band of the A-3
+  133k food ceiling** (the conservation invariant, §6) — the upper bound.
+- **2b — modulators ON (ablation).** Enable each flag in turn, then all together; measure each one's
+  downward shift of the carrying capacity and its spatial fingerprint; calibrate the density-disease lever.
+- **Scale discipline (red-team m-1):** a *rescaled* 50×50 world is a DIFFERENT world (different biome mix;
+  doubled perimeter:area → different edge crowding) and does NOT transfer to 100×100. Calibrate on a
+  **100×100 sub-window / same-resolution patch**, not a shrunk world. The 100×100 confirmation is itself a
+  falsifiable check (small-scale `δ, ρ_half` must reproduce the CDR band + spatial correlations within
+  tolerance, else transfer rejected). **Runtime: generations of turnover (thousands of steps) with
+  per-agent Siler draws at ~10⁵ agents — plausibly hours and OOM-risky** (A-3 was 2.8 GB / ~20 min
+  *frozen*); use `progress.txt`, crash-safe saves, population-cap lessons; budget it before the full run.
 
 ---
 
 ## 6. Validation gate (Step-2 GREEN requires all)
 
-1. **r → 0 at a spatial equilibrium** (the demographic carrying capacity), with **births ≈ deaths > 0**
-   and a **crude death rate now in the Aché stationary band (~40–60 per 1000/yr)** — at the *stationary*
-   equilibrium the CDR band applies (unlike Step-1's growing population).
-2. **Aché vital rates survive on terrain:** realized IBI/TFR and l(x) stay within band of Step-1 (the
-   spatial economy must not silently break the calibrated demography).
-3. **Demographic carrying capacity reported vs the A-3 ~133k food ceiling** — expected **below** it;
-   quantify the gap and attribute it across modulators (ablation table).
-4. **Spatial sorting:** occupancy correlates with terrain (low-risk/low-pathogen/high-NPP cells carry
-   more); high-risk and high-pathogen cells under-populated. The productivity-vs-disease tradeoff visible
-   in wetland/forest occupancy.
-5. **Rails:** no NaN/Inf, no sub-floor reserve survivors, no agents on water, determinism PASS; the
-   inherited ×12 units guard still holds.
+0. **Bounded stability (red-team B-1):** post-settling population is bounded — peak-to-trough oscillation
+   below a pre-registered threshold, no extinction across seeds. "r→0 over the back half" alone is NOT
+   sufficient (a collapsing/oscillating run can spuriously satisfy it).
+1. **r → 0 at a spatial equilibrium** with **births ≈ deaths > 0** and **CDR in the Aché stationary band
+   (~40–60 per 1000/yr)** — the stationary CDR band applies here (unlike Step-1's growing population).
+2. **Aché vital rates survive on terrain:** realized IBI/TFR and l(x) within band of Step-1 — measured
+   **with the energetic fertility modifier LIVE** (red-team M-3: it was neutral in Step-1, so turning it
+   on will drift the rates → re-confirm).
+3. **Conservation invariant (red-team M-1):** with all modulators OFF, the demographic CC lands **within a
+   tight band of the A-3 133k food ceiling** — NOT just "below it" (near-tautological, since every
+   modulator is ≥1). Far-below-with-modulators-off ⇒ the demographic core is silently breaking the economy.
+4. **Pre-registered QUANTITATIVE spatial predictions (red-team M-1)** — declared before the run, with
+   magnitudes: e.g. occupancy–risk rank correlation ρ ≤ −0.4; occupancy–pathogen ρ ≤ −0.3. "Correlates"
+   without a signed magnitude is unfalsifiable.
+5. **Ablation-additivity check (red-team M-1):** the sum of isolated single-modulator CC shifts ≈ the
+   all-on shift (within a stated interaction tolerance). A miswired modulator breaks additivity — the test
+   a wrong wiring FAILS.
+6. **`a2_eff` cap diagnostics (red-team m-4):** report the fraction of agent-steps where the cap binds; if
+   non-trivial, the cap is doing demographic work (flattening the sorting) and must be a parameter, not a
+   guardrail.
+7. **Rails:** no NaN/Inf, no sub-floor reserve survivors, no agents on water, determinism PASS; inherited
+   ×12 units guard holds; **no `deaths_senesc` from a hard cap** (red-team M-3 — `max_age` removed, §7).
 
 Ablation deliverable: each modulator flag on/off — its isolated effect on carrying capacity and turnover.
 
@@ -126,10 +161,21 @@ Ablation deliverable: each modulator flag on/off — its isolated effect on carr
 - **`phase1_model.py`:** swap the A-3 mortality/repro block for the `sic_games.demography` core (Siler
   `a2_mult` mortality + IBI reproduction + maternal + staggered founders); compute `a2_mult` per agent
   from the live modulators; keep CC-1 harvest field, substrate, water guard.
+  - **REMOVE the hard `max_age` senescence cap** (`_make_agent` ~line 188; `age ≥ max_age` deaths). The
+    Siler hazard has no cap — leaving it gives Siler + a residual hard cap → the synchronized senescence
+    wave A-3 warned about. Add a rail asserting no hard-cap senescence deaths (red-team M-3).
+  - **Separate mortality channels in reserve-space (red-team M-3):** the starvation backstop fires ONLY at
+    `reserve ≤ floor`; nutrition-synergy `M(reserve)` operates ONLY for `floor < reserve < full`. No agent
+    charged for "death by undernutrition" twice/step; verify with cause counters (`deaths_starv` vs
+    `deaths_baseline`).
+  - **Confirm the harness passes the CC-1 `harvest_field`** (red-team n-2): the A-3 default falls back to
+    raw `terrain_field` forage (under-estimates extractable rate) — the fallback would make the 133k
+    comparison apples-to-oranges.
 - **`terrain.py`:** new `pathogen` field (flagged); `risk` field wired (already exists).
-- **`config.py` / `demography.py`:** `DemographyConfig` already has the flags + fertility; add the
-  pinned modulator constants (`risk_ref`, `π`, `NPP_half`, `μ_max`) + the free `δ, ρ_half`.
-- **New harness:** `outputs/phase1_demography_step2/` — 2a/2b runs + ablation + self-contained report.
+- **`config.py` / `demography.py`:** add the modulator constants (`risk_ref` + risk max-cap, `π`,
+  `NPP_half`, `μ_max`, `δ`, `ρ_half`) AND `fertility_energetic_slope` — **count the last as a free knob**
+  (the energetic modifier going live is a new, unvalidated coupling; red-team M-3).
+- **New harness:** `outputs/phase1_demography_step2/` — 2a-pre / 2a / 2b runs + ablation + report.
 
 ---
 
@@ -137,7 +183,7 @@ Ablation deliverable: each modulator flag on/off — its isolated effect on carr
 
 | Item | State |
 |---|---|
-| **M-3 sex-split + maternal-removed female Siler** | The Aché monograph (Hill & Hurtado 1996) is FILED and **machine-readable (digital, 592 pp)** — extract the sex-specific life tables to replace the both-sexes schedule. Do this **before** Step-2 lock so the +3.3% (both-sexes) → real sex-specific rates. |
+| **M-3 sex-split + maternal-removed female Siler** | **HARD dependency for the headline carrying-capacity number** (red-team m-2). Aché monograph (Hill & Hurtado 1996) is FILED and machine-readable (digital, 592 pp) — extract the sex-specific tables. The current both-sexes schedule applies maternal mortality on a both-sexes baseline → female reproductive-age mortality double-counted → fertility suppressed → **CC biased LOW (known direction)**, CDR inflated. A both-sexes run is fine for 2a-pre stability only; the CC-vs-133k deliverable WAITS for the sex-split. |
 | Pathogen SEM coefficients (`π`, `NPP_half`) | extract from Tallavaara Zenodo 1069787 (RTL-table parse, as for G&K) |
 | Synergy `μ_max` | undernutrition×infection lit anchor (find/confirm a reference) |
 | Scale/perf at 100×100 | calibrate on 50×50; confirm once at 100×100 |
@@ -164,6 +210,37 @@ mechanism sound? (d) does the gate falsify a wrong wiring? (e) scale/perf realis
 
 ---
 
-*Phase 1 Demographic Stage · Step 2 (terrain-modulated demography) · DRAFT 2026-06-18 · C-only,
-forage-only · Step-1 demography FIXED; only terrain-modulator knobs calibrated; pathogen + synergy
-anchors pending; M-3 sex-split to land first. Open items: §8.*
+## 11. Red-team revision log (v2 — independent review 2026-06-18)
+
+Independent repo-grounded red-team. **Verdict: NEEDS REVISION before lock** (the central food→stable-r≈0
+claim was unproven). Dispositions:
+
+**Applied in v2 (inline):**
+- **B-1 (BLOCKER) — food→stable r≈0 asserted; A-3 evidence invalid (frozen fill ≠ growing pop).** Reframed
+  §4 as a HYPOTHESIS; added stage **2a-pre stability test** (§5) + a **bounded-stability gate item 0** (§6).
+  Lock now depends on the 2a-pre empirical result.
+- **M-1 — gate couldn't falsify a wrong wiring; "CC below 133k" tautological.** Added the **conservation
+  invariant** (modulators-off ≈ 133k), **pre-registered quantitative spatial predictions** (signed ρ
+  magnitudes), and the **ablation-additivity check** (§6 items 3–5).
+- **M-2 — free-knob count understated (~6, not ≤2).** §3 reclassified: pathogen + synergy are FREE until
+  anchors extracted; risk needs its *scale* pinned (max-cap), not just the mean.
+- **M-3 — three seam collisions.** §7: (1) **remove the hard `max_age` cap** (+ rail); (2) **separate
+  starvation vs synergy in reserve-space** (no double-count); (3) the **energetic fertility modifier going
+  live is a new coupling** → re-validate IBI/TFR with it on (§6.2), count `fertility_energetic_slope` free.
+- **m-1 — scale transfer.** §5: calibrate on a 100×100 **sub-window**, not a rescaled 50×50 world; 100×100
+  confirmation is a falsifiable transfer check; runtime/OOM budgeted.
+- **m-2 — both-sexes CC biased LOW.** §8: M-3 sex-split is a **hard dependency** for the headline CC.
+- **m-3 — density-disease ρ** defined as **agents/km²**, not cell-size-dependent occupancy (§3).
+- **m-4 — `a2_eff` cap.** §6.6: report the cap-binding fraction; if non-trivial, treat as a parameter.
+- **n-1/n-2/n-3:** wetland tradeoff phrased as a prediction; confirm the harness passes the CC-1 harvest
+  field; the +3.3% start rate is itself provisional (both-sexes).
+
+**Net:** lock is gated on (1) running 2a-pre and seeing bounded settling, (2) landing the M-3 sex-split,
+(3) extracting the pathogen/synergy anchors or re-balancing DOF vs gate targets. None require a redesign —
+but (1) is an empirical result we must obtain, not a doc edit.
+
+---
+
+*Phase 1 Demographic Stage · Step 2 · **DRAFT v2** 2026-06-18 (red-teamed) · C-only, forage-only · Step-1
+demography FIXED; the food→stable-r≈0 mechanism is a HYPOTHESIS pending the 2a-pre test; ~6 free/soft-free
+knobs to pin or cover; M-3 sex-split is a hard prerequisite. Open items: §8, §11.*
