@@ -166,6 +166,9 @@ class DemographyConfig(BaseModel):
     enable_terrain_pathogen: bool = False
     enable_nutrition_synergy: bool = False
     enable_infanticide: bool = False
+    # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
+    # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
+    enable_energetic_fertility: bool = False
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
@@ -219,3 +222,13 @@ def synergy_mult(reserve: float, floor: float, full: float, mu_max: float) -> fl
     span = full - floor
     frac = 0.0 if span <= 0.0 else max(0.0, min(1.0, (reserve - floor) / span))
     return 1.0 + (mu_max - 1.0) * (1.0 - frac)
+
+
+def energetic_fertility_factor(reserve: float, floor: float, full: float) -> float:
+    """Energetic fertility modifier (Step-2 economy fix): birth probability scales with maternal
+    reserve — 1 at full reserve → 0 at the floor. Lean conditions depress fertility WITHOUT a hard
+    cliff, so the population caps before reserves drain to the starvation floor."""
+    span = full - floor
+    if span <= 0.0:
+        return 1.0
+    return max(0.0, min(1.0, (reserve - floor) / span))

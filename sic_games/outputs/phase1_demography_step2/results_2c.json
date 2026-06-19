@@ -1,0 +1,47 @@
+{
+  "winners": [],
+  "floor": 20000.0,
+  "full": 100000.0,
+  "conditions": {
+    "baseline (scramble)": {
+      "eq_pop": 20046.793333333335,
+      "pct_ceiling": 95.13774808401038,
+      "eq_reserve": 25250.719083140277,
+      "reserve_band_frac": 0.06563398853925347,
+      "frac_above_50k": 0.004338286626109505,
+      "frac_near_floor": 0.08162960007978458,
+      "slope": 0.1830469227435856
+    },
+    "A: energetic fertility": {
+      "eq_pop": 13.213333333333333,
+      "pct_ceiling": 0.06270762396330337,
+      "eq_reserve": 25093.122257644318,
+      "reserve_band_frac": 0.06366402822055398,
+      "frac_above_50k": 0.0,
+      "frac_near_floor": 0.0,
+      "slope": -0.0246584962055134
+    },
+    "B: density-cap": {
+      "eq_pop": 12383.616666666667,
+      "pct_ceiling": 58.769968004971986,
+      "eq_reserve": 25363.13986944083,
+      "reserve_band_frac": 0.06703924836801038,
+      "frac_above_50k": 0.004555198285101822,
+      "frac_near_floor": 0.0,
+      "slope": 16.677320636895963
+    },
+    "A+B": {
+      "eq_pop": 2.8933333333333335,
+      "pct_ceiling": 0.0137311346115407,
+      "eq_reserve": 25000.0,
+      "reserve_band_frac": 0.0625,
+      "frac_above_50k": 0.0,
+      "frac_near_floor": 0.0,
+      "slope": -0.007182302025578061
+    }
+  },
+  "founders": 400,
+  "steps": 2000,
+  "seed": 42,
+  "elapsed_sec": 220.8215172290802
+}

@@ -53,7 +53,7 @@ from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
-    DemographyConfig, density_mult, is_fertile, risk_mult, synergy_mult,
+    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, risk_mult, synergy_mult,
 )
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target
 from sic_games.terrain import N, WorldFields, generate_world
@@ -423,7 +423,10 @@ class TerrainWorld(mesa.Model):
                 continue
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
-            if a.random.random() < cfg.fecundability:
+            p_birth = cfg.fecundability
+            if cfg.enable_energetic_fertility:                 # economy fix (A): births scale w/ reserve
+                p_birth *= energetic_fertility_factor(a.wealth, a.reserve_floor, self._reserve_full)
+            if a.random.random() < p_birth:
                 a.months_since_birth = 0
                 a.parity += 1
                 csex = "male" if a.random.random() < cfg.srb_male else "female"
