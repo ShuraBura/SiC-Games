@@ -1,0 +1,49 @@
+{
+  "base_eq": 20046.793333333335,
+  "food_ceiling": 21071.334708943526,
+  "conditions": {
+    "baseline (all off)": {
+      "eq": 20046.793333333335,
+      "pct_ceiling": 95.13774808401038,
+      "shift_vs_baseline_pct": 0.0,
+      "occ_risk_spearman": -0.9488802180454093,
+      "cap_bind_frac": 0.0
+    },
+    "+risk": {
+      "eq": 20038.896666666667,
+      "pct_ceiling": 95.10027221085976,
+      "shift_vs_baseline_pct": 0.03939117112330415,
+      "occ_risk_spearman": -0.9571517730772295,
+      "cap_bind_frac": 0.0
+    },
+    "+density-disease": {
+      "eq": 20002.763333333332,
+      "pct_ceiling": 94.92879122101056,
+      "shift_vs_baseline_pct": 0.21963612468030025,
+      "occ_risk_spearman": -0.9518787423827146,
+      "cap_bind_frac": 0.0
+    },
+    "+synergy": {
+      "eq": 3957.0433333333335,
+      "pct_ceiling": 18.779272352661195,
+      "shift_vs_baseline_pct": 80.26096609299775,
+      "occ_risk_spearman": -0.831705269455996,
+      "cap_bind_frac": 0.0
+    },
+    "all (risk+dens+syn)": {
+      "eq": 7174.213333333333,
+      "pct_ceiling": 34.047265787526534,
+      "shift_vs_baseline_pct": 64.21266377099712,
+      "occ_risk_spearman": -0.9224584141357085,
+      "cap_bind_frac": 0.0
+    }
+  },
+  "ablation_additivity": {
+    "sum_of_singles_pct": 80.51999338880135,
+    "all_on_pct": 64.21266377099712
+  },
+  "founders": 400,
+  "steps": 2000,
+  "seed": 42,
+  "elapsed_sec": 478.24984192848206
+}
