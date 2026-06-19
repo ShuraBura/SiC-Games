@@ -13,9 +13,12 @@ from sic_games.demography import (
     ACHE_FOREST_MALE,
     DemographyConfig,
     SilerParams,
+    density_mult,
     is_fertile,
     life_expectancy,
     modal_adult_death,
+    risk_mult,
+    synergy_mult,
 )
 
 
@@ -124,3 +127,19 @@ def test_config_returns_sex_specific_siler():
     assert cfg.siler() == ACHE_FOREST                 # default = both-sexes
     assert cfg.siler("female") == ACHE_FOREST_FEMALE
     assert cfg.siler("male") == ACHE_FOREST_MALE
+
+
+# --- Step-2 a2 modulators ---
+def test_a2_modulators():
+    # terrain risk: 1 at mean, capped, rises on high-risk cells
+    assert risk_mult(0.2, 0.2, 3.0) == pytest.approx(1.0)
+    assert risk_mult(1.0, 0.2, 3.0) == 3.0                    # capped
+    assert risk_mult(0.4, 0.2, 3.0) == pytest.approx(2.0)
+    # density-disease: 1 at ρ=0, +δ/2 at ρ=ρ_half, saturating below 1+δ
+    assert density_mult(0.0, 1.0, 0.2) == pytest.approx(1.0)
+    assert density_mult(0.2, 1.0, 0.2) == pytest.approx(1.5)
+    assert 1.0 < density_mult(0.1, 1.0, 0.2) < density_mult(0.5, 1.0, 0.2) < 2.0
+    # nutrition synergy: 1 at full reserve, μ_max at floor, monotone in between
+    assert synergy_mult(100_000, 20_000, 100_000, 2.5) == pytest.approx(1.0)
+    assert synergy_mult(20_000, 20_000, 100_000, 2.5) == pytest.approx(2.5)
+    assert synergy_mult(60_000, 20_000, 100_000, 2.5) == pytest.approx(1.75)

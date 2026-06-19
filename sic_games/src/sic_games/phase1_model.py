@@ -52,10 +52,14 @@ from sic_games.agents.perception import LocalVisionPerception
 from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
-from sic_games.demography import DemographyConfig, is_fertile
+from sic_games.demography import (
+    DemographyConfig, density_mult, is_fertile, risk_mult, synergy_mult,
+)
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
+
+_CELL_KM2 = 100.0   # CC-1: each cell = 100 km² (local density = cell occupancy / _CELL_KM2)
 
 # Default terrain knobs (production 100×100 grid)
 _DEFAULT_KNOBS: dict = {
@@ -129,6 +133,9 @@ class TerrainWorld(mesa.Model):
             self._siler = {"female": demography_cfg.siler("female"),
                            "male": demography_cfg.siler("male")}
             self._siler_both = demography_cfg.siler()
+            land = self._fields.isWater == 0
+            self._risk_ref = float(self._fields.risk[land].mean())  # mean land risk (normalization)
+            self.a2_cap_hits = 0   # red-team m-4: agent-steps where the a2_eff cap binds
 
         self.agent_list: list[BaseAgent] = []
         self.occupied: set[tuple[int, int]] = set()
@@ -314,9 +321,11 @@ class TerrainWorld(mesa.Model):
                 if a.wealth <= a.reserve_floor:          # starvation backstop (reserve ≤ floor)
                     a.alive = False
                     self.deaths_starv_this_step += 1
-                elif a.random.random() < self._siler[a.sex].monthly_death_prob(a.age):
-                    a.alive = False                       # Siler baseline+senescence (modulators OFF → a2_mult=1)
-                    self.deaths_senesc_this_step += 1
+                else:
+                    a2m = self._a2_mult(a, occ_count)     # Step-2 a2 modulators (1.0 if all flags off)
+                    if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m):
+                        a.alive = False                   # Siler baseline+senescence
+                        self.deaths_senesc_this_step += 1
             elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
@@ -425,6 +434,23 @@ class TerrainWorld(mesa.Model):
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
+
+    def _a2_mult(self, a, occ_count) -> float:
+        """Step-2 baseline-mortality (a2) multiplier from the live modulators (1.0 if all flags off) —
+        the only Siler term the world modulates. Capped (red-team n-1). Pathogen OFF in 2b."""
+        cfg = self._demog
+        m = 1.0
+        if cfg.enable_terrain_risk:
+            m *= risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
+        if cfg.enable_density_disease:
+            rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
+            m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
+        if cfg.enable_nutrition_synergy:
+            m *= synergy_mult(a.wealth, a.reserve_floor, self._reserve_full, cfg.mu_max)
+        if m > cfg.a2_cap:
+            self.a2_cap_hits += 1
+            return cfg.a2_cap
+        return m
 
     # ── Diagnostics ──────────────────────────────────────────────────────────
 

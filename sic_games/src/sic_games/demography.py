@@ -167,6 +167,13 @@ class DemographyConfig(BaseModel):
     enable_nutrition_synergy: bool = False
     enable_infanticide: bool = False
 
+    # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
+    risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
+    dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
+    dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
+    mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994) [PROVISIONAL]
+    a2_cap: float = Field(5.0, ge=1.0)          # cap on the a2_eff multiplier (red-team n-1)
+
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""
         both = SilerParams(self.siler_a1, self.siler_b1, self.siler_a2, self.siler_a3, self.siler_b3)
@@ -184,3 +191,31 @@ def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig
         cfg.menarche_months <= age_months < cfg.menopause_months
         and months_since_birth >= cfg.ibi_refractory_months
     )
+
+
+# ---------------------------------------------------------------------------
+# Step-2 a2 modulators — each gated by its DemographyConfig flag; the baseline (Makeham) a2 is the
+# ONLY term the world modulates. Values + citations: MODEL_SPEC §4.3.3.
+# ---------------------------------------------------------------------------
+def risk_mult(risk_cell: float, risk_ref: float, cap: float) -> float:
+    """Terrain accident/exposure: `min(cap, risk_cell/risk_ref)`. Mean-normalized (≈1 in average-risk
+    terrain), capped — pins the risk *scale*, not just the mean (red-team M-2). Anchor: accidents
+    ≈10% of HG deaths (Hill, Hurtado & Walker 2007)."""
+    if risk_ref <= 0.0:
+        return 1.0
+    return min(cap, risk_cell / risk_ref)
+
+
+def density_mult(density_per_km2: float, delta: float, rho_half: float) -> float:
+    """Density-dependent disease: `1 + δ·ρ/(ρ+ρ_half)`, ρ in **agents/km²** (red-team m-3). Endemic /
+    zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever."""
+    return 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+
+
+def synergy_mult(reserve: float, floor: float, full: float, mu_max: float) -> float:
+    """Nutrition × infection synergy: `1 + (μ_max−1)·(1 − clamp((reserve−floor)/(full−floor)))`.
+    Undernutrition multiplicatively potentiates mortality (Pelletier 1994): 1 at full reserve → μ_max
+    near the floor."""
+    span = full - floor
+    frac = 0.0 if span <= 0.0 else max(0.0, min(1.0, (reserve - floor) / span))
+    return 1.0 + (mu_max - 1.0) * (1.0 - frac)
