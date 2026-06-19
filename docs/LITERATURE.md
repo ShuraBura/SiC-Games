@@ -596,9 +596,9 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 
 **Use:** Siler coefficients FIXED as constants (M-1), converted per-month (÷12). G&K Table 2 is both-sexes; sex-specific + maternal-removed (M-3) fits to come from Hill & Hurtado.
 
-**Provenance:** extracted from the open-access PDF (Table 2) via pdfplumber word-coordinate reconstruction (table rendered RTL), cross-checked two independent ways. PDF now filed in `literature/` (`Gurven and Kaplan - 2007 - Longevity...pdf`) — treat as confirmed; spot-check at final lock.
+**Provenance:** Table 2 extracted via pdfplumber word-coordinate reconstruction (table rendered RTL), cross-checked two ways AND **spot-checked against the filed `literature/` PDF 2026-06-18 — CONFIRMED** (a1=0.157, b1=0.721, a2=0.013, a3=4.80e-5, b3=0.103; e₀/e₁₅/e₄₅/mode reproduce the paper exactly via closed-form survivorship).
 
-**Citation tag:** [USED — demographic Siler anchor (M-1); coefficients pending re-verification vs filed PDF]
+**Citation tag:** [USED — demographic Siler anchor (M-1); coefficients CONFIRMED vs filed PDF 2026-06-18]
 
 ---
 
