@@ -52,6 +52,7 @@ from sic_games.agents.perception import LocalVisionPerception
 from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
+from sic_games.demography import DemographyConfig, is_fertile
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
@@ -94,6 +95,8 @@ class TerrainWorld(mesa.Model):
         birth_cost: float = 40_000.0,
         child_endowment: float = 40_000.0,
         p_birth: float = 0.10,
+        # ── Demographic-stage core (opt-in): Siler mortality + IBI reproduction ──
+        demography_cfg: DemographyConfig | None = None,
     ) -> None:
         super().__init__(seed=seed)
 
@@ -120,6 +123,12 @@ class TerrainWorld(mesa.Model):
         self._birth_cost = birth_cost
         self._child_endowment = child_endowment
         self._p_birth = p_birth
+        # demographic-stage core (opt-in): sex-specific Siler + IBI; modulators OFF here (2a-pre).
+        self._demog = demography_cfg
+        if demography_cfg is not None:
+            self._siler = {"female": demography_cfg.siler("female"),
+                           "male": demography_cfg.siler("male")}
+            self._siler_both = demography_cfg.siler()
 
         self.agent_list: list[BaseAgent] = []
         self.occupied: set[tuple[int, int]] = set()
@@ -155,8 +164,20 @@ class TerrainWorld(mesa.Model):
             sex = "female" if self.random.random() < kcal_cfg.p_female else "male"
             agent = self._make_agent(sex=sex, lh_cfg=lh_cfg)
             agent.pos = pos
+            if self._demog is not None:
+                agent.age = self._sample_founder_age()   # staggered founders (stationary ∝ l(x))
             self.agent_list.append(agent)
             self.occupied.add(pos)   # set: founder stacking (many agents, one cell) is allowed
+
+    def _sample_founder_age(self) -> int:
+        """Staggered founder age (months) ∝ survivorship l(x) — the stationary / young pyramid."""
+        if not hasattr(self, "_founder_age_pool"):
+            p = self._siler_both
+            ages = list(range(0, 90 * 12, 6))
+            wts = [p.survivorship(a / 12.0) for a in ages]
+            self._founder_age_pool = (ages, wts)
+        ages, wts = self._founder_age_pool
+        return int(self.random.choices(ages, weights=wts, k=1)[0])
 
     def _make_agent(self, sex: str, lh_cfg: LifeHistoryConfig | None) -> BaseAgent:
         from sic_games.agents.strategies.greedy import GreedyMaximizer
@@ -196,6 +217,8 @@ class TerrainWorld(mesa.Model):
             reserve_floor=self._reserve_floor,
             sex=sex,
         )
+        agent.months_since_birth = 10**9   # IBI counter (huge → first birth not blocked by refractory)
+        agent.parity = 0
         return agent
 
     # ── Step ───────────────────────────────────────────────────────────────
@@ -223,7 +246,9 @@ class TerrainWorld(mesa.Model):
         self.agent_list = [a for a in self.agent_list if a.alive]
 
         # Demographic layer: births (opt-in)
-        if self._reproduction:
+        if self._demog is not None:
+            self._do_births_ibi()
+        elif self._reproduction:
             self._do_births()
         self.occupied = {a.pos for a in self.agent_list}
 
@@ -280,10 +305,19 @@ class TerrainWorld(mesa.Model):
                 a.wealth = min(a.wealth + intake, self._reserve_full)
 
         # 4. metabolism: burn + age + mortality (cause-attributed)
+        demog = self._demog
         for a in self.agent_list:
             a.wealth -= self._burn
             a.age += 1
-            if a.wealth <= a.reserve_floor:
+            if demog is not None:
+                a.months_since_birth += 1
+                if a.wealth <= a.reserve_floor:          # starvation backstop (reserve ≤ floor)
+                    a.alive = False
+                    self.deaths_starv_this_step += 1
+                elif a.random.random() < self._siler[a.sex].monthly_death_prob(a.age):
+                    a.alive = False                       # Siler baseline+senescence (modulators OFF → a2_mult=1)
+                    self.deaths_senesc_this_step += 1
+            elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
             elif a.age >= a.max_age:
@@ -365,6 +399,29 @@ class TerrainWorld(mesa.Model):
                 child.pos = agent.pos
                 child.wealth = self._child_endowment
                 child.age = 0
+                newborns.append(child)
+                self.births_this_step += 1
+        self.agent_list.extend(newborns)
+
+    def _do_births_ibi(self) -> None:
+        """Demographic-stage reproduction: female-only, IBI-gated (Siler+IBI core). Maternal folded
+        into the all-cause female schedule (approach (ii)); the energetic fertility modifier is OFF
+        here (2a-pre strict stability test). Child on the parent's cell; disperses via diffusion."""
+        cfg = self._demog
+        newborns: list[BaseAgent] = []
+        for a in self.agent_list:
+            if a.sex != "female":
+                continue
+            if not is_fertile(a.age, a.months_since_birth, cfg):
+                continue
+            if a.random.random() < cfg.fecundability:
+                a.months_since_birth = 0
+                a.parity += 1
+                csex = "male" if a.random.random() < cfg.srb_male else "female"
+                child = self._make_agent(sex=csex, lh_cfg=self._lh_cfg)
+                child.pos = a.pos
+                child.age = 0
+                child.wealth = self._reserve_full
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
