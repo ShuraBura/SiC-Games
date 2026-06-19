@@ -1,4 +1,4 @@
-# SiC Games — Model Specification: Resource Layer
+# SiC Games — Model Specification (methodology record: resource, demographic & climate layers)
 
 **Document:** `MODEL_SPEC.md`  
 **Scope:** Resource-layer literature treatment and seasonal architecture. This document does NOT reconstitute the former MODEL_SPEC v0.2 (split into `ARCHITECTURE.md` and `MECHANISMS.md` on 2026-06-06; archived at `archive/superseded/`). It is a new, focused methodology record for the resource layer only.  
@@ -168,6 +168,80 @@ Timmermann 2018 [INLINE], Cane 2005 [INLINE], Cook 2010 [INLINE], Sigl 2015 [INL
 
 ---
 
-*End of MODEL_SPEC.md resource-layer section.*
+## Demographic Layer: Literature Treatment (added 2026-06-18)
 
-> **Cross-reference:** Parameter values (energy density, edible fraction, forage kcal targets, terrain constants) are authoritative in `docs/PARAMETERS.md`. This document records methodology and architecture; it does not own parameter values.
+Mortality + fertility methodology — same discipline as the resource layer: each value records its source,
+extraction, and the **exact transformation** of the literature number. Values authoritative in
+`PARAMETERS.md`; findings in `RESULTS.md`.
+
+### §4.2.1 Siler mortality coefficients — Aché forest (M-1)
+**Value:** `a1=0.157, b1=0.721, a2=0.013, a3=4.80×10⁻⁵, b3=0.103` (annual; age in years), form
+`h(x)=a1·exp(−b1·x)+a2+a3·exp(b3·x)`. **Source:** Gurven & Kaplan 2007 (PDR 33:321–365), Table 2,
+"Aché forest (e₀=37)", both sexes. **Extraction:** Table 2 renders right-to-left in the filed PDF; pulled
+via pdfplumber word-coordinate reconstruction (group by `top`, sort by `x0`, reverse each token),
+cross-checked two ways, **confirmed against the filed copy 2026-06-18**. **Transformation:** none —
+published constants (FIXED, not re-fit). **Validation:** closed-form `l(x)=exp(−H(x))`,
+`H(x)=(a1/b1)(1−e^{−b1x})+a2x+(a3/b3)(e^{b3x}−1)`, reproduces e₀=36.5 / e₁₅=38.3 / e₄₅=21.3 / l(15)=0.66
+/ l(45)=0.43 / mode=71 / MRDT=6.7 — matching the paper.
+
+### §4.2.2 Monthly hazard conversion (×12 guard)
+1 step = 1 month; coefficients annual → `p_month = 1 − exp(−h_year(age)/12)`. Unit test asserts the
+month-stepped survivorship equals the closed-form annual `l(x)` (guards the classic ×12 error).
+
+### §4.2.3 Sex split — sex-specific Siler (M-3)
+**Source:** Hill & Hurtado 1996, Ch. 6, forest period: male childhood mortality = **0.71×** female;
+male adult mortality = **1.47×** female. **Extraction:** age-specific sex curves are in figures
+(not machine-readable) → the two documented ratios applied to the both-sexes Siler as a *level* split.
+**Transformation (preserving the sex-average):**
+- childhood ratio `r_c=0.71` scales `a1`: `a1_F = a1_both·2/(1+r_c) = 0.1836`, `a1_M = r_c·a1_F = 0.1304`.
+- adult ratio `r_a=1.47` scales the **Gompertz** `a3`: `a3_F = a3_both·2/(1+r_a) = 3.89e-5`, `a3_M = r_a·a3_F = 5.71e-5`.
+- Makeham `a2 = 0.013` **shared**; `b1,b3` common. `0.5(F+M)=both` for each scaled term → reproduces the life table.
+**Why `a3` not `a2`:** `a2` is age-independent; scaling it crosses the sexes over at ~age 4, but the
+monograph has females disadvantaged throughout childhood (crossover ~age 20). Scaling the Gompertz `a3`
+lands the crossover in adolescence (verified by the ordering test). **Result (F/M):** a1 0.1836/0.1304 ·
+a2 0.013/0.013 · a3 3.89e-5/5.71e-5 · b1 0.721 · b3 0.103. **Caveat:** level approximation; exact crossover
+age approximate (figures not digitized).
+
+### §4.2.4 Maternal mortality — approach (ii)
+First pass folds maternal into the all-cause female Siler (the H&H ratios are all-cause) → explicit
+per-birth term = 0 (no double-count). Maternal-removed fit (approach (a)) deferred — needs the Aché
+maternal rate.
+
+### §4.2.5 Fertility (Aché)
+Menarche/menopause 15/42 yr → fertile window [180,504] mo. SRB 0.512 male (105:100). Target **IBI ≈ 37 mo**
+(H&H); `fecundability` (monthly birth prob past the ~30-mo lactational refractory) is the **only free
+fertility knob**, bisection-calibrated to IBI=37 → ≈0.12/mo. TFR=7.9 emergent (Aché ~8; a *check*).
+Growth r=+3.3%/yr emergent (forest Aché grew ~2.5%; r≈0 is a Step-2 property).
+
+### §4.2.6 Founder ages
+Sampled ∝ `l(x)` (the stationary / Aché-shaped young pyramid).
+
+---
+
+## Terrain / Climate methodology
+
+### §4.3.1 CC-1 cell capacity — NPP → density [PROVISIONAL]
+`K = density(NPP)·100 km²`, `density = min(0.5, 0.3·npp_gm2/1360)` people/km²; `E = K·burn`. **Source:**
+Tallavaara 2018 (PNAS), HG density vs NPP; 1360 g/m²/yr = their low/high threshold. **Transformation:**
+linear density–NPP relation anchored to the ethnographic ~0.1–0.5/km² band, capped 0.5, slope 0.3 so
+density(1360)=0.3; `npp_gm2 = npp·3400`. **PROVISIONAL** — the full CC-1 stage fits Tallavaara's regression.
+
+### §4.3.2 Climate seam — temperature & humidity [PLACEHOLDER]
+`temperature=14.0 °C`, `humidity=0.70`, **homogeneous (constant)**. **Source:** global mean surface air
+temperature ~14 °C; near-surface relative humidity land-ish ~70%. PLACEHOLDER seam
+(`terrain.py: MEAN_GLOBAL_TEMP_C, MEAN_REL_HUMIDITY`); the spatial/seasonal **solar-forced** field is the
+deferred climate-season stage (`DEFERRED_MECHANICS` CL-1; Berger 1978 / ENSO / Holocene). Exists so the
+Step-2 **pathogen field** reads real T/humidity rather than a `wateracc × NPP` proxy.
+
+### §4.3.3 Pending Step-2 anchors
+Pathogen (`π, NPP_half`): Tallavaara SEM coefficients — **TO EXTRACT** (Zenodo 1069787). Synergy (`μ_max`):
+undernutrition×infection relative-risk — **TO SOURCE**. Terrain risk scale: accident-mortality elevation
+in rugged terrain — **TO SOURCE**.
+
+---
+
+*End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3).*
+
+> **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
+coefficients, fertility params) are authoritative in `docs/PARAMETERS.md`. This document records
+**methodology — how each literature value was extracted and transformed** — not the values themselves.

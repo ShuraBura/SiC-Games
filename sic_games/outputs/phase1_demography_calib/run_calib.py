@@ -42,10 +42,10 @@ def stationary_ages(p, n, rng, x_max=90):
 def simulate(cfg, fecundability, n0=2000, months=3000, seed=42, record=False, cap=6000):
     """Vectorised monthly microsim. Returns growth rate r (per yr) and, if record, full series."""
     rng = np.random.default_rng(seed)
-    p = cfg.siler()
-    a1, b1, a2, a3, b3 = p.a1, p.b1, p.a2, p.a3, p.b3
-    # founder state
-    age = stationary_ages(p, n0, rng)
+    fp, mp = cfg.siler("female"), cfg.siler("male")   # M-3 sex split
+    b1, b3 = fp.b1, fp.b3                              # shape params common across sexes
+    # founder state (ages from the both-sexes stationary structure)
+    age = stationary_ages(cfg.siler(), n0, rng)
     sex = (rng.random(n0) < 0.5).astype(np.int8)          # ~half female at init
     msb = np.full(n0, 10**9, dtype=np.int64)              # months since birth (huge → no refractory block)
     parity = np.zeros(n0, dtype=np.int64)
@@ -64,9 +64,12 @@ def simulate(cfg, fecundability, n0=2000, months=3000, seed=42, record=False, ca
         cross = (sex == FEMALE) & reached_menarche & (~counted) & (age >= cfg.menopause_months)
         if cross.any():
             completed_parity.extend(parity[cross].tolist()); counted[cross] = True
-        # 2. mortality (Siler monthly; a2 unmodulated in Step 1)
+        # 2. mortality (SEX-SPECIFIC Siler monthly; a2 unmodulated in Step 1)
         ay = age / MPY
-        h = a1 * np.exp(-b1 * ay) + a2 + a3 * np.exp(b3 * ay)
+        fa1 = np.where(sex == FEMALE, fp.a1, mp.a1)
+        fa2 = np.where(sex == FEMALE, fp.a2, mp.a2)
+        fa3 = np.where(sex == FEMALE, fp.a3, mp.a3)
+        h = fa1 * np.exp(-b1 * ay) + fa2 + fa3 * np.exp(b3 * ay)
         p_death = 1.0 - np.exp(-h / MPY)
         died = rng.random(n) < p_death
         # 3. reproduction (eligible females, past refractory, in window) — BEFORE removing dead

@@ -9,6 +9,7 @@ from sic_games.terrain import (
     BIOME_WATER, BIOME_WETLAND, BIOME_FOREST, BIOME_SAVANNA, BIOME_GRASS,
     BIOME_DESERT, BIOME_MOUNTAIN,
     NPP_GM2_SCALE, SHORE_BONUS_KCAL, FORAGE_KCAL_TARGETS,
+    MEAN_GLOBAL_TEMP_C, MEAN_REL_HUMIDITY,
     EXTERIOR_WATER_CEILING, LARGE_BODY_CEILING,
     generate_world, characterize_map, _water_bodies, _classify_water_components,
     _component_sizes,
@@ -674,3 +675,13 @@ def test_p1s1c_component_sizes_all_true():
     mask = np.ones((N, N), dtype=bool)
     sizes = _component_sizes(mask)
     assert sizes == [N * N]
+
+
+def test_climate_seam_homogeneous_placeholders():
+    """Phase 1 climate seam: temperature + humidity exist as CONSTANT global-average placeholders
+    (spatial/seasonal variation is the deferred climate-season stage)."""
+    assert _W.temperature is not None and _W.humidity is not None
+    assert _W.temperature.shape == _W.humidity.shape == (N, N)
+    assert np.all(_W.temperature == MEAN_GLOBAL_TEMP_C)
+    assert np.all(_W.humidity == MEAN_REL_HUMIDITY)
+    assert not _W.temperature.flags.writeable and not _W.humidity.flags.writeable

@@ -110,4 +110,18 @@
 
 ---
 
-*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 7 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring), MR-2 (carried provision), PL-1 (pool scale-dependence).*
+## CL-1 — Climate field (temperature & humidity, solar-forced seasonality)
+
+**What:** A spatially- and seasonally-varying **temperature and humidity** field, driven by latitude / insolation / **solar forcing** (and ENSO / Holocene variability). `terrain.py` currently ships HOMOGENEOUS constant placeholders (`MEAN_GLOBAL_TEMP_C = 14 °C`, `MEAN_REL_HUMIDITY = 0.70`). CL-1 replaces the constants with a real climate field and ties the existing seasonal-oscillation mechanic to it.
+
+**Why deferred:** It is its own terrain/climate stage — it touches the terrain generator and couples to insolation/orbital forcing. The demographic stage needs only a *reference* T/humidity (a constant is sufficient as a seam); building the full solar-forced climate layer now would confound three changes. The constant placeholder unblocks the pathogen field without it.
+
+**Literature-rationale anchor:** Berger 1978 (insolation / orbital forcing); Timmermann 2018 + Cane 2005 (ENSO); Wanner 2008 / Mayewski 2004 (Holocene climate variability); Sigl 2015 (volcanic forcing). Guernier 2004 (temperature + precipitation drive pathogen richness) motivates the demographic payoff. [all FILED in `literature/` — B-series.]
+
+**Seam:** `terrain.py: temperature, humidity` fields (constant now) + `MEAN_GLOBAL_TEMP_C` / `MEAN_REL_HUMIDITY`. CL-1 makes them spatial (latitude / elevation lapse) + seasonal (insolation cycle, solar-forced). Consumers: (a) the demographic **pathogen field** (Step 2) reads T/humidity instead of the `wateracc × NPP` proxy; (b) the existing **seasonal-oscillation** mechanic (`test_seasonal_oscillation.py`) becomes physically driven rather than a painted-on sine; (c) forage seasonality. Placeholder-value derivation: `MODEL_SPEC.md` §4.3.2.
+
+**Status:** SEAM PLACED — homogeneous constant fields live (2026-06-18, Phase 1); the spatial/seasonal solar-forced field is DEFERRED to the climate-season stage.
+
+---
+
+*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 8 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced).*

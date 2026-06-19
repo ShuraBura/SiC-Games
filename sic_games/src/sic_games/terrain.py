@@ -216,6 +216,16 @@ def _fbm(grid_f64: np.ndarray, x_arr: np.ndarray, y_arr: np.ndarray,
 
 # ── WorldFields ────────────────────────────────────────────────────────────
 
+# ── Climate seam (Phase 1, 2026-06-18) ──────────────────────────────────────────────
+# HOMOGENEOUS global-average placeholders. Spatial + seasonal variation (latitude / insolation /
+# solar forcing) is the DEFERRED climate-season stage; these constant fields exist NOW so the
+# demographic pathogen field (Step 2) can reference real temperature/humidity rather than a
+# `wateracc × NPP` proxy. [PLACEHOLDER — exact values + the spatially/seasonally varying field are
+# pinned in the climate-season stage; see DEFERRED_MECHANICS CL-1 / MODEL_SPEC §4.3.2.]
+MEAN_GLOBAL_TEMP_C = 14.0    # global mean surface air temperature ~14 °C (20th-century baseline)
+MEAN_REL_HUMIDITY = 0.70     # near-surface relative humidity, land-ish average (fraction)
+
+
 @dataclass
 class WorldFields:
     """Frozen terrain field set. All arrays non-writeable after generate_world()."""
@@ -243,6 +253,10 @@ class WorldFields:
     # Phase 1 Blueprint A fields (added 2026-06-14)
     # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
     game_kcal:     np.ndarray = None  # (N,N) float64 kcal/forager-hr; 0 at wetland/mountain/water
+    # Phase 1 climate seam (added 2026-06-18) — HOMOGENEOUS placeholders (spatially constant); the
+    # spatial/seasonal (solar-forced) field is the deferred climate-season stage. [PLACEHOLDER]
+    temperature:   np.ndarray = None  # (N,N) float64 °C; constant = MEAN_GLOBAL_TEMP_C
+    humidity:      np.ndarray = None  # (N,N) float64 [0,1] rel. humidity; constant = MEAN_REL_HUMIDITY
 
 
 # ── Water-body connected components ───────────────────────────────────────
@@ -564,10 +578,14 @@ def generate_world(knobs: dict) -> WorldFields:
     nc[:, 1:, 2]  = cost[:, :-1]   # west:  target (y, x-1)
     nc[:, :-1, 3] = cost[:, 1:]    # east:  target (y, x+1)
 
+    # ── Climate seam: homogeneous placeholder fields (constant; see module header) ─────
+    temperature = np.full((N, N), MEAN_GLOBAL_TEMP_C, dtype=np.float64)
+    humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
+
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
-                npp_gm2, is_shore, forage_kcal, game_kcal):
+                npp_gm2, is_shore, forage_kcal, game_kcal, temperature, humidity):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -577,7 +595,7 @@ def generate_world(knobs: dict) -> WorldFields:
         risk=risk, biome=biome, npp=npp, forestness=forestness,
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
-        game_kcal=game_kcal,
+        game_kcal=game_kcal, temperature=temperature, humidity=humidity,
     )
 
 

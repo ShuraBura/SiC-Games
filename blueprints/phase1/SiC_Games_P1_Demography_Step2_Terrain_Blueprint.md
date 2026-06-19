@@ -183,7 +183,7 @@ Ablation deliverable: each modulator flag on/off — its isolated effect on carr
 
 | Item | State |
 |---|---|
-| **M-3 sex-split + maternal-removed female Siler** | **HARD dependency for the headline carrying-capacity number** (red-team m-2). Aché monograph (Hill & Hurtado 1996) is FILED and machine-readable (digital, 592 pp) — extract the sex-specific tables. The current both-sexes schedule applies maternal mortality on a both-sexes baseline → female reproductive-age mortality double-counted → fertility suppressed → **CC biased LOW (known direction)**, CDR inflated. A both-sexes run is fine for 2a-pre stability only; the CC-vs-133k deliverable WAITS for the sex-split. |
+| **M-3 sex-split** | **LANDED 2026-06-18** — sex-specific Siler via the H&H 1996 forest ratios (childhood M:F 0.71 → female-higher `a1`; adult M:F 1.47 → male-higher Gompertz `a3`; Makeham `a2` shared). Maternal folded in (approach (ii)). Vital rates hold (IBI 37/TFR 8, r=+3.3%), 11 demography tests, suite 442. **The headline-CC blocker is cleared.** *Remaining (not a Step-2 blocker):* approach-(a) maternal-removed fit (needs the Aché maternal rate); the ratio-split is a level approximation (age-specific sex curves are in monograph figures). |
 | Pathogen SEM coefficients (`π`, `NPP_half`) | extract from Tallavaara Zenodo 1069787 (RTL-table parse, as for G&K) |
 | Synergy `μ_max` | undernutrition×infection lit anchor (find/confirm a reference) |
 | Scale/perf at 100×100 | calibrate on 50×50; confirm once at 100×100 |

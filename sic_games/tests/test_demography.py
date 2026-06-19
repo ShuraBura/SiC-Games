@@ -9,6 +9,8 @@ import pytest
 
 from sic_games.demography import (
     ACHE_FOREST,
+    ACHE_FOREST_FEMALE,
+    ACHE_FOREST_MALE,
     DemographyConfig,
     SilerParams,
     is_fertile,
@@ -96,3 +98,29 @@ def test_config_siler_roundtrip_and_flags_default_off():
     assert not any([cfg.enable_terrain_risk, cfg.enable_density_disease,
                     cfg.enable_terrain_pathogen, cfg.enable_nutrition_synergy,
                     cfg.enable_infanticide])
+
+
+# --- M-3 sex split (Hill & Hurtado 1996 forest-period ratios) ---
+def test_sex_split_ratios_preserve_average():
+    f, m, both = ACHE_FOREST_FEMALE, ACHE_FOREST_MALE, ACHE_FOREST
+    # childhood (a1): male = 0.71 × female ; adult (a2, a3): male = 1.47 × female
+    assert m.a1 == pytest.approx(0.71 * f.a1, rel=1e-9)          # childhood: a1 scaled (female higher)
+    assert m.a3 == pytest.approx(1.47 * f.a3, rel=1e-9)          # adulthood: a3 (Gompertz) scaled (male higher)
+    assert f.a2 == m.a2 == both.a2                                # Makeham baseline SHARED
+    # the sex-average reproduces the validated both-sexes anchor
+    assert 0.5 * (f.a1 + m.a1) == pytest.approx(both.a1, rel=1e-9)
+    assert 0.5 * (f.a3 + m.a3) == pytest.approx(both.a3, rel=1e-9)
+    assert (f.b1, f.b3) == (m.b1, m.b3) == (both.b1, both.b3)   # shape params common
+
+
+def test_sex_split_ordering_matches_monograph():
+    # forest Aché (Hill & Hurtado): HIGHER female child mortality, HIGHER male adult mortality
+    assert ACHE_FOREST_FEMALE.hazard(5.0) > ACHE_FOREST_MALE.hazard(5.0)     # childhood
+    assert ACHE_FOREST_MALE.hazard(50.0) > ACHE_FOREST_FEMALE.hazard(50.0)   # adulthood
+
+
+def test_config_returns_sex_specific_siler():
+    cfg = DemographyConfig()
+    assert cfg.siler() == ACHE_FOREST                 # default = both-sexes
+    assert cfg.siler("female") == ACHE_FOREST_FEMALE
+    assert cfg.siler("male") == ACHE_FOREST_MALE
