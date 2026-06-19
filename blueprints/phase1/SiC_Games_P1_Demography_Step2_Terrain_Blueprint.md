@@ -1,10 +1,10 @@
 # SiC Games — Phase 1 Demographic Stage · STEP 2 Blueprint
 ## Terrain-Modulated Demography on the Full World
 
-**Status:** DRAFT v2 (independently red-teamed 2026-06-18) — for supervisor review. Red-team found a
-**BLOCKER** (the food→stable-r≈0 claim is unproven; A-3 was a frozen fill, not a growing population
-hitting a wall) + majors; dispositions in §11. **NOT lockable until (a) the 2a-pre stability test (§5)
-is run empirically and (b) the M-3 sex-split lands.**
+**Status:** DRAFT v3 (red-teamed 2026-06-18; **B-1 BLOCKER RESOLVED 2026-06-18**). The 2a-pre stability
+test **PASSED** — bounded settling, food density-dependence stabilizes the +3.3%/yr population (no
+overshoot/oscillation/collapse; the food brake is ~1 step). **M-3 sex-split landed.** Remaining before
+lock: **the 2b knob-anchoring** (Tallavaara pathogen SEM, μ_max, risk scale). Dispositions in §11.
 **Created:** 2026-06-18
 **Phase:** 1 (Terrain & Resource Ecology). Builds directly on Step 1.
 **Precursors:** `SiC_Games_P1_Demography_Siler_Blueprint.md` (the locked stage spec) and Step-1
@@ -235,9 +235,11 @@ claim was unproven). Dispositions:
 - **n-1/n-2/n-3:** wetland tradeoff phrased as a prediction; confirm the harness passes the CC-1 harvest
   field; the +3.3% start rate is itself provisional (both-sexes).
 
-**Net:** lock is gated on (1) running 2a-pre and seeing bounded settling, (2) landing the M-3 sex-split,
-(3) extracting the pathogen/synergy anchors or re-balancing DOF vs gate targets. None require a redesign —
-but (1) is an empirical result we must obtain, not a doc edit.
+**Net (updated 2026-06-18):** (1) 2a-pre RUN → **BOUNDED SETTLING** (settled_peak 1.01× / trough 0.90×,
+3 seeds, plateau ~95% of food ceiling) — **B-1 RESOLVED**: food alone stabilizes (the fast ~1-step
+reserve brake gives smooth logistic settling, no overshoot), so the modulators are NOT load-bearing for
+stability and the free-knob accounting stands; (2) M-3 sex-split **LANDED**; (3) the pathogen/synergy/risk
+anchors remain — **the only gate left before lock.**
 
 ---
 
