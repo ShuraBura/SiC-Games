@@ -1,0 +1,28 @@
+{
+  "verdict": "DEPLETION INERT \u2014 agents still dodge to fresh cells; synergy ~1 across agents. The trap is too weak (raise deplete/regrow ratio) or movement still escapes it.",
+  "bites": false,
+  "deplete_rate": 0.3,
+  "regrow_rate": 0.1,
+  "conditions": {
+    "depletion only (s=1)": {
+      "eq_pop": 5427.736,
+      "ceiling": 21071.334708943526,
+      "synmean_eq": 1.0011682114282197,
+      "synfrac_eq": 0.0,
+      "synmax_eq": 1.002885812531115,
+      "fresh_eq": 0.32112542091843455
+    },
+    "seasonal\u00d7depletion (s=0.4)": {
+      "eq_pop": 3658.41,
+      "ceiling": 21071.334708943526,
+      "synmean_eq": 1.0006386140220194,
+      "synfrac_eq": 0.0,
+      "synmax_eq": 1.0105320276266727,
+      "fresh_eq": 0.5561593346134454
+    }
+  },
+  "founders": 400,
+  "steps": 2500,
+  "seed": 42,
+  "elapsed_sec": 230.98009252548218
+}
