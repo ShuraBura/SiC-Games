@@ -250,6 +250,11 @@ class LifeHistoryConfig(BaseModel):
     # fraction of an adult's, ramping to 1.0 at forage_age_min. Kaplan/Hill/Lancaster/Hurtado 2000 +
     # FAO requirement-by-age. With the η production ramp this yields the net childhood deficit.
     cons_min: float = Field(0.3, ge=0.0, le=1.0)
+    # Resource-Ecology Phase C.2a: age-graded RESERVE size — a newborn's energy reserve (fat store,
+    # and hence the starvation floor + the cap) as a fraction of an adult's, ramping to 1.0 at
+    # forage_age_min. Body-mass scaling (neonate ~3.5 kg / adult ~50 kg) + Pontzer 2012 body comp.
+    # A small neonatal reserve is what makes the C.1 childhood deficit actually bite (R-9).
+    reserve_min: float = Field(0.1, ge=0.01, le=1.0)
 
 
 class SupportPoolConfig(BaseModel):

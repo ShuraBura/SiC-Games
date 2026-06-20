@@ -59,6 +59,7 @@ class BaseAgent(mesa.Agent):
             self._eta_min: float = lh_config.eta_min
             self._eta_old: float = lh_config.eta_old
             self._cons_min: float = getattr(lh_config, "cons_min", 0.3)
+            self._reserve_min: float = getattr(lh_config, "reserve_min", 0.1)
             self._use_eta: bool = True
         else:
             self._use_eta = False
@@ -167,6 +168,21 @@ class BaseAgent(mesa.Agent):
         if a_min <= 0 or self.age >= a_min:
             return 1.0
         return self._cons_min + (1.0 - self._cons_min) * self.age / a_min
+
+    def reserve_scale(self) -> float:
+        """Age-graded reserve size r(a) ∈ [reserve_min, 1.0] (Resource-Ecology Phase C.2a).
+
+        Scales the energy reserve (and hence the starvation floor AND the cap) by body size: a newborn
+        carries reserve_min of an adult's store, ramping to 1.0 at forage_age_min. Returns 1.0 if
+        lh_config absent (backward-compatible). The small neonatal reserve is what makes the C.1
+        childhood deficit bite (R-9): a newborn cannot self-buffer a month of maintenance → it must be
+        provisioned."""
+        if not self._use_eta:
+            return 1.0
+        a_min = self._forage_age_min
+        if a_min <= 0 or self.age >= a_min:
+            return 1.0
+        return self._reserve_min + (1.0 - self._reserve_min) * self.age / a_min
 
     def is_juvenile(self) -> bool:
         return self._use_eta and self.age < self._forage_age_min

@@ -1,0 +1,29 @@
+{
+  "verdict": "RESERVE SCALING MAKES THE DEFICIT BITE \u2014 C.2a walls (final 0, slope -0.2) where C.1 with adult-sized reserves did not (eq 1504, slope 0.1). A body-sized neonatal reserve is the missing piece (R-9 confirmed) \u2192 mother-linked provisioning (C.2b) is now load-bearing. Core intact (baseline 5824).",
+  "bites": true,
+  "conditions": {
+    "baseline": {
+      "final_pop": 10581,
+      "eq_pop": 5824.05,
+      "slope": 15.956214979231678,
+      "final_child": 5662
+    },
+    "C.1 (flat reserves)": {
+      "final_pop": 1518,
+      "eq_pop": 1503.79375,
+      "slope": 0.10545385396637903,
+      "final_child": 477
+    },
+    "C.2a (body-scaled reserves)": {
+      "final_pop": 0,
+      "eq_pop": 0.0,
+      "slope": -0.16304173022769475,
+      "final_child": 0
+    }
+  },
+  "reserve_min_C2a": 0.1,
+  "founders": 400,
+  "steps": 1200,
+  "seed": 42,
+  "elapsed_sec": 36.62138366699219
+}

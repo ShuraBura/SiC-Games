@@ -311,7 +311,7 @@ class TerrainWorld(mesa.Model):
             shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             for a, sh in zip(occ, shares):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
-                a.wealth = min(a.wealth + intake, self._reserve_full)
+                a.wealth = min(a.wealth + intake, self._reserve_full * a.reserve_scale())  # C.2a age-scaled cap
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing
@@ -327,7 +327,7 @@ class TerrainWorld(mesa.Model):
             a.age += 1
             if demog is not None:
                 a.months_since_birth += 1
-                if a.wealth <= a.reserve_floor:          # starvation backstop (reserve ≤ floor)
+                if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
                     a.alive = False
                     self.deaths_starv_this_step += 1
                 else:
@@ -434,7 +434,8 @@ class TerrainWorld(mesa.Model):
                 continue
             p_birth = cfg.fecundability
             if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
-                p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor, self._reserve_full)
+                _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
+                p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs)
             if a.random.random() < p_birth:
                 a.months_since_birth = 0
                 a.parity += 1
@@ -442,7 +443,7 @@ class TerrainWorld(mesa.Model):
                 child = self._make_agent(sex=csex, lh_cfg=self._lh_cfg)
                 child.pos = a.pos
                 child.age = 0
-                child.wealth = self._reserve_full
+                child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
@@ -458,7 +459,8 @@ class TerrainWorld(mesa.Model):
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
         if cfg.enable_nutrition_synergy:                       # reads POST-HARVEST reserve (nutritional state)
-            m *= synergy_mult(a._fed_reserve, a.reserve_floor, self._reserve_full, cfg.mu_max)
+            _rs = a.reserve_scale()                            # C.2a age-scaled floor/full
+            m *= synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
         if m > cfg.a2_cap:
             self.a2_cap_hits += 1
             return cfg.a2_cap
