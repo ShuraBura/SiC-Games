@@ -1,0 +1,55 @@
+{
+  "verdict": "STILL INERT \u2014 even at move_cost 0.35*burn (moves/yr 0.1) the under-fed fraction stays ~0. Stickiness alone does not trap agents lean (the despotic claim or graded reserves are needed). Escalate the constraint or go to provisioning.",
+  "bites": false,
+  "window": 24,
+  "conditions": [
+    {
+      "mult": 0.0,
+      "move_cost": 0.0,
+      "eq_pop": 5427.736,
+      "moves_yr": 0.9335921536575399,
+      "range_cells": 2.435226808336739,
+      "occ_cv": 0.5046080082278189,
+      "synfrac_eq": 0.0,
+      "synfrac_max": 0.0,
+      "n_tracked": 4894
+    },
+    {
+      "mult": 0.05,
+      "move_cost": 3750.0,
+      "eq_pop": 5343.223,
+      "moves_yr": 0.475973487986744,
+      "range_cells": 1.7972245236122617,
+      "occ_cv": 0.5095454075520947,
+      "synfrac_eq": 0.0,
+      "synfrac_max": 0.0,
+      "n_tracked": 4828
+    },
+    {
+      "mult": 0.15,
+      "move_cost": 11250.0,
+      "eq_pop": 5176.469,
+      "moves_yr": 0.2651142918179876,
+      "range_cells": 1.4708395641956846,
+      "occ_cv": 0.5012042661709635,
+      "synfrac_eq": 0.0,
+      "synfrac_max": 0.0,
+      "n_tracked": 4681
+    },
+    {
+      "mult": 0.35,
+      "move_cost": 26250.0,
+      "eq_pop": 4912.013,
+      "moves_yr": 0.14513254622410338,
+      "range_cells": 1.2608598797059478,
+      "occ_cv": 0.5134456121283498,
+      "synfrac_eq": 0.0,
+      "synfrac_max": 0.0,
+      "n_tracked": 4489
+    }
+  ],
+  "founders": 400,
+  "steps": 2500,
+  "seed": 42,
+  "elapsed_sec": 402.67328214645386
+}
