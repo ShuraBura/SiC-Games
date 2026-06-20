@@ -322,22 +322,31 @@ class TerrainWorld(mesa.Model):
                 if provisioning and total > cap:                            # overflow → giveable to her children
                     provision_pool[a] = provision_pool.get(a, 0.0) + (total - cap)
 
-        # C.2b mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit
-        # from their mother's harvest overflow (flow-based — adults at the cap have no reserve to spare).
-        # A mother on a poor/crowded cell has little overflow → her children dwell lean → synergy bites.
-        if provisioning and provision_pool:
+        # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
+        # their mother. C.2b tier = the mother's wasted harvest overflow. S1 tier = the mother also dips
+        # into her own reserve down to `provision_self_keep`·(her cap) — child-priority shortfall-sharing,
+        # so in a lean season the child dwells at a mild deficit (→ condition degrades → graded disease)
+        # instead of being cut off and starving, with the mother absorbing the deeper end.
+        if provisioning:
+            self_keep_frac = demog.provision_self_keep
             for child in self.agent_list:
                 if not child.is_juvenile():
                     continue
                 m = child._mother
-                avail = provision_pool.get(m, 0.0) if (m is not None and m.alive) else 0.0
-                if avail <= 0.0:
+                if m is None or not m.alive:
                     continue
-                cap_c = self._reserve_full * child.reserve_scale()
-                give = min(cap_c - child.wealth, avail)
-                if give > 0.0:
-                    child.wealth += give
-                    provision_pool[m] = avail - give
+                need = self._reserve_full * child.reserve_scale() - child.wealth
+                if need <= 0.0:
+                    continue
+                ov = provision_pool.get(m, 0.0)          # tier 1: wasted overflow (free to give)
+                g = min(need, ov)
+                if g > 0.0:
+                    child.wealth += g; provision_pool[m] = ov - g; need -= g
+                if need > 0.0 and self_keep_frac < 1.0:  # tier 2 (S1): mother's reserve above self_keep
+                    res_av = m.wealth - self_keep_frac * self._reserve_full * m.reserve_scale()
+                    if res_av > 0.0:
+                        g2 = min(need, res_av)
+                        child.wealth += g2; m.wealth -= g2
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing

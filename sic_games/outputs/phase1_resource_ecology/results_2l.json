@@ -1,0 +1,39 @@
+{
+  "verdict": "STILL FLAT \u2014 even at sk=0.4 juvenile condition barely moves (1.00\u21921.00); shortfall-sharing isn't producing the dwell (mothers fully cover, or the squeeze still cuts children off acutely). Re-examine the allocation.",
+  "conditions": {
+    "1.0": {
+      "eq_pop": 3221.8888888888887,
+      "starv_lean": 33.66323024054983,
+      "dis_lean": 6.762886597938144,
+      "dis_good": 6.735973597359736,
+      "jcond_lean": 0.9999037194578431,
+      "jcond_good": 0.9999737281458846,
+      "acond_lean": 0.9999721433007028,
+      "acond_good": 0.9999921404693938
+    },
+    "0.7": {
+      "eq_pop": 3025.1844444444446,
+      "starv_lean": 18.22680412371134,
+      "dis_lean": 6.501718213058419,
+      "dis_good": 6.273927392739274,
+      "jcond_lean": 0.999981509143091,
+      "jcond_good": 0.9999924072463287,
+      "acond_lean": 0.9999379687061398,
+      "acond_good": 0.9999817092329436
+    },
+    "0.4": {
+      "eq_pop": 3026.4944444444445,
+      "starv_lean": 18.189003436426116,
+      "dis_lean": 6.353951890034364,
+      "dis_good": 6.514851485148514,
+      "jcond_lean": 0.9999806246512212,
+      "jcond_good": 0.9999920042227802,
+      "acond_lean": 0.999933214009357,
+      "acond_good": 0.9999800408522428
+    }
+  },
+  "founders": 400,
+  "steps": 1800,
+  "seed": 42,
+  "elapsed_sec": 150.2456567287445
+}

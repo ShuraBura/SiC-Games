@@ -180,6 +180,12 @@ class DemographyConfig(BaseModel):
     # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
     enable_condition: bool = False
     condition_alpha: float = 0.25   # EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag
+    # Biome-Mortality S1: child-priority shortfall-sharing. The mother provisions her child's deficit not
+    # only from wasted overflow (C.2b) but from her own reserve DOWN TO `provision_self_keep`·(her cap) —
+    # so in a lean season the shortfall is *shared* (child dwells at a mild deficit instead of starving;
+    # mother absorbs the deeper end). 1.0 = C.2b overflow-only (no reserve-sharing); lower = more priority.
+    # The child-priority knob, gated so child starvation→≈0 but children still dwell (→ condition degrades).
+    provision_self_keep: float = 1.0
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
