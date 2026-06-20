@@ -92,6 +92,44 @@ reference = Aché-forest NPP — is it pinned correctly. RT-I5: S1 child-priorit
 child mortality *below* realistic) — gate it. RT-I6: opt-in safety — every change flagged so the 444 suite
 stays green.
 
+## 7b. Red-team v1 (2026-06-20, sub-agent) — VERDICT: NEEDS REVISION (1 blocker, several majors)
+
+**Blockers.** (B1/L-1) "Modulate only f_s≈0.36 of a2" is **mathematically incoherent**: `a2` is a scalar
+Makeham *constant*; 0.36 is a fraction of *total* mortality (illness+accident), and the causes are spread
+across a1 (infant disease + infanticide), a2 (exogenous), a3 (adult) — there is no "36% inside a2."
+Reformulate: a2 IS the age-independent exogenous term (warfare/congenital largely live in a1/a3, already
+invariant to an a2 multiplier) → either modulate a2 wholesale, or build an explicit additive biome-disease
+component; drop the 0.36-of-a2 claim. (B2/I-1) The **pathogen modulator does not exist** (only the flag;
+no `pathogen_mult`; `_a2_mult` never reads it) AND its Tallavaara SEM target is documented non-extractable
+(§4.3.3) → S3 can't be honestly calibrated; re-scope to density-disease + a **bracketed-sensitivity**
+pathogen term. (B3/I-3) The **multi-biome harness does not exist** — every run is one 40×40 window; S4 is a
+from-scratch infra build (multi-window NPP selection, per-pop q(x), determinism, ~3× compute).
+
+**Majors.** (L-2) "disease-ecology dominant / nutrition marginal" *assumes its conclusion* — with pathogen
+unwired and density/synergy inert at equilibrium (R-5/6/7/8), S4 would report a near-zero gradient as an
+**artifact**, indistinguishable from "biomes really are invariant." Pre-register a **bracketed gradient
+sweep** (report gradient vs channel-strength), not a point estimate. (L-3) Keeping the warfare-inflated Aché
+baseline as a constant offset corrupts the *level* of "total mortality" while claiming violence is excluded —
+**internally contradictory**; reframe the deliverable to *gradient + age-shape, Aché-anchored level with a
+documented offset*, or de-warfare. (I-2) a1 modulation hazards: a1 is sex-scaled AND contains infanticide
+(modulating it by disease wrongly scales infanticide); any new mult must thread through `hazard()` only, NOT
+`cumulative_hazard()`/`survivorship()` (founder sampling + ×12 guard + life-table test depend on the
+unmodulated forms). (I-4) S1 shortfall-sharing-from-reserve fights the overflow-only design and risks
+**over-correcting child mortality to ~0**, abolishing the R-10 variance instead of routing it to graded
+disease — gate with a child-mortality floor (≥ Aché illness ~16–21/1000 mid-child).
+
+**Critical-path catch (I-5).** The real R-10 blocker — the **bang-bang reserve** (a squeezed agent hits the
+floor in ~1 step, too fast to dwell → synergy stays ~1) — is unaddressed; the disease channel stays inert
+without a **lagged body-condition / immune-competence signal**. Insert it as **S0, before** the disease
+channel, or S2/S4 re-confirm a false near-zero gradient.
+
+**Resequenced plan:** **S0** lagged body-condition signal → **S1** *gated* child-priority provisioning (floor
+≥ Aché illness rate; route squeeze to graded disease, don't abolish) → **S2** correct disease-hazard
+formulation (explicit biome-sensitive component, threaded through `hazard()`, per-channel mean-norm; don't
+scale a1-infanticide) → **S3.5** build the multi-biome harness → **S4** bracketed-gradient validation
+(gradient vs channel-strength; honest level offset). Pathogen demoted to bracketed sensitivity until CL-1
+climate lands real T/humidity.
+
 ## 8. Out of scope / deferred
 
 Inter-band warfare + cultural mixing (→ conflict subsystem); full baseline de-warfaring; cause-decomposed
