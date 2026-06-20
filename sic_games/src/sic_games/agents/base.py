@@ -58,6 +58,7 @@ class BaseAgent(mesa.Agent):
             self._forage_age_max_offset: int = lh_config.forage_age_max_offset
             self._eta_min: float = lh_config.eta_min
             self._eta_old: float = lh_config.eta_old
+            self._cons_min: float = getattr(lh_config, "cons_min", 0.3)
             self._use_eta: bool = True
         else:
             self._use_eta = False
@@ -152,6 +153,20 @@ class BaseAgent(mesa.Agent):
             if remaining <= 0:
                 return self._eta_old
             return 1.0 - (1.0 - self._eta_old) * (a - a_max) / remaining
+
+    def consumption_factor(self) -> float:
+        """Age-graded maintenance c(a) ∈ [cons_min, 1.0] (Resource-Ecology Phase C.1).
+
+        Child maintenance ramps linearly cons_min → 1.0 over [0, forage_age_min], then 1.0 (no elder
+        reduction — elder need stays adult). Returns 1.0 if lh_config absent (backward-compatible).
+        Paired with η(a) production, consumption rising faster than production in early childhood is the
+        Kaplan 2000 net deficit the band must provision."""
+        if not self._use_eta:
+            return 1.0
+        a_min = self._forage_age_min
+        if a_min <= 0 or self.age >= a_min:
+            return 1.0
+        return self._cons_min + (1.0 - self._cons_min) * self.age / a_min
 
     def is_juvenile(self) -> bool:
         return self._use_eta and self.age < self._forage_age_min

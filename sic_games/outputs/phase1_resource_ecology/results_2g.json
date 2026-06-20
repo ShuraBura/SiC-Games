@@ -1,0 +1,25 @@
+{
+  "verdict": "NO WALL \u2014 C.1 pop 1518 (slope 0.1) did not collapse vs baseline 5824. Children survive the deficit unfunded \u2192 \u03b7/consumption too mild (raise the deficit) or the endowment carries them. Re-check the curves.",
+  "wall": false,
+  "conditions": {
+    "baseline (children=adults)": {
+      "final_pop": 10581,
+      "eq_pop": 5824.05,
+      "slope": 15.956214979231678,
+      "final_child": 5662,
+      "final_adult": 4919
+    },
+    "C.1 (childhood deficit, no provisioning)": {
+      "final_pop": 1518,
+      "eq_pop": 1503.79375,
+      "slope": 0.10545385396637903,
+      "final_child": 477,
+      "final_adult": 1041
+    }
+  },
+  "founders": 400,
+  "steps": 1200,
+  "seed": 42,
+  "mature_mo": 180,
+  "elapsed_sec": 38.50121760368347
+}

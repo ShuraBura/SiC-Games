@@ -310,7 +310,7 @@ class TerrainWorld(mesa.Model):
             S = tf.level(cx, cy)
             shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             for a, sh in zip(occ, shares):
-                intake = 0.0 if a.is_juvenile() else sh
+                intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
                 a.wealth = min(a.wealth + intake, self._reserve_full)
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
@@ -323,7 +323,7 @@ class TerrainWorld(mesa.Model):
         demog = self._demog
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
-            a.wealth -= self._burn
+            a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             a.age += 1
             if demog is not None:
                 a.months_since_birth += 1

@@ -33,7 +33,7 @@ Three coupled pieces, each lit-anchored, reusing the dormant life-history scaffo
 
 ### C.2 — Provisioning (transfers fund the deficit)
 - Each step, after harvest, adults on a cell that ate to maintenance contribute their **surplus** (reserve above a target band) to a **provisioning pool**; dependents (juveniles; optionally elders via `is_elder`, pregnant/lactating via a requirement bump) draw from it to cover their deficit, up to availability.
-- **Topology decision (red-team Q):** start with **cell-pooled** provisioning (everyone on a cell shares — matches the existing within-cell scramble and band-sharing norms; Kaplan-Hill reciprocity), NOT mother-only. Mother-linkage is a later refinement (FD-1) if cell-pooling over-smooths.
+- **Topology decision — LIT-RESOLVED (2026-06-20): MOTHER/KIN-LINKED, not cell-pooled.** HG food-sharing is two-tiered by resource type (Gurven 2004; Kaplan & Hill 1985; Hawkes): large lumpy packages (**meat/game**) are shared **band-wide** (= cell-pooled), but small divisible **gathered plant food** is shared **within the household/close kin**, and children are provisioned by **mother + kin** (incl. grandmother, Hawkes). Our economy is **forage-only (game off)** = the *gathered-plant* tier → the faithful model is **mother-linked** provisioning. Cell-pooling is the *meat* pattern and is the correct model only once the **game stream is on** (deferred). Mother-linkage also gives sharper per-agent variance (a poorly-fed mother's children suffer specifically) and sidesteps the cell-pooling over-smoothing risk. Implementation: an FD-1-lite `child._mother` pointer set at the (already mother-identifying) IBI birth; child draws its deficit from the mother's surplus; mother death → orphan (no provisioning unless a grandmother/kin fallback is added — deferred). Cell-pooled remains the fallback if mother-linkage proves too sparse/brittle.
 - **The bite:** on a lean/depleted cell the adult surplus shrinks → the pool can't cover the child deficit → children draw down their reserve → **dwell lean** (the graded reserve the bang-bang adult economy lacked) → synergy/disease grade their mortality.
 
 ### C.3 — Graded child reserve (the lean band)
@@ -83,7 +83,8 @@ Three coupled pieces, each lit-anchored, reusing the dormant life-history scaffo
 
 ## 7. Out of scope (deferred)
 
-- Mother/kin-linked provisioning topology (FD-1) — only if cell-pooling over-smooths (risk 1).
+- Grandmother/kin provisioning fallback for orphans (Hawkes) — C.2 uses mother-only; kin fallback deferred.
+- Cell-pooled (band-wide) provisioning — the MEAT-sharing pattern; correct only once the game stream is on.
 - Sexual division of labour in provisioning (male game → offspring) — game stream is off here.
 - Full depletion economy (D, CC-1-gated) — A stays depletion-lite backdrop.
 - The realistic non-linear Kaplan production curve if the linear η proves too coarse for T-4.

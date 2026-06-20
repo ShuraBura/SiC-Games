@@ -246,6 +246,10 @@ class LifeHistoryConfig(BaseModel):
     eta_old: float = Field(0.4, ge=0.0, le=1.0)     # elder efficiency at max_age
     # Stage 4.3: Si fission offspring start fully capable (no juvenile ramp)
     eta_fission_offspring: float = Field(1.0, ge=0.0, le=1.0)
+    # Resource-Ecology Phase C.1: age-graded CONSUMPTION (burn) floor — a newborn's maintenance as a
+    # fraction of an adult's, ramping to 1.0 at forage_age_min. Kaplan/Hill/Lancaster/Hurtado 2000 +
+    # FAO requirement-by-age. With the η production ramp this yields the net childhood deficit.
+    cons_min: float = Field(0.3, ge=0.0, le=1.0)
 
 
 class SupportPoolConfig(BaseModel):
