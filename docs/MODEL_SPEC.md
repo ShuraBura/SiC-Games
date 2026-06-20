@@ -295,6 +295,162 @@ seasonality + depletion) to act, so `μ_max` is not calibratable until then.
 
 ---
 
+## Resource-Ecology economy methods (added 2026-06-20; RESULTS R-6…R-8)
+
+The economy layer added to give the demographic modulators nutritional *variance*. Harnesses
+`outputs/phase1_resource_ecology/run_2d…2f`. **Headline (R-6/7/8):** all three are NEGATIVE — none makes
+the graded modulators bite at equilibrium, because the density-regulated population self-organises to
+"broadly fed at the biome carrying capacity." Each only moves the *carrying capacity*.
+
+### §4.4.1 Seasonality (A.1) — `s(t)` harvest multiplier
+Uniform annual cosine `s(t) = s_min + (1−s_min)·½(1+cos(2π·t/12))`, period 12 steps = 1 yr. **`s_min`
+PROVISIONAL** (no lit anchor yet; tied to the deferred climate-season stage CL-1 / Berger insolation). On
+`level = E·s(t)`. **Established:** regulates the demographic CC down to the **lean-season bottleneck**
+(Liebig's law of the minimum; 95%→37% of peak food ceiling at s_min=0.4) but agents self-adjust and stay
+fed year-round (reserves ~full, synergy ~1) — **inert on its own**.
+
+### §4.4.2 Depletion (A.2, GD-1) — per-cell freshness `f` [PROVISIONAL]
+Each cell carries `f ∈ [0.05, 1]` (fraction of standing stock); `level = E·f·s(t)`. After harvest,
+`consume(occ_count)`: occupied cells `f −= deplete_rate·min(1, occ/K)`; all cells regrow
+`f += regrow_rate·(1−f)`. **Values `deplete_rate=0.30`, `regrow_rate=0.10` are PROVISIONAL — phenomenological,
+NOT lit-anchored** (a mechanistic biomass/logistic-regrowth model with prey/tuber population dynamics is the
+proper version, deferred). Opt-in: the model calls `tf.consume()` only if the field exposes it (`hasattr`
+guard) → no-op for non-depletable fields, 444-suite unchanged. **Established:** lowers the CC further
+(to ~26% peak; cells stripped to f≈0.32) but **0% under-fed** — the ideal-free-distribution movement washes
+out per-agent variance.
+
+### §4.4.3 Movement / `move_cost_flat` (B) — a mobility knob, not a variance source
+`move_cost_flat` is a **decision friction** subtracted from cell utility (`ypc − move_cost`), **NOT a wealth
+debit** — it changes the chosen cell without burning kcal (so it adds stickiness without re-lowering the
+mean). **Established:** clean monotone mobility control (residential moves/yr 0.93→0.15 as cost 0→0.35·burn)
+but **0% under-fed at every level, occupancy CV invariant** → spatial trapping RULED OUT as the variance
+source. **Incidental realism finding:** the model is *under*-mobile (0.93 moves/yr vs Binford 2001 forager
+envelope ~10–40/yr) — the lit-realistic setting is **`move_cost ≈ 0`** (the baseline); restoring HG mobility
+is a resource-tracking realism issue, separate from mortality. **Diagnosis (R-8):** the limiter is the
+near-**bang-bang reserve** (fed-at-cap or culled-in-~1-step; no stable "lean but alive" band) — the needed
+variance is **structural (dependency), not spatial**.
+
+---
+
+## Life-history & provisioning methods (Phase C; added 2026-06-20; RESULTS R-9/R-10)
+
+Introduces the **dependent class** (children who can't self-feed) — the only structure the
+ideal-free-distribution can't wash out. All opt-in via `lh_cfg`/`enable_provisioning`; 444-suite green
+throughout. `LifeHistoryConfig`, `agents/base.py: eta()/consumption_factor()/reserve_scale()`,
+`phase1_model.py` harvest+metabolism+births.
+
+### §4.5.1 Graded production η(age) (C.1) — the Kaplan childhood deficit
+Own intake `= η(age)·harvest_share`. `η` is the existing piecewise-linear ramp: `eta_min` at birth → 1.0 at
+`forage_age_min`, elder decline to `eta_old`. **`forage_age_min = 180 mo (15 yr)`, `eta_min = 0`** (newborn
+produces nothing). **Source:** Kaplan, Hill, Lancaster & Hurtado 2000 (net-production-by-age; children
+net-positive ~18–20 yr). **The LINEAR ramp is the JV-1 approximation** — overstates older-child production;
+the convex Kaplan curve is **deferred**. Replaces the old **binary** juvenile gate (`intake=0` below age).
+
+### §4.5.2 Age-scaled consumption c(age) (C.1)
+`burn = burn_adult · c(age)`; `c` ramps `cons_min → 1.0` over `[0, forage_age_min]`. **`cons_min = 0.3`**
+(neonate maintenance ~30% of adult absolute). **Source:** Kaplan 2000 / FAO requirement-by-age. The net
+deficit `c(age) − η(age)·share` is positive through early childhood (consumption rises faster than
+production) — the transfer the band must fund.
+
+### §4.5.3 Per-class reserves `reserve_scale(age)` (C.2a) — body-sized neonatal reserve
+Scales the energy reserve (= starvation **floor** AND **cap** AND **birth endowment**) by body size:
+`reserve_min` at birth → 1.0 at `forage_age_min`. **Source:** Pontzer 2012 (Hadza body composition: ♀24.2%
+/♂8.6% fat → ♀~109k/♂~43k kcal — men *below* the 100k constant) + body-mass scaling. **HARD CONSTRAINT
+(C.2b finding): `reserve_min` must = `cons_min` (= 0.3)** — a neonate's cap must cover ≥1 step's burn, else
+the monthly timestep + once-per-step provisioning make a dependent unsustainable *even when fully
+provisioned*. So reserve and consumption scale together (uniform ~1.3-month buffer across ages); the
+**deficit comes from η lagging, not from storage**. **Established (R-9):** the deficit only *bites* with a
+body-sized neonatal reserve — the old adult-sized 100k masked it (C.1 didn't wall; C.2a → extinction without
+provisioning).
+
+### §4.5.4 Provisioning (C.2b) — mother-linked, flow-based
+`child._mother` set at IBI birth. A mother's harvest that **overflows her cap** (otherwise wasted) is
+**redirected to her dependent children** (age < forage_age_min), filling each toward its cap. **Flow-based**
+because adults at the cap have no reserve headroom to give. **Topology — LIT-RESOLVED to mother/kin-linked**
+(Gurven 2004; Kaplan & Hill 1985; Hawkes): gathered-*plant* food is shared **within household/close kin**;
+band-wide pooling is the **meat** pattern, correct only with the game stream on (deferred). Forage-only =
+the plant tier = mother-linked. **Feeding priority (micro):** adults eat to maintenance (own cap) first →
+surplus to own children → child draws deficit toward its cap → mother death = orphan (no provisioning).
+**Established (R-10):** provisioning *rescues* the dependent class (C.2a extinction → stable ~5000, normal
+34% juvenile); on a self-adjusting economy it **over-smooths** (children always fully provisioned); but
+**seasonality + provisioning → emergent SEASONAL CHILD MORTALITY** (lean-trough starvation 34/step vs good
+0.3 = 68× pulse, on children; adults stay fed). **CAVEAT:** routes through the hard starvation floor, NOT
+graded synergy — the bang-bang reserve sends a squeezed child to the floor in ~1 step, too fast to dwell.
+
+---
+
+## Mortality architecture — decisions, decouplings, neglects (added 2026-06-20; Biome-Mortality blueprint)
+
+**DELIVERABLE (supervisor scoping 2026-06-20):** emergent **total** age-specific mortality `q(x)` and how it
+varies by **dwelling biome** — NOT cause-decomposed output channels (channels only where needed for
+correctness). Blueprint: `blueprints/phase1/SiC_Games_P1_BiomeMortality_Blueprint.md` (+ red-team v1 §7b).
+
+### §4.6.1 Baseline de-warfaring (DECIDED 2026-06-20)
+Frontier/colonial violence **excluded entirely** — never a modeled dynamic (it is a contact-era artifact;
+Aché ≈50%+ of forest-period deaths are conspecific violence, mostly **external warfare vs Paraguayan
+colonists**, §4.2.7). **Decision:** strip the **external-warfare** hazard from the Aché Siler (KEEP
+infanticide + disease + accident — these are pristine), re-fit a Siler, re-validate the core. **Feasibility
+(computed):** with warfare ≈0 for unweaned (their violence is infanticide, kept) and ~35% of the hazard for
+ages 4+, de-warfared **e₀ ≈ 42–44** (vs all-cause 36.5) — high but defensible for a low-violence forager,
+and crucially NOT the ~50 that stripping *all* violence would give (infanticide anchors infant mortality,
+which dominates e₀). Build task = the re-fit + re-validation (changes the validated R-3 baseline; handle as
+a science change). *Note: precise Aché Table 5.1 age×cause %s are a non-text-extractable formatted table;
+the de-warfaring uses the documented aggregate + age-pattern, cross-checkable against the Hiwi Table 5 rates
+which DO extract.*
+
+### §4.6.2 Biome → mortality channel
+Primary channel is **disease ecology** (pathogen load by climate/NPP), with **nutrition a seasonal,
+infant-concentrated modifier** (foragers self-regulate to the biome CC → broadly fed regardless of richness;
+R-5/6 — plausibly *correct*, not a bug). Exploratory (discover the gradient), **not calibrate-hard** — the
+true gradient strength is uncertain and may be modest.
+
+### §4.6.3 Pathogen channel — data status & approach
+Tallavaara SEM coefficient + Guernier 2004 numeric slopes are **non-text-extractable** (formatted
+tables/figures) and Guernier gives pathogen **richness, not mortality** (an unvalidated leap). **Redirect
+(2026-06-20):** anchor to **general disease-ecology / biogeography** (not HG-gated): **Dunn et al. 2010**
+(richness *and prevalence* by environment), **Cashdan 2014** (infectious-disease biogeography by climate) —
+TO FETCH. **Holocene-stability split:** *environmental* pathogens (malaria, soil helminths, arboviruses,
+diarrheal) track temperature/humidity/productivity and their climate envelope is **stable** → modern maps
+apply to the pre-agricultural world; *crowd/zoonotic* diseases (measles, TB) are **agriculture-era** and
+**excluded** (Houldcroft & Underdown 2023). Approach: **direction-anchored** (disease ecology pins the sign
++ shape: pathogen↑ with NPP/warmth/humidity) with a **bracketed magnitude** (low/mid/high) reported as a
+gradient sweep until CL-1 climate lands real T/humidity.
+
+### §4.6.4 Modulation correctness (red-team v1 corrections)
+- **"Modulate 36% of a2" was INCOHERENT** (B1/L-1): `a2` is a scalar Makeham constant; 0.36 is a fraction of
+  *total* mortality; the causes spread across a1/a2/a3. **Correct formulation:** modulate `a2` wholesale (it
+  IS the age-independent exogenous term; warfare/congenital largely live in a1/a3, already invariant) OR add
+  an explicit additive biome-disease hazard component — **drop the "0.36-of-a2" claim**.
+- **a1 reach (I-2):** infant disease lives in `a1`, but `a1` also contains **infanticide** (do NOT scale it
+  by pathogen) and is **sex-scaled** (childhood ratio). Any new modulator must thread through `hazard()`
+  ONLY — never `cumulative_hazard()`/`survivorship()` (founder-age sampling + the ×12 guard + the life-table
+  validation depend on the unmodulated forms). Add a regression test that the unmodulated life table is
+  byte-identical.
+- **Mean-normalisation reference = Aché-forest NPP**, per-channel (risk normalised; density currently
+  absolute; pathogen TBD).
+- **The R-8/R-10 bang-bang blocker is the critical path:** synergy can't bite because a squeezed agent hits
+  the floor in ~1 step. **Fix = S0 lagged body-condition / immune-competence signal** (EMA of nutritional
+  status) read by the disease modulator, BEFORE wiring the disease channel, or it stays inert. Routes the
+  seasonal squeeze through **graded disease** (Pelletier potentiation) rather than the starvation floor —
+  matching the data (child nutritional death ≈0; disease-dominated, §4.2.7).
+
+### §4.6.5 Violence module (DESIGNED, OFF by default)
+Separate, toggleable, **scarcity/biome-gated** (resource-poor band → higher conflict hazard). Tiers:
+*intra-band interpersonal* (runs in an isolated band; minor for mobile egalitarian foragers — Fry &
+Söderberg 2013 → default OFF) and *inter-band warfare* (requires **contact** → coupled with **mixing** →
+**deferred to the C-vs-Si conflict subsystem**, where it emerges from civ competition over territory).
+
+### §4.6.6 Neglected / deferred (the explicit "what we left out" ledger)
+External warfare + inter-band conflict + cultural **mixing** (→ conflict subsystem; **isolated far-apart
+seeding** avoids both now and keeps per-biome mortality clean); intra-band interpersonal violence (separate
+module, OFF); accidents (terrain-risk modulator, can promote to a tracked cause); crowd/zoonotic diseases
+(agriculture-era, excluded); the convex Kaplan η production curve (linear JV-1 approximation in use);
+maternal-removed female Siler (approach (a), deferred); full pathogen calibration (data non-extractable →
+bracketed); the multi-biome harness (S3.5 — to build; every run so far is one 40×40 window); cause-decomposed
+mortality outputs (out of scope — total q(x) only).
+
+---
+
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3).*
 
 > **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
