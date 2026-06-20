@@ -1,0 +1,27 @@
+{
+  "verdict": "SEASONALITY INERT \u2014 even at equilibrium the trough does not draw reserves below maintenance; synergy stays ~1. Depletion (A.2) is required.",
+  "bites": false,
+  "conditions": {
+    "constant (control)": {
+      "eq_pop": 20033.419,
+      "ceiling": 21071.334708943526,
+      "res_min": 99776.17831382786,
+      "res_max": 99959.36038691776,
+      "syn_mean": 1.0019881434805862,
+      "syn_max": 1.0041966566157279
+    },
+    "seasonal (s_min=0.4)": {
+      "eq_pop": 7764.721,
+      "ceiling": 21071.334708943526,
+      "res_min": 99312.35225914908,
+      "res_max": 100000.0,
+      "syn_mean": 1.0008651747337882,
+      "syn_max": 1.012893395140955
+    }
+  },
+  "s_min": 0.4,
+  "founders": 400,
+  "steps": 2500,
+  "seed": 42,
+  "elapsed_sec": 407.8215537071228
+}
