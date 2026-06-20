@@ -1,0 +1,22 @@
+{
+  "verdict": "SEASONALITY + PROVISIONING BITES \u2014 a clean seasonal child STARVATION pulse: lean-trough deaths 34/step vs good-season 0.3 (68\u00d7 pulse). Children are the buffer that absorbs the seasonal squeeze \u2192 emergent seasonal child mortality, the variance the whole A\u2192B\u2192C arc chased. NOTE: it runs through the hard floor, not graded synergy (juv synergy>1.2 only 0.0% \u2014 a squeezed child plummets to the floor in ~1 step, too fast to dwell). T-4 (emergent child q(x) vs Ach\u00e9) is open; whether to route the mortality through the graded synergy/disease channel is the modeling choice.",
+  "bites": true,
+  "conditions": {
+    "C.2b constant (s=1)": {
+      "eq_pop": 4972.537777777778,
+      "juv_uf_mean": 0.0,
+      "juv_uf_max": 0.0,
+      "adt_uf_mean": 0.0
+    },
+    "C.2b seasonal (s=0.4)": {
+      "eq_pop": 3223.2833333333333,
+      "juv_uf_mean": 0.0,
+      "juv_uf_max": 0.0,
+      "adt_uf_mean": 0.0
+    }
+  },
+  "founders": 400,
+  "steps": 1800,
+  "seed": 42,
+  "elapsed_sec": 154.81768321990967
+}
