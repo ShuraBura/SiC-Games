@@ -407,14 +407,28 @@ true gradient strength is uncertain and may be modest.
 ### §4.6.3 Pathogen channel — data status & approach
 Tallavaara SEM coefficient + Guernier 2004 numeric slopes are **non-text-extractable** (formatted
 tables/figures) and Guernier gives pathogen **richness, not mortality** (an unvalidated leap). **Redirect
-(2026-06-20):** anchor to **general disease-ecology / biogeography** (not HG-gated): **Dunn et al. 2010**
-(richness *and prevalence* by environment), **Cashdan 2014** (infectious-disease biogeography by climate) —
-TO FETCH. **Holocene-stability split:** *environmental* pathogens (malaria, soil helminths, arboviruses,
-diarrheal) track temperature/humidity/productivity and their climate envelope is **stable** → modern maps
+to general disease-ecology / biogeography (not HG-gated) — FETCHED 2026-06-20** (both fully text-extractable,
+in `literature/`):
+- **Cashdan 2014** (*PLoS ONE* 9(10):e106752, open access) — THE anchor. A **pathogen *prevalence* index**
+  (10 pathogens, ordinal 1–4 = absent→epidemic) across **SCCS societies** (Standard Cross-Cultural Sample —
+  *includes foragers/traditional societies, pre-modern-medicine*), OLS-modelled on **mean annual
+  temperature, # frost-free months, temperature extremes, precipitation, habitat diversity, population
+  density** (adj. R²≈0.48). **Shape:** prevalence ↑ with temperature + frost-free climate + seasonal-dry-
+  extremes; **predictors switch by latitude** — high-latitude pathogen load is temperature-driven, low-
+  latitude is precipitation-driven (precip. effect peaks at *intermediate* rainfall, not monotone).
+  Standardized (β) coefficients reported (the magnitude). Maps directly onto our terrain **temperature +
+  humidity (CL-1 seam) + NPP**.
+- **Dunn et al. 2010** (*Proc. R. Soc. B* 277:2587, via Europe PMC GREEN OA) — corroborates: pathogen
+  *richness* GLM pseudo-r²=0.82, driven by **reservoir-host (bird+mammal) diversity** + temperature /
+  precipitation / AET.
+
+**Holocene-stability split:** *environmental* pathogens (malaria, soil helminths, arboviruses, diarrheal)
+track temperature/humidity/productivity and their climate envelope is **stable** → these biogeographic maps
 apply to the pre-agricultural world; *crowd/zoonotic* diseases (measles, TB) are **agriculture-era** and
-**excluded** (Houldcroft & Underdown 2023). Approach: **direction-anchored** (disease ecology pins the sign
-+ shape: pathogen↑ with NPP/warmth/humidity) with a **bracketed magnitude** (low/mid/high) reported as a
-gradient sweep until CL-1 climate lands real T/humidity.
+**excluded** (Houldcroft & Underdown 2023). **Approach:** anchor the channel's **sign + shape + relative
+magnitude** to Cashdan's prevalence-index-by-climate (the prevalence→mortality step is a *small* honestly-
+bracketed leap, far better than richness→mortality); report the biome gradient as a bracketed sweep over the
+residual magnitude until CL-1 climate lands real T/humidity. Precise β extraction deferred to the S2/S3 wire.
 
 ### §4.6.4 Modulation correctness (red-team v1 corrections)
 - **"Modulate 36% of a2" was INCOHERENT** (B1/L-1): `a2` is a scalar Makeham constant; 0.36 is a fraction of

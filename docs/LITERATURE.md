@@ -638,3 +638,19 @@ Our Step-1 realized **IBI 37.0 / TFR 7.9** sits at the high-fertility (Aché) en
 **What was lifted — per-class body composition (Hadza; MR-1 / Resource-Ecology Phase B):** body fat by sex — **women 24.2 ± 5.8%**, **men 8.6 ± 3.8%** (mean ± SD); child fat ~similar to age 10 then rises for females. Anchors the per-agent `reserve_full ~ N(sex × age)`: women carry far more *absolute* fat (the reproductive buffer). Provisional kcal stores (fat × 9 kcal/g; assumed body weights ♀~50 kg, ♂~55 kg): **female adult ~109k ± 26k**, **male adult ~43k ± 19k** (note: men's is *below* the current 100k global constant); child low (~scale by body mass); senior declining. [Body weights assumed — refine from Hadza/Aché anthropometry.] See MODEL_SPEC §4.3.3.
 
 **Citation tag:** [USED — per-class reserve anchor (Resource-Ecology Phase B / MR-1)]
+
+---
+
+### Cashdan, E. (2014). "Biogeography of Human Infectious Diseases: A Global Historical Analysis." *PLoS ONE* 9(10):e106752. DOI 10.1371/journal.pone.0106752. FILED `literature/` 2026-06-20 (open access).
+
+**What was lifted — pathogen-prevalence-by-climate anchor (Biome-Mortality / pathogen channel, §4.6.3):** a **pathogen *prevalence* index** (10 pathogens, ordinal 1–4 = absent→epidemic) across **SCCS societies** (Standard Cross-Cultural Sample — includes foragers / traditional pre-modern-medicine societies), OLS-modelled on mean annual temperature, # frost-free months, temperature extremes, precipitation, habitat diversity, population density (adj. R²≈0.48). **Shape:** prevalence ↑ with temperature + frost-free climate + seasonal-dry-extremes; predictors **switch by latitude** (high-lat temperature-driven, low-lat precipitation-driven, precip. peaking at intermediate rainfall). Standardized β coefficients reported (magnitude; precise extraction deferred to the channel wire). Maps onto terrain temperature + humidity (CL-1) + NPP. The **prevalence**-not-richness metric makes prevalence→mortality a small, bracketable leap. Replaces the non-extractable Tallavaara/Guernier richness path.
+
+**Citation tag:** [USED — pathogen channel direction+shape+magnitude (Biome-Mortality §4.6.3)]
+
+---
+
+### Dunn, R.R., Davies, T.J., Harris, N.C., Gavin, M.C. (2010). "Global drivers of human pathogen richness and prevalence." *Proc. R. Soc. B* 277(1694):2587–2595. DOI 10.1098/rspb.2010.0340. FILED `literature/` 2026-06-20 (Europe PMC GREEN OA: PMC2982038).
+
+**What was lifted — corroborating pathogen-richness drivers (Biome-Mortality §4.6.3):** pathogen *richness* GLM **pseudo-r²=0.82**, most variation explained by **reservoir-host (bird + mammal) species diversity** plus temperature / precipitation / actual evapotranspiration (AET). Supports the Holocene-stability case (environmental/host-driven pathogen distribution) and the warm/wet/productive → higher-pathogen direction. Secondary to Cashdan (richness, not prevalence).
+
+**Citation tag:** [USED — pathogen channel corroboration (Biome-Mortality §4.6.3)]
