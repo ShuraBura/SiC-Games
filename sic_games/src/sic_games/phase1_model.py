@@ -53,7 +53,7 @@ from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
-    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, risk_mult, synergy_mult,
+    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
 )
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target
 from sic_games.terrain import N, WorldFields, generate_world
@@ -135,6 +135,9 @@ class TerrainWorld(mesa.Model):
             self._siler_both = demography_cfg.siler()
             land = self._fields.isWater == 0
             self._risk_ref = float(self._fields.risk[land].mean())  # mean land risk (normalization)
+            # S2 pathogen reference NPP (Aché-forest biome → neutral); config 0 → mean land NPP of this terrain
+            self._pathogen_npp_ref = (demography_cfg.pathogen_npp_ref if demography_cfg.pathogen_npp_ref > 0.0
+                                      else float(self._fields.npp[land].mean()))
             self.a2_cap_hits = 0   # red-team m-4: agent-steps where the a2_eff cap binds
 
         self.agent_list: list[BaseAgent] = []
@@ -502,6 +505,9 @@ class TerrainWorld(mesa.Model):
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
+        if cfg.enable_terrain_pathogen:                        # S2 biome disease-ecology (Cashdan; NPP proxy)
+            m *= pathogen_mult(float(self._fields.npp[a.pos[1], a.pos[0]]), self._pathogen_npp_ref,
+                               cfg.pathogen_gamma, cfg.pathogen_cap)
         if cfg.enable_nutrition_synergy:
             if cfg.enable_condition:                           # S0: disease potentiated by SUSTAINED condition (EMA)
                 m *= 1.0 + (cfg.mu_max - 1.0) * (1.0 - a._condition)

@@ -193,6 +193,10 @@ class DemographyConfig(BaseModel):
     dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
     mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994) [PROVISIONAL]
     a2_cap: float = Field(5.0, ge=1.0)          # cap on the a2_eff multiplier (red-team n-1)
+    # Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2.
+    pathogen_gamma: float = Field(0.0, ge=0.0)  # BRACKETED strength (NPP exponent); 0 = OFF/flat. Sweep low/mid/high.
+    pathogen_cap: float = Field(3.0, ge=1.0)    # symmetric cap [1/cap, cap] on pathogen_mult
+    pathogen_npp_ref: float = Field(0.0, ge=0.0)  # reference NPP (Aché-forest biome); 0 → model uses terrain mean
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""
@@ -230,6 +234,21 @@ def density_mult(density_per_km2: float, delta: float, rho_half: float) -> float
     """Density-dependent disease: `1 + δ·ρ/(ρ+ρ_half)`, ρ in **agents/km²** (red-team m-3). Endemic /
     zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever."""
     return 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+
+
+def pathogen_mult(npp_cell: float, npp_ref: float, gamma: float, cap: float) -> float:
+    """Biome disease-ecology: pathogen load → multiplies a2. Pathogen PREVALENCE rises with
+    productivity/warmth/wetness (Cashdan 2014 prevalence index by temperature+precipitation; §4.6.3).
+    **PROXY (Biome-Mortality S2, path A):** driven by **NPP** because real spatial temperature+humidity are
+    constant CL-1 placeholders — so this is the PARTIAL, *productivity-driven* gradient (NPP conflates warmth
+    and wetness), NOT the real climate decomposition (that needs CL-1). Mean-normalised so
+    `pathogen_mult(npp_ref) = 1` (the Aché-forest reference biome is neutral); other biomes deviate.
+    **`gamma` is the BRACKETED magnitude** (0 → flat; report the gradient as a function of it — the
+    prevalence→mortality step is unvalidated, §4.6.3). Symmetrically capped to [1/cap, cap]."""
+    if npp_ref <= 0.0 or gamma <= 0.0:
+        return 1.0
+    m = (npp_cell / npp_ref) ** gamma
+    return min(cap, max(1.0 / cap, m))
 
 
 def synergy_mult(reserve: float, floor: float, full: float, mu_max: float) -> float:
