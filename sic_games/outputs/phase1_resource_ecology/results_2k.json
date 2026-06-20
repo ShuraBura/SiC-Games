@@ -1,0 +1,30 @@
+{
+  "verdict": "INERT \u2014 condition barely moved (1.00\u21921.00); the squeeze is too acute (children cut off \u2192 floor before condition degrades). Needs S1 (partial provisioning) first.",
+  "cond_degrades": false,
+  "dis_pulse": false,
+  "starv_softens": false,
+  "conditions": {
+    "synergy on reserve (R-10)": {
+      "eq_pop": 3223.2833333333333,
+      "starv_lean": 34.07216494845361,
+      "starv_good": 0.2508250825082508,
+      "dis_lean": 6.3883161512027495,
+      "dis_good": 6.841584158415841,
+      "jcond_lean": 1.0,
+      "jcond_good": 1.0
+    },
+    "synergy on condition (S0)": {
+      "eq_pop": 3221.8888888888887,
+      "starv_lean": 33.66323024054983,
+      "starv_good": 0.2079207920792079,
+      "dis_lean": 6.762886597938144,
+      "dis_good": 6.735973597359736,
+      "jcond_lean": 0.9999037194578431,
+      "jcond_good": 0.9999737281458846
+    }
+  },
+  "founders": 400,
+  "steps": 1800,
+  "seed": 42,
+  "elapsed_sec": 104.37870192527771
+}

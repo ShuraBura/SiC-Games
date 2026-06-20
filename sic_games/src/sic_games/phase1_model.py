@@ -227,6 +227,7 @@ class TerrainWorld(mesa.Model):
         agent.months_since_birth = 10**9   # IBI counter (huge → first birth not blocked by refractory)
         agent.parity = 0
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
+        agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
         return agent
@@ -346,8 +347,16 @@ class TerrainWorld(mesa.Model):
 
         # 4. metabolism: burn + age + mortality (cause-attributed)
         demog = self._demog
+        cond_on = demog is not None and demog.enable_condition
+        c_alpha = demog.condition_alpha if cond_on else 0.0
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
+            if cond_on:                      # S0: slow EMA of nutritional status → body condition / immune competence
+                _rs = a.reserve_scale()
+                _lo = a.reserve_floor * _rs; _span = self._reserve_full * _rs - _lo
+                _frac = (a._fed_reserve - _lo) / _span if _span > 0 else 1.0
+                _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
+                a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             a.age += 1
             if demog is not None:
@@ -484,9 +493,12 @@ class TerrainWorld(mesa.Model):
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
-        if cfg.enable_nutrition_synergy:                       # reads POST-HARVEST reserve (nutritional state)
-            _rs = a.reserve_scale()                            # C.2a age-scaled floor/full
-            m *= synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
+        if cfg.enable_nutrition_synergy:
+            if cfg.enable_condition:                           # S0: disease potentiated by SUSTAINED condition (EMA)
+                m *= 1.0 + (cfg.mu_max - 1.0) * (1.0 - a._condition)
+            else:                                              # legacy: instantaneous post-harvest reserve
+                _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
+                m *= synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
         if m > cfg.a2_cap:
             self.a2_cap_hits += 1
             return cfg.a2_cap

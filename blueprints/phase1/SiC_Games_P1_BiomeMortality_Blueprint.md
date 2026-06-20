@@ -1,8 +1,9 @@
 # SiC Games · Phase 1 · **Biome Mortality** — total age-specific mortality per dwelling biome
 
-**Status:** DRAFT for red-team (2026-06-20). Supersedes the cause-decomposition framing of the Phase C
-provisioning blueprint per supervisor scoping: **the deliverable is *total* mortality q(x) by age × biome,
-not separate cause channels** (channels only where needed for correctness).
+**Status:** vNext — red-team v1 addressed (§7b); **building S0**. Supersedes the cause-decomposition framing
+of the Phase C provisioning blueprint per supervisor scoping: **the deliverable is *total* mortality q(x) by
+age × biome, not separate cause channels** (channels only where needed for correctness). §2/§3 are the live
+plan; §7/§7b retain the red-team record.
 
 ---
 
@@ -19,47 +20,59 @@ seasonality, produces a seasonal infant nutritional signal that currently routes
 starvation floor (R-10). Cause data (MODEL_SPEC §4.2.7): precontact forager child **nutritional death ≈ 0**;
 mortality is disease-dominated (+ frontier violence, excluded).
 
-## 2. Conceptual model (the "logic" to red-team)
+## 2. Conceptual model (vNext — red-team-corrected 2026-06-20)
 
-`mortality(age, biome, t) = Siler_baseline(age)` with its **biome-sensitive fraction f_s modulated** by the
-biome/condition modulators, **mean-normalised** so the **Aché-forest** biome reproduces the validated
-baseline:
+Mortality from the **de-warfared Aché Siler** ("natural mortality" baseline, §4.6.1; e₀≈42–44), with the
+**disease hazard** modulated by biome + body-condition, **mean-normalised per channel** so the Aché-forest
+reference biome reproduces the baseline.
 
-- **Biome→mortality is carried mainly by DISEASE ECOLOGY** (pathogen load varies strongly by biome —
-  humid-tropical high, arid low; Guernier 2004 / Tallavaara), via `terrain-pathogen` + `density-disease`
-  on the disease portion. Hypothesis, **exploratory not calibrate-hard** (the true gradient strength is
-  uncertain; it may be modest — see RT-L1).
-- **Nutrition is a SEASONAL, infant-concentrated modifier** (C.2b/seasonal), not the main biome signal —
-  foragers self-regulate to their CC and are broadly fed regardless of biome richness (R-5/6, plausibly
-  *correct* under this framing).
-- **Baseline = validated Aché Siler kept AS-IS** (do NOT re-derive). Only the biome-sensitive fraction
-  f_s ≈ 0.36 (Aché illness ~24% + accident ~12%, §4.2.7) is modulated; warfare/congenital remainder is a
-  **constant, non-distorting offset** → frontier violence is never a dynamic (supervisor directive), and
-  the biome *gradient* is clean. Absolute-level Aché offset noted as a caveat.
-- **Violence = separate module, OFF by default** (§5). **Bands seeded far apart → isolated per-biome
-  populations, no mixing** (§6).
+- **Disease-channel formulation (fixes red-team L-1 — "f_s≈0.36 of a2" was incoherent).** `a2` (Makeham) is
+  the age-independent exogenous term; `a1` carries infant disease *but also infanticide* (do NOT scale
+  that). Modulate the **disease-attributable hazard** by `M = condition × pathogen(biome) × density`,
+  threaded through `hazard()` ONLY (never `cumulative_hazard()`/`survivorship()` — founder sampling + ×12
+  guard + life-table test). Realised as **`a2` wholesale + an a1 infant-disease component above weaning**
+  (so infanticide, unweaned, is untouched) — NOT "a fraction of a2."
+- **Body condition (S0 — the critical path).** Disease potentiation reads a slow EMA of nutritional status
+  (`_condition`, immune competence; α=0.25), so *sustained* undernutrition raises DISEASE mortality
+  (Pelletier), routing the seasonal squeeze through **graded disease**, not the bang-bang starvation floor
+  (R-8/R-10). Matches the data: child nutritional death ≈0, disease-dominated (§4.2.7).
+- **pathogen(biome).** Anchored to **Cashdan 2014** prevalence-index-by-climate (temperature / frost-free /
+  precipitation; SCCS societies incl. foragers; §4.6.3) for the **sign + shape + relative magnitude**; the
+  residual prevalence→mortality is **bracketed** (low/mid/high) and reported as a sweep. Maps to terrain
+  temperature+humidity (CL-1) + NPP. Crowd/zoonotic diseases excluded (agriculture-era).
+- **Nutrition = seasonal, infant-concentrated modifier** (C.2b/seasonal), NOT the main biome signal —
+  foragers self-regulate to CC, broadly fed regardless of biome richness (R-5/6, plausibly *correct*).
+- **Baseline de-warfared** (frontier violence excluded as a dynamic); **violence module OFF** (§5); **bands
+  seeded far apart → isolated per-biome populations, no mixing** (§6).
 
-## 3. Build stages
+## 3. Build stages (resequenced per red-team — S0 is the critical path)
 
-- **S1 — Child-priority provisioning.** Shortfall-sharing that protects children first → the seasonal
-  *starvation* pulse (R-10, 68×) collapses toward ≈0 (matching the data). Re-run 2j as the check. Goal: stop
-  the model *over*-killing children; child mortality should sit at realistic levels via the baseline, not
-  the floor.
-- **S2 — Biome-sensitive fraction + a1/a2 reach + mean-normalisation.** Split the baseline so the
-  modulators scale only f_s, **on a1 (infant) AND a2 (Makeham)** — infant disease lives in a1 (RT-I2).
-  Normalise so modulators ≈1 at the **Aché-forest reference NPP** (RT-I4).
-- **S3 — Activate disease-ecology modulators.** `terrain-pathogen` (NPP/temperature/humidity-driven) +
-  `density-disease`. Calibrate the *gradient* (not a single rate) against the cross-forager disease range,
-  with explicit caveats (RT-I1: pathogen *richness* → mortality is an inferential leap).
-- **S4 — Multi-biome validation.** Isolated populations in ≥3 distinct biomes (low/med/high NPP) →
-  equilibrate → total q(x) by age × biome. Compare age-shape to Aché; report the emergent biome gradient
-  (expect *modest*). Nutrition enters as the seasonal infant modifier.
+- **S0 — body-condition signal** [BUILDING]. `_condition` EMA (α=0.25); the synergy/disease modulator reads
+  it (`1+(μ_max−1)(1−condition)`), opt-in `enable_condition`. **Test (run_2k):** on the C.2b seasonal
+  squeeze, does juvenile condition degrade in the lean season and seasonal child mortality reroute
+  **starvation → graded disease**? Unblocks the whole disease channel (else it stays inert).
+- **S1 — gated child-priority provisioning.** Shortfall-sharing that protects children → starvation→≈0
+  (data) AND children dwell at a *partial* deficit so condition degrades gradually (the slow drain S0 needs).
+  **GATE (RT-I5):** child mortality floor ≥ Aché illness ~16–21/1000 mid-child — don't over-correct to zero.
+- **S2 — disease-hazard formulation.** `a2`-wholesale + a1 infant-disease (weaning-gated) modulated by
+  condition × pathogen × density, threaded through `hazard()` only, per-channel mean-normalised to the
+  Aché-forest reference. **Regression test:** unmodulated life table byte-identical (RT-I2/I6).
+- **S3 — de-warfared baseline + pathogen channel.** Re-fit the Siler to the de-warfared schedule
+  (e₀≈42–44), re-validate the core; wire Cashdan-anchored pathogen(biome) + density-disease; calibrate μ_max
+  + the bracketed pathogen magnitude.
+- **S3.5 — multi-biome harness** [from scratch — none exists; RT-I3]. ≥3 isolated populations in
+  low/med/high-NPP windows; per-population q(x); determinism; compute budget.
+- **S4 — bracketed validation.** Total q(x) by age × biome; report **gradient vs pathogen-strength bracket**
+  (not a point estimate, RT-L2); age-shape vs Aché; nutrition as the seasonal modifier; honest level offset
+  (gradient+shape, Aché-anchored level — RT-L3).
 
 ## 4. Mean-normalisation (correctness, not cosmetics)
 
-Modulator `M(biome) = raw(biome) / raw(Aché-forest-NPP)`, applied as `a_s' = a_s · M` on the sensitive
-fraction only. ⇒ Aché-forest biome reproduces the validated baseline exactly; other biomes deviate. Prevents
-the biome gradient from scaling the invariant (warfare/congenital) fraction.
+Per channel, `M(biome) = raw(biome) / raw(Aché-forest reference)`, applied to the **disease-attributable
+hazard** (`a2` wholesale + the a1 infant-disease component) via `hazard()` — NOT to the whole Siler. ⇒ the
+Aché-forest reference biome reproduces the (de-warfared) baseline exactly; other biomes deviate; the a3
+senescence term and the a1 *infanticide* portion stay invariant (they are not biome/disease-driven). This is
+what keeps the biome gradient from scaling non-disease mortality.
 
 ## 5. Violence module (designed, OFF by default)
 
@@ -132,5 +145,8 @@ climate lands real T/humidity.
 
 ## 8. Out of scope / deferred
 
-Inter-band warfare + cultural mixing (→ conflict subsystem); full baseline de-warfaring; cause-decomposed
-outputs; the absolute-level Aché offset cleanup.
+Inter-band warfare + cultural mixing (→ C-vs-Si conflict subsystem; isolated far-apart seeding sidesteps
+both now); cause-decomposed mortality **outputs** (total q(x) only); crowd/zoonotic diseases (agriculture-
+era); the convex Kaplan η production curve (linear JV-1 in use); precise Cashdan β extraction (deferred to
+the S2/S3 wire); real spatial/seasonal temperature+humidity (CL-1 climate stage — pathogen reads constants
+until then). *(De-warfaring is now IN scope at S3, not deferred.)*

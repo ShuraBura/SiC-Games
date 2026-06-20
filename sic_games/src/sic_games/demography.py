@@ -174,6 +174,12 @@ class DemographyConfig(BaseModel):
     # Flow-based (adults at the cap have no reserve headroom to give); the variance lands on the
     # mother's cell quality. Forage-only = the gathered-plant kin-sharing tier (Gurven 2004).
     enable_provisioning: bool = False
+    # Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease
+    # synergy reads a slow EMA of nutritional status (`_condition`) instead of the instantaneous (bang-bang)
+    # reserve — so sustained undernutrition potentiates DISEASE mortality (Pelletier), routing the seasonal
+    # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
+    enable_condition: bool = False
+    condition_alpha: float = 0.25   # EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
