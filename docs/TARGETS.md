@@ -94,5 +94,36 @@ disabled; ≥5 seeds; pre-committed interpretation of bimodal vs unimodal.
 
 ---
 
+## T-4 — Emergent nutritional child mortality reproduces the Aché schedule
+
+**Status:** TARGET (downstream of the Resource-Ecology stage). **Origin:** supervisor, 2026-06-19.
+
+**Aspiration:** instead of the all-cause Aché Siler encoding child mortality *by construction*,
+**decouple the nutritional component**: keep an exogenous non-nutritional residual (accidents,
+violence, non-nutritional infection — from Hill & Hurtado cause-of-death) in the schedule, and let
+the **nutritional** part of child mortality EMERGE from the mechanisms — children's low per-class
+reserves × scarcity (seasonality / depletion) × parental provisioning load. The emergent nutritional
+child mortality + the exogenous residual should then **reproduce the empirical Aché child-mortality
+schedule**.
+
+**Why this is a real target and not a rationalization:** it is genuinely falsifiable — the emergent
+child mortality could come out too high, too low, or the wrong age-shape, and that would update us on
+what the nutrition/provisioning model is missing. It converts "the model reproduces Aché child
+mortality" from a **tautology** (painted-in by the all-cause Siler) into a real test of the mechanisms
+— the project's "emergent, not painted-in" ideal applied to mortality — and it dissolves the M-3-style
+double-count (nutrition is the part *removed* from the Siler, not restated on top of it).
+
+**What it needs to graduate to a HYPOTHESIS:**
+- The Resource-Ecology stage built and trustworthy: nutritional variance (seasonality + depletion),
+  per-class reserves (children's low buffer), and family provisioning (JV-1 / MR-2).
+- A decomposition of Aché child mortality into nutritional vs non-nutritional from Hill & Hurtado
+  cause-of-death (the non-nutritional residual stays in the Siler).
+- An l(x) / q(x) comparison over child ages with a tolerance band, ≥5 seeds, and a pre-committed
+  interpretation of match / too-high / too-low / wrong-shape.
+- *Watch (TMTS guard):* the emergent mortality must come from the existing reserve/scarcity/provisioning
+  mechanisms, not a new child-mortality knob.
+
+---
+
 *End of TARGETS — seeded 2026-06-05. Graduate a target by moving it to HYPOTHESES with a test
 spec; never mark a target "confirmed."*

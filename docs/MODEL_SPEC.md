@@ -255,6 +255,14 @@ Step-2 **pathogen field** reads real T/humidity rather than a `wateracc × NPP` 
   anchored to **real temperature/humidity** (Guernier 2004 climate drivers) when the **climate-season
   stage** lands (DEFERRED_MECHANICS CL-1; §4.3.2). 2b runs with pathogen OFF.
 
+**Implementation note (synergy read; 2026-06-19).** The synergy (and energetic-fertility) modulator reads
+the **post-harvest** reserve (`_fed_reserve`, the nutritional state), NOT the post-burn value — which is
+`reserve_full − burn` for *any* fed agent and falsely reads as starvation (this was the 2b/2c artifact;
+RESULTS R-5). `reserve_full = 100k` is ~physiologically right (~1.3–1.5 months of fat); the bug was the
+read timing, not the magnitude. **On the current constant/undepletable economy all three modulators are
+INERT** (agents fully fed + spread) — they need nutritional *variance* (Resource-Ecology stage:
+seasonality + depletion) to act, so `μ_max` is not calibratable until then.
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3).*

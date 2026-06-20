@@ -226,6 +226,8 @@ class TerrainWorld(mesa.Model):
         )
         agent.months_since_birth = 10**9   # IBI counter (huge → first birth not blocked by refractory)
         agent.parity = 0
+        agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
+        #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
         return agent
 
     # ── Step ───────────────────────────────────────────────────────────────
@@ -314,6 +316,7 @@ class TerrainWorld(mesa.Model):
         # 4. metabolism: burn + age + mortality (cause-attributed)
         demog = self._demog
         for a in self.agent_list:
+            a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
             a.wealth -= self._burn
             a.age += 1
             if demog is not None:
@@ -424,8 +427,8 @@ class TerrainWorld(mesa.Model):
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
             p_birth = cfg.fecundability
-            if cfg.enable_energetic_fertility:                 # economy fix (A): births scale w/ reserve
-                p_birth *= energetic_fertility_factor(a.wealth, a.reserve_floor, self._reserve_full)
+            if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
+                p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor, self._reserve_full)
             if a.random.random() < p_birth:
                 a.months_since_birth = 0
                 a.parity += 1
@@ -448,8 +451,8 @@ class TerrainWorld(mesa.Model):
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
-        if cfg.enable_nutrition_synergy:
-            m *= synergy_mult(a.wealth, a.reserve_floor, self._reserve_full, cfg.mu_max)
+        if cfg.enable_nutrition_synergy:                       # reads POST-HARVEST reserve (nutritional state)
+            m *= synergy_mult(a._fed_reserve, a.reserve_floor, self._reserve_full, cfg.mu_max)
         if m > cfg.a2_cap:
             self.a2_cap_hits += 1
             return cfg.a2_cap

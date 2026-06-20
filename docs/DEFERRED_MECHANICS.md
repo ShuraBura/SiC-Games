@@ -78,6 +78,8 @@
 
 **Seam:** `reserve_full_kcal` and `reserve_floor_kcal` in `KcalEconomyConfig` (config.py); `reserve_floor` attribute on `BaseAgent` (base.py). MR-1 replaces the placeholder values with literature-grounded ones; no code structure changes needed.
 
+**Extension (2026-06-19) — per-class reserves:** MR-1 also extends from one constant to a **per-agent `reserve_full` drawn from a normal distribution keyed on sex × age-class** (male / female / child / senior), lit-anchored to body composition — women carry more *absolute* fat (a reproductive buffer); children's low absolute store → starvation-vulnerable; seniors decline. Dormant on the constant economy (all fed); the differential vulnerability expresses only under nutritional variance (Resource-Ecology stage), where it must be reconciled against the all-cause Siler to avoid M-3-style double-counting (the reserve channel = scarcity *deviation*, not a restatement of the average sex/age mortality). Supports TARGET T-4.
+
 **Status:** SURVEY-PENDING — placeholders live (A-1, 2026-06-14); values tagged [PLACEHOLDER] in PARAMETERS.md.
 
 ---
@@ -124,4 +126,20 @@
 
 ---
 
-*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 8 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced).*
+## FD-1 — Family dynamics (co-residence & provisioning)
+
+**What:** Define a **family unit** (mother + dependent children) that **co-resides and moves together** until child maturation (~age 15), with children **provisioned by the mother** (they do not self-forage). Currently a newborn is dropped on the parent's cell and immediately becomes an independent forager that wanders off — no bond, no provisioning, no co-residence.
+
+**Why deferred:** Belongs in the **Resource-Ecology stage** (with depletion + seasonality + per-class reserves): (a) provisioning load only bites under nutritional scarcity, and (b) family co-residence creates *realistic* local structure (a family ≈ several co-located agents) — which is what makes density-disease and spatial dynamics meaningful, but only once there's scarcity to act on. On the constant economy it would be inert.
+
+**Literature-rationale anchor:** HG juvenile dependence + parental/alloparental provisioning (Kaplan/Hill/Hurtado embodied-capital; Hawkes grandmothering). Ties to JV-1 (age-graded juvenile productivity) and MR-2 (carried provisioning). [INLINE — not yet in LITERATURE.md]
+
+**Seam:** child placement (`_do_births_ibi`: `child.pos = parent.pos`) + the diffusion mover. FD-1 keeps the child bound to the mother's position (move as a unit) until maturation, and routes the child's subsistence through the mother (provisioning) rather than independent harvest. Connects to the JV-1 age-gate (`is_juvenile`) and the MR-2 provisioning seam.
+
+**Status:** DEFERRED — child currently independent at birth (Step-2, 2026-06-19); family unit not built. Part of the Resource-Ecology stage; supports TARGET T-4 (provisioning load → emergent nutritional child mortality).
+
+> **Resource-Ecology stage grouping (2026-06-19):** GD-1 (depletion) + CL-1 (climate/seasonality) + MR-1 per-class reserves + MR-2 (provisioning) + FD-1 (family) compose the next stage — the economy that gives the demographic `a2` modulators nutritional *variance* to act on (they are inert without it; RESULTS R-5) and that enables the T-4 emergent-child-mortality validation.
+
+---
+
+*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 9 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring + per-class), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced), FD-1 (family dynamics — co-residence & provisioning).*
