@@ -630,3 +630,11 @@ Our Step-1 realized **IBI 37.0 / TFR 7.9** sits at the high-fertility (Aché) en
 **Status:** **NOT yet in `literature/`** (paywalled — supervisor to fetch). `μ_max` PROVISIONAL pending the filed paper + the RR-by-severity table; the RR is child-mortality data extrapolated to adult reserve depletion.
 
 **Citation tag:** [USED — nutrition-synergy μ_max anchor (Step-2); PROVISIONAL, source not yet filed]
+
+---
+
+### Pontzer, H., Raichlen, D.A., Wood, B.M., et al. (2012). "Hunter-Gatherer Energetics and Human Obesity." *PLoS ONE* 7(7):e40503. DOI 10.1371/journal.pone.0040503. FILED `literature/` 2026-06-19 (open access).
+
+**What was lifted — per-class body composition (Hadza; MR-1 / Resource-Ecology Phase B):** body fat by sex — **women 24.2 ± 5.8%**, **men 8.6 ± 3.8%** (mean ± SD); child fat ~similar to age 10 then rises for females. Anchors the per-agent `reserve_full ~ N(sex × age)`: women carry far more *absolute* fat (the reproductive buffer). Provisional kcal stores (fat × 9 kcal/g; assumed body weights ♀~50 kg, ♂~55 kg): **female adult ~109k ± 26k**, **male adult ~43k ± 19k** (note: men's is *below* the current 100k global constant); child low (~scale by body mass); senior declining. [Body weights assumed — refine from Hadza/Aché anthropometry.] See MODEL_SPEC §4.3.3.
+
+**Citation tag:** [USED — per-class reserve anchor (Resource-Ecology Phase B / MR-1)]
