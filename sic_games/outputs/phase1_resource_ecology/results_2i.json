@@ -1,0 +1,25 @@
+{
+  "verdict": "PROVISIONING RESCUES but variance still thin \u2014 pop recovers (eq 4984) but juvenile under-fed only 0.0% (adults 0.0%). Children are provisioned almost fully even on poor cells \u2192 tighten provisioning (partial transfer) or sharpen cell-quality variance to widen the lean dwell.",
+  "rescued": true,
+  "bites": false,
+  "conditions": {
+    "C.2a (provisioning OFF)": {
+      "final_pop": 0,
+      "eq_pop": 0.0,
+      "juv_uf_eq": 0.0,
+      "adt_uf_eq": 0.0,
+      "juv_frac_eq": 0.0
+    },
+    "C.2b (provisioning ON)": {
+      "final_pop": 4951,
+      "eq_pop": 4983.815,
+      "juv_uf_eq": 0.0,
+      "adt_uf_eq": 0.0,
+      "juv_frac_eq": 0.34297367757151764
+    }
+  },
+  "founders": 400,
+  "steps": 1500,
+  "seed": 42,
+  "elapsed_sec": 51.53190326690674
+}

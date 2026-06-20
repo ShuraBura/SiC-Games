@@ -169,6 +169,11 @@ class DemographyConfig(BaseModel):
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
+    # Resource-Ecology Phase C.2b: mother-linked provisioning. A mother's harvest that overflows her
+    # reserve cap (otherwise wasted) is redirected to her dependent children (age < forage_age_min).
+    # Flow-based (adults at the cap have no reserve headroom to give); the variance lands on the
+    # mother's cell quality. Forage-only = the gathered-plant kin-sharing tier (Gurven 2004).
+    enable_provisioning: bool = False
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)

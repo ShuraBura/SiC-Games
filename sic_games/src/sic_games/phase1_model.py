@@ -226,6 +226,7 @@ class TerrainWorld(mesa.Model):
         )
         agent.months_since_birth = 10**9   # IBI counter (huge → first birth not blocked by refractory)
         agent.parity = 0
+        agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
         return agent
@@ -306,12 +307,36 @@ class TerrainWorld(mesa.Model):
         occ_lists: dict[tuple[int, int], list[BaseAgent]] = {}
         for a in self.agent_list:
             occ_lists.setdefault(a.pos, []).append(a)
+        demog = self._demog
+        provisioning = demog is not None and demog.enable_provisioning
+        provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
             shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             for a, sh in zip(occ, shares):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
-                a.wealth = min(a.wealth + intake, self._reserve_full * a.reserve_scale())  # C.2a age-scaled cap
+                total = a.wealth + intake
+                cap = self._reserve_full * a.reserve_scale()                 # C.2a age-scaled cap
+                a.wealth = min(total, cap)
+                if provisioning and total > cap:                            # overflow → giveable to her children
+                    provision_pool[a] = provision_pool.get(a, 0.0) + (total - cap)
+
+        # C.2b mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit
+        # from their mother's harvest overflow (flow-based — adults at the cap have no reserve to spare).
+        # A mother on a poor/crowded cell has little overflow → her children dwell lean → synergy bites.
+        if provisioning and provision_pool:
+            for child in self.agent_list:
+                if not child.is_juvenile():
+                    continue
+                m = child._mother
+                avail = provision_pool.get(m, 0.0) if (m is not None and m.alive) else 0.0
+                if avail <= 0.0:
+                    continue
+                cap_c = self._reserve_full * child.reserve_scale()
+                give = min(cap_c - child.wealth, avail)
+                if give > 0.0:
+                    child.wealth += give
+                    provision_pool[m] = avail - give
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing
@@ -443,6 +468,7 @@ class TerrainWorld(mesa.Model):
                 child = self._make_agent(sex=csex, lh_cfg=self._lh_cfg)
                 child.pos = a.pos
                 child.age = 0
+                child._mother = a                                          # C.2b mother-link for provisioning
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1

@@ -253,8 +253,12 @@ class LifeHistoryConfig(BaseModel):
     # Resource-Ecology Phase C.2a: age-graded RESERVE size — a newborn's energy reserve (fat store,
     # and hence the starvation floor + the cap) as a fraction of an adult's, ramping to 1.0 at
     # forage_age_min. Body-mass scaling (neonate ~3.5 kg / adult ~50 kg) + Pontzer 2012 body comp.
-    # A small neonatal reserve is what makes the C.1 childhood deficit actually bite (R-9).
-    reserve_min: float = Field(0.1, ge=0.01, le=1.0)
+    # MUST be ≥ cons_min·(burn/reserve_full) so a full reserve covers ≥1 step's burn — else, given the
+    # monthly timestep + once-per-step provisioning, a dependent cannot be sustained even when fully
+    # provisioned (C.2b finding). Reserve and consumption both scale with body mass, so the principled
+    # choice is reserve_min = cons_min (uniform buffer-months across ages); the childhood DEFICIT comes
+    # from the η production/skill curve lagging body size, not from storage.
+    reserve_min: float = Field(0.3, ge=0.01, le=1.0)
 
 
 class SupportPoolConfig(BaseModel):
