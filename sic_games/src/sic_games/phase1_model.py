@@ -313,6 +313,12 @@ class TerrainWorld(mesa.Model):
                 intake = 0.0 if a.is_juvenile() else sh
                 a.wealth = min(a.wealth + intake, self._reserve_full)
 
+        # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
+        # pressure and regrows it. No-op for non-depletable fields (the default), so existing
+        # behaviour + tests are unchanged.
+        if hasattr(tf, "consume"):
+            tf.consume(occ_count)
+
         # 4. metabolism: burn + age + mortality (cause-attributed)
         demog = self._demog
         for a in self.agent_list:
