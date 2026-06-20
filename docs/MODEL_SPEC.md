@@ -442,11 +442,19 @@ residual magnitude until CL-1 climate lands real T/humidity. Precise β extracti
   byte-identical.
 - **Mean-normalisation reference = Aché-forest NPP**, per-channel (risk normalised; density currently
   absolute; pathogen TBD).
-- **The R-8/R-10 bang-bang blocker is the critical path:** synergy can't bite because a squeezed agent hits
-  the floor in ~1 step. **Fix = S0 lagged body-condition / immune-competence signal** (EMA of nutritional
-  status) read by the disease modulator, BEFORE wiring the disease channel, or it stays inert. Routes the
-  seasonal squeeze through **graded disease** (Pelletier potentiation) rather than the starvation floor —
-  matching the data (child nutritional death ≈0; disease-dominated, §4.2.7).
+- **The R-8/R-10 bang-bang blocker — RESOLVED BY SCOPING (2026-06-20; RESULTS R-11).** S0 (lagged
+  body-condition EMA; `enable_condition`, `condition_alpha`) + S1 (child-priority shortfall-sharing;
+  `provision_self_keep`) were built (444 green) and red-teamed → **CORRECT-BUT-INERT**: provisioning tops
+  children to their cap, so survivors sit at condition ≈1.0 and the only under-cap children starve at the
+  floor in ~1 step (the bang-bang) before the EMA moves; the self-regulation attractor (R-5…R-8) compounds
+  it. The fine graded-nutrition→disease channel is **over-engineering for a TOTAL-mortality-by-biome
+  deliverable** (it only relabels the *same* weaning-age deaths starvation↔disease, which the total sums
+  over). **Decision:** **S1 ON** (drives child nutritional death → the Aché ≈0; coarse cause-split = the two
+  existing buckets, starvation-floor vs Siler-baseline `deaths_senesc`); **S0 banked OFF** (opt-in, for the
+  deferred fine effort). **The biome gradient does NOT depend on this** — it comes from the *exogenous*
+  pathogen × `a2` channel (no dwell problem). The **fine** mechanistic synergy is deferred to **T-4**, where
+  the two-part fix it needs (burn-cap provisioning + slow child-drain / stochastic returns) is recorded as
+  the mark for later.
 
 ### §4.6.5 Violence module (DESIGNED, OFF by default)
 Separate, toggleable, **scarcity/biome-gated** (resource-poor band → higher conflict hazard). Tiers:

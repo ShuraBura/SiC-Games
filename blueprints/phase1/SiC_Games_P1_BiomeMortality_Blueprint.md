@@ -47,13 +47,15 @@ reference biome reproduces the baseline.
 
 ## 3. Build stages (resequenced per red-team — S0 is the critical path)
 
-- **S0 — body-condition signal** [BUILDING]. `_condition` EMA (α=0.25); the synergy/disease modulator reads
-  it (`1+(μ_max−1)(1−condition)`), opt-in `enable_condition`. **Test (run_2k):** on the C.2b seasonal
-  squeeze, does juvenile condition degrade in the lean season and seasonal child mortality reroute
-  **starvation → graded disease**? Unblocks the whole disease channel (else it stays inert).
-- **S1 — gated child-priority provisioning.** Shortfall-sharing that protects children → starvation→≈0
-  (data) AND children dwell at a *partial* deficit so condition degrades gradually (the slow drain S0 needs).
-  **GATE (RT-I5):** child mortality floor ≥ Aché illness ~16–21/1000 mid-child — don't over-correct to zero.
+- **S0 — body-condition signal** [DONE → BANKED OFF; RESULTS R-11]. Built (`_condition` EMA, opt-in
+  `enable_condition`), 444 green, **correct-but-inert** (provisioning tops children to cap → survivors at
+  condition ≈1.0; under-cap children starve in ~1 step before the EMA moves; self-regulation attractor
+  compounds). The *fine* graded-nutrition→disease channel is **over-engineering for total-mortality-by-biome**
+  → **deferred to T-4** (two-part fix recorded there); kept as an opt-in flag.
+- **S1 — child-priority shortfall-sharing** [DONE → KEPT ON; `provision_self_keep`<1.0]. Cuts lean-trough
+  child starvation 33.7→18.2 (mothers absorb the squeeze; residual = orphans/failed-support = the data's
+  infanticide cohort). Earns its place: drives child **nutritional** death → the Aché ≈0, giving the
+  **coarse** cause-split (starvation-floor vs Siler-baseline `deaths_senesc`) the Biome stage validates.
 - **S2 — disease-hazard formulation.** `a2`-wholesale + a1 infant-disease (weaning-gated) modulated by
   condition × pathogen × density, threaded through `hazard()` only, per-channel mean-normalised to the
   Aché-forest reference. **Regression test:** unmodulated life table byte-identical (RT-I2/I6).

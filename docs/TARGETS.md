@@ -123,6 +123,26 @@ double-count (nutrition is the part *removed* from the Siler, not restated on to
 - *Watch (TMTS guard):* the emergent mortality must come from the existing reserve/scarcity/provisioning
   mechanisms, not a new child-mortality knob.
 
+**⚑ [2026-06-20 — ATTEMPTED & DEFERRED — THE MARK FOR LATER]** First attempt at the *fine* (graded
+nutrition→disease) version, via **S0** (lagged body-condition EMA so synergy reads sustained nutritional
+state, not the bang-bang reserve) + **S1** (child-priority shortfall-sharing). **Result: CORRECT-BUT-INERT**
+(red-team `a1f44d9c`, RESULTS R-11). The code is right; it can't bite because provisioning **tops children
+to their cap** → survivors sit at condition ≈1.0, and the only under-cap children hit the starvation floor
+in ~1 step (R-10 bang-bang) before the EMA moves. The self-regulation attractor (R-5…R-8) defeats it: the
+*surviving* mothers are by construction the ones who can cover their kids, so children rarely dwell lean.
+**What the fine version needs to graduate (the deferred work):** a TWO-part fix — (a) change provisioning
+*target* from cap to maintenance/burn (`phase1_model.py:338`) so a drawn-down child is NOT refilled and
+dwells at partial reserve; **AND** (b) slow the child reserve dynamics (widen the cap-to-floor span beyond
+~1.3 months) OR add **stochastic foraging returns** so even adequate mothers occasionally fail — i.e.
+re-open the R-7 "source-of-variance" problem one level down. Red-team predicts (a) alone stays flat. This is
+a dedicated research subproject, NOT a quick add. **Banked, not abandoned:** `enable_condition` /
+`condition_alpha` (S0) are kept as **opt-in, off-by-default** flags for this future effort.
+**The COARSE version IS in use now** (RESULTS R-11): the model's two existing cause buckets —
+**starvation (floor)** vs **Siler baseline `deaths_senesc` (disease+infanticide+accident)** — give a
+disease-dominated / low-nutritional child split that roughly matches the Aché coarse benchmark, with **S1
+(kept ON)** driving child nutritional death toward the data's ≈0. The Biome-Mortality stage validates this
+coarse split as a byproduct; the fine mechanistic synergy is what remains here as T-4.
+
 ---
 
 *End of TARGETS — seeded 2026-06-05. Graduate a target by moving it to HYPOTHESES with a test
