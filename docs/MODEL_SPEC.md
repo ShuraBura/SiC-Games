@@ -216,6 +216,36 @@ Growth r=+3.3%/yr emergent (forest Aché grew ~2.5%; r≈0 is a Step-2 property)
 ### §4.2.6 Founder ages
 Sampled ∝ `l(x)` (the stationary / Aché-shaped young pyramid).
 
+### §4.2.7 Child mortality — cause structure (Resource-Ecology Phase C / T-4 calibration targets, 2026-06-20)
+Extracted from the filed monographs to ground how emergent child mortality should decompose. **Both
+precontact forager populations show ≈ZERO nutritional/starvation child death** — children are buffered;
+nutritional stress acts by *potentiating disease*, not by direct starvation.
+
+**Aché forest period** (Hill & Hurtado 1996, *Aché Life History*, Ch. 5 "Causes of Mortality", Table 5.1;
+382 deaths). Four categories, NO nutritional category: **conspecific violence ~50%+** (Ache-initiated
+homicide/**infanticide** = ~40% of violent deaths, concentrated in *unweaned* infants 0–3; external warfare
+= ~60% of violent deaths, older ages), **illness/disease ~24%** (lethal mainly in unweaned infants; weaned
+children 4–14 are *"the healthiest age group,"* killed mostly by accident/violence), **accident ~12.5%**
+(rises with age, food-acquisition-related, rare in young children), degenerative/congenital the remainder.
+Infanticide is **condition-dependent** in the ethnography: too-short birth interval (the next child killed),
+parental death/orphan, lack of a sponsor/support, deformity.
+
+**Hiwi precontact** (Hill, Hurtado & Walker 2007, *J. Hum. Evol.* 52:443, Table 5 — cause-specific rates
+per 1000 risk-years; Table 4 — % by cause): mid-childhood (1–9 yr) **disease 21♂/16♀**, congenital 3/2,
+accident 7/2, violence 5/2; infant (0) disease 51/68, congenital 51/68, accident 13/27, violence 64/108.
+**Nutritional row ≈0 precontact** (3–13% only *post*-contact, from parental incapacitation). Disease ≈45%
+of all Hiwi deaths vs ≈24% Aché (Aché more warfare-dominated).
+
+**Implications for the model (T-4):** (a) the nutrition→mortality channel is **disease-potentiation**
+(synergy multiplies the *disease* portion of `a2`, the Pelletier 2009 malnutrition×infection mechanism),
+NOT starvation; calibrate child *disease* mortality to ~16–21/1000 (mid-child) and child *starvation* to
+≈0 (child-priority high). (b) It matters mainly for **unweaned infants** (the η≈0 dependent class); weaned
+children are robust as η closes the deficit — emergent, not imposed. (c) **Infanticide** is the dominant
+*infant* cause and is condition-dependent (short IBI / orphan / no support) → a non-disease infant channel
+keyed to state we already track; worth wiring this stage. (d) **External warfare** (≈60% of violent deaths,
+older ages) is the inter-group conflict subsystem — deferred to the C-vs-Si conflict phase. PDFs filed in
+`literature/`.
+
 ---
 
 ## Terrain / Climate methodology
