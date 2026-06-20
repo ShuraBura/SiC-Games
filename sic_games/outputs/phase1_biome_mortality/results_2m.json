@@ -1,0 +1,74 @@
+{
+  "verdict": "PATHOGEN BIOME GRADIENT (bracketed) \u2014 at gamma=1, e0 falls arid\u2192lush 21.9\u219232.1 yr (-10.1 yr span; gamma=0 span -20.0), and the lush population collapses 11936\u21921955 (food\u2212disease trade-off: productive biome = most food but most disease). Real, monotone, scales with strength. HONEST: NPP-proxy only (T/humidity = CL-1); magnitude BRACKETED; exploratory, not a validated fit; gradient may be modest (a result, not a failure).",
+  "bites": true,
+  "npp_ref": 0.18528799458284348,
+  "grid": {
+    "arid|0.0": {
+      "eq_pop": 7023.4383333333335,
+      "e0": 23.81458274506966,
+      "q_u5": 0.3195937336350545,
+      "n_deaths": 16911,
+      "cdr": 0.048155900849133
+    },
+    "arid|0.5": {
+      "eq_pop": 7317.676666666666,
+      "e0": 23.185689244962905,
+      "q_u5": 0.3242727442109411,
+      "n_deaths": 18076,
+      "cdr": 0.04940365862935549
+    },
+    "arid|1.0": {
+      "eq_pop": 7600.54,
+      "e0": 21.918531058187266,
+      "q_u5": 0.3298823545540783,
+      "n_deaths": 19754,
+      "cdr": 0.05198051717377976
+    },
+    "temperate|0.0": {
+      "eq_pop": 11598.961666666666,
+      "e0": 35.809881695366045,
+      "q_u5": 0.26017748564819454,
+      "n_deaths": 18899,
+      "cdr": 0.032587399705462136
+    },
+    "temperate|0.5": {
+      "eq_pop": 8787.776666666667,
+      "e0": 41.979018662630864,
+      "q_u5": 0.2453195917749459,
+      "n_deaths": 12060,
+      "cdr": 0.027447215507297448
+    },
+    "temperate|1.0": {
+      "eq_pop": 6769.301666666666,
+      "e0": 40.38962258787102,
+      "q_u5": 0.25058414999199197,
+      "n_deaths": 9768,
+      "cdr": 0.028859697738393007
+    },
+    "lush|0.0": {
+      "eq_pop": 11935.695,
+      "e0": 43.81201242509468,
+      "q_u5": 0.2412582256653304,
+      "n_deaths": 15542,
+      "cdr": 0.026042890673731188
+    },
+    "lush|0.5": {
+      "eq_pop": 6192.746666666667,
+      "e0": 38.13785081884011,
+      "q_u5": 0.2589954977482406,
+      "n_deaths": 9469,
+      "cdr": 0.030580937699157724
+    },
+    "lush|1.0": {
+      "eq_pop": 1954.7983333333334,
+      "e0": 32.05638019993101,
+      "q_u5": 0.27843054843456716,
+      "n_deaths": 3570,
+      "cdr": 0.03652550689372049
+    }
+  },
+  "founders": 400,
+  "steps": 1500,
+  "seed": 42,
+  "elapsed_sec": 538.7037947177887
+}
