@@ -98,6 +98,49 @@ biome-gated cleanly and is the mobility anchor (Binford) identifiable? RT-5: sea
 is large — is the G.1→G.5 sequence right, and what is the minimal subset needed *before* the δ calibration
 vs deferrable after?
 
+## 5b. Red-team v1 (2026-06-20, sub-agent) — VERDICT: NEEDS REVISION
+
+All three "key facts" verified true (the rivalrous/biome path runs on the NPP-CC only; forage_kcal/game_kcal
+exist + lognormal; `_select_stream` is dead code on the rivalrous path). Findings:
+
+- **RT-1 [MAJOR — units incoherence].** "Decompose the CC by the forage_kcal:game_kcal *ratio*" mixes a
+  **carrying-capacity** (people supportable, NPP-driven) with **return rates** (kcal/forager-hr,
+  encounter/handling-driven) — no reason the ratios are equal; same class-error as the old "fraction of a2."
+  Worse, it **contradicts the data**: forest game_kcal=5541 is the *highest* return rate, yet §2 claimed
+  "forest leans forage." **Fix:** split diet by **Cordain 2000 animal-fraction-by-latitude ONLY** (a
+  *diet-composition* split, not a productivity split); return-rate fields stay diagnostic/movement-only.
+  "Total CC preserved" holds only *nominally* — variance + sharing change *effective* CC (nonlinear mortality).
+- **RT-2 [BLOCKER for the stated purpose — the variance wash-out].** G.2 injects per-hunter variance; G.4
+  band-pools meat and **cancels exactly that variance** → re-creates the R-5…R-13 wash-out. Deeper: R-7/R-8
+  proved the limiter is the **bang-bang reserve + IFD**, NOT absence of a variance *source*; stochastic
+  returns hit the same dwell wall. The variance that works is **structural (dependents, C.2b)** — which the
+  model already has (R-10). So **game variance is largely redundant.** **Fix:** answer it with a cheap
+  pre-registered **band-size × sharing-completeness micro-experiment** (metric: under-fed synergy>1.2
+  fraction) BEFORE building G.3–G.5; if buffered (predicted), cut G.2 from the critical path — meat becomes
+  diet realism (Cordain), not a variance source.
+- **RT-2b [MINOR].** CV 2.24 is **savanna-specific** (forest 0.73, desert 0.29) — use per-biome
+  `GAME_KCAL_STD`. G.2's per-step draw needs the agent's own RNG (`agent.random`), not a new global one.
+- **RT-3 [MAJOR — meat mis-route].** Provisioning is mother→child via the mother's **forage overflow**; there
+  is **no father-link** (`_mother` only). A male hunter's meat has **no route to his children**, and routing
+  meat through the mother's overflow would **inflate the pool → over-smooth** (worsen the wash-out). **Fix:**
+  an explicit band-meat→dependent route, distinct from the forage-overflow tier; meat may count toward
+  `_fed_reserve` (fertility) but must not inflate the provisioning overflow.
+- **RT-4 [MAJOR — migration mis-scoped; DEFER].** G.5 **contradicts MODEL_SPEC §4.1.5's own standing
+  deferral** of true migration, R-8 says mobility is *separate* from the δ question, and **none of the
+  calibration biomes (arid/temperate/lush) has migratory game**. G.5 has **zero effect on the δ calibration**
+  → cut from this stage; its own stage after δ. (R-8 under-mobility is real but orthogonal.)
+- **RT-5 [MINOR].** Seasonality (G.3) is the best-grounded part. But the "R-10 was an artifact" retro-claim
+  over-reaches — R-10's *mechanism* is validated; only the *amplitude* was biome-generic. Don't discard it.
+- **Extra miss:** game productivity also keys off NPP → an NPP-derived game stream **compounds the
+  NPP-monoculture** behind R-12's over-strong gradient; a game standing-stock driver must NOT just re-use NPP.
+
+**Resequenced (red-team (d)):** the stated G.1→G.5-then-δ order is backwards. **Minimal honest pre-δ subset:**
+(1) **G.1 diet-composition split via Cordain** (RT-1 fix), (2) the **RT-2 micro-experiment** (decides if any
+of G.2–G.5 even matters for δ). **Defer to after δ:** G.2 (likely redundant), G.3 seasonality (calibration
+biomes don't need it), G.5 migration (orthogonal + contradicts §4.1.5). **Punchline:** R-13 *already* got
+density-disease to regulate (r→0, starvation→0) on the forage-only NPP economy with **no game at all** —
+current evidence (R-7/R-8/R-13) predicts **none of G.2–G.5 needs to precede δ.**
+
 ## 6. Out of scope / deferred
 Pastoralism / herd *management* (HG following only); intra-herd predator-prey dynamics (herd is an exogenous
 moving field); the full star-mechanics seasonal lottery (use Earth biome anchors); inter-band competition
