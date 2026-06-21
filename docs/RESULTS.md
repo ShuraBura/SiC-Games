@@ -176,6 +176,16 @@
 
 **Consequence:** the demographic substrate (R-1…R-13) is the **validated Si/egalitarian ecological baseline**; the **C/Cred individuality is the next real layer** (kappa>0 + the demographic core) — the C-vs-Si demographic resilience test, the project's central question, now on a real ecology instead of Sugarscape. The per-agent-variance chase is closed (it was the wrong level for Si; it's the *point* for C).
 
+## R-15 — δ calibration lands the model at a Hiwi-like e₀ (~28), ~8 yr below the Aché (37) it's parameterized to — the double-count; de-warfaring is the prerequisite for a clean calibration
+
+**Origin:** Biome-Mortality density-disease δ calibration, `outputs/phase1_biome_mortality/run_2o_delta_calibration.py`, 2026-06-20. Temperate biome, period life tables + density.
+
+**What we know:** sweeping δ — as it rises, starvation falls (49%→0% at δ=4) and **e₀ rises to a peak of 28.5 yr at δ=4, then falls** (δ=8 → 25.1); density falls monotonically (0.116→0.037/km²). **No δ satisfies all three forager constraints at once** (e₀ 27–43, density 0.1–0.5, starvation≈0): low δ → realistic density but heavy starvation (24–49%) + low e₀; **δ≈3–4 → forager-range e₀ (27–28.5) + borderline density (0.065–0.083) + starvation 0–9%**; high δ → no starvation but density too low + e₀ falls. The recommended **δ≈3–4 is a HIWI-like regulated state** (e₀~28, disease-regulated) — realistic for a *low-end* forager but **~8 years below the Aché (37)** the Siler is parameterized to.
+
+**The gap is the DOUBLE-COUNT:** density-disease is added **on top of the Aché-TOTAL Siler**, which already encodes the Aché's own mortality regime — so the regulation costs ~8 yr of e₀ (at δ=4, e₀ drops from the Siler's 36.5 to 28.5). The fix is the **mean-preservation / DE-WARFARING** (deferred, §4.6.1): strip the ~50% frontier violence from the baseline (e₀≈42–44) so density-disease brings it down to ~34–36, matching the Aché *and* supporting a higher (Tallavaara-range) density.
+
+**Consequence:** **de-warfaring is the PREREQUISITE for a clean δ calibration** — the order is **baseline-first** (de-warfare → re-fit Siler → re-calibrate δ → multi-biome). δ is PROVISIONALLY ~3–4 (the forage-only Hiwi-like regulated state). The δ↔(starvation, density, e₀) trade-off curve is itself a finding: the forage-only economy is *mortal* — regulating the +3.3% growth costs ~8 yr of e₀ whichever way (starvation or disease).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

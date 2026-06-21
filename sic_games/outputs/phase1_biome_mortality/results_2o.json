@@ -1,0 +1,59 @@
+{
+  "verdict": "RECOMMENDED \u03b4 \u2248 3 \u2014 e0 27.2yr, density 0.083/km\u00b2, starvation 9% (joint-fit 2/3: forager e0 27\u201343, Tallavaara density 0.1\u20130.5, starvation\u22480). \u03b4 is a calibrated FREE lever (PARAMETERS \u00a715); the multi-biome sweep re-runs with this \u03b4 next. NOTE: if no \u03b4 hits all three, the trade-off (realistic density vs starvation\u21920) is itself a finding about the forage-only economy.",
+  "recommended_delta": 3.0,
+  "conditions": [
+    {
+      "delta": 0.0,
+      "eq_pop": 18534.67,
+      "e0": 22.525512932944785,
+      "density": 0.11584168749999998,
+      "starv_frac": 0.49382086890049687
+    },
+    {
+      "delta": 1.0,
+      "eq_pop": 17137.6525,
+      "e0": 23.580906949817866,
+      "density": 0.107110328125,
+      "starv_frac": 0.36056030236265607
+    },
+    {
+      "delta": 2.0,
+      "eq_pop": 15648.52125,
+      "e0": 24.759693090768202,
+      "density": 0.0978032578125,
+      "starv_frac": 0.23952587002440376
+    },
+    {
+      "delta": 3.0,
+      "eq_pop": 13258.52625,
+      "e0": 27.24377085776227,
+      "density": 0.0828657890625,
+      "starv_frac": 0.086533902323376
+    },
+    {
+      "delta": 4.0,
+      "eq_pop": 10462.9875,
+      "e0": 28.490088170686256,
+      "density": 0.06539367187499999,
+      "starv_frac": 0.0010779984003894704
+    },
+    {
+      "delta": 6.0,
+      "eq_pop": 8642.3,
+      "e0": 25.483198244790326,
+      "density": 0.054014374999999996,
+      "starv_frac": 0.0
+    },
+    {
+      "delta": 8.0,
+      "eq_pop": 5979.3725,
+      "e0": 25.071683848690338,
+      "density": 0.037371078125000005,
+      "starv_frac": 0.0
+    }
+  ],
+  "founders": 400,
+  "steps": 2000,
+  "seed": 42,
+  "elapsed_sec": 909.2716693878174
+}

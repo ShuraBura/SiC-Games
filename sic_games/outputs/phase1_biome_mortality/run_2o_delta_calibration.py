@@ -112,7 +112,7 @@ def main():
         msg = (f"delta={d:4.1f}: eq_pop {r['eq_pop']:6.0f} | e0 {r['e0']:5.1f}yr{'✓' if e_ok else ' '} | "
                f"density {r['density']:.3f}/km²{'✓' if d_ok else ' '} | starv {r['starv_frac']*100:3.0f}%{'✓' if s_ok else ' '}")
         print(f"[2o] {msg}  [{time.time()-t0:.0f}s]", flush=True)
-        with open(prog, "w") as f: f.write(f"2o: {msg} | elapsed {time.time()-t0:.0f}s\n")
+        with open(prog, "w", encoding="utf-8") as f: f.write(f"2o: {msg} | elapsed {time.time()-t0:.0f}s\n")
 
     # recommend: max joint-fit score; tie-break = smallest δ (least extrapolated lever)
     scored = [( _score(r)[0], -r["delta"], r) for r in res]
