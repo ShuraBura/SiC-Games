@@ -1,0 +1,45 @@
+{
+  "verdict": "DENSITY-DISEASE REGULATES \u2014 at delta=8 the population settles 5979 (vs 18535 food-ceiling baseline) and the starvation fraction collapses 49%\u21920%. Graded disease holds r\u21920 BELOW the food ceiling \u2014 the Step-2 design works; mortality becomes disease-regulated, not starvation. (delta is a calibration, large; multi-biome next.)",
+  "regulates": true,
+  "conditions": [
+    {
+      "delta": 0.0,
+      "eq_pop": 18534.67,
+      "starv_frac": 0.49382086890049687,
+      "disease_deaths": 31784,
+      "starv_deaths": 31008
+    },
+    {
+      "delta": 2.0,
+      "eq_pop": 15648.52125,
+      "starv_frac": 0.23952587002440376,
+      "disease_deaths": 37083,
+      "starv_deaths": 11680
+    },
+    {
+      "delta": 4.0,
+      "eq_pop": 10462.9875,
+      "starv_frac": 0.0010779984003894704,
+      "disease_deaths": 28726,
+      "starv_deaths": 31
+    },
+    {
+      "delta": 8.0,
+      "eq_pop": 5979.3725,
+      "starv_frac": 0.0,
+      "disease_deaths": 18513,
+      "starv_deaths": 0
+    },
+    {
+      "delta": 16.0,
+      "eq_pop": 2870.75125,
+      "starv_frac": 0.0,
+      "disease_deaths": 9502,
+      "starv_deaths": 0
+    }
+  ],
+  "founders": 400,
+  "steps": 2000,
+  "seed": 42,
+  "elapsed_sec": 405.31257462501526
+}
