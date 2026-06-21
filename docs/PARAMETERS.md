@@ -277,6 +277,68 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 ---
 
+## §14 — Demographic core: Siler mortality + IBI fertility + life-history (R-2…R-9; MODEL_SPEC §4.2, §4.5)
+
+| Name | Value | Status | Grounding / history |
+|------|-------|--------|---------------------|
+| Siler a1 (infant) | **0.157**/yr | LOCKED | Aché forest, Gurven & Kaplan 2007 Tbl 2 (M-1). Sex-split a1 ♀0.184/♂0.130. §4.2.1/§4.2.3 |
+| Siler b1 | **0.721** | LOCKED | " |
+| Siler a2 (Makeham) | **0.013**/yr | LOCKED | " — the ONLY term the world modulates (a2_mult) |
+| Siler a3 (Gompertz) | **4.80e-5**/yr | LOCKED | " . Sex-split ♀3.89e-5/♂5.71e-5 |
+| Siler b3 | **0.103** | LOCKED | " . Reproduces e₀=36.5, e₁₅=38.3, mode=71 |
+| Childhood M:F ratio | **0.71** | LOCKED | H&H 1996 Ch.6 forest (M-3); scales a1 (female-higher) |
+| Adult M:F ratio | **1.47** | LOCKED | " ; scales a3 (male-higher) |
+| Fecundability | **~0.12**/mo | LOCKED (calibrated) | bisection to Aché IBI=37 mo / TFR≈8; r=+3.3%/yr emergent. §4.2.5 |
+| Menarche / menopause | **180 / 504** mo | LOCKED | 15/42 yr fertile window |
+| IBI lactational refractory | **30** mo | LOCKED | Aché |
+| SRB (male) | **0.512** | LOCKED | 105:100 |
+| reserve_full | **100 000** kcal | PROVISIONAL | ~1.3 mo adult fat. Pontzer 2012 anchor (♀109k/♂43k; sex-split deferred). §4.5.3 |
+| reserve_floor | **20 000** kcal | PROVISIONAL | starvation threshold |
+| burn (maintenance) | **75 000** kcal/mo | LOCKED | 2500 kcal/day × 30 |
+| forage_age_min | **180** mo | PROVISIONAL | foraging competence (15 yr); Kaplan 2000. η + cons + reserve scaling key. §4.5.1 |
+| eta_min | **0.0** | PROVISIONAL | newborn production (linear JV-1 approx; convex Kaplan deferred) |
+| eta_old | **0.4** | PROVISIONAL | elder efficiency |
+| cons_min | **0.3** | PROVISIONAL | neonate maintenance fraction; Kaplan 2000 / FAO. §4.5.2 |
+| reserve_min | **0.3** (= cons_min) | LOCKED (constraint) | cap ≥ 1-step burn (C.2b/R-9); Pontzer body-mass. §4.5.3 |
+
+## §15 — a2 mortality modulators + condition + provisioning (Phase C / biome; R-5…R-14; §4.3.3, §4.5.4, §4.6)
+
+| Name | Value | Status | Grounding / history |
+|------|-------|--------|---------------------|
+| μ_max (nutrition synergy) | **2.5** | PROVISIONAL / BANKED | Pelletier 1994 (~2–3× malnutrition mortality). The **Carbon mechanism** (R-14) — inert under egalitarian sharing. §4.3.3 |
+| risk_cap (terrain accident) | **3.0** | LOCKED | M-2; accidents ~10% HG deaths (Hiwi). Off in biome runs |
+| dens_delta (density-disease) | **1.0** default; **δ≥4 regulates** (R-13) | OPEN / FREE | the free lever. δ≥4 holds pop below food ceiling → starvation→0 (R-13). **δ calibration pending** |
+| dens_rho_half | **0.2** agents/km² | OPEN | density-disease half-saturation |
+| a2_cap | **5.0** | LOCKED | cap on a2_eff multiplier (red-team n-1) |
+| pathogen_gamma | **0.0** (off); bracketed {0.5, 1.0} | OPEN / BRACKETED | NPP-proxy exponent; Cashdan 2014 direction; magnitude bracketed (prevalence→mortality leap). §4.6.3 |
+| pathogen_cap | **3.0** | PROVISIONAL | symmetric cap [1/cap, cap] |
+| pathogen_npp_ref | **0** → terrain-mean NPP | PROVISIONAL | Aché-forest reference (neutral biome) |
+| condition_alpha (S0) | **0.25** | BANKED (opt-in OFF) | EMA ~2.4-mo half-life; S0 = Carbon mechanism (R-11/R-14); `enable_condition` default off |
+| provision_self_keep (S1) | **1.0** (=C.2b overflow); <1 = child-priority | OPEN / KEPT | shortfall-sharing knob; band-level supersedes as variance vehicle (R-14). §4.5.4 |
+
+## §16 — Resource-ecology + biome + game seams (R-6…R-14; §4.1.4–8, §4.3, §4.4)
+
+| Name | Value | Status | Grounding / history |
+|------|-------|--------|---------------------|
+| CC-1 density slope | **0.3** | PROVISIONAL | Tallavaara 2018; density = min(0.5, 0.3·npp_gm2/1360). §4.3.1 |
+| CC-1 density cap | **0.5**/km² | PROVISIONAL | Tallavaara high bound |
+| NPP threshold | **1360** g/m²/yr | PROVISIONAL | Tallavaara low/high |
+| NPP_GM2_SCALE | **3400** | PROVISIONAL | npp_gm2 = npp × 3400 |
+| seasonality s_min | **0.4** (test) | PROVISIONAL | forage seasonal trough; biome-specific per §4.1.4 (forest flat, llanos high) — NOT yet biome-wired. R-6/R-10 (forest-as-seasonal = artifact, R-14) |
+| depletion deplete_rate | **0.30** | PROVISIONAL (phenomenological, NOT lit-anchored) | GD-1 freshness. §4.4.2 |
+| depletion regrow_rate | **0.10** | PROVISIONAL (phenomenological) | " |
+| move_cost_flat | **0.0** (realistic) | OPEN | decision-friction mobility knob; model under-mobile vs Binford (R-8); realistic ≈0. §4.4.3 |
+| temperature (climate seam) | **14.0** °C | PLACEHOLDER | constant; spatial/seasonal field = CL-1 deferred. §4.3.2 |
+| humidity (climate seam) | **0.70** | PLACEHOLDER | " |
+| game_mobility | **FOREST 0, DESERT 0, SAVANNA 0.2, GRASS 1.0** | SEAM (mechanic deferred) | Binford 2001 / forager-collector; ≈0 in calibration biomes by construction. §4.1.8 |
+
+> **§14–16 currency note (2026-06-20):** added to close the audit gap — PARAMETERS.md had not been updated
+> since 2026-06-14 (§13) through the entire demographic + resource-ecology + biome + game arc (R-2…R-14).
+> Many are PROVISIONAL/OPEN by design (the model is mid-build); the key **un-calibrated** value is the
+> density-disease **δ** (R-13 shows it regulates; the forager-e₀/density calibration is the pending step).
+
+---
+
 ## Discrepancy resolution log
 
 The following D-items from ARCHITECTURE.md §15 are resolved by this document:
