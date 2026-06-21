@@ -500,7 +500,66 @@ mortality outputs (out of scope — total q(x) only).
 
 ---
 
-*End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3).*
+## Model architecture — scale, agents, family, fallbacks (added 2026-06-20; RESULTS R-14)
+
+### §4.7.1 Two scales, one architecture
+The model is **agent-based individuals** running on a **band/biome-level ecology**. Different layers live
+at different scales, deliberately:
+- **Ecology / demography** (food capacity, mortality schedule, disease, density, birth/death rates, age
+  structure) — **band/biome-level**. Within a cell the harvest is split **per-capita**, so a cell IS the
+  *band* (the sharing unit); a band is fed or not *as a unit*. **Per-agent (intra-band) nutritional variance
+  is ≈0 by construction, and that is physically correct** for a monthly step + band sharing (R-14).
+- **Strategy / Cred / status** — **individual-level**, entering through the **sharing-rule weights** and the
+  Carbon decision logic. This is where individuality is load-bearing and is *not* lumped.
+
+### §4.7.2 The sharing rule is the strategy locus (where per-agent variance is/ isn't)
+`compute_harvest_shares(occupants, S, kappa, phi_ε)`:
+- **kappa = 0 (Si / egalitarian):** equal split `S/n` → **no per-agent variance** → band-level. This is the
+  baseline every demographic run (R-1…R-13) used (`contest_exponent=0`).
+- **kappa > 0 (Carbon / hierarchical):** shares ∝ `(phi+ε)^kappa` for Carbon agents → **Cred/status-weighted**
+  → **per-agent variance BY STATUS** (high-Cred eat more). Carbon decisions are Cred-coupled
+  (`σ = σ_base + kappa·tanh(cred/cred_scale)`; status amplification `1 + β·tanh(cred/cred_scale)`).
+- ⇒ **per-agent nutritional variance is STRATEGY-SPECIFIC.** The R-5…R-13 "modulators inert" finding is the
+  **Si baseline** (correctly ≈0); the **C case has real status-graded variance**. The banked S0/S1
+  condition/provisioning machinery (R-11) is the **Carbon mechanism** — inert under equal sharing, live under
+  Cred-weighted sharing. The C-vs-Si anti-fragility (R-1) *is* the individualism: C's hierarchy protects the
+  high-Cred core under shock; Si's equal sharing crashes together (the dormancy cliff).
+
+### §4.7.3 Family structure — a fecundity ensemble, NOT explicit families
+The demographic model has **no marriage, no household, no father-role** (the biparental "partner" code in
+`reproduction.py` is the unused Sugarscape path):
+- **Reproduction is female-only and statistical** (`_do_births_ibi`): each fertile female has a per-month
+  `fecundability` (~0.12), gated by the fertile window (menarche–menopause) + the IBI lactational refractory;
+  SRB sets offspring sex. No pairing — births are individual female fecundity draws.
+- **Males are demographically near-inert** — they carry the sex ratio + sex-specific Siler mortality, but do
+  not pair, father, or provision. The only "family" is the **mother→child link** (`_mother`, for C.2b
+  provisioning). "Single vs married" is not tracked — there is no marriage. **Implication:** band-level meat
+  sharing (a future game tier) reaches children via the *band*, so the missing father-link is a non-issue at
+  band scale (R-14 / Game-Economy RT-3).
+
+### §4.7.4 Scale decision & fallbacks (R-14)
+**Decision: keep individual agents** — the Cred/strategy/resilience core is **path-dependent** (Matthew
+effect → heavy-tailed Cred; mean-field moment-closure fails), **discrete** (HG bands ~25–50 → demographic
+stochasticity *is* the substance; extinction is a discrete event), and **emergent** (the R-1 dormancy cliff
+is a synchronized threshold mass-death that mean-field DENSITY smooths into a smooth decline — it would
+*erase the defining result*). Agents are affordable at HG scale (thousands, runs in minutes), so the
+density compute-win is not worth the loss.
+
+**Fallbacks, deferred to concrete triggers (NOT built now — YAGNI):**
+- **Band-as-super-agent** (bands as discrete units; intra-band hierarchy → a Cred-inequality/Gini summary):
+  *trigger* = continental / deep-time / many-bands scale where O(individuals) is prohibitive but inter-band
+  discreteness (extinction, inter-band C-vs-Si conflict/migration) still matters. *Loses* the intra-band Cred
+  path → valid only once the intra-band hierarchy has stopped being the question.
+- **Mean-field / density:** *trigger* = fast parameter sweeps / equilibrium / sensitivity analysis. Use only
+  as a **surrogate / cross-check**, never the main model (it smooths the R-1 cliff).
+- **The cheap future-proofing is discipline, not architecture:** keep the **ecology-rates ↔ individual-
+  strategy boundary clean** so a future coarsening is a swap-the-consumer job, not a rewrite. No swappable
+  representation layer is built until a trigger arises.
+
+---
+
+*End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
+resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7).*
 
 > **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
 coefficients, fertility params) are authoritative in `docs/PARAMETERS.md`. This document records

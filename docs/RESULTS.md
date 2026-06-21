@@ -160,6 +160,22 @@
 
 **Consequence — the path to realistic biome mortality is open.** δ is the calibration knob (≥4 for starvation→0; the equilibrium density ~0.04–0.13/km² spans the Tallavaara forager band). **Next:** calibrate δ to the forager e₀ + density, then re-run the multi-biome sweep WITH density-disease ON → expect **broadly-similar e₀ across biomes** (disease-regulated, no starvation) with the **pathogen productivity gradient on top** — matching the data (vs the R-12 starvation-dominated over-gradient). The supervisor's "turn on density-disease" was correct.
 
+## R-14 — Scale resolution: per-agent variance is non-physical here (intra-band), the modulators were measuring the wrong level; the operative variance is inter-band/biome, and individuality lives in the Cred/sharing rule
+
+**Origin:** supervisor design closure, 2026-06-20. Resolves the recurring "modulators inert" frustration (R-5…R-13) and the agent-vs-density architecture question. Full architecture record: MODEL_SPEC §4.7.
+
+**What we know (the reframing):**
+1. **Per-agent (intra-band) nutritional variance is NON-PHYSICAL in this model, and that's correct.** Within a cell the harvest is split **per-capita** (`compute_harvest_shares`, kappa=0), and over a 1-month step a band is fed or not *as a unit* — individuals do not starve individually. So the nine "modulators inert / under-fed ≈0%" results (R-5…R-13) were **measuring a quantity that should be ≈0**, not failing to find a real one. The cell **IS** the band (the sharing unit).
+2. **The operative variance is INTER-BAND / INTER-BIOME** — between bands in different biomes, scaled by band size / population density — which is exactly what **R-12/R-13 produced** (the arid↔lush mortality gradient; density-disease regulating per biome).
+3. **Band-level starvation is a RARE / EXTREME-EVENT mode, not the equilibrium regulator.** R-13's density-disease holds the band below the food ceiling (r→0, starvation→0). Mass starvation belongs to the catastrophe seam (§4.1.7), not the steady state.
+4. **Per-agent variance is STRATEGY-SPECIFIC — and that is where individuality is preserved.** The within-band sharing rule is the dial: **Si / egalitarian (kappa=0) → equal split → no per-agent variance** (the baseline we built, R-1…R-13); **Carbon / hierarchical (kappa>0) → `(phi+ε)^kappa`, Cred-weighted shares → per-agent variance BY STATUS** (high-Cred eat more, low-Cred squeezed). So R-5…R-13 is the **Si baseline**; the C case has real per-agent (status) variance. Individuality is NOT erased by band-level ecology — it lives in the Cred/contest sharing.
+5. **The C-vs-Si anti-fragility (R-1) IS the individualism**: under shock, C's hierarchy channels scarce food to the high-Cred core → the core persists; Si's equal sharing → everyone crashes together (the dormancy cliff). So "averaging out" is the *Si failure mode*, not a modeling choice — lumping the *ecology* to band-level does not touch the C-vs-Si difference, which is the *sharing rule on top of* it.
+6. **S0/S1 (the banked per-agent condition/provisioning machinery, "over-engineering" per R-11) is actually the Carbon mechanism** — inert under equal sharing, **live under Cred-weighted sharing** (low-status → chronically under-fed → synergy/disease bites differentially). Banked for the right reason, not wasted.
+
+**Scale decision (the architecture):** keep **individual agents** (the Cred/strategy/resilience core is path-dependent — Matthew effect — + discrete — small-band stochasticity — + emergent — the R-1 cliff — exactly what mean-field DENSITY smooths away; and agents are affordable at HG scale) with the **ecology running on band/biome-level rates**. Fallbacks (band-as-super-agent for continental/deep-time scale; mean-field as a fast *surrogate* only) are **deferred to concrete triggers**; we keep the **ecology-rates ↔ individual-strategy boundary clean** (cheap discipline, not premature architecture) so a future coarsening is a swap-the-consumer job. Details + triggers: MODEL_SPEC §4.7.
+
+**Consequence:** the demographic substrate (R-1…R-13) is the **validated Si/egalitarian ecological baseline**; the **C/Cred individuality is the next real layer** (kappa>0 + the demographic core) — the C-vs-Si demographic resilience test, the project's central question, now on a real ecology instead of Sugarscape. The per-agent-variance chase is closed (it was the wrong level for Si; it's the *point* for C).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
