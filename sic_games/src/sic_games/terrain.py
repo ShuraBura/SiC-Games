@@ -84,6 +84,20 @@ GAME_KCAL_STD = {
 # Applies to every biome absent from the *_STD dicts above → every biome uses the lognormal draw.
 DEFAULT_STD_FRAC = 0.10
 
+# ── Phase 1 game_mobility SEAM (per-biome migratory-game / herd-following mobility) ─────────
+# [SEAM — parameter wired, MECHANIC DEFERRED to the open-biome migration stage; MODEL_SPEC §4.1.7]
+# Normalized [0,1]: 0 = resident game (HG mobility comes from seasonal/patchy tracking, not herds);
+# 1 = fully migratory megafauna (logistical herd-following dominates mobility, Binford's collector end).
+# Anchor: Binford 2001 (residential/logistical mobility + range size by biome / effective-temperature) +
+# the forager↔collector continuum. ≈0 in the calibration biomes (forest/desert) → migration is OFF there
+# BY CONSTRUCTION (resolves red-team RT-4). Biomes absent here (wetland/mountain/water) → 0.
+GAME_MOBILITY = {
+    BIOME_FOREST:  0.0,   # Aché — resident forest game; mobility from seasonal/patchy tracking, not herds
+    BIOME_DESERT:  0.0,   # !Kung — resident desert game (gemsbok); residential foragers
+    BIOME_SAVANNA: 0.2,   # Hadza — dry-season AGGREGATION (access), not true range-shift (§4.1.5)
+    BIOME_GRASS:   1.0,   # steppe/grassland — migratory ungulates (Nunamiut caribou, plains bison): logistical herd-following
+}
+
 # ── Lognormal cell-value rescale (Phase 1, 2026-06-15) ─────────────────────
 def _lognormal_rescale(field_norm: np.ndarray, mask: np.ndarray,
                        mean: float, std: float) -> np.ndarray:
@@ -253,6 +267,9 @@ class WorldFields:
     # Phase 1 Blueprint A fields (added 2026-06-14)
     # [PROVISIONAL — biome-scaled from return-rate table, pending CC-1 ceiling]
     game_kcal:     np.ndarray = None  # (N,N) float64 kcal/forager-hr; 0 at wetland/mountain/water
+    # Phase 1 game_mobility seam (added 2026-06-20) — per-biome migratory-game/herd-following factor [0,1];
+    # ≈0 forest/desert (resident), finite grass/steppe (migratory). MECHANIC DEFERRED (open-biome stage).
+    game_mobility: np.ndarray = None  # (N,N) float64 [0,1]; GAME_MOBILITY[biome]. [SEAM — MODEL_SPEC §4.1.7]
     # Phase 1 climate seam (added 2026-06-18) — HOMOGENEOUS placeholders (spatially constant); the
     # spatial/seasonal (solar-forced) field is the deferred climate-season stage. [PLACEHOLDER]
     temperature:   np.ndarray = None  # (N,N) float64 °C; constant = MEAN_GLOBAL_TEMP_C
@@ -571,6 +588,11 @@ def generate_world(knobs: dict) -> WorldFields:
         std = GAME_KCAL_STD.get(b_code, DEFAULT_STD_FRAC * target_mean)
         game_kcal[mask] = _lognormal_rescale(game, mask, target_mean, std)
 
+    # ── game_mobility: per-biome migratory-game/herd-following factor (SEAM; mechanic deferred) ──
+    game_mobility = np.zeros((N, N), dtype=np.float64)
+    for b_code, val in GAME_MOBILITY.items():
+        game_mobility[biome == b_code] = val
+
     # ── Neighbour cost (N,N,4): d=0 N, d=1 S, d=2 W, d=3 E ────────────
     nc = np.ones((N, N, 4), dtype=np.float64)   # sentinel = 1.0 at edges
     nc[1:, :, 0]  = cost[:-1, :]   # north: target (y-1, x)
@@ -585,7 +607,7 @@ def generate_world(knobs: dict) -> WorldFields:
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
-                npp_gm2, is_shore, forage_kcal, game_kcal, temperature, humidity):
+                npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -595,7 +617,7 @@ def generate_world(knobs: dict) -> WorldFields:
         risk=risk, biome=biome, npp=npp, forestness=forestness,
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
-        game_kcal=game_kcal, temperature=temperature, humidity=humidity,
+        game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
     )
 
 

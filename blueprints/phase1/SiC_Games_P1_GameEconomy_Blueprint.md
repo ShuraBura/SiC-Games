@@ -65,15 +65,14 @@ partly an artifact; seasonal stress is a savanna/llanos phenomenon. Seasonal amp
 the two sharing topologies we identified (LIT-RESOLVED in §4.5.4) finally both exist: plant=kin, meat=band.
 This smooths individual hunting variance (G.2) at the band level — the realistic buffer.
 
-### G.5 — Migratory game + following (open biomes; the R-8 fix)
-**Lit-anchored, biome-gated.** A **moving game resource** (a herd field that translates seasonally across
-the terrain) in **open biomes only** (steppe/plains/tundra/savanna — migratory megafauna); resident in
-closed forest. Agents **follow** it (logistical mobility — move camp to intercept). **Anchors:** Binford
-1978/1980 (Nunamiut caribou hunters = the forager-collector model's logistical end), plains bison
-(pedestrian + equestrian), Eurasian reindeer; **Binford 2001** for mobility rates/radii by
-biome/effective-temperature. **Biome-specific rates + radii** (caribou ~100s km; bison shorter). **Addresses
-R-8** (resource-tracking restores realistic moves/yr). Couples to the movement model — the largest, most
-coupled piece; built last.
+### G.5 — Game-mobility SEAM (per-biome) — DONE; migration *mechanic* deferred
+**Resolved architecturally (supervisor, 2026-06-20):** migration is a **per-biome parameter**, not a
+monolithic mechanic. **WIRED:** `terrain.GAME_MOBILITY` dict + `WorldFields.game_mobility` per-cell field
+∈ [0,1] (MODEL_SPEC §4.1.8) — `FOREST/DESERT 0.0` (resident), `SAVANNA 0.2` (aggregation), `GRASS/steppe 1.0`
+(migratory), Binford 2001-anchored. ⇒ migration is **≈0 in the calibration biomes by construction** (resolves
+RT-4), and the open-biome stage activates only where the parameter is finite. **The mechanic — a
+seasonally-translating herd field + agent following (radius + rate sub-params), addressing R-8 under-mobility
+— is its own OPEN-BIOME stage, after δ.** 444 green (opt-in field, no consumer yet).
 
 ### Then — calibrate density-disease (δ) on the complete economy
 With G.1–G.5 in, calibrate δ to the forager e₀ (~32–37) + density (Tallavaara) + diet (Cordain), then re-run

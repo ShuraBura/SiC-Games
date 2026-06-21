@@ -168,6 +168,33 @@ Timmermann 2018 [INLINE], Cane 2005 [INLINE], Cook 2010 [INLINE], Sigl 2015 [INL
 
 ---
 
+### §4.1.8 Game-mobility seam — per-biome migratory game / herd-following (added 2026-06-20)
+
+**Status: SEAM — parameter wired, MECHANIC DEFERRED to the open-biome migration stage.**
+
+A per-biome **`game_mobility` ∈ [0,1]** (terrain.py `GAME_MOBILITY` dict → `WorldFields.game_mobility`
+per-cell field): **0 = resident game** (HG mobility comes from seasonal/patchy resource tracking, not herds);
+**1 = fully migratory megafauna** (logistical **herd-following** dominates mobility — Binford's *collector*
+end). **Architecture rationale:** migration is a *biome attribute*, not a monolithic mechanic — so it's
+≈0 in the calibration biomes (forest/desert) **by construction** (resolves Game-Economy red-team RT-4:
+migration cannot affect arid/temperate/lush), and the open-biome stage activates only where the parameter
+is finite. Fits the existing seam pattern (climate §4.3.2, pathogen §4.3.3, catastrophe §4.1.7).
+
+**Values (anchor: Binford 2001 — residential/logistical mobility + range size by biome / effective
+temperature; the forager↔collector continuum):** `FOREST 0.0` (Aché — resident forest game), `DESERT 0.0`
+(!Kung — resident, residential foragers), `SAVANNA 0.2` (Hadza — dry-season *aggregation*/access, not true
+range-shift, §4.1.5), `GRASS/steppe 1.0` (Nunamiut caribou, plains bison — migratory ungulates, logistical
+herd-following). Wetland/mountain/water → 0. **[PROVISIONAL values; the mechanic — a seasonally-translating
+herd field + agent following, with biome-specific *radius* and *rate* sub-parameters — and the precise
+Binford rate/radius extraction are the open-biome stage.]** Also addresses R-8 under-mobility there (the
+resource-tracking driver that's missing).
+
+**Interface contract:** the future migration mechanic reads `game_mobility` (and the game field) and writes
+the herd position + the agent-following movement — it MUST NOT touch the demographic state, the NPP capacity,
+or other terrain fields directly.
+
+---
+
 ## Demographic Layer: Literature Treatment (added 2026-06-18)
 
 Mortality + fertility methodology — same discipline as the resource layer: each value records its source,
