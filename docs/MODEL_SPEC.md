@@ -412,18 +412,23 @@ graded synergy — the bang-bang reserve sends a squeezed child to the floor in 
 varies by **dwelling biome** — NOT cause-decomposed output channels (channels only where needed for
 correctness). Blueprint: `blueprints/phase1/SiC_Games_P1_BiomeMortality_Blueprint.md` (+ red-team v1 §7b).
 
-### §4.6.1 Baseline de-warfaring (DECIDED 2026-06-20)
+### §4.6.1 Baseline de-warfaring (DONE 2026-06-20; RESULTS R-15)
 Frontier/colonial violence **excluded entirely** — never a modeled dynamic (it is a contact-era artifact;
 Aché ≈50%+ of forest-period deaths are conspecific violence, mostly **external warfare vs Paraguayan
-colonists**, §4.2.7). **Decision:** strip the **external-warfare** hazard from the Aché Siler (KEEP
-infanticide + disease + accident — these are pristine), re-fit a Siler, re-validate the core. **Feasibility
-(computed):** with warfare ≈0 for unweaned (their violence is infanticide, kept) and ~35% of the hazard for
-ages 4+, de-warfared **e₀ ≈ 42–44** (vs all-cause 36.5) — high but defensible for a low-violence forager,
-and crucially NOT the ~50 that stripping *all* violence would give (infanticide anchors infant mortality,
-which dominates e₀). Build task = the re-fit + re-validation (changes the validated R-3 baseline; handle as
-a science change). *Note: precise Aché Table 5.1 age×cause %s are a non-text-extractable formatted table;
-the de-warfaring uses the documented aggregate + age-pattern, cross-checkable against the Hiwi Table 5 rates
-which DO extract.*
+colonists**, §4.2.7). **Procedure:** strip the **external-warfare** hazard fraction by age `w(x)` from the
+Aché-total Siler (KEEP infanticide + disease + accident — pristine), `h_dewar(x) = h_total(x)·(1−w(x))`, and
+**re-fit a Siler** by least-squares. **`w(x)`:** ≈0 for unweaned (0–3 yr; their violence is infanticide,
+kept), **0.35** for ages 4–59, **0.25** for ≥60 (documented Aché aggregate + age-pattern; Table 5.1 age×cause
+%s are a non-text-extractable formatted table — cross-checked against the Hiwi Table 5 rates).
+**Result — `ACHE_FOREST_NATURAL` (demography.py):** `a1=0.1611, b1=0.6775, a2=0.00813, a3=3.781e-5,
+b3=0.1025` → **e₀=42.7, e₁₅=45.0** (vs Aché-total 36.4/38.3; fit residual negligible). The change is
+concentrated in the **Makeham a2 (0.013→0.0081)** — external warfare was the age-independent *adult* hazard;
+infant a1 ≈ unchanged (infanticide kept). NOT the ~50 a full violence-strip would give. **Status:** OPT-IN
+(passed via `DemographyConfig.siler_*` in biome runs; the default config keeps the validated Aché-total so
+R-3 + the 444 suite are unchanged — this is *not* a silent change to the core). **Why it was the prerequisite
+(R-15):** density-disease on the Aché-*total* baseline double-counts the disease the Siler already encodes →
+e₀ caps at ~28 (Hiwi-like). On `ACHE_FOREST_NATURAL` (e₀=42.7), density-disease regulates *down* to the
+realistic ~34–36 (Aché-matched) without the double-count.
 
 ### §4.6.2 Biome → mortality channel
 Primary channel is **disease ecology** (pathogen load by climate/NPP), with **nutrition a seasonal,

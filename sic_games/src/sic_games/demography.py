@@ -101,6 +101,17 @@ def _sex_split(both: SilerParams, childhood_mf: float = _CHILDHOOD_MF,
 
 ACHE_FOREST_FEMALE, ACHE_FOREST_MALE = _sex_split(ACHE_FOREST)
 
+# De-warfared "natural mortality" baseline (Biome-Mortality, 2026-06-20; RESULTS R-15, MODEL_SPEC §4.6.1).
+# The Aché TOTAL Siler includes ~50% frontier/external warfare (a contact-era artifact, supervisor: "does not
+# belong in the model"). Stripping the external-warfare hazard by age (≈0 unweaned — infanticide KEPT —;
+# ~0.35 ages 4–59; ~0.25 ≥60) and re-fitting a Siler to h_total·(1−w) gives this "natural mortality"
+# schedule: **e₀=42.7, e₁₅=45.0** (vs Aché-total e₀=36.4). The change is concentrated in the Makeham a2
+# (0.013→0.0081) — warfare was the age-independent adult hazard; infant a1 ~unchanged (infanticide kept).
+# Used as the biome-mortality baseline: density-disease then regulates it DOWN to the realistic ~34–36
+# (Aché-matched) WITHOUT the R-15 double-count. OPT-IN — pass these via DemographyConfig.siler_* in biome
+# runs; the default config keeps the validated Aché-total (R-3) so existing runs/tests are unchanged.
+ACHE_FOREST_NATURAL = SilerParams(a1=0.1611, b1=0.6775, a2=0.00813, a3=3.781e-5, b3=0.1025)
+
 
 # ---------------------------------------------------------------------------
 # Life-table metrics — for validating a schedule against the Aché anchors.

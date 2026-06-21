@@ -23,7 +23,7 @@ except Exception:
     pass
 
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
-from sic_games.demography import DemographyConfig
+from sic_games.demography import DemographyConfig, ACHE_FOREST_NATURAL as NAT  # de-warfared baseline (R-15)
 from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world
 import importlib.util as _iu
@@ -53,7 +53,9 @@ def run_one(delta, seed=SEED):
                                                    contest_exponent=0.0, move_cost_flat=0.0),
                      harvest_field=cap, placement_positions=pos,
                      demography_cfg=DemographyConfig(enable_density_disease=(delta > 0.0),
-                                                     dens_delta=delta, dens_rho_half=0.2))
+                                                     dens_delta=delta, dens_rho_half=0.2,
+                                                     siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2,
+                                                     siler_a3=NAT.a3, siler_b3=NAT.b3))   # de-warfared baseline
     nb = len(EDGES) - 1
     expo = [0] * nb; dband = [0] * nb; starv = 0; senesc = 0
     def band(a):

@@ -286,6 +286,7 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | Siler a2 (Makeham) | **0.013**/yr | LOCKED | " — the ONLY term the world modulates (a2_mult) |
 | Siler a3 (Gompertz) | **4.80e-5**/yr | LOCKED | " . Sex-split ♀3.89e-5/♂5.71e-5 |
 | Siler b3 | **0.103** | LOCKED | " . Reproduces e₀=36.5, e₁₅=38.3, mode=71 |
+| **De-warfared Siler** (ACHE_FOREST_NATURAL) | a1=**0.1611**, b1=**0.6775**, a2=**0.00813**, a3=**3.781e-5**, b3=**0.1025** → e₀=**42.7** | OPT-IN (biome runs) | Aché-total minus external-warfare (w(x): 0 unweaned / 0.35 ages 4–59 / 0.25 ≥60); re-fit. Change in a2 (warfare = adult Makeham). Fixes the R-15 double-count → density-disease regulates to ~34–36 (Aché-matched). §4.6.1 |
 | Childhood M:F ratio | **0.71** | LOCKED | H&H 1996 Ch.6 forest (M-3); scales a1 (female-higher) |
 | Adult M:F ratio | **1.47** | LOCKED | " ; scales a3 (male-higher) |
 | Fecundability | **~0.12**/mo | LOCKED (calibrated) | bisection to Aché IBI=37 mo / TFR≈8; r=+3.3%/yr emergent. §4.2.5 |
