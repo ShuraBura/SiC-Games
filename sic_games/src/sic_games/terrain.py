@@ -79,6 +79,18 @@ GAME_KCAL_STD = {
     # GRASS absent → DEFAULT_STD_FRAC fallback (10% of mean; Hurtado & Hill 1987 variance source not in repo)
 }
 
+# ── Cordain 2000 Table 2 — diet meat-fraction by biome (MODEL_SPEC §4.5.5) ──────────────────
+# The animal (hunted) fraction of the *terrestrial* diet = hunted / (plant + hunted), at class-interval
+# midpoints, with the fished column DROPPED (the model has a forage + game economy, no aquatic stream).
+# Source: Cordain et al. 2000, AJCN 71:682–692, Table 2 (mean subsistence dependence by primary living
+# environment, n=63). Used by DemographyConfig.game_meat_frac to split the cell yield (forage + meat).
+MEAT_FRAC = {
+    BIOME_FOREST:  0.55,   # Subtropical rain forest (Aché): hunted 50.5 / (plant 40.5 + hunted 50.5)
+    BIOME_DESERT:  0.45,   # Desert grasses & shrubs (!Kung): 40.5 / (50.5 + 40.5)
+    BIOME_SAVANNA: 0.38,   # Tropical grassland (Hadza): 30.5 / (50.5 + 30.5)
+    BIOME_GRASS:   0.66,   # Temperate grasslands (steppe/plains): 60.5 / (30.5 + 60.5)
+}
+
 # Fallback spread when a biome's std is NOT literature-anchored: std = DEFAULT_STD_FRAC × mean.
 # Supervisor rule (2026-06-15): "if [literature std] not available use 10% of the value as std."
 # Applies to every biome absent from the *_STD dicts above → every biome uses the lognormal draw.

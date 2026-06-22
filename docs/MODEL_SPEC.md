@@ -404,6 +404,49 @@ surplus to own children → child draws deficit toward its cap → mother death 
 0.3 = 68× pulse, on children; adults stay fed). **CAVEAT:** routes through the hard starvation floor, NOT
 graded synergy — the bang-bang reserve sends a squeezed child to the floor in ~1 step, too fast to dwell.
 
+### §4.5.5 Game/meat two-stream economy (G.1+G.2; the Carbon substrate; added 2026-06-21)
+
+**Purpose (blueprint v2):** the validated economy is forage-only and **low-variance**, so the Cred-weighted
+sharing lever (κ) has almost nothing to act on. **Meat** is the high-variance, **band-shared**, status/
+reciprocity resource (Kaplan & Hill 1985; Hawkes 1991; §4.5.4) — the resource where a hierarchical (Carbon)
+vs egalitarian (Silicon) sharing rule diverges. This stage splits the cell yield into the two streams so the
+Carbon mechanism has a substrate. **Not** a δ/e₀ fix (settled, R-13/R-15/R-16/R-17) and **not** a density fix
+(energy is conserved — RT-E); it is the economic substrate for the status hierarchy.
+
+**Mechanism (`phase1_model.py:_step_rivalrous`, opt-in `DemographyConfig.enable_game`/`game_meat_frac`):**
+the per-cell yield `S` is split `S_forage = (1−mf)·S`, `S_meat = mf·S`, and distributed by two calls to
+`compute_harvest_shares`: **forage at a literal `κ=0`** (household / equal — plant food is not the status
+resource) and **meat at the substrate `κ` (`contest_exponent`)** — band-pooled, Cred-weighted `(φ+ε)^κ` for
+Carbon agents. Intake `= η(age)·(forage_share + meat_share)`. **Energy-conserving:** at κ=0 the sum is
+identical to the single stream (exact back-compat — the inertness gate, `test_game_economy.py`); at κ>0 meat
+redistributes toward high-Cred Carbon agents while forage stays equal (RT-B: κ is applied to meat only, never
+double-applied to both halves).
+
+**`mf` = `game_meat_frac` = diet animal fraction by biome — Cordain et al. 2000, AJCN 71:682, Table 2**
+(mean subsistence dependence by primary living environment, n=63). The model has a forage+game economy with
+**no aquatic stream**, so `mf` is the **terrestrial-renormalized** hunted fraction `hunted/(plant+hunted)` at
+class-interval midpoints, **fished column dropped** (`terrain.MEAT_FRAC`):
+
+| Model biome | Cordain environment | plant / hunted / fished (%) | `mf` = h/(p+h) |
+|---|---|---|---|
+| FOREST (Aché) | Subtropical rain forest | 40.5 / 50.5 / 10.5 | **0.55** |
+| DESERT (!Kung) | Desert grasses & shrubs | 50.5 / 40.5 / 10.5 | 0.45 |
+| SAVANNA (Hadza) | Tropical grassland | 50.5 / 30.5 / 20.5 | 0.38 |
+| GRASS (steppe/plains) | Temperate grasslands | 30.5 / 60.5 / 10.5 | 0.66 |
+
+Cordain finding used: hunted-animal dependence is ~latitude-invariant (~26–35%, r=0.08 n.s.); the latitude
+gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by environment, not a latitude law.
+**`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs; the per-biome
+`terrain.MEAT_FRAC` dict is the home for a future per-cell wiring.
+
+**DEFERRED (documented, not built):** (a) **meat not η-discounted** — currently η(age) multiplies the *summed*
+intake, so a child's received meat share is production-discounted; the lit-faithful refinement (band sharing
+feeds dependents regardless of their own production → meat share *not* η-scaled) would let meat-sharing buffer
+the dependent class, a separate increment. (b) **G.3 stochastic meat returns** (per-biome CV; band-level
+correlated draw) — the inter-band/temporal variance for the resilience shock; deferred to the C/Cred stage.
+(c) **Cred dynamics in the rivalrous path** — φ is currently uniform (0.5) on the demographic path, so κ-on-meat
+is correct-but-uniform until the Carbon Cred/status evolution is coupled in (the C/Cred stage proper).
+
 ---
 
 ## Mortality architecture — decisions, decouplings, neglects (added 2026-06-20; Biome-Mortality blueprint)

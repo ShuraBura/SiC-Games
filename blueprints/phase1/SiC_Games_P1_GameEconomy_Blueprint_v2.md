@@ -1,9 +1,17 @@
 # SiC Games · Phase 1 · **Game / Hunting Economy — v2 (the C-vs-Si substrate)**
 
-**Status:** DRAFT for red-team (2026-06-21). Supersedes v1 (`SiC_Games_P1_GameEconomy_Blueprint.md`),
-whose motivation ("add game *before* calibrating δ") was overtaken by R-13/R-15/R-16/R-17. v1 + its
-sub-agent red-team (§5b there) are kept as the audit trail; this v2 carries every v1 red-team fix forward
-(RT-1…RT-5) and re-frames the purpose around the now-settled demographic substrate.
+**Status:** **G.1 + G.2 BUILT 2026-06-21** (commit pending; `demography.py` `enable_game`/`game_meat_frac`,
+`terrain.MEAT_FRAC`, `phase1_model._step_rivalrous` two-stream split, `test_game_economy.py`, MODEL_SPEC
+§4.5.5, PARAMETERS §16). Red-teamed (§6b, APPROVE-WITH-FIXES, all applied). G.3 deferred. Supersedes v1
+(`SiC_Games_P1_GameEconomy_Blueprint.md`), whose motivation ("add game *before* calibrating δ") was overtaken
+by R-13/R-15/R-16/R-17. v1 + its sub-agent red-team (§5b) are kept as the audit trail; v2 carries every v1
+fix (RT-1…RT-5) forward.
+
+**Supervisor scope (2026-06-21):** near-term goal is a **working Carbon (hierarchical, κ>0) simulation**;
+**Silicon is deferred** as the eventual comparison (the "C-vs-Si" language below is the long-run frame, not
+the current target). First Carbon biome = **forest (Aché)**: best-anchored on both meat rate (5541 kcal/hr)
+and variance (CV 0.73), and the e₀-validated demographic baseline (R-17). `meat_frac(forest)=0.55` — a
+majority-meat diet, so the high-variance game stream carries most forest calories → a real κ substrate.
 
 ---
 

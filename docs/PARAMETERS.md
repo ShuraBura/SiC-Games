@@ -332,6 +332,9 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | temperature (climate seam) | **14.0** °C | PLACEHOLDER | constant; spatial/seasonal field = CL-1 deferred. §4.3.2 |
 | humidity (climate seam) | **0.70** | PLACEHOLDER | " |
 | game_mobility | **FOREST 0, DESERT 0, SAVANNA 0.2, GRASS 1.0** | SEAM (mechanic deferred) | Binford 2001 / forager-collector; ≈0 in calibration biomes by construction. §4.1.8 |
+| enable_game | **False** (default) | OPT-IN | Two-stream forage+meat economy (G.1+G.2). Default off = forage-only back-compat. §4.5.5 |
+| game_meat_frac (mf) | **FOREST 0.55, DESERT 0.45, SAVANNA 0.38, GRASS 0.66** | LIT-ANCHORED (Cordain 2000 Table 2) | diet animal fraction = hunted/(plant+hunted), terrestrial-renormalized (fished dropped). `terrain.MEAT_FRAC`. §4.5.5 |
+| meat sharing κ | = substrate `contest_exponent` | STRATEGY LEVER | meat split Cred-weighted (φ+ε)^κ for Carbon; forage forced κ=0. κ=0 ⇒ energy-conserving/inert (Silicon). §4.5.5 |
 
 > **§14–16 currency note (2026-06-20):** added to close the audit gap — PARAMETERS.md had not been updated
 > since 2026-06-14 (§13) through the entire demographic + resource-ecology + biome + game arc (R-2…R-14).

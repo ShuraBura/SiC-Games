@@ -313,10 +313,21 @@ class TerrainWorld(mesa.Model):
             occ_lists.setdefault(a.pos, []).append(a)
         demog = self._demog
         provisioning = demog is not None and demog.enable_provisioning
+        game_on = demog is not None and demog.enable_game and demog.game_meat_frac > 0.0
+        meat_frac = demog.game_meat_frac if game_on else 0.0
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
-            shares = compute_harvest_shares(occ, S, kappa, phi_eps)
+            if game_on:
+                # Two-stream economy (§4.5.5 / blueprint v2): forage = household (literal κ=0); meat =
+                # band-pooled, Cred-weighted at κ>0 (the Carbon mechanism on high-variance game). Energy-
+                # conserving: at κ=0 forage+meat == single stream (exact back-compat + the inertness gate);
+                # at κ>0 meat redistributes toward high-Cred Carbon agents while forage stays equal.
+                f_sh = compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps)
+                m_sh = compute_harvest_shares(occ, meat_frac * S, kappa, phi_eps)
+                shares = [f + m for f, m in zip(f_sh, m_sh)]
+            else:
+                shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             for a, sh in zip(occ, shares):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
                 total = a.wealth + intake
