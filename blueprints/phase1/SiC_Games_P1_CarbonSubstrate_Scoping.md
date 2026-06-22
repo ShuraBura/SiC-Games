@@ -1,21 +1,32 @@
 # SiC Games · Phase 1 · **Carbon-on-Substrate (Cred coupling)** — Scoping draft
 
-**Status:** SCOPING — **red-teamed 2026-06-21, verdict NEEDS-REVISION; revised below** (red-team record §9).
+**Status:** SCOPING — red-teamed 2026-06-21 (NEEDS-REVISION), **then supervisor-corrected** (the red-team
+*and* the first revision over-corrected into a "shock/catastrophe" frame — wrong; see the central finding).
 Goal: a **working Carbon (hierarchical) simulation** — bring the Cred/status dynamics onto the validated
 demographic substrate so κ-weighted meat sharing produces a real status hierarchy with anti-fragile
 demographics. **Silicon deferred.** Builds on the game economy G.1+G.2 (commit c8d3f31, §4.5.5).
 
-> **THE RED-TEAM'S CENTRAL FINDING (governs everything below).** On this substrate the Cred advantage is
-> **inert at equilibrium by construction** — *two stacked wash-outs*: (1) the **bang-bang cap** (R-8) clips a
-> high-Cred agent's larger meat share to the same `reserve_full` cap (`min(total,cap)`, `phase1_model.py:335`)
-> → the surplus is discarded/overflowed, not a survival buffer; (2) **fertility-pinning at r=0** (R-16/R-17) —
-> density-disease supplies *whatever* excess mortality holds deaths=births, so any cred-driven survival edge
-> for the core is **compensated away** elsewhere (the same lever that ate the +6.2 yr de-warfaring to 0.0).
-> **⇒ The Carbon advantage is an inherently NON-EQUILIBRIUM phenomenon** — it appears only **below K**
-> (growth/colonization, where agents aren't cap-pinned and density-disease is slack — R-17's regime) and
-> **during/after a shock** (food, not density-disease, binds). This is not a defect: **anti-fragility (R-1)
-> was always a shock/transient property.** The revision below makes the shock/transient regime THE test and
-> explicitly predicts (and accepts) a NULL equilibrium gradient — *not* a sign of inertness.
+> **CENTRAL FINDING (supervisor-corrected 2026-06-21; governs everything below).** The Carbon advantage is
+> **compositional, not aggregate, and lives in ORDINARY foraging variance — no catastrophe needed.** Two
+> steps:
+> 1. **The red-team's wash-out is real only for a DETERMINISTIC meat economy.** Cap-pinning (R-8,
+>    `min(total,cap)` `phase1_model.py:335`) discards a high-Cred agent's larger share **only when everyone is
+>    fed to cap.** That is the current build (G.3 not yet built). **With stochastic returns (the real HG case —
+>    forest meat CV 0.73, savanna 2.24), a bad streak routinely thins the band pool below cap-for-all, and
+>    THEN the share rule decides who crosses the starvation floor.** Bad streaks / lean weeks / "no game" are
+>    *ordinary variability*, not rare shocks — so the variance itself, at its anchored magnitude (attenuated by
+>    band-pooling ~CV/√n), manufactures the sub-cap moments. **⇒ G.3 stochastic meat is the CORE mechanism, not
+>    a deferred increment.**
+> 2. **Fertility-pinning (R-16) fixes the aggregate death RATE, NOT who dies.** density-disease is a function
+>    of local density ρ, not Cred, so it **cannot preferentially spare the high-Cred core.** With status-weighted
+>    meat, starvation deaths **concentrate on the low-Cred periphery** while δ holds the aggregate at r=0. So a
+>    **Cred→survival gradient lives at ordinary stochastic equilibrium** — it is *compositional* (who dies),
+>    which R-16 does not touch, NOT *aggregate* (e₀, which R-16 pins). The red-team conflated the two.
+>
+> **⇒ A catastrophe/shock is NOT required** (the prior framing was wrong). The primary test is the **Cred–survival
+> correlation under ordinary variance**; a big shock is only an *amplified* version, optional/secondary. Whether
+> the gradient is large enough to matter (band size, CV, floor-proximity) is **empirical — the model measures
+> it**, not asserted. **No RESULT recorded** until the model shows it with stats (this is a design hypothesis).
 
 ---
 
@@ -48,30 +59,33 @@ drive it from cred. **Recommend (a)** — a `status_of(agent)` hook so the conte
 the demographic path):** (i) the hook **defaults to `φ`** (preserves `test_substrate.py:59` /
 `test_game_economy.py` which assert φ-weighting) and returns **`cred` only under the carbon flag**; (ii)
 **cred-seeding is MANDATORY** when the hook reads cred — `cred` defaults to 0.0 (`base.py:74`), so an unseeded
-carbon run collapses every weight to `(0+ε)^κ` (uniform). This single change makes the hierarchy *bite* on
-meat — but only in the non-equilibrium regime (see the central finding).
+carbon run collapses every weight to `(0+ε)^κ` (uniform). This makes the hierarchy *bite* on meat — but the
+gradient only **materializes when meat is stochastic** (G.3): a uniform-share cap-pinned band shows nothing
+(central finding).
 
 ## 3. D2 (the crux) — what is the Cred SOURCE on a forager substrate?
 
 The Oracle earns Cred via joint tasks. Foragers don't co-work on sugar cells. Three options:
 
+*(NB: the Cred SOURCE [A/B/C] is independent of the meat VARIANCE [G.3] — G.3 is in the first build either way;
+A vs C is only about whether status is earned or seeded.)*
 - **A — Earned from hunting/provisioning (lit-faithful; costly signaling, Hawkes 1991).** A successful hunter
-  who contributes meat to the band beyond his own need gains prestige. **Needs per-hunter variance (G.3,
-  deferred)** so there *is* a "successful hunter"; without it every occupant gets an equal deterministic meat
-  share and no one stands out. Most realistic, most work, and carries the **runaway risk** (Cred→more meat→
-  more Cred) the Oracle already had to guard (fc_sweep `_cred_runaway`, >5%/100 steps).
+  who contributes meat to the band beyond his own need gains prestige. G.3's per-hunter variance is what makes
+  one hunter "stand out." Most realistic, most work, and carries the **runaway risk** (Cred→more meat→more
+  Cred) the Oracle already had to guard (fc_sweep `_cred_runaway`, >5%/100 steps).
 - **B — Port joint tasks** (cooperative hunts as the "task"). Reuses machinery but is awkward on the forager
   substrate and re-imports the Sugarscape framing we're trying to leave.
 - **C — Heritable status, seeded (minimal; isolates the consequence).** Don't *earn* Cred; **seed** a Cred
-  distribution and **inherit** it at IBI birth (mother's cred ×noise, or `f_C·mean_cred`). Cred-weighted meat
-  gives high-Cred lineages a survival/fertility edge; the hierarchy persists by **differential survival**, not
-  earning. Tests directly: *does a heritable status hierarchy produce anti-fragile demographics under shock?*
+  distribution and **inherit** it at IBI birth (mother's cred ×noise, or `f_C·mean_cred`). Cred-weighted meat,
+  **under G.3 variance**, gives high-Cred lineages a survival edge in bad streaks; the hierarchy persists by
+  **differential survival**, not earning. Tests directly: *does a heritable status hierarchy concentrate
+  bad-streak mortality on the periphery and protect the core?*
 
 **Recommendation: C-first, then A.** C isolates the project's actual question (does a Cred hierarchy →
-anti-fragility on real demography?) with minimal new mechanism and **no runaway risk** (no Cred→Cred feedback;
-the only dynamics are inheritance + selection). Once C shows the anti-fragility signature, **A** makes the
-hierarchy *endogenous* (earned from hunting, needs G.3 + the runaway guard) as increment 2. **B** rejected
-(Sugarscape re-import).
+anti-fragility on real demography?) with minimal new mechanism and **no Cred→Cred runaway** (the only dynamics
+are inheritance + selection; G.3 supplies the *external* variance, not a feedback). Once C shows the
+compositional gradient, **A** makes the hierarchy *endogenous* (earned from hunting + the runaway guard) as
+increment 2. **B** rejected (Sugarscape re-import).
 
 **C-first decay decision:** with no earning, per-step `cred_decay` would erode all Cred → flat. So **C-first
 runs decay OFF (cred is a persistent heritable trait)**; decay returns with the earning source (A) that
@@ -92,34 +106,44 @@ balances it. Document this explicitly.
 
 ## 5. Minimal first build (in / out) — REVISED
 
-**IN:** D1 (`status_of` hook, φ-default / cred-under-carbon-flag, mandatory seeding) · D3(i) (heritable cred at
-birth + founder seeding from the model RNG) · a `carbon` TerrainWorld path (`carbon_cfg` already wires
-`strategy="carbon"`, `_make_agent:196`) · **a shock hook in the rivalrous path** — confirmed NOT to exist
-(`PerturbationConfig` is Oracle-only; `phase1_model.py` has no perturbation/season multiplier), so **build it
-as a time-varying `harvest_field` wrapper** (the R-6 `run_2d` seasonal harness already modulated the field
-externally — reuse that pattern; no deep model change) · the **post-shock-recovery harness**, κ>0 vs κ=0, on
-**forest-Aché** (meat_frac 0.55). Decay OFF, β=0.
-**Isolate the confound (RT-6):** seeding cred **silently activates the movement-temperature coupling**
-(`diffusion_select_target` reads `agent._decision.temperature` → `tanh(cred/scale)`, `carbon.py:47`; neutral
-only at cred=0). For the meat-isolation run, **hold temperature at σ_base** (or measure movement dispersion as
-a separate channel) so the meat-share effect isn't confounded by cred-driven exploration.
-**OUT (increments):** A earned-Cred + G.3 hunting variance + the (re-statisticked) runaway guard; B joint
-tasks; D5 β; the Silicon comparison; multi-biome.
+**IN:**
+- **D1** — `status_of` hook (φ-default; `cred` only under the carbon flag; **seeding mandatory**) in
+  `compute_harvest_shares` + `occ_wsum` so the meat/contest weight is `(status+ε)^κ`.
+- **G.3 stochastic meat (NOW CORE, was deferred)** — per-hunter lognormal meat draw with the **per-biome CV**
+  (`terrain.GAME_KCAL_STD`; forest 0.73), as a **band-level correlated draw** (a shared per-cell encounter
+  shock, not N independent draws that wash to ~CV/√n), from `agent.random`. This is the variance that creates
+  the sub-cap moments where the share rule decides survival. *Without it the first build is null (red-team).*
+- **D3(i)** — heritable cred: founder seeding (lognormal, model RNG) + `child.cred = mother.cred·(1±σ)` at
+  `_do_births_ibi`. Decay OFF, β=0.
+- **carbon path** — `carbon_cfg` already wires `strategy="carbon"` (`_make_agent:196`). **Isolate the
+  movement confound (RT-6):** seeding cred silently activates the temperature coupling
+  (`diffusion_select_target` → `agent._decision.temperature` → `tanh(cred/scale)`); **hold σ_base** for the
+  meat-isolation run (or measure dispersion separately).
+- **Diagnostics + harness** — the Cred–survival correlation + Gini(cred) over a forest-Aché run, **κ>0 vs κ=0**.
 
-## 6. First forest-Aché Carbon run — what it measures (REVISED: regime-aware)
-**Equilibrium gradient is NULL by construction (predicted, not a failure)** — do not lead with it; cap-pinning
-+ fertility-pinning erase it (central finding). The signal is in the **non-equilibrium** regimes:
-1. **PRIMARY — post-shock recovery (the R-1 anti-fragility test):** apply a resource crash (a time-varying
-   `harvest_field` wrapper — §5) to a settled population; measure whether κ>0 (Carbon) **retains a reproducing
-   high-cred core and recovers faster**, vs κ=0 (egalitarian) dipping collectively. The cred–survival
-   correlation should go **positive during the shock** (when food binds) and ~0 at equilibrium.
-2. **SECONDARY — below-K transient (R-17 regime):** in the growth phase (agents below cap, density-disease
-   slack), is there a cred→reserve→survival/parity gradient? This is the *other* place the advantage can live.
-3. **Hierarchy is stable, not drifting/runaway:** gate on **Gini(cred) drift + the cred–survival
-   correlation**, NOT `mean_cred` slope (RT-5: a multiplicative noisy-copy inflates Gini/variance while leaving
-   mean flat, so the fc_sweep mean-slope guard would miss it).
+**OUT (later increments):** earned/endogenous Cred (prestige-from-provisioning) + decay + the re-statisticked
+runaway guard; an *optional amplified* catastrophe shock (time-varying `harvest_field` wrapper, R-6 `run_2d`
+pattern — confirmed absent in the rivalrous path; **not needed for the first test**); D5 β; Silicon comparison;
+multi-biome. *(Note: G.3 moved from OUT→IN per the central finding — it is the mechanism, not a refinement.)*
+
+## 6. First forest-Aché Carbon run — what it measures (regime-aware)
+The **aggregate** e₀ is fertility-pinned (R-16) and will be ~unchanged by κ — that is *correct*, not the test.
+The signal is **compositional** and lives in the **ordinary stochastic variance** (G.3), no catastrophe needed:
+1. **PRIMARY — the Cred–survival gradient under ordinary variance:** with G.3 on, does κ>0 (Carbon)
+   **concentrate starvation deaths on the low-Cred periphery** while the high-Cred core persists (cred–survival
+   correlation **> 0**), vs κ=0 (egalitarian) spreading deaths evenly (correlation ~0)? This is anti-fragility
+   (R-1) in its native form — *who* the bad streaks kill. Measured at stochastic equilibrium; **no shock**.
+2. **Magnitude is empirical:** report the gradient as a function of **band size** (pooling shrinks band CV
+   ~CV/√n) and **floor-proximity** — it may be modest in the forest (CV 0.73) and large in the savanna (2.24).
+   A null *here* (with G.3 on) would be the real "Carbon inert on this substrate" finding; a null *without* G.3
+   is just the deterministic wash-out and tells us nothing.
+3. **Hierarchy stable, not drifting/runaway:** gate on **Gini(cred) drift + the cred–survival correlation**,
+   NOT `mean_cred` slope (a multiplicative noisy-copy inflates Gini/variance while leaving mean flat → the
+   fc_sweep mean-slope guard misses it).
 4. **Substrate intact:** with κ=0 (or game off) the run reproduces the validated baseline (e₀, density); 452
    green throughout (opt-in).
+5. **OPTIONAL later — amplified shock:** a catastrophe (field crash) is just a *bigger* down-fluctuation; it
+   sharpens the same compositional gradient. Build it only if the ordinary-variance signal needs amplifying.
 
 ## 7. Red-team targets (for the fresh repo-grounded sub-agent)
 RT-1: **D1 cred-vs-φ** — is reading `cred` in `compute_harvest_shares`/`occ_wsum` correct, or does φ have a
@@ -140,18 +164,16 @@ partially couple, and does that interact with diffusion movement?
 RT-7: **scope** — is D1+D3 the right minimal first build, or is the shock-test (D4) premature before
 confirming the advantage channel (RT-4) in equilibrium?
 
-## 8. Open questions for the supervisor (REVISED post-red-team)
-- **Q1:** Endorse **C-first** (heritable seeded Cred, no earning yet) as the minimal first Carbon sim, with
-  earned-Cred (A, needs G.3) as increment 2? *(Red-team caveat: C-first is legitimate ONLY in the
-  shock/transient regime — at equilibrium it tests nothing, by construction.)*
+## 8. Open questions for the supervisor (post supervisor-correction)
+- **Q1:** Endorse **C-first** (heritable seeded Cred, no earning yet) **+ G.3 stochastic meat in the first
+  build** (the variance is the mechanism), earned-Cred (A) as increment 2?
 - **Q2:** Inheritance **(i) noisy lineage copy** vs **(ii) f_C·mean_cred regression**? (Recommend i.)
-- **Q3 (resolved by the central finding):** ~~equilibrium advantage first vs shock first~~ → **shock/transient
-  is the test; equilibrium gradient is a predicted null.** Confirm you accept leading with the **post-shock
-  recovery** comparison (and the below-K transient) rather than an equilibrium gradient.
+- **Q3 (resolved):** the test is the **Cred–survival gradient under ordinary variance** (who the bad streaks
+  kill), measured at stochastic equilibrium — **no catastrophe**. A big shock is an optional later amplifier.
 - **Q4:** Decay **OFF** for C-first (persistent heritable status) — agreed?
-- **Q5 (new):** The Carbon advantage being a **non-equilibrium phenomenon** is a genuine *scientific result*
-  about this substrate, not just a build choice. Accept that framing — anti-fragility lives off-equilibrium —
-  as the stage's thesis, and record it as a RESULT?
+- **Q5 (resolved — do NOT record):** the "non-equilibrium" framing was an over-correction (supervisor); the
+  advantage lives in **ordinary stochastic variance**, not off-equilibrium. Either way it is a **design
+  hypothesis, not a RESULT** — record nothing until the model demonstrates it with statistics.
 
 ## 9. Red-team record (2026-06-21, fresh repo-grounded sub-agent) — VERDICT: NEEDS-REVISION → revised
 
@@ -173,6 +195,21 @@ The gap was conceptual — the scoping didn't follow its own R-16/R-17 to the co
   run (§5).
 - **[MINOR → resolved] D1 breaks φ tests + unseeded-cred uniformity:** `status_of` **defaults to φ**, cred only
   under the carbon flag; **seeding mandatory** (§2).
+
+### 9b. Supervisor correction (2026-06-21) — the red-team's RT-4 was HALF right; the first revision over-corrected
+The red-team proved the **aggregate** gradient is washed out (cap-pinning + fertility-pinning) and I revised
+into a **"shock/catastrophe, non-equilibrium"** frame. The supervisor caught two errors in that:
+1. **Cap-pinning only holds for a DETERMINISTIC meat economy.** Real HG meat is high-variance (CV 0.73–2.24);
+   **ordinary bad streaks** (not catastrophes) routinely thin the band pool below cap-for-all, and there the
+   share rule decides who crosses the floor. **⇒ G.3 stochastic meat is the CORE mechanism (moved OUT→IN); no
+   shock needed.** "Variability, not catastrophe."
+2. **Fertility-pinning (R-16) pins the aggregate death RATE, not the COMPOSITION.** density-disease is
+   density- not cred-keyed → it cannot spare the core → with status-weighted meat, **bad-streak deaths
+   concentrate on the low-Cred periphery at ordinary stochastic equilibrium.** The advantage is *compositional*
+   (who dies), which R-16 does not touch. The red-team conflated aggregate with distributional.
+**Net:** the "non-equilibrium/shock-first" framing is withdrawn (central finding + §5/§6 rewritten); the catastrophe
+shock is demoted to an optional later amplifier; **no RESULT is recorded** (design hypothesis until the model
+shows it with stats).
 
 ---
 

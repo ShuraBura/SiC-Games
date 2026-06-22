@@ -442,10 +442,15 @@ gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by e
 **DEFERRED (documented, not built):** (a) **meat not η-discounted** — currently η(age) multiplies the *summed*
 intake, so a child's received meat share is production-discounted; the lit-faithful refinement (band sharing
 feeds dependents regardless of their own production → meat share *not* η-scaled) would let meat-sharing buffer
-the dependent class, a separate increment. (b) **G.3 stochastic meat returns** (per-biome CV; band-level
-correlated draw) — the inter-band/temporal variance for the resilience shock; deferred to the C/Cred stage.
-(c) **Cred dynamics in the rivalrous path** — φ is currently uniform (0.5) on the demographic path, so κ-on-meat
-is correct-but-uniform until the Carbon Cred/status evolution is coupled in (the C/Cred stage proper).
+the dependent class, a separate increment. (b) **G.3 stochastic meat returns** (per-biome CV `GAME_KCAL_STD`;
+**band-level correlated** draw) — NOT a "shock": this is the **ordinary foraging variance** (forest CV 0.73,
+savanna 2.24) whose *bad streaks* push the band below cap-for-all, the regime where Cred-weighted sharing
+decides who crosses the starvation floor. **It is the CORE mechanism of the Carbon stage** (a deterministic
+meat economy is cap-pinned → Cred-inert), scoped INTO the first Carbon build (see the Carbon-substrate scoping
+blueprint). (c) **Cred dynamics in the rivalrous path** — the meat/contest weight reads `φ` (uniform 0.5), not
+`cred`; under the Carbon stage a `status_of` hook reads `cred`, seeded + heritable. The Carbon advantage is
+**compositional** (κ-weighted meat concentrates bad-streak mortality on the low-Cred periphery while
+density-disease pins only the *aggregate* rate, R-16) — to be demonstrated by the model, not asserted.
 
 ---
 
