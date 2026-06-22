@@ -188,4 +188,49 @@
 
 ---
 
+## R-16 — De-warfaring DOESN'T change the regulated e₀ — R-15's double-count diagnosis was wrong: at r=0 equilibrium e₀ is pinned by FERTILITY, not by the natural-mortality Siler. The Aché's e₀=37 is a growth-phase snapshot, not a stationary value.
+
+**Origin:** Biome-Mortality δ re-calibration on the **de-warfared** baseline (ACHE_FOREST_NATURAL, natural e₀=42.7), `outputs/phase1_biome_mortality/run_2o_delta_calibration.py`, 2026-06-20. Same temperate biome / period life table / δ-sweep as R-15, only the Siler coefficients changed (Aché-total e₀=36.5 → de-warfared e₀=42.7, +6.2 yr).
+
+**The result FALSIFIES R-15's prediction.** R-15 predicted de-warfaring would lift the regulated e₀ into the Aché range (~34–36). It did not. Side-by-side at the regulating δ=4:
+
+| baseline | natural e₀ | regulated e₀ (δ=4) | density | starv |
+|---|---|---|---|---|
+| Aché-total (R-15) | 36.5 | 28.5 | 0.065 | 0% |
+| de-warfared (R-16) | **42.7** | **28.5** | 0.065 | 0.1% |
+
+A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0.0 yr**. The whole de-warfared sweep tracks R-15 within noise (peak e₀ 28.5 @ δ=4, falling either side; no δ hits all three targets).
+
+**Why — the regulated e₀ is fertility-pinned, not mortality-pinned.** At a carrying-capacity equilibrium the population is held at **r=0**: deaths must exactly balance births. Density-disease is the free lever that supplies *whatever excess mortality* is needed to reach r=0. Lowering the natural-mortality floor (de-warfaring) just means density-disease must work *harder* — and it eats back exactly the e₀ that de-warfaring added. The two cancel. **At r=0 the equilibrium life table is determined by the FERTILITY schedule (IBI/TFR), not by the natural-mortality coefficients.** This is the classic stationary-population identity: NRR=1 ties e₀ to TFR. A forager schedule with the Aché's high fertility, held stationary, *must* have a low e₀ (~25–28) regardless of the natural Siler.
+
+**The reframe — Aché e₀=37 @ TFR≈8 is a GROWTH-phase snapshot, not an equilibrium.** Those two numbers coexist in the ethnographic record only because the observed Aché were **growing** (r>0, below K), not sitting at carrying capacity. Our model regulates *to* K (r=0), so it correctly lands at the *stationary* e₀ for the Aché fertility schedule (~28), which is genuinely Hiwi-like. **The model is behaving correctly; the target was mis-specified.** To make the model sit at e₀≈37 at equilibrium you must **lower fertility (lengthen IBI)** — not lower mortality. De-warfaring (kept, OPT-IN, §4.6.1) is still a *cleaner* natural baseline, but it is NOT the lever for equilibrium e₀.
+
+**Consequence / fork (SUPERVISOR DECISION):** the "calibrate δ to hit Aché e₀=37" goal is demographically incoherent at r=0 with Aché fertility. Options: **(A)** accept the stationary e₀~28 as correct and re-target validation to a *stationary* forager (Hiwi-like e₀ 27 is already in-range — the model may simply be *done* and correct); **(B)** calibrate to e₀≈37 by **lowering fertility** (longer IBI) and document that as the equilibrium-consistent schedule; **(C)** validate against the *growth-phase* by running the model below K (r>0, transient) and comparing the transient e₀. Re-running the multi-biome sweep on the current substrate would only re-confirm e₀~28 everywhere — **deferred pending this fork.** δ remains PROVISIONALLY ~3–4. → **Resolved by R-17: (B) rejected (launders an artifact into fertility), (C) done & confirms, (A) adopted as the equilibrium framing.**
+
+---
+
+## R-17 — Growth-phase validation CONFIRMS R-16: below K the model reproduces the Aché e₀ (38≈37) in the regime they were measured in; the equilibrium ~28 is a regime effect, not a coefficient failure. The model is correct in BOTH regimes.
+
+**Origin:** Growth-phase validation, `outputs/phase1_biome_mortality/run_2p_growth_validation.py`, 2026-06-20. Density-disease **OFF**; period life table accumulated only over a **below-K window** (density ∈ [0.005, 0.040]/km², ≪ the δ=0 equilibrium ≈0.116); two baselines (Aché-total, de-warfared); 3 seeds pooled (~450k person-years each). Option C of the R-16 fork.
+
+**What we know:** in the growth window (r ≈ +3.4–3.7 %/yr, starvation **0%**, density ≪ K) the period e₀ **recovers the input Siler**:
+
+| baseline | input Siler e₀ | growth-phase e₀ | stationary e₀ (R-16) |
+|---|---|---|---|
+| **Aché-total** | 36.5 (ethnographic Aché 37) | **38.2** | ~28 |
+| de-warfared | 42.7 | **45.1** | ~28 |
+
+(Fine age bands required: the first pass with a wide 50–120 band read e₀ ~8 yr high — a known wide-band period-table bias in a young/growing age structure; refining to `[0,1,5,10,15,20,30,40,50,60,70,80,120]` brought 44.1→38.2 and 51.5→45.1, i.e. onto the input within ~2 yr. The residual ~+2 yr is the still-open 80–120 band + finite old-age sample.)
+
+**Interpretation — the model is correct in BOTH regimes, and the e₀ gap is a *regime* difference it explains:**
+- **Growth (below K):** mortality = the natural Siler; e₀ = 38.2 ≈ **the ethnographic Aché 37**, validating the substrate *in the regime the Aché were measured in* (growing, food-ample, starvation-free). De-warfaring is now *visible* and correct (45.1 ≈ 42.7) — confirming it sets the natural-mortality **ceiling**, which only the growth regime exposes (R-16: invisible at r=0).
+- **Stationary (at K):** e₀ ~28, fertility-pinned (R-16). Genuinely Hiwi-like and in-range.
+- The **~10 yr swing (38 growth → 28 stationary)** is the stationary-population identity in action, not a calibration miss.
+
+**Resolution of the R-16 fork:** **(B) rejected** — forcing equilibrium e₀=37 by lowering fertility would launder a growth-phase artifact into a corrupted core input matching no real forager. **(A) adopted** — stationary e₀~28 is the *correct* value for a high-TFR forager at K. **(C) done** — growth-phase e₀≈37 validates the substrate. The two regimes together are a *stronger* result than hitting either number alone: the model spans the Aché (growth) and a Hiwi-like stationary state with one consistent parameter set.
+
+**Standing caveat (orthogonal to e₀, the real next constraint):** at the starvation-free δ the *density* sits at 0.065/km², **below the Tallavaara forager floor (0.1)** (R-15/R-16). No e₀ choice fixes this — it is the **forage-only carrying-capacity ceiling**. The fix is the **game/meat stream** raising per-cell K (the "add game before calibrating" call). Game economy stays on the critical path for density, independent of the now-settled e₀ question.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
