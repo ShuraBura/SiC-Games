@@ -27,6 +27,12 @@ demographics. **Silicon deferred.** Builds on the game economy G.1+G.2 (commit c
 > correlation under ordinary variance**; a big shock is only an *amplified* version, optional/secondary. Whether
 > the gradient is large enough to matter (band size, CV, floor-proximity) is **empirical — the model measures
 > it**, not asserted. **No RESULT recorded** until the model shows it with stats (this is a design hypothesis).
+>
+> **STAT-VAL UPDATE (R-18, 2026-06-21) — this framing was itself partly wrong.** The validation (N=20, CV
+> control) confirmed the compositional gradient (death-deficit t=6.5–7.5, eq_pop κ-invariant) **but the CV=0
+> control did NOT vanish** → temporal meat variance (G.3) is **not** the switch. The operative heterogeneity is
+> **SPATIAL competition near K** (crowded/poor cells → sub-cap shares deterministically), via Cred-weighted
+> harvest split **and** the movement contest. G.3 only *modulates* (peaks at moderate forest-CV). See R-18.
 
 ---
 

@@ -233,4 +233,18 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-18 — Carbon validated on the demographic substrate: a Cred hierarchy concentrates mortality on the low-Cred periphery (aggregate κ-invariant) — but the channel is SPATIAL competition near K, NOT temporal meat variance (the CV=0 control did not vanish)
+
+**Origin:** Carbon-on-substrate Tier-1 statistical validation, `outputs/phase1_biome_mortality/run_3b_carbon_statval.py`, 2026-06-21. Forest-Aché substrate (de-warfared Siler, meat_frac 0.55, δ=3), seeded heritable Cred (lognormal median 1, inherit σ=0.1), movement temperature held at σ_base (`carbon_cfg.kappa=0`). **N=20 seeds**, paired drift-control (κ>0 vs κ=0 share seeding/inheritance), sweep **κ∈{0,1,2} × meat-CV∈{0.0, 0.73, 2.24}** (control / forest / savanna). Direct measure: cred of starvation-deaths vs the living (`model.starv_cred_this_step`).
+
+**The thesis HOLDS, strongly — the Carbon advantage is compositional.** At every κ>0 and every CV, κ-weighting **concentrates starvation on the low-Cred periphery**: cred-death-deficit **+0.07…+0.12, t=6.5–7.5**, monotone in κ; mean(cred|alive) lifts **+0.04…+0.09, t=2.4–4.2**; and **eq_pop stays κ-invariant** (~550–580 across all κ). So *who* dies is Cred-graded while *how many* is fertility-pinned (R-16) — the compositional anti-fragility (R-1) reproduced on real demography, for the first time off the Sugarscape toy. The κ=0 rows are a clean null (deficit t≈0).
+
+**But a prediction was FALSIFIED — meat variance (G.3) is NOT the switch.** The pre-registered control was: at **CV=0** (deterministic meat) the gradient must vanish (the red-team's cap-pinning wash-out). **It did not** — CV=0, κ=2: Δmean_cred t=3.5***, death-deficit t=7.2. The advantage is **fully present without any temporal meat variance.**
+
+**Why — the operative heterogeneity is SPATIAL competition near carrying capacity, not temporal "bad streaks."** Near K (δ=3) cells are crowded/poor, so per-capita shares are **sub-cap deterministically** — the cap-pinning argument (everyone fed to cap → surplus wasted) is false near K. Two Cred channels are active at CV=0: (a) the **meat harvest split** (high-Cred get more of a contested cell's meat), and (b) the **cell-occupancy movement contest** (`occ_wsum`/`w_self` are also `(cred+ε)^κ`-weighted → high-Cred secure better cells). Both are variance-independent. **G.3 only MODULATES**: the effect **peaks at moderate CV** (forest 0.73: Δmean_cred +0.093, deficit +0.118) and is **lower at the extremes** — CV=0 (spatial only) *and* CV=2.24 (savanna: meat is mostly near-zero with rare over-cap jackpots → the band lives on egalitarian forage, so Cred-weight has little meat to bite on). Forest-like variance is the sweet spot.
+
+**Consequence / caveats:** (1) This **revises** the "ordinary temporal meat variance / bad streaks" framing (scoping bp central finding, §4.5.5): the channel is spatial competition near K; G.3 is a modulator, not a prerequisite. (2) **κ Cred-weights two things at once** — the meat harvest split AND the movement contest. The validated result is the *combined* Cred-competition advantage; a clean **harvest-only vs movement-only ablation** is the next step to apportion them. (3) Decay/β OFF, Gini(cred) stable (~0.23–0.27, no runaway in 700 steps). δ=3 provisional. **This is the first recorded Carbon result on the substrate; Tier-2 (earned Cred + leadership) is the next stage.**
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

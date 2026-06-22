@@ -473,14 +473,18 @@ opt-in (default flags off → the 452-baseline unchanged; suite now 461).
   Decay/earning OFF in Tier-1 (persistent heritable status). Movement temperature held at σ_base
   (`carbon_cfg.kappa=0`) to isolate the meat-share effect from the cred→exploration channel.
 
-**Preliminary result (`outputs/.../run_3a_carbon_substrate.py`, 2026-06-21; forest-Aché, meat_frac 0.55, CV
-0.73, δ=3, 3 seeds — NOT yet a validated RESULT):** drift-controlled (κ=0 vs κ>0 share seeding/inheritance),
-κ>0 **lifts mean(cred | alive)** above κ=0 — Δ **+0.091** (κ=1), **+0.128** (κ=2), monotone — while **eq_pop
-stays ~κ-invariant** (694/638/668; fertility-pinned, R-16) and Gini(cred)~0.28 (no runaway in 700 steps). I.e.
-Cred-weighted meat **concentrates bad-streak survival on the high-Cred core** (compositional anti-fragility,
-R-1) without moving the aggregate — exactly the corrected prediction. **Needs proper statistics** (more seeds,
-direct cred–survival correlation, savanna CV 2.24) before it becomes a recorded R-result. **Deferred (Tier-2):**
-earned/endogenous Cred + the leadership/Couzin–Henrich movement model (§6b of the scoping bp); decay; β.
+**VALIDATED — RESULTS R-18 (`run_3b_carbon_statval.py`, N=20 seeds, κ×CV sweep, 2026-06-21).** The thesis
+holds strongly: at every κ>0 the Cred hierarchy **concentrates starvation on the low-Cred periphery** (direct
+cred-death-deficit t=6.5–7.5, monotone in κ; mean(cred|alive) lift t=2.4–4.2) while **eq_pop stays κ-invariant**
+(fertility-pinned, R-16) — compositional anti-fragility (R-1) on real demography. **A prediction was falsified:**
+the **CV=0 control did NOT vanish** (κ=2: deficit t=7.2) — **meat temporal variance (G.3) is NOT the switch.**
+The operative heterogeneity is **spatial competition near K** (cells crowded/poor → per-capita shares sub-cap
+*deterministically*, so the cap-pinning wash-out is false near K), through TWO Cred channels: the meat harvest
+split AND the **cell-occupancy movement contest** (`occ_wsum`/`w_self` are also `(cred+ε)^κ`). G.3 only
+*modulates* — the effect **peaks at moderate forest-CV (0.73)** and falls at CV=0 (spatial only) and CV=2.24
+(savanna meat too bursty to leverage). **Caveat:** κ weights harvest *and* movement together → a harvest-only
+vs movement-only **ablation** is the next step. **Deferred (Tier-2):** earned/endogenous Cred + the
+leadership/Couzin–Henrich movement model (§6b of the scoping bp); decay; β.
 
 ---
 
