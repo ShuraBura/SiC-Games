@@ -452,6 +452,36 @@ blueprint). (c) **Cred dynamics in the rivalrous path** — the meat/contest wei
 **compositional** (κ-weighted meat concentrates bad-streak mortality on the low-Cred periphery while
 density-disease pins only the *aggregate* rate, R-16) — to be demonstrated by the model, not asserted.
 
+### §4.5.6 Carbon-on-substrate Tier-1 (the Cred hierarchy on the meat economy; built 2026-06-21)
+
+Scoping: `blueprints/phase1/SiC_Games_P1_CarbonSubstrate_Scoping.md`. Brings the Cred/status hierarchy onto
+the demographic substrate so κ-weighted meat sharing produces a **compositional** survival advantage. All
+opt-in (default flags off → the 452-baseline unchanged; suite now 461).
+
+**Mechanics built (D1 + G.3 + D3, "C-first"):**
+- **D1 `status_of(agent)` hook (`substrate.py`):** the meat/contest weight is `(status_of(a)+ε)^κ` where
+  `status_of` returns `cred` when `agent.use_cred_status` is set (the Carbon-substrate run), else the `φ` trait
+  (default — preserves the Sugarscape contest tests). Applied in `compute_harvest_shares`, the diffusion
+  `w_self`, and the `occ_wsum` movement weights.
+- **G.3 stochastic meat (`DemographyConfig.game_meat_cv`):** the cell meat pool is a **mean-preserving
+  lognormal draw**, ONE per cell (band-level correlated; all occupants share it), `μ=ln(M)−σ²/2`,
+  `σ=√ln(1+CV²)`. Per-biome CV anchors `terrain.GAME_KCAL_STD` (forest 0.73, savanna 2.24). This is the
+  *ordinary bad-streak variance* that pushes a band below cap-for-all so the share rule decides who crosses
+  the floor — **the core mechanism** (a deterministic meat economy is cap-pinned → Cred-inert).
+- **D3(i) heritable Cred (`enable_cred_status`, `cred_seed_sigma`, `cred_inherit_sigma`):** founders seeded
+  `cred ~ lognormal(median 1)`; at IBI birth `child.cred = mother.cred·exp(N(0,σ))` (noisy lineage copy).
+  Decay/earning OFF in Tier-1 (persistent heritable status). Movement temperature held at σ_base
+  (`carbon_cfg.kappa=0`) to isolate the meat-share effect from the cred→exploration channel.
+
+**Preliminary result (`outputs/.../run_3a_carbon_substrate.py`, 2026-06-21; forest-Aché, meat_frac 0.55, CV
+0.73, δ=3, 3 seeds — NOT yet a validated RESULT):** drift-controlled (κ=0 vs κ>0 share seeding/inheritance),
+κ>0 **lifts mean(cred | alive)** above κ=0 — Δ **+0.091** (κ=1), **+0.128** (κ=2), monotone — while **eq_pop
+stays ~κ-invariant** (694/638/668; fertility-pinned, R-16) and Gini(cred)~0.28 (no runaway in 700 steps). I.e.
+Cred-weighted meat **concentrates bad-streak survival on the high-Cred core** (compositional anti-fragility,
+R-1) without moving the aggregate — exactly the corrected prediction. **Needs proper statistics** (more seeds,
+direct cred–survival correlation, savanna CV 2.24) before it becomes a recorded R-result. **Deferred (Tier-2):**
+earned/endogenous Cred + the leadership/Couzin–Henrich movement model (§6b of the scoping bp); decay; β.
+
 ---
 
 ## Mortality architecture — decisions, decouplings, neglects (added 2026-06-20; Biome-Mortality blueprint)

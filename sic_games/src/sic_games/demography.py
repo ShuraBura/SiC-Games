@@ -215,6 +215,18 @@ class DemographyConfig(BaseModel):
     # Energy-conserving: at κ=0 forage+meat == the single stream (exact back-compat; default 0 = forage-only).
     enable_game: bool = False
     game_meat_frac: float = Field(0.0, ge=0.0, le=1.0)
+    # G.3 stochastic meat returns (the Carbon-stage core variance; MODEL_SPEC §4.5.5 / Carbon scoping). The
+    # cell meat pool is a mean-preserving lognormal draw with this CV (band-level correlated: ONE draw per cell,
+    # all occupants share it). 0 = deterministic (back-compat). Per-biome anchors (terrain.GAME_KCAL_STD/mean):
+    # forest 0.73, savanna 2.24, desert 0.29. The ordinary bad-streak variance, NOT a shock.
+    game_meat_cv: float = Field(0.0, ge=0.0)
+    # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
+    # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
+    # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`
+    # (cred_inherit_sigma). Decay/earning OFF in Tier-1 (persistent heritable status). See Carbon scoping bp.
+    enable_cred_status: bool = False
+    cred_seed_sigma: float = Field(0.0, ge=0.0)      # founder log-status spread; 0 = uniform (no hierarchy)
+    cred_inherit_sigma: float = Field(0.0, ge=0.0)   # lineage-copy noise at birth; 0 = exact inheritance
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""

@@ -145,6 +145,44 @@ The signal is **compositional** and lives in the **ordinary stochastic variance*
 5. **OPTIONAL later — amplified shock:** a catastrophe (field crash) is just a *bigger* down-fluctuation; it
    sharpens the same compositional gradient. Build it only if the ordinary-variance signal needs amplifying.
 
+## 6b. TIER-2 — active individualism / leadership (the Couzin–Henrich loop) [scoped 2026-06-21]
+
+Tier 1 (above) is the **passive** advantage: Cred-weighted meat shares concentrate bad-streak mortality on the
+periphery, on a *static* spatial economy. But the defining Carbon individualism is **active**: high-Cred agents
+**lead** — they actively seek high-reward / high-variance cells (game), **peel off** viable cells to chase
+bigger rewards elsewhere, and **pull companions with them** (they lead the band; the band follows in *most*
+cases, not all). This is **not yet in the code**: the rivalrous movement (`diffusion_select_target`,
+`substrate.py:66`) is a **purely local** (von-Neumann r=1) per-capita-yield softmax with **trait hooks held
+neutral** (`affinity=1, crowd=1`, line 89) — no goal-seeking, no leadership, no prestige-cohesion.
+
+**Models to build it from (validated literature):**
+- **Couzin et al. 2005 (Nature 433:513)** — informed-minority leadership in collective motion: each agent
+  balances a **private goal direction** vs **group cohesion**; a few informed individuals (leaders) steer the
+  group *without signaling identity*. The mechanics of "leaders pull, band follows."
+- **Couzin et al. 2011 (Science 334:1578)** — when leaders pull different ways, the band's **consensus vs
+  split** depends on numbers + conviction → "**most cases, not all**" + band fission, for free.
+- **Henrich & Gil-White 2001 (Evol. Hum. Behav. 22:165)** — **prestige-biased** deference/copying: low-status
+  follow high-status. Grounds *why* low-Cred follow high-Cred (Cred = prestige) → cohesion biased toward
+  **high-Cred neighbors**, not the band centroid.
+- **Hawkes show-off / costly signaling** (our meat anchor) — the high-status hunter *leads* risky high-reward
+  hunts; leadership and prestige are one loop.
+
+**How it implements (activates the existing neutral hooks):** movement utility per agent becomes a tug-of-war
+`U(cell) = w_goal·goal_pull + w_cohesion·prestige_cohesion − move_cost`, with `w_goal/w_cohesion` from the
+existing `CarbonDecision.w_C_eff(cred)`. **Leader (high Cred):** large `w_goal`, **risk-seeking** goal_pull
+(values the high-variance *game* cell's upside, not just the mean), small cohesion → peels off. **Follower (low
+Cred):** small `w_goal`, large cohesion **toward high-Cred neighbors** → follows. Softmax temperature → "mostly,
+not always" + splits. Two real pieces: (a) a **non-local goal** (leaders perceive/aim at the best cell in a
+radius — extend perception beyond r=1); (b) the **prestige-cohesion** term.
+
+**When + why it pairs with earned Cred (NOT Tier 1):** "high-Cred chases higher Cred" only *closes* when chasing
+high-reward game **earns** Cred (the show-off circuit: lead → big kill [G.3 upside] → share wide → gain prestige
+→ lead more). In the seeded C-first build, Cred doesn't grow from chasing, so leadership has no feedback. ⇒
+**Tier-2 = leadership + earned-Cred TOGETHER** (Couzin movement + risk-seeking + Henrich prestige-cohesion +
+prestige-from-big-kills, runaway-guarded). This is also where anti-fragility (R-1) gets its **spatial** form:
+Carbon leaders explore high-variance opportunity (find resources after a shock) while egalitarian Si stays put
+(dormancy) — exploration-vs-dormancy. Build **after** Tier 1 confirms the passive compositional gradient.
+
 ## 7. Red-team targets (for the fresh repo-grounded sub-agent)
 RT-1: **D1 cred-vs-φ** — is reading `cred` in `compute_harvest_shares`/`occ_wsum` correct, or does φ have a
 defined role that breaks? Does any existing test/path assume the φ-weight? Is a `status_of` hook clean?

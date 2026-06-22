@@ -44,6 +44,8 @@ deterministic founder-cluster layout instead of random land sampling.
 """
 from __future__ import annotations
 
+import math
+
 import mesa
 
 from sic_games.agents.base import BaseAgent
@@ -55,7 +57,7 @@ from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConf
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
 )
-from sic_games.substrate import compute_harvest_shares, diffusion_select_target
+from sic_games.substrate import compute_harvest_shares, diffusion_select_target, status_of
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
 
@@ -176,6 +178,9 @@ class TerrainWorld(mesa.Model):
             agent.pos = pos
             if self._demog is not None:
                 agent.age = self._sample_founder_age()   # staggered founders (stationary ∝ l(x))
+            if getattr(agent, "use_cred_status", False) and self._demog.cred_seed_sigma > 0.0:
+                s = self._demog.cred_seed_sigma          # founder status ~ lognormal(median 1) → the heritable hierarchy
+                agent.cred = math.exp(self.random.normalvariate(0.0, s))
             self.agent_list.append(agent)
             self.occupied.add(pos)   # set: founder stacking (many agents, one cell) is allowed
 
@@ -229,6 +234,9 @@ class TerrainWorld(mesa.Model):
         )
         agent.months_since_birth = 10**9   # IBI counter (huge → first birth not blocked by refractory)
         agent.parity = 0
+        # Carbon-on-substrate: when ON, the meat/contest weight reads `cred` (status), not `φ` (status_of hook).
+        agent.use_cred_status = (self._carbon_cfg is not None and self._demog is not None
+                                 and getattr(self._demog, "enable_cred_status", False))
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
@@ -280,7 +288,7 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             occ_count[a.pos] = occ_count.get(a.pos, 0) + 1
             if occ_wsum is not None:
-                wt = (a.phi + phi_eps) ** kappa if a.strategy == "carbon" else 1.0
+                wt = (status_of(a) + phi_eps) ** kappa if a.strategy == "carbon" else 1.0
                 occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
@@ -301,7 +309,7 @@ class TerrainWorld(mesa.Model):
                     del occ_count[old]
                 occ_count[target] = occ_count.get(target, 0) + 1
                 if occ_wsum is not None:
-                    wt = (agent.phi + phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
+                    wt = (status_of(agent) + phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
                     occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
                     occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
                 agent.pos = target
@@ -315,6 +323,7 @@ class TerrainWorld(mesa.Model):
         provisioning = demog is not None and demog.enable_provisioning
         game_on = demog is not None and demog.enable_game and demog.game_meat_frac > 0.0
         meat_frac = demog.game_meat_frac if game_on else 0.0
+        meat_cv = demog.game_meat_cv if game_on else 0.0
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
@@ -323,8 +332,15 @@ class TerrainWorld(mesa.Model):
                 # band-pooled, Cred-weighted at κ>0 (the Carbon mechanism on high-variance game). Energy-
                 # conserving: at κ=0 forage+meat == single stream (exact back-compat + the inertness gate);
                 # at κ>0 meat redistributes toward high-Cred Carbon agents while forage stays equal.
+                meat_pool = meat_frac * S
+                if meat_cv > 0.0 and meat_pool > 0.0:
+                    # G.3: band-level correlated stochastic meat — ONE mean-preserving lognormal draw per cell
+                    # (shared by all occupants). Ordinary bad-streak variance; the regime where the share rule
+                    # decides who crosses the floor (Carbon scoping). One model-RNG draw → deterministic.
+                    sig = math.sqrt(math.log(1.0 + meat_cv * meat_cv))
+                    meat_pool = math.exp(self.random.normalvariate(math.log(meat_pool) - 0.5 * sig * sig, sig))
                 f_sh = compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps)
-                m_sh = compute_harvest_shares(occ, meat_frac * S, kappa, phi_eps)
+                m_sh = compute_harvest_shares(occ, meat_pool, kappa, phi_eps)
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
                 shares = compute_harvest_shares(occ, S, kappa, phi_eps)
@@ -501,6 +517,9 @@ class TerrainWorld(mesa.Model):
                 child.pos = a.pos
                 child.age = 0
                 child._mother = a                                          # C.2b mother-link for provisioning
+                if getattr(child, "use_cred_status", False):               # D3(i): heritable cred = noisy lineage copy
+                    si = cfg.cred_inherit_sigma
+                    child.cred = a.cred * math.exp(self.random.normalvariate(0.0, si)) if si > 0.0 else a.cred
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1
