@@ -254,6 +254,12 @@ class DemographyConfig(BaseModel):
     mate_choice_strength: float = Field(0.0, ge=0.0)         # m; 0 = random paternity (the drift-control twin)
     patriline_weight: float = Field(0.5, ge=0.0, le=1.0)     # father vs mother weight in lineage inheritance
     lineage_reversion: float = Field(0.0, ge=0.0, le=1.0)    # ρ: mean-reversion of inherited lineage (homeostat)
+    # B+ step 5: PATERNAL provisioning. A father gives `paternal_provision_frac` of his harvest OVERFLOW (above
+    # his cap, otherwise wasted) to his OWN children, drawn against the child's RESIDUAL need AFTER the maternal
+    # tiers (RT-2: conserved, no double-feed) — so it bites only on the constrained-mother / ORPHAN cohort (the
+    # Marlowe critical-period target; calibrate so emergent male share of <3-yr provisioning ≈ 58%). 0 = pure B
+    # (no paternal feeding). Requires enable_paternity (the father-links).
+    paternal_provision_frac: float = Field(0.0, ge=0.0, le=1.0)
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""

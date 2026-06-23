@@ -236,6 +236,38 @@ def test_paternity_determinism():
             == sorted(round(a.cred, 9) for a in w2.agent_list))
 
 
+# ── Cred-vector step 5: paternal provisioning (conserved, no double-feed) ──────
+def _patprov_world(seed, frac):
+    return TerrainWorld(
+        n_agents=200, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
+        carbon_cfg=CarbonConfig(kappa=0.0),
+        substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                      contest_exponent=1.0, move_cost_flat=0.0),
+        demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                        enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+                                        enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0,
+                                        enable_paternity=True, mate_choice_strength=2.0, lineage_reversion=0.1,
+                                        enable_provisioning=True, paternal_provision_frac=frac))
+
+
+def test_paternal_provisioning_never_overfeeds():
+    # conservation (RT-2): no child is filled past its cap by any provisioning tier
+    w = _patprov_world(7, 0.6)
+    for _ in range(40):
+        w.step()
+        for a in w.agent_list:
+            if a.is_juvenile():
+                assert a.wealth <= w._reserve_full * a.reserve_scale() + 1e-6
+
+
+def test_paternal_provisioning_determinism():
+    w1, w2 = _patprov_world(4, 0.6), _patprov_world(4, 0.6)
+    for _ in range(12):
+        w1.step(); w2.step()
+    assert (sorted(round(a.wealth, 6) for a in w1.agent_list)
+            == sorted(round(a.wealth, 6) for a in w2.agent_list))
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

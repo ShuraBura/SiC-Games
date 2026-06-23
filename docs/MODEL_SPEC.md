@@ -534,9 +534,17 @@ domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain 
   loop, calibratable to r≈0.19); the homeostat **bounds Gini(cred) 0.29 (ρ=0) → 0.25 (ρ=0.1)**; male **N_e
   stays healthy (~64–82)** → no small-N drift collapse (RT-4). m PROVISIONAL pending the full r≈0.19 calibration.
 
-**REMAINING:** step 5 B+ paternal provisioning (residual-need 3rd tier after the maternal tiers, conservation
-test — RT-2; calibrate to Marlowe 58% male share for child<3). Then the post-step-5 multi-seed statistical
-validation + fresh red-team. C (pair-bonding) deferred.
+- **Step 5 — B+ paternal provisioning (`paternal_provision_frac`):** a father gives that fraction of his harvest
+  OVERFLOW (above his cap, otherwise wasted) to his OWN children, drawn against the child's **residual need
+  AFTER the two maternal tiers** (RT-2: conserved like the mother's tier-1, no double-feed; child never filled
+  past cap — tested). It therefore bites only on the **constrained-mother / orphan cohort** (the orphan path is
+  now reached — the loop no longer `continue`s on a dead mother), the Marlowe critical-period target. 0 = pure
+  B. Calibrate so emergent male share of <3-yr provisioning ≈ 58% (Marlowe) — PROVISIONAL pending the run.
+
+**ALL 5 STEPS BUILT (475 tests).** **NEXT:** the post-stage **multi-seed statistical validation** (a run_3c,
+like R-18's run_3b — calibrate `mate_choice_strength` to status→RS r≈0.19 and `paternal_provision_frac` to
+Marlowe 58%; confirm the lineage homeostat + male N_e over long runs) **+ a fresh deep red-team** on the
+complete B+ behavior. **C (pair-bonding: persistence, polygyny cap, assortment) deferred** to its own stage.
 
 ---
 

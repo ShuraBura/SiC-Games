@@ -328,6 +328,8 @@ class TerrainWorld(mesa.Model):
             occ_lists.setdefault(a.pos, []).append(a)
         demog = self._demog
         provisioning = demog is not None and demog.enable_provisioning
+        pat_prov = (demog is not None and getattr(demog, "enable_paternity", False)
+                    and demog.paternal_provision_frac > 0.0)   # B+ step 5: paternal provisioning
         game_on = demog is not None and demog.enable_game and demog.game_meat_frac > 0.0
         meat_frac = demog.game_meat_frac if game_on else 0.0
         meat_cv = demog.game_meat_cv if game_on else 0.0
@@ -367,7 +369,7 @@ class TerrainWorld(mesa.Model):
                 total = a.wealth + intake
                 cap = self._reserve_full * a.reserve_scale()                 # C.2a age-scaled cap
                 a.wealth = min(total, cap)
-                if provisioning and total > cap:                            # overflow → giveable to her children
+                if (provisioning or pat_prov) and total > cap:              # overflow → giveable to dependents
                     provision_pool[a] = provision_pool.get(a, 0.0) + (total - cap)
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
@@ -375,26 +377,36 @@ class TerrainWorld(mesa.Model):
         # into her own reserve down to `provision_self_keep`·(her cap) — child-priority shortfall-sharing,
         # so in a lean season the child dwells at a mild deficit (→ condition degrades → graded disease)
         # instead of being cut off and starving, with the mother absorbing the deeper end.
-        if provisioning:
+        if provisioning or pat_prov:
             self_keep_frac = demog.provision_self_keep
+            pat_frac = demog.paternal_provision_frac if pat_prov else 0.0
             for child in self.agent_list:
                 if not child.is_juvenile():
-                    continue
-                m = child._mother
-                if m is None or not m.alive:
                     continue
                 need = self._reserve_full * child.reserve_scale() - child.wealth
                 if need <= 0.0:
                     continue
-                ov = provision_pool.get(m, 0.0)          # tier 1: wasted overflow (free to give)
-                g = min(need, ov)
-                if g > 0.0:
-                    child.wealth += g; provision_pool[m] = ov - g; need -= g
-                if need > 0.0 and self_keep_frac < 1.0:  # tier 2 (S1): mother's reserve above self_keep
-                    res_av = m.wealth - self_keep_frac * self._reserve_full * m.reserve_scale()
-                    if res_av > 0.0:
-                        g2 = min(need, res_av)
-                        child.wealth += g2; m.wealth -= g2
+                m = child._mother
+                if provisioning and m is not None and m.alive:
+                    ov = provision_pool.get(m, 0.0)          # tier 1: mother's wasted overflow (free to give)
+                    g = min(need, ov)
+                    if g > 0.0:
+                        child.wealth += g; provision_pool[m] = ov - g; need -= g
+                    if need > 0.0 and self_keep_frac < 1.0:  # tier 2 (S1): mother's reserve above self_keep
+                        res_av = m.wealth - self_keep_frac * self._reserve_full * m.reserve_scale()
+                        if res_av > 0.0:
+                            g2 = min(need, res_av)
+                            child.wealth += g2; m.wealth -= g2; need -= g2
+                # tier 3 (B+ step 5): father gives `pat_frac` of HIS overflow against the child's RESIDUAL need
+                # (after the maternal tiers) — conserved (otherwise-wasted overflow, like tier 1), so no
+                # double-feed (RT-2); bites on the constrained-mother / orphan cohort (Marlowe).
+                if need > 0.0 and pat_frac > 0.0:
+                    f = child._father
+                    if f is not None and f.alive:
+                        fov = provision_pool.get(f, 0.0) * pat_frac
+                        g3 = min(need, fov)
+                        if g3 > 0.0:
+                            child.wealth += g3; provision_pool[f] = provision_pool.get(f, 0.0) - g3; need -= g3
 
         # Prowess facet dynamics (B+ step 2): achieved status = a slow decaying EMA of RELATIVE meat intake
         # (reputation, not instantaneous — Smith 2004). Relative (mean-pinned) ⇒ runaway-safe by construction
