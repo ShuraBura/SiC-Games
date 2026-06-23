@@ -257,6 +257,7 @@ class TerrainWorld(mesa.Model):
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
+        self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
 
         if self._rivalrous:
             self._step_rivalrous()
@@ -458,6 +459,7 @@ class TerrainWorld(mesa.Model):
                     a.alive = False
                     self.deaths_starv_this_step += 1
                     self.starv_cred_this_step.append(a.cred)
+                    self.starv_status_this_step.append(a.cred * getattr(a, "prowess", 1.0))
                 else:
                     a2m = self._a2_mult(a, occ_count)     # Step-2 a2 modulators (1.0 if all flags off)
                     if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m):

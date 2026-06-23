@@ -247,4 +247,28 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-19 — The full Carbon "lineage of chiefs" validated: a multifaceted heritable status hierarchy with prowess-weighted mate-choice reproduces the von Rueden status→RS r≈0.19, stays runaway-bounded, and keeps the R-18 compositional anti-fragility
+
+**Origin:** Cred-vector + B+ paternity stage statistical validation, `outputs/phase1_biome_mortality/run_3c_bplus_statval.py`, 2026-06-21. Forest-Aché substrate (de-warfared Siler, δ=3, meat_frac 0.55, meat CV 0.73), **full B+** (lineage `cred` + earned sex-specific `prowess` + prowess-weighted mate-choice + bilateral lineage with the mean-reversion homeostat, ρ=0.1), **N=8 seeds × 1500 steps (~4 generations)**, sweep `mate_choice_strength` m∈{0,2,4}.
+
+**What we know (per-m, mean across seeds):**
+
+| m | status→RS `corr(prowess,offspring\|♂)` | mean(cred) | Gini(cred) | male N_e | combined-status death-deficit |
+|---|---|---|---|---|---|
+| 0 (random-paternity control) | −0.00 ± 0.02 | 1.21 | 0.21 | 170 | +0.04 |
+| 2 | +0.089 ± 0.013 | 1.90 | 0.22 | 134 | +0.10 |
+| **4** | **+0.190 ± 0.015** | 3.08 | 0.23 | 111 | +0.11 |
+
+**Four results:**
+1. **Status→RS calibrates to the literature.** `mate_choice_strength` **m≈4 gives status→reproductive-success r = +0.190**, matching **von Rueden & Jaeggi 2016 (r≈0.19)** — the "lineage of chiefs" emerges at the *realistic* magnitude (modest human skew), monotone from the m=0 random-paternity control (~0). **This is the calibrated operating value.**
+2. **The lineage homeostat holds LIVE (the R-18-era BLOCKER fix validated in practice).** mean(cred) is **bounded/finite (1.2–3.1)** across ~4 generations — NOT the ~10⁴ runaway of the pre-fix code (mean-1 noise + fixed-anchor reversion works). Gini(cred) **bounded 0.18–0.23**.
+3. **The compositional anti-fragility (R-1/R-18) SURVIVES the multifaceted hierarchy.** Mortality concentrates on the low-**combined-status** (cred·prowess) periphery — death-deficit **+0.04 → +0.11**, rising with m. (Measured on the *combined* status, not cred alone: with prowess sharing the survival advantage, the cred-only gradient washes out — itself confirming prowess is a real second axis, R-17-style.)
+4. **No small-N drift collapse.** Male **N_e stays 111–170** (declining with m as fathering concentrates, but healthy) — the hierarchy is *selection*, not drift (RT-4 clear).
+
+**Caveat (operating envelope, honest):** the cred *equilibrium* RISES with m (1.2→3.1) because prowess-weighted fathering folds achieved status into the inherited lineage (`base = cred·prowess`). It is finite/bounded at the tested settings, and since contest shares are **ratio/scale-invariant**, the *absolute* mean is largely cosmetic — **Gini is the meaningful inequality and it is bounded**. But the runaway margin (`(1−ρ)·mean-father-prowess < 1`) narrows at high m; the safe envelope is **m≲4, ρ≥0.1**. Paternal-provisioning (`paternal_provision_frac`) calibration to Marlowe 58% still pending (needs a life-history-enabled run; the channel is built + conserved).
+
+**Status:** the **complete Carbon civilization** — multifaceted heritable status, achieved prowess, status→fitness mating, runaway-safe lineage — is now built (476 tests), deep-red-teamed (1 BLOCKER found + fixed), and statistically validated on the demographic substrate. The deferred **C (pair-bonding)** and the **Silicon comparison** (the original C-vs-Si question) are the open frontiers.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

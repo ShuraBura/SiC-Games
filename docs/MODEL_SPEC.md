@@ -555,9 +555,13 @@ the code — and found **one BLOCKER (now fixed):**
 - Plus a MINOR robustness fix (unisex prowess-EMA now normalizes over `_use_prowess` agents only) — behavior-
   neutral in current configs.
 
-**NEXT:** the post-stage **multi-seed statistical validation** (a run_3c, like R-18's run_3b — calibrate
-`mate_choice_strength` to status→RS r≈0.19 and `paternal_provision_frac` to Marlowe 58%; confirm the homeostat
-+ male N_e over long *sustained* runs). **C (pair-bonding: persistence, polygyny cap, assortment) deferred.**
+**VALIDATED — RESULTS R-19** (run_3c, N=8 seeds × 1500 steps): **`mate_choice_strength` m≈4 → status→RS
+r=+0.190 = von Rueden r≈0.19** (the calibrated value); the homeostat holds live (mean cred bounded 1.2–3.1,
+Gini 0.18–0.23 — the BLOCKER fix works in practice); the compositional anti-fragility (R-18) survives on the
+**combined** status (death-deficit +0.04→+0.11); male N_e healthy (111–170). **Operating envelope: m≲4, ρ≥0.1**
+(the cred equilibrium rises with m but is scale-invariant in the shares; Gini is the meaningful inequality).
+`paternal_provision_frac`→Marlowe 58% calibration still pending (needs a life-history run). **C (pair-bonding:
+persistence, polygyny cap, assortment) and the Silicon comparison deferred.**
 
 ---
 
