@@ -171,6 +171,35 @@ def test_prowess_dynamics_deterministic():
     assert sorted(round(a.prowess, 9) for a in w1.agent_list) == sorted(round(a.prowess, 9) for a in w2.agent_list)
 
 
+# ── Cred-vector step 3: sex-divided production (prowess signal) ────────────────
+def _sexdiv_world(seed, sex_division, decay=0.1):
+    return TerrainWorld(
+        n_agents=200, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
+        carbon_cfg=CarbonConfig(kappa=0.0),
+        substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                      contest_exponent=1.0, move_cost_flat=0.0),
+        demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                        enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+                                        enable_prowess_facet=True, prowess_decay=decay, sex_division=sex_division))
+
+
+def test_sex_division_inert_without_prowess_dynamics():
+    # prowess_decay=0 → prowess static (1.0) → sex_division is unused → sd=0 and sd=1 identical
+    w0, w1 = _sexdiv_world(2, 0.0, decay=0.0), _sexdiv_world(2, 1.0, decay=0.0)
+    for _ in range(12):
+        w0.step(); w1.step()
+    assert sorted(a.wealth for a in w0.agent_list) == sorted(a.wealth for a in w1.agent_list)
+
+
+def test_sex_division_prowess_differentiates_mean_pinned():
+    w = _sexdiv_world(8, 1.0, decay=0.1)
+    for _ in range(50):
+        w.step()
+    prov = [a.prowess for a in w.agent_list]
+    assert 0.5 < statistics.mean(prov) < 1.6          # within-sex mean-pinned → runaway-safe
+    assert statistics.pstdev(prov) > 0.05             # differentiated
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

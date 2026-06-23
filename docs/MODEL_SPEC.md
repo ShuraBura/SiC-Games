@@ -514,14 +514,18 @@ domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain 
   reproduces R-18 — tested).
 - **Step 2 — prowess growth (`prowess_decay` λ):** `prowess ← (1−λ)·prowess + λ·(meat_i / mean_meat)` — a
   **decaying EMA of RELATIVE meat intake** (reputation, Smith). **Relative ⇒ mean-pinned ⇒ runaway-safe by
-  construction** (mean prowess → ~1; verified). G.3 supplies the skill/luck component. **OPEN validation:**
-  whether prowess is a *genuinely independent* axis from lineage or merely tracks the Cred-weighted meat share
-  (would make the 2nd facet redundant) — needs a calibrated (SubWindowCapacity) run; flagged.
+  construction** (mean prowess → ~1; verified). G.3 supplies the skill/luck component.
+- **Step 3 — sex-divided production (`sex_division`∈[0,1]):** the prowess SIGNAL becomes sex-specific
+  **production credit** — meat → male hunters, forage → female gatherers — normalized within sex; the
+  *consumption* economy is unchanged in aggregate (total food conserved → e₀/density pinned, only redistributed
+  by prowess, as in R-18). **Resolves the step-2 independence question** (calibrated 1-seed, δ=3, forest):
+  `corr(cred, prowess|male)` **drops +0.29 → +0.14** with sex-division — male prowess decouples from inherited
+  lineage because it's earned from meat *production*, not the Cred-weighted *consumption* share → the 2nd facet
+  is a genuinely independent (hunting) axis. (Full multi-seed validation pending, as for R-18.)
 
-**REMAINING:** step 3 sex-division (men→meat/women→forage, so prowess is sex-specific); step 4 B paternity +
-prowess-weighted mate-choice (calibrate to r≈0.19) + bilateral lineage inheritance with mean-reversion +
-m=0 drift-control; step 5 B+ paternal provisioning (residual-need 3rd tier, conservation test). C (pair-bonding)
-deferred.
+**REMAINING:** step 4 B paternity + prowess-weighted mate-choice (calibrate to r≈0.19) + bilateral lineage
+inheritance with mean-reversion + m=0 drift-control; step 5 B+ paternal provisioning (residual-need 3rd tier,
+conservation test). C (pair-bonding) deferred.
 
 ---
 

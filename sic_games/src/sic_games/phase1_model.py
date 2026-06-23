@@ -330,6 +330,7 @@ class TerrainWorld(mesa.Model):
         game_on = demog is not None and demog.enable_game and demog.game_meat_frac > 0.0
         meat_frac = demog.game_meat_frac if game_on else 0.0
         meat_cv = demog.game_meat_cv if game_on else 0.0
+        sex_div = demog.sex_division if (demog is not None and game_on) else 0.0   # step 3: prowess-signal only
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
@@ -351,9 +352,17 @@ class TerrainWorld(mesa.Model):
             else:
                 shares = compute_harvest_shares(occ, S, kappa, phi_eps)
             msh = m_sh if game_on else [0.0] * len(occ)
+            if sex_div > 0.0:
+                # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
+                # female gatherers. Independent of the Cred-weighted consumption share below.
+                n_m = sum(1 for a in occ if a.sex == "male")
+                male_credit = (meat_pool / n_m) if n_m else 0.0
+                female_credit = ((1.0 - meat_frac) * S / (len(occ) - n_m)) if (len(occ) - n_m) else 0.0
             for a, sh, m in zip(occ, shares, msh):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
                 a._meat_intake = a.eta() * m   # B+ step 2: per-agent meat intake → the prowess (reputation) signal
+                if sex_div > 0.0:
+                    a._prod_credit = a.eta() * (male_credit if a.sex == "male" else female_credit)
                 total = a.wealth + intake
                 cap = self._reserve_full * a.reserve_scale()                 # C.2a age-scaled cap
                 a.wealth = min(total, cap)
@@ -391,12 +400,24 @@ class TerrainWorld(mesa.Model):
         # (mean prowess → ~1); the independent skill/luck component comes from the G.3 meat draws.
         if demog is not None and demog.enable_prowess_facet and demog.prowess_decay > 0.0:
             al = self.agent_list
-            mm = sum(getattr(a, "_meat_intake", 0.0) for a in al) / len(al) if al else 0.0
-            if mm > 0.0:
-                lam = demog.prowess_decay
-                for a in al:
-                    if getattr(a, "_use_prowess", False):
-                        a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
+            lam = demog.prowess_decay
+            if sex_div > 0.0:
+                # sex-specific PRODUCTION credit, normalized WITHIN sex (each sex's prowess centered ~1; male
+                # prowess = hunting reputation, decoupled from the Cred-weighted consumption share → independent
+                # of lineage). Female prowess (forage) is lower-variance — expected (male hunting = the facet).
+                for sx in ("male", "female"):
+                    grp = [a for a in al if a.sex == sx and getattr(a, "_use_prowess", False)]
+                    sigs = [getattr(a, "_prod_credit", 0.0) for a in grp]
+                    mm = (sum(sigs) / len(sigs)) if sigs else 0.0
+                    if mm > 0.0:
+                        for a in grp:
+                            a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_prod_credit", 0.0) / mm)
+            else:
+                mm = sum(getattr(a, "_meat_intake", 0.0) for a in al) / len(al) if al else 0.0
+                if mm > 0.0:
+                    for a in al:
+                        if getattr(a, "_use_prowess", False):
+                            a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing

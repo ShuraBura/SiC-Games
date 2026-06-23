@@ -237,6 +237,12 @@ class DemographyConfig(BaseModel):
     # (EMA rate / fade; 0 = static facet = step-1 seam only). RELATIVE ⇒ mean-pinned ⇒ runaway-safe by
     # construction (mean prowess stays ~1); G.3 supplies the skill/luck component independent of lineage.
     prowess_decay: float = Field(0.0, ge=0.0, le=1.0)
+    # B+ step 3: sex-divided PRODUCTION (men hunt → meat, women gather → forage). Tunes the prowess SIGNAL only
+    # (male prowess from meat-production credit, female from forage credit), NOT the consumption economy — so
+    # e₀/density are preserved (the band still shares meat+forage to everyone). `sex_division`∈[0,1]: 0 = unisex
+    # (= step-2, meat-intake signal); 1 = strict. Decouples male prowess from the Cred-weighted consumption
+    # share → makes prowess a genuinely independent (hunting) axis from inherited lineage.
+    sex_division: float = Field(0.0, ge=0.0, le=1.0)
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""
