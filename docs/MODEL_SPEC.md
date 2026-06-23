@@ -541,10 +541,23 @@ domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain 
   now reached — the loop no longer `continue`s on a dead mother), the Marlowe critical-period target. 0 = pure
   B. Calibrate so emergent male share of <3-yr provisioning ≈ 58% (Marlowe) — PROVISIONAL pending the run.
 
-**ALL 5 STEPS BUILT (475 tests).** **NEXT:** the post-stage **multi-seed statistical validation** (a run_3c,
-like R-18's run_3b — calibrate `mate_choice_strength` to status→RS r≈0.19 and `paternal_provision_frac` to
-Marlowe 58%; confirm the lineage homeostat + male N_e over long runs) **+ a fresh deep red-team** on the
-complete B+ behavior. **C (pair-bonding: persistence, polygyny cap, assortment) deferred** to its own stage.
+**ALL 5 STEPS BUILT + DEEP-RED-TEAMED (2026-06-21).** A fresh repo-grounded code audit of the whole stage
+confirmed R-18 collapse, prowess mean-pinning, paternal-provisioning conservation, and determinism all hold in
+the code — and found **one BLOCKER (now fixed):**
+- **Lineage homeostat was not a contraction → unbounded `cred` drift.** The inheritance noise `exp(N(0,σ))`
+  has mean `exp(σ²/2)>1` (a per-generation multiplicative *upward bias*), and reverting toward the **co-moving**
+  population mean is not a contraction, so `cred` drifted up without bound (latent only because the forage-only
+  shakedown goes extinct first; an isolated 2000-generation recursion ran to ~10⁴). **Fix:** (a) **mean-1
+  noise** `exp(N(−σ²/2, σ))` (mean-preserving, no bias) and (b) reversion toward a **FIXED anchor (1.0 = founder
+  median)** — a true contraction. `lineage_reversion=0` ⇒ a pure mean-1 multiplicative copy (R-18/step-1). A
+  2000-generation regression test now guards boundedness. *(Note: R-18's recorded result used the old noise but
+  ran only ~2 generations — drift was ~1%, so its relative/compositional conclusion is unaffected.)*
+- Plus a MINOR robustness fix (unisex prowess-EMA now normalizes over `_use_prowess` agents only) — behavior-
+  neutral in current configs.
+
+**NEXT:** the post-stage **multi-seed statistical validation** (a run_3c, like R-18's run_3b — calibrate
+`mate_choice_strength` to status→RS r≈0.19 and `paternal_provision_frac` to Marlowe 58%; confirm the homeostat
++ male N_e over long *sustained* runs). **C (pair-bonding: persistence, polygyny cap, assortment) deferred.**
 
 ---
 

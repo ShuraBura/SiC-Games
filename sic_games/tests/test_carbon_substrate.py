@@ -268,6 +268,20 @@ def test_paternal_provisioning_determinism():
             == sorted(round(a.wealth, 6) for a in w2.agent_list))
 
 
+# ── Lineage homeostat (red-team BLOCKER fix): bounded over many generations ────
+def test_lineage_homeostat_bounded_over_generations():
+    # mean-1 noise + reversion to a FIXED anchor (1.0) must bound cred over many generations. The buggy
+    # version (exp(N(0,σ)) upward-biased noise + co-moving population mean) ran to ~10^4 — unbounded drift.
+    import random
+    rng = random.Random(0)
+    si, rho = 0.1, 0.1
+    creds = [1.0] * 300
+    for _ in range(2000):                          # ~2000 generations
+        creds = [(1.0 - rho) * creds[rng.randrange(300)] * math.exp(rng.normalvariate(-0.5 * si * si, si))
+                 + rho * 1.0 for _ in range(300)]
+    assert 0.5 < statistics.mean(creds) < 2.0      # bounded (without the fix → ~12000)
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

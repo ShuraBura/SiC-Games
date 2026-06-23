@@ -426,11 +426,11 @@ class TerrainWorld(mesa.Model):
                         for a in grp:
                             a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_prod_credit", 0.0) / mm)
             else:
-                mm = sum(getattr(a, "_meat_intake", 0.0) for a in al) / len(al) if al else 0.0
+                grp = [a for a in al if getattr(a, "_use_prowess", False)]   # normalize over prowess-agents only
+                mm = sum(getattr(a, "_meat_intake", 0.0) for a in grp) / len(grp) if grp else 0.0
                 if mm > 0.0:
-                    for a in al:
-                        if getattr(a, "_use_prowess", False):
-                            a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
+                    for a in grp:
+                        a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing
@@ -558,14 +558,11 @@ class TerrainWorld(mesa.Model):
         # mean-reversion target. Fertility itself is UNCHANGED (female-IBI) — this only assigns WHO fathers
         # and how lineage propagates (R-14 reopened minimally).
         paternity = getattr(cfg, "enable_paternity", False)
-        males = None; m_w = None; pop_mean_cred = 1.0
+        males = None; m_w = None
         if paternity:
             males = [x for x in self.agent_list if x.sex == "male" and x.age >= cfg.menarche_months]
             if males and cfg.mate_choice_strength > 0.0:
                 m_w = [(getattr(x, "prowess", 1.0) + 1e-6) ** cfg.mate_choice_strength for x in males]
-            cr = [x.cred for x in self.agent_list if getattr(x, "use_cred_status", False)]
-            if cr:
-                pop_mean_cred = sum(cr) / len(cr)
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
@@ -586,11 +583,12 @@ class TerrainWorld(mesa.Model):
                 child._mother = a                                          # C.2b mother-link for provisioning
                 if getattr(child, "use_cred_status", False):               # heritable lineage (cred)
                     si = cfg.cred_inherit_sigma
-                    noise = math.exp(self.random.normalvariate(0.0, si)) if si > 0.0 else 1.0
+                    # MEAN-1 lognormal noise (E[noise]=1): mean-preserving, so inheritance adds no multiplicative
+                    # upward bias across generations (red-team BLOCKER fix — `exp(N(0,σ))` had mean exp(σ²/2)>1).
+                    noise = math.exp(self.random.normalvariate(-0.5 * si * si, si)) if si > 0.0 else 1.0
                     if paternity:
                         # mate-choice: prowess-weighted father (m=0 → random); bilateral lineage = blend of the
-                        # parents' TOTAL standing (cred·prowess — folds the father's hunting record in) +
-                        # mean-reversion ρ toward the population mean (the c_lineage homeostat, RT-3).
+                        # parents' TOTAL standing (cred·prowess — folds the father's hunting record in).
                         if males:
                             father = (self.random.choices(males, weights=m_w, k=1)[0] if m_w is not None
                                       else self.random.choice(males))
@@ -600,13 +598,15 @@ class TerrainWorld(mesa.Model):
                         t_mom = a.cred * getattr(a, "prowess", 1.0)
                         if father is not None:
                             pw = cfg.patriline_weight
-                            blended = (1.0 - pw) * t_mom + pw * (father.cred * getattr(father, "prowess", 1.0))
+                            base = (1.0 - pw) * t_mom + pw * (father.cred * getattr(father, "prowess", 1.0))
                         else:
-                            blended = t_mom                                # matrilineal fallback (no adult males)
-                        rho = cfg.lineage_reversion
-                        child.cred = (1.0 - rho) * blended * noise + rho * pop_mean_cred
+                            base = t_mom                                   # matrilineal fallback (no adult males)
                     else:
-                        child.cred = a.cred * noise                        # step-1 matrilineal (paternity off)
+                        base = a.cred                                      # step-1 matrilineal (paternity off)
+                    # Mean-reversion toward a FIXED anchor (1.0 = founder median) — a TRUE contraction that bounds
+                    # the no-decay lineage facet (red-team BLOCKER fix: the co-moving population mean was NOT a
+                    # contraction → unbounded drift). ρ=0 ⇒ pure mean-1 multiplicative copy (R-18/step-1).
+                    child.cred = (1.0 - cfg.lineage_reversion) * base * noise + cfg.lineage_reversion * 1.0
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1
