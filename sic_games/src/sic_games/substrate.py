@@ -20,12 +20,23 @@ if TYPE_CHECKING:
 
 
 def status_of(agent: "BaseAgent") -> float:
-    """Contest/share weight basis. Carbon-on-substrate: accumulated `cred` (status) when the agent opts in
-    (`use_cred_status`), else the `φ` trait. Defaulting to φ preserves the Sugarscape contest tests and any
-    non-demographic carbon path; only the seeded/heritable Carbon-substrate run reads cred."""
+    """Contest/share weight basis (LINEAGE facet). Carbon-on-substrate: accumulated `cred` (status) when the
+    agent opts in (`use_cred_status`), else the `φ` trait. Defaulting to φ preserves the Sugarscape contest
+    tests and any non-demographic carbon path; only the seeded/heritable Carbon-substrate run reads cred."""
     if getattr(agent, "use_cred_status", False):
         return agent.cred
     return agent.phi
+
+
+def base_status(agent: "BaseAgent", eps: float) -> float:
+    """Multiplicative contest-weight base over ACTIVE status facets (Cobb–Douglas, equal within-domain
+    exponents → the caller applies the exponent κ). Lineage (`status_of`) is always present; the achieved
+    PROWESS facet joins when `_use_prowess` (B+). Collapses to the scalar `(cred+ε)` / `(φ+ε)` (R-18) when
+    prowess is off — exact back-compat."""
+    b = status_of(agent) + eps
+    if getattr(agent, "_use_prowess", False):
+        b *= (getattr(agent, "prowess", 0.0) + eps)
+    return b
 
 
 def compute_harvest_shares(
@@ -42,7 +53,7 @@ def compute_harvest_shares(
         base = S / n
         return [base] * n
     weights = [
-        (status_of(a) + phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
+        base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
         for a in occupants
     ]
     wsum = sum(weights)
@@ -77,7 +88,7 @@ def diffusion_select_target(
     eps = sc.phi_epsilon
     kc = sc.k_cell
     cands = [(x, y), ((x + 1) % w, y), ((x - 1) % w, y), (x, (y + 1) % h), (x, (y - 1) % h)]
-    w_self = (status_of(agent) + eps) ** kappa if (kappa > 0.0 and agent.strategy == "carbon") else 1.0
+    w_self = base_status(agent, eps) ** kappa if (kappa > 0.0 and agent.strategy == "carbon") else 1.0
 
     cells: list[tuple[int, int]] = []
     utils: list[float] = []

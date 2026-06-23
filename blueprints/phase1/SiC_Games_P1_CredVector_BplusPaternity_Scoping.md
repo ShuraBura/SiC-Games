@@ -30,11 +30,17 @@ reproductive consequence — the von Rueden status→fitness loop). Each link is
   direct provisioning. **Reputation > instantaneous return**: Aché hunting *reputation* predicted RS (forest
   period), observed *return rate* did not (reservation). → *prowess = an ACCUMULATED reputation (EMA + decay),
   not raw per-step yield.*
-- **Marlowe 2003, "A critical period for provisioning by Hadza men", Evol. Hum. Behav. 24:217** (★). Paternal
-  provisioning is real **during the lactation critical period** (mother's returns drop; ~40% of camp calories
-  from male sources then), and is **biased to biological offspring** (stepchildren provisioned less; ⅓ of Hadza
-  children are stepchildren). → *B+ paternal provisioning: father preferentially feeds his OWN children, matters
-  most when the mother is constrained.*
+- **Marlowe 2003, "A critical period for provisioning by Hadza men", Evol. Hum. Behav. 24:217** (in
+  `literature/`, EXTRACTED). Baseline adult **male provisioning ≈ 43%** of camp Kcal (female 57%); it **rises
+  to 58% when a man has a child <3 yr, and 69% when <1 yr** (the lactation critical period). Conditional on
+  **biological paternity** — men provision more "so long as the children were their own offspring and not
+  stepchildren." Polygyny ≈ 4% of Hadza men. → *`paternal_provision_frac` calibration target: emergent male
+  share of <3-yr-old provisioning ≈ 58% (vs ~43% baseline); the RT-2 residual-need routing lands it on exactly
+  this constrained-mother/young-child cohort.*
+- **Descent/residence (web, 2026-06-21):** foragers are predominantly **bilateral descent + flexible/bilocal
+  residence** (~40% bilocal, 23% matrilocal, 25% patrilocal; gathering-heavy → matrilocal lean; early human
+  kinship tended matrilineal). → ***Q3 RESOLVED: `patriline_weight = 0.5` (symmetric bilateral) is the
+  lit-justified default***, with a defensible slight matrilineal tilt option.
 - **Polygyny rates** (PLoS ONE 2011 marriage-practices; Traditions-of-Conflict review). Foragers **mostly
   monogamous** (~11% of men ever polygynous; best hunters up to 2 wives). Skew is driven by **serial monogamy**,
   not simultaneous harems. **Aché: partible paternity — 2.1 possible fathers/child.** → *B+'s per-conception

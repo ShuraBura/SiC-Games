@@ -10,18 +10,21 @@ from __future__ import annotations
 import math
 import statistics
 
-from sic_games.substrate import status_of, compute_harvest_shares
+from sic_games.substrate import status_of, base_status, compute_harvest_shares
 from sic_games.config import KcalEconomyConfig, SubstrateConfig, CarbonConfig
 from sic_games.demography import DemographyConfig
 from sic_games.phase1_model import TerrainWorld
 
 
 class _MockA:
-    def __init__(self, phi=0.5, cred=0.0, strategy="carbon", use_cred_status=False):
+    def __init__(self, phi=0.5, cred=0.0, strategy="carbon", use_cred_status=False,
+                 prowess=0.0, use_prowess=False):
         self.phi = phi
         self.cred = cred
         self.strategy = strategy
         self.use_cred_status = use_cred_status
+        self.prowess = prowess
+        self._use_prowess = use_prowess
 
 
 # ── status_of hook ────────────────────────────────────────────────────────────
@@ -92,6 +95,52 @@ def test_founder_cred_uniform_when_seed_sigma_zero():
     w = _carbon_world(cred_status=True, seed_sigma=0.0)
     creds = [a.cred for a in w.agent_list]
     assert all(c == 0.0 for c in creds)              # unseeded → cred stays 0 (status_of → (0+ε)^κ uniform)
+
+
+# ── Cred-vector (B+ step 1): facet machinery, collapses to R-18 ────────────────
+def test_base_status_collapses_to_lineage_when_prowess_off():
+    a = _MockA(cred=3.0, use_cred_status=True)                 # _use_prowess False
+    assert abs(base_status(a, 1e-6) - (status_of(a) + 1e-6)) < 1e-12     # = cred+ε = R-18
+
+
+def test_base_status_multiplies_active_facets():
+    a = _MockA(cred=3.0, use_cred_status=True, prowess=2.0, use_prowess=True)
+    assert abs(base_status(a, 1e-6) - (3.0 + 1e-6) * (2.0 + 1e-6)) < 1e-9
+
+
+def test_prowess_facet_favors_high_prowess_at_equal_lineage():
+    a = _MockA(cred=2.0, use_cred_status=True, prowess=1.0, use_prowess=True)
+    b = _MockA(cred=2.0, use_cred_status=True, prowess=5.0, use_prowess=True)
+    sh = compute_harvest_shares([a, b], 20.0, kappa=1.0, phi_epsilon=1e-6)
+    assert sh[1] > sh[0]                                       # higher prowess → larger share
+
+
+def test_uniform_prowess_cancels_in_shares():
+    # prowess ON but identical across agents → shares identical to lineage-only (ratio cancels)
+    on = [_MockA(cred=1.0, use_cred_status=True, prowess=3.0, use_prowess=True),
+          _MockA(cred=4.0, use_cred_status=True, prowess=3.0, use_prowess=True)]
+    off = [_MockA(cred=1.0, use_cred_status=True), _MockA(cred=4.0, use_cred_status=True)]
+    s_on = compute_harvest_shares(on, 20.0, 1.0, 1e-6)
+    s_off = compute_harvest_shares(off, 20.0, 1.0, 1e-6)
+    assert all(abs(x - y) < 1e-9 for x, y in zip(s_on, s_off))
+
+
+def test_model_prowess_seam_on_unearned_matches_off():
+    # enabling the prowess facet with un-earned (uniform 0) prowess must reproduce R-18 exactly
+    def world(enable_prowess):
+        return TerrainWorld(
+            n_agents=150, kcal_cfg=KcalEconomyConfig(), seed=5, game_stream=False,
+            carbon_cfg=CarbonConfig(kappa=0.0),
+            substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                          contest_exponent=1.0, move_cost_flat=0.0),
+            demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                            enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+                                            enable_prowess_facet=enable_prowess))
+    w_off, w_on = world(False), world(True)
+    for _ in range(10):
+        w_off.step(); w_on.step()
+    assert len(w_off.agent_list) == len(w_on.agent_list)
+    assert sorted(a.wealth for a in w_off.agent_list) == sorted(a.wealth for a in w_on.agent_list)
 
 
 def test_carbon_g3_determinism():

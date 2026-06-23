@@ -57,7 +57,7 @@ from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConf
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
 )
-from sic_games.substrate import compute_harvest_shares, diffusion_select_target, status_of
+from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
 
@@ -237,6 +237,10 @@ class TerrainWorld(mesa.Model):
         # Carbon-on-substrate: when ON, the meat/contest weight reads `cred` (status), not `φ` (status_of hook).
         agent.use_cred_status = (self._carbon_cfg is not None and self._demog is not None
                                  and getattr(self._demog, "enable_cred_status", False))
+        # Cred-vector (B+): `cred` = lineage facet; `prowess` = achieved facet (earned in step 2). The prowess
+        # facet joins the multiplicative contest weight only when enabled (else lineage-only = R-18 exact).
+        agent.prowess = 0.0
+        agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
@@ -289,7 +293,7 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             occ_count[a.pos] = occ_count.get(a.pos, 0) + 1
             if occ_wsum is not None:
-                wt = (status_of(a) + phi_eps) ** kappa if a.strategy == "carbon" else 1.0
+                wt = base_status(a, phi_eps) ** kappa if a.strategy == "carbon" else 1.0
                 occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
@@ -310,7 +314,7 @@ class TerrainWorld(mesa.Model):
                     del occ_count[old]
                 occ_count[target] = occ_count.get(target, 0) + 1
                 if occ_wsum is not None:
-                    wt = (status_of(agent) + phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
+                    wt = base_status(agent, phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
                     occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
                     occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
                 agent.pos = target

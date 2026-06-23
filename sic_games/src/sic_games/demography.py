@@ -227,6 +227,11 @@ class DemographyConfig(BaseModel):
     enable_cred_status: bool = False
     cred_seed_sigma: float = Field(0.0, ge=0.0)      # founder log-status spread; 0 = uniform (no hierarchy)
     cred_inherit_sigma: float = Field(0.0, ge=0.0)   # lineage-copy noise at birth; 0 = exact inheritance
+    # Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS
+    # facet (achieved) joins the contest weight multiplicatively (Cobb–Douglas, equal within-domain exponents):
+    # weight = ((cred+ε)·(prowess+ε))^κ. Default off → lineage-only = R-18 exact. Build step 1 ships the seam;
+    # prowess GROWTH/decay (earned from provisioning) is step 2. See SiC_Games_P1_CredVector_BplusPaternity bp.
+    enable_prowess_facet: bool = False
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""
