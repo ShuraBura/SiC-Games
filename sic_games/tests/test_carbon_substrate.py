@@ -143,6 +143,34 @@ def test_model_prowess_seam_on_unearned_matches_off():
     assert sorted(a.wealth for a in w_off.agent_list) == sorted(a.wealth for a in w_on.agent_list)
 
 
+# ── Cred-vector step 2: prowess growth (earned, mean-pinned, runaway-safe) ─────
+def _prowess_world(seed=9, decay=0.1):
+    return TerrainWorld(
+        n_agents=200, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
+        carbon_cfg=CarbonConfig(kappa=0.0),
+        substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                      contest_exponent=1.0, move_cost_flat=0.0),
+        demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                        enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+                                        enable_prowess_facet=True, prowess_decay=decay))
+
+
+def test_prowess_differentiates_but_stays_mean_pinned():
+    w = _prowess_world()
+    for _ in range(60):
+        w.step()
+    prov = [a.prowess for a in w.agent_list]
+    assert 0.6 < statistics.mean(prov) < 1.5          # mean-pinned ~1 → runaway-safe (relative measure)
+    assert statistics.pstdev(prov) > 0.05             # but differentiated → a real achieved hierarchy
+
+
+def test_prowess_dynamics_deterministic():
+    w1, w2 = _prowess_world(seed=3), _prowess_world(seed=3)
+    for _ in range(15):
+        w1.step(); w2.step()
+    assert sorted(round(a.prowess, 9) for a in w1.agent_list) == sorted(round(a.prowess, 9) for a in w2.agent_list)
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

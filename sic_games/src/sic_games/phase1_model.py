@@ -237,9 +237,10 @@ class TerrainWorld(mesa.Model):
         # Carbon-on-substrate: when ON, the meat/contest weight reads `cred` (status), not `φ` (status_of hook).
         agent.use_cred_status = (self._carbon_cfg is not None and self._demog is not None
                                  and getattr(self._demog, "enable_cred_status", False))
-        # Cred-vector (B+): `cred` = lineage facet; `prowess` = achieved facet (earned in step 2). The prowess
-        # facet joins the multiplicative contest weight only when enabled (else lineage-only = R-18 exact).
-        agent.prowess = 0.0
+        # Cred-vector (B+): `cred` = lineage facet; `prowess` = achieved facet (earned in step 2, EMA centered
+        # at 1 = neutral reputation). The prowess facet joins the multiplicative contest weight only when
+        # enabled (else lineage-only = R-18 exact; a uniform prowess cancels in the share ratio).
+        agent.prowess = 1.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
@@ -349,8 +350,10 @@ class TerrainWorld(mesa.Model):
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
                 shares = compute_harvest_shares(occ, S, kappa, phi_eps)
-            for a, sh in zip(occ, shares):
+            msh = m_sh if game_on else [0.0] * len(occ)
+            for a, sh, m in zip(occ, shares, msh):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
+                a._meat_intake = a.eta() * m   # B+ step 2: per-agent meat intake → the prowess (reputation) signal
                 total = a.wealth + intake
                 cap = self._reserve_full * a.reserve_scale()                 # C.2a age-scaled cap
                 a.wealth = min(total, cap)
@@ -382,6 +385,18 @@ class TerrainWorld(mesa.Model):
                     if res_av > 0.0:
                         g2 = min(need, res_av)
                         child.wealth += g2; m.wealth -= g2
+
+        # Prowess facet dynamics (B+ step 2): achieved status = a slow decaying EMA of RELATIVE meat intake
+        # (reputation, not instantaneous — Smith 2004). Relative (mean-pinned) ⇒ runaway-safe by construction
+        # (mean prowess → ~1); the independent skill/luck component comes from the G.3 meat draws.
+        if demog is not None and demog.enable_prowess_facet and demog.prowess_decay > 0.0:
+            al = self.agent_list
+            mm = sum(getattr(a, "_meat_intake", 0.0) for a in al) / len(al) if al else 0.0
+            if mm > 0.0:
+                lam = demog.prowess_decay
+                for a in al:
+                    if getattr(a, "_use_prowess", False):
+                        a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing

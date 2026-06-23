@@ -232,6 +232,11 @@ class DemographyConfig(BaseModel):
     # weight = ((cred+ε)·(prowess+ε))^κ. Default off → lineage-only = R-18 exact. Build step 1 ships the seam;
     # prowess GROWTH/decay (earned from provisioning) is step 2. See SiC_Games_P1_CredVector_BplusPaternity bp.
     enable_prowess_facet: bool = False
+    # B+ step 2: prowess GROWTH. Prowess is a decaying EMA of the agent's RELATIVE meat intake (reputation, not
+    # instantaneous return — Smith 2004): `prowess ← (1−λ)·prowess + λ·(meat_i / mean_meat)`. λ = `prowess_decay`
+    # (EMA rate / fade; 0 = static facet = step-1 seam only). RELATIVE ⇒ mean-pinned ⇒ runaway-safe by
+    # construction (mean prowess stays ~1); G.3 supplies the skill/luck component independent of lineage.
+    prowess_decay: float = Field(0.0, ge=0.0, le=1.0)
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""

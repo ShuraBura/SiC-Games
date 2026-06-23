@@ -486,6 +486,43 @@ split AND the **cell-occupancy movement contest** (`occ_wsum`/`w_self` are also 
 vs movement-only **ablation** is the next step. **Deferred (Tier-2):** earned/endogenous Cred + the
 leadership/Couzin–Henrich movement model (§6b of the scoping bp); decay; β.
 
+### §4.5.7 Cred-vector + B+ paternity (multifaceted status; building 2026-06-21)
+
+Generalizes the scalar Carbon hierarchy (R-18) to a **multifaceted status vector** with **earned prowess** and
+(forthcoming) **paternity**, all knob-tunable to collapse back to R-18. Blueprint:
+`SiC_Games_P1_CredVector_BplusPaternity_Scoping.md` (scoped + red-teamed APPROVE-WITH-FIXES). Opt-in; default
+flags off → R-18/461-baseline unchanged.
+
+**Lit anchors** (PDFs in `literature/`): **von Rueden & Jaeggi 2016** — male status→reproductive success
+**r≈0.19** (modest in humans; 4 dims [formidability, hunting, wealth, influence] ~equal weight; mating channel
+> survival; polygyny amplifies ~⅓) → *calibrate mate-choice skew LOW.* **Smith 2004** — *reputation*, not
+instantaneous return, predicts RS → *prowess = an accumulated EMA, not raw yield.* **Marlowe 2003** — male
+provisioning **43% baseline → 58% (child <3) → 69% (child <1)**, conditional on biological paternity → the
+`paternal_provision_frac` calibration target + cohort. **Descent** — foragers predominantly bilateral/bilocal
+→ **`patriline_weight = 0.5`**. Forager polygyny ~4–11% (modest) / serial monogamy / Aché partible paternity
+(2.1 fathers) → per-conception mate-choice lottery captures the real skew without pair-bonds.
+
+**Facets (2, minimal):** **c_lineage** (= `cred`, ascribed: seeded + inherited, *mean-reverting* — its only
+homeostat, since decay touches prowess only [red-team RT-3]) and **c_prowess** (achieved). Contest weight per
+domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain exponents (identifiability).
+
+**BUILT (steps 1–2):**
+- **Step 1 — facet machinery (`base_status`, `substrate.py`):** `base_status(agent,eps)` = `(cred+ε)` ×
+  `(prowess+ε)` when `enable_prowess_facet`, else `(cred+ε)` — replaces the scalar `(status_of+ε)` at all three
+  contest sites (harvest split, movement `w_self`, `occ_wsum`). The caller applies κ. **Collapses to R-18
+  exactly** with prowess off; a *uniform* prowess cancels in the share ratio (so the seam-on/un-earned run
+  reproduces R-18 — tested).
+- **Step 2 — prowess growth (`prowess_decay` λ):** `prowess ← (1−λ)·prowess + λ·(meat_i / mean_meat)` — a
+  **decaying EMA of RELATIVE meat intake** (reputation, Smith). **Relative ⇒ mean-pinned ⇒ runaway-safe by
+  construction** (mean prowess → ~1; verified). G.3 supplies the skill/luck component. **OPEN validation:**
+  whether prowess is a *genuinely independent* axis from lineage or merely tracks the Cred-weighted meat share
+  (would make the 2nd facet redundant) — needs a calibrated (SubWindowCapacity) run; flagged.
+
+**REMAINING:** step 3 sex-division (men→meat/women→forage, so prowess is sex-specific); step 4 B paternity +
+prowess-weighted mate-choice (calibrate to r≈0.19) + bilateral lineage inheritance with mean-reversion +
+m=0 drift-control; step 5 B+ paternal provisioning (residual-need 3rd tier, conservation test). C (pair-bonding)
+deferred.
+
 ---
 
 ## Mortality architecture — decisions, decouplings, neglects (added 2026-06-20; Biome-Mortality blueprint)
