@@ -523,9 +523,20 @@ domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain 
   lineage because it's earned from meat *production*, not the Cred-weighted *consumption* share → the 2nd facet
   is a genuinely independent (hunting) axis. (Full multi-seed validation pending, as for R-18.)
 
-**REMAINING:** step 4 B paternity + prowess-weighted mate-choice (calibrate to r≈0.19) + bilateral lineage
-inheritance with mean-reversion + m=0 drift-control; step 5 B+ paternal provisioning (residual-need 3rd tier,
-conservation test). C (pair-bonding) deferred.
+- **Step 4 — B paternity (`enable_paternity`, `mate_choice_strength` m, `patriline_weight`, `lineage_reversion`
+  ρ):** at each IBI conception a father is assigned by **prowess-weighted mate-choice** `P(j)∝(prowess_j+ε)^m`
+  among living adult males (m=0 = random = the drift-control); the child's **lineage** inherits a **bilateral
+  blend of the parents' TOTAL standing** (`cred·prowess` — folds the father's hunting record into the child's
+  ascribed rank), with **mean-reversion ρ** toward the population mean (the c_lineage homeostat — RT-3, since
+  lineage has no decay). Fertility itself is unchanged (female-IBI); R-14 reopened minimally. `enable_paternity`
+  off → matrilineal (step-1 exact). **Validated** (calibrated 1-seed, δ=3, forest, 500 steps): mate-choice
+  produces reproductive skew **`corr(prowess,offspring)` +0.06 (m=0) → +0.15 (m=2)** (the von Rueden status→RS
+  loop, calibratable to r≈0.19); the homeostat **bounds Gini(cred) 0.29 (ρ=0) → 0.25 (ρ=0.1)**; male **N_e
+  stays healthy (~64–82)** → no small-N drift collapse (RT-4). m PROVISIONAL pending the full r≈0.19 calibration.
+
+**REMAINING:** step 5 B+ paternal provisioning (residual-need 3rd tier after the maternal tiers, conservation
+test — RT-2; calibrate to Marlowe 58% male share for child<3). Then the post-step-5 multi-seed statistical
+validation + fresh red-team. C (pair-bonding) deferred.
 
 ---
 

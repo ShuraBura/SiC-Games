@@ -200,6 +200,42 @@ def test_sex_division_prowess_differentiates_mean_pinned():
     assert statistics.pstdev(prov) > 0.05             # differentiated
 
 
+# ── Cred-vector step 4: paternity + mate-choice + bilateral lineage ────────────
+def _paternity_world(seed, m=2.0, rho=0.0, enable=True):
+    return TerrainWorld(
+        n_agents=200, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
+        carbon_cfg=CarbonConfig(kappa=0.0),
+        substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                      contest_exponent=1.0, move_cost_flat=0.0),
+        demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                        enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+                                        enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0,
+                                        enable_paternity=enable, mate_choice_strength=m,
+                                        patriline_weight=0.5, lineage_reversion=rho))
+
+
+def test_paternity_assigns_fathers():
+    w = _paternity_world(7)
+    for _ in range(40):
+        w.step()
+    assert any(getattr(a, "_father", None) is not None for a in w.agent_list)   # children get a father-link
+
+
+def test_paternity_off_leaves_no_father_links():
+    w = _paternity_world(7, enable=False)
+    for _ in range(40):
+        w.step()
+    assert all(getattr(a, "_father", None) is None for a in w.agent_list)       # matrilineal (step-1)
+
+
+def test_paternity_determinism():
+    w1, w2 = _paternity_world(3), _paternity_world(3)
+    for _ in range(12):
+        w1.step(); w2.step()
+    assert (sorted(round(a.cred, 9) for a in w1.agent_list)
+            == sorted(round(a.cred, 9) for a in w2.agent_list))
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

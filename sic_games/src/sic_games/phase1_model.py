@@ -243,6 +243,7 @@ class TerrainWorld(mesa.Model):
         agent.prowess = 1.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
+        agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
@@ -541,6 +542,18 @@ class TerrainWorld(mesa.Model):
         into the all-cause female schedule (approach (ii)); the energetic fertility modifier is OFF
         here (2a-pre strict stability test). Child on the parent's cell; disperses via diffusion."""
         cfg = self._demog
+        # B+ step 4 paternity setup (once/step): candidate fathers + mate-choice weights + the lineage
+        # mean-reversion target. Fertility itself is UNCHANGED (female-IBI) — this only assigns WHO fathers
+        # and how lineage propagates (R-14 reopened minimally).
+        paternity = getattr(cfg, "enable_paternity", False)
+        males = None; m_w = None; pop_mean_cred = 1.0
+        if paternity:
+            males = [x for x in self.agent_list if x.sex == "male" and x.age >= cfg.menarche_months]
+            if males and cfg.mate_choice_strength > 0.0:
+                m_w = [(getattr(x, "prowess", 1.0) + 1e-6) ** cfg.mate_choice_strength for x in males]
+            cr = [x.cred for x in self.agent_list if getattr(x, "use_cred_status", False)]
+            if cr:
+                pop_mean_cred = sum(cr) / len(cr)
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
@@ -559,9 +572,29 @@ class TerrainWorld(mesa.Model):
                 child.pos = a.pos
                 child.age = 0
                 child._mother = a                                          # C.2b mother-link for provisioning
-                if getattr(child, "use_cred_status", False):               # D3(i): heritable cred = noisy lineage copy
+                if getattr(child, "use_cred_status", False):               # heritable lineage (cred)
                     si = cfg.cred_inherit_sigma
-                    child.cred = a.cred * math.exp(self.random.normalvariate(0.0, si)) if si > 0.0 else a.cred
+                    noise = math.exp(self.random.normalvariate(0.0, si)) if si > 0.0 else 1.0
+                    if paternity:
+                        # mate-choice: prowess-weighted father (m=0 → random); bilateral lineage = blend of the
+                        # parents' TOTAL standing (cred·prowess — folds the father's hunting record in) +
+                        # mean-reversion ρ toward the population mean (the c_lineage homeostat, RT-3).
+                        if males:
+                            father = (self.random.choices(males, weights=m_w, k=1)[0] if m_w is not None
+                                      else self.random.choice(males))
+                        else:
+                            father = None
+                        child._father = father
+                        t_mom = a.cred * getattr(a, "prowess", 1.0)
+                        if father is not None:
+                            pw = cfg.patriline_weight
+                            blended = (1.0 - pw) * t_mom + pw * (father.cred * getattr(father, "prowess", 1.0))
+                        else:
+                            blended = t_mom                                # matrilineal fallback (no adult males)
+                        rho = cfg.lineage_reversion
+                        child.cred = (1.0 - rho) * blended * noise + rho * pop_mean_cred
+                    else:
+                        child.cred = a.cred * noise                        # step-1 matrilineal (paternity off)
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1

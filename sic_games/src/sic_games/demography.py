@@ -243,6 +243,17 @@ class DemographyConfig(BaseModel):
     # (= step-2, meat-intake signal); 1 = strict. Decouples male prowess from the Cred-weighted consumption
     # share → makes prowess a genuinely independent (hunting) axis from inherited lineage.
     sex_division: float = Field(0.0, ge=0.0, le=1.0)
+    # B+ step 4: PATERNITY. At each IBI conception a father is assigned by prowess-weighted mate-choice —
+    # P(father=j) ∝ (prowess_j+ε)^mate_choice_strength among living adult males (m=0 = random = the drift-control)
+    # — and the child's LINEAGE inherits a BILATERAL blend of the parents' TOTAL standing (cred·prowess, folding
+    # the father's hunting record into the child's ascribed rank), with MEAN-REVERSION toward the population mean
+    # (lineage_reversion ρ = the c_lineage homeostat; lineage has no decay otherwise — red-team RT-3). Calibrate
+    # mate_choice_strength to status→RS r≈0.19 (von Rueden). enable_paternity off → matrilineal (step-1). Reopens
+    # R-14 minimally: fertility stays female-IBI (this only sets WHO fathers / how lineage propagates).
+    enable_paternity: bool = False
+    mate_choice_strength: float = Field(0.0, ge=0.0)         # m; 0 = random paternity (the drift-control twin)
+    patriline_weight: float = Field(0.5, ge=0.0, le=1.0)     # father vs mother weight in lineage inheritance
+    lineage_reversion: float = Field(0.0, ge=0.0, le=1.0)    # ρ: mean-reversion of inherited lineage (homeostat)
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""
