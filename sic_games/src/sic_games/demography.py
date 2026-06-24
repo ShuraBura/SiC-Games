@@ -260,6 +260,12 @@ class DemographyConfig(BaseModel):
     # Marlowe critical-period target; calibrate so emergent male share of <3-yr provisioning ≈ 58%). 0 = pure B
     # (no paternal feeding). Requires enable_paternity (the father-links).
     paternal_provision_frac: float = Field(0.0, ge=0.0, le=1.0)
+    # B++ : ASSORTATIVE mating. The father a mother draws is weighted by his prowess^m (the B+ skew) AND his
+    # status-SIMILARITY to the mother — a Gaussian-in-log-status kernel exp(−α·(ln s_j − ln s_i)²), s = cred·
+    # prowess, α = assortative_strength. So high-status mothers pair with high-status fathers, CONSOLIDATING
+    # dynasties (vs B+'s one-sided draw that dilutes the dynasty through random maternal lineage each
+    # generation). 0 = B+ (no assortment — the paired control). Requires enable_paternity.
+    assortative_strength: float = Field(0.0, ge=0.0)
 
     def siler(self, sex: str | None = None) -> SilerParams:
         """Both-sexes schedule (sex=None) or the M-3 sex split (sex='female' / 'male')."""

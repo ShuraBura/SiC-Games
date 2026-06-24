@@ -570,7 +570,19 @@ band-shared to women + children → **male caloric contribution ≈ 55% ≈ Marl
 Marlowe is matched via `meat_frac` + sex-division (validating those), and **`paternal_provision_frac` is a
 separate safety-net for failing/orphan mothers — set ≈ 0.5** (saturation, fully covers the residual deficit).
 A *proactive* paternal-provisioning redesign (father as primary, to push deficit-share higher) would risk the
-RT-2 double-count and is unnecessary. **C (pair-bonding) and the Silicon comparison deferred.**
+RT-2 double-count and is unnecessary.
+
+### §4.5.8 B++ assortative mating + lineage tracking (built 2026-06-21)
+
+**`assortative_strength` α** adds status-similarity to the mate-choice draw: father weight = `prowess^m ×
+exp(−α·(ln s_j − ln s_i)²)`, s=cred·prowess (high-status mothers pair with high-status fathers). α=0 = B+ (the
+paired control). **Lineage tracking:** each founder seeds a unique `_lineage`; children inherit the **father's**
+`_lineage` (patrilineal; matriline fallback) — diagnostics: #surviving lineages, largest-patriline fraction,
+lineage-size Gini, mate-status correlation. **RESULTS R-20 (counterintuitive, control-revealed):** assortment
+*works* (mate-status corr 0.04→0.80) but **does NOT consolidate dynasties** (largest patriline 10%→9%) and
+**REDUCES the status→RS skew** (0.19→0.10) — homogamy ≠ reproductive skew; assortment constrains top males to a
+limited top-status mate pool, *spreading* reproduction. The dynastic lever is `mate_choice_strength` (monopoly),
+NOT assortment. The two are independently tunable. **C (full pair-bonding) and the Silicon comparison deferred.**
 
 ---
 

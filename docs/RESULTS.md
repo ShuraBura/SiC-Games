@@ -271,4 +271,24 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-20 — Assortative mating (B++) SPREADS reproduction, it does NOT consolidate dynasties — a counterintuitive control-revealed result: homogamy ≠ reproductive skew
+
+**Origin:** B++ assortative-mating build + paired control comparison, `outputs/phase1_biome_mortality/run_3e_bpp_assortment.py`, 2026-06-21. Full B+ (m=4), forest-Aché δ=3, lineage-tracking (patriline IDs), N=6 seeds × 1200 steps, sweep `assortative_strength` α∈{0 (=B+ control), 2, 4}. Mate-choice father weight = prowess^m × **status-similarity kernel** `exp(−α·(ln s_j−ln s_i)²)`, s=cred·prowess.
+
+**Hypothesis (mine, going in): assortment amplifies dynasties** — high-status ♂ pairing with high-status ♀ should make status compound on both lineages and consolidate the elite. **The control comparison FALSIFIED it.**
+
+| α | mate-status corr | largest patriline | #lineages | lineage-Gini | status→RS | mean(cred) |
+|---|---|---|---|---|---|---|
+| **0 (B+ control)** | +0.04 | 10% | 54 | 0.53 | **+0.19** | 2.9 |
+| 2 | +0.66 | 11% | 55 | 0.50 | +0.10 | 1.7 |
+| 4 | +0.80 | 9% | 56 | 0.53 | **+0.10** | 1.4 |
+
+**What we know:** the assortment **mechanism works strongly** (mate-status correlation +0.04→**+0.80**), but its consequences are the *opposite* of the hypothesis: **no dynastic consolidation** (largest patriline 10%→9%, #lineages flat ~55, lineage-Gini flat 0.53), and it **REDUCES the status→reproductive-success skew** (+0.19→+0.10) and lowers mean(cred). Robust across 6 seeds.
+
+**Why — homogamy ≠ reproductive skew (orthogonal mating-system axes).** The "lineage of chiefs" consolidation comes from **reproductive MONOPOLY** — a few high-prowess males fathering many children across *all* mothers (dominance; B+'s one-sided prowess draw at m=4). **Assortment COUNTERS that monopoly**: it constrains a top male to the *limited pool of top-status mothers*, so he fathers *fewer* total children → the prowess→fertility skew drops (0.19→0.10) and no single patriline runs away. Assortment sorts *who pairs with whom* (homogamy); it does not concentrate *how unequal* reproduction is — if anything it democratizes it.
+
+**Consequence:** **B++ is built + validated but is NOT a dynastic amplifier** (my §pair-bonding recommendation was wrong). It is a *realistic homogamy* feature that **spreads** reproduction. If the goal is maximal dynastic skew, the lever is *higher* `mate_choice_strength` (more monopoly), not assortment. The two are tunable independently (m = skew/monopoly; α = homogamy). The homeostat held throughout (mean cred bounded); R-19's status→RS calibration (r≈0.19) is a B+ (α=0) property — with assortment on, realized skew is lower. Lineage-tracking diagnostics (patriline IDs, largest-fraction, #lineages, Gini) now exist for all future dynasty questions.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

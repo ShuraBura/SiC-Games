@@ -201,7 +201,7 @@ def test_sex_division_prowess_differentiates_mean_pinned():
 
 
 # ── Cred-vector step 4: paternity + mate-choice + bilateral lineage ────────────
-def _paternity_world(seed, m=2.0, rho=0.0, enable=True):
+def _paternity_world(seed, m=2.0, rho=0.0, enable=True, assort=0.0):
     return TerrainWorld(
         n_agents=200, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
         carbon_cfg=CarbonConfig(kappa=0.0),
@@ -211,7 +211,34 @@ def _paternity_world(seed, m=2.0, rho=0.0, enable=True):
                                         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
                                         enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0,
                                         enable_paternity=enable, mate_choice_strength=m,
-                                        patriline_weight=0.5, lineage_reversion=rho))
+                                        patriline_weight=0.5, lineage_reversion=rho,
+                                        assortative_strength=assort))
+
+
+def test_assortment_off_is_bplus_deterministic():
+    # B++ knob at 0 = B+ exactly (the paired control nests); + deterministic
+    w1, w2 = _paternity_world(3, assort=0.0), _paternity_world(3, assort=0.0)
+    for _ in range(12):
+        w1.step(); w2.step()
+    assert (sorted(round(a.cred, 9) for a in w1.agent_list)
+            == sorted(round(a.cred, 9) for a in w2.agent_list))
+
+
+def test_assortment_on_deterministic():
+    w1, w2 = _paternity_world(3, assort=2.0), _paternity_world(3, assort=2.0)
+    for _ in range(12):
+        w1.step(); w2.step()
+    assert (sorted(round(a.cred, 9) for a in w1.agent_list)
+            == sorted(round(a.cred, 9) for a in w2.agent_list))
+
+
+def test_lineage_ids_seed_unique_and_propagate():
+    w = _paternity_world(7)
+    assert len({a._lineage for a in w.agent_list}) == len(w.agent_list)    # founders all unique
+    for _ in range(40):
+        w.step()
+    assert all(getattr(a, "_lineage", None) is not None for a in w.agent_list)   # inherited by all
+    assert len({a._lineage for a in w.agent_list}) < len(w.agent_list)     # coalescence (lineages merge/die)
 
 
 def test_paternity_assigns_fathers():

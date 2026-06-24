@@ -172,10 +172,11 @@ class TerrainWorld(mesa.Model):
             n_place = min(n, len(land_cells))
             positions = self.random.sample(land_cells, n_place)
 
-        for pos in positions:
+        for fid, pos in enumerate(positions):
             sex = "female" if self.random.random() < kcal_cfg.p_female else "male"
             agent = self._make_agent(sex=sex, lh_cfg=lh_cfg)
             agent.pos = pos
+            agent._lineage = fid                         # each founder seeds a unique lineage (patriline tracking)
             if self._demog is not None:
                 agent.age = self._sample_founder_age()   # staggered founders (stationary ∝ l(x))
             if getattr(agent, "use_cred_status", False) and self._demog.cred_seed_sigma > 0.0:
@@ -244,6 +245,7 @@ class TerrainWorld(mesa.Model):
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
+        agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
@@ -260,6 +262,7 @@ class TerrainWorld(mesa.Model):
         self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
         self.prov_young_maternal = 0.0   # diagnostic: kcal provisioned to <3-yr children by mother (Marlowe calib)
         self.prov_young_paternal = 0.0   # diagnostic: "" by father (male share = paternal/(maternal+paternal))
+        self.mate_pairs_this_step: list[tuple[float, float]] = []   # (mother status, father status) — assortment
 
         if self._rivalrous:
             self._step_rivalrous()
@@ -566,11 +569,15 @@ class TerrainWorld(mesa.Model):
         # mean-reversion target. Fertility itself is UNCHANGED (female-IBI) — this only assigns WHO fathers
         # and how lineage propagates (R-14 reopened minimally).
         paternity = getattr(cfg, "enable_paternity", False)
-        males = None; m_w = None
+        males = None; m_w = None; m_status = None
+        assort = getattr(cfg, "assortative_strength", 0.0)
         if paternity:
             males = [x for x in self.agent_list if x.sex == "male" and x.age >= cfg.menarche_months]
-            if males and cfg.mate_choice_strength > 0.0:
-                m_w = [(getattr(x, "prowess", 1.0) + 1e-6) ** cfg.mate_choice_strength for x in males]
+            mexp = cfg.mate_choice_strength
+            if males and (mexp > 0.0 or assort > 0.0):
+                m_w = [(getattr(x, "prowess", 1.0) + 1e-6) ** mexp for x in males]   # prowess^m base
+            if males and assort > 0.0:
+                m_status = [x.cred * getattr(x, "prowess", 1.0) for x in males]      # B++ assortment status
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
@@ -589,6 +596,7 @@ class TerrainWorld(mesa.Model):
                 child.pos = a.pos
                 child.age = 0
                 child._mother = a                                          # C.2b mother-link for provisioning
+                child._lineage = a._lineage                                # default matriline (overridden to patriline if a father is assigned)
                 if getattr(child, "use_cred_status", False):               # heritable lineage (cred)
                     si = cfg.cred_inherit_sigma
                     # MEAN-1 lognormal noise (E[noise]=1): mean-preserving, so inheritance adds no multiplicative
@@ -598,11 +606,23 @@ class TerrainWorld(mesa.Model):
                         # mate-choice: prowess-weighted father (m=0 → random); bilateral lineage = blend of the
                         # parents' TOTAL standing (cred·prowess — folds the father's hunting record in).
                         if males:
-                            father = (self.random.choices(males, weights=m_w, k=1)[0] if m_w is not None
-                                      else self.random.choice(males))
+                            if assort > 0.0 and m_status is not None:
+                                # B++ assortment: prowess^m × similarity-to-mother (Gaussian in log-status)
+                                li = math.log(a.cred * getattr(a, "prowess", 1.0) + 1e-9)
+                                ww = [m_w[k] * math.exp(-assort * (math.log(m_status[k] + 1e-9) - li) ** 2)
+                                      for k in range(len(males))]
+                                father = self.random.choices(males, weights=ww, k=1)[0]
+                            elif m_w is not None:
+                                father = self.random.choices(males, weights=m_w, k=1)[0]
+                            else:
+                                father = self.random.choice(males)
                         else:
                             father = None
                         child._father = father
+                        child._lineage = father._lineage if father is not None else a._lineage   # patriline
+                        if father is not None:
+                            self.mate_pairs_this_step.append(
+                                (a.cred * getattr(a, "prowess", 1.0), father.cred * getattr(father, "prowess", 1.0)))
                         t_mom = a.cred * getattr(a, "prowess", 1.0)
                         if father is not None:
                             pw = cfg.patriline_weight
