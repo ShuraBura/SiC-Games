@@ -255,6 +255,8 @@ class TerrainWorld(mesa.Model):
 
     def step(self) -> None:
         self.step_count += 1
+        if hasattr(self._harvest_field, "set_step"):     # climate: advance the time-varying field clock (C.1)
+            self._harvest_field.set_step(self.step_count)
         self.births_this_step = 0
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0

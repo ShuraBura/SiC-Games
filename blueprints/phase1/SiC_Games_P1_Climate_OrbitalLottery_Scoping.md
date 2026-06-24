@@ -121,8 +121,13 @@ real LIA/Bond excursion needs).
   the live morph awaits the storage mechanic + the periodic-call wiring (a separate deferred step).
 
 ## §6. Build steps (each tunable, nesting, gated)
-- **C.1 — obliquity → seasonal (Layer 1).** Draw ε; map to A_seas (§1-B); wrap `season(t)` on the field.
-  **GATE:** `A_seas=0.6 ⇔ s_min=0.4` reproduces **R-6 CC=37%**; `A_seas=0 ⇒ s(t)≡1.0 bit-exact` (baseline).
+- **C.1 — obliquity → seasonal (Layer 1). ✅ BUILT 2026-06-21** (`sic_games/climate.py`: `ClimateField` wrapper
+  + `obliquity_to_amplitude` + `draw_obliquity`; model `step()` advances the climate clock via `set_step`).
+  **GATE met:** `ClimateField.season(A_seas=0.6)` is **bit-identical to the validated R-6 `s_min=0.4` form**
+  (unit-tested) ⇒ on R-6's exact config it reproduces R-6's CC=37%; `A_seas=0 ⇒ s(t)≡1.0 bit-exact` (aseasonal
+  baseline). Dynamic check: in the at-ceiling regime seasonality bites hard (eq_pop 11601→7073, 61%); under
+  density-disease (below-K, R-13) it bites *less* (96%) — correct regime-dependence (regulated population has
+  slack). Per-biome φ + multi-biome amplitudes are a refinement (single-world φ for C.1). 7 tests, suite green.
 - **C.2 — eccentricity + flux (orbital draws complete).** e → interannual + `(1−e²)^−½` mean; S → seasonal T̄
   field (→ pathogen seasonality free). **GATE:** Earth (e=0.017,S=1) ≈ C.1; high-e/low-S shift as predicted.
 - **C.3 — regime-shift (Layer 3).** Slow **regime-switching/step** modulation of the field (NOT OU). Ships the
