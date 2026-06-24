@@ -276,6 +276,52 @@ class DemographyConfig(BaseModel):
         return female if sex == "female" else male
 
 
+# ---------------------------------------------------------------------------
+# Society presets — switchable, lit-anchored bundles of the family/status knobs.
+# Each maps an ethnographic TYPE to (kappa = status-weighted sharing [SubstrateConfig.contest_exponent]) +
+# the family knobs (mate-choice skew m, assortment α, descent patriline_weight, status-mobility ρ, paternal
+# investment, sex-division). These capture each type's family-dynamics SIGNATURE (skew / descent / heritability
+# / sharing) with the available knobs — NOT every institution (bridewealth, the avunculate, persistent
+# households are approximated, not mechanistic). Switch seamlessly via `society_knobs(name)`.
+# ---------------------------------------------------------------------------
+SOCIETY_PRESETS: dict[str, dict] = {
+    # Immediate-return mobile foragers (!Kung/Ju'hoansi, Hadza, Mbuti, Aché): leveled, no heritable rank,
+    # bilateral/flexible descent, modest skew, band-wide sharing. [Woodburn 1982; Lee 1979; Boehm 1999 reverse
+    # dominance; von Rueden 2016 r≈0.19]. ≈ the Silicon-leaning baseline.
+    "egalitarian_forager": dict(kappa=0.0, mate_choice_strength=1.0, assortative_strength=0.0,
+                                patriline_weight=0.5, lineage_reversion=0.30, paternal_provision_frac=0.5,
+                                sex_division=1.0),
+    # Delayed-return / complex foragers (NW Coast: Kwakiutl, Tlingit, Haida): heritable RANK from a stored
+    # surplus, status-weighted sharing, chiefly lineages. [Ames 1994; Service 1962 chiefdom; Sahlins 1958].
+    "complex_forager": dict(kappa=1.5, mate_choice_strength=3.0, assortative_strength=1.0,
+                            patriline_weight=0.5, lineage_reversion=0.10, paternal_provision_frac=0.5,
+                            sex_division=1.0),
+    # Patrilineal pastoralists (Nuer, Maasai, Turkana, Kipsigis): cattle-wealth → bridewealth → polygyny,
+    # strong patrilineal descent + patrilocality. [Evans-Pritchard 1940; Borgerhoff Mulder; Betzig 1986].
+    "patrilineal_pastoralist": dict(kappa=1.0, mate_choice_strength=4.0, assortative_strength=2.0,
+                                    patriline_weight=0.9, lineage_reversion=0.08, paternal_provision_frac=0.5,
+                                    sex_division=1.0),
+    # Matrilineal horticulturalists (Trobriand, Hopi, Iroquois, Navajo): matrilineal descent + matrilocality,
+    # the avunculate (mother's brother invests, not father → low paternal provision), dampened male skew.
+    # [Malinowski 1929; Schneider & Gough 1961; Holden & Mace 2003].
+    "matrilineal_horticulturalist": dict(kappa=0.5, mate_choice_strength=2.0, assortative_strength=0.5,
+                                         patriline_weight=0.1, lineage_reversion=0.20,
+                                         paternal_provision_frac=0.2, sex_division=0.5),
+    # Stratified chiefdoms (Polynesia, early states): hereditary stratification, reproductive monopoly +
+    # rigid ascribed rank. [Sahlins 1958; Fried 1967 stratified; Kirch 1984; Betzig despotism].
+    "stratified_chiefdom": dict(kappa=2.0, mate_choice_strength=4.0, assortative_strength=2.0,
+                                patriline_weight=0.8, lineage_reversion=0.04, paternal_provision_frac=0.5,
+                                sex_division=1.0),
+}
+
+
+def society_knobs(name: str) -> tuple[float, dict]:
+    """Return (kappa → SubstrateConfig.contest_exponent, family-knob dict → DemographyConfig(**base, **knobs))
+    for a society preset. Seamless switching: pick a name, splice the knobs into the configs."""
+    p = dict(SOCIETY_PRESETS[name])
+    return p.pop("kappa"), p
+
+
 def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig) -> bool:
     """Female fertility eligibility this month: within the fertile window AND past the IBI
     lactational refractory. (Sex check and the stochastic birth/maternal/SRB draws are the

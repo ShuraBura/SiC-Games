@@ -309,6 +309,42 @@ def test_lineage_homeostat_bounded_over_generations():
     assert 0.5 < statistics.mean(creds) < 2.0      # bounded (without the fix → ~12000)
 
 
+# ── Society presets (switchable lit-anchored family-dynamics types) ────────────
+def test_society_presets_build_valid_configs():
+    from sic_games.demography import SOCIETY_PRESETS, society_knobs
+    assert len(SOCIETY_PRESETS) >= 5
+    for name in SOCIETY_PRESETS:
+        kappa, fam = society_knobs(name)
+        assert kappa >= 0.0
+        cfg = DemographyConfig(enable_cred_status=True, enable_prowess_facet=True, enable_paternity=True,
+                               enable_provisioning=True, **fam)        # must construct without error
+        assert 0.0 <= cfg.patriline_weight <= 1.0 and cfg.mate_choice_strength >= 0.0
+
+
+def test_society_presets_are_distinct():
+    from sic_games.demography import SOCIETY_PRESETS, society_knobs
+    sigs = {name: (society_knobs(name)[0],) + tuple(sorted(society_knobs(name)[1].items()))
+            for name in SOCIETY_PRESETS}
+    assert len(set(sigs.values())) == len(SOCIETY_PRESETS)             # every preset is a distinct knob-bundle
+
+
+def test_society_egalitarian_runs():
+    from sic_games.demography import society_knobs
+    kappa, fam = society_knobs("egalitarian_forager")
+    w = TerrainWorld(n_agents=120, kcal_cfg=KcalEconomyConfig(), seed=5, game_stream=False,
+                     carbon_cfg=CarbonConfig(kappa=0.0),
+                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                   contest_exponent=kappa, move_cost_flat=0.0),
+                     demography_cfg=DemographyConfig(enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
+                                                     enable_cred_status=True, cred_seed_sigma=0.5,
+                                                     cred_inherit_sigma=0.1, enable_prowess_facet=True,
+                                                     prowess_decay=0.1, enable_paternity=True,
+                                                     enable_provisioning=True, **fam))
+    for _ in range(10):
+        w.step()
+    assert all(getattr(a, "_lineage", None) is not None for a in w.agent_list)
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

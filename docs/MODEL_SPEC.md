@@ -582,7 +582,33 @@ lineage-size Gini, mate-status correlation. **RESULTS R-20 (counterintuitive, co
 *works* (mate-status corr 0.04→0.80) but **does NOT consolidate dynasties** (largest patriline 10%→9%) and
 **REDUCES the status→RS skew** (0.19→0.10) — homogamy ≠ reproductive skew; assortment constrains top males to a
 limited top-status mate pool, *spreading* reproduction. The dynastic lever is `mate_choice_strength` (monopoly),
-NOT assortment. The two are independently tunable. **C (full pair-bonding) and the Silicon comparison deferred.**
+NOT assortment. The two are independently tunable.
+
+### §4.5.9 Switchable society types (lit-anchored family-dynamics presets; built 2026-06-21)
+
+**`demography.SOCIETY_PRESETS` + `society_knobs(name)`** bundle the family/status knobs (κ status-weighted
+sharing · mate-choice skew m · assortment α · descent `patriline_weight` · status-mobility ρ · paternal
+investment · sex-division) into named, **switchable**, lit-anchored ethnographic types — so we can run different
+societies (and, later, *evolving* societies) by selecting a name. The presets capture each type's family-
+dynamics *signature*, not every institution (bridewealth, the avunculate, persistent households are
+*approximated* via the knobs). Five types:
+
+| type | anchor | knob signature |
+|---|---|---|
+| **egalitarian_forager** | !Kung/Hadza/Aché; Woodburn 1982, Boehm 1999 | κ=0, m=1, α=0, bilateral, **high ρ (mobility)** |
+| **complex_forager** | NW Coast; Ames 1994, Service 1962 | κ=1.5, m=3, α=1, heritable rank (low ρ) |
+| **patrilineal_pastoralist** | Nuer/Maasai; Evans-Pritchard 1940, Betzig 1986 | **patriline 0.9**, m=4, α=2 |
+| **matrilineal_horticulturalist** | Trobriand/Hopi; Malinowski 1929 | **patriline 0.1**, low paternal-provision (avunculate) |
+| **stratified_chiefdom** | Polynesia; Sahlins 1958, Fried 1967 | **κ=2, very low ρ (rigid rank)**, m=4, α=2 |
+
+**Benchmark (run_3f, 3 seeds, forest-Aché):** the types produce **distinct signatures**, headlined by the
+**status-inequality gradient Gini(cred) 0.13 (egalitarian) → 0.36 (stratified)** — the anthropological
+egalitarian↔stratified axis, emergent from the knobs (Boehm leveling vs chiefly stratification). Mate-homogamy
+(−0.01→+0.73) and mean status (1.1→2.3) also separate as designed. **Caveat:** lineage *tracking* is currently
+always **patrilineal** (child inherits the father's `_lineage`), independent of `patriline_weight` (which sets
+the *cred* blend) — so the matrilineal type's lineage IDs still follow the father; a descent-aware tracking
+(matriline when `patriline_weight` low) is a refinement. **C (full pair-bonding) and the Silicon comparison
+deferred.**
 
 ---
 
