@@ -322,6 +322,40 @@ def society_knobs(name: str) -> tuple[float, dict]:
     return p.pop("kappa"), p
 
 
+# Lit-anchored MILESTONES for society morphing (the egalitarian→complex→stratified ladder is driven by resource
+# STRUCTURE, not biome label): Binford 2001 PACKING threshold ≈ 9.1 persons/100 km² (0.091/km²) — above it
+# foragers can't freely move → intensification/territoriality/complexity; Testart 1982 STORAGE/surplus → a
+# defendable delayed-return surplus → wealth differentials → heritable inequality; Carneiro 1970 circumscription.
+BINFORD_PACKING_PER_KM2 = 0.091
+
+
+def biome_default_society(biome_code: int | None = None, aquatic_rich: bool = False) -> str:
+    """Initial society by a biome's RESOURCE STRUCTURE (NOT a clean biome→type mapping — see §4.5.10). The
+    model's terrestrial forager biomes (forest/desert/savanna/grass = dispersed, low-storability resources)
+    all default **egalitarian_forager** (Testart/Binford); the ONE clean enabler of forager complexity is a
+    dense **storable/aquatic** resource base (NW Coast salmon) → **complex_forager**. Everything richer is
+    reached by morphing on CONDITIONS (`society_from_character`), not assigned by biome."""
+    return "complex_forager" if aquatic_rich else "egalitarian_forager"
+
+
+def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
+    """Morph hook — map a band's measured CHARACTER (density vs Binford packing; surplus = Testart storage
+    enabler) onto the complexity ladder. surplus_frac = mean reserve fraction above subsistence (0..1).
+      below packing & no defendable surplus → egalitarian (mobile, leveled);
+      packed (≥ Binford) AND large sustained surplus → stratified (hereditary);
+      else (packed OR storable surplus) → complex (intensification/ranking).
+    Note: this ladder is the storage/packing (complexity) axis only — the patrilineal/matrilineal DESCENT types
+    are set by history/biome, not reached by density. And in the current forage-only model the equilibrium
+    density (~0.065–0.1/km²) sits AT/below packing, so a band stays egalitarian until a carrying-capacity boost
+    (storage/aquatic/agriculture — the deferred surplus mechanic) lifts it past the threshold."""
+    packed = density_per_km2 >= BINFORD_PACKING_PER_KM2
+    if not packed and surplus_frac < 0.5:
+        return "egalitarian_forager"
+    if packed and surplus_frac >= 0.7:
+        return "stratified_chiefdom"
+    return "complex_forager"
+
+
 def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig) -> bool:
     """Female fertility eligibility this month: within the fertile window AND past the IBI
     lactational refractory. (Sex check and the stochastic birth/maternal/SRB draws are the

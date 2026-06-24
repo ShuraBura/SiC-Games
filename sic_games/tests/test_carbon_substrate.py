@@ -345,6 +345,36 @@ def test_society_egalitarian_runs():
     assert all(getattr(a, "_lineage", None) is not None for a in w.agent_list)
 
 
+# ── Society morphing hooks (biome default + character-driven transition ladder) ─
+def test_society_from_character_ladder():
+    from sic_games.demography import society_from_character, BINFORD_PACKING_PER_KM2
+    assert society_from_character(0.05, 0.2) == "egalitarian_forager"          # below packing, no surplus
+    assert society_from_character(BINFORD_PACKING_PER_KM2 + 0.05, 0.4) == "complex_forager"   # packed
+    assert society_from_character(0.2, 0.8) == "stratified_chiefdom"            # packed + large surplus
+
+
+def test_biome_default_society():
+    from sic_games.demography import biome_default_society
+    assert biome_default_society(aquatic_rich=False) == "egalitarian_forager"   # dispersed terrestrial forager
+    assert biome_default_society(aquatic_rich=True) == "complex_forager"        # storable/aquatic enabler
+
+
+def test_morph_to_society_swaps_knobs():
+    from sic_games.demography import society_knobs
+    w = TerrainWorld(n_agents=80, kcal_cfg=KcalEconomyConfig(), seed=5, game_stream=False,
+                     carbon_cfg=CarbonConfig(kappa=0.0),
+                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                   contest_exponent=0.0, move_cost_flat=0.0),
+                     demography_cfg=DemographyConfig(enable_cred_status=True, enable_prowess_facet=True,
+                                                     enable_paternity=True, enable_provisioning=True))
+    w.morph_to_society("stratified_chiefdom")
+    kappa, fam = society_knobs("stratified_chiefdom")
+    assert abs(w._substrate_cfg.contest_exponent - kappa) < 1e-9               # κ swapped
+    assert abs(w._demog.mate_choice_strength - fam["mate_choice_strength"]) < 1e-9   # family knobs swapped
+    assert abs(w._demog.lineage_reversion - fam["lineage_reversion"]) < 1e-9
+    w.step()   # still runs after the morph
+
+
 def test_carbon_g3_determinism():
     w1 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)
     w2 = _carbon_world(seed=7, cv=0.73, cred_status=True, seed_sigma=0.5)

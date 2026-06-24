@@ -607,7 +607,27 @@ egalitarian↔stratified axis, emergent from the knobs (Boehm leveling vs chiefl
 (−0.01→+0.73) and mean status (1.1→2.3) also separate as designed. **Caveat:** lineage *tracking* is currently
 always **patrilineal** (child inherits the father's `_lineage`), independent of `patriline_weight` (which sets
 the *cred* blend) — so the matrilineal type's lineage IDs still follow the father; a descent-aware tracking
-(matriline when `patriline_weight` low) is a refinement. **C (full pair-bonding) and the Silicon comparison
+(matriline when `patriline_weight` low) is a refinement.
+
+### §4.5.10 Biome→society mapping + the evolving-society morph hooks (built 2026-06-21)
+
+**Is there a clean biome→society-type mapping? Mostly NO — the lit-anchored finding.** Society type is driven by
+**resource STRUCTURE (storability + density + predictability)**, not biome label (Testart 1982 storage; Binford
+2001 packing). For the model's *forager* biomes (forest/desert/savanna/grass = dispersed, low-storability) the
+mapping is nearly flat → **egalitarian_forager**; the one clean enabler of forager complexity is a dense
+**storable/aquatic** base (NW-Coast salmon) → **complex_forager**. So `biome_default_society(biome, aquatic_rich)`
+returns egalitarian for terrestrial forager biomes, complex only for aquatic-rich — the honest, weak mapping.
+
+**The real driver is band CHARACTER → type (the morph hook).** `society_from_character(density_per_km2,
+surplus_frac)` implements the lit ladder: below **Binford packing (0.091/km²)** + no surplus → egalitarian;
+packed + large sustained surplus (Testart storage) → stratified; else (packed OR storable surplus) → complex.
+`TerrainWorld.morph_to_society(name)` is the evolving hook — it re-bundles the family/status knobs (swaps the
+demog config + substrate κ) mid-run. **Milestones** = Binford packing 0.091/km², Testart storage/surplus,
+sedentism, Carneiro circumscription. **Honest limit:** in the current forage-only model the equilibrium density
+(~0.065–0.1/km², Tallavaara) sits AT/below packing, so a band **stays egalitarian** until a **surplus/storage
+mechanic** (the deferred climate/storage stage — abundance enables surplus, catastrophe selects for storage)
+lifts density past the threshold. The hook is wired; the trigger awaits that mechanic. (The descent types —
+patrilineal/matrilineal — are set by history/biome, NOT reached by the density ladder.) **C (full pair-bonding)
 deferred.**
 
 ---

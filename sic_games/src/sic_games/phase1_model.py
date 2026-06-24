@@ -640,6 +640,22 @@ class TerrainWorld(mesa.Model):
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
 
+    def morph_to_society(self, name: str) -> None:
+        """Evolving-society hook: re-bundle the family/status knobs to a new society preset mid-run — swaps the
+        demographic config + the substrate `contest_exponent` (κ). Drive it from `society_from_character` on the
+        band's measured character (Binford packing density / Testart surplus; MODEL_SPEC §4.5.10). In the current
+        forage-only model the equilibrium density sits at/below the packing threshold, so a transition stays
+        inert until a surplus/storage mechanic lifts density past it — the hook is wired, the trigger awaits."""
+        from sic_games.demography import society_knobs
+        kappa, fam = society_knobs(name)
+        cp = getattr(self._demog, "model_copy", None)
+        self._demog = self._demog.model_copy(update=fam) if cp else self._demog.copy(update=fam)
+        sc = self._substrate_cfg
+        scp = getattr(sc, "model_copy", None)
+        self._substrate_cfg = (sc.model_copy(update={"contest_exponent": kappa}) if scp
+                               else sc.copy(update={"contest_exponent": kappa}))
+        self._society = name
+
     def _a2_mult(self, a, occ_count) -> float:
         """Step-2 baseline-mortality (a2) multiplier from the live modulators (1.0 if all flags off) —
         the only Siler term the world modulates. Capped (red-team n-1). Pathogen OFF in 2b."""
