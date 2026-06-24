@@ -1,142 +1,162 @@
-# SiC Games · Phase 1 · **Climate — orbital-lottery variability** (+ catastrophe seam) — Scoping
+# SiC Games · Phase 1 · **Climate — orbital-lottery 4-layer variability** (comprehensive blueprint)
 
-**Status:** SCOPING for red-team (2026-06-21). Builds the §4.1.6 star-mechanics seam + §4.1.7 catastrophe stub
-into a live, lit-anchored climate-forcing stage. **Discipline (locked, §4.1.6):** stellar mechanics *bound the
-parameter draws*; they do **NOT** run tick-by-tick (no insolation→NPP transfer function in the agent loop).
-Supervisor scope: **full (ε, e, S) trio, in 2 verified steps** (obliquity→seasonal first, then add e/S); one
-orbital draw **per world/run** with temporal variability layered on top; **catastrophe = a separate later step**.
+**Status:** BLUEPRINT for re-red-team (2026-06-21). Supersedes the v1 scoping (same file). Implements the
+§4.1.6 star-mechanics seam + §4.1.7 catastrophe stub as a **4-timescale climate-forcing stage**. **Locked
+discipline (§4.1.6):** stellar mechanics *bound the parameter draws*; they do NOT run tick-by-tick (no
+insolation→NPP transfer inside the agent loop). **Supervisor decisions:** Q1 **(B)** — obliquity maps onto the
+*empirical Earth §4.1.4 amplitude band* (a scaling dial, NOT a sunlight→food transfer function); Q3 **uniform**
+draws over the (forager-sustainable) habitable range, no Earth-leaning prior; the **4th (regime-shift) layer**
+is added as the society-morph driver; catastrophe is a separate step.
 
 ---
 
-## 1. The two-stage per-world lottery
+## §0. The four timescales (architecture)
 
-**Stage 1 — draw orbital/stellar parameters** from habitability-bounded ranges (the star lottery):
-- **obliquity ε** (axial tilt) ∈ ~[0°, 60°] as a **conservative habitable-relevant envelope** (RT-1 fix:
-  Spiegel 2009 actually finds habitability across a *broad* obliquity band with **no clean monotone
-  obliquity→snowball threshold** — snowball susceptibility keys on ocean fraction + CO₂, not a tidy ε limit;
-  the equator-freezes-at-high-ε intuition is Williams & Kasting 1997, not Spiegel). Earth ε=23.4°.
-- **eccentricity e** ∈ ~[0, 0.6], **upper third marginal** (Spiegel 2010: habitability is sharply cut at the
-  snowball transition for 0.4<e<0.6) → favor a weighted/Earth-leaning prior over uniform (Q3). Earth e=0.017.
-- **stellar flux S** ∈ ~[0.34, 1.05] S⊕ (Kopparapu 2013 verified: max-greenhouse outer **0.344**, moist/runaway
-  inner **1.014–1.051**). Earth = 1.0.
-
-**Stage 2 — map orbital → climate-forcing parameters** (lit *bounds* not tick-transfer; the ε→amplitude map is
-a **bounding HEURISTIC, PROVISIONAL** — it sets *where in the Earth range* a world sits, it does NOT compute
-forage amplitude from insolation [forage amplitude is rain/phenology-driven, §4.1.4], RT-1):
-- **ε → seasonal amplitude A_seas.** Insolation contrast rises ∝ ~sin ε, monotone until **ε≈54°** (verified:
-  pole/equator annual-insolation ratio crosses 1.0 at 54.0° — poles then out-heat the equator). An assumed
-  monotone map of ε onto the **Earth-anchored §4.1.4 range** (forest≈flat ↔ llanos≈0.5–0.7 drawdown); Earth
-  ε=23.4° → mid-range. *Step 1.*
-- **e → intra-annual flux asymmetry + a high-e mean brightening.** Perihelion/aphelion swing = `((1+e)/(1−e))²`
-  (verified: e=0.017→1.07, e=0.3→3.45) — **intra**-annual (interannual only via precession, correctly hedged);
-  AND fold the **annual-mean brightening ∝ (1−e²)^(−½)** (Spiegel 2010; +25% at e=0.6, negligible at Earth)
-  into mean-T/CC. *Step 2.*
-- **S → mean temperature.** `T_eff ∝ S^¼` (equilibrium) is ~33 K BELOW surface temp (RT-3) — so **anchor S=1 →
-  14°C (§4.3.2 placeholder) and scale ΔT from there** (an effective greenhouse offset), so the pathogen channel
-  (§4.6.3, keyed on *surface* T) gets a plausible surface temperature, not the bare effective temp. *Step 2.*
-
-## 2. The forcing application (the field wrapper, §4.1.7-isolated)
-
-A **time-varying multiplier on the carrying-capacity field** (`harvest_field`) — the R-6 `run_2d` wrapper
-pattern, NOT a model-internal change. **The form is PINNED to the validated R-6 envelope (RT-4 fix):**
-`s(t) = s_min + (1−s_min)·½(1+cos(2πt/12 − φ))` — range **[s_min, 1], peak-normalized to 1.0** — with the
-lottery setting the **amplitude `A_seas ≡ 1 − s_min`** (NOT a "1+A·season" boost-above-ceiling, which would
-*not* reproduce R-6's lean-season-bottleneck mechanism). **C.1 acceptance test (exact): `A_seas=0.6 ⇔
-s_min=0.4` must reproduce R-6's CC = 37%**, and `A_seas=0 ⇔ s_min=1 ⇒ s(t)≡1.0 exactly` (aseasonal baseline,
-bit-for-bit — mirror the harness `s_min=1.0 → season()≡1.0`). Per-biome curve *shape* AND **phase φ** stay the
-§4.1.4/5 forms — **the lottery sets the world AMPLITUDE; the biome keeps its SHAPE + PHASE** (RT-7: forest
-fat-season vs llanos wet-season are opposite-signed lean seasons — don't force one hemisphere's calendar; and
-the §4.1.5 game *threshold*-access mechanism must NOT be smoothed into a sine by the amplitude knob). Interannual
-(e) and mean-T (S) layer in C.2; catastrophe (§3) multiplies on top later. §4.1.6 contract.
-
-## 3. Build steps (each tunable, nesting, gated)
-- **Step C.1 — obliquity → seasonal amplitude lottery.** Draw ε per world; map to A_seas; wrap a seasonal
-  multiplier on the field. **Verify:** Earth ε → the validated forest-flat / llanos-high amplitudes (R-6);
-  amplitude=0 (ε→low) reproduces the aseasonal baseline exactly. *(Supervisor: verify before adding e/S.)*
-- **Step C.2 — add eccentricity + flux.** e → interannual term + asymmetry; S → mean T (climate-seam field) +
-  biome. **Verify:** Earth (e≈0.017, S=1) ≈ C.1 (e/S negligible); high-e/low-S shift amplitude/T as predicted.
-- **Step C.3 (SEPARATE, later) — catastrophe seam (§4).**
-
-## 4. Catastrophe step — per-biome lit-anchorage assessment (the supervisor's question)
-
-**Is there enough lit to define catastrophes PER BIOME, with effects + rates? PARTIALLY — solid for the major
-types, thin for cold/high-latitude.** Survey:
-
-| biome / setting | catastrophe | amplitude (CC drop) | recurrence | lit anchor |
+| # | layer | period / scale | orbital/lit driver | role in the model |
 |---|---|---|---|---|
-| arid / grass / temperate flats | **megadrought** | duration anchored, **decadal–multidecadal**; the 30–60% CC-drop is INTERPRETIVE (not a Cook number) | centennial–millennial (~0.1–0.5%/yr) | **Cook 2010** (NA Drought Atlas; Medieval megadroughts) |
-| tropical forest | **drought + wildfire** (ENSO) | 20–40% | ENSO 2–7 yr | **Timmermann 2018; Cane 2005** |
-| ALL biomes (global) | **volcanic cooling** | **common events −0.3 to −0.6°C** (Sigl: 19 largest CE tropical −0.6±0.2°C); **1–3°C only for the rare VEI7 tail** (Tambora/Samalas) | significant ~1%/yr; VEI7 ~millennial | **Sigl 2015** |
-| llanos / savanna (wet-season) | **flood** (access loss) | **NEEDS ITS OWN ANCHOR** — the Hurtado & Hill caiman 44→489 swing is the llanos seasonal-SHAPE datum (§4.1.4), reusing it as a flood-CATASTROPHE magnitude double-books it (RT-5) → drop or re-anchor | — | (re-anchor needed) |
-| high-latitude / tundra / mountain | **blizzard / cold-snap / freeze** | — | — | **GAP — no source in repo lit** (RT-5 confirmed) |
+| 1 | **Seasonal** | 12 mo (within-year) | obliquity ε (Spiegel 2009) | the within-year lean-season bottleneck (R-6) |
+| 2 | **Interannual** | 2–7 yr | eccentricity e + ENSO (Spiegel 2010; Timmermann 2018) | good/bad years |
+| 3 | **Regime-shift** | ~1–5 centuries (a few generations) | Holocene variability / Bond / LIA (Wanner 2008; Mayewski 2004) | **the SOCIETY-MORPH driver** — sustained CC shift pushes density across Binford packing → §4.5.10 transition |
+| 4 | **Catastrophe** | shock, yrs–decades | megadrought / volcanic / caribou-crash (Cook 2010; Sigl 2015; Bergerud) | the resilience SHOCK (push band ≪ K) |
 
-**⇒ Catastrophe design (C.3):** a per-biome **Poisson event** with (type, amplitude, duration, rate). Honestly
-anchored: **megadrought (Cook, duration only — CC-drop interpretive), volcanic (Sigl, ~0.3–0.6°C common /
-1–3°C VEI7-tail), ENSO-drought (Timmermann)**. **Flood needs its own anchor** (don't reuse the §4.1.4 caiman
-datum); **blizzard/cold is a lit gap** — fetch a source or omit (Q2). The resilience-test design point (R-16/
-R-18: push the band below K) = a **~40–50% CC drop sustained a few years** (megadrought-scale). Implemented as
-the §4.1.7 amplitude modifier on the field — **isolated** (writes only to the field wrapper, nothing else).
+**The forcing (one product, peak-normalized, on the `harvest_field` — §4.1.7 isolated):**
+`M(t) = season(t) · interannual(t) · regime(t) · catastrophe(t)`, each layer ∈ (0, 1] with peak pinned at 1.0.
+The demographic substrate is **unchanged code** — it just reads a time-varying carrying-capacity field (the
+R-6 `run_2d` wrapper pattern). **No double-count** (the legacy `s_min` lives only in the opt-in harness).
 
-## 5. Validation / gates
-- **Earth recovers the baseline:** (ε=23.4°, e=0.017, S=1) reproduces the validated forest-flat/llanos-high
-  seasonality (R-6) and e/S negligible; amplitude→0 = aseasonal baseline exact. 485 green throughout (opt-in).
+## §1. The per-world orbital lottery
+
+**Stage 1 — draw orbital/stellar parameters (uniform over the sustainable-habitable range):**
+
+| param | symbol | draw range | Earth | distribution | citation |
+|---|---|---|---|---|---|
+| obliquity | ε | **[0°, 60°]** (conservative habitable envelope) | 23.4° | uniform | Spiegel 2009 (no clean monotone ε→snowball threshold; broad habitable band) |
+| eccentricity | e | **[0, 0.6]** (upper third marginal) | 0.017 | uniform (sustainable-bounded) | Spiegel 2010 (annual-mean flux governs; snowball cut 0.4<e<0.6) |
+| stellar flux | S | **[0.34, 1.05] S⊕** | 1.0 | uniform | Kopparapu 2013 (max-greenhouse outer 0.344; moist/runaway inner 1.014–1.051) |
+
+*"Forager-sustainable" = the demographic substrate still sustains a population; extreme worlds that extinct it
+define the practical edge (measured, not assumed). Milankovitch long-term drift of (ε, e) is negligible within
+a centuries-long run → one draw per world.*
+
+**Stage 2 — map orbital → climate-forcing parameters (methods):**
+
+| orbital | → forcing param | mapping (math) | citation / status |
+|---|---|---|---|
+| ε | seasonal amplitude **A_seas** | **(B)** linear map of ε onto the empirical §4.1.4 band: `A_seas = clamp(A_earth · sin ε / sin 23.4°, 0, A_max)`; monotone to ε≈54° (pole annual-insolation crosses equator — verified 54.0°). PROVISIONAL bounding heuristic, NOT a derived transfer fn (forage amplitude is rain/phenology-driven). | §4.1.4 (Earth band) + Spiegel 2009 (bounds) |
+| e | interannual amp **A_e** + mean brightening | intra-annual flux swing `((1+e)/(1−e))²` (e=0.017→1.07, e=0.3→3.45); fold annual-mean `(1−e²)^(−½)` (+25% at e=0.6) into mean-CC. Interannual coupling only via precession (slow). | Spiegel 2010 |
+| S | mean temperature **T̄** | `T̄ = 14°C + ΔT`, `ΔT ∝ S^¼` anchored at S=1→14°C (§4.3.2) — an effective-greenhouse offset so the *surface* T (not the −33 K effective temp) feeds the pathogen channel §4.6.3. | Kopparapu 2013 / §4.3.2 |
+
+## §2. The four forcing layers (parameter tables + math)
+
+**Layer 1 — Seasonal** (PINNED to the validated R-6 form): `season(t) = s_min + (1−s_min)·½(1+cos(2πt/12 − φ_b))`,
+range [s_min, 1], **`A_seas ≡ 1 − s_min`**, period 12 steps, **phase φ_b per-biome** (forest fat-season vs
+llanos wet-season are opposite-signed — keep the biome's own calendar). §4.1.5 game *threshold*-access shape
+must NOT be smoothed by the amplitude knob.
+
+| biome | A_seas (= 1−s_min) | lean-season cause | citation |
+|---|---|---|---|
+| forest (Aché) | ~0.0–0.1 (flat) | calories ~aseasonal | Hill 1984 |
+| llanos/savanna (Hiwi) | **0.5–0.7** | wet-season flood access loss (Liebig) | Hurtado & Hill 1987 |
+| Hadza savanna | ~0.3–0.5 (moderate) | dry-season water aggregation | Hawkes 1991 |
+
+**Layer 2 — Interannual** (ENSO-like): `interannual(t) = 1 − A_inter·max(0, ξ(t))`, ξ = an AR/quasi-periodic
+noise, period 2–7 yr.
+
+| param | value/range | citation |
+|---|---|---|
+| period | 2–7 yr (quasi-periodic) | Timmermann 2018; Cane 2005 |
+| amplitude A_inter | ±20–40% CC in marginal biomes; ≤10% in buffered (forest) | Timmermann 2018 (ENSO drought/flood) |
+
+**Layer 3 — Regime-shift** (the morph driver): `regime(t) = 1 − A_reg·R(t)`, R = a slow Ornstein-Uhlenbeck /
+piecewise excursion, period ~1–5 centuries.
+
+| param | value/range | citation | note |
+|---|---|---|---|
+| period | ~100–500 yr (≈ a few–20 generations) | Wanner 2008; Mayewski 2004 (Holocene/Bond) | NOT glacial cycles (10⁴–10⁵ yr, too slow) |
+| amplitude A_reg | **±10–30% CC** (Little-Ice-Age-scale ~0.5–1°C → CC effect; bigger for 8.2-kyr/Younger-Dryas tails) | Wanner 2008; Mayewski 2004 | drives density past/below **Binford packing 0.091/km²** → §4.5.10 morph |
+
+**Layer 4 — Catastrophe** (per-biome Poisson; §3).
+
+## §3. Catastrophe — per-biome table (the resilience shock)
+
+| biome / setting | type | amplitude (CC drop) | duration | recurrence | citation | note |
+|---|---|---|---|---|---|---|
+| arid / grass / temperate flats | **megadrought** | 30–60% **(INTERPRETIVE — not a Cook number)** | decadal–multidecadal | ~0.1–0.5 %/yr | Cook 2010 | duration anchored; magnitude derived |
+| tropical forest | **ENSO drought + wildfire** | 20–40% | 1–3 yr | ENSO 2–7 yr | Timmermann 2018 | |
+| ALL (global) | **volcanic cooling** | **−0.3 to −0.6 °C common** (CC ~10–20%); **1–3 °C VEI7 tail** | 1–10 yr | common ~1 %/yr; VEI7 ~millennial | Sigl 2015 (19 largest CE tropical −0.6±0.2°C) | amplitude split common vs tail |
+| migratory-game (grass/steppe/tundra, `game_mobility`≈1) | **caribou/herd crash** | **~50–66 % (game collapse)** | multi-year | **~40–70 yr cycle** | Bergerud; Zalatan 2006 (tree-ring, 5–10× swings); **Usher 2022 CAVEAT** (famine record confounded by colonial policy — discount the pure-ecological signal) | the high-latitude megadrought-analog |
+| llanos / savanna (wet-season) | **flood** | **NEEDS OWN ANCHOR** (don't reuse the §4.1.4 caiman datum — that's the seasonal SHAPE) | seasonal | annual+extreme | (re-anchor) | |
+
+**Resilience-test design point** (R-16/R-18: push band ≪ K) = a **~40–50 % CC drop sustained a few years**
+(megadrought / caribou-crash scale). Implemented as the §4.1.7 amplitude modifier (writes ONLY to the field).
+
+## §4. Deeper seasonal couplings (the realism ties — ranked)
+
+| coupling | mechanism | lit-anchorage | priority | status |
+|---|---|---|---|---|
+| **water → season → aggregation** | dry-season shrink of small water → game + forager concentration at permanent water → packing (→ §4.5.10 morph) | dry-season aggregation documented (Hawkes 1991 Hadza; Hurtado & Hill Hiwi); per-biome **ephemeral-stream %** needs extraction (dryland hydrology) | **HIGH** (feeds morphing) | C.5 (after C.1–C.3) |
+| **T/humidity → pathogen seasonality** | seasonal T/humidity → seasonal pathogen pressure | the pathogen channel (§4.6.3, Cashdan 2014) already reads T/humidity → **free** once they're seasonal | HIGH (free) | falls out of C.2 |
+| **T → metabolic burn** | cold season → thermoregulation cost → higher burn | cold-climate forager energetics | MODEST | optional |
+| **birth seasonality** | seasonal nutrition → clustered births | `energetic_fertility_factor` reads `_fed_reserve` → **emergent** | — | already emergent |
+
+## §5. Math-mapping to the current structure (how it wires in)
+
+- **The field wrapper:** a `ClimateField` wraps the existing `harvest_field` (`SubWindowCapacity`/`TerrainField`):
+  `level(x,y) = base.level(x,y) · M(t)`. The model's `_step_rivalrous` reads `tf.level(...)` unchanged (R-6
+  `run_2d` precedent: `level = E × season()`). **Isolation (§4.1.7):** the climate writes ONLY to this
+  multiplier; nothing else in the resource/agent loop changes → no R-3/R-17 regression.
+- **Per-biome φ / shape:** `M` carries the world-level amplitudes; the per-biome curve *shape* + *phase* stay in
+  the §4.1.4/4.1.5 biome curves (the lottery scales magnitude, the biome keeps its calendar).
+- **Temperature field → pathogen:** C.2's seasonal T̄ + amplitude writes the (currently constant) `temperature`
+  field (terrain.py:616), which §4.6.3 `pathogen_mult` already consumes → seasonal disease for free.
+- **Regime-shift → society morph:** the slow `regime(t)` shifts equilibrium density; the model periodically
+  calls `society_from_character(density, surplus)` (§4.5.10) → `morph_to_society(...)` — i.e. **the regime layer
+  is what finally pushes density across Binford packing and fires the morph hook** (currently inert).
+
+## §6. Build steps (each tunable, nesting, gated)
+- **C.1 — obliquity → seasonal (Layer 1).** Draw ε; map to A_seas (§1-B); wrap `season(t)` on the field.
+  **GATE:** `A_seas=0.6 ⇔ s_min=0.4` reproduces **R-6 CC=37%**; `A_seas=0 ⇒ s(t)≡1.0 bit-exact` (baseline).
+- **C.2 — eccentricity + flux (orbital draws complete).** e → interannual + `(1−e²)^−½` mean; S → seasonal T̄
+  field (→ pathogen seasonality free). **GATE:** Earth (e=0.017,S=1) ≈ C.1; high-e/low-S shift as predicted.
+- **C.3 — regime-shift (Layer 3).** Slow OU/excursion modulation; wire to the §4.5.10 morph trigger.
+  **GATE:** a sustained warm excursion lifts density past Binford packing → a morph fires (the inert hook lives).
+- **C.4 — catastrophe (Layer 4, §3).** Per-biome Poisson events; the resilience shock.
+- **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
+
+## §7. Validation / gates
+- **Earth recovers the baseline** (ε=23.4°,e=0.017,S=1; all amplitudes→0 ⇒ `M≡1` bit-exact) → 485 green
+  (opt-in cfg). C.1 reproduces R-6 (CC=37% at A_seas=0.6).
 - **Transfer functions monotone + bounded** to the habitable ranges (no snowball/runaway leakage).
-- **Field-wrapper isolation** (§4.1.7): the climate forcing touches ONLY the harvest field multiplier; the
-  demographic substrate is unchanged code (just reads a time-varying field) → no R-3/R-17 regression.
-- **One draw per world** (deterministic from seed); the temporal layers (seasonal/interannual) are within-run.
+- **§4.1.7 isolation:** climate touches ONLY the field multiplier (grep — no other write site).
+- **Per-world determinism** (orbital draw from seed); temporal layers within-run.
+- **C.3 morph gate:** the regime layer demonstrably fires a society transition (the payoff — the inert §4.5.10
+  hook becomes live).
 
-## 6. Red-team targets (fresh repo-grounded sub-agent)
-RT-1: the **ε→A_seas mapping** — is `sin ε`-scaling onto the §4.1.4 Earth range defensible, and are the
-habitable ε bounds (snowball limits) right per Spiegel 2009? RT-2: **e→interannual** — is `((1+e)/(1−e))²` the
-right flux-swing, and does eccentricity belong as *interannual* vs *intra-annual asymmetry* (precession
-dependence)? RT-3: **S→T** — `T∝S^¼` equilibrium vs the climate-seam field's role (pathogen channel); does
-changing S need a biome re-derivation? RT-4: **field-wrapper isolation** — does the multiplier truly stay out
-of the model loop (§4.1.7), reproducing R-6's seasonal result, with no double-count vs the existing `s_min`?
-RT-5: **per-biome catastrophe** — is the table's lit-anchoring honest (esp. the cold-gap), and are the
-amplitudes/rates defensible? RT-6: **scope/nesting** — is C.1→C.2→C.3 right; does Earth-config reproduce the
-baseline bit-for-bit at amplitude 0? RT-7: anything missed (Milankovitch long-term drift? the s_min legacy
-test value? the seasonal phase per hemisphere?).
+## §8. Open questions (resolved + remaining)
+- **Q1 RESOLVED (B):** ε → empirical Earth §4.1.4 band, scaling dial (provisional heuristic).
+- **Q2 RESOLVED:** cold/high-latitude = **caribou/herd crash** (Bergerud/Zalatan magnitude; Usher 2022 confound
+  caveat) on migratory-game biomes — the gap is filled.
+- **Q3 RESOLVED:** **uniform** draws over the (forager-sustainable) habitable range.
+- **REMAINING Q4:** regime-shift amplitude/period calibration (±10–30% / 100–500 yr) — extract the Wanner/
+  Mayewski numbers more precisely? **Q5:** flood catastrophe re-anchor (own source) or drop?
 
-## 7. Open questions for the supervisor
-- **Q1:** ε→A_seas — map onto the **Earth §4.1.4 range** (forest-flat↔llanos-high), so Earth ε sits mid-range?
-- **Q2:** Catastrophe **cold/blizzard gap** — fetch a high-latitude catastrophe source, or omit that biome's
-  catastrophe for now (megadrought/flood/volcanic/ENSO cover the rest)?
-- **Q3:** Lottery **distribution** — uniform over the habitable range, or weighted toward Earth-like (a
-  realistic prior)?
-
----
-
-## 8. Red-team record (2026-06-21, fresh repo-grounded sub-agent) — VERDICT: APPROVE-WITH-FIXES (applied)
-
-Physics verified correct: **ε≈54° crossover** (integrated to 54.0°), **`((1+e)/(1−e))²`** swing math, **Kopparapu
-flux bounds** (0.344 outer / 1.014–1.051 inner), the intra-vs-interannual eccentricity hedge, the field-wrapper
-**isolation discipline matches the run_2d code**, and **no live double-count** (`s_min` exists only in the opt-in
-harness, not the core model — core T/humidity are constant placeholders per §4.3.2). Four MAJORs, all fixed in
-the design:
-- **[MAJOR→fixed] RT-4 forcing form:** the proposed `M(t)=1+A·season` ≠ the validated R-6 `s_min+(1−s_min)·½(1+cos)`
-  (peak-normalized [s_min,1]) → "reproduces R-6" wasn't guaranteed. **Pinned `A_seas ≡ 1−s_min`; C.1 gate =
-  A_seas=0.6 ⇔ s_min=0.4 ⇒ R-6's CC=37%; A_seas=0 ⇒ s(t)≡1.0 bit-exact** (§2). *The load-bearing fix.*
-- **[MAJOR→fixed] RT-1 Spiegel mis-cite:** Spiegel 2009 *refutes* a monotone obliquity→snowball threshold
-  (snowball keys on ocean/CO₂, not ε); the equator-freeze intuition is Williams & Kasting 1997. Restated ε∈[0,60°]
-  as a conservative envelope; the ε→amplitude map labeled a **PROVISIONAL bounding heuristic**, not a transfer
-  function (§1).
-- **[MAJOR→fixed] RT-5 volcanic magnitude:** "1–3°C" overstates Sigl 2015's **−0.4 to −0.6°C** for the ~1%/yr
-  events (amplitude/rate were mismatched to one source). Split: ~0.3–0.6°C common, 1–3°C VEI7-tail (§4).
-- **[MAJOR→fixed] RT-5 flood double-book:** the Hurtado & Hill caiman 44→489 datum is the llanos seasonal-SHAPE
-  anchor (§4.1.4), not an independent flood-catastrophe magnitude → flagged "needs its own anchor or drop" (§4).
-- **[MINOR→fixed]** RT-3 `T∝S^¼` is ~33 K below surface T → anchor S=1→14°C, scale ΔT (§1); RT-2 fold the
-  `(1−e²)^−½` annual-mean brightening at high e (§1); RT-7 keep per-biome **phase φ** + the §4.1.5 game
-  **threshold-vs-smooth** distinction intact under the amplitude knob (§2); Milankovitch correctly out of scope.
-- **[honest, confirmed]** the **cold/blizzard catastrophe is a genuine lit gap** (no high-latitude source in
-  `literature/`) — fill or omit (Q2).
-
-**Net:** 4 MAJORs resolved in design; no BLOCKER. Build order (§3) stands: C.1 (obliquity→seasonal, gated on
-R-6) → C.2 (e/S) → C.3 (catastrophe).
+## §9. Red-team record
+**v1 (2026-06-21, sub-agent) — APPROVE-WITH-FIXES, all applied** (physics verified: ε≈54° crossover,
+`((1+e)/(1−e))²`, Kopparapu bounds, isolation, no live double-count): RT-4 pinned the forcing to the R-6
+`s_min` form (A_seas≡1−s_min, C.1 gate); RT-1 corrected the Spiegel-2009 snowball mis-cite (→ heuristic label);
+RT-5 volcanic −0.4 to −0.6°C (not 1–3°C); RT-5 flood double-book flagged; +S→T greenhouse offset, `(1−e²)^−½`,
+per-biome φ, §4.1.5 threshold preservation.
+**v2 NEEDS RE-RED-TEAM** — the NEW material (Layer-3 regime-shift, the caribou-crash catastrophe via the
+ecology lit + Usher caveat, the water→aggregation coupling, the regime→morph wiring, the comprehensive tables)
+has not been reviewed. Targets: is the regime-shift amplitude/period defensible (Wanner/Mayewski)? is the
+caribou-crash magnitude (50–66%) honest given Usher's confound? does the regime→morph wiring stay §4.1.7-clean?
+is the 4-layer product `M(t)` conservative/peak-normalized with no cross-layer double-count?
 
 ---
 
-**Lit (in `literature/`):** Berger 1978 (insolation/Milankovitch formalism), Spiegel 2009 (obliquity→
-seasonality + snowball bounds), Spiegel 2010 (eccentricity, habitable to high e), Kopparapu 2013 / Kasting 1993
-(HZ flux bounds), Timmermann 2018 / Cane 2005 (ENSO), Cook 2010 (megadrought), Sigl 2015 (volcanic), Wanner
-2008 / Mayewski 2004 (Holocene variability). MODEL_SPEC §4.1.4–4.1.7 (the seams), §4.3.2 (climate field), R-6
-(the validated seasonal result the wrapper must reproduce).
+**Lit (in `literature/`):** Berger 1978 (Milankovitch), Spiegel 2009 (obliquity), Spiegel 2010 (eccentricity),
+Kopparapu 2013 / Kasting 1993 (HZ flux), Timmermann 2018 / Cane 2005 (ENSO), Cook 2010 (megadrought), Sigl 2015
+(volcanic), Wanner 2008 / Mayewski 2004 (Holocene/regime-shift), Usher 2022 (caribou-crisis confound caveat).
+**To fetch:** caribou population-ecology (Bergerud; Zalatan 2006; Vors & Boyce 2009) for the crash magnitude/
+cycle; a flood-catastrophe anchor; dryland ephemeral-stream % per biome (water-coupling). MODEL_SPEC §4.1.4–7
+(seams), §4.3.2 (climate field), §4.5.10 (morph hooks), §4.6.3 (pathogen), R-6 (the seasonal anchor).
