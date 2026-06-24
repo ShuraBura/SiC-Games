@@ -16,7 +16,7 @@ is added as the society-morph driver; catastrophe is a separate step.
 |---|---|---|---|---|
 | 1 | **Seasonal** | 12 mo (within-year) | obliquity ε (Spiegel 2009) | the within-year lean-season bottleneck (R-6) |
 | 2 | **Interannual** | 2–7 yr | eccentricity e + ENSO (Spiegel 2010; Timmermann 2018) | good/bad years |
-| 3 | **Regime-shift** | ~1–5 centuries (a few generations) | Holocene variability / Bond / LIA (Wanner 2008; Mayewski 2004) | **the SOCIETY-MORPH driver** — sustained CC shift pushes density across Binford packing → §4.5.10 transition |
+| 3 | **Regime-shift** | excursion ~100–500 yr (a few–20 gen); recurrence ~1000–2000 yr (Bond ~1500) | Holocene variability / Bond / LIA (Wanner 2008; Mayewski 2004) | multi-generational CC modulation (realism + a slow resilience driver). **CAVEAT (v2 red-team):** it does NOT by itself fire the §4.5.10 morph — the morph also needs *storable surplus* (Testart, the deferred storage mechanic) + a periodic-call wiring that does not yet exist; a CC multiplier feeds *density* only, and the +10–30% boost clears Binford packing only marginally/transiently. Regime-layer = a contributing factor, not the trigger. |
 | 4 | **Catastrophe** | shock, yrs–decades | megadrought / volcanic / caribou-crash (Cook 2010; Sigl 2015; Bergerud) | the resilience SHOCK (push band ≪ K) |
 
 **The forcing (one product, peak-normalized, on the `harvest_field` — §4.1.7 isolated):**
@@ -67,13 +67,16 @@ noise, period 2–7 yr.
 | period | 2–7 yr (quasi-periodic) | Timmermann 2018; Cane 2005 |
 | amplitude A_inter | ±20–40% CC in marginal biomes; ≤10% in buffered (forest) | Timmermann 2018 (ENSO drought/flood) |
 
-**Layer 3 — Regime-shift** (the morph driver): `regime(t) = 1 − A_reg·R(t)`, R = a slow Ornstein-Uhlenbeck /
-piecewise excursion, period ~1–5 centuries.
+**Layer 3 — Regime-shift** (multi-generational CC modulation): `regime(t) = 1 − A_reg·R(t)`, R = a
+**REGIME-SWITCHING (two-state Markov / telegraph) or step-excursion** process (v2 red-team: NOT
+Ornstein-Uhlenbeck — OU is mean-reverting and produces wiggles, not the *sustained* multi-century plateau a
+real LIA/Bond excursion needs).
 
 | param | value/range | citation | note |
 |---|---|---|---|
-| period | ~100–500 yr (≈ a few–20 generations) | Wanner 2008; Mayewski 2004 (Holocene/Bond) | NOT glacial cycles (10⁴–10⁵ yr, too slow) |
-| amplitude A_reg | **±10–30% CC** (Little-Ice-Age-scale ~0.5–1°C → CC effect; bigger for 8.2-kyr/Younger-Dryas tails) | Wanner 2008; Mayewski 2004 | drives density past/below **Binford packing 0.091/km²** → §4.5.10 morph |
+| excursion **duration** | ~100–500 yr (LIA ≈ 500 yr) | Wanner 2008; Mayewski 2004 | NOT glacial cycles (10⁴–10⁵ yr) |
+| **recurrence** | **~1000–2000 yr** (Bond ~1500; Mayewski RCC ~2000–2800 & 1500) | Mayewski 2004 | (v2 fix: was conflated with duration) |
+| amplitude A_reg | **central ~0.5°C global** (Wanner: LIA global-mean 0.5°C, millennial trend 0.3°C) → an *interpretive* ±10–15% CC; reserve **±30% / ~1°C** for explicitly-flagged 8.2-kyr/YD tails | Wanner 2008 p.1793 | °C→CC% is interpretive (no NPP transfer fn) |
 
 **Layer 4 — Catastrophe** (per-biome Poisson; §3).
 
@@ -84,7 +87,7 @@ piecewise excursion, period ~1–5 centuries.
 | arid / grass / temperate flats | **megadrought** | 30–60% **(INTERPRETIVE — not a Cook number)** | decadal–multidecadal | ~0.1–0.5 %/yr | Cook 2010 | duration anchored; magnitude derived |
 | tropical forest | **ENSO drought + wildfire** | 20–40% | 1–3 yr | ENSO 2–7 yr | Timmermann 2018 | |
 | ALL (global) | **volcanic cooling** | **−0.3 to −0.6 °C common** (CC ~10–20%); **1–3 °C VEI7 tail** | 1–10 yr | common ~1 %/yr; VEI7 ~millennial | Sigl 2015 (19 largest CE tropical −0.6±0.2°C) | amplitude split common vs tail |
-| migratory-game (grass/steppe/tundra, `game_mobility`≈1) | **caribou/herd crash** | **~50–66 % (game collapse)** | multi-year | **~40–70 yr cycle** | Bergerud; Zalatan 2006 (tree-ring, 5–10× swings); **Usher 2022 CAVEAT** (famine record confounded by colonial policy — discount the pure-ecological signal) | the high-latitude megadrought-analog |
+| migratory-game (grass/steppe/tundra, `game_mobility`≈1) | **caribou/herd crash** | **drive the field with the HERD swing — Zalatan 2006 ~5–10× (≈80% peak-to-trough); Usher counts 668k→279k ≈58% (unreliable).** The **~50–66% is HUMAN famine mortality, a downstream OUTCOME — NOT the forcing input** (v2 red-team category-error fix) | multi-year | **~40–70 yr cycle** | Bergerud; Zalatan 2006 (tree-ring); **Usher 2022 CAVEAT** (famine record confounded by colonial sedentarisation — discount the human-mortality signal) | high-latitude megadrought-analog; sources to fetch (not in repo) |
 | llanos / savanna (wet-season) | **flood** | **NEEDS OWN ANCHOR** (don't reuse the §4.1.4 caiman datum — that's the seasonal SHAPE) | seasonal | annual+extreme | (re-anchor) | |
 
 **Resilience-test design point** (R-16/R-18: push band ≪ K) = a **~40–50 % CC drop sustained a few years**
@@ -109,17 +112,24 @@ piecewise excursion, period ~1–5 centuries.
   the §4.1.4/4.1.5 biome curves (the lottery scales magnitude, the biome keeps its calendar).
 - **Temperature field → pathogen:** C.2's seasonal T̄ + amplitude writes the (currently constant) `temperature`
   field (terrain.py:616), which §4.6.3 `pathogen_mult` already consumes → seasonal disease for free.
-- **Regime-shift → society morph:** the slow `regime(t)` shifts equilibrium density; the model periodically
-  calls `society_from_character(density, surplus)` (§4.5.10) → `morph_to_society(...)` — i.e. **the regime layer
-  is what finally pushes density across Binford packing and fires the morph hook** (currently inert).
+- **Regime-shift → society morph (CORRECTED, v2 red-team):** the slow `regime(t)` shifts equilibrium density up
+  or down. It is a *contributing factor* to the §4.5.10 morph, **NOT the trigger**: `society_from_character` has
+  **no call site in the loop yet** (must be added as its own step), it needs a **`surplus_frac`** input a CC
+  multiplier does not supply (the morph's real gate is the *deferred storage mechanic*, Testart, per
+  MODEL_SPEC §4.5.10), and a +10–30% CC boost clears Binford packing only *marginally/transiently* (e.g. +30%
+  on 0.08→0.104 ✓, but +10% on 0.08→0.088 ✗). So the climate stage *enables* but does not *cause* the morph;
+  the live morph awaits the storage mechanic + the periodic-call wiring (a separate deferred step).
 
 ## §6. Build steps (each tunable, nesting, gated)
 - **C.1 — obliquity → seasonal (Layer 1).** Draw ε; map to A_seas (§1-B); wrap `season(t)` on the field.
   **GATE:** `A_seas=0.6 ⇔ s_min=0.4` reproduces **R-6 CC=37%**; `A_seas=0 ⇒ s(t)≡1.0 bit-exact` (baseline).
 - **C.2 — eccentricity + flux (orbital draws complete).** e → interannual + `(1−e²)^−½` mean; S → seasonal T̄
   field (→ pathogen seasonality free). **GATE:** Earth (e=0.017,S=1) ≈ C.1; high-e/low-S shift as predicted.
-- **C.3 — regime-shift (Layer 3).** Slow OU/excursion modulation; wire to the §4.5.10 morph trigger.
-  **GATE:** a sustained warm excursion lifts density past Binford packing → a morph fires (the inert hook lives).
+- **C.3 — regime-shift (Layer 3).** Slow **regime-switching/step** modulation of the field (NOT OU). Ships the
+  *climate layer* only. **GATE:** a sustained excursion produces a sustained multi-generational CC plateau (not
+  a mean-reverting wiggle) of the right magnitude/duration; Earth-config → no excursion. *(The morph trigger is
+  a SEPARATE deferred step — it needs the storage/surplus mechanic + a periodic `society_from_character` call,
+  neither of which exists; do NOT gate C.3 on a morph firing.)*
 - **C.4 — catastrophe (Layer 4, §3).** Per-biome Poisson events; the resilience shock.
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
 
@@ -146,11 +156,37 @@ piecewise excursion, period ~1–5 centuries.
 `s_min` form (A_seas≡1−s_min, C.1 gate); RT-1 corrected the Spiegel-2009 snowball mis-cite (→ heuristic label);
 RT-5 volcanic −0.4 to −0.6°C (not 1–3°C); RT-5 flood double-book flagged; +S→T greenhouse offset, `(1−e²)^−½`,
 per-biome φ, §4.1.5 threshold preservation.
-**v2 NEEDS RE-RED-TEAM** — the NEW material (Layer-3 regime-shift, the caribou-crash catastrophe via the
-ecology lit + Usher caveat, the water→aggregation coupling, the regime→morph wiring, the comprehensive tables)
-has not been reviewed. Targets: is the regime-shift amplitude/period defensible (Wanner/Mayewski)? is the
-caribou-crash magnitude (50–66%) honest given Usher's confound? does the regime→morph wiring stay §4.1.7-clean?
-is the 4-layer product `M(t)` conservative/peak-normalized with no cross-layer double-count?
+**v2 (2026-06-21, sub-agent on the new material) — NEEDS-REVISION → fixed.** Verified sound: the
+timescale-vs-Milankovitch distinction, the Usher caveat *direction*, the caribou ~40–70 yr period, the M(t)
+conservativeness/normalization, the ephemeral-stream "needs extraction" honesty, and the code primitives
+(`BINFORD_PACKING_PER_KM2=0.091` demography.py:329, `morph_to_society` phase1_model.py:643). Findings + fixes:
+- **[BLOCKER→fixed] regime→morph wiring was asserted-but-uncoded AND contradicts the model's own design.**
+  `society_from_character` is **never called in the loop** (grep: 0 call sites) and the blueprint added no step
+  for it; the morph needs **storable surplus** (`surplus_frac` ≥0.5/0.7, demography.py:352) — Testart, the
+  *deferred storage mechanic* (MODEL_SPEC:626 says the morph "stays inert until a surplus/storage mechanic")
+  — a CC multiplier feeds *density* only; and the arithmetic clears packing only marginally/transiently
+  (+30% on 0.08=0.104 ✓ but +10% on 0.08=0.088 ✗, +30% on 0.065 ✗). **Fix:** §0/§5/§6 downgraded — the regime
+  layer is a *contributing factor, NOT the morph trigger*; the morph awaits the storage mechanic + an actual
+  periodic-call wiring (its own deferred step, not C.3).
+- **[BLOCKER-for-row→fixed] caribou CATEGORY ERROR:** the 50–66% is **human famine mortality** (downstream
+  outcome), NOT the herd-crash magnitude — and it contradicted "Zalatan 5–10× (≈80%)" in the same cell. **Fix:**
+  §3 drives the field with the **herd swing** (Zalatan/Bergerud ~5–10×); the human 50–66% is an outcome,
+  discounted per Usher's colonial confound. Sources (Bergerud/Zalatan/Vors&Boyce) not in repo → to fetch.
+- **[MAJOR→fixed] OU is mean-reverting** → wiggles, not a sustained multi-century plateau. **Fix:** §2 Layer-3
+  = a **regime-switching (two-state Markov) / step-excursion** process.
+- **[MAJOR→fixed] period/amplitude mis-anchor:** excursion *duration* ~100–500 yr ≠ *recurrence* ~1500 yr
+  (Bond); LIA central ~0.5°C global (Wanner), not 1°C. **Fix:** §2 Layer-3 table split + pinned.
+- **[MAJOR→to-apply-in-impl] ENSO double-count:** Layer-2 interannual (ENSO 2–7 yr) and Layer-4 catastrophe
+  forest ENSO-drought are the **same driver on the same biome** → fold the catastrophe-drought into the *tail*
+  of the Layer-2 ENSO distribution (one process, one draw), not an independent multiplicative event.
+- **[MAJOR→to-apply-in-impl] water→aggregation double-count:** the dry-season aggregation is ALREADY in the
+  code (terrain.py:109 `game_mobility=0.2` "Hadza dry-season aggregation"; §4.1.5 threshold-access). C.5 must
+  *reuse* that signal (set only the spatial *location* of aggregation), not add a parallel magnitude.
+
+**Net:** the v2 payoff (regime→morph) was overstated and is corrected to honest; the new layer's process + lit
+anchors fixed; two cross-layer double-counts flagged for the implementation. **Build C.1–C.2 are unaffected
+and ready;** C.3 (regime-shift) ships the *climate layer* but NOT a morph trigger (that's a separate deferred
+step with the storage mechanic); the ENSO/water reconciliations apply at C.4/C.5.
 
 ---
 
