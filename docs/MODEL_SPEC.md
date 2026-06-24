@@ -560,8 +560,17 @@ r=+0.190 = von Rueden r≈0.19** (the calibrated value); the homeostat holds liv
 Gini 0.18–0.23 — the BLOCKER fix works in practice); the compositional anti-fragility (R-18) survives on the
 **combined** status (death-deficit +0.04→+0.11); male N_e healthy (111–170). **Operating envelope: m≲4, ρ≥0.1**
 (the cred equilibrium rises with m but is scale-invariant in the shares; Gini is the meaningful inequality).
-`paternal_provision_frac`→Marlowe 58% calibration still pending (needs a life-history run). **C (pair-bonding:
-persistence, polygyny cap, assortment) and the Silicon comparison deferred.**
+**`paternal_provision_frac` calibration (life-history run, run_3d, 2026-06-21) — Marlowe 58% is ALREADY captured,
+by a different channel.** Sweeping the knob, the male share of *deficit-provisioning* to <3-yr children saturates
+at **~17%** (it can't reach 58%) — because the RT-2 residual-need design makes the father a **safety-net** (he
+fires only when the mother fails / orphans, ~17% of cases), and because *deficit-provisioning* is the wrong
+analog for Marlowe's *camp-calorie* share. The father's PRIMARY caloric contribution to young children is the
+**band meat share**: with sex-division, males produce the meat (= `meat_frac` ≈ 0.55 of the diet, Cordain),
+band-shared to women + children → **male caloric contribution ≈ 55% ≈ Marlowe's 58%**, by construction. So
+Marlowe is matched via `meat_frac` + sex-division (validating those), and **`paternal_provision_frac` is a
+separate safety-net for failing/orphan mothers — set ≈ 0.5** (saturation, fully covers the residual deficit).
+A *proactive* paternal-provisioning redesign (father as primary, to push deficit-share higher) would risk the
+RT-2 double-count and is unnecessary. **C (pair-bonding) and the Silicon comparison deferred.**
 
 ---
 

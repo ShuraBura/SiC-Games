@@ -258,6 +258,8 @@ class TerrainWorld(mesa.Model):
         self.deaths_senesc_this_step = 0
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
         self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
+        self.prov_young_maternal = 0.0   # diagnostic: kcal provisioned to <3-yr children by mother (Marlowe calib)
+        self.prov_young_paternal = 0.0   # diagnostic: "" by father (male share = paternal/(maternal+paternal))
 
         if self._rivalrous:
             self._step_rivalrous()
@@ -387,17 +389,20 @@ class TerrainWorld(mesa.Model):
                 need = self._reserve_full * child.reserve_scale() - child.wealth
                 if need <= 0.0:
                     continue
+                young = child.age < 36   # Marlowe critical period (<3 yr): male provisioning-share target ~58%
                 m = child._mother
                 if provisioning and m is not None and m.alive:
                     ov = provision_pool.get(m, 0.0)          # tier 1: mother's wasted overflow (free to give)
                     g = min(need, ov)
                     if g > 0.0:
                         child.wealth += g; provision_pool[m] = ov - g; need -= g
+                        if young: self.prov_young_maternal += g
                     if need > 0.0 and self_keep_frac < 1.0:  # tier 2 (S1): mother's reserve above self_keep
                         res_av = m.wealth - self_keep_frac * self._reserve_full * m.reserve_scale()
                         if res_av > 0.0:
                             g2 = min(need, res_av)
                             child.wealth += g2; m.wealth -= g2; need -= g2
+                            if young: self.prov_young_maternal += g2
                 # tier 3 (B+ step 5): father gives `pat_frac` of HIS overflow against the child's RESIDUAL need
                 # (after the maternal tiers) — conserved (otherwise-wasted overflow, like tier 1), so no
                 # double-feed (RT-2); bites on the constrained-mother / orphan cohort (Marlowe).
@@ -408,6 +413,7 @@ class TerrainWorld(mesa.Model):
                         g3 = min(need, fov)
                         if g3 > 0.0:
                             child.wealth += g3; provision_pool[f] = provision_pool.get(f, 0.0) - g3; need -= g3
+                            if young: self.prov_young_paternal += g3
 
         # Prowess facet dynamics (B+ step 2): achieved status = a slow decaying EMA of RELATIVE meat intake
         # (reputation, not instantaneous — Smith 2004). Relative (mean-pinned) ⇒ runaway-safe by construction
