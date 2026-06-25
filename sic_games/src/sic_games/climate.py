@@ -66,9 +66,19 @@ CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
 # flood (drought → aquatic collapse) and an over-flood (terrestrial drowning) hurt the forager, so the llanos
 # interannual is two-sided `1 − amp·|sin θ|` (worst at either flood extreme), vs the generic one-sided ENSO.
 # Same Layer-2 clock (period/phase) → the flood IS the llanos ENSO (El Niño suppresses Orinoco discharge), not a
-# parallel Poisson (v2 anti-double-count). LLANOS_FLOOD_AMP is INTERPRETIVE (no inundation-km²→forage-kcal
-# transfer fn, cf. the regime °C→CC% note); PROVISIONAL, pending supervisor review.
-LLANOS_FLOOD_AMP = 0.45                          # extreme flood/drought year → llanos forage ≈ 55% of normal [PROVISIONAL]
+# parallel Poisson (v2 anti-double-count). The amplitude is DRAWN per world over a LIT-BOUNDED band (the exact
+# inundation-km²→forage-kcal mapping stays interpretive WITHIN the band, cf. the regime °C→CC% note):
+#   lower 0.15 = Castello et al. 2015 (Lower Amazon flood-pulse fishery): climate explains ~18% of yield var,
+#               per-extreme single-species swings ~15–20% — a MODERATE extreme year (protein channel). Their
+#               "high and low waters exert EQUAL forcing" is the empirical basis for the TWO-SIDED form.
+#   upper 0.45 = Sarmiento et al. 2004 (Apure llanos) MEASURED above-ground production drop in an exceptional-
+#               flood year: TotalANPP 1996 (dyke-breach flood, 3 mo under water) 265–418 vs 1997 (normal)
+#               601–659 g/m² (ungrazed) → −37 to −56%, central ~45%; their "both drought and water excess limit
+#               production, even more in wet years" also confirms the two-sided form. Corroborated by Welcomme
+#               1979 (fish yield ∝ flood extent). NOTE: a direct flood-year→production measurement (NOT the
+#               earlier interpretive km²→kcal hand-wave).
+LLANOS_FLOOD_AMP_MIN, LLANOS_FLOOD_AMP_MAX = 0.15, 0.45
+LLANOS_FLOOD_AMP = LLANOS_FLOOD_AMP_MAX          # Sarmiento-anchored severe-end (used by unit tests / default cap)
 
 
 def draw_eccentricity(rng) -> float:
@@ -116,7 +126,7 @@ def draw_world_climate(rng, a_earth: float) -> dict:
         caribou_period=int(rng.uniform(CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR) * SEASON_PERIOD_DEFAULT),
         caribou_phase=rng.uniform(0.0, 2.0 * math.pi),
         # Layer 4c llanos flood (GRASS_LLANOS forage) — rides the same interannual ENSO clock, two-sided.
-        llanos_flood_amp=LLANOS_FLOOD_AMP,
+        llanos_flood_amp=rng.uniform(LLANOS_FLOOD_AMP_MIN, LLANOS_FLOOD_AMP_MAX),
         mean_temperature=flux_to_temperature(S),
         obliquity=eps, eccentricity=e, flux=S,
     )

@@ -272,10 +272,16 @@ the llanos flood as the heavy TAIL of Layer-2 interannual on `GRASS_LLANOS` fora
 1,278–105,454 km², median 25,374). Because both flood extremes hurt the forager, the llanos interannual is
 **two-sided** `1 − amp·|sin θ|` (worst at either extreme), vs the generic one-sided ENSO, on the same Layer-2
 clock — REPLACING the ENSO form on llanos cells (one process per cell, no double-count). `level()` routes
-through a per-cell `interannual_at(x,y)` (== generic off-llanos → bit-exact). `LLANOS_FLOOD_AMP=0.45` is
-INTERPRETIVE/PROVISIONAL (no inundation-km²→forage-kcal transfer fn, cf. regime °C→CC%), pending review. Gate:
-700-step run, full-llanos mask at |sin θ|=1 → eq_pop ratio 0.872 (sustained forage depression; below-K slack
-absorbs part). A stochastic heavy-tail (vs the regular two-sided swing) is a noted refinement.
+through a per-cell `interannual_at(x,y)` (== generic off-llanos → bit-exact). The amplitude is **drawn per world
+over the lit-bounded band [0.15, 0.45]** (the km²→kcal mapping stays interpretive within the band): lower 0.15 =
+Castello et al. 2015 Lower-Amazon flood-pulse fishery (climate ~18% of yield variance; per-extreme swings
+~15–20%; "high & low waters exert EQUAL forcing" → the two-sided basis); upper 0.45 = **Sarmiento et al. 2004
+MEASURED** Apure-llanos production drop in an exceptional-flood year (TotalANPP 1996 flood 265–418 vs 1997
+normal 601–659 g/m² ungrazed → −37 to −56%, central ~45%; "both drought & water excess limit production, even
+more in wet years" confirms two-sidedness; Welcomme 1979 corroborates) — a direct flood-year→production
+measurement, not interpretive. Gate: 700-step run, full-llanos mask at |sin θ|=1, amp 0.45 →
+eq_pop ratio 0.872 (sustained forage depression; below-K slack absorbs part). A stochastic heavy-tail (vs the
+regular two-sided swing) is a noted refinement.
 
 **C.5 water→aggregation (pending):** reuse the existing §4.1.5/game-mobility dry-season aggregation, not a
 parallel mechanic.

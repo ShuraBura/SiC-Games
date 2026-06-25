@@ -15,7 +15,7 @@ from sic_games.climate import (
     ECCENTRICITY_MAX, STELLAR_FLUX_MIN, STELLAR_FLUX_MAX,
     REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
     CARIBOU_AMP_ABOUT_MEAN, CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR,
-    LLANOS_FLOOD_AMP,
+    LLANOS_FLOOD_AMP, LLANOS_FLOOD_AMP_MIN, LLANOS_FLOOD_AMP_MAX,
 )
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
@@ -267,8 +267,10 @@ def test_llanos_does_not_touch_meat_factor():
 
 
 def test_draw_world_climate_llanos_key():
-    d = draw_world_climate(random.Random(5), a_earth=A_SEAS_EARTH["llanos"])
-    assert d["llanos_flood_amp"] == LLANOS_FLOOD_AMP
+    # llanos flood amplitude is DRAWN per-world over the lit-bounded band [0.15, 0.45] (Castello/Welcomme/Apure)
+    for s in range(50):
+        d = draw_world_climate(random.Random(s), a_earth=A_SEAS_EARTH["llanos"])
+        assert LLANOS_FLOOD_AMP_MIN <= d["llanos_flood_amp"] <= LLANOS_FLOOD_AMP_MAX
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

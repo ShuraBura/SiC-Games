@@ -173,11 +173,18 @@ real LIA/Bond excursion needs).
     **two-sided** `1 − amp·|sin θ|` (worst at either extreme) — vs the generic one-sided ENSO `1 − amp·max(0,sin θ)`
     — on the SAME Layer-2 clock (the flood IS the llanos ENSO; El Niño suppresses Orinoco discharge), REPLACING
     the ENSO form on llanos cells (one process per cell, no double-count). `level()` routes through a per-cell
-    `interannual_at(x,y)` (== generic off-llanos → non-llanos bit-exact). `LLANOS_FLOOD_AMP=0.45` is
-    **INTERPRETIVE/PROVISIONAL** (no inundation-km²→forage-kcal transfer fn — cf. the regime °C→CC% note),
-    pending supervisor review. **GATE met:** (700-step run, full-llanos mask, flood held at |sin θ|=1) eq_pop
-    563→491 (ratio 0.872) — a sustained, proportional forage depression (below-K regulation slack absorbs part,
-    the C.1/C.3 pattern); off-llanos / amp=0 nests to C.3 bit-exact. 4 field unit tests.
+    `interannual_at(x,y)` (== generic off-llanos → non-llanos bit-exact). The amplitude is **DRAWN per world
+    over a LIT-BOUNDED band `[0.15, 0.45]`** (the km²→kcal mapping stays interpretive *within* the band): lower
+    0.15 = Castello et al. 2015 Lower-Amazon flood-pulse fishery (climate ~18% of yield var, per-extreme swings
+    ~15–20%; their "high & low waters exert EQUAL forcing" is the empirical basis for the two-sided form); upper
+    0.45 = **Sarmiento et al. 2004 MEASURED** Apure-llanos above-ground production drop in an exceptional-flood
+    year (TotalANPP 1996 dyke-breach flood 265–418 vs 1997 normal 601–659 g/m² ungrazed → **−37 to −56%, central
+    ~45%**; their "both drought & water excess limit production, even more in wet years" also confirms the
+    two-sided form; Welcomme 1979 fish∝flood-extent corroborates). The upper bound is now a direct
+    flood-year→production measurement, not the earlier interpretive km²→kcal estimate. **GATE met:** (700-step run,
+    full-llanos mask, flood held at |sin θ|=1, amp 0.45) eq_pop 563→491 (ratio 0.872) — a sustained, proportional
+    forage depression (below-K regulation slack absorbs part, the C.1/C.3 pattern); off-llanos / amp=0 nests to
+    C.3 bit-exact. 4 field unit tests.
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
 
 ## §7. Validation / gates
