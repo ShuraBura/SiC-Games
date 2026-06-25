@@ -8,7 +8,7 @@ from __future__ import annotations
 from sic_games.climate import ClimateField
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
-from sic_games.phase1_model import TerrainWorld
+from sic_games.phase1_model import TerrainWorld, allocate_store_draw
 
 
 def _world(storage_on, temp_threshold=100.0, n=60, seed=5, a_seas=0.0):
@@ -48,6 +48,30 @@ def test_storage_temperature_gated_off_in_warm_cells():
     for _ in range(150):
         w.step()
     assert _max_store(w) == 0.0                                    # warm/immediate-return ⇒ no accumulation
+
+
+# ── S.2: the cred-weighted granary draw (the inequality engine) ───────────────
+def test_draw_equal_weights_is_egalitarian():
+    # κ=0 ⇒ status^0 = 1 for all ⇒ equal split (egalitarian draw)
+    gives = allocate_store_draw(weights=[1.0, 1.0], deficits=[100.0, 100.0], store=100.0)
+    assert gives == [50.0, 50.0]
+
+
+def test_draw_status_weighted_favours_high_cred():
+    # κ>0 ⇒ high-status (weight 3) draws more of the granary than low-status (weight 1)
+    gives = allocate_store_draw(weights=[3.0, 1.0], deficits=[100.0, 100.0], store=100.0)
+    assert gives[0] > gives[1]                                    # high-cred eats more from the commons
+    assert abs(gives[0] - 75.0) < 1e-9 and abs(gives[1] - 25.0) < 1e-9
+    assert abs(sum(gives) - 100.0) < 1e-9                         # the whole store is distributed (no deficit cap hit)
+
+
+def test_draw_capped_at_deficit_no_annihilation():
+    # high-status share is CAPPED at its (small) deficit ⇒ leftover stays in the granary; low-status still gets
+    # its share (bounded — RT-2: no winner-take-all annihilation of commoners)
+    gives = allocate_store_draw(weights=[3.0, 1.0], deficits=[10.0, 100.0], store=100.0)
+    assert abs(gives[0] - 10.0) < 1e-9                            # capped at deficit, not 75
+    assert abs(gives[1] - 25.0) < 1e-9                            # low-status still draws its weighted share
+    assert sum(gives) < 100.0                                     # leftover remains in the store
 
 
 def test_storage_raises_harsh_winter_carrying_capacity():

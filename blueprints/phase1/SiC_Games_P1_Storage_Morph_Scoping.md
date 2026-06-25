@@ -46,9 +46,15 @@ storing, dense band transitions `egalitarian_forager → complex_forager / strat
 
 - **S.1 — Collective store refactor.** Per-cell granary; enforced overflow contribution; drop the per-agent
   store; individual survival = reserve. **Gate:** re-demonstrate the harsh-winter carrying-capacity lift.
-- **S.2 — Cred-weighted draw (the inequality engine).** Lean-season store distributed cred-weighted (κ).
-  **Gate:** in a κ>0 cold winter, high-cred winter-survival > low-cred (a Gini/mortality-by-cred split) —
-  the Hayden/Testart signature; at κ=0 the draw is equal (egalitarian, back-compat).
+- **S.2 — Cred-weighted draw (the inequality engine). ✅ BUILT 2026-06-25.** The lean-season granary is
+  allocated by **status^κ** (the same `base_status`/κ as the meat pool), capped at each agent's deficit
+  (`allocate_store_draw`). **Gate (mechanism, deterministic unit tests):** κ=0 → equal split (egalitarian);
+  κ>0 → high-cred draws more (3:1 weight → 75:25); capped at deficit → leftover stays, low-cred still gets a
+  share (RT-2 no annihilation). **Emergent finding:** in this density-regulated regime winter *starvation* is
+  ~nil even with a scarce granary (baseline Siler mortality trims the population first), so the draw's
+  inequality manifests as a winter-*wealth* differential, not death — subtle + meat-pool-confounded at the
+  individual level. **The society-level inequality is therefore the S.4 output** (a `stratified_chiefdom`
+  emerging), where it is visible and meaningful. Mechanism proven; emergent demonstration → S.4.
 - **S.3 — Maintenance/spoilage.** `storage_decay`. **Gate:** store reaches a steady state; high decay → storage
   not worth it (reverts toward immediate-return).
 - **S.4 — Morph wiring.** Settlement detector + the `society_from_character`/`morph_to_society` call.

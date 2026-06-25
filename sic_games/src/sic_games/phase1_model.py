@@ -63,6 +63,15 @@ from sic_games.terrain_field import TerrainField
 
 _CELL_KM2 = 100.0   # CC-1: each cell = 100 km² (local density = cell occupancy / _CELL_KM2)
 
+
+def allocate_store_draw(weights: list[float], deficits: list[float], store: float) -> list[float]:
+    """S.2 collective-granary draw: allocate `store` across claimants by `weights` (status^κ — the Hayden
+    control-of-redistribution lever), each capped at its `deficits`. Single pass from the initial store; any
+    leftover (from weight-rich but near-full claimants) stays in the granary. Equal weights ⇒ equal split
+    (egalitarian, κ=0); skewed weights ⇒ high-status fill more of their reserve (κ>0 inequality). Pure/numeric."""
+    wsum = sum(weights) or 1.0
+    return [min(store * (w / wsum), d) for w, d in zip(weights, deficits)]
+
 # Default terrain knobs (production 100×100 grid)
 _DEFAULT_KNOBS: dict = {
     "seedStr": "world42",
@@ -407,14 +416,20 @@ class TerrainWorld(mesa.Model):
                 if store > cap_cell:
                     store = cap_cell
                 if store > 0.0:
-                    deficits = [(a, self._reserve_full * a.reserve_scale() - a.wealth) for a in occ]
-                    tot_def = sum(d for _, d in deficits if d > 0.0)
-                    if tot_def > 0.0:
-                        drawn = store if store < tot_def else tot_def
-                        for a, d in deficits:
-                            if d > 0.0:
-                                a.wealth += drawn * (d / tot_def)            # need-proportional (S.1 egalitarian)
-                        store -= drawn
+                    needy = [(a, self._reserve_full * a.reserve_scale() - a.wealth) for a in occ]
+                    needy = [(a, d) for a, d in needy if d > 0.0]
+                    if needy:
+                        # S.2 cred-weighted draw = the Hayden control-of-redistribution inequality engine: the
+                        # granary is allocated by status^κ (the SAME base_status/κ as the meat pool), capped at
+                        # each agent's deficit. κ=0 → equal shares (egalitarian draw); κ>0 → high-cred fill more
+                        # of their reserve → ride out winter → differential survival → inequality. Bounded
+                        # (graded, deficit-capped) — low-cred get a SMALLER share, not zero (RT-2: no annihilation).
+                        weights = [base_status(a, phi_eps) ** kappa if a.strategy == "carbon" else 1.0
+                                   for a, _ in needy]                       # carbon → cred-weighted; else equal
+                        gives = allocate_store_draw(weights, [d for _, d in needy], store)
+                        for (a, _), g in zip(needy, gives):
+                            a.wealth += g
+                            store -= g
                 self._cell_store[key] = store
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from

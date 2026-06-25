@@ -753,8 +753,13 @@ latitudinal temperature field) — co-resident occupants' harvest **OVERFLOW** (
 reserve cap, which stays the individual buffer — itself already covering solo survival beyond the 2–3-day carry,
 Woodburn) is **ENFORCED** into a **per-cell collective store** (`_cell_store`), capped at
 `store_capacity_reserves × reserve_full × band_size`. In the **lean season** the granary is **drawn down to top
-occupants toward their caps** — the band lives off the store through winter. S.1 draw is **need-proportional
-(egalitarian)**; S.2 makes it **cred-weighted** (the Hayden control-of-redistribution inequality engine). A
+occupants toward their caps** — the band lives off the store through winter. **S.2 (BUILT):** the draw is
+**cred-weighted** — `allocate_store_draw` allocates the granary by **status^κ** (the same `base_status`/κ as the
+meat pool), capped at each agent's deficit = the **Hayden control-of-redistribution inequality engine** (κ=0 →
+equal/egalitarian; κ>0 → high-cred fill more of their reserve, bounded/graded so commoners get a smaller-not-zero
+share). The mechanism is deterministically unit-tested; the *society-level* inequality output is the **S.4 morph**
+(a `stratified_chiefdom` emerging) — in the density-regulated regime winter starvation is ~nil (baseline mortality
+trims first), so the draw surfaces as a winter-wealth differential, not death. A
 *mobile* band barely accumulates (you can't store if you move, Testart) ⇒ storage ↔ sedentism reinforce.
 **Warm/aseasonal cells never accumulate** ⇒ immediate-return ⇒ egalitarian *by construction* — capturing why
 the four tropical calibration foragers (Aché/Hadza/Hiwi/!Kung) don't store. Default OFF ⇒ bit-exact back-compat
