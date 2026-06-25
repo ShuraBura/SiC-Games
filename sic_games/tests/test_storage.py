@@ -11,9 +11,10 @@ from sic_games.demography import DemographyConfig
 from sic_games.phase1_model import TerrainWorld, allocate_store_draw
 
 
-def _world(storage_on, temp_threshold=100.0, n=60, seed=5, a_seas=0.0):
+def _world(storage_on, temp_threshold=100.0, n=60, seed=5, a_seas=0.0, decay=0.0):
     demog = DemographyConfig(enable_storage=storage_on, storable_fraction=0.5,
-                             store_capacity_reserves=3.0, storage_temp_threshold_c=temp_threshold)
+                             store_capacity_reserves=3.0, storage_temp_threshold_c=temp_threshold,
+                             storage_decay=decay)
     w = TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False,
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
                                                    contest_exponent=0.0, move_cost_flat=0.0),
@@ -76,9 +77,22 @@ def test_draw_capped_at_deficit_no_annihilation():
 
 def test_storage_raises_harsh_winter_carrying_capacity():
     # The payoff: under a harsh winter the unstored population is capped by the lean season; storage lifts it.
-    def eq_pop(on):
-        w = _world(storage_on=on, temp_threshold=100.0, n=120, a_seas=0.85)
+    def eq_pop(on, decay=0.0):
+        w = _world(storage_on=on, temp_threshold=100.0, n=120, a_seas=0.85, decay=decay)
         pops = [ (w.step(), len(w.agents))[1] for _ in range(500) ]
         return sum(pops[-150:]) / 150.0
     on, off = eq_pop(True), eq_pop(False)
     assert on > 1.3 * off                                          # storage materially raises harsh-winter capacity
+
+
+def test_storage_decay_erodes_the_capacity_lift():
+    # S.3 spoilage: high decay makes the granary unable to buffer winter → capacity reverts toward no-storage.
+    def eq_pop(on, decay=0.0):
+        w = _world(storage_on=on, temp_threshold=100.0, n=120, a_seas=0.85, decay=decay)
+        pops = [ (w.step(), len(w.agents))[1] for _ in range(500) ]
+        return sum(pops[-150:]) / 150.0
+    no_decay = eq_pop(True, 0.0)
+    high_decay = eq_pop(True, 0.5)
+    off = eq_pop(False)
+    assert high_decay < no_decay                                   # spoilage erodes the storage benefit
+    assert high_decay < 0.7 * no_decay + 0.3 * off                 # … substantially, toward immediate-return

@@ -55,8 +55,12 @@ storing, dense band transitions `egalitarian_forager → complex_forager / strat
   inequality manifests as a winter-*wealth* differential, not death — subtle + meat-pool-confounded at the
   individual level. **The society-level inequality is therefore the S.4 output** (a `stratified_chiefdom`
   emerging), where it is visible and meaningful. Mechanism proven; emergent demonstration → S.4.
-- **S.3 — Maintenance/spoilage.** `storage_decay`. **Gate:** store reaches a steady state; high decay → storage
-  not worth it (reverts toward immediate-return).
+- **S.3 — Maintenance/spoilage. ✅ BUILT 2026-06-25.** `storage_decay` — every granary loses a fraction each
+  step (incl. abandoned ones → no stale free stores, addresses the RT free-rider). **Gate met (monotonic):**
+  harsh winter, eq_pop OFF=199; ON decay=0→447, 0.05→366, 0.2→311, **0.5→230 (≈ back toward the 199 immediate-
+  return level)**; steady-state store shrinks in step. High-spoilage resources (fresh meat/fruit — tropical)
+  ⇒ delayed-return not worth it ⇒ immediate-return — a *second* reason tropical foragers don't store, beyond
+  the ET gate. Unit test: high decay erodes the capacity lift toward no-storage.
 - **S.4 — Morph wiring.** Settlement detector + the `society_from_character`/`morph_to_society` call.
   **Gate:** a cold/seasonal/storable/dense region morphs `egalitarian→complex`; a warm/aseasonal (Aché-like)
   region never morphs. **DECISION (RT-1): global vs per-band morph locality.**

@@ -232,6 +232,7 @@ class DemographyConfig(BaseModel):
     storable_fraction: float = Field(0.5, ge=0.0, le=1.0)        # QSTOR-anchored fraction of overflow that is storable [PROVISIONAL]
     store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
+    storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`

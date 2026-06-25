@@ -761,6 +761,9 @@ share). The mechanism is deterministically unit-tested; the *society-level* ineq
 (a `stratified_chiefdom` emerging) — in the density-regulated regime winter starvation is ~nil (baseline mortality
 trims first), so the draw surfaces as a winter-wealth differential, not death. A
 *mobile* band barely accumulates (you can't store if you move, Testart) ⇒ storage ↔ sedentism reinforce.
+**S.3 spoilage:** `storage_decay` erodes every granary each step — high spoilage (fresh meat/fruit, tropical)
+makes delayed-return not worth it (eq_pop reverts toward the immediate-return baseline: harsh-winter ON
+0→447, 0.2→311, 0.5→230 vs OFF 199), a second reason tropical foragers don't store beyond the ET gate.
 **Warm/aseasonal cells never accumulate** ⇒ immediate-return ⇒ egalitarian *by construction* — capturing why
 the four tropical calibration foragers (Aché/Hadza/Hiwi/!Kung) don't store. Default OFF ⇒ bit-exact back-compat
 (the overflow refactor is numerically identical when off). *(v1 used a per-agent store; the red-team replaced it

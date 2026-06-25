@@ -357,6 +357,16 @@ class TerrainWorld(mesa.Model):
         store_frac = demog.storable_fraction if store_on else 0.0
         store_cap_mult = demog.store_capacity_reserves if store_on else 0.0
         store_temp_thr = demog.storage_temp_threshold_c if store_on else 0.0
+        store_decay = demog.storage_decay if store_on else 0.0
+        if store_decay > 0.0 and self._cell_store:
+            # S.3 spoilage/maintenance: every granary loses a fraction each step (incl. abandoned ones → no
+            # stale free stores for wanderers, RT free-rider); prune the negligible remainder.
+            for k in list(self._cell_store):
+                s = self._cell_store[k] * (1.0 - store_decay)
+                if s > 1.0:
+                    self._cell_store[k] = s
+                else:
+                    del self._cell_store[k]
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
