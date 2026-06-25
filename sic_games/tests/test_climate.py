@@ -16,6 +16,7 @@ from sic_games.climate import (
     REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
     CARIBOU_AMP_ABOUT_MEAN, CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR,
     LLANOS_FLOOD_AMP, LLANOS_FLOOD_AMP_MIN, LLANOS_FLOOD_AMP_MAX,
+    INTERCEPT_BOOST, INTERCEPT_DRY_THRESHOLD,
 )
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
@@ -271,6 +272,88 @@ def test_draw_world_climate_llanos_key():
     for s in range(50):
         d = draw_world_climate(random.Random(s), a_earth=A_SEAS_EARTH["llanos"])
         assert LLANOS_FLOOD_AMP_MIN <= d["llanos_flood_amp"] <= LLANOS_FLOOD_AMP_MAX
+
+
+# ── C.5: intercept-hunting meat boost at water (late dry season, savanna+llanos) ──
+def _intercept_field(a_seas=0.6, on=True, seed=0):
+    N = 40
+    ww = np.random.RandomState(seed).rand(N, N)               # synthetic wateracc ∈ [0,1)
+    mask = np.ones((N, N), bool)
+    return ClimateField(_MockField(), a_seas=a_seas, water_weight=ww, agg_mask=mask, intercept_on=on), ww, mask
+
+
+def test_intercept_off_meat_factor_is_one_and_forage_is_plain_seasonal():
+    # flag off ⇒ no meat boost; and intercept (meat channel) never changes forage capacity vs the plain seasonal
+    f, ww, mask = _intercept_field(on=False)
+    plain = ClimateField(_MockField(), a_seas=0.6)              # same season, no C.5
+    for t in (0, 3, 6, 9):
+        f.set_step(t); plain.set_step(t)
+        assert f.meat_factor(3, 3) == 1.0                       # flag off ⇒ no boost
+        assert abs(f.level(3, 3) - plain.level(3, 3)) < 1e-12  # forage capacity == plain seasonal (intercept is meat-only)
+    # and ON likewise leaves forage capacity identical (boost is meat-channel, not forage):
+    fon, _, _ = _intercept_field(on=True)
+    for t in (0, 3, 6, 9):
+        fon.set_step(t); plain.set_step(t)
+        assert abs(fon.level(3, 3) - plain.level(3, 3)) < 1e-12
+
+
+def test_intercept_default_on():
+    f, ww, mask = _intercept_field()                            # intercept_on defaults True
+    assert f.intercept_on is True
+
+
+def test_intercept_boost_at_water_late_dry_only():
+    N = 40
+    ww = np.zeros((N, N)); ww[5, :] = 1.0; ww[20, :] = 0.0       # row5 = at water, row20 = far
+    mask = np.ones((N, N), bool)
+    f = ClimateField(_MockField(), a_seas=0.6, water_weight=ww, agg_mask=mask)
+    f.set_step(6)                                                # dry trough: dryness=(1−s)/A_seas = 1 ≥ threshold
+    assert abs(f.meat_factor(3, 5) - (1.0 + INTERCEPT_BOOST)) < 1e-9   # AT water → full +44% boost
+    assert f.meat_factor(3, 20) == 1.0                          # far from water → no boost
+    f.set_step(0)                                                # wet peak: dryness=0 < threshold → gate OFF
+    assert f.meat_factor(3, 5) == 1.0                           # no intercept in the wet season
+
+
+def test_intercept_threshold_gate_is_late_dry_only():
+    # boost only once normalized dryness crosses INTERCEPT_DRY_THRESHOLD (a late-dry window, not all dry season)
+    N = 40
+    ww = np.full((N, N), 1.0); mask = np.ones((N, N), bool)
+    f = ClimateField(_MockField(), a_seas=0.6, water_weight=ww, agg_mask=mask)
+    boosted = []
+    for t in range(12):
+        f.set_step(t)
+        dryness = (1.0 - f.season()) / 0.6
+        on = f.meat_factor(0, 0) > 1.0
+        assert on == (dryness >= INTERCEPT_DRY_THRESHOLD)        # exactly the threshold gate
+        boosted.append(on)
+    assert 0 < sum(boosted) < 12                                # a WINDOW (late dry), not always / never
+
+
+def test_intercept_only_aggregation_biomes_and_aseasonal_off():
+    N = 40
+    ww = np.full((N, N), 1.0)
+    mask = np.zeros((N, N), bool); mask[5, :] = True            # only row 5 is an aggregation biome
+    f = ClimateField(_MockField(), a_seas=0.6, water_weight=ww, agg_mask=mask)
+    f.set_step(6)
+    assert f.meat_factor(3, 5) > 1.0                           # agg biome at water in late dry → boost
+    assert f.meat_factor(3, 10) == 1.0                         # off-biome → no boost
+    f2 = ClimateField(_MockField(), a_seas=0.0, water_weight=ww, agg_mask=np.ones((N, N), bool))  # no season
+    f2.set_step(6)
+    assert f2.meat_factor(3, 3) == 1.0                         # no seasonality ⇒ no dry season ⇒ no intercept
+
+
+def test_intercept_and_caribou_compose_on_disjoint_biomes():
+    # a cell is steppe XOR savanna/llanos; meat_factor = caribou × intercept, each active only on its biome
+    N = 40
+    ww = np.full((N, N), 1.0)
+    steppe = np.zeros((N, N), bool); steppe[10, :] = True       # row 10 = steppe (caribou)
+    agg = np.zeros((N, N), bool);    agg[5, :] = True           # row 5 = savanna/llanos (intercept)
+    f = ClimateField(_MockField(), a_seas=0.6, caribou_amp=0.871, caribou_period=480, caribou_phase=math.pi,
+                     steppe_mask=steppe, water_weight=ww, agg_mask=agg)
+    f.set_step(6)
+    assert f.meat_factor(3, 5) > 1.0                           # intercept boost on the agg row
+    a = 0.871
+    assert abs(f.meat_factor(3, 10) - (1.0 - a) / (1.0 + a)) < 1e-2   # caribou depression on the steppe row (phase π near trough)
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

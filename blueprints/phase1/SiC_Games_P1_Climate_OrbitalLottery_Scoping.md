@@ -185,7 +185,24 @@ real LIA/Bond excursion needs).
     full-llanos mask, flood held at |sin θ|=1, amp 0.45) eq_pop 563→491 (ratio 0.872) — a sustained, proportional
     forage depression (below-K regulation slack absorbs part, the C.1/C.3 pattern); off-llanos / amp=0 nests to
     C.3 bit-exact. 4 field unit tests.
-- **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
+- **C.5 — water→aggregation = dry-season INTERCEPT HUNTING. ✅ BUILT 2026-06-25** (`climate.py`; on/off flag,
+  ON by default). **Two scoping findings drove the design:** (1) there is NO aggregation MECHANIC to "reuse" —
+  `game_mobility` is a deferred seam (§4.1.8); the true logistical migration (the thin/under-documented part per
+  a lit survey) stays in the deferred open-biome stage. (2) The **always-on** "good hunting near water" is
+  ALREADY in the terrain (`wateracc` is 55% of the moisture term → NPP → forage+game, terrain.py:529), so it
+  needs no climate layer. The ONLY genuinely-seasonal, not-yet-modelled piece is the **intercept-hunting peak**:
+  as ephemeral water dries, game funnels to the few permanent waterholes and night-water-blind hunting becomes
+  viable — a high-return mode that switches on ONLY in the late dry season (§4.1.5; threshold-like, not
+  continuous). **Built as a meat-channel BOOST** (not the earlier mean-conserved redistribution *cost* — a
+  red-team caught the sign): `_intercept_factor = 1 + INTERCEPT_BOOST·wateracc(x,y)` on savanna+llanos cells,
+  gated ON when `(1−season)/A_seas ≥ INTERCEPT_DRY_THRESHOLD=0.75`; `INTERCEPT_BOOST = 745/518−1 ≈ +0.44`
+  (Hadza intercept vs encounter hunting, Hawkes 1991 / §4.1.5). Read by the economy via `meat_pool *=
+  meat_factor` (= `_caribou_factor · _intercept_factor`, disjoint biomes); forage capacity untouched.
+  **GATE met (correct metric = realized return, not population):** late-dry near-water **meat/forager ×1.25–1.41**
+  across seeds (≈ the +44% anchor); eq_pop unchanged within noise (0.77–1.03, no sign) because the regime is
+  **density-regulated** — the boost fattens foragers, doesn't add bodies (a correct result, not a cost);
+  `meat_frac=0 → ratio 1.000` (meat-only). 7 field unit tests. Anchors: Hadza 518→745 kcal/hr; Hiwi caiman ~11×
+  (corroborates game-at-water); the always-on baseline already in terrain.py:529.
 
 ## §7. Validation / gates
 - **Earth recovers the baseline** (ε=23.4°,e=0.017,S=1; all amplitudes→0 ⇒ `M≡1` bit-exact) → 485 green

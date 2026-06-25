@@ -80,6 +80,20 @@ CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
 LLANOS_FLOOD_AMP_MIN, LLANOS_FLOOD_AMP_MAX = 0.15, 0.45
 LLANOS_FLOOD_AMP = LLANOS_FLOOD_AMP_MAX          # Sarmiento-anchored severe-end (used by unit tests / default cap)
 
+# ── C.5: water→aggregation = the dry-season INTERCEPT-HUNTING game boost at water (§4.1.5) ──────────────
+# Reframed after supervisor red-team: the ALWAYS-ON "good hunting near water" is ALREADY in the terrain
+# (wateracc is 55% of the moisture term → NPP → forage+game, terrain.py:529), so it needs no climate layer.
+# What C.5 adds is the genuinely-SEASONAL piece the ethnography flags as a distinct dry-season event: as
+# ephemeral water dries, game FUNNELS to the few permanent waterholes and INTERCEPT hunting (night water-blinds)
+# becomes viable — a high-return mode that switches on only in the late dry season (§4.1.5; NOT continuous).
+# It is a meat-channel BOOST (not a cost / not a redistribution), on the savanna+llanos aggregation biomes,
+# scaled by water proximity. Anchor (Hawkes 1991, §4.1.5 / game return-rate table):
+INTERCEPT_RETURN_RATIO = 745.0 / 518.0           # Hadza intercept (water blinds, ~745 kcal/hr, late dry) vs encounter (~518) hunting
+INTERCEPT_BOOST = INTERCEPT_RETURN_RATIO - 1.0   # ≈ +0.439 (+44%) game premium AT the waterhole in the late dry season
+INTERCEPT_DRY_THRESHOLD = 0.75                   # threshold-like (§4.1.5): switches on only when normalized dryness
+                                                 # (1−season)/A_seas ≥ this → ~late-dry quarter (≈ Hadza Aug–Oct)
+# (Hiwi caiman 44→489 kg/km² ~11×, Hurtado & Hill 1987, corroborates that game concentrates at dry-season water.)
+
 
 def draw_eccentricity(rng) -> float:
     """Per-world UNIFORM draw over [0, 0.6] (Q3; Spiegel 2010)."""
@@ -148,7 +162,8 @@ class ClimateField:
                  interannual_period: int = 0, interannual_phase: float = 0.0,
                  regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None,
                  caribou_amp: float = 0.0, caribou_period: int = 0, caribou_phase: float = 0.0,
-                 steppe_mask=None, llanos_flood_amp: float = 0.0, llanos_mask=None):
+                 steppe_mask=None, llanos_flood_amp: float = 0.0, llanos_mask=None,
+                 water_weight=None, agg_mask=None, intercept_on: bool = True):
         self._base = base
         self.a_seas = max(0.0, min(1.0, a_seas))
         self.phase = phase
@@ -173,6 +188,10 @@ class ClimateField:
         # C.4c llanos flood (GRASS_LLANOS forage-channel, two-sided interannual tail):
         self.llanos_flood_amp = max(0.0, min(1.0, llanos_flood_amp))
         self._llanos_mask = llanos_mask                         # (N,N) bool [y,x]; None ⇒ layer inert
+        # C.5 water→aggregation = the dry-season INTERCEPT-HUNTING meat boost at water (savanna+llanos).
+        self.intercept_on = intercept_on                       # flag, ON by default
+        self._agg_mask = agg_mask                              # (N,N) bool [y,x]; savanna+llanos aggregation biomes
+        self._water_weight = water_weight                     # (N,N) wateracc [0,1]; spatial water-proximity scale
         self.t = 0
 
     def set_step(self, t: int) -> None:
@@ -228,10 +247,15 @@ class ClimateField:
         return self.season() * self.interannual() * self.regime()
 
     def meat_factor(self, x: int, y: int) -> float:
-        """C.4b caribou herd-swing: a per-cell MEAT-channel multiplier (read by the economy's meat_pool, §4.5.5).
-        A 40–90 yr quasi-periodic depression on GRASS_STEPPE cells ONLY (steppe_mask); 1.0 elsewhere / when off.
-        Peak-pinned to 1.0; trough (1−a)/(1+a) (a=0.871 ⇒ ~0.069 = a ~93% peak-to-trough megafauna crash). The
-        forage channel ((1−meat_frac)·S) is untouched — a herd crash is not a plant crash (supervisor choice B)."""
+        """The per-cell MEAT-channel multiplier read by the economy's meat_pool (§4.5.5) = the product of the two
+        meat-channel climate layers, which live on DISJOINT biomes (so at most one is ≠1 per cell):
+          • C.4b caribou herd-swing — a depression on GRASS_STEPPE; • C.5 intercept hunting — a boost on
+        savanna+llanos near-water cells in the late dry season. Forage capacity (level) is untouched by both."""
+        return self._caribou_factor(x, y) * self._intercept_factor(x, y)
+
+    def _caribou_factor(self, x: int, y: int) -> float:
+        """C.4b: 40–90 yr quasi-periodic megafauna depression on GRASS_STEPPE meat (steppe_mask). Peak-pinned to
+        1.0; trough (1−a)/(1+a) (a=0.871 ⇒ ~0.069 = ~93% peak-to-trough). 1.0 off-steppe / when off."""
         if self.caribou_amp <= 0.0 or self.caribou_period <= 0 or self._steppe_mask is None:
             return 1.0
         if not self._steppe_mask[y, x]:
@@ -239,10 +263,24 @@ class ClimateField:
         a = self.caribou_amp
         return (1.0 + a * math.cos(2.0 * math.pi * self.t / self.caribou_period + self.caribou_phase)) / (1.0 + a)
 
+    def _intercept_factor(self, x: int, y: int) -> float:
+        """C.5 intercept hunting: a late-dry-season meat BOOST at water on the savanna+llanos aggregation biomes.
+        `1 + INTERCEPT_BOOST·wateracc(x,y)` (Hadza 745/518 ≈ +44% AT the waterhole, tapering to 0 far from water),
+        gated THRESHOLD-like (§4.1.5) — on ONLY when normalized dryness (1−season)/A_seas ≥ INTERCEPT_DRY_THRESHOLD
+        (the late dry season). 1.0 when the flag is off / off-biome / no seasonality / outside the dry window."""
+        if not self.intercept_on or self._agg_mask is None or self._water_weight is None:
+            return 1.0
+        if not self._agg_mask[y, x] or self.a_seas <= 0.0:
+            return 1.0
+        dryness = (1.0 - self.season()) / self.a_seas          # ∈ [0,1]; 1 at the dry trough
+        if dryness < INTERCEPT_DRY_THRESHOLD:
+            return 1.0                                          # not yet the late dry season → no intercept
+        return 1.0 + INTERCEPT_BOOST * float(self._water_weight[y, x])
+
     def level(self, x: int, y: int) -> float:
         # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult).
-        # Uses interannual_at(x,y) (per-cell: generic ENSO, or the two-sided llanos flood tail) — equals mult()
-        # off-llanos, so non-llanos cells / no-mask are bit-identical to C.3.
+        # Uses interannual_at(x,y) (C.4c llanos flood; == generic off-llanos). C.5 intercept hunting is a MEAT-
+        # channel boost (meat_factor), NOT a forage/capacity change — so level() (forage capacity) is unchanged.
         return (self._base.level(x, y) * self.mean_factor
                 * self.season() * self.interannual_at(x, y) * self.regime())
 

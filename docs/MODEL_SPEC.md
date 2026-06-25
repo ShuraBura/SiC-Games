@@ -283,8 +283,21 @@ measurement, not interpretive. Gate: 700-step run, full-llanos mask at |sin θ|=
 eq_pop ratio 0.872 (sustained forage depression; below-K slack absorbs part). A stochastic heavy-tail (vs the
 regular two-sided swing) is a noted refinement.
 
-**C.5 water→aggregation (pending):** reuse the existing §4.1.5/game-mobility dry-season aggregation, not a
-parallel mechanic.
+**C.5 water→aggregation = dry-season INTERCEPT HUNTING (BUILT; on/off flag, ON by default).** Two scoping
+findings: (1) no aggregation MECHANIC existed to "reuse" (`game_mobility` is a deferred seam, §4.1.8; the true
+logistical migration is the thin/deferred open-biome stage); (2) the ALWAYS-ON "good hunting near water" is
+already in the terrain (`wateracc` is 55% of the moisture term → NPP → forage+game, terrain.py:529). So C.5 adds
+only the genuinely-seasonal piece: the **intercept-hunting peak** — as ephemeral water dries, game funnels to
+permanent waterholes and night-water-blind hunting switches on, ONLY in the late dry season (§4.1.5,
+threshold-like). Built as a **meat-channel BOOST** (a red-team corrected an earlier mean-conserved
+*redistribution* that had the wrong sign): `_intercept_factor = 1 + INTERCEPT_BOOST·wateracc(x,y)` on
+savanna+llanos cells, gated ON when `(1−season)/A_seas ≥ INTERCEPT_DRY_THRESHOLD=0.75`; `INTERCEPT_BOOST =
+745/518 − 1 ≈ +0.44` (Hadza intercept vs encounter hunting, Hawkes 1991). Economy: `meat_pool *= meat_factor`
+(= `_caribou_factor · _intercept_factor`, disjoint biomes); forage capacity untouched. Gate (correct metric =
+realized return): late-dry near-water **meat/forager ×1.25–1.41** (≈ the +44% anchor); eq_pop unchanged within
+noise (density-regulated regime — the boost fattens foragers, doesn't add bodies); `meat_frac=0 → 1.000`
+(meat-only). Lit: Hadza 518→745 kcal/hr; Hiwi caiman ~11× (game-at-water corroboration); always-on baseline in
+terrain.py:529.
 
 ---
 
