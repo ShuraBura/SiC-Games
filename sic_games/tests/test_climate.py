@@ -15,6 +15,7 @@ from sic_games.climate import (
     ECCENTRICITY_MAX, STELLAR_FLUX_MIN, STELLAR_FLUX_MAX,
     REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
     CARIBOU_AMP_ABOUT_MEAN, CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR,
+    LLANOS_FLOOD_AMP,
 )
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
@@ -228,6 +229,46 @@ def test_draw_world_climate_caribou_keys_and_ranges():
     d = draw_world_climate(random.Random(3), a_earth=A_SEAS_EARTH["savanna"])
     assert d["caribou_amp"] == CARIBOU_AMP_ABOUT_MEAN                   # fixed empirical anchor (0.871)
     assert int(CARIBOU_PERIOD_MIN_YR * 12) <= d["caribou_period"] <= int(CARIBOU_PERIOD_MAX_YR * 12)   # 480–1080
+
+
+# ── C.4c: llanos flood (two-sided interannual tail on GRASS_LLANOS forage) ────
+def test_llanos_off_nests_to_generic_interannual():
+    # llanos_flood_amp=0 OR no mask ⇒ level() uses the generic one-sided ENSO (== C.3, bit-exact)
+    base_kw = dict(interannual_amp=0.3, interannual_period=48)
+    c3 = ClimateField(_MockField(), **base_kw)
+    c4 = ClimateField(_MockField(), **base_kw, llanos_flood_amp=0.0, llanos_mask=np.ones((40, 40), bool))
+    for t in range(48):
+        c3.set_step(t); c4.set_step(t)
+        assert abs(c3.level(2, 2) - c4.level(2, 2)) < 1e-12
+
+
+def test_llanos_flood_is_two_sided_only_on_llanos():
+    mask = np.zeros((40, 40), dtype=bool)
+    mask[5, 5] = True                                                  # one llanos cell at (x=5, y=5)
+    f = ClimateField(_MockField(), interannual_amp=0.3, interannual_period=48, interannual_phase=0.0,
+                     llanos_flood_amp=0.45, llanos_mask=mask)
+    # llanos cell: depressed at BOTH flood extremes (sin=+1 at t=12, sin=−1 at t=36), best at sin=0 (t=0)
+    f.set_step(0);  assert abs(f.level(5, 5) - 100.0) < 1e-9          # median flood → no stress
+    f.set_step(12); assert abs(f.level(5, 5) - 55.0) < 1e-9          # over-flood (sin=+1) → 1−0.45
+    f.set_step(36); assert abs(f.level(5, 5) - 55.0) < 1e-9          # failed-flood (sin=−1) → 1−0.45 (TWO-sided)
+    # non-llanos cell: generic ONE-sided ENSO (amp 0.3) — depressed only on the sin>0 half
+    f.set_step(12); assert abs(f.level(1, 1) - 70.0) < 1e-9          # 100·(1−0.3)
+    f.set_step(36); assert abs(f.level(1, 1) - 100.0) < 1e-9         # sin<0 ⇒ no ENSO depression (one-sided)
+
+
+def test_llanos_does_not_touch_meat_factor():
+    # C.4c hits forage capacity (level); the caribou meat channel is independent and stays 1.0 here.
+    mask = np.ones((40, 40), dtype=bool)
+    f = ClimateField(_MockField(), interannual_amp=0.0, interannual_period=48,
+                     llanos_flood_amp=0.45, llanos_mask=mask)
+    f.set_step(12)
+    assert f.level(3, 3) < 100.0                                      # forage depressed by the flood
+    assert f.meat_factor(3, 3) == 1.0                                 # no caribou config ⇒ meat untouched
+
+
+def test_draw_world_climate_llanos_key():
+    d = draw_world_climate(random.Random(5), a_earth=A_SEAS_EARTH["llanos"])
+    assert d["llanos_flood_amp"] == LLANOS_FLOOD_AMP
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

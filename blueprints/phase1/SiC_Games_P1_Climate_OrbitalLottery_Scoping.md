@@ -167,8 +167,17 @@ real LIA/Bond excursion needs).
     forage channel `(1−meat_frac)·S` is untouched (a herd crash ≠ a plant crash). **GATE met:** (700-step run,
     full-steppe mask, caribou at trough) meat_frac=0.66 → eq_pop **563→346 (ratio 0.614)**; **meat_frac=0.0 →
     ratio 1.000 EXACTLY** (proves meat-only — zero leakage to forage/capacity). 5 field unit tests.
-  - **C.4c — llanos flood tail (PENDING).** The heavy tail of Layer-2 interannual on `GRASS_LLANOS` **forage**
-    (Hamilton inundation 1,278–105,454 km², median 25,374 → failed-flood / over-flood extremes).
+  - **C.4c — llanos flood tail. ✅ BUILT 2026-06-24** (`climate.py`). The heavy tail of Layer-2 interannual on
+    `GRASS_LLANOS` **forage**: because BOTH a failed flood (drought → aquatic collapse) and an over-flood
+    (terrestrial drowning) hurt the forager (Hamilton inundation 1,278–105,454 km²), the llanos interannual is
+    **two-sided** `1 − amp·|sin θ|` (worst at either extreme) — vs the generic one-sided ENSO `1 − amp·max(0,sin θ)`
+    — on the SAME Layer-2 clock (the flood IS the llanos ENSO; El Niño suppresses Orinoco discharge), REPLACING
+    the ENSO form on llanos cells (one process per cell, no double-count). `level()` routes through a per-cell
+    `interannual_at(x,y)` (== generic off-llanos → non-llanos bit-exact). `LLANOS_FLOOD_AMP=0.45` is
+    **INTERPRETIVE/PROVISIONAL** (no inundation-km²→forage-kcal transfer fn — cf. the regime °C→CC% note),
+    pending supervisor review. **GATE met:** (700-step run, full-llanos mask, flood held at |sin θ|=1) eq_pop
+    563→491 (ratio 0.872) — a sustained, proportional forage depression (below-K regulation slack absorbs part,
+    the C.1/C.3 pattern); off-llanos / amp=0 nests to C.3 bit-exact. 4 field unit tests.
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
 
 ## §7. Validation / gates

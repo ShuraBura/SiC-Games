@@ -267,9 +267,15 @@ on `GRASS_STEPPE` **meat only** (supervisor choice B). ClimateField exposes `mea
 `(1+a·cos(2πt/P+φ))/(1+a)` (peak-pinned, trough ≈0.069), masked to steppe cells; the economy applies it as
 `meat_pool *= tf.meat_factor(cx,cy)` (phase1_model.py:354) — the forage slice `(1−meat_frac)·S` is untouched,
 so a herd crash is not a plant crash. Duck-typed (no-climate runs bit-exact). Gate: 700-step run at trough,
-meat_frac=0.66 → eq_pop ratio 0.614; meat_frac=0 → ratio 1.000 exactly (meat-only, no forage leakage). **C.4c (pending):**
+meat_frac=0.66 → eq_pop ratio 0.614; meat_frac=0 → ratio 1.000 exactly (meat-only, no forage leakage). **C.4c (BUILT):**
 the llanos flood as the heavy TAIL of Layer-2 interannual on `GRASS_LLANOS` forage (Hamilton et al. inundation
-1,278–105,454 km², median 25,374), folded into Layer-2 per the ENSO anti-double-count discipline.
+1,278–105,454 km², median 25,374). Because both flood extremes hurt the forager, the llanos interannual is
+**two-sided** `1 − amp·|sin θ|` (worst at either extreme), vs the generic one-sided ENSO, on the same Layer-2
+clock — REPLACING the ENSO form on llanos cells (one process per cell, no double-count). `level()` routes
+through a per-cell `interannual_at(x,y)` (== generic off-llanos → bit-exact). `LLANOS_FLOOD_AMP=0.45` is
+INTERPRETIVE/PROVISIONAL (no inundation-km²→forage-kcal transfer fn, cf. regime °C→CC%), pending review. Gate:
+700-step run, full-llanos mask at |sin θ|=1 → eq_pop ratio 0.872 (sustained forage depression; below-K slack
+absorbs part). A stochastic heavy-tail (vs the regular two-sided swing) is a noted refinement.
 
 **C.5 water→aggregation (pending):** reuse the existing §4.1.5/game-mobility dry-season aggregation, not a
 parallel mechanic.

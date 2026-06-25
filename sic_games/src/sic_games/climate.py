@@ -61,6 +61,15 @@ REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR = 1000.0, 2000.0   # onset sp
 CARIBOU_AMP_ABOUT_MEAN = 0.871                  # St. John 2022 cyclic amplitude (fraction of the mean)
 CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
 
+# ── C.4c: llanos flood — a TWO-SIDED interannual-tail depression on GRASS_LLANOS *forage* ──────────
+# Hamilton et al. 2004: Llanos del Orinoco inundated area 1,278–105,454 km² (median 25,374) — BOTH a failed
+# flood (drought → aquatic collapse) and an over-flood (terrestrial drowning) hurt the forager, so the llanos
+# interannual is two-sided `1 − amp·|sin θ|` (worst at either flood extreme), vs the generic one-sided ENSO.
+# Same Layer-2 clock (period/phase) → the flood IS the llanos ENSO (El Niño suppresses Orinoco discharge), not a
+# parallel Poisson (v2 anti-double-count). LLANOS_FLOOD_AMP is INTERPRETIVE (no inundation-km²→forage-kcal
+# transfer fn, cf. the regime °C→CC% note); PROVISIONAL, pending supervisor review.
+LLANOS_FLOOD_AMP = 0.45                          # extreme flood/drought year → llanos forage ≈ 55% of normal [PROVISIONAL]
+
 
 def draw_eccentricity(rng) -> float:
     """Per-world UNIFORM draw over [0, 0.6] (Q3; Spiegel 2010)."""
@@ -106,6 +115,8 @@ def draw_world_climate(rng, a_earth: float) -> dict:
         caribou_amp=CARIBOU_AMP_ABOUT_MEAN,
         caribou_period=int(rng.uniform(CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR) * SEASON_PERIOD_DEFAULT),
         caribou_phase=rng.uniform(0.0, 2.0 * math.pi),
+        # Layer 4c llanos flood (GRASS_LLANOS forage) — rides the same interannual ENSO clock, two-sided.
+        llanos_flood_amp=LLANOS_FLOOD_AMP,
         mean_temperature=flux_to_temperature(S),
         obliquity=eps, eccentricity=e, flux=S,
     )
@@ -127,7 +138,7 @@ class ClimateField:
                  interannual_period: int = 0, interannual_phase: float = 0.0,
                  regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None,
                  caribou_amp: float = 0.0, caribou_period: int = 0, caribou_phase: float = 0.0,
-                 steppe_mask=None):
+                 steppe_mask=None, llanos_flood_amp: float = 0.0, llanos_mask=None):
         self._base = base
         self.a_seas = max(0.0, min(1.0, a_seas))
         self.phase = phase
@@ -149,6 +160,9 @@ class ClimateField:
         self.caribou_period = caribou_period                    # steps (yr×12); 0 = off
         self.caribou_phase = caribou_phase
         self._steppe_mask = steppe_mask                         # (N,N) bool [y,x]; None ⇒ layer inert
+        # C.4c llanos flood (GRASS_LLANOS forage-channel, two-sided interannual tail):
+        self.llanos_flood_amp = max(0.0, min(1.0, llanos_flood_amp))
+        self._llanos_mask = llanos_mask                         # (N,N) bool [y,x]; None ⇒ layer inert
         self.t = 0
 
     def set_step(self, t: int) -> None:
@@ -178,6 +192,19 @@ class ClimateField:
         return 1.0 - self.interannual_amp * max(
             0.0, math.sin(2.0 * math.pi * self.t / self.interannual_period + self.interannual_phase))
 
+    def interannual_at(self, x: int, y: int) -> float:
+        """Per-cell interannual: the generic one-sided ENSO everywhere, but a TWO-SIDED flood-deviation
+        depression `1 − amp·|sin θ|` on GRASS_LLANOS cells (C.4c) — same Layer-2 clock, flood-shaped, REPLACING
+        (not stacked on) the ENSO form so the flood is the llanos ENSO (no double-count)."""
+        if self.interannual_period <= 0:
+            return 1.0
+        theta = 2.0 * math.pi * self.t / self.interannual_period + self.interannual_phase
+        if (self.llanos_flood_amp > 0.0 and self._llanos_mask is not None and self._llanos_mask[y, x]):
+            return 1.0 - self.llanos_flood_amp * abs(math.sin(theta))      # two-sided flood tail (llanos forage)
+        if self.interannual_amp <= 0.0:
+            return 1.0
+        return 1.0 - self.interannual_amp * max(0.0, math.sin(theta))      # one-sided ENSO (everywhere else)
+
     def regime(self) -> float:
         """C.3 regime-shift: a sustained CC PLATEAU while the telegraph sits in the excursion state (state·A_reg
         depression), 1.0 in the normal state. Multi-generational because the dwell time is ~100–500 yr ≫ a
@@ -203,8 +230,11 @@ class ClimateField:
         return (1.0 + a * math.cos(2.0 * math.pi * self.t / self.caribou_period + self.caribou_phase)) / (1.0 + a)
 
     def level(self, x: int, y: int) -> float:
-        # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult)
-        return self._base.level(x, y) * self.mean_factor * self.mult()
+        # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult).
+        # Uses interannual_at(x,y) (per-cell: generic ENSO, or the two-sided llanos flood tail) — equals mult()
+        # off-llanos, so non-llanos cells / no-mask are bit-identical to C.3.
+        return (self._base.level(x, y) * self.mean_factor
+                * self.season() * self.interannual_at(x, y) * self.regime())
 
     def __getattr__(self, name):
         if name.startswith("_"):
