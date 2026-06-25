@@ -142,4 +142,18 @@
 
 ---
 
-*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 9 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring + per-class), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced), FD-1 (family dynamics — co-residence & provisioning).*
+## PA-1 — Proto-agriculture yields per biome + seasonality
+
+**What:** Per-biome proto-agricultural / intensive-wild-resource yields (and their seasonality) for the **post-morph sedentary state** — what a settled, storing, delayed-return community *produces* (wild-cereal / acorn / salmon intensification → incipient cultivation), distinct from the mobile-forager return rates already in the game return-rate table.
+
+**Why deferred:** It is the **CONSEQUENCE (end state) of the sedentism/storage morph, not the trigger.** The morph *trigger* — Binford's storage threshold (Effective Temperature ≤ 15.25 °C) + storable seasonal surplus + sustained density → delayed-return — is being built first (the storage mechanic, 2026-06-25). Proto-ag yields are only needed once a community has *already morphed* to the sedentary/proto-ag society type and we model its altered productivity. Building the yields before the trigger is placeholder-on-placeholder. **(Explicitly deferred at supervisor request, 2026-06-25.)**
+
+**Literature-rationale anchor:** Binford 2001 (ET 15.25 °C storage threshold; QSTOR quantity-stored); Testart 1982 (storage → delayed-return → inequality); Woodburn 1982 (immediate- vs delayed-return). Post-morph yields to survey: Natufian wild-cereal, California acorn, NW-Coast salmon intensification. [INLINE — not yet in LITERATURE.md]
+
+**Seam:** the society morph (`society_from_character` / `morph_to_society`, demography.py) + the storage stock (`enable_storage`); the proto-ag society type would carry a per-biome yield multiplier read only in the morphed state.
+
+**Status:** DEFERRED — trigger (storage + morph) built first; proto-ag yields surveyed + valued when the post-morph sedentary/proto-ag state is built.
+
+---
+
+*End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 10 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring + per-class), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced), FD-1 (family dynamics — co-residence & provisioning), PA-1 (proto-agriculture yields — post-morph consequence).*

@@ -342,6 +342,11 @@ class TerrainWorld(mesa.Model):
         meat_frac = demog.game_meat_frac if game_on else 0.0
         meat_cv = demog.game_meat_cv if game_on else 0.0
         sex_div = demog.sex_division if (demog is not None and game_on) else 0.0   # step 3: prowess-signal only
+        # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
+        store_on = demog is not None and demog.enable_storage
+        store_frac = demog.storable_fraction if store_on else 0.0
+        store_cap_mult = demog.store_capacity_reserves if store_on else 0.0
+        store_temp_thr = demog.storage_temp_threshold_c if store_on else 0.0
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
@@ -379,8 +384,18 @@ class TerrainWorld(mesa.Model):
                 total = a.wealth + intake
                 cap = self._reserve_full * a.reserve_scale()                 # C.2a age-scaled cap
                 a.wealth = min(total, cap)
-                if (provisioning or pat_prov) and total > cap:              # overflow → giveable to dependents
-                    provision_pool[a] = provision_pool.get(a, 0.0) + (total - cap)
+                overflow = total - cap
+                if overflow > 0.0:
+                    # Storage (delayed-return): in the overwintering zone bank a storable fraction of the
+                    # otherwise-wasted overflow into the per-agent store (capped); the remainder stays giveable.
+                    if store_on and self._fields.temperature[cy, cx] <= store_temp_thr:
+                        room = store_cap_mult * cap - getattr(a, "_store", 0.0)
+                        banked = min(store_frac * overflow, room if room > 0.0 else 0.0)
+                        if banked > 0.0:
+                            a._store = getattr(a, "_store", 0.0) + banked
+                            overflow -= banked
+                    if (provisioning or pat_prov) and overflow > 0.0:        # remaining overflow → giveable to dependents
+                        provision_pool[a] = provision_pool.get(a, 0.0) + overflow
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
         # their mother. C.2b tier = the mother's wasted harvest overflow. S1 tier = the mother also dips
@@ -466,6 +481,13 @@ class TerrainWorld(mesa.Model):
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             a.age += 1
+            if store_on and getattr(a, "_store", 0.0) > 0.0:
+                # Lean-season drawdown: live off the store at full ration — top wealth back toward the reserve
+                # cap (so a stored band rides out the multi-month winter, not just one step). Glut refills it.
+                _cap = self._reserve_full * a.reserve_scale()
+                if a.wealth < _cap:
+                    _draw = min(_cap - a.wealth, a._store)
+                    a.wealth += _draw; a._store -= _draw
             if demog is not None:
                 a.months_since_birth += 1
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor

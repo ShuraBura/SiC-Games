@@ -738,6 +738,41 @@ deferred.**
 
 ---
 
+### §4.5.11 Storage — the delayed-return economy (built 2026-06-25; the morph trigger's first piece)
+
+**Status: BUILT (flaggable, default OFF). The first piece of the §4.5.10 morph trigger the model "awaits".**
+Anchors: **Binford 2001** (storage threshold Effective Temperature **ET ≤ 15.25 °C** — an "overwintering tactic";
+packing 0.091/km² = our `BINFORD_PACKING_PER_KM2` ✓), **Testart 1982** (storage = prime mover → sedentism,
+density, inequality), **Woodburn 1982** (immediate- vs delayed-return: storage is the egalitarian→hierarchical
+pivot). Config: `DemographyConfig.enable_storage / storable_fraction / store_capacity_reserves /
+storage_temp_threshold_c`.
+
+**Mechanic (per-agent store, v1).** In the **overwintering zone** — cell mean temperature ≤
+`storage_temp_threshold_c` (≈ Binford's ET 15.25 °C, mapped onto the C.4a latitudinal temperature field) — an
+agent banks a `storable_fraction` of its harvest **OVERFLOW** (intake above the reserve cap, otherwise
+wasted/given to dependents) into a per-agent store, capped at `store_capacity_reserves × reserve_cap`
+(phase1_model.py glut-capture). In the **lean season** it draws the store down to top wealth back toward the
+reserve cap — living off the bank through winter (drawdown before the starvation check). **Warm/aseasonal cells
+never accumulate** ⇒ immediate-return ⇒ egalitarian *by construction* — correctly capturing why our four
+calibration foragers (Aché/Hadza/Hiwi/!Kung, all tropical) don't store. Default OFF ⇒ bit-exact back-compat (the
+overflow refactor is numerically identical when off; drawdown skipped).
+
+**Gate (winter survival = carrying capacity).** Harsh winter (`a_seas=0.85`, trough 15% of peak, threshold=100
+so storage is active everywhere to isolate the survival function): **storage doubles the sustainable population,
+eq_pop 188 → 380**, because the unstored population is capped by what the *lean season* can feed, while the
+stored one lives off banked surplus (store fills to ~159k in the glut, drains ~39k through winter). This is
+exactly Binford's overwintering logic. 4 unit tests (off ⇒ no store; accumulates in the cold zone; temperature-
+gated off in warm cells; the harsh-winter capacity lift). **Provisional:** `storable_fraction=0.5` (QSTOR exact
+% is in the Binford 2001 print volume, not web-accessible); the ET→model-temp mapping is a calibration point.
+
+**NEXT (the rest of the trigger, [[project-sic-games-climate]] / §4.5.10):** sustained store + density →
+sedentism state → call `society_from_character` / `morph_to_society` in the loop (currently never called) → the
+egalitarian→complex/stratified transition. The **collective-vs-individual** store grain (and storage →
+differential accumulation → inequality, Woodburn) is the morph step. Proto-ag yields = the post-morph consequence
+(DEFERRED_MECHANICS **PA-1**).
+
+---
+
 ## Mortality architecture — decisions, decouplings, neglects (added 2026-06-20; Biome-Mortality blueprint)
 
 **DELIVERABLE (supervisor scoping 2026-06-20):** emergent **total** age-specific mortality `q(x)` and how it

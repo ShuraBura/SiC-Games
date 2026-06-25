@@ -220,6 +220,18 @@ class DemographyConfig(BaseModel):
     # all occupants share it). 0 = deterministic (back-compat). Per-biome anchors (terrain.GAME_KCAL_STD/mean):
     # forest 0.73, savanna 2.24, desert 0.29. The ordinary bad-streak variance, NOT a shock.
     game_meat_cv: float = Field(0.0, ge=0.0)
+    # ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982,
+    # Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp ≤ storage_temp_threshold_c ≈ Binford's
+    # Effective-Temperature 15.25 °C storage threshold) an agent banks a `storable_fraction` of its harvest
+    # OVERFLOW (intake above the reserve cap — otherwise wasted/given away) into a per-agent store (cap =
+    # store_capacity_reserves × the reserve cap), then DRAWS it down in the lean season to stay one step above
+    # the starvation floor. Warm/aseasonal cells never accumulate (immediate-return → egalitarian, by
+    # construction — Aché/Hadza/Hiwi/!Kung). Default OFF = exact back-compat. (Per-agent store is v1; the
+    # collective-vs-individual grain + the storage→inequality morph is the next step.)
+    enable_storage: bool = False
+    storable_fraction: float = Field(0.5, ge=0.0, le=1.0)        # QSTOR-anchored fraction of overflow that is storable [PROVISIONAL]
+    store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
+    storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`
