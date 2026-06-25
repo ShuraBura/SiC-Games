@@ -159,9 +159,14 @@ real LIA/Bond excursion needs).
     `GRASS_LLANOS` (warm) vs `GRASS_STEPPE` (cool). **GATE met:** non-degenerate split on 4 seeds (llanos
     115–190 / steppe 247–570 cells); tag exhaustive on grass, `GRASS_NONE` elsewhere; T-mean = 14.00; 70
     terrain tests green.
-  - **C.4b — caribou quasi-cycle (PENDING).** A 40–90 yr quasi-periodic depression on `GRASS_STEPPE` **game**
-    (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration). Needs
-    ClimateField to become **game-channel + biome aware** (it currently scales forage `level()` only).
+  - **C.4b — caribou quasi-cycle. ✅ BUILT 2026-06-24** (`climate.py` + a 1-line economy hook). A 40–90 yr
+    quasi-periodic depression on `GRASS_STEPPE` **meat only** (supervisor choice **B**, meat-only not whole-cell):
+    ClimateField gains `meat_factor(x,y)` = peak-pinned `(1+a·cos(2πt/P+φ))/(1+a)`, a=0.871 (St. John 2022;
+    trough ≈0.069 = ~93% peak-to-trough), restricted to a `steppe_mask`; the economy reads it at
+    `meat_pool *= tf.meat_factor(cx,cy)` (phase1_model.py:354, duck-typed → no-climate runs bit-exact). The
+    forage channel `(1−meat_frac)·S` is untouched (a herd crash ≠ a plant crash). **GATE met:** (700-step run,
+    full-steppe mask, caribou at trough) meat_frac=0.66 → eq_pop **563→346 (ratio 0.614)**; **meat_frac=0.0 →
+    ratio 1.000 EXACTLY** (proves meat-only — zero leakage to forage/capacity). 5 field unit tests.
   - **C.4c — llanos flood tail (PENDING).** The heavy tail of Layer-2 interannual on `GRASS_LLANOS` **forage**
     (Hamilton inundation 1,278–105,454 km², median 25,374 → failed-flood / over-flood extremes).
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.

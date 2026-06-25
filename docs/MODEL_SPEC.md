@@ -261,10 +261,13 @@ targeted identical cells. **C.4a (BUILT, `terrain.py`):** the dormant `temperatu
 nothing read it) becomes a **latitudinal gradient** (equator `TEMP_EQUATOR_C=27 °C` → high-lat
 `TEMP_HIGHLAT_C=1 °C`, 14 °C area-mean preserved); a new per-cell `grass_subtype` splits GRASS by the
 `GRASS_TROPICAL_THRESHOLD_C=18 °C` Köppen isotherm → `GRASS_LLANOS` (warm) / `GRASS_STEPPE` (cool). Gate:
-non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (pending):** a 40–90 yr caribou
+non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (BUILT):** a 40–90 yr caribou
 quasi-cycle (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration)
-on `GRASS_STEPPE` **game** — needs ClimateField to gain a game-channel + biome-aware path (currently forage-only,
-spatially uniform), magnitude-only so as not to smooth the §4.1.5 threshold-access signal. **C.4c (pending):**
+on `GRASS_STEPPE` **meat only** (supervisor choice B). ClimateField exposes `meat_factor(x,y)` =
+`(1+a·cos(2πt/P+φ))/(1+a)` (peak-pinned, trough ≈0.069), masked to steppe cells; the economy applies it as
+`meat_pool *= tf.meat_factor(cx,cy)` (phase1_model.py:354) — the forage slice `(1−meat_frac)·S` is untouched,
+so a herd crash is not a plant crash. Duck-typed (no-climate runs bit-exact). Gate: 700-step run at trough,
+meat_frac=0.66 → eq_pop ratio 0.614; meat_frac=0 → ratio 1.000 exactly (meat-only, no forage leakage). **C.4c (pending):**
 the llanos flood as the heavy TAIL of Layer-2 interannual on `GRASS_LLANOS` forage (Hamilton et al. inundation
 1,278–105,454 km², median 25,374), folded into Layer-2 per the ENSO anti-double-count discipline.
 

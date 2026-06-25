@@ -7,12 +7,14 @@ is the EXACT validated R-6 form (range [s_min,1], peak-normalized); (3) A_seas=0
 from __future__ import annotations
 import math
 import random
+import numpy as np
 
 from sic_games.climate import (
     ClimateField, obliquity_to_amplitude, draw_obliquity, A_SEAS_EARTH, OBLIQUITY_EARTH_DEG,
     eccentricity_mean_factor, draw_eccentricity, draw_stellar_flux, flux_to_temperature, draw_world_climate,
     ECCENTRICITY_MAX, STELLAR_FLUX_MIN, STELLAR_FLUX_MAX,
     REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
+    CARIBOU_AMP_ABOUT_MEAN, CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR,
 )
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
@@ -178,6 +180,54 @@ def test_draw_world_climate_regime_keys_and_ranges():
     assert 100 * 12 <= d["regime_duration"] <= 500 * 12
     assert 1000 * 12 <= d["regime_recurrence"] <= int(REGIME_RECURRENCE_MAX_YR * 12)
     assert d["regime_duration"] >= 12 * int(REGIME_DURATION_MIN_YR)    # ≥100 yr ≫ generation
+
+
+# ── C.4b: caribou herd-swing (meat-channel quasi-cycle on GRASS_STEPPE) ───────
+def test_caribou_off_meat_factor_is_one():
+    # amp=0 OR no mask ⇒ meat_factor ≡ 1 (back-compat: the economy multiplies meat by 1.0)
+    f0 = ClimateField(_MockField(), caribou_amp=0.0)
+    assert f0.meat_factor(5, 5) == 1.0
+    mask = np.ones((40, 40), dtype=bool)
+    fn = ClimateField(_MockField(), caribou_amp=0.871, caribou_period=480, steppe_mask=None)
+    assert fn.meat_factor(5, 5) == 1.0                                  # mask None ⇒ inert even with amp>0
+
+
+def test_caribou_depresses_steppe_cells_only():
+    mask = np.zeros((40, 40), dtype=bool)
+    mask[7, 3] = True                                                   # one steppe cell at (x=3, y=7)
+    f = ClimateField(_MockField(), caribou_amp=0.871, caribou_period=480,
+                     caribou_phase=math.pi, steppe_mask=mask)           # phase=π ⇒ t=0 is the trough
+    f.set_step(0)
+    assert f.meat_factor(2, 2) == 1.0                                   # non-steppe cell untouched
+    a = 0.871
+    assert abs(f.meat_factor(3, 7) - (1.0 - a) / (1.0 + a)) < 1e-12    # steppe trough = (1-a)/(1+a) ≈ 0.069
+
+
+def test_caribou_peak_pinned_and_bounded():
+    mask = np.ones((40, 40), dtype=bool)
+    f = ClimateField(_MockField(), caribou_amp=0.871, caribou_period=480, caribou_phase=0.0, steppe_mask=mask)
+    a = 0.871; lo = (1.0 - a) / (1.0 + a)
+    vals = []
+    for t in range(480):
+        f.set_step(t); vals.append(f.meat_factor(1, 1))
+    assert abs(max(vals) - 1.0) < 1e-9                                  # peak pinned to 1.0
+    assert abs(min(vals) - lo) < 1e-3                                   # trough ≈ 0.069
+    assert all(lo - 1e-9 <= v <= 1.0 + 1e-9 for v in vals)             # bounded
+
+
+def test_caribou_does_not_touch_forage_or_capacity():
+    # meat_factor is a SEPARATE accessor; level()/mult() (forage capacity) are unaffected by the caribou layer.
+    mask = np.ones((40, 40), dtype=bool)
+    f = ClimateField(_MockField(), a_seas=0.0, caribou_amp=0.871, caribou_period=480,
+                     caribou_phase=math.pi, steppe_mask=mask)
+    f.set_step(0)
+    assert f.level(1, 1) == 100.0 and f.mult() == 1.0                  # capacity/forage untouched at caribou trough
+
+
+def test_draw_world_climate_caribou_keys_and_ranges():
+    d = draw_world_climate(random.Random(3), a_earth=A_SEAS_EARTH["savanna"])
+    assert d["caribou_amp"] == CARIBOU_AMP_ABOUT_MEAN                   # fixed empirical anchor (0.871)
+    assert int(CARIBOU_PERIOD_MIN_YR * 12) <= d["caribou_period"] <= int(CARIBOU_PERIOD_MAX_YR * 12)   # 480–1080
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

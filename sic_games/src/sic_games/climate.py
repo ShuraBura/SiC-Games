@@ -54,6 +54,13 @@ REGIME_AMP_TAIL = 0.30                              # reserve ±30% / ~1°C for 
 REGIME_DURATION_MIN_YR, REGIME_DURATION_MAX_YR = 100.0, 500.0   # excursion length (LIA ≈ 500 yr; Wanner/Mayewski)
 REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR = 1000.0, 2000.0   # onset spacing (Bond ~1500; Mayewski RCC)
 
+# ── C.4b: caribou herd-swing — a quasi-periodic depression on GRASS_STEPPE *meat* only ──────────
+# St. John 2022 (43-herd database): migratory-tundra cycles, amplitude 0.871 standardized about the mean
+# (⇒ peak 1.871× / trough 0.129× mean → ~93% peak-to-trough drawdown), median period 40.5 yr (range 40–90 yr).
+# Vors & Boyce 2009 corroborate ~57% (modern, confounded). Hits the meat channel on the steppe sub-biome only.
+CARIBOU_AMP_ABOUT_MEAN = 0.871                  # St. John 2022 cyclic amplitude (fraction of the mean)
+CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
+
 
 def draw_eccentricity(rng) -> float:
     """Per-world UNIFORM draw over [0, 0.6] (Q3; Spiegel 2010)."""
@@ -95,6 +102,10 @@ def draw_world_climate(rng, a_earth: float) -> dict:
         regime_amp=rng.uniform(REGIME_AMP_MIN, REGIME_AMP_MAX),
         regime_duration=int(rng.uniform(REGIME_DURATION_MIN_YR, REGIME_DURATION_MAX_YR) * SEASON_PERIOD_DEFAULT),
         regime_recurrence=int(rng.uniform(REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR) * SEASON_PERIOD_DEFAULT),
+        # Layer 4a caribou herd-swing (GRASS_STEPPE meat) — amplitude is the empirical anchor, period drawn.
+        caribou_amp=CARIBOU_AMP_ABOUT_MEAN,
+        caribou_period=int(rng.uniform(CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR) * SEASON_PERIOD_DEFAULT),
+        caribou_phase=rng.uniform(0.0, 2.0 * math.pi),
         mean_temperature=flux_to_temperature(S),
         obliquity=eps, eccentricity=e, flux=S,
     )
@@ -114,7 +125,9 @@ class ClimateField:
     def __init__(self, base, a_seas: float = 0.0, phase: float = 0.0, period: int = SEASON_PERIOD_DEFAULT,
                  mean_factor: float = 1.0, interannual_amp: float = 0.0,
                  interannual_period: int = 0, interannual_phase: float = 0.0,
-                 regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None):
+                 regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None,
+                 caribou_amp: float = 0.0, caribou_period: int = 0, caribou_phase: float = 0.0,
+                 steppe_mask=None):
         self._base = base
         self.a_seas = max(0.0, min(1.0, a_seas))
         self.phase = phase
@@ -131,6 +144,11 @@ class ClimateField:
         self._rng = rng                                         # drives the telegraph (per-world, seeded)
         self._regime_state = 0                                  # current state (0/1); a sustained PLATEAU, not a wiggle
         self._regime_last_t = 0
+        # C.4b caribou herd-swing (GRASS_STEPPE meat-channel quasi-cycle):
+        self.caribou_amp = caribou_amp                          # amplitude about the mean (St. John 0.871)
+        self.caribou_period = caribou_period                    # steps (yr×12); 0 = off
+        self.caribou_phase = caribou_phase
+        self._steppe_mask = steppe_mask                         # (N,N) bool [y,x]; None ⇒ layer inert
         self.t = 0
 
     def set_step(self, t: int) -> None:
@@ -171,6 +189,18 @@ class ClimateField:
     def mult(self) -> float:
         # temporal [0,1] layers: seasonal × interannual × regime-shift
         return self.season() * self.interannual() * self.regime()
+
+    def meat_factor(self, x: int, y: int) -> float:
+        """C.4b caribou herd-swing: a per-cell MEAT-channel multiplier (read by the economy's meat_pool, §4.5.5).
+        A 40–90 yr quasi-periodic depression on GRASS_STEPPE cells ONLY (steppe_mask); 1.0 elsewhere / when off.
+        Peak-pinned to 1.0; trough (1−a)/(1+a) (a=0.871 ⇒ ~0.069 = a ~93% peak-to-trough megafauna crash). The
+        forage channel ((1−meat_frac)·S) is untouched — a herd crash is not a plant crash (supervisor choice B)."""
+        if self.caribou_amp <= 0.0 or self.caribou_period <= 0 or self._steppe_mask is None:
+            return 1.0
+        if not self._steppe_mask[y, x]:
+            return 1.0
+        a = self.caribou_amp
+        return (1.0 + a * math.cos(2.0 * math.pi * self.t / self.caribou_period + self.caribou_phase)) / (1.0 + a)
 
     def level(self, x: int, y: int) -> float:
         # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult)

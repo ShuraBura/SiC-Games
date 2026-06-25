@@ -351,6 +351,8 @@ class TerrainWorld(mesa.Model):
                 # conserving: at κ=0 forage+meat == single stream (exact back-compat + the inertness gate);
                 # at κ>0 meat redistributes toward high-Cred Carbon agents while forage stays equal.
                 meat_pool = meat_frac * S
+                if hasattr(tf, "meat_factor"):
+                    meat_pool *= tf.meat_factor(cx, cy)   # C.4b caribou herd-swing: meat-only depression on GRASS_STEPPE
                 if meat_cv > 0.0 and meat_pool > 0.0:
                     # G.3: band-level correlated stochastic meat — ONE mean-preserving lognormal draw per cell
                     # (shared by all occupants). Ordinary bad-streak variance; the regime where the share rule
