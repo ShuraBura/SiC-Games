@@ -248,8 +248,20 @@ def _fbm(grid_f64: np.ndarray, x_arr: np.ndarray, y_arr: np.ndarray,
 # demographic pathogen field (Step 2) can reference real temperature/humidity rather than a
 # `wateracc × NPP` proxy. [PLACEHOLDER — exact values + the spatially/seasonally varying field are
 # pinned in the climate-season stage; see DEFERRED_MECHANICS CL-1 / MODEL_SPEC §4.3.2.]
-MEAN_GLOBAL_TEMP_C = 14.0    # global mean surface air temperature ~14 °C (20th-century baseline)
+MEAN_GLOBAL_TEMP_C = 14.0    # global mean surface air temperature ~14 °C (20th-century baseline; area-mean anchor)
 MEAN_REL_HUMIDITY = 0.70     # near-surface relative humidity, land-ish average (fraction)
+
+# ── C.4a sub-biome tag: GRASS splits into tropical-llanos vs temperate-steppe (climate catastrophe stage) ──
+# The `temperature` field becomes a LATITUDINAL gradient (was a flat placeholder; verified NOTHING read it).
+# Linear in grid row y: y=0 equator (warm) → y=N-1 high latitude (cold); endpoints preserve the 14 °C area-mean.
+# This lets the C.4 catastrophe layers separate the two ecologies the single BIOME_GRASS code conflates:
+# Hurtado & Hill (tropical llanos, Hiwi/Cuiva) vs Nunamiut caribou / plains bison (temperate-arctic steppe).
+TEMP_EQUATOR_C  = 27.0       # mean-annual T at the equatorial edge (tropical savanna/llanos ≈ 27 °C)
+TEMP_HIGHLAT_C  = 1.0        # mean-annual T at the high-latitude edge (temperate/boreal steppe ≈ 1 °C); mean (27+1)/2 = 14
+GRASS_TROPICAL_THRESHOLD_C = 18.0   # Köppen tropical-A boundary (18 °C isotherm): GRASS warmer → llanos, cooler → steppe
+GRASS_NONE   = 0             # grass_subtype codes
+GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
+GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
 
 
 @dataclass
@@ -284,8 +296,10 @@ class WorldFields:
     game_mobility: np.ndarray = None  # (N,N) float64 [0,1]; GAME_MOBILITY[biome]. [SEAM — MODEL_SPEC §4.1.7]
     # Phase 1 climate seam (added 2026-06-18) — HOMOGENEOUS placeholders (spatially constant); the
     # spatial/seasonal (solar-forced) field is the deferred climate-season stage. [PLACEHOLDER]
-    temperature:   np.ndarray = None  # (N,N) float64 °C; constant = MEAN_GLOBAL_TEMP_C
+    temperature:   np.ndarray = None  # (N,N) float64 °C; LATITUDINAL gradient (C.4a; was a flat placeholder)
     humidity:      np.ndarray = None  # (N,N) float64 [0,1] rel. humidity; constant = MEAN_REL_HUMIDITY
+    # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
+    grass_subtype: np.ndarray = None  # (N,N) uint8
 
 
 # ── Water-body connected components ───────────────────────────────────────
@@ -612,14 +626,21 @@ def generate_world(knobs: dict) -> WorldFields:
     nc[:, 1:, 2]  = cost[:, :-1]   # west:  target (y, x-1)
     nc[:, :-1, 3] = cost[:, 1:]    # east:  target (y, x+1)
 
-    # ── Climate seam: homogeneous placeholder fields (constant; see module header) ─────
-    temperature = np.full((N, N), MEAN_GLOBAL_TEMP_C, dtype=np.float64)
+    # ── Climate: latitudinal temperature gradient + GRASS sub-biome tag (C.4a) ─────
+    # temperature: linear equator (row 0, warm) → high latitude (row N-1, cold); area-mean = MEAN_GLOBAL_TEMP_C.
+    lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # 0 at equator → 1 at the pole edge
+    temperature = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
     humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
+    # grass_subtype: split BIOME_GRASS by the tropical isotherm (warm → llanos, cool → steppe); 0 elsewhere.
+    grass_subtype = np.zeros((N, N), dtype=np.uint8)
+    _is_grass = (biome == BIOME_GRASS)
+    grass_subtype[_is_grass & (temperature >= GRASS_TROPICAL_THRESHOLD_C)] = GRASS_LLANOS
+    grass_subtype[_is_grass & (temperature <  GRASS_TROPICAL_THRESHOLD_C)] = GRASS_STEPPE
 
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
-                npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity):
+                npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -630,6 +651,7 @@ def generate_world(knobs: dict) -> WorldFields:
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
+        grass_subtype=grass_subtype,
     )
 
 

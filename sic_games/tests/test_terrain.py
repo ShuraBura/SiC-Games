@@ -10,6 +10,8 @@ from sic_games.terrain import (
     BIOME_DESERT, BIOME_MOUNTAIN,
     NPP_GM2_SCALE, SHORE_BONUS_KCAL, FORAGE_KCAL_TARGETS,
     MEAN_GLOBAL_TEMP_C, MEAN_REL_HUMIDITY,
+    TEMP_EQUATOR_C, TEMP_HIGHLAT_C, GRASS_TROPICAL_THRESHOLD_C,
+    GRASS_NONE, GRASS_LLANOS, GRASS_STEPPE,
     EXTERIOR_WATER_CEILING, LARGE_BODY_CEILING,
     generate_world, characterize_map, _water_bodies, _classify_water_components,
     _component_sizes,
@@ -677,11 +679,28 @@ def test_p1s1c_component_sizes_all_true():
     assert sizes == [N * N]
 
 
-def test_climate_seam_homogeneous_placeholders():
-    """Phase 1 climate seam: temperature + humidity exist as CONSTANT global-average placeholders
-    (spatial/seasonal variation is the deferred climate-season stage)."""
+def test_climate_seam_temperature_gradient_and_humidity():
+    """C.4a: `temperature` is now a LATITUDINAL gradient (was a flat placeholder); humidity stays constant."""
     assert _W.temperature is not None and _W.humidity is not None
     assert _W.temperature.shape == _W.humidity.shape == (N, N)
-    assert np.all(_W.temperature == MEAN_GLOBAL_TEMP_C)
+    # Linear equator(row 0, warm) → high latitude(row N-1, cold); each row constant across x; area-mean = 14 °C.
+    assert _W.temperature[0, 0] == pytest.approx(TEMP_EQUATOR_C)
+    assert _W.temperature[N - 1, 0] == pytest.approx(TEMP_HIGHLAT_C)
+    assert np.all(np.diff(_W.temperature[:, 0]) < 0)                     # strictly cooler toward the pole
+    assert np.allclose(_W.temperature, _W.temperature[:, [0]])           # no x-dependence (pure latitude)
+    assert _W.temperature.mean() == pytest.approx(MEAN_GLOBAL_TEMP_C, abs=0.2)   # 14 °C area-mean preserved
     assert np.all(_W.humidity == MEAN_REL_HUMIDITY)
     assert not _W.temperature.flags.writeable and not _W.humidity.flags.writeable
+
+
+def test_grass_subtype_tag_splits_by_isotherm():
+    """C.4a: BIOME_GRASS splits into tropical-llanos (warm) vs temperate-steppe (cool) by the 18 °C isotherm;
+    every non-grass cell is GRASS_NONE; the split is exhaustive over grass cells."""
+    gs = _W.grass_subtype
+    assert gs is not None and gs.shape == (N, N) and not gs.flags.writeable
+    is_grass = (_W.biome == BIOME_GRASS)
+    assert np.all(gs[~is_grass] == GRASS_NONE)                            # tag only lives on grass
+    assert np.all((gs[is_grass] == GRASS_LLANOS) | (gs[is_grass] == GRASS_STEPPE))   # exhaustive on grass
+    # consistency with the isotherm
+    assert np.all(_W.temperature[gs == GRASS_LLANOS] >= GRASS_TROPICAL_THRESHOLD_C)
+    assert np.all(_W.temperature[gs == GRASS_STEPPE] < GRASS_TROPICAL_THRESHOLD_C)

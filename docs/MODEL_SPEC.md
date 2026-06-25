@@ -252,9 +252,24 @@ suite green at each step (C.1 cf74bda 492; C.2 e4ccd33 499; C.3 18 climate tests
 **Honest seams / deferred.** (a) `flux_to_temperature` sets a dormant world property — wiring pathogen→T (or
 →the climate-modulated CC) is a future step, NOT free. (b) The regime layer ENABLES but does NOT CAUSE the
 §4.5.10 society morph — that needs the deferred storage/surplus mechanic (Testart) + a periodic
-`society_from_character` call; C.3 ships the climate layer only. (c) Catastrophe (C.4, per-biome Poisson, with
-the ENSO-tail fold and HERD-swing caribou) and water→aggregation (C.5, reusing the existing §4.1.5/game-mobility
-dry-season aggregation, not a parallel mechanic) are pending.
+`society_from_character` call; C.3 ships the climate layer only.
+
+**C.4 catastrophe — the two biome-specific shocks (sub-biome split BUILT; layers pending).** A v3 red-team
+(2026-06-24) caught that the single `BIOME_GRASS` code conflates *tropical-llanos* (Hurtado & Hill forage/game
+anchors) and *temperate-arctic steppe* (caribou/bison mobility + meat_frac anchors), so the two approved shocks
+targeted identical cells. **C.4a (BUILT, `terrain.py`):** the dormant `temperature` placeholder (verified:
+nothing read it) becomes a **latitudinal gradient** (equator `TEMP_EQUATOR_C=27 °C` → high-lat
+`TEMP_HIGHLAT_C=1 °C`, 14 °C area-mean preserved); a new per-cell `grass_subtype` splits GRASS by the
+`GRASS_TROPICAL_THRESHOLD_C=18 °C` Köppen isotherm → `GRASS_LLANOS` (warm) / `GRASS_STEPPE` (cool). Gate:
+non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (pending):** a 40–90 yr caribou
+quasi-cycle (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration)
+on `GRASS_STEPPE` **game** — needs ClimateField to gain a game-channel + biome-aware path (currently forage-only,
+spatially uniform), magnitude-only so as not to smooth the §4.1.5 threshold-access signal. **C.4c (pending):**
+the llanos flood as the heavy TAIL of Layer-2 interannual on `GRASS_LLANOS` forage (Hamilton et al. inundation
+1,278–105,454 km², median 25,374), folded into Layer-2 per the ENSO anti-double-count discipline.
+
+**C.5 water→aggregation (pending):** reuse the existing §4.1.5/game-mobility dry-season aggregation, not a
+parallel mechanic.
 
 ---
 

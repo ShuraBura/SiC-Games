@@ -148,7 +148,22 @@ real LIA/Bond excursion needs).
   a held multi-generational plateau, not a wiggle/collapse; regime_amp=0 (Earth-rare excursion) nests to C.2
   bit-exact. *(The morph trigger is a SEPARATE deferred step — it needs the storage/surplus mechanic + a
   periodic `society_from_character` call, neither of which exists; C.3 was NOT gated on a morph firing.)*
-- **C.4 — catastrophe (Layer 4, §3).** Per-biome Poisson events; the resilience shock.
+- **C.4 — catastrophe (Layer 4, §3).** The two biome-specific resilience shocks (caribou herd-swing +
+  llanos flood), decomposed after the v3 red-team (below) into:
+  - **C.4a — sub-biome tag. ✅ BUILT 2026-06-24** (`terrain.py`). RESOLVES the v3 BLOCKER: the single
+    `BIOME_GRASS` code conflates *tropical-llanos* (Hurtado & Hill forage/game anchors) and *temperate-arctic
+    steppe* (caribou/bison mobility+meat-frac anchors), so the two approved shocks targeted the SAME cells.
+    Fix (user-chosen, "add a sub-biome tag"): the dormant `temperature` placeholder becomes a **latitudinal
+    gradient** (equator 27 °C → high-lat 1 °C, 14 °C area-mean preserved; verified NOTHING read the old flat
+    field), and a new per-cell `grass_subtype` splits grass by the **18 °C Köppen tropical isotherm** →
+    `GRASS_LLANOS` (warm) vs `GRASS_STEPPE` (cool). **GATE met:** non-degenerate split on 4 seeds (llanos
+    115–190 / steppe 247–570 cells); tag exhaustive on grass, `GRASS_NONE` elsewhere; T-mean = 14.00; 70
+    terrain tests green.
+  - **C.4b — caribou quasi-cycle (PENDING).** A 40–90 yr quasi-periodic depression on `GRASS_STEPPE` **game**
+    (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration). Needs
+    ClimateField to become **game-channel + biome aware** (it currently scales forage `level()` only).
+  - **C.4c — llanos flood tail (PENDING).** The heavy tail of Layer-2 interannual on `GRASS_LLANOS` **forage**
+    (Hamilton inundation 1,278–105,454 km², median 25,374 → failed-flood / over-flood extremes).
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
 
 ## §7. Validation / gates
@@ -165,8 +180,10 @@ real LIA/Bond excursion needs).
 - **Q2 RESOLVED:** cold/high-latitude = **caribou/herd crash** (Bergerud/Zalatan magnitude; Usher 2022 confound
   caveat) on migratory-game biomes — the gap is filled.
 - **Q3 RESOLVED:** **uniform** draws over the (forager-sustainable) habitable range.
-- **REMAINING Q4:** regime-shift amplitude/period calibration (±10–30% / 100–500 yr) — extract the Wanner/
-  Mayewski numbers more precisely? **Q5:** flood catastrophe re-anchor (own source) or drop?
+- **Q4 RESOLVED (C.3 build):** regime-shift = A_reg∈[0.10,0.15] central / dur 100–500 yr / recur 1000–2000 yr
+  (Wanner/Bond/Mayewski); ±30% tail reserved for C.4 flagged events.
+- **Q5 RESOLVED (v3):** flood **re-anchored** — Hamilton et al. Llanos del Orinoco inundation 1,278–105,454 km²
+  (median 25,374) gives the failed-flood / over-flood extremes; modeled as the C.4c Layer-2 llanos tail.
 
 ## §9. Red-team record
 **v1 (2026-06-21, sub-agent) — APPROVE-WITH-FIXES, all applied** (physics verified: ε≈54° crossover,
@@ -205,6 +222,25 @@ conservativeness/normalization, the ephemeral-stream "needs extraction" honesty,
 anchors fixed; two cross-layer double-counts flagged for the implementation. **Build C.1–C.2 are unaffected
 and ready;** C.3 (regime-shift) ships the *climate layer* but NOT a morph trigger (that's a separate deferred
 step with the storage mechanic); the ENSO/water reconciliations apply at C.4/C.5.
+
+**v3 (2026-06-24, at C.4 entry) — BLOCKER found + resolved before any C.4 code.** Anchors fetched + proposed
+to the supervisor (approved): caribou = St. John 2022 (43-herd DB) period 40–90 yr / amplitude 0.871-about-mean
+(⇒ ~93% peak-to-trough), Vors & Boyce 2009 57% corroboration; llanos flood = Hamilton et al. inundation
+1,278–105,454 km² (median 25,374). Modeling: caribou = a tundra/steppe quasi-cycle, llanos flood = a Layer-2
+tail (both supervisor-approved).
+- **[BLOCKER→fixed] the two biome-specific shocks target the SAME cells.** Grounding the design in the code
+  (not the blueprint's assumed taxonomy) revealed the terrain has **7 fixed biome codes and NO separate
+  tundra/llanos** — both collapse into `BIOME_GRASS` (terrain.py:33), which is itself a mash-up (forage/game
+  ← Hurtado & Hill *tropical llanos*; meat_frac 0.66 + game_mobility 1.0 ← *temperate steppe* caribou/bison).
+  So "caribou on steppe" and "flood on llanos" would double-hit identical GRASS cells. **Fix (supervisor chose
+  "add a sub-biome tag"):** C.4a — the dormant `temperature` field (verified: nothing reads it) becomes a
+  latitudinal gradient + a per-cell `grass_subtype` (18 °C isotherm) splits GRASS → llanos/steppe. C.4b/C.4c
+  then target disjoint sub-types. BUILT + gated (above).
+- **[NOTE for C.4b] ClimateField is forage-only + spatially uniform.** It scales `level()` (forage) with a
+  time-only `mult()`; the caribou layer hits **game** on **steppe cells only**, so C.4b must add a game-channel
+  + per-cell biome-aware path (and must NOT smooth the §4.1.5 game threshold-access signal — magnitude only).
+- **[NOTE for C.4c] llanos flood folds into Layer-2** (per the v2 ENSO-tail discipline): a deeper interannual
+  depression on `GRASS_LLANOS` forage, not a parallel Poisson event.
 
 ---
 
