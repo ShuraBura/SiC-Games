@@ -747,23 +747,28 @@ density, inequality), **Woodburn 1982** (immediate- vs delayed-return: storage i
 pivot). Config: `DemographyConfig.enable_storage / storable_fraction / store_capacity_reserves /
 storage_temp_threshold_c`.
 
-**Mechanic (per-agent store, v1).** In the **overwintering zone** — cell mean temperature ≤
-`storage_temp_threshold_c` (≈ Binford's ET 15.25 °C, mapped onto the C.4a latitudinal temperature field) — an
-agent banks a `storable_fraction` of its harvest **OVERFLOW** (intake above the reserve cap, otherwise
-wasted/given to dependents) into a per-agent store, capped at `store_capacity_reserves × reserve_cap`
-(phase1_model.py glut-capture). In the **lean season** it draws the store down to top wealth back toward the
-reserve cap — living off the bank through winter (drawdown before the starvation check). **Warm/aseasonal cells
-never accumulate** ⇒ immediate-return ⇒ egalitarian *by construction* — correctly capturing why our four
-calibration foragers (Aché/Hadza/Hiwi/!Kung, all tropical) don't store. Default OFF ⇒ bit-exact back-compat (the
-overflow refactor is numerically identical when off; drawdown skipped).
+**Mechanic (COLLECTIVE band granary; blueprint `…_Storage_Morph_Scoping.md` S.1).** In the **overwintering
+zone** — cell mean temperature ≤ `storage_temp_threshold_c` (≈ Binford's ET 15.25 °C, mapped onto the C.4a
+latitudinal temperature field) — co-resident occupants' harvest **OVERFLOW** (intake above the *personal*
+reserve cap, which stays the individual buffer — itself already covering solo survival beyond the 2–3-day carry,
+Woodburn) is **ENFORCED** into a **per-cell collective store** (`_cell_store`), capped at
+`store_capacity_reserves × reserve_full × band_size`. In the **lean season** the granary is **drawn down to top
+occupants toward their caps** — the band lives off the store through winter. S.1 draw is **need-proportional
+(egalitarian)**; S.2 makes it **cred-weighted** (the Hayden control-of-redistribution inequality engine). A
+*mobile* band barely accumulates (you can't store if you move, Testart) ⇒ storage ↔ sedentism reinforce.
+**Warm/aseasonal cells never accumulate** ⇒ immediate-return ⇒ egalitarian *by construction* — capturing why
+the four tropical calibration foragers (Aché/Hadza/Hiwi/!Kung) don't store. Default OFF ⇒ bit-exact back-compat
+(the overflow refactor is numerically identical when off). *(v1 used a per-agent store; the red-team replaced it
+— individual survival is the existing reserve, the morph-driving store is collective.)*
 
 **Gate (winter survival = carrying capacity).** Harsh winter (`a_seas=0.85`, trough 15% of peak, threshold=100
-so storage is active everywhere to isolate the survival function): **storage doubles the sustainable population,
-eq_pop 188 → 380**, because the unstored population is capped by what the *lean season* can feed, while the
-stored one lives off banked surplus (store fills to ~159k in the glut, drains ~39k through winter). This is
-exactly Binford's overwintering logic. 4 unit tests (off ⇒ no store; accumulates in the cold zone; temperature-
-gated off in warm cells; the harsh-winter capacity lift). **Provisional:** `storable_fraction=0.5` (QSTOR exact
-% is in the Binford 2001 print volume, not web-accessible); the ET→model-temp mapping is a calibration point.
+so storage is active everywhere to isolate the survival function): **storage ~doubles the sustainable population,
+eq_pop 199 → 447 (2.25×)** (collective; per-agent v1 was 188→380), because the unstored population is capped by
+what the *lean season* can feed, while the stored one lives off the band granary (369 stocked cells, ~207k each).
+This is exactly Binford's overwintering logic. 4 unit tests (off ⇒ no store; accumulates in the cold zone;
+temperature-gated off in warm cells; the harsh-winter capacity lift). **Provisional:** `storable_fraction=0.5`
+(QSTOR exact % is in the Binford 2001 print volume, not web-accessible); the ET→model-temp mapping is a
+calibration point.
 
 **NEXT (the rest of the trigger, [[project-sic-games-climate]] / §4.5.10):** sustained store + density →
 sedentism state → call `society_from_character` / `morph_to_society` in the loop (currently never called) → the

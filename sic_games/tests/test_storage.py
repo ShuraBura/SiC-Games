@@ -24,7 +24,7 @@ def _world(storage_on, temp_threshold=100.0, n=60, seed=5, a_seas=0.0):
 
 
 def _max_store(w):
-    return max((getattr(a, "_store", 0.0) for a in w.agents), default=0.0)
+    return max(w._cell_store.values(), default=0.0)        # collective per-cell band granary (S.1)
 
 
 def test_storage_off_no_store_accrues():

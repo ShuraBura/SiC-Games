@@ -121,6 +121,7 @@ class TerrainWorld(mesa.Model):
         self._substrate_cfg = substrate_cfg
         self._rivalrous = substrate_cfg is not None and substrate_cfg.enabled
         self._harvest_field = harvest_field if harvest_field is not None else self.terrain_field
+        self._cell_store: dict[tuple[int, int], float] = {}   # collective band granary per cell (delayed-return; §4.5.11 S.1)
 
         # demographic layer
         self._reproduction = reproduction
@@ -376,6 +377,8 @@ class TerrainWorld(mesa.Model):
                 n_m = sum(1 for a in occ if a.sex == "male")
                 male_credit = (meat_pool / n_m) if n_m else 0.0
                 female_credit = ((1.0 - meat_frac) * S / (len(occ) - n_m)) if (len(occ) - n_m) else 0.0
+            in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)
+            cell_contrib = 0.0
             for a, sh, m in zip(occ, shares, msh):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
                 a._meat_intake = a.eta() * m   # B+ step 2: per-agent meat intake → the prowess (reputation) signal
@@ -386,16 +389,33 @@ class TerrainWorld(mesa.Model):
                 a.wealth = min(total, cap)
                 overflow = total - cap
                 if overflow > 0.0:
-                    # Storage (delayed-return): in the overwintering zone bank a storable fraction of the
-                    # otherwise-wasted overflow into the per-agent store (capped); the remainder stays giveable.
-                    if store_on and self._fields.temperature[cy, cx] <= store_temp_thr:
-                        room = store_cap_mult * cap - getattr(a, "_store", 0.0)
-                        banked = min(store_frac * overflow, room if room > 0.0 else 0.0)
-                        if banked > 0.0:
-                            a._store = getattr(a, "_store", 0.0) + banked
-                            overflow -= banked
+                    # S.1 collective storage (delayed-return): in the overwintering zone the storable fraction of
+                    # the otherwise-wasted overflow is ENFORCED into the band granary; the remainder stays giveable.
+                    if in_owz and store_frac > 0.0:
+                        banked = store_frac * overflow
+                        cell_contrib += banked
+                        overflow -= banked
                     if (provisioning or pat_prov) and overflow > 0.0:        # remaining overflow → giveable to dependents
                         provision_pool[a] = provision_pool.get(a, 0.0) + overflow
+            # S.1 collective band granary: bank the contribution (capped at band-scaled capacity), then DRAW it
+            # down to top occupants toward their reserve caps in the lean season — the band lives off the store
+            # through winter. S.1 draw is need-proportional (egalitarian); S.2 makes it cred-weighted (inequality).
+            if in_owz:
+                key = (cx, cy)
+                store = self._cell_store.get(key, 0.0) + cell_contrib
+                cap_cell = store_cap_mult * self._reserve_full * len(occ)     # granary cap scales with band size
+                if store > cap_cell:
+                    store = cap_cell
+                if store > 0.0:
+                    deficits = [(a, self._reserve_full * a.reserve_scale() - a.wealth) for a in occ]
+                    tot_def = sum(d for _, d in deficits if d > 0.0)
+                    if tot_def > 0.0:
+                        drawn = store if store < tot_def else tot_def
+                        for a, d in deficits:
+                            if d > 0.0:
+                                a.wealth += drawn * (d / tot_def)            # need-proportional (S.1 egalitarian)
+                        store -= drawn
+                self._cell_store[key] = store
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
         # their mother. C.2b tier = the mother's wasted harvest overflow. S1 tier = the mother also dips
@@ -481,13 +501,6 @@ class TerrainWorld(mesa.Model):
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             a.age += 1
-            if store_on and getattr(a, "_store", 0.0) > 0.0:
-                # Lean-season drawdown: live off the store at full ration — top wealth back toward the reserve
-                # cap (so a stored band rides out the multi-month winter, not just one step). Glut refills it.
-                _cap = self._reserve_full * a.reserve_scale()
-                if a.wealth < _cap:
-                    _draw = min(_cap - a.wealth, a._store)
-                    a.wealth += _draw; a._store -= _draw
             if demog is not None:
                 a.months_since_birth += 1
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
