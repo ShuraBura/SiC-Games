@@ -195,6 +195,69 @@ or other terrain fields directly.
 
 ---
 
+### §4.1.9 Climate stage — IMPLEMENTED orbital-lottery model (C.1–C.3, added 2026-06-24)
+
+**Status: BUILT (C.1 seasonal, C.2 eccentricity+flux+interannual, C.3 regime-shift). C.4 catastrophe / C.5
+water-aggregation pending.** Code: `sic_games/src/sic_games/climate.py`; blueprint:
+`blueprints/phase1/SiC_Games_P1_Climate_OrbitalLottery_Scoping.md`.
+
+**Design discipline (honours §4.1.6/§4.1.7).** The `ClimateField` wraps the carrying-capacity field and
+multiplies it by a time-varying climate factor; the demographic substrate is UNCHANGED code that merely reads
+a time-varying field (R-6 `run_2d` isolation). Stellar/orbital mechanics **BOUND the per-world parameter
+draws** (a one-time lottery) — they do NOT run tick-by-tick; there is no insolation→NPP transfer function.
+
+**Carrying-capacity factor (peak-normalised to 1.0):**
+
+> `level(x,y,t) = base.level(x,y) · mean_factor · season(t) · interannual(t) · regime(t)`
+
+where `mean_factor ≥ 1` is the per-world eccentricity brightening (a baseline scalar, outside the [0,1]
+temporal product) and the three temporal layers each ∈ (0,1] with peak pinned at 1.0.
+
+**The per-world lottery** (`draw_world_climate`, Q3 = UNIFORM draws over the habitable range, no Earth-leaning
+prior): draws obliquity ε, eccentricity e, stellar flux S, and the ENSO/regime nuisance params, then maps
+them to the field params below.
+
+**Parameter & literature table (all values used as anchors):**
+
+| Param | Draw range (uniform) | Map → field param | Anchor (citation) | Method / transform |
+|---|---|---|---|---|
+| obliquity ε | [0°, 60°] | `A_seas = a_earth·sin ε / sin 23.4°` (clamped [0,1]) | Spiegel 2009 (broad habitable band); Williams & Kasting 1997 | **Q1-(B):** scales the *empirical* Earth per-biome amplitude (§4.1.4) by the insolation-contrast ratio — a provisional BOUNDING heuristic, NOT a sunlight→food transfer fn. Earth ε→Earth amplitude by construction. |
+| — Earth amplitudes `a_earth` | (fixed) forest 0.05 / savanna 0.40 / llanos 0.60 | seeds `A_seas` | Hill 1984; Hawkes 1991; Hurtado & Hill 1987 | §4.1.4 empirical seasonal amplitude `A_seas≡1−s_min` per biome at Earth tilt. |
+| eccentricity e | [0, 0.6] | `mean_factor = (1−e²)^(−½)` | Spiegel 2010 (e>0.6 snowball-marginal) | Annual-mean flux brightening. e=0.017→1.0001, e=0.6→1.25. A baseline CC scalar (not temporal). |
+| stellar flux S | [0.34, 1.05] S⊕ | `T̄ = 14 + 255·(S^¼ − 1)` °C | Kopparapu 2013 (HZ edges); Stefan-Boltzmann | `T_eff ∝ S^¼`, anchored S=1→14°C via a fixed effective-greenhouse offset (RT-3: bare T_eff ~33 K too cold). **A world property/seam — currently NOTHING reads it** (pathogen reads NPP, not T; §4.6.3). |
+| ENSO amplitude | [0.20, 0.40] | `interannual_amp` | Timmermann 2018 | Layer-2 quasi-periodic DEPRESSION (bad years only, ≤1): `interannual(t)=1−amp·max(0,sin(2πt/P+φ))`. |
+| ENSO period | [2, 7] yr ×12 | `interannual_period` (steps) | Timmermann 2018 | Single drawn period (irregular/stochastic ENSO = a refinement). |
+| regime amplitude A_reg | **central [0.10, 0.15]** | `regime_amp` | Wanner 2008 (LIA global-mean ~0.5°C → ±10–15% CC) | Layer-3 depression while in excursion. **Tails (±30% / ~1°C, `REGIME_AMP_TAIL`) reserved for C.4-flagged 8.2-kyr/YD events**, not the routine lottery (v2 red-team). °C→CC% is interpretive (no NPP transfer fn). |
+| excursion **duration** | [100, 500] yr ×12 | `regime_duration` (steps) | LIA ≈ 500 yr; Wanner 2008 / Mayewski 2004 | Mean dwell in the excursion state, P(end)=1/duration. |
+| excursion **recurrence** | [1000, 2000] yr ×12 | `regime_recurrence` (steps) | Bond ~1500 yr; Mayewski RCC | Mean onset spacing, P(onset)=1/recurrence. **≠ duration** (v2 fix: the two were conflated). |
+
+**Layer 3 process (the key C.3 correction).** `regime(t) = 1 − A_reg·state(t)` where `state ∈ {0,1}` is a
+**two-state Markov / telegraph** chain with geometric dwell times (NOT an Ornstein-Uhlenbeck wiggle — v2
+red-team). It produces a *sustained multi-generational plateau*: the level holds depressed for the whole
+excursion (~100–500 yr ≫ a ~25-yr generation) and then switches back. Stationary occupancy =
+`duration/(duration+recurrence)` (≈1500 yr recurrence × ~300 yr duration ⇒ excursions are the Earth-rare
+minority state). `regime_amp=0` ⇒ `regime≡1`, nesting bit-exact to C.2.
+
+**Seasonal form (validated R-6, unchanged).** `season(t)=s_min+(1−s_min)·½(1+cos(2πt/P−φ))`,
+`A_seas≡1−s_min`, range `[s_min,1]`, peak-normalised; `A_seas=0 ⇒ season≡1` (aseasonal baseline bit-exact).
+Per-biome phase φ. **The §4.1.5 game threshold-access signal must NOT be smoothed by this multiplier.**
+
+**Validation (gates).** C.1: on R-6's exact config the multiplier reproduces the 37% trough bit-for-bit (unit
+test on the algebraic identity); the regime-dependent 61%/96% eq_pop responses are correct (at-ceiling bites
+hard, below-K bites less). C.3: forced excursion = a perfectly flat depressed plateau (zero variance) +
+occupancy within 3% of the duty cycle; a 900-step demographic run at A_reg=0.15 → eq_pop ratio 0.891
+(sustained, proportional; population as stable as baseline = a held plateau, not a collapse/wiggle). Full
+suite green at each step (C.1 cf74bda 492; C.2 e4ccd33 499; C.3 18 climate tests).
+
+**Honest seams / deferred.** (a) `flux_to_temperature` sets a dormant world property — wiring pathogen→T (or
+→the climate-modulated CC) is a future step, NOT free. (b) The regime layer ENABLES but does NOT CAUSE the
+§4.5.10 society morph — that needs the deferred storage/surplus mechanic (Testart) + a periodic
+`society_from_character` call; C.3 ships the climate layer only. (c) Catastrophe (C.4, per-biome Poisson, with
+the ENSO-tail fold and HERD-swing caribou) and water→aggregation (C.5, reusing the existing §4.1.5/game-mobility
+dry-season aggregation, not a parallel mechanic) are pending.
+
+---
+
 ## Demographic Layer: Literature Treatment (added 2026-06-18)
 
 Mortality + fertility methodology — same discipline as the resource layer: each value records its source,

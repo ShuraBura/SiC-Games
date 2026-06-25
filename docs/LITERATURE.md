@@ -654,3 +654,38 @@ Our Step-1 realized **IBI 37.0 / TFR 7.9** sits at the high-fertility (Aché) en
 **What was lifted — corroborating pathogen-richness drivers (Biome-Mortality §4.6.3):** pathogen *richness* GLM **pseudo-r²=0.82**, most variation explained by **reservoir-host (bird + mammal) species diversity** plus temperature / precipitation / actual evapotranspiration (AET). Supports the Holocene-stability case (environmental/host-driven pathogen distribution) and the warm/wet/productive → higher-pathogen direction. Secondary to Cashdan (richness, not prevalence).
 
 **Citation tag:** [USED — pathogen channel corroboration (Biome-Mortality §4.6.3)]
+
+---
+
+## Climate / orbital-lottery anchors (Climate stage C.1–C.3, MODEL_SPEC §4.1.9, added 2026-06-24)
+
+These ground the per-world climate lottery in `climate.py`. PDFs are astronomy/paleoclimate references not
+filed locally (PDFs gitignored); each is anchored to the specific number lifted.
+
+### Spiegel, D.S., Menou, K., Scharf, C.A. (2009). "Habitable Climates: The Influence of Obliquity." *ApJ* 691:596. & Spiegel, D.S., Raymond, S.N., Dressing, C.D., et al. (2010). "Generalized Milankovitch Cycles and Long-Term Climatic Habitability." *ApJ* 721:1308.
+**What was lifted — obliquity & eccentricity bounds (C.1/C.2):** a BROAD habitable obliquity band (no clean monotone obliquity→snowball threshold) → uniform ε∈[0°,60°] draw; eccentricity habitability marginal above e≈0.6 (snowball risk 0.4<e<0.6) → uniform e∈[0,0.6]; and the **annual-mean flux brightening `(1−e²)^(−½)`** used as `mean_factor`. **Rejected:** any per-step Milankovitch insolation integration — we BOUND draws only.
+**Citation tag:** [USED — obliquity & eccentricity draw bounds + (1−e²)^−½ brightening (§4.1.9 C.1/C.2)]
+
+### Williams, D.M. & Kasting, J.F. (1997). "Habitable Planets with High Obliquities." *Icarus* 129:254–267.
+**What was lifted — obliquity→insolation-contrast intuition (C.1):** at high obliquity the pole receives more annual insolation than the equator (contrast crosses ≈54°); motivates the monotone `sin ε/sin 23.4°` scaling of the empirical Earth seasonal amplitude. **Rejected:** the literal pole>equator transfer as a food signal — forage amplitude is rain/phenology-driven (Q1-B keeps it a provisional bounding heuristic).
+**Citation tag:** [USED — obliquity→amplitude scaling rationale (§4.1.9 C.1)]
+
+### Kopparapu, R.K., Ramirez, R., Kasting, J.F., et al. (2013). "Habitable Zones around Main-Sequence Stars: New Estimates." *ApJ* 765:131.
+**What was lifted — stellar-flux HZ edges (C.2):** conservative HZ flux range ≈ [0.34, 1.05] S⊕ (max-greenhouse outer edge → moist/runaway inner edge) → uniform S draw; `T(S)=14+255·(S^¼−1)` °C uses Stefan-Boltzmann `T_eff∝S^¼` anchored S=1→14 °C via a fixed effective-greenhouse offset. **Rejected:** a full radiative-convective climate model — T̄ is a dormant world property (nothing reads it yet).
+**Citation tag:** [USED — stellar-flux draw bounds + S→T̄ map (§4.1.9 C.2)]
+
+### Timmermann, A., An, S.-I., Kug, J.-S., et al. (2018). "El Niño–Southern Oscillation complexity." *Nature* 559:535–545.
+**What was lifted — interannual (ENSO) layer (C.2):** ENSO quasi-period 2–7 yr → `interannual_period`; ±20–40% CC swing in marginal biomes → `interannual_amp`. Implemented as a one-sided depression (bad years only). **Rejected:** stochastic/irregular ENSO realism — a single drawn period is used (refinement deferred).
+**Citation tag:** [USED — interannual ENSO period+amplitude (§4.1.9 C.2)]
+
+### Wanner, H., Beer, J., Bütikofer, J., et al. (2008). "Mid- to Late Holocene climate change: an overview." *Quaternary Science Reviews* 27:1791–1828.
+**What was lifted — regime-shift amplitude (C.3):** Little Ice Age global-mean cooling ~0.5 °C (p.1793) → an *interpretive* central ±10–15% CC depression (`regime_amp∈[0.10,0.15]`); LIA excursion duration ≈ 500 yr → `regime_duration` upper bound. **Rejected:** °C→CC% as a calibrated transfer (no NPP transfer fn — flagged interpretive); the ±30% / ~1 °C tail is RESERVED for explicitly-flagged 8.2-kyr/YD catastrophe events (C.4), not the routine lottery.
+**Citation tag:** [USED — regime amplitude + excursion duration (§4.1.9 C.3)]
+
+### Mayewski, P.A., Rohling, E.E., Stager, J.C., et al. (2004). "Holocene climate variability." *Quaternary Research* 62:243–255. & Bond, G., Kromer, B., Beer, J., et al. (2001). *Science* 294:2130.
+**What was lifted — regime-shift recurrence (C.3):** Holocene Rapid Climate Change events recur on ~1500 / ~2000–2800 yr pacing (Bond ~1500 yr) → `regime_recurrence∈[1000,2000]` yr. The two-state Markov **telegraph** dwell/recurrence split (DURATION ≠ RECURRENCE) is anchored here. **Rejected:** glacial-cycle (10⁴–10⁵ yr) timescales — out of scope; an OU/mean-reverting process (v2 red-team: these are sustained regime shifts, not wiggles).
+**Citation tag:** [USED — regime recurrence + step-process justification (§4.1.9 C.3)]
+
+### Usher, P.J. (2022). "Caribou Crisis or Administrative Crisis? …" *(filed `literature/`.)*
+**What was lifted — a CONFOUND CAVEAT (C.4 prep, NOT yet wired):** the 50–66% mid-20thC caribou-dependent *human* famine mortality is a downstream, COLONIALLY-CONFOUNDED outcome (administrative/policy failure), NOT a clean herd-crash magnitude. **How used:** when C.4 drives the field with a caribou shock, use the HERD swing (Bergerud/Zalatan ~5–10×, ~80% — to be filed) as the resource forcing; the human famine figure is an OUTCOME, not the input. **Rejected:** using 50–66% as the herd-crash amplitude (category error caught in v2 red-team).
+**Citation tag:** [REFERENCE — caribou-crisis confound caveat (C.4 catastrophe prep)]

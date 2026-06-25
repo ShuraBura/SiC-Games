@@ -137,11 +137,17 @@ real LIA/Bond excursion needs).
   reads `_fields.npp` (phase1_model.py:672), and **nothing reads the `temperature` field** (dormant placeholder).
   So `flux_to_temperature` sets a world *property/seam* (recorded), NOT a live pathogen coupling — wiring
   pathogen→T (or →the climate-modulated CC) is a deferred step, not free.
-- **C.3 — regime-shift (Layer 3).** Slow **regime-switching/step** modulation of the field (NOT OU). Ships the
-  *climate layer* only. **GATE:** a sustained excursion produces a sustained multi-generational CC plateau (not
-  a mean-reverting wiggle) of the right magnitude/duration; Earth-config → no excursion. *(The morph trigger is
-  a SEPARATE deferred step — it needs the storage/surplus mechanic + a periodic `society_from_character` call,
-  neither of which exists; do NOT gate C.3 on a morph firing.)*
+- **C.3 — regime-shift (Layer 3). ✅ BUILT 2026-06-24** (`climate.py`: a **two-state Markov telegraph** —
+  `regime(t)=1−A_reg·state`, geometric dwell times P(onset)=1/recurrence, P(end)=1/duration; central band
+  A_reg∈[0.10,0.15] (Wanner LIA ~0.5°C), duration 100–500 yr, recurrence 1000–2000 yr (Bond/Mayewski); tails
+  (±30%) reserved for C.4-flagged events. `mult()=season·interannual·regime`; `draw_world_climate` extended).
+  **GATE met:** (unit) forced excursion = a perfectly FLAT depressed plateau (zero variance), occupancy
+  matches the duty cycle duration/(duration+recurrence) within 3%, dwell ≫ a generation; (demographic, 900-step
+  run) A_reg=0.15 → eq_pop ratio **0.891** (sustained, proportional depression — regulation slack absorbs part,
+  exactly the C.1 below-K behaviour) with the excursion population AS stable as baseline (CoV 0.195 vs ~0.188) =
+  a held multi-generational plateau, not a wiggle/collapse; regime_amp=0 (Earth-rare excursion) nests to C.2
+  bit-exact. *(The morph trigger is a SEPARATE deferred step — it needs the storage/surplus mechanic + a
+  periodic `society_from_character` call, neither of which exists; C.3 was NOT gated on a morph firing.)*
 - **C.4 — catastrophe (Layer 4, §3).** Per-biome Poisson events; the resilience shock.
 - **C.5 — water→aggregation coupling (§4).** Seasonal water field → aggregation.
 

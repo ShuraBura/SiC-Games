@@ -12,6 +12,7 @@ from sic_games.climate import (
     ClimateField, obliquity_to_amplitude, draw_obliquity, A_SEAS_EARTH, OBLIQUITY_EARTH_DEG,
     eccentricity_mean_factor, draw_eccentricity, draw_stellar_flux, flux_to_temperature, draw_world_climate,
     ECCENTRICITY_MAX, STELLAR_FLUX_MIN, STELLAR_FLUX_MAX,
+    REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
 )
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig
@@ -129,6 +130,54 @@ def test_draw_world_climate_keys_and_ranges():
                      interannual_amp=d["interannual_amp"], interannual_period=d["interannual_period"],
                      interannual_phase=d["interannual_phase"])
     f.set_step(3); assert f.level(1, 1) > 0.0                          # constructs + runs from the lottery
+
+
+# ── C.3: regime-shift telegraph (two-state Markov / sustained plateau) ─────────
+def test_regime_off_nests_to_c2():
+    # regime_amp=0 ⇒ regime()≡1 ⇒ identical to C.2 (no Layer-3 effect)
+    c2 = ClimateField(_MockField(), a_seas=0.6, interannual_amp=0.3, interannual_period=48)
+    c3 = ClimateField(_MockField(), a_seas=0.6, interannual_amp=0.3, interannual_period=48, regime_amp=0.0)
+    for t in range(24):
+        c2.set_step(t); c3.set_step(t)
+        assert abs(c2.level(2, 2) - c3.level(2, 2)) < 1e-12
+
+
+def test_regime_excursion_is_a_sustained_plateau():
+    # Force the chain into the excursion state: the level holds a FLAT depressed plateau (NOT a mean-reverting
+    # wiggle). Seasonal/interannual off to isolate Layer 3.
+    f = ClimateField(_MockField(), a_seas=0.0, regime_amp=0.12, regime_duration=3600, regime_recurrence=18000,
+                     rng=random.Random(0))
+    f._regime_state = 1                                                  # in an excursion
+    levels = []
+    for t in range(1, 200):                                             # short window vs 3600-step dwell → stays on
+        f.set_step(t); levels.append(f.level(1, 1))
+    assert all(abs(v - 88.0) < 1e-9 for v in levels)                    # 100 × (1 − 0.12), perfectly flat plateau
+    assert max(levels) - min(levels) < 1e-9                             # zero variance = a plateau, not a wiggle
+
+
+def test_telegraph_occupancy_matches_duty_cycle():
+    # Long run: excursion-state occupancy ≈ duration/(duration+recurrence); dwell ≫ a generation.
+    dur, rec = 240, 1200                                                # 20-yr / 100-yr (scaled for a fast test)
+    f = ClimateField(_MockField(), a_seas=0.0, regime_amp=0.1, regime_duration=dur, regime_recurrence=rec,
+                     rng=random.Random(42))
+    occ = 0; N = 400_000
+    for t in range(1, N + 1):
+        f.set_step(t); occ += f._regime_state
+    expected = dur / (dur + rec)                                        # ≈ 0.1667
+    assert abs(occ / N - expected) < 0.03
+    assert dur >= 12 * 15                                                # excursion ≫ ~15-yr generation (multi-gen)
+
+
+def test_draw_world_climate_regime_keys_and_ranges():
+    rng = random.Random(11)
+    d = draw_world_climate(rng, a_earth=A_SEAS_EARTH["savanna"])
+    for k in ("regime_amp", "regime_duration", "regime_recurrence"):
+        assert k in d
+    assert REGIME_AMP_MIN <= d["regime_amp"] <= REGIME_AMP_MAX          # central band (tails reserved for C.4)
+    assert d["regime_duration"] < d["regime_recurrence"]               # duration ≠ recurrence (v2 fix)
+    assert 100 * 12 <= d["regime_duration"] <= 500 * 12
+    assert 1000 * 12 <= d["regime_recurrence"] <= int(REGIME_RECURRENCE_MAX_YR * 12)
+    assert d["regime_duration"] >= 12 * int(REGIME_DURATION_MIN_YR)    # ≥100 yr ≫ generation
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

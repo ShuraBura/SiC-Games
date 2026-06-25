@@ -46,6 +46,14 @@ T_SURFACE_EARTH_C = 14.0            # §4.3.2 anchor: S=1 → 14°C surface (a f
 ENSO_PERIOD_MIN_YR, ENSO_PERIOD_MAX_YR = 2.0, 7.0   # Timmermann 2018
 ENSO_AMP_MIN, ENSO_AMP_MAX = 0.20, 0.40             # Timmermann 2018 (±20–40% CC, marginal biomes)
 
+# ── C.3: regime-shift (Layer 3) — a two-state Markov / telegraph excursion ──────
+# v2 red-team: this is a REGIME-SWITCHING / step process (a sustained multi-generational PLATEAU), NOT a
+# mean-reverting OU wiggle, and excursion DURATION (~100–500 yr) ≠ RECURRENCE (~1000–2000 yr).
+REGIME_AMP_MIN, REGIME_AMP_MAX = 0.10, 0.15         # Wanner 2008: LIA global-mean ~0.5°C → central ±10–15% CC
+REGIME_AMP_TAIL = 0.30                              # reserve ±30% / ~1°C for explicitly-flagged 8.2-kyr/YD tails
+REGIME_DURATION_MIN_YR, REGIME_DURATION_MAX_YR = 100.0, 500.0   # excursion length (LIA ≈ 500 yr; Wanner/Mayewski)
+REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR = 1000.0, 2000.0   # onset spacing (Bond ~1500; Mayewski RCC)
+
 
 def draw_eccentricity(rng) -> float:
     """Per-world UNIFORM draw over [0, 0.6] (Q3; Spiegel 2010)."""
@@ -82,6 +90,11 @@ def draw_world_climate(rng, a_earth: float) -> dict:
         interannual_amp=rng.uniform(ENSO_AMP_MIN, ENSO_AMP_MAX),
         interannual_period=int(rng.uniform(ENSO_PERIOD_MIN_YR, ENSO_PERIOD_MAX_YR) * SEASON_PERIOD_DEFAULT),
         interannual_phase=rng.uniform(0.0, 2.0 * math.pi),
+        # Layer 3 regime-shift (telegraph) params — the central band; tails (REGIME_AMP_TAIL) are reserved for
+        # explicitly-flagged catastrophe events (C.4), not the routine lottery (v2 red-team).
+        regime_amp=rng.uniform(REGIME_AMP_MIN, REGIME_AMP_MAX),
+        regime_duration=int(rng.uniform(REGIME_DURATION_MIN_YR, REGIME_DURATION_MAX_YR) * SEASON_PERIOD_DEFAULT),
+        regime_recurrence=int(rng.uniform(REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR) * SEASON_PERIOD_DEFAULT),
         mean_temperature=flux_to_temperature(S),
         obliquity=eps, eccentricity=e, flux=S,
     )
@@ -100,7 +113,8 @@ class ClimateField:
 
     def __init__(self, base, a_seas: float = 0.0, phase: float = 0.0, period: int = SEASON_PERIOD_DEFAULT,
                  mean_factor: float = 1.0, interannual_amp: float = 0.0,
-                 interannual_period: int = 0, interannual_phase: float = 0.0):
+                 interannual_period: int = 0, interannual_phase: float = 0.0,
+                 regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None):
         self._base = base
         self.a_seas = max(0.0, min(1.0, a_seas))
         self.phase = phase
@@ -110,9 +124,26 @@ class ClimateField:
         self.interannual_amp = max(0.0, min(1.0, interannual_amp))   # ENSO depression amplitude
         self.interannual_period = interannual_period            # steps (yr×12); 0 = off
         self.interannual_phase = interannual_phase
+        # C.3 regime-shift (telegraph): two states {0 normal, 1 excursion}; geometric dwell times.
+        self.regime_amp = max(0.0, min(1.0, regime_amp))        # CC depression while in excursion
+        self.regime_duration = regime_duration                  # mean excursion length (steps); P(end)=1/duration
+        self.regime_recurrence = regime_recurrence              # mean onset spacing (steps); P(onset)=1/recurrence
+        self._rng = rng                                         # drives the telegraph (per-world, seeded)
+        self._regime_state = 0                                  # current state (0/1); a sustained PLATEAU, not a wiggle
+        self._regime_last_t = 0
         self.t = 0
 
     def set_step(self, t: int) -> None:
+        # Advance the regime telegraph once per forward step (state persists → a sustained plateau).
+        if (self.regime_amp > 0.0 and self._rng is not None
+                and self.regime_duration > 0 and self.regime_recurrence > 0):
+            for _ in range(max(0, t - self._regime_last_t)):
+                if self._regime_state == 0:
+                    if self._rng.random() < 1.0 / self.regime_recurrence:
+                        self._regime_state = 1                  # onset of an excursion
+                elif self._rng.random() < 1.0 / self.regime_duration:
+                    self._regime_state = 0                      # excursion ends
+        self._regime_last_t = t
         self.t = t
 
     def season(self) -> float:
@@ -129,8 +160,17 @@ class ClimateField:
         return 1.0 - self.interannual_amp * max(
             0.0, math.sin(2.0 * math.pi * self.t / self.interannual_period + self.interannual_phase))
 
+    def regime(self) -> float:
+        """C.3 regime-shift: a sustained CC PLATEAU while the telegraph sits in the excursion state (state·A_reg
+        depression), 1.0 in the normal state. Multi-generational because the dwell time is ~100–500 yr ≫ a
+        ~25-yr generation. NOT mean-reverting — it holds the level until the chain switches back."""
+        if self.regime_amp <= 0.0:
+            return 1.0
+        return 1.0 - self.regime_amp * self._regime_state
+
     def mult(self) -> float:
-        return self.season() * self.interannual()               # temporal [0,1] layers (seasonal × interannual)
+        # temporal [0,1] layers: seasonal × interannual × regime-shift
+        return self.season() * self.interannual() * self.regime()
 
     def level(self, x: int, y: int) -> float:
         # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult)
