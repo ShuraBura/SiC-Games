@@ -128,8 +128,15 @@ real LIA/Bond excursion needs).
   baseline). Dynamic check: in the at-ceiling regime seasonality bites hard (eq_pop 11601→7073, 61%); under
   density-disease (below-K, R-13) it bites *less* (96%) — correct regime-dependence (regulated population has
   slack). Per-biome φ + multi-biome amplitudes are a refinement (single-world φ for C.1). 7 tests, suite green.
-- **C.2 — eccentricity + flux (orbital draws complete).** e → interannual + `(1−e²)^−½` mean; S → seasonal T̄
-  field (→ pathogen seasonality free). **GATE:** Earth (e=0.017,S=1) ≈ C.1; high-e/low-S shift as predicted.
+- **C.2 — eccentricity + flux (orbital draws complete). ✅ BUILT 2026-06-21** (`climate.py`:
+  `draw_eccentricity`/`eccentricity_mean_factor` (1−e²)^−½; `draw_stellar_flux`/`flux_to_temperature` (S=1→14°C
+  greenhouse offset); the **interannual ENSO layer** (quasi-periodic depression, 2–7 yr, ±20–40%, Timmermann);
+  `draw_world_climate` = the full (ε,e,S) lottery; ClimateField gains `mean_factor` + `interannual`).
+  **GATE met:** C.2 defaults (mean_factor=1, interannual_amp=0) nest to C.1 bit-exact (tested); 14 climate tests.
+  **CORRECTION (verified):** the v1 "pathogen seasonality FREE via the T field" is **WRONG** — `pathogen_mult`
+  reads `_fields.npp` (phase1_model.py:672), and **nothing reads the `temperature` field** (dormant placeholder).
+  So `flux_to_temperature` sets a world *property/seam* (recorded), NOT a live pathogen coupling — wiring
+  pathogen→T (or →the climate-modulated CC) is a deferred step, not free.
 - **C.3 — regime-shift (Layer 3).** Slow **regime-switching/step** modulation of the field (NOT OU). Ships the
   *climate layer* only. **GATE:** a sustained excursion produces a sustained multi-generational CC plateau (not
   a mean-reverting wiggle) of the right magnitude/duration; Earth-config → no excursion. *(The morph trigger is
