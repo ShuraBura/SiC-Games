@@ -118,6 +118,15 @@ class SubstrateConfig(BaseModel):
     contest_exponent: float = Field(0.0, ge=0.0)       # κ: 0 = even split (scramble); 1 = Cred-weighted contest (C)
     move_cost_flat: float = Field(0.0, ge=0.0)         # flat energy cost per move; 0 = free (recovery)
     phi_epsilon: float = Field(1e-6, gt=0.0)           # contest denominator guard (φ+ε)
+    # Emergent bands (E.1): a SATURATING grouping benefit (risk dilution / many-eyes) multiplies a cell's value
+    # by 1 + group_safety_max·(1 − e^(−g/group_safety_scale)), g = post-move group size. Trades against the
+    # falling per-capita yield → an OPTIMAL band size emerges (Smith & Winterhalder). 0 = off (bit-exact IFD).
+    group_safety_max: float = Field(0.0, ge=0.0)       # max safety benefit (× cell value); 0 = no grouping drive
+    group_safety_scale: float = Field(8.0, gt=0.0)     # g_s: group size at which safety is ~63% saturated
+    # E.2 mating-access drive: being below a minimum viable band (the ~25 connubium, Wobst 1974) is actively bad
+    # (no mates) — a lone agent's cell value is multiplied by group_mate_floor, rising to 1 at group_mate_min.
+    group_mate_min: float = Field(0.0, ge=0.0)         # g_mate: band size at/above which no mating penalty; 0 = off
+    group_mate_floor: float = Field(0.3, ge=0.0, le=1.0)  # cell-value multiplier for a LONE agent (g=1)
 
 
 class RunConfig(BaseModel):

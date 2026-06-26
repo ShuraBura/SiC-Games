@@ -87,6 +87,10 @@ def diffusion_select_target(
     kappa = sc.contest_exponent
     eps = sc.phi_epsilon
     kc = sc.k_cell
+    s_max = getattr(sc, "group_safety_max", 0.0)        # E.1 emergent-bands safety drive (0 = off → bit-exact IFD)
+    g_s = getattr(sc, "group_safety_scale", 8.0)
+    g_mate = getattr(sc, "group_mate_min", 0.0)         # E.2 mating-access drive (0 = off)
+    m_floor = getattr(sc, "group_mate_floor", 0.3)
     cands = [(x, y), ((x + 1) % w, y), ((x - 1) % w, y), (x, (y + 1) % h), (x, (y - 1) % h)]
     w_self = base_status(agent, eps) ** kappa if (kappa > 0.0 and agent.strategy == "carbon") else 1.0
 
@@ -97,16 +101,24 @@ def diffusion_select_target(
         if not is_cur and kc > 0 and occ_count.get((cx, cy), 0) >= kc:
             continue  # full cell, blocked by K_cell ceiling
         S = sugar_field.level(cx, cy)
+        n_cell = occ_count.get((cx, cy), 0)
         if kappa == 0.0:
-            n = occ_count.get((cx, cy), 0)
-            n_after = n if is_cur else n + 1
+            n_after = n_cell if is_cur else n_cell + 1
             ypc = S / n_after if n_after > 0 else S
         else:
             Wsum = occ_wsum.get((cx, cy), 0.0) if occ_wsum is not None else 0.0
             denom = Wsum if is_cur else Wsum + w_self
             ypc = (S * w_self / denom) if denom > 0 else S
         move_cost = 0.0 if is_cur else sc.move_cost_flat
-        # affinity=1.0, crowd_response=1.0 (neutral hooks; ψ re-point held neutral in 6.0a)
+        # Emergent-bands grouping multipliers on the cell value (the crowd_response hook), traded against the
+        # falling per-capita yield ⇒ an optimal band size emerges. E.1 safety (risk dilution, saturating) +
+        # E.2 mating access (a penalty below the minimum viable band ⇒ being alone is actively bad).
+        if s_max > 0.0 or g_mate > 0.0:
+            g = n_cell if is_cur else n_cell + 1                 # post-move group size
+            if s_max > 0.0:
+                ypc *= 1.0 + s_max * (1.0 - math.exp(-g / g_s))
+            if g_mate > 0.0:
+                ypc *= m_floor + (1.0 - m_floor) * min(1.0, g / g_mate)
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 
