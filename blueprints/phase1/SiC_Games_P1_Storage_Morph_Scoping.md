@@ -61,9 +61,20 @@ storing, dense band transitions `egalitarian_forager → complex_forager / strat
   return level)**; steady-state store shrinks in step. High-spoilage resources (fresh meat/fruit — tropical)
   ⇒ delayed-return not worth it ⇒ immediate-return — a *second* reason tropical foragers don't store, beyond
   the ET gate. Unit test: high decay erodes the capacity lift toward no-storage.
-- **S.4 — Morph wiring.** Settlement detector + the `society_from_character`/`morph_to_society` call.
-  **Gate:** a cold/seasonal/storable/dense region morphs `egalitarian→complex`; a warm/aseasonal (Aché-like)
-  region never morphs. **DECISION (RT-1): global vs per-band morph locality.**
+- **S.4 — Morph wiring. ✅ BUILT 2026-06-25 (PER-CELL).** RT-1 DECISION: **per-cell** society state (supervisor:
+  a "band" = a cell's co-resident occupants — the model has no band entity, and the cell is the sharing unit, so
+  per-cell is both simpler and more correct; stratified bands are sedentary so the place-attached state is
+  stable). `self._cell_society`/`_cell_settle`; the harvest loop reads `kappa_cell` (the cell's society κ:
+  egalitarian 0 … stratified 2) for the meat pool + store draw; a per-cell settlement detector calls
+  `society_from_character(density, surplus_frac=store/cap)` and morphs with a `morph_settle_steps` (≈1 gen)
+  hysteresis timer; abandoned cells decay back to egalitarian. **+ STORAGE TETHERING (the feasibility fix):**
+  the diagnostic showed agents diffuse so thin (max occupancy **2**) that NO cell ever settled → the morph
+  couldn't fire. Added `storage_tether_reserves` — a stocked band STAYS PUT (Testart sedentism; the user's
+  "step 4") → max occupancy **2→19**, packed cells appear, surplus persists → the morph fires. **GATES met
+  (scenario tests):** (1) cold/storable + tether → `complex_forager` cells emerge; (2) no tethering → no
+  concentration → no morph; (3) warm world (ET-gated off) → never morphs (immediate-return geography);
+  (4) **sustained famine → all cells COLLAPSE back to egalitarian**; (5) flag off → no morph state. `stratified_
+  chiefdom` is reachable-in-principle but rare (needs packed AND surplus≥0.7 — the apex; calibration note).
 
 ## §5. Gates / validation
 

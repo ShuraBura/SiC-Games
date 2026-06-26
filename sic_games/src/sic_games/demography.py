@@ -233,6 +233,18 @@ class DemographyConfig(BaseModel):
     store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
     storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
+    # ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable
+    # surplus for ~1 generation morphs egalitarian_forager → complex_forager → stratified_chiefdom (the cell's κ
+    # rises → unequal store/meat sharing); it DE-morphs back when the surplus/density collapse (hysteresis via the
+    # settle timer). Drives `society_from_character` (which was never called). Needs enable_storage (the surplus
+    # signal). Default OFF = bit-exact back-compat. (v1 morphs the κ/inequality lever per cell; the family-knob
+    # localization — per-cell mate-choice etc. — is a follow-on, reproduction still reads the global config.)
+    enable_morph: bool = False
+    morph_settle_steps: int = Field(300, ge=1)                  # T: sustained-settlement steps to morph (~1 generation; Bocquet-Appel)
+    # Storage TETHERING (Testart: stored food → sedentism; the user's step 4 "they gravitate and stay"): a band
+    # whose cell granary exceeds storage_tether_reserves × reserve_cap STAYS PUT (stops diffusing) → it
+    # concentrates (births accrue, density rises) + the store/surplus persists → the precondition the morph needs.
+    storage_tether_reserves: float = Field(0.0, ge=0.0)        # 0 = no tethering (mobile); >0 = sedentary once stocked
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`

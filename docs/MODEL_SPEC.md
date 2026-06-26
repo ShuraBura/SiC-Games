@@ -778,11 +778,20 @@ temperature-gated off in warm cells; the harsh-winter capacity lift). **Provisio
 (QSTOR exact % is in the Binford 2001 print volume, not web-accessible); the ET→model-temp mapping is a
 calibration point.
 
-**NEXT (the rest of the trigger, [[project-sic-games-climate]] / §4.5.10):** sustained store + density →
-sedentism state → call `society_from_character` / `morph_to_society` in the loop (currently never called) → the
-egalitarian→complex/stratified transition. The **collective-vs-individual** store grain (and storage →
-differential accumulation → inequality, Woodburn) is the morph step. Proto-ag yields = the post-morph consequence
-(DEFERRED_MECHANICS **PA-1**).
+**S.4 society morph (BUILT, per-cell; blueprint S.4).** The `society_from_character` hook is finally CALLED.
+Per-cell state (`_cell_society`/`_cell_settle`); the harvest loop reads `kappa_cell` (the cell's society κ:
+egalitarian 0 … stratified 2) for the meat pool + the store draw; a settlement detector computes density +
+surplus (store/cap) each step and morphs `egalitarian→complex→stratified` with a `morph_settle_steps` (≈1
+generation) hysteresis timer; abandoned/collapsed cells decay back to egalitarian. **Per-cell (RT-1 decision):**
+a "band" = a cell's occupants (no band entity; the cell is the sharing unit), so society attaches to the cell;
+stratified bands are sedentary so this is stable. **Storage TETHERING (`storage_tether_reserves`, the
+feasibility fix):** agents diffuse so thin (max occupancy 2) that without it no cell ever settles; a stocked
+band STAYS PUT (Testart sedentism) → occupancy 2→19, packing reachable, surplus persists → the morph fires.
+**Scenario gates:** cold/storable+tether → `complex_forager` emerges; no tether → no morph; warm world
+(ET-gated off) → never morphs (immediate-return geography); **sustained famine → cells collapse back to
+egalitarian**; flag off → no morph state. `stratified_chiefdom` is the rare apex (needs packed AND surplus≥0.7).
+The **collective-vs-individual** grain is settled (collective, S.1); per-cell **family-knob** localization
+(mate-choice etc. — reproduction still global) + proto-ag yields (DEFERRED_MECHANICS **PA-1**) remain.
 
 ---
 

@@ -56,6 +56,7 @@ from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
+    society_from_character, SOCIETY_PRESETS,
 )
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
 from sic_games.terrain import N, WorldFields, generate_world
@@ -131,6 +132,8 @@ class TerrainWorld(mesa.Model):
         self._rivalrous = substrate_cfg is not None and substrate_cfg.enabled
         self._harvest_field = harvest_field if harvest_field is not None else self.terrain_field
         self._cell_store: dict[tuple[int, int], float] = {}   # collective band granary per cell (delayed-return; §4.5.11 S.1)
+        self._cell_society: dict[tuple[int, int], str] = {}    # S.4 per-cell morphed society type (absent ⇒ egalitarian_forager)
+        self._cell_settle: dict[tuple[int, int], int] = {}     # S.4 per-cell settlement timer (hysteresis)
 
         # demographic layer
         self._reproduction = reproduction
@@ -317,10 +320,15 @@ class TerrainWorld(mesa.Model):
                 occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
+        _dm = self._demog
+        tether_thr = (_dm.storage_tether_reserves * self._reserve_full
+                      if (_dm is not None and _dm.enable_storage and _dm.storage_tether_reserves > 0.0) else 0.0)
         agents = list(self.agent_list)
         self.random.shuffle(agents)
         for agent in agents:
             old = agent.pos
+            if tether_thr > 0.0 and self._cell_store.get(old, 0.0) >= tether_thr:
+                continue   # S.4 storage tethering: a stocked band stays put (Testart sedentism) → it concentrates
             temp = None
             tfn = getattr(agent._decision, "temperature", None)
             if callable(tfn):
@@ -367,9 +375,14 @@ class TerrainWorld(mesa.Model):
                     self._cell_store[k] = s
                 else:
                     del self._cell_store[k]
+        morph_on = demog is not None and demog.enable_morph    # S.4 per-cell society morph
+        settle_T = demog.morph_settle_steps if morph_on else 0
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
+            # S.4: the cell's CURRENT society sets its contest exponent (egalitarian κ=0 … stratified κ=2) for
+            # this step's meat pool + store draw; the morph detector below updates it for the next step.
+            kappa_cell = SOCIETY_PRESETS[self._cell_society[(cx, cy)]]["kappa"] if (cx, cy) in self._cell_society else kappa
             if game_on:
                 # Two-stream economy (§4.5.5 / blueprint v2): forage = household (literal κ=0); meat =
                 # band-pooled, Cred-weighted at κ>0 (the Carbon mechanism on high-variance game). Energy-
@@ -385,10 +398,10 @@ class TerrainWorld(mesa.Model):
                     sig = math.sqrt(math.log(1.0 + meat_cv * meat_cv))
                     meat_pool = math.exp(self.random.normalvariate(math.log(meat_pool) - 0.5 * sig * sig, sig))
                 f_sh = compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps)
-                m_sh = compute_harvest_shares(occ, meat_pool, kappa, phi_eps)
+                m_sh = compute_harvest_shares(occ, meat_pool, kappa_cell, phi_eps)
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
-                shares = compute_harvest_shares(occ, S, kappa, phi_eps)
+                shares = compute_harvest_shares(occ, S, kappa_cell, phi_eps)
             msh = m_sh if game_on else [0.0] * len(occ)
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
@@ -434,13 +447,43 @@ class TerrainWorld(mesa.Model):
                         # each agent's deficit. κ=0 → equal shares (egalitarian draw); κ>0 → high-cred fill more
                         # of their reserve → ride out winter → differential survival → inequality. Bounded
                         # (graded, deficit-capped) — low-cred get a SMALLER share, not zero (RT-2: no annihilation).
-                        weights = [base_status(a, phi_eps) ** kappa if a.strategy == "carbon" else 1.0
+                        weights = [base_status(a, phi_eps) ** kappa_cell if a.strategy == "carbon" else 1.0
                                    for a, _ in needy]                       # carbon → cred-weighted; else equal
                         gives = allocate_store_draw(weights, [d for _, d in needy], store)
                         for (a, _), g in zip(needy, gives):
                             a.wealth += g
                             store -= g
                 self._cell_store[key] = store
+                if morph_on:
+                    # S.4 settlement detector → society_from_character (the morph hook, finally called). A cell
+                    # that stays packed (≥ Binford) with a defendable store for ~settle_T steps (≈1 generation)
+                    # morphs egalitarian→complex→stratified; it DE-morphs when surplus/density collapse (the
+                    # settle timer = hysteresis, so it holds through a bad year, not flickers). Per-cell → local.
+                    density = len(occ) / _CELL_KM2
+                    surplus_frac = store / cap_cell if cap_cell > 0.0 else 0.0
+                    target = society_from_character(density, surplus_frac)
+                    c0 = self._cell_settle.get(key, 0)
+                    c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
+                    if c >= settle_T:
+                        self._cell_society[key] = target          # morph / escalate (complex→stratified)
+                        self._cell_settle[key] = c
+                    elif c <= 0:
+                        self._cell_society.pop(key, None)         # de-morph → egalitarian baseline
+                        self._cell_settle.pop(key, None)
+                    else:
+                        self._cell_settle[key] = c                # hysteresis band: hold the current society
+        if morph_on:
+            # Abandoned settlements collapse: a morphed cell that is no longer occupied this step decays its
+            # settle timer toward 0 and reverts to egalitarian (the band is gone / dispersed — sustained
+            # collapse, with the same hysteresis as a morph). Without this, abandoned cells freeze their label.
+            for key in list(self._cell_society):
+                if key not in occ_lists:
+                    c = self._cell_settle.get(key, 0) - 1
+                    if c <= 0:
+                        self._cell_society.pop(key, None)
+                        self._cell_settle.pop(key, None)
+                    else:
+                        self._cell_settle[key] = c
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
         # their mother. C.2b tier = the mother's wasted harvest overflow. S1 tier = the mother also dips
