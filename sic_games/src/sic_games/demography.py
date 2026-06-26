@@ -249,6 +249,11 @@ class DemographyConfig(BaseModel):
     # adult male who is NOT her own son (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and
     # the population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only (R-18/19).
     enable_bonded_mating: bool = False
+    # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
+    # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
+    # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the
+    # inequality contest — i.e., whether the model could lump to band-as-unit. Default OFF (full individualism).
+    homogenize_cred: bool = False
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`

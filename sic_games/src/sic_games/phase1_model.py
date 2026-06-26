@@ -394,6 +394,13 @@ class TerrainWorld(mesa.Model):
         occ_lists: dict[tuple[int, int], list[BaseAgent]] = {}
         for a in self.agent_list:
             occ_lists.setdefault(a.pos, []).append(a)
+        # ABLATION: flatten within-band cred to the band mean (band = the unit, no internal status heterogeneity)
+        if self._demog is not None and getattr(self._demog, "homogenize_cred", False):
+            for occ in occ_lists.values():
+                if len(occ) > 1:
+                    mc = sum(a.cred for a in occ) / len(occ)
+                    for a in occ:
+                        a.cred = mc
         demog = self._demog
         provisioning = demog is not None and demog.enable_provisioning
         pat_prov = (demog is not None and getattr(demog, "enable_paternity", False)
@@ -778,6 +785,8 @@ class TerrainWorld(mesa.Model):
                         else:
                             father = None
                         child._father = father
+                        if father is not None:
+                            father._n_fathered = getattr(father, "_n_fathered", 0) + 1   # E.3: male RS (children fathered)
                         child._lineage = father._lineage if father is not None else a._lineage   # patriline
                         if father is not None:
                             self.mate_pairs_this_step.append(

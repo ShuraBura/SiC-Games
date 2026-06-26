@@ -91,6 +91,28 @@ are a *dying margin* (no navigation needed), keeping E.1/E.2 as reinforcement (s
 - **[MINOR — not a double-count] risk-dilution (↓ with g) vs density-disease (↑ with g)** are different channels
   (predation vs disease) that OPPOSE → the optimal-band-size balance. Intended.
 
+## §3c. E.3 — lumping ablation + R-19 on bands (DECISIVE: individualism is load-bearing)
+
+**Question (supervisor):** at the civilizational scale, is individual tracking necessary, or can we lump to
+band-as-unit (ensemble)? **Ablation:** `homogenize_cred` flag flattens within-band cred to the band mean each
+step (= what a band-mean ensemble does); `_n_fathered` counter gives male RS. Harness: status (cred·prowess) →
+RS (children fathered) Pearson r, 3 seeds, 1200 steps. **RESULT (decisive):**
+
+| Arm | mean status→RS r |
+|---|---|
+| IFD baseline (control) | 0.53 |
+| Bands, full individualism | **0.48** |
+| Bands, HOMOGENIZED (band=unit) | **0.13** |
+
+→ **Homogenizing collapses the von Rueden status→RS signal 0.48→0.13** = it destroys the "lineage of chiefs"
+reproductive skew (the model's core inequality result). **Individualism IS load-bearing — do NOT lump to
+band-mean.** (A moment-tracking ensemble carrying the within-band *variance* might preserve it, but that's most
+of the cost — not worth it.) **Good news:** the signal SURVIVES the move to bands (full r 0.48 ≈ IFD 0.53) → R-19
+operates on the realistic banded substrate. **Caveats / E.3-proper TODO:** (1) r~0.5 ≫ validated 0.19 → `m`
+needs RE-CALIBRATING on bands; (2) bonded mating OVER-SUPPRESSES turnover (births ~3–6/window vs ~15–30 IFD →
+frozen pop) — fix before clean re-calibration. Ablation tooling: `homogenize_cred` + `_n_fathered` (both
+harmless/off-or-counter), full suite green.
+
 ## §4. Gates / validation
 - Emergent band size **~25–50/occupied-cell** (≈7–8 foragers); **multiple bands**, not one blob (saturation works).
 - Devastated band → survivors re-aggregate (the emergence test).
