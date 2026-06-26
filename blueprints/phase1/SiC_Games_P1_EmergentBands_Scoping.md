@@ -52,6 +52,45 @@ hunting-threshold + heritable-sociability ψ as enrichments once the core produc
   sociability ψ (settler/wanderer distribution).
 - **Then:** retire storage-tethering; revisit per-cell → per-BAND society + bonded mating (Phase 2).
 
+## §3b. Fitness/selection drives (the REAL emergence — supervisor pivot)
+
+**Root cause found:** the model's fitness landscape *rewards* loners — reproduction is **asexual/female-only**
+(`_do_births_ibi`: a lone female breeds; the father is picked globally only for lineage) and the only group-size
+mortality term is **density-disease** (crowding *raises* mortality). So a loner is *safer* AND reproduces. The
+movement nudge (E.1/E.2) fights this gradient. The realistic fix: make grouping a **fitness** effect so loners
+are a *dying margin* (no navigation needed), keeping E.1/E.2 as reinforcement (supervisor choice).
+
+- **F.1 — bonded mating (partner-required reproduction). ✅ BUILT.** A female births only if her cell has ≥1
+  co-resident adult male who is **not her own son** (kin-avoidance via `_mother`). Loners ⇒ **no birth**.
+  Flaggable (`enable_bonded_mating`). **FINDING (key):** bonded mating CANNOT bootstrap bands from a gas (a
+  spread population almost never has a co-resident mate → near-zero births → no densification → 7% in bands).
+  It needs bands to ALREADY exist. → the band-SEEDER below.
+- **F.1b — banded seeding. ✅ BUILT** (`seed_band_positions`). Real foragers START in bands, not a gas. Seeds
+  ~`n/band_size` kin bands of ~25 at good-but-not-best (sampled), TERRITORY-spaced sites, allocated PER BIOME by
+  carrying capacity → marginal biomes (desert, mountain) get fewer-but-NON-ZERO bands (desert dwellers + mountain
+  clans). Flaggable via `placement_positions`. **GATE met:** 250 agents → 10 bands of 25, biomes {forest 4,
+  savanna 4, desert 2}, min spacing 12. **Seeded + bonded mating → 96% of agents in bands of ≥10, population
+  stable (254, mates co-resident → reproduction sustains bands), biome-diverse (Desert/Savanna/Forest clans
+  persist)** — vs 7% for the gas start. This is the working emergent-band substrate; "emergence" is correctly
+  reframed as maintenance/merge/split of bands that always exist, not condensation from a gas.
+- **F.2 — risk-dilution mortality.** Effective predation risk = `biome_risk · (floor + (1−floor)/g)`, g = local
+  group size (`risk_dilution_floor`; 1 = off). Loner (g=1) gets full biome risk; a band dilutes it to `floor`.
+  Balances the existing density-disease cost ⇒ an optimal band size. Wires to the existing `risk` field + `_a2_mult`.
+
+## §3b red-team
+- **[BLOCKER — re-validation, again] mate-gated reproduction is a demographic-engine change** → re-opens e₀/Siler
+  fertility tuning + R-18/19. Fix: FLAGGABLE (default off ⇒ bit-exact; all validations untouched); the on-config
+  re-validation is the deliberate E.3 pass.
+- **[MAJOR — population crash] if mates are often unavailable, the birth rate collapses → extinction.** Fix:
+  the gate is at the BAND (cell) level — band-members have mates, only true loners don't; GATE checks the
+  population PERSISTS (doesn't crash) while loners decline.
+- **[MAJOR — incest] mother + her adult sons would "mate".** Fix: exclude `m._mother is a` (her sons);
+  founders/unrelated males qualify. (Finer kin-avoidance = refinement.)
+- **[MINOR — coexist with B+] mate-choice (m, father assignment) already exists for LINEAGE; F.1 requires a male
+  be PRESENT.** They compose: F.1 gates the birth, B+ picks which male fathers.
+- **[MINOR — not a double-count] risk-dilution (↓ with g) vs density-disease (↑ with g)** are different channels
+  (predation vs disease) that OPPOSE → the optimal-band-size balance. Intended.
+
 ## §4. Gates / validation
 - Emergent band size **~25–50/occupied-cell** (≈7–8 foragers); **multiple bands**, not one blob (saturation works).
 - Devastated band → survivors re-aggregate (the emergence test).

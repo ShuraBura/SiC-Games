@@ -245,6 +245,10 @@ class DemographyConfig(BaseModel):
     # whose cell granary exceeds storage_tether_reserves × reserve_cap STAYS PUT (stops diffusing) → it
     # concentrates (births accrue, density rises) + the store/surplus persists → the precondition the morph needs.
     storage_tether_reserves: float = Field(0.0, ge=0.0)        # 0 = no tethering (mobile); >0 = sedentary once stocked
+    # F.1 bonded mating (emergent bands via SELECTION): a female reproduces only if her cell has a co-resident
+    # adult male who is NOT her own son (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and
+    # the population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only (R-18/19).
+    enable_bonded_mating: bool = False
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`

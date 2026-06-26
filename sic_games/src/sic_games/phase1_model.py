@@ -73,6 +73,48 @@ def allocate_store_draw(weights: list[float], deficits: list[float], store: floa
     wsum = sum(weights) or 1.0
     return [min(store * (w / wsum), d) for w, d in zip(weights, deficits)]
 
+
+def seed_band_positions(fields, n_agents: int, band_size: int = 25, territory_radius: int = 3,
+                        quality_frac: float = 0.5, rng=None) -> list[tuple[int, int]] | None:
+    """Realistic BANDED initial placement (foragers start in bands, not a gas): ~band_size-person kin bands at
+    good-but-not-best, TERRITORY-spaced sites, allocated PER BIOME by carrying capacity — so marginal biomes
+    (desert, mountain) get fewer-but-NON-ZERO bands (desert dwellers + mountain clans) while rich biomes get
+    many. Sites are SAMPLED from the viable set (≥ quality_frac of the biome's best), not the argmax, so bands
+    have slack to wander. Returns a `placement_positions` list (len = n_agents); None if degenerate."""
+    import numpy as np
+    import random as _random
+    rng = rng or _random.Random(0)
+    val = np.asarray(fields.forage_kcal, dtype=float)              # carrying-capacity proxy [y,x]
+    biome = np.asarray(fields.biome)
+    land = np.asarray(fields.isWater) == 0
+    n_bands = max(1, n_agents // band_size)
+    cap = {int(b): float(val[land & (biome == b)].sum()) for b in np.unique(biome[land])}
+    cap = {b: c for b, c in cap.items() if c > 0.0}
+    if not cap:
+        return None
+    total = sum(cap.values())
+    alloc = {b: max(1, round(n_bands * c / total)) for b, c in cap.items()}   # ∝ capacity, floor 1 per biome
+    placed: list[tuple[int, int]] = []
+    positions: list[tuple[int, int]] = []
+    for b in sorted(alloc, key=lambda k: -cap[k]):                 # rich biomes claim sites first
+        mask = land & (biome == b)
+        vmax = float(val[mask].max())
+        ys, xs = np.where(mask & (val >= quality_frac * vmax))     # viable (good-but-not-best) cells
+        viable = list(zip(xs.tolist(), ys.tolist()))
+        rng.shuffle(viable)
+        cnt = 0
+        for (x, y) in viable:
+            if cnt >= alloc[b]:
+                break
+            if all(max(abs(x - px), abs(y - py)) >= territory_radius for (px, py) in placed):
+                placed.append((x, y))
+                positions.extend([(x, y)] * band_size)
+                cnt += 1
+    i = 0
+    while len(positions) < n_agents and placed:                   # pad to n_agents (⇒ slightly larger bands)
+        positions.append(placed[i % len(placed)]); i += 1
+    return positions[:n_agents]
+
 # Default terrain knobs (production 100×100 grid)
 _DEFAULT_KNOBS: dict = {
     "seedStr": "world42",
@@ -685,12 +727,22 @@ class TerrainWorld(mesa.Model):
                 m_w = [(getattr(x, "prowess", 1.0) + 1e-6) ** mexp for x in males]   # prowess^m base
             if males and assort > 0.0:
                 m_status = [x.cred * getattr(x, "prowess", 1.0) for x in males]      # B++ assortment status
+        # F.1 bonded mating: a co-resident adult male is REQUIRED for a birth → loners can't reproduce. Precompute
+        # the adult males per cell (kin-avoidance applied per-mother below).
+        bonded = getattr(cfg, "enable_bonded_mating", False)
+        males_by_cell: dict[tuple[int, int], list] = {}
+        if bonded:
+            for x in self.agent_list:
+                if x.sex == "male" and x.age >= cfg.menarche_months:
+                    males_by_cell.setdefault(x.pos, []).append(x)
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
                 continue
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
+            if bonded and not any(m._mother is not a for m in males_by_cell.get(a.pos, ())):
+                continue   # F.1: no co-resident non-son adult male ⇒ no mate ⇒ no birth (loners don't reproduce)
             p_birth = cfg.fecundability
             if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
