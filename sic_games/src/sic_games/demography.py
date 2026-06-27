@@ -249,6 +249,11 @@ class DemographyConfig(BaseModel):
     # adult male who is NOT her own son (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and
     # the population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only (R-18/19).
     enable_bonded_mating: bool = False
+    # F.2 mate-search RADIUS (Chebyshev). The band is a spatially-EXTENDED group: on the IFD substrate agents sit
+    # ~1 per 100 km² cell (Binford packing) and spread over a territory, so a mate co-resident in the BAND is
+    # rarely on the mother's EXACT cell. radius=0 = the original per-cell gate (a loner with no neighbours can't
+    # reproduce); radius≥1 = an unrelated adult male anywhere within the band territory (Chebyshev r) qualifies.
+    bonded_mate_radius: int = Field(0, ge=0)
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the

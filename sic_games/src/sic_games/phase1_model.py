@@ -115,6 +115,75 @@ def seed_band_positions(fields, n_agents: int, band_size: int = 25, territory_ra
         positions.append(placed[i % len(placed)]); i += 1
     return positions[:n_agents]
 
+def seed_band_positions_spread(fields, n_agents: int, hours_per_step: float, burn: float,
+                               band_size: int = 25, territory_radius: int = 3, spread_radius: int = 2,
+                               target_fill: float = 1.0, quality_frac: float = 0.5, rng=None):
+    """Capacity-gated BANDED seeding (the founder-die-off fix): same per-biome, territory-spaced band SITES as
+    `seed_band_positions`, but each band's members are SPREAD over the viable cells in its territory (Chebyshev
+    `spread_radius`) instead of all stacked on the site cell — because one 100 km² cell feeds only ~1–8 foragers
+    (Binford packing), so a 25-stacked band starves instantly. Each territory cell takes up to
+    `max(1, floor(target_fill · S_cell/burn))` members (its carrying capacity); members beyond the territory's
+    capacity spill onto its best cells (the founder mobile-reserve covers the transient overload). Returns a
+    `placement_positions` list (len = n_agents); None if degenerate."""
+    import numpy as np
+    import random as _random
+    rng = rng or _random.Random(0)
+    forage = np.asarray(fields.forage_kcal, dtype=float)
+    cap = forage * hours_per_step / burn               # agents each cell can feed (S/burn) [y,x]
+    biome = np.asarray(fields.biome)
+    land = np.asarray(fields.isWater) == 0
+    n_bands = max(1, n_agents // band_size)
+    bcap = {int(b): float(cap[land & (biome == b)].sum()) for b in np.unique(biome[land])}
+    bcap = {b: c for b, c in bcap.items() if c > 0.0}
+    if not bcap:
+        return None
+    total = sum(bcap.values())
+    alloc = {b: max(1, round(n_bands * c / total)) for b, c in bcap.items()}
+    placed_sites: list[tuple[int, int]] = []
+    positions: list[tuple[int, int]] = []
+    H, W = cap.shape
+    for b in sorted(alloc, key=lambda k: -bcap[k]):
+        mask = land & (biome == b)
+        vmax = float(cap[mask].max())
+        ys, xs = np.where(mask & (cap >= quality_frac * vmax))
+        viable = list(zip(xs.tolist(), ys.tolist()))
+        rng.shuffle(viable)
+        cnt = 0
+        for (sx, sy) in viable:
+            if cnt >= alloc[b]:
+                break
+            if not all(max(abs(sx - px), abs(sy - py)) >= territory_radius for (px, py) in placed_sites):
+                continue
+            # gather this band's territory cells (land), best-capacity first
+            terr = []
+            for dy in range(-spread_radius, spread_radius + 1):
+                for dx in range(-spread_radius, spread_radius + 1):
+                    x, y = sx + dx, sy + dy
+                    if 0 <= x < W and 0 <= y < H and land[y, x]:
+                        terr.append((float(cap[y, x]), x, y))
+            terr.sort(reverse=True)
+            # fill each cell to its capacity (target_fill · S/burn), then spill the remainder onto the best cells
+            remaining = band_size
+            for (c, x, y) in terr:
+                if remaining <= 0:
+                    break
+                k = min(remaining, max(1, int(c * target_fill)))
+                positions.extend([(x, y)] * k)
+                remaining -= k
+            i = 0
+            while remaining > 0 and terr:                 # spill overflow onto best cells (buffer covers it)
+                _, x, y = terr[i % len(terr)]
+                positions.append((x, y)); remaining -= 1; i += 1
+            placed_sites.append((sx, sy))
+            cnt += 1
+    if not positions:
+        return None
+    i = 0
+    while len(positions) < n_agents:
+        positions.append(positions[i]); i += 1
+    return positions[:n_agents]
+
+
 # Default terrain knobs (production 100×100 grid)
 _DEFAULT_KNOBS: dict = {
     "seedStr": "world42",
@@ -155,6 +224,12 @@ class TerrainWorld(mesa.Model):
         p_birth: float = 0.10,
         # ── Demographic-stage core (opt-in): Siler mortality + IBI reproduction ──
         demography_cfg: DemographyConfig | None = None,
+        # Founder MOBILE RESERVE (band-cohesion fix): each FOUNDER carries a private provision store of
+        # `founder_buffer_steps × burn` kcal, drawn down to cover any per-step shortfall during the founding
+        # transient (while the seeded band disperses over its territory to viable cells). Models the carried/
+        # body-fat reserve a real band lives off the land with — the ~1-step wealth buffer alone can't bridge it.
+        # Founder-only + decaying ⇒ no effect on steady state or prior validations. 0 = off (bit-exact).
+        founder_buffer_steps: float = 0.0,
     ) -> None:
         super().__init__(seed=seed)
 
@@ -170,6 +245,7 @@ class TerrainWorld(mesa.Model):
         self._lh_cfg = lh_cfg
         self._carbon_cfg = carbon_cfg
         self._placement_positions = placement_positions
+        self._founder_buffer_steps = founder_buffer_steps
         self._substrate_cfg = substrate_cfg
         self._rivalrous = substrate_cfg is not None and substrate_cfg.enabled
         self._harvest_field = harvest_field if harvest_field is not None else self.terrain_field
@@ -231,6 +307,8 @@ class TerrainWorld(mesa.Model):
             sex = "female" if self.random.random() < kcal_cfg.p_female else "male"
             agent = self._make_agent(sex=sex, lh_cfg=lh_cfg)
             agent.pos = pos
+            if self._founder_buffer_steps > 0.0:         # carried mobile reserve for the founding transient
+                agent._founder_store = self._founder_buffer_steps * self._burn
             agent._lineage = fid                         # each founder seeds a unique lineage (patriline tracking)
             if self._demog is not None:
                 agent.age = self._sample_founder_age()   # staggered founders (stationary ∝ l(x))
@@ -298,6 +376,7 @@ class TerrainWorld(mesa.Model):
         # enabled (else lineage-only = R-18 exact; a uniform prowess cancels in the share ratio).
         agent.prowess = 1.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
+        agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
@@ -331,10 +410,14 @@ class TerrainWorld(mesa.Model):
                     continue
                 self._step_agent(agent)
 
-        # Prune dead agents
+        # Prune dead agents. `agent.remove()` deregisters the corpse from Mesa's `self.agents`
+        # AgentSet too — without it, dead agents linger frozen at their death cell and any metric
+        # read off `self.agents` (e.g. the band tests) silently counts CORPSES as live population.
+        # The dynamics already run off `agent_list` (live), so this is a measurement-correctness fix.
         for a in self.agent_list:
             if not a.alive:
                 self.occupied.discard(a.pos)
+                a.remove()
         self.agent_list = [a for a in self.agent_list if a.alive]
 
         # Demographic layer: births (opt-in)
@@ -618,6 +701,14 @@ class TerrainWorld(mesa.Model):
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             a.age += 1
+            if a._founder_store > 0.0:
+                # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the
+                # dispersal transient (lifts wealth just over the floor; the store decays as it is consumed).
+                floor_w = a.reserve_floor * a.reserve_scale()
+                if a.wealth <= floor_w:
+                    g = min(a._founder_store, floor_w - a.wealth + 1.0)
+                    a.wealth += g
+                    a._founder_store -= g
             if demog is not None:
                 a.months_since_birth += 1
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
@@ -737,19 +828,31 @@ class TerrainWorld(mesa.Model):
         # F.1 bonded mating: a co-resident adult male is REQUIRED for a birth → loners can't reproduce. Precompute
         # the adult males per cell (kin-avoidance applied per-mother below).
         bonded = getattr(cfg, "enable_bonded_mating", False)
+        mate_r = getattr(cfg, "bonded_mate_radius", 0)
         males_by_cell: dict[tuple[int, int], list] = {}
         if bonded:
             for x in self.agent_list:
                 if x.sex == "male" and x.age >= cfg.menarche_months:
                     males_by_cell.setdefault(x.pos, []).append(x)
+
+        def _has_band_mate(mother) -> bool:
+            # F.2: an unrelated (non-son) adult male co-resident in the band — the mother's cell (radius 0) or,
+            # since a band spreads ~1/cell over its territory, anywhere within Chebyshev `mate_r` of her.
+            mx, my = mother.pos
+            for dx in range(-mate_r, mate_r + 1):
+                for dy in range(-mate_r, mate_r + 1):
+                    for m in males_by_cell.get((mx + dx, my + dy), ()):
+                        if m._mother is not mother:
+                            return True
+            return False
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
                 continue
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
-            if bonded and not any(m._mother is not a for m in males_by_cell.get(a.pos, ())):
-                continue   # F.1: no co-resident non-son adult male ⇒ no mate ⇒ no birth (loners don't reproduce)
+            if bonded and not _has_band_mate(a):
+                continue   # F.1/F.2: no co-resident non-son adult male in the band ⇒ no mate ⇒ no birth
             p_birth = cfg.fecundability
             if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
