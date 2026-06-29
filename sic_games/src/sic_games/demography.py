@@ -278,6 +278,14 @@ class DemographyConfig(BaseModel):
     enable_pair_bonds: bool = False
     divorce_rate: float = Field(0.0, ge=0.0, le=1.0)      # per-step bond dissolution prob (0 = lifelong unless widowed)
     family_maturity_months: int = Field(180, ge=0)        # child detaches from the family unit at this age (~15 yr)
+    # F.3a MODEST POLYGYNY (von Rueden & Jaeggi 2016: polygyny is the MAIN status→RS amplifier; ~4-11% of forager
+    # marriages). polygyny_rate>0: when a female pairs she may also consider ALREADY-MARRIED males (each with prob
+    # polygyny_rate), prowess-weighted (mate_choice_strength) — so high-status males accumulate up to `max_wives`
+    # wives and some low-status males are bachelors → the status→RS skew (lost under strict monogamy) returns.
+    # A female has ONE husband (`_partner`); a male's wives = `_wives`. Polygynous (>1 wife) husbands move as
+    # roots (wives are mother-anchored cores in his band; the birth gate is band-level). 0 = strict monogamy.
+    polygyny_rate: float = Field(0.0, ge=0.0, le=1.0)
+    max_wives: int = Field(1, ge=1)                       # cap on wives per male (1 = monogamy even if rate>0)
     # F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership that
     # families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle per-band society
     # attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS the larger/richer band

@@ -391,7 +391,8 @@ class TerrainWorld(mesa.Model):
         agent.prowess = 1.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
-        agent._partner = None                      # F.3a durable spousal bond (mutual; None = unpaired)
+        agent._partner = None                      # F.3a: a FEMALE's husband link (None = unpaired). Males use _wives.
+        agent._wives = set()                       # F.3a: a MALE's wives (≥1 ⇒ married; >1 ⇒ polygynous)
         agent._group = GroupVector()               # F.3c collective-identity vector (band_id assigned below / inherited)
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
@@ -433,9 +434,13 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             if not a.alive:
                 self.occupied.discard(a.pos)
-                p = getattr(a, "_partner", None)
-                if p is not None:
-                    p._partner = None        # F.3a: widow(er) — dissolve the bond so the survivor can re-pair
+                # F.3a bond dissolution on death: a dead WIFE leaves her husband's _wives; a dead HUSBAND widows
+                # ALL his wives (they re-enter the pairing pool — serial monogamy / re-marriage).
+                if a._partner is not None:
+                    a._partner._wives.discard(a); a._partner = None
+                for w in a._wives:
+                    w._partner = None
+                a._wives.clear()
                 a.remove()
         self.agent_list = [a for a in self.agent_list if a.alive]
 
@@ -934,6 +939,7 @@ class TerrainWorld(mesa.Model):
         bonded = getattr(cfg, "enable_bonded_mating", False)
         pair_bonds = getattr(cfg, "enable_pair_bonds", False)   # F.3a: the durable partner gates + fathers
         loc = getattr(cfg, "enable_band_family_knobs", False)   # F.3c-2b: per-band lineage/descent knobs
+        affil = getattr(cfg, "enable_band_affiliation", False)  # F.3a: band-level co-residence for the husband (polygyny)
         mate_r = getattr(cfg, "bonded_mate_radius", 0)
         males_by_cell: dict[tuple[int, int], list] = {}
         if bonded and not pair_bonds:
@@ -958,11 +964,14 @@ class TerrainWorld(mesa.Model):
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
             if pair_bonds:
-                partner = a._partner                           # F.3a: needs a living, co-resident durable partner
+                partner = a._partner                           # F.3a: needs a living, co-resident husband
                 if partner is None or not partner.alive:
                     continue
-                if max(abs(a.pos[0] - partner.pos[0]), abs(a.pos[1] - partner.pos[1])) > mate_r:
-                    continue                                   # partner not co-resident (guard; co-movement keeps them together)
+                if affil:
+                    if partner._group.band_id != a._group.band_id:
+                        continue                               # husband in a different band (polygyny → band-level)
+                elif max(abs(a.pos[0] - partner.pos[0]), abs(a.pos[1] - partner.pos[1])) > mate_r:
+                    continue                                   # husband not co-resident (F.3a/b cell-neighbourhood)
             elif bonded and not _has_band_mate(a):
                 continue   # F.1/F.2: no co-resident non-son adult male in the band ⇒ no mate ⇒ no birth
             p_birth = cfg.fecundability
@@ -1087,32 +1096,44 @@ class TerrainWorld(mesa.Model):
         m = a._mother
         if a.age < mat and m is not None and m.alive:
             return m
-        p = a._partner
-        if a.sex == "male" and p is not None and p.alive:
-            return p
+        if a.sex == "male" and a._wives:
+            alive_wives = [w for w in a._wives if w.alive]
+            if len(alive_wives) == 1:
+                return alive_wives[0]       # monogamous husband co-moves with his wife (F.3b)
+            # polygynous husband (>1 wife) is a ROOT — wives are mother-anchored cores in his band
         return None
 
     def _do_pairing(self) -> None:
-        """F.3a serial monogamy: match unpaired adults WITHIN each band (mate-gate neighbourhood) into durable
-        bonds, prowess-weighted (mate_choice_strength), kin-avoiding (not son/father). Widowed/divorced agents
-        re-enter the pool automatically. Divorce dissolves a fraction of bonds each step (serial re-pairing)."""
+        """F.3a serial monogamy (+ modest polygyny): match unpaired adults WITHIN each band (mate-gate
+        neighbourhood) into durable bonds, prowess-weighted (mate_choice_strength), kin-avoiding (not son/father).
+        Widowed/divorced agents re-enter the pool automatically. With polygyny_rate>0 an already-married male can
+        take additional wives (≤ max_wives), prowess-weighted → high-status males accumulate wives (von Rueden)."""
         cfg = self._demog
         if cfg.divorce_rate > 0.0:
             for a in self.agent_list:
                 if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
-                    a._partner._partner = None; a._partner = None
+                    a._partner._wives.discard(a); a._partner = None
         mexp = cfg.mate_choice_strength
         affil = getattr(cfg, "enable_band_affiliation", False)
         loc = getattr(cfg, "enable_band_family_knobs", False)        # F.3c-2b per-band family knobs
+        poly = getattr(cfg, "polygyny_rate", 0.0)
+        max_wives = getattr(cfg, "max_wives", 1)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         for band in self.bands(cfg.bonded_mate_radius):
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
-            males = [a for a in band if a.sex == "male" and a._partner is None and a.age >= cfg.menarche_months]
+            males = [a for a in band if a.sex == "male" and a.age >= cfg.menarche_months]
             if not females or not males:
                 continue
             self.random.shuffle(females)
             for f in females:
-                avail = [x for x in males if x._partner is None and x._mother is not f and x is not f._father]
+                avail = []
+                for x in males:
+                    if x._mother is f or x is f._father:             # kin-avoidance (not son / father)
+                        continue
+                    if not x._wives:                                 # unpaired male — always a candidate
+                        avail.append(x)
+                    elif poly > 0.0 and len(x._wives) < max_wives and self.random.random() < poly:
+                        avail.append(x)                              # modest polygyny: an already-married male, gated
                 if not avail:
                     continue
                 m_f = self._band_knob(f._group.band_id, "mate_choice_strength") if loc else mexp   # per-band skew
@@ -1121,7 +1142,7 @@ class TerrainWorld(mesa.Model):
                     male = self.random.choices(avail, weights=w, k=1)[0]
                 else:
                     male = self.random.choice(avail)
-                f._partner = male; male._partner = f
+                f._partner = male; male._wives.add(f)
                 if affil:
                     # D2 exogamy/residence: the spouse from the SMALLER band joins the LARGER (flexible/multilocal;
                     # tie → the female's band). Mixing lineages across bands keeps bands mostly non-kin (Hill 2011).

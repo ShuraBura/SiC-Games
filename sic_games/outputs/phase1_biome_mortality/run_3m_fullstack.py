@@ -60,10 +60,11 @@ def band_positions_patch(fields, cap, n, band_size=25, sep=4):
     return pos[:n]
 
 
-def run_one(seed):
+def run_one(seed, polygyny_rate=0.0, max_wives=1):
     fields = generate_world(knobs_for(seed)); cap = SubWindowCapacity(fields)
     pos = band_positions_patch(fields, cap, FOUNDERS)
     demog = DemographyConfig(
+        polygyny_rate=polygyny_rate, max_wives=max_wives,
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
@@ -122,20 +123,19 @@ def run_one(seed):
 
 def main():
     t0 = time.time()
-    rows = [run_one(s) for s in SEEDS]
-    ok = [r for r in rows if not r.get("extinct")]
-    print(f"FULL-STACK integration ({len(SEEDS)} seeds × {STEPS} steps; {len(ok)} non-extinct)")
-    if not ok:
-        print("  ALL EXTINCT — the stacked architecture does not cohere."); return
-    agg = {k: statistics.mean([r[k] for r in ok]) for k in ("eq_pop", "mean_cred", "gini", "rs", "ne", "deficit",
-                                                             "band", "kin_dom", "assab", "morph_frac")}
-    print(f"  DEMOGRAPHY:  eq_pop {agg['eq_pop']:.0f} | N_e(fathers) {agg['ne']:.0f}")
-    print(f"  STATUS→RS:   {agg['rs']:+.3f}   (von Rueden ~0.19)")
-    print(f"  R-18 anti-fragility: death-deficit {agg['deficit']:+.3f}   (>0 = low-status die first)")
-    print(f"  HOMEOSTAT:   mean_cred {agg['mean_cred']:.2f} | Gini(cred) {agg['gini']:.2f}   (bounded)")
-    print(f"  BANDS:       agent-weighted size {agg['band']:.1f} | dominant-lineage {agg['kin_dom']:.2f} (1=clan) | "
-          f"morphed frac {agg['morph_frac']:.2f} | assabiyah {agg['assab']:.2f}")
-    print(f"  [{time.time()-t0:.0f}s]")
+    for lab, pr, mw in (("MONOGAMY", 0.0, 1), ("POLYGYNY", 0.3, 3)):
+        rows = [run_one(s, polygyny_rate=pr, max_wives=mw) for s in SEEDS]
+        ok = [r for r in rows if not r.get("extinct")]
+        print(f"\n[{lab}] full-stack ({len(SEEDS)} seeds × {STEPS} steps; {len(ok)} non-extinct)")
+        if not ok:
+            print("  ALL EXTINCT — does not cohere."); continue
+        agg = {k: statistics.mean([r[k] for r in ok]) for k in ("eq_pop", "mean_cred", "gini", "rs", "ne",
+                                                                 "deficit", "band", "kin_dom", "assab", "morph_frac")}
+        print(f"  eq_pop {agg['eq_pop']:.0f} | N_e {agg['ne']:.0f} | STATUS→RS {agg['rs']:+.3f} (von Rueden 0.19) | "
+              f"death-deficit {agg['deficit']:+.3f}")
+        print(f"  mean_cred {agg['mean_cred']:.2f} Gini {agg['gini']:.2f} | band {agg['band']:.1f} "
+              f"dom-lineage {agg['kin_dom']:.2f} morphed {agg['morph_frac']:.2f} assabiyah {agg['assab']:.2f}  "
+              f"[{time.time()-t0:.0f}s]")
 
 
 if __name__ == "__main__":

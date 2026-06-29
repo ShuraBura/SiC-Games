@@ -190,7 +190,8 @@ def test_pair_bonds_form_and_are_monogamous():
     f.sex, f.age = "female", 300
     mn.sex, mn.age = "male", 300
     w.step()
-    assert f._partner is mn and mn._partner is f                 # mutual, monogamous bond formed
+    assert f._partner is mn and mn._wives == {f}                 # durable bond: wife→husband + husband's wives set
+    assert mn._partner is None                                   # males track wives via _wives, not _partner
 
 
 def test_nuclear_family_co_moves():
@@ -205,7 +206,7 @@ def test_nuclear_family_co_moves():
     mother.sex, mother.age = "female", 300
     father.sex, father.age = "male", 300
     child.age = 0                                                 # dependent (< maturity)
-    mother._partner = father; father._partner = mother           # pre-bonded couple
+    mother._partner = father; father._wives.add(mother)          # pre-bonded couple (wife→husband + husband's wives)
     child._mother = mother                                        # mother's dependent
     w.step()
     assert father.pos == mother.pos                              # bonded father co-moves to the mother
@@ -214,6 +215,25 @@ def test_nuclear_family_co_moves():
 
 def test_pair_bonds_off_by_default():
     assert DemographyConfig().enable_pair_bonds is False and DemographyConfig().divorce_rate == 0.0
+
+
+def test_modest_polygyny_high_status_male_takes_multiple_wives():
+    # F.3a polygyny: with polygyny_rate>0 + max_wives>1, an already-married male can take additional wives.
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0, move_cost_flat=1e12)
+    w = TerrainWorld(n_agents=3, kcal_cfg=KcalEconomyConfig(), seed=5, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=[(10, 10), (10, 10), (11, 10)],
+                     demography_cfg=DemographyConfig(enable_pair_bonds=True, bonded_mate_radius=1,
+                                                     mate_choice_strength=0.0, polygyny_rate=1.0, max_wives=2))
+    f1, f2, mn = w.agent_list
+    f1.sex, f1.age = "female", 300
+    f2.sex, f2.age = "female", 300
+    mn.sex, mn.age = "male", 300
+    w.step()
+    assert len(mn._wives) == 2 and f1._partner is mn and f2._partner is mn   # one husband, two wives
+
+
+def test_polygyny_off_by_default():
+    assert DemographyConfig().polygyny_rate == 0.0 and DemographyConfig().max_wives == 1
 
 
 def test_group_vector_inherit():

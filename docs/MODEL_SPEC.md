@@ -1245,9 +1245,22 @@ is *not* an age artifact (corr(age,prowess)≈0; prime-age-controlled still −0
 **mating/fertility** channel, and is **marriage-system specific** — polygyny (more mates) is the main amplifier,
 and even monogamy gives r≈0.15 only via **wife quality**. The model under **strict monogamy (F.3a)** has *neither*
 channel (no polygyny; partner fertility is status-blind), so status decouples from reproduction (it still drives
-SURVIVAL via R-18, just not reproduction). **Resolution:** add **modest polygyny** (the deferred F.3a option —
-status-gated multiple partners; ~4–11 % polygynous, von Rueden/Marlowe) and/or status-linked partner quality, then
-re-run the full-stack gate to confirm status→RS returns toward 0.19 with everything else still healthy. *(Pending.)*
+SURVIVAL via R-18, just not reproduction). **Resolution attempt 1 — modest polygyny (BUILT, `polygyny_rate`/`max_wives`):** a female may pair with an
+already-married high-status male (gated, prowess-weighted) → high-status males accumulate ≤`max_wives` wives. The
+polygyny MACHINERY works (run_3m, polygyny_rate=0.3/max_wives=3: corr(#wives, offspring) = **+0.71**; modest, max
+3 wives) — **but status→RS did NOT recover** (+0.010 vs monogamy +0.012).
+
+**Deeper root cause found — the PROWESS facet is corrupted under co-residence.** The achieved-status proxy
+`prod_credit = meat_pool / n_males_in_cell` is **diluted by co-resident males, including a father's own dependent
+sons**: corr(prowess, #males-in-cell) = **−0.396**, so reproductive success *depresses* a father's "hunting
+reputation." This **cancels** the polygyny signal (prowess→#wives only +0.12, then offspring→sons→lower prowess
+−0.40 ⇒ net corr(prowess, offspring) ≈ 0). So polygyny was necessary-but-insufficient: the broken link is
+**prowess→pairing**, not the marriage system. (E.3 got +0.19 because the per-conception lottery re-selected
+fathers by CURRENT prowess each birth; a fixed pair-bond lets the son-dilution accumulate over the bond.)
+**Resolution options (pending supervisor):** (a) fix the prowess prod-credit to normalise by ADULT hunters only
+(exclude dependent sons) so reproduction doesn't depress prowess; (b) key mate-choice on the clean heritable
+lineage status (`cred`) rather than the corrupted `prowess`; (c) measure status→RS against prowess-AT-PAIRING. The
+polygyny→offspring channel itself is sound and stays.
 
 ---
 
