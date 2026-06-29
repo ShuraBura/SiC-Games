@@ -256,6 +256,8 @@ class TerrainWorld(mesa.Model):
         self._cell_settle: dict[tuple[int, int], int] = {}     # S.4 per-cell settlement timer (hysteresis)
         self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
+        self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
+        self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
 
         # demographic layer
         self._reproduction = reproduction
@@ -683,12 +685,14 @@ class TerrainWorld(mesa.Model):
                     bid = a._group.band_id
                     band_members[bid] = band_members.get(bid, 0) + 1
                     band_cells.setdefault(bid, set()).add((cx, cy))
+            self._band_surplus = {}
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
                 density = n / footprint_km2 if footprint_km2 > 0 else 0.0
                 store_sum = sum(self._cell_store.get(c, 0.0) for c in band_cells[bid])
                 cap_band = store_cap_mult * self._reserve_full * n
                 surplus_frac = store_sum / cap_band if cap_band > 0.0 else 0.0
+                self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
                 target = society_from_character(density, surplus_frac)
                 c0 = self._band_settle.get(bid, 0)
                 c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
@@ -1126,8 +1130,10 @@ class TerrainWorld(mesa.Model):
 
     def _maintain_bands(self) -> None:
         """F.3c-1 emergent band fission/fusion (hysteretic) on the affiliation band_id. FUSION: a band below
-        `band_merge_size` joins its nearest neighbour band. FISSION: a band above `band_split_size` splits along its
-        wider spatial axis at the median — a SPATIAL cut (cuts across lineages → keeps bands non-kin, Hill 2011)."""
+        `band_merge_size` joins its nearest neighbour band. FISSION: a band above its split threshold splits along
+        its wider spatial axis at the median — a SPATIAL cut (cuts across lineages → keeps bands non-kin, Hill
+        2011). F.3c-3: with `enable_dynamic_bands` the split threshold is the CONDITION-DEPENDENT `tolerable_size`
+        = base + (hard_cap − base)·assabiyah (rich/high-solidarity bands stay together larger), not a constant."""
         cfg = self._demog
         members: dict[int, list] = {}
         for a in self.agent_list:
@@ -1136,6 +1142,22 @@ class TerrainWorld(mesa.Model):
         def _centroid(ms):
             n = len(ms)
             return (sum(a.pos[0] for a in ms) / n, sum(a.pos[1] for a in ms) / n)
+
+        # F.3c-3 dynamic: update per-band ASSABIYAH (success→solidarity) and the condition-dependent split threshold.
+        dynamic = getattr(cfg, "enable_dynamic_bands", False)
+        split_thr: dict[int, float] = {}
+        if dynamic:
+            base, cap = cfg.band_base_tolerable, cfg.band_split_size
+            new_assab: dict[int, float] = {}
+            for bid, ms in members.items():
+                surplus = self._band_surplus.get(bid, 0.0)
+                a_prev = self._band_assabiyah.get(bid, 0.0)
+                a_new = min(1.0, max(0.0, a_prev + cfg.assabiyah_gain * surplus - cfg.assabiyah_decay))
+                new_assab[bid] = a_new
+                for a in ms:                                   # mirror onto the collective-identity vector
+                    a._group.assabiyah = a_new
+                split_thr[bid] = base + (cap - base) * a_new   # tolerable size grows with solidarity
+            self._band_assabiyah = new_assab
 
         # FUSION (small → nearest other band)
         for bid in [b for b, ms in members.items() if len(ms) < cfg.band_merge_size]:
@@ -1147,8 +1169,8 @@ class TerrainWorld(mesa.Model):
             for a in members[bid]:
                 a._group.band_id = nb
             members[nb].extend(members.pop(bid))
-        # FISSION (large → spatial median split)
-        for bid in [b for b, ms in members.items() if len(ms) > cfg.band_split_size]:
+        # FISSION (above the split threshold → spatial median split)
+        for bid in [b for b, ms in members.items() if len(ms) > split_thr.get(b, cfg.band_split_size)]:
             ms = members[bid]
             xs = [a.pos[0] for a in ms]; ys = [a.pos[1] for a in ms]
             if (max(xs) - min(xs)) >= (max(ys) - min(ys)):

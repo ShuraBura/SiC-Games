@@ -48,13 +48,15 @@ def _band_seed(fields, cap, n, band_size=25, sep=4):
     return pos[:n]
 
 
-def _world(temp_threshold, morph=True, seed=7, n=150, affiliation=False):
+def _world(temp_threshold, morph=True, seed=7, n=150, affiliation=False, dynamic=False):
     knobs = _knobs(seed)
     fields = generate_world(knobs)
     cap = NPPCapacityField(fields, _BURN, patch=_PATCH)
     pos = _band_seed(fields, cap, n)
     extra = dict(enable_pair_bonds=True, enable_band_affiliation=True, band_cohesion=0.3,
                  band_split_size=45, band_merge_size=10) if affiliation else {}
+    if dynamic:
+        extra.update(enable_dynamic_bands=True, band_base_tolerable=25, assabiyah_gain=0.05, assabiyah_decay=0.02)
     demog = DemographyConfig(
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
@@ -135,3 +137,25 @@ def test_per_band_morph_warm_world_stays_egalitarian():
     for _ in range(400):
         w.step()
     assert len(w._band_society) == 0 and len(w._cell_society) == 0
+
+
+# ── F.3c-3 dynamic fission/fusion + assabiyah ──
+def test_assabiyah_builds_under_dynamic_bands():
+    # F.3c-3: a band that accumulates surplus builds solidarity (assabiyah > 0), mirrored onto its members' vector.
+    w = _world(temp_threshold=100.0, affiliation=True, dynamic=True)     # overwintering everywhere → surplus
+    for _ in range(300):
+        w.step()
+    assert w._band_assabiyah and max(w._band_assabiyah.values()) > 0.5   # solidarity accrued from surplus
+    assert max(a._group.assabiyah for a in w.agent_list) > 0.5           # mirrored onto the collective-identity vector
+
+
+def test_warm_world_no_assabiyah():
+    # no surplus (warm) ⇒ assabiyah decays to ~0 ⇒ bands fission at the base tolerable (no solidarity to grow on)
+    w = _world(temp_threshold=-100.0, affiliation=True, dynamic=True)
+    for _ in range(300):
+        w.step()
+    assert all(v < 0.1 for v in w._band_assabiyah.values()) if w._band_assabiyah else True
+
+
+def test_dynamic_bands_off_by_default():
+    assert DemographyConfig().enable_dynamic_bands is False

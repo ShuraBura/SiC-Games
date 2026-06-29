@@ -286,8 +286,18 @@ class DemographyConfig(BaseModel):
     # hysteresis bound band size ~25. Requires enable_pair_bonds. Default OFF = bit-exact back-compat.
     enable_band_affiliation: bool = False
     band_cohesion: float = Field(0.0, ge=0.0)             # cohesion-drive strength (pull toward band centroid); 0 = off
-    band_split_size: int = Field(45, ge=2)               # band fissions above this (upper "community" rung)
+    band_split_size: int = Field(45, ge=2)               # band fissions above this (upper "community" rung / HARD cap)
     band_merge_size: int = Field(10, ge=1)               # band fuses into the nearest band below this (hysteresis vs split)
+    # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
+    # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
+    # base)·assabiyah — so a rich, high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base.
+    # `assabiyah` (the GroupVector seam, now active) builds from the band's SURPLUS (success → solidarity, +gain·
+    # surplus) and decays (−decay) — a per-band cohesion state, mirrored onto members' GroupVector. band_split_size
+    # stays the absolute runaway cap; band_merge_size the viability floor. Requires enable_band_affiliation.
+    enable_dynamic_bands: bool = False
+    band_base_tolerable: int = Field(25, ge=2)           # tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline)
+    assabiyah_gain: float = Field(0.05, ge=0.0)          # solidarity gained per step per unit band surplus
+    assabiyah_decay: float = Field(0.02, ge=0.0)         # baseline solidarity decay per step (luxury/turnover erosion)
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the

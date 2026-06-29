@@ -1185,11 +1185,32 @@ aren't tight enough, a fair follow-on), `_cell_society` stays empty (per-cell by
 fires + bypasses cells; warm-world (no surplus) stays egalitarian. Back-compat: `enable_band_affiliation` off ⇒
 the per-cell morph is bit-exact (the per-cell `test_morph` scenarios unchanged).
 
-*Remaining (F.3c-2b / F.3c-3):* **family-knob localization** — reproduction still reads the GLOBAL
-mate_choice_strength/assortment/patriline/paternal-provision; localizing these per-band (from the band's society
-preset) is the next refinement. Then **F.3c-3 dynamic fission/fusion** — replace the hard band_split/merge
-constants with a condition-dependent `tolerable_size = base × resource × cohesion(assabiyah) × season`, activating
-the `assabiyah` seam (the per-band resource/surplus state F.3c-2 now provides is what it conditions on).
+### §4.8.10 F.3c-3 — dynamic, condition-dependent fission/fusion + the assabiyah seam (built 2026-06-29)
+
+The hard `band_split_size` constant becomes a **condition-dependent `tolerable_size`**, activating the
+**`assabiyah`** cell of the collective-identity vector (Ibn Khaldun group solidarity). `enable_dynamic_bands`
+(default OFF; needs `enable_band_affiliation`):
+- **Assabiyah dynamics (per band, `_band_assabiyah`):** `assabiyah ← clamp(assabiyah + assabiyah_gain·surplus −
+  assabiyah_decay, 0, 1)` — a band builds solidarity from its **surplus** (success → solidarity; the per-band
+  surplus_frac F.3c-2 computes) and erodes it with a baseline decay (luxury/turnover). Mirrored onto each member's
+  `GroupVector.assabiyah` (inherited; the seam later religion/biome will modulate).
+- **Tolerable size:** `tolerable = band_base_tolerable + (band_split_size − band_base_tolerable)·assabiyah`. A
+  band **fissions only above its own tolerable size** — so a rich, high-solidarity band **stays together larger**
+  (toward the hard cap), a poor (low-surplus) band fissions at the base (~25). `band_split_size` remains the
+  absolute runaway cap, `band_merge_size` the viability floor.
+
+**RESULTS (run_3l, realistic storage threshold so surplus varies, 5 seeds × 1000 steps):** assabiyah builds
+(mean **0.83**) and is **condition-dependent** — **corr(assabiyah, band size) = +0.27** (richer/higher-solidarity
+bands are larger; poor ones fission smaller), with **eq_pop preserved** (497 vs the hard-threshold 496 — no
+destabilization). Tests: assabiyah builds from surplus + mirrors to the vector; warm-world (no surplus) → assabiyah
+~0; default-off back-compat.
+
+**Open enrichments:** (i) the full Ibn Khaldun **dynastic cycle** — assabiyah currently only rises with success;
+the luxury→decay→collapse arc (solidarity eroding *because* of sustained wealth/size) is a natural next layer.
+(ii) `season_factor` (couple `tolerable_size` to the `ClimateField` for wet/dry aggregation). (iii) **religion**
+(the other vector seam) amplifying assabiyah → larger polities. (iv) F.3c-2b **family-knob localization**
+(reproduction still reads the global mate-choice/assortment/patriline; localizing per-band needs a baseline-vs-
+preset decision so it doesn't override the E.3 calibration).
 
 ---
 
