@@ -1133,8 +1133,39 @@ Config (`DemographyConfig`, default OFF): `enable_pair_bonds`, `divorce_rate`, `
   **multi-family** band (~25) — each family tracks its own mother and they don't aggregate into multi-family bands.
   Reaching ~25 needs multi-family *band affiliation* (or stronger aggregation), a follow-on.
 
-*Remaining roadmap:* **F.3c** — per-band society (move the morph + κ + family knobs from the cell to the band) and
-multi-family band affiliation (the Hill-2011 ~25 band).
+### §4.8.8 F.3c-1 — the band as a first-class entity: the collective-identity vector + band affiliation (built 2026-06-29)
+
+The band becomes a **persistent multi-family entity** (~25), not the fluid connected-component of F.2. Anchors:
+**Birdsell** (the "magic number" ~25 band, nesting in a ~500 connubium); **Hamilton et al. 2007** (HG social
+structure is nested/self-similar, family→band→community, ratio ≈3.8); **Hill et al. 2011** (bands mostly NON-kin,
+marriage-linked). *(Birdsell + Hamilton 2007 flagged for PDF verification — web search was rate-limited.)*
+
+**The collective-identity vector (`agent._group`, `sic_games/group.py: GroupVector`).** The affiliation is a
+**vector, not a scalar** — the Carbon "hive-mind": `band_id` is the ACTIVE cell (F.3c band membership); `assabiyah`
+(Ibn Khaldun group solidarity / cohesion) and `religion` are **reserved SEAMS** (present, inert) for later stages,
+biome-linked. Newborns inherit the mother's vector; marriage updates `band_id`.
+
+**Mechanism (`enable_band_affiliation`, default OFF; needs `enable_pair_bonds`).**
+- **Seed:** founder `band_id`s = the initial spatial clusters (the seeded territory-bands).
+- **Inherit:** a newborn copies its mother's vector (`GroupVector.inherit()`).
+- **Exogamy/residence (D2 flexible/multilocal):** at marriage the spouse from the **smaller** band joins the
+  **larger** (tie → the female's band) → mixes lineages across bands → bands stay non-kin.
+- **Cohesion (movement):** a bounded per-step nudge toward the band centroid in `diffusion_select_target`
+  (`band_cohesion`; gain 1±coh on a step toward/away from the centroid) — food stays the dominant term.
+- **Fission/fusion (`_maintain_bands`, hysteretic):** a band > `band_split_size` (45) splits along its wider
+  spatial axis at the median (a SPATIAL cut → cuts across lineages, keeps bands non-kin); a band <
+  `band_merge_size` (10) fuses into its nearest neighbour band.
+
+**RESULTS (run_3k, CC-1 patch, 5 seeds × 1000 steps) — VALIDATED on all four targets:**
+- **Band size ~25:** agent-weighted **28.7**, median **25.3**, ~11 bands (Birdsell/Wobst ✓).
+- **Non-kin / multi-family (Hill 2011 ✓):** dominant-lineage share **0.38** (1.0 = single-lineage clan), **~7
+  distinct lineages/band**, only **30 % of adults** co-reside with a parent — bands are multi-family assemblages of
+  mostly-unrelated adults, not clans.
+- **eq_pop preserved (~330)** — band cohesion did not over-constrain movement or starve the population (red-team §3.3 OK).
+- Band counts stable (no fission/fusion thrash) under the split=45 / merge=10 hysteresis.
+
+*Remaining roadmap:* **F.3c-2** — per-band society: re-key the morph + κ + family knobs from the **cell** to the
+**band_id** (band density = members / occupied-footprint area, D3); reproduction reads the band's society knobs.
 
 ---
 

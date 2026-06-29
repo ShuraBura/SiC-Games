@@ -45,6 +45,7 @@ deterministic founder-cluster layout instead of random land sampling.
 from __future__ import annotations
 
 import math
+from collections import Counter
 
 import mesa
 
@@ -58,6 +59,7 @@ from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS,
 )
+from sic_games.group import GroupVector, NO_BAND
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
@@ -318,6 +320,14 @@ class TerrainWorld(mesa.Model):
             self.agent_list.append(agent)
             self.occupied.add(pos)   # set: founder stacking (many agents, one cell) is allowed
 
+        # F.3c-1: seed founder band affiliations by the initial spatial clusters (the seeded territory-bands).
+        if self._demog is not None and getattr(self._demog, "enable_band_affiliation", False):
+            self._next_band_id = 0
+            for band in self.bands(self._demog.bonded_mate_radius):
+                for a in band:
+                    a._group.band_id = self._next_band_id
+                self._next_band_id += 1
+
     def _sample_founder_age(self) -> int:
         """Staggered founder age (months) ∝ survivorship l(x) — the stationary / young pyramid."""
         if not hasattr(self, "_founder_age_pool"):
@@ -378,6 +388,7 @@ class TerrainWorld(mesa.Model):
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
         agent._partner = None                      # F.3a durable spousal bond (mutual; None = unpaired)
+        agent._group = GroupVector()               # F.3c collective-identity vector (band_id assigned below / inherited)
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
@@ -428,6 +439,8 @@ class TerrainWorld(mesa.Model):
         if self._demog is not None:
             if getattr(self._demog, "enable_pair_bonds", False):
                 self._do_pairing()
+            if getattr(self._demog, "enable_band_affiliation", False):
+                self._maintain_bands()
             self._do_births_ibi()
         elif self._reproduction:
             self._do_births()
@@ -455,6 +468,16 @@ class TerrainWorld(mesa.Model):
         # is superseded by the emergent-bands grouping drives + bonded mating — the morph now fires from emergent
         # density+storage alone, validated in run_3h. MODEL_SPEC §4.8.5.)
         fam_move = self._demog is not None and getattr(self._demog, "enable_pair_bonds", False)
+        # F.3c-1 band cohesion: pull each mover (family-root / unpaired adult) toward its band's centroid.
+        coh_str = (self._demog.band_cohesion if (self._demog is not None
+                   and getattr(self._demog, "enable_band_affiliation", False)) else 0.0)
+        band_centroid: dict[int, tuple[int, int]] = {}
+        if coh_str > 0.0:
+            sums: dict[int, list] = {}
+            for a in self.agent_list:
+                s = sums.setdefault(a._group.band_id, [0, 0, 0])
+                s[0] += a.pos[0]; s[1] += a.pos[1]; s[2] += 1
+            band_centroid = {b: (round(s[0] / s[2]), round(s[1] / s[2])) for b, s in sums.items()}
         agents = list(self.agent_list)
         self.random.shuffle(agents)
 
@@ -477,7 +500,8 @@ class TerrainWorld(mesa.Model):
             tfn = getattr(agent._decision, "temperature", None)
             if callable(tfn):
                 temp = tfn(agent)
-            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp)
+            ct = band_centroid.get(agent._group.band_id) if coh_str > 0.0 else None
+            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -902,6 +926,7 @@ class TerrainWorld(mesa.Model):
                 child.pos = a.pos
                 child.age = 0
                 child._mother = a                                          # C.2b mother-link for provisioning
+                child._group = a._group.inherit()                          # F.3c-1: newborn inherits the mother's band affiliation
                 child._lineage = a._lineage                                # default matriline (overridden to patriline if a father is assigned)
                 if getattr(child, "use_cred_status", False):               # heritable lineage (cred)
                     si = cfg.cred_inherit_sigma
@@ -1025,6 +1050,8 @@ class TerrainWorld(mesa.Model):
                 if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
                     a._partner._partner = None; a._partner = None
         mexp = cfg.mate_choice_strength
+        affil = getattr(cfg, "enable_band_affiliation", False)
+        band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         for band in self.bands(cfg.bonded_mate_radius):
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
             males = [a for a in band if a.sex == "male" and a._partner is None and a.age >= cfg.menarche_months]
@@ -1041,6 +1068,51 @@ class TerrainWorld(mesa.Model):
                 else:
                     male = self.random.choice(avail)
                 f._partner = male; male._partner = f
+                if affil:
+                    # D2 exogamy/residence: the spouse from the SMALLER band joins the LARGER (flexible/multilocal;
+                    # tie → the female's band). Mixing lineages across bands keeps bands mostly non-kin (Hill 2011).
+                    fb, mb = f._group.band_id, male._group.band_id
+                    if fb != mb:
+                        if band_sizes[mb] > band_sizes[fb]:
+                            band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
+                        else:
+                            band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+
+    def _maintain_bands(self) -> None:
+        """F.3c-1 emergent band fission/fusion (hysteretic) on the affiliation band_id. FUSION: a band below
+        `band_merge_size` joins its nearest neighbour band. FISSION: a band above `band_split_size` splits along its
+        wider spatial axis at the median — a SPATIAL cut (cuts across lineages → keeps bands non-kin, Hill 2011)."""
+        cfg = self._demog
+        members: dict[int, list] = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+
+        def _centroid(ms):
+            n = len(ms)
+            return (sum(a.pos[0] for a in ms) / n, sum(a.pos[1] for a in ms) / n)
+
+        # FUSION (small → nearest other band)
+        for bid in [b for b, ms in members.items() if len(ms) < cfg.band_merge_size]:
+            if len(members) <= 1:
+                break
+            cx, cy = _centroid(members[bid])
+            others = [b for b in members if b != bid]
+            nb = min(others, key=lambda b: (lambda c: (c[0] - cx) ** 2 + (c[1] - cy) ** 2)(_centroid(members[b])))
+            for a in members[bid]:
+                a._group.band_id = nb
+            members[nb].extend(members.pop(bid))
+        # FISSION (large → spatial median split)
+        for bid in [b for b, ms in members.items() if len(ms) > cfg.band_split_size]:
+            ms = members[bid]
+            xs = [a.pos[0] for a in ms]; ys = [a.pos[1] for a in ms]
+            if (max(xs) - min(xs)) >= (max(ys) - min(ys)):
+                med = sorted(xs)[len(xs) // 2]; side = lambda a: a.pos[0] >= med
+            else:
+                med = sorted(ys)[len(ys) // 2]; side = lambda a: a.pos[1] >= med
+            new_id = self._next_band_id; self._next_band_id += 1
+            for a in ms:
+                if side(a):
+                    a._group.band_id = new_id
 
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell

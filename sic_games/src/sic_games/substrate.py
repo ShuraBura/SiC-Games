@@ -68,6 +68,8 @@ def diffusion_select_target(
     sc,
     rng,
     temperature: float | None,
+    cohesion_target: tuple[int, int] | None = None,
+    cohesion_strength: float = 0.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     r=1 neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -93,6 +95,10 @@ def diffusion_select_target(
     m_floor = getattr(sc, "group_mate_floor", 0.3)
     cands = [(x, y), ((x + 1) % w, y), ((x - 1) % w, y), (x, (y + 1) % h), (x, (y - 1) % h)]
     w_self = base_status(agent, eps) ** kappa if (kappa > 0.0 and agent.strategy == "carbon") else 1.0
+    # F.3c-1 band cohesion: a bounded per-step nudge toward the agent's band centroid (food stays dominant — this
+    # only re-weights the same von-Neumann candidates; the gain on a step TOWARD the centroid is 1+coh, AWAY 1−coh).
+    coh = cohesion_strength if cohesion_target is not None else 0.0
+    d_cur = max(abs(x - cohesion_target[0]), abs(y - cohesion_target[1])) if coh > 0.0 else 0
 
     cells: list[tuple[int, int]] = []
     utils: list[float] = []
@@ -119,6 +125,9 @@ def diffusion_select_target(
                 ypc *= 1.0 + s_max * (1.0 - math.exp(-g / g_s))
             if g_mate > 0.0:
                 ypc *= m_floor + (1.0 - m_floor) * min(1.0, g / g_mate)
+        if coh > 0.0:
+            d_cell = max(abs(cx - cohesion_target[0]), abs(cy - cohesion_target[1]))
+            ypc *= max(0.05, 1.0 + coh * (d_cur - d_cell))      # toward centroid ↑, away ↓ (bounded)
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 

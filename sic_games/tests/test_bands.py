@@ -214,3 +214,27 @@ def test_nuclear_family_co_moves():
 
 def test_pair_bonds_off_by_default():
     assert DemographyConfig().enable_pair_bonds is False and DemographyConfig().divorce_rate == 0.0
+
+
+def test_group_vector_inherit():
+    # F.3c collective-identity vector: a child copies the mother's vector (all cells), distinct object.
+    from sic_games.group import GroupVector
+    g = GroupVector(band_id=7, assabiyah=0.5, religion=2)
+    c = g.inherit()
+    assert (c.band_id, c.assabiyah, c.religion) == (7, 0.5, 2) and c is not g
+
+
+def test_band_affiliation_seeds_founder_bands():
+    # F.3c-1: founder band_ids are seeded by the initial spatial clusters (two territory-spaced clusters → two bands).
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0, move_cost_flat=0.0)
+    w = TerrainWorld(n_agents=4, kcal_cfg=KcalEconomyConfig(), seed=1, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=[(10, 10), (11, 10), (50, 50), (51, 50)],
+                     demography_cfg=DemographyConfig(enable_pair_bonds=True, enable_band_affiliation=True,
+                                                     bonded_mate_radius=1))
+    b = [a._group.band_id for a in w.agent_list]
+    assert len(set(b)) == 2                                       # two spatial clusters → two distinct bands
+    assert b[0] == b[1] and b[2] == b[3] and b[0] != b[2]         # each cluster shares one band id
+
+
+def test_band_affiliation_off_by_default():
+    assert DemographyConfig().enable_band_affiliation is False and DemographyConfig().band_cohesion == 0.0

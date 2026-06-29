@@ -278,6 +278,16 @@ class DemographyConfig(BaseModel):
     enable_pair_bonds: bool = False
     divorce_rate: float = Field(0.0, ge=0.0, le=1.0)      # per-step bond dissolution prob (0 = lifelong unless widowed)
     family_maturity_months: int = Field(180, ge=0)        # child detaches from the family unit at this age (~15 yr)
+    # F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership that
+    # families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle per-band society
+    # attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS the larger/richer band
+    # (FLEXIBLE/multilocal — keeps bands non-kin). A band-cohesion movement drive pulls family-roots toward their
+    # band's centroid (food stays dominant); emergent fission (> band_split_size) / fusion (< band_merge_size) with
+    # hysteresis bound band size ~25. Requires enable_pair_bonds. Default OFF = bit-exact back-compat.
+    enable_band_affiliation: bool = False
+    band_cohesion: float = Field(0.0, ge=0.0)             # cohesion-drive strength (pull toward band centroid); 0 = off
+    band_split_size: int = Field(45, ge=2)               # band fissions above this (upper "community" rung)
+    band_merge_size: int = Field(10, ge=1)               # band fuses into the nearest band below this (hysteresis vs split)
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the
