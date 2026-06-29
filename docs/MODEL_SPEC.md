@@ -1085,15 +1085,24 @@ channel is left in, default-OFF with a caveat, for future experiments only — i
 
 **Band life-cycle diagnostics — BUILT (`TerrainWorld.bands()`; `run_3j`).** `bands(radius)` partitions the live
 population into spatially-connected components (incl singletons) at the mate-gate radius — the band unit for
-tracking. Characterization on the corrected substrate (CC-1 patch + bonded r=1, 5 seeds × 1000 steps, durable
-events sampled every 20 steps to debounce single-step boundary flicker):
-- **Size distribution is heavy-tailed:** median band ~3, **agent-weighted band size ~25–47** (the band the
-  *average agent* lives in; rises with equilibrium density — in/above the Wobst ~25 / Dunbar band-society range),
-  max ~170, **~17 % of agents transiently solo**.
-- **A balanced dynamic equilibrium:** **merge ≈ split (~21–22 / 100 steps)** and **collapse ≈ form (~6–7 / 100
+tracking. A **time-together (persistence) filter** then excludes transient elements: band lineages are tracked
+across debounced samples (every 20 steps) by member overlap (a band continues if it retains ≥ half its members),
+and only a lineage that has survived ≥ 3 samples (~60 steps / ~5 yr) counts as a REAL band. Characterization on
+the corrected substrate (CC-1 patch + bonded r=1, 5 seeds × 1000 steps):
+- **Instantaneous (RAW) size distribution is transient-polluted:** median ~3 (every momentary 2–3-person
+  splinter counted), agent-weighted ~46, max ~138, ~17 % solo.
+- **Persistence-filtered (the real bands):** **median band ~17** (the splinters drop out — an ethnographic band
+  core), **~30 % of the population in a durable band** (≥60 steps stable), the rest in fluid/transient
+  aggregations. (The agent-weighted/max stay high, ~63/~137, because the `r=1` connectivity definition durably
+  *chains adjacent territories into one macroband* — a separate over-merge artifact that a stricter spatial band
+  definition (separation gap / density core), not the time filter, would resolve.)
+- **A balanced dynamic equilibrium:** **merge ≈ split (~20–21 / 100 steps)** and **collapse ≈ form (~6–7 / 100
   steps)** — bands are *fluid* (members flow between them) and turn over at matching rates, not rigid persistent
   units. (Collapse of sub-viable/isolated bands happens on its own from ordinary mortality — no risk penalty
   needed.) This is the merge/split/collapse the E.1/E.2 grouping + F.1/F.2 bonded-mating mechanisms produce.
+- **Implication for F.3:** only ~30 % of agents are in a *durable* band because there is **no persistent social
+  bond yet** (reproduction is statistical; no family moves as a unit). The fluidity is exactly what **F.3**
+  (persistent pair-bonds / families that move together) would reduce — the diagnostic motivates it.
 
 *Remaining roadmap:* **F.3** — per-band society + persistent pair-bonds (the deferred "C": a durable
 mother+children(+father) unit that moves together, and society attached to the band rather than the cell).
