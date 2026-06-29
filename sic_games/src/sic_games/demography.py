@@ -298,6 +298,17 @@ class DemographyConfig(BaseModel):
     band_base_tolerable: int = Field(25, ge=2)           # tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline)
     assabiyah_gain: float = Field(0.05, ge=0.0)          # solidarity gained per step per unit band surplus
     assabiyah_decay: float = Field(0.02, ge=0.0)         # baseline solidarity decay per step (luxury/turnover erosion)
+    # F.3c-3 SEASON factor: couple `tolerable_size` to the current seasonal abundance (ClimateField.season()) →
+    # wet/abundant season AGGREGATION, lean-season DISPERSAL (Kelly/Marlowe fission-fusion). 0 = off (no season
+    # effect); 1 = the tolerable headroom fully scales with seasonal abundance. Needs a ClimateField harvest field.
+    season_aggregation: float = Field(0.0, ge=0.0, le=1.0)
+    # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
+    # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
+    # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from
+    # the egalitarian preset — an egalitarian (un-morphed) band keeps the global value EXACTLY, only a morphed
+    # complex/stratified band deviates (e.g. higher mate_choice_strength + lower lineage_reversion = more dynastic).
+    # Needs enable_band_affiliation + enable_morph (society must be per-band). Default OFF = bit-exact.
+    enable_band_family_knobs: bool = False
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the

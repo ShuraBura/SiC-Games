@@ -238,3 +238,21 @@ def test_band_affiliation_seeds_founder_bands():
 
 def test_band_affiliation_off_by_default():
     assert DemographyConfig().enable_band_affiliation is False and DemographyConfig().band_cohesion == 0.0
+
+
+def test_band_knob_additive_delta():
+    # F.3c-2b: a band's family knob = global (egalitarian baseline) + the society preset's additive delta from
+    # egalitarian. Un-morphed band → global EXACTLY (E.3 calibration preserved); a complex band deviates.
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0, move_cost_flat=0.0)
+    w = TerrainWorld(n_agents=1, kcal_cfg=KcalEconomyConfig(), seed=1, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(2.0), placement_positions=[(10, 10)],
+                     demography_cfg=DemographyConfig(mate_choice_strength=5.0, lineage_reversion=0.1))
+    assert w._band_knob(0, "mate_choice_strength") == 5.0                  # no society → global baseline (E.3 safe)
+    w._band_society[0] = "complex_forager"
+    assert abs(w._band_knob(0, "mate_choice_strength") - 7.0) < 1e-9       # 5 + (3.0 − 1.0)
+    assert abs(w._band_knob(0, "lineage_reversion") - 0.0) < 1e-9          # 0.1 + (0.10 − 0.30) = −0.1 → clamp 0
+
+
+def test_dynamic_band_seams_off_by_default():
+    cfg = DemographyConfig()
+    assert cfg.enable_dynamic_bands is False and cfg.season_aggregation == 0.0 and cfg.enable_band_family_knobs is False

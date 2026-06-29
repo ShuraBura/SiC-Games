@@ -1205,12 +1205,32 @@ bands are larger; poor ones fission smaller), with **eq_pop preserved** (497 vs 
 destabilization). Tests: assabiyah builds from surplus + mirrors to the vector; warm-world (no surplus) → assabiyah
 ~0; default-off back-compat.
 
-**Open enrichments:** (i) the full Ibn Khaldun **dynastic cycle** — assabiyah currently only rises with success;
-the luxury→decay→collapse arc (solidarity eroding *because* of sustained wealth/size) is a natural next layer.
-(ii) `season_factor` (couple `tolerable_size` to the `ClimateField` for wet/dry aggregation). (iii) **religion**
-(the other vector seam) amplifying assabiyah → larger polities. (iv) F.3c-2b **family-knob localization**
-(reproduction still reads the global mate-choice/assortment/patriline; localizing per-band needs a baseline-vs-
-preset decision so it doesn't override the E.3 calibration).
+**SEASON factor — BUILT (`season_aggregation`).** `tolerable_size`'s headroom is scaled by the current seasonal
+abundance: `tolerable = base + (cap − base)·assabiyah·[(1−sa) + sa·ClimateField.season()]` — wet/abundant season
+→ aggregation, lean → dispersal (Kelly/Marlowe). Needs a `ClimateField` harvest field. **Honest caveat:** the
+coupling is plumbed and directionally correct, but in the current regime its realized effect on band size is
+SMALL (corr(season, mean band size) ≈ 0.05) — bands (~25) sit *below* the seasonal tolerable (≈34–43), so the
+threshold rarely binds, and re-aggregation (fusion) is slower than the 12-step seasonal cycle. Stronger seasonal
+aggregation would need season-coupled FUSION (not just the split threshold) or a regime where bands sit near the
+cap — a follow-on.
+
+### §4.8.11 F.3c-2b — per-band family-knob localization (built 2026-06-29)
+
+Reproduction reads the mother's **band-society** family knobs instead of the global config (`enable_band_family_knobs`,
+default OFF; needs per-band society). **Decision (so it never overrides the E.3 m calibration):** the global config
+is the **egalitarian baseline**; a band applies the **additive delta** of its society preset from the egalitarian
+preset (`_band_knob` = `global + (preset[society][knob] − preset["egalitarian_forager"][knob])`, clamped). An
+egalitarian/un-morphed band returns the global value EXACTLY; only a morphed band deviates. Localized: **mate-choice
+strength** (`_do_pairing` — the partner-choice skew, per the female's band), **patriline_weight + lineage_reversion**
+(births — descent + heritability, per the mother's band). **Validated:** a `complex_forager` band reads
+mate_choice_strength **5 → 7** (global 5 + (3−1)) and lineage_reversion **0.1 → 0** (more dynastic), while
+egalitarian bands keep 5 — so complex bands run a sharper, more heritable status hierarchy than egalitarian ones,
+on the same world. (For the forager societies that fire, `patriline_weight`/`paternal_provision` deltas are 0; they
+localize too, inert until a stratified/pastoralist society arises.)
+
+**Open enrichments (remaining):** the full Ibn Khaldun **dynastic cycle** (assabiyah luxury→decay→collapse, not
+just rise); **religion** (the other vector seam) amplifying assabiyah → larger polities + biome differences;
+season-coupled **fusion** for stronger seasonal aggregation.
 
 ---
 

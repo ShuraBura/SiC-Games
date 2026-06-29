@@ -933,6 +933,7 @@ class TerrainWorld(mesa.Model):
         # the adult males per cell (kin-avoidance applied per-mother below).
         bonded = getattr(cfg, "enable_bonded_mating", False)
         pair_bonds = getattr(cfg, "enable_pair_bonds", False)   # F.3a: the durable partner gates + fathers
+        loc = getattr(cfg, "enable_band_family_knobs", False)   # F.3c-2b: per-band lineage/descent knobs
         mate_r = getattr(cfg, "bonded_mate_radius", 0)
         males_by_cell: dict[tuple[int, int], list] = {}
         if bonded and not pair_bonds:
@@ -1010,7 +1011,7 @@ class TerrainWorld(mesa.Model):
                                 (a.cred * getattr(a, "prowess", 1.0), father.cred * getattr(father, "prowess", 1.0)))
                         t_mom = a.cred * getattr(a, "prowess", 1.0)
                         if father is not None:
-                            pw = cfg.patriline_weight
+                            pw = self._band_knob(a._group.band_id, "patriline_weight") if loc else cfg.patriline_weight
                             base = (1.0 - pw) * t_mom + pw * (father.cred * getattr(father, "prowess", 1.0))
                         else:
                             base = t_mom                                   # matrilineal fallback (no adult males)
@@ -1019,7 +1020,8 @@ class TerrainWorld(mesa.Model):
                     # Mean-reversion toward a FIXED anchor (1.0 = founder median) — a TRUE contraction that bounds
                     # the no-decay lineage facet (red-team BLOCKER fix: the co-moving population mean was NOT a
                     # contraction → unbounded drift). ρ=0 ⇒ pure mean-1 multiplicative copy (R-18/step-1).
-                    child.cred = (1.0 - cfg.lineage_reversion) * base * noise + cfg.lineage_reversion * 1.0
+                    lr = self._band_knob(a._group.band_id, "lineage_reversion") if loc else cfg.lineage_reversion
+                    child.cred = (1.0 - lr) * base * noise + lr * 1.0
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
                 newborns.append(child)
                 self.births_this_step += 1
@@ -1101,6 +1103,7 @@ class TerrainWorld(mesa.Model):
                     a._partner._partner = None; a._partner = None
         mexp = cfg.mate_choice_strength
         affil = getattr(cfg, "enable_band_affiliation", False)
+        loc = getattr(cfg, "enable_band_family_knobs", False)        # F.3c-2b per-band family knobs
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         for band in self.bands(cfg.bonded_mate_radius):
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
@@ -1112,8 +1115,9 @@ class TerrainWorld(mesa.Model):
                 avail = [x for x in males if x._partner is None and x._mother is not f and x is not f._father]
                 if not avail:
                     continue
-                if mexp > 0.0:
-                    w = [(getattr(x, "prowess", 1.0) + 1e-6) ** mexp for x in avail]
+                m_f = self._band_knob(f._group.band_id, "mate_choice_strength") if loc else mexp   # per-band skew
+                if m_f > 0.0:
+                    w = [(getattr(x, "prowess", 1.0) + 1e-6) ** m_f for x in avail]
                     male = self.random.choices(avail, weights=w, k=1)[0]
                 else:
                     male = self.random.choice(avail)
@@ -1127,6 +1131,19 @@ class TerrainWorld(mesa.Model):
                             band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
                         else:
                             band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+
+    def _band_knob(self, band_id: int, name: str) -> float:
+        """F.3c-2b: the per-band value of a family knob = the GLOBAL config (egalitarian baseline) + the additive
+        DELTA of the band's society preset from the egalitarian preset. An egalitarian/un-morphed band returns the
+        global value EXACTLY (preserves the E.3 calibration); a morphed band deviates by its society's signature."""
+        glob = getattr(self._demog, name)
+        soc = self._band_society.get(band_id)
+        if soc is None or soc == "egalitarian_forager":
+            return glob
+        val = glob + (SOCIETY_PRESETS[soc][name] - SOCIETY_PRESETS["egalitarian_forager"][name])
+        if name in ("patriline_weight", "lineage_reversion", "paternal_provision_frac"):
+            return min(1.0, max(0.0, val))
+        return max(0.0, val)
 
     def _maintain_bands(self) -> None:
         """F.3c-1 emergent band fission/fusion (hysteretic) on the affiliation band_id. FUSION: a band below
@@ -1148,6 +1165,12 @@ class TerrainWorld(mesa.Model):
         split_thr: dict[int, float] = {}
         if dynamic:
             base, cap = cfg.band_base_tolerable, cfg.band_split_size
+            # F.3c-3 season factor: scale the tolerable headroom by the current seasonal abundance → wet-season
+            # aggregation / lean-season dispersal. 1.0 (no effect) unless a ClimateField + season_aggregation>0.
+            sa = getattr(cfg, "season_aggregation", 0.0)
+            season_ab = 1.0
+            if sa > 0.0 and hasattr(self._harvest_field, "season"):
+                season_ab = (1.0 - sa) + sa * self._harvest_field.season()
             new_assab: dict[int, float] = {}
             for bid, ms in members.items():
                 surplus = self._band_surplus.get(bid, 0.0)
@@ -1156,7 +1179,7 @@ class TerrainWorld(mesa.Model):
                 new_assab[bid] = a_new
                 for a in ms:                                   # mirror onto the collective-identity vector
                     a._group.assabiyah = a_new
-                split_thr[bid] = base + (cap - base) * a_new   # tolerable size grows with solidarity
+                split_thr[bid] = base + (cap - base) * a_new * season_ab   # tolerable grows w/ solidarity, scaled by season
             self._band_assabiyah = new_assab
 
         # FUSION (small → nearest other band)

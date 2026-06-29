@@ -159,3 +159,44 @@ def test_warm_world_no_assabiyah():
 
 def test_dynamic_bands_off_by_default():
     assert DemographyConfig().enable_dynamic_bands is False
+
+
+def test_per_band_family_knobs_localize():
+    # F.3c-2b: with enable_band_family_knobs, a morphed (complex) band reads a LOCALIZED mate-choice skew
+    # (global + the complex-vs-egalitarian delta), while egalitarian bands keep the global value (E.3 safe).
+    from sic_games.demography import DemographyConfig as DC
+    knobs = _knobs(7); fields = generate_world(knobs)
+    cap = NPPCapacityField(fields, _BURN, patch=_PATCH); pos = _band_seed(fields, cap, 150)
+    demog = DC(siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
+               enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
+               enable_cred_status=True, cred_seed_sigma=0.6, cred_inherit_sigma=0.3,
+               enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True, enable_paternity=True,
+               mate_choice_strength=5.0, enable_band_affiliation=True, band_cohesion=0.3,
+               enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
+               storage_temp_threshold_c=100.0, storage_decay=0.05, enable_morph=True, morph_settle_steps=60,
+               enable_band_family_knobs=True)
+    w = TerrainWorld(n_agents=150, kcal_cfg=_KC, terrain_knobs=knobs, game_stream=False, seed=7,
+                     carbon_cfg=CarbonConfig(kappa=1.5), harvest_field=cap, placement_positions=pos,
+                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                   contest_exponent=1.5, move_cost_flat=0.0, **_GRP),
+                     demography_cfg=demog)
+    for _ in range(400):
+        w.step()
+    cbands = [b for b, s in w._band_society.items() if s == "complex_forager"]
+    assert cbands                                                  # a band morphed to complex
+    assert abs(w._band_knob(cbands[0], "mate_choice_strength") - 7.0) < 1e-9   # 5 + (3 − 1) localized
+
+
+def test_season_aggregation_runs():
+    # F.3c-3 season coupling: a seasonal (ClimateField) capacity + season_aggregation runs and still morphs bands
+    # (the tolerable headroom is scaled by ClimateField.season(); integration sanity).
+    from sic_games.climate import ClimateField
+    knobs = _knobs(7); fields = generate_world(knobs)
+    cap = ClimateField(NPPCapacityField(fields, _BURN, patch=_PATCH), a_seas=0.5)
+    pos = _band_seed(fields, cap, 150)
+    w = _world(temp_threshold=100.0, affiliation=True, dynamic=True, n=150)
+    w._harvest_field = cap
+    w._demog = w._demog.model_copy(update={"season_aggregation": 1.0})
+    for _ in range(300):
+        w.step()
+    assert len(w.agent_list) > 0 and w._band_assabiyah                 # ran; bands + assabiyah present
