@@ -268,6 +268,16 @@ class DemographyConfig(BaseModel):
     enable_band_risk: bool = False
     band_risk_penalty: float = Field(0.0, ge=0.0)   # max extra a2 multiplier for a LONER in a mean-risk biome
     band_risk_size: int = Field(25, ge=1)           # band size at which the biome risk is fully mitigated (Wobst ~25)
+    # F.3a/b PERSISTENT FAMILIES (the deferred "C"; core of FD-1). `enable_pair_bonds`: a female forms a DURABLE
+    # monogamous bond with a band male (prowess-weighted by mate_choice_strength), persisting across births (vs the
+    # per-conception lottery); births default to the living co-resident partner; the bond dissolves on partner
+    # death (→ widow re-pairs = serial monogamy) or at `divorce_rate`/step. The NUCLEAR FAMILY — mother + bonded
+    # father + dependent children (age < `family_maturity_months`) — MOVES AS A UNIT (co-locates to the mother each
+    # step); children DETACH at maturity → exogamous dispersal. Builds stable family-cored bands (Hill et al. 2011;
+    # Marlowe monogamy). Uses bonded_mate_radius as the band extent. Default OFF = bit-exact back-compat.
+    enable_pair_bonds: bool = False
+    divorce_rate: float = Field(0.0, ge=0.0, le=1.0)      # per-step bond dissolution prob (0 = lifelong unless widowed)
+    family_maturity_months: int = Field(180, ge=0)        # child detaches from the family unit at this age (~15 yr)
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the

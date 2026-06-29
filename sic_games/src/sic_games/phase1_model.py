@@ -377,6 +377,7 @@ class TerrainWorld(mesa.Model):
         agent.prowess = 1.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
+        agent._partner = None                      # F.3a durable spousal bond (mutual; None = unpaired)
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
@@ -417,11 +418,16 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             if not a.alive:
                 self.occupied.discard(a.pos)
+                p = getattr(a, "_partner", None)
+                if p is not None:
+                    p._partner = None        # F.3a: widow(er) — dissolve the bond so the survivor can re-pair
                 a.remove()
         self.agent_list = [a for a in self.agent_list if a.alive]
 
-        # Demographic layer: births (opt-in)
+        # Demographic layer: pairing (F.3a) then births (opt-in)
         if self._demog is not None:
+            if getattr(self._demog, "enable_pair_bonds", False):
+                self._do_pairing()
             self._do_births_ibi()
         elif self._reproduction:
             self._do_births()
@@ -448,9 +454,24 @@ class TerrainWorld(mesa.Model):
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
         # is superseded by the emergent-bands grouping drives + bonded mating — the morph now fires from emergent
         # density+storage alone, validated in run_3h. MODEL_SPEC §4.8.5.)
+        fam_move = self._demog is not None and getattr(self._demog, "enable_pair_bonds", False)
         agents = list(self.agent_list)
         self.random.shuffle(agents)
+
+        def _shift(agent, old, target):                  # move agent old→target, keeping occ_count/occ_wsum in sync
+            occ_count[old] -= 1
+            if occ_count[old] == 0:
+                del occ_count[old]
+            occ_count[target] = occ_count.get(target, 0) + 1
+            if occ_wsum is not None:
+                wt = base_status(agent, phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
+                occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
+                occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
+            agent.pos = target
+
         for agent in agents:
+            if fam_move and self._family_head(agent) is not None:
+                continue                                 # F.3b: family followers don't move independently
             old = agent.pos
             temp = None
             tfn = getattr(agent._decision, "temperature", None)
@@ -460,15 +481,14 @@ class TerrainWorld(mesa.Model):
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
-                occ_count[old] -= 1
-                if occ_count[old] == 0:
-                    del occ_count[old]
-                occ_count[target] = occ_count.get(target, 0) + 1
-                if occ_wsum is not None:
-                    wt = base_status(agent, phi_eps) ** kappa if agent.strategy == "carbon" else 1.0
-                    occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
-                    occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
-                agent.pos = target
+                _shift(agent, old, target)
+        if fam_move:
+            # F.3b nuclear-family co-movement: followers (dependent children + bonded males) snap to their head's
+            # final cell, so the family forages + co-resides as a unit.
+            for agent in self.agent_list:
+                head = self._family_head(agent)
+                if head is not None and agent.pos != head.pos:
+                    _shift(agent, agent.pos, head.pos)
         self.occupied = set(occ_count.keys())
 
         # 3. per-cell harvest split (forage-only; S = cell total return rate, flow)
@@ -838,9 +858,10 @@ class TerrainWorld(mesa.Model):
         # F.1 bonded mating: a co-resident adult male is REQUIRED for a birth → loners can't reproduce. Precompute
         # the adult males per cell (kin-avoidance applied per-mother below).
         bonded = getattr(cfg, "enable_bonded_mating", False)
+        pair_bonds = getattr(cfg, "enable_pair_bonds", False)   # F.3a: the durable partner gates + fathers
         mate_r = getattr(cfg, "bonded_mate_radius", 0)
         males_by_cell: dict[tuple[int, int], list] = {}
-        if bonded:
+        if bonded and not pair_bonds:
             for x in self.agent_list:
                 if x.sex == "male" and x.age >= cfg.menarche_months:
                     males_by_cell.setdefault(x.pos, []).append(x)
@@ -861,7 +882,13 @@ class TerrainWorld(mesa.Model):
                 continue
             if not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
-            if bonded and not _has_band_mate(a):
+            if pair_bonds:
+                partner = a._partner                           # F.3a: needs a living, co-resident durable partner
+                if partner is None or not partner.alive:
+                    continue
+                if max(abs(a.pos[0] - partner.pos[0]), abs(a.pos[1] - partner.pos[1])) > mate_r:
+                    continue                                   # partner not co-resident (guard; co-movement keeps them together)
+            elif bonded and not _has_band_mate(a):
                 continue   # F.1/F.2: no co-resident non-son adult male in the band ⇒ no mate ⇒ no birth
             p_birth = cfg.fecundability
             if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
@@ -884,7 +911,9 @@ class TerrainWorld(mesa.Model):
                     if paternity:
                         # mate-choice: prowess-weighted father (m=0 → random); bilateral lineage = blend of the
                         # parents' TOTAL standing (cred·prowess — folds the father's hunting record in).
-                        if males:
+                        if pair_bonds:
+                            father = a._partner                # F.3a: the durable partner IS the father (no lottery)
+                        elif males:
                             if assort > 0.0 and m_status is not None:
                                 # B++ assortment: prowess^m × similarity-to-mother (Gaussian in log-status)
                                 li = math.log(a.cred * getattr(a, "prowess", 1.0) + 1e-9)
@@ -970,6 +999,48 @@ class TerrainWorld(mesa.Model):
         for c, occ in occ_lists.items():
             groups.setdefault(find(c), []).extend(occ)
         return list(groups.values())
+
+    def _family_head(self, a) -> "BaseAgent | None":
+        """F.3b nuclear-family movement: the agent's MOVEMENT ANCHOR, or None if it moves independently. A dependent
+        child (age < family_maturity_months, living mother) follows its MOTHER; a bonded adult male follows his
+        female PARTNER. Adult females + unpaired/mature agents are roots (None). No multi-level chains: a child's
+        mother is always an adult root (she must be ≥ menarche to have borne it)."""
+        cfg = self._demog
+        mat = cfg.family_maturity_months
+        m = a._mother
+        if a.age < mat and m is not None and m.alive:
+            return m
+        p = a._partner
+        if a.sex == "male" and p is not None and p.alive:
+            return p
+        return None
+
+    def _do_pairing(self) -> None:
+        """F.3a serial monogamy: match unpaired adults WITHIN each band (mate-gate neighbourhood) into durable
+        bonds, prowess-weighted (mate_choice_strength), kin-avoiding (not son/father). Widowed/divorced agents
+        re-enter the pool automatically. Divorce dissolves a fraction of bonds each step (serial re-pairing)."""
+        cfg = self._demog
+        if cfg.divorce_rate > 0.0:
+            for a in self.agent_list:
+                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
+                    a._partner._partner = None; a._partner = None
+        mexp = cfg.mate_choice_strength
+        for band in self.bands(cfg.bonded_mate_radius):
+            females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
+            males = [a for a in band if a.sex == "male" and a._partner is None and a.age >= cfg.menarche_months]
+            if not females or not males:
+                continue
+            self.random.shuffle(females)
+            for f in females:
+                avail = [x for x in males if x._partner is None and x._mother is not f and x is not f._father]
+                if not avail:
+                    continue
+                if mexp > 0.0:
+                    w = [(getattr(x, "prowess", 1.0) + 1e-6) ** mexp for x in avail]
+                    male = self.random.choices(avail, weights=w, k=1)[0]
+                else:
+                    male = self.random.choice(avail)
+                f._partner = male; male._partner = f
 
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell

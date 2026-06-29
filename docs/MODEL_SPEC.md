@@ -1104,8 +1104,37 @@ the corrected substrate (CC-1 patch + bonded r=1, 5 seeds × 1000 steps):
   bond yet** (reproduction is statistical; no family moves as a unit). The fluidity is exactly what **F.3**
   (persistent pair-bonds / families that move together) would reduce — the diagnostic motivates it.
 
-*Remaining roadmap:* **F.3** — per-band society + persistent pair-bonds (the deferred "C": a durable
-mother+children(+father) unit that moves together, and society attached to the band rather than the cell).
+### §4.8.7 F.3a/b — persistent families: pair-bonds + nuclear-family co-movement (built 2026-06-29)
+
+The deferred "C" / core of FD-1: replace the per-conception statistical paternity with **durable family units that
+co-reside and move together**. Anchors: **Hill et al. 2011** (HG bands are mostly *unrelated* individuals linked by
+**marriage** — bands = multiple families + maturing singles); **Marlowe 2004** (forager **monogamy**-dominant,
+modest polygyny, multilocal residence); **Kaplan/Hill/Lancaster/Hurtado 2000** (juvenile dependence to ~15–18).
+Config (`DemographyConfig`, default OFF): `enable_pair_bonds`, `divorce_rate`, `family_maturity_months` (~180 = 15 yr).
+
+- **F.3a persistent pair-bonds (`enable_pair_bonds`).** Each step `_do_pairing()` matches unpaired adults WITHIN
+  each band (mate-gate neighbourhood) into **mutual, monogamous** bonds — prowess-weighted by `mate_choice_strength`,
+  kin-avoiding (not son/father). The bond **persists across births** (the partner is the father — no per-conception
+  lottery) and dissolves on **partner death** (the widow(er) re-enters the pool → **serial monogamy**) or at
+  `divorce_rate`/step. A female reproduces only with a **living, co-resident partner** (the gate replaces the
+  F.1/F.2 band-mate gate when pair-bonds are on).
+- **F.3b nuclear-family co-movement.** In the movement step the family — **mother + bonded father + dependent
+  children (age < `family_maturity_months`)** — moves as a **unit**: the mother (root) diffuses with the grouping
+  drives; her bonded father and dependent children **co-locate to her cell** (`_family_head`). Children **detach at
+  maturity** → independent movement → exogamous dispersal. (Orphaned dependents — dead mother — disperse alone.)
+
+**RESULTS (run_3j, CC-1 patch + bonded r=1, 5 seeds × 1000 steps; vs the F.2 baseline):**
+- **Durable-band fraction 0.30 → 0.41** — families create more stable cores (the predicted F.3 effect); bonds are
+  monogamous (mutual) and co-residence is exact (every paired female shares her partner's cell).
+- **The §4.8.6 macroband over-merge artifact RESOLVED for free:** agent-weighted band 63 → **7**, max 137 → **26**
+  — nuclear families move as cohesive units, so the population organises into **discrete family-cored bands**
+  instead of one connectivity-glued component. Fewer solos (0.17 → 0.10) and collapses (7.2 → 3.9 /100).
+- **Open (F.3c / calibration):** bands are now **nuclear-family-sized (~7)**, *below* the Hill-2011/Wobst
+  **multi-family** band (~25) — each family tracks its own mother and they don't aggregate into multi-family bands.
+  Reaching ~25 needs multi-family *band affiliation* (or stronger aggregation), a follow-on.
+
+*Remaining roadmap:* **F.3c** — per-band society (move the morph + κ + family knobs from the cell to the band) and
+multi-family band affiliation (the Hill-2011 ~25 band).
 
 ---
 

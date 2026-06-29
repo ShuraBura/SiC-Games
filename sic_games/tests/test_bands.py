@@ -176,3 +176,41 @@ def test_bands_method_connected_components():
 def test_band_risk_shelved_off_by_default():
     # F.2 risk-dilution mortality was shelved (death spiral, run_3i) — the flag must stay OFF by default.
     assert DemographyConfig().enable_band_risk is False
+
+
+def test_pair_bonds_form_and_are_monogamous():
+    # F.3a: an unpaired adult female + adult male co-resident in a band form a mutual, monogamous durable bond.
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0,
+                         move_cost_flat=1e12)
+    w = TerrainWorld(n_agents=2, kcal_cfg=KcalEconomyConfig(), seed=3, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=[(10, 10), (11, 10)],
+                     demography_cfg=DemographyConfig(enable_pair_bonds=True, enable_paternity=True,
+                                                     bonded_mate_radius=1, mate_choice_strength=0.0))
+    f, mn = w.agent_list
+    f.sex, f.age = "female", 300
+    mn.sex, mn.age = "male", 300
+    w.step()
+    assert f._partner is mn and mn._partner is f                 # mutual, monogamous bond formed
+
+
+def test_nuclear_family_co_moves():
+    # F.3b: a dependent child and the bonded father co-locate to the mother each step (the family moves as a unit).
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0,
+                         move_cost_flat=1e12)                     # mother (root) frozen at her cell
+    w = TerrainWorld(n_agents=3, kcal_cfg=KcalEconomyConfig(), seed=4, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=[(10, 10), (50, 50), (60, 60)],
+                     demography_cfg=DemographyConfig(enable_pair_bonds=True, enable_paternity=True,
+                                                     bonded_mate_radius=1, family_maturity_months=180))
+    mother, father, child = w.agent_list
+    mother.sex, mother.age = "female", 300
+    father.sex, father.age = "male", 300
+    child.age = 0                                                 # dependent (< maturity)
+    mother._partner = father; father._partner = mother           # pre-bonded couple
+    child._mother = mother                                        # mother's dependent
+    w.step()
+    assert father.pos == mother.pos                              # bonded father co-moves to the mother
+    assert child.pos == mother.pos                              # dependent child co-moves to the mother
+
+
+def test_pair_bonds_off_by_default():
+    assert DemographyConfig().enable_pair_bonds is False and DemographyConfig().divorce_rate == 0.0

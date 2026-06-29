@@ -74,14 +74,18 @@ def classify(prev, now):
     return merge, split, collapse, form
 
 
-def run_one(seed):
+def run_one(seed, pair_bonds=False):
     fields = generate_world(knobs_for(seed)); cap = SubWindowCapacity(fields)
     pos = band_positions_patch(fields, cap, FOUNDERS)
-    demog = DemographyConfig(
+    dkw = dict(
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
         enable_bonded_mating=True, bonded_mate_radius=MATE_R)
+    if pair_bonds:                                               # F.3a/b: persistent families + nuclear co-movement
+        dkw.update(enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0, enable_paternity=True,
+                   mate_choice_strength=5.0, enable_pair_bonds=True)
+    demog = DemographyConfig(**dkw)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=knobs_for(seed),
                      game_stream=False, seed=seed, carbon_cfg=CarbonConfig(kappa=1.0),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -157,18 +161,20 @@ def run_one(seed):
 
 def main():
     t0 = time.time()
-    rows = [run_one(s) for s in SEEDS]
-    agg = {k: statistics.mean([r[k] for r in rows]) for k in rows[0]}
     pst_steps = MIN_PERSIST_SAMPLES * SAMPLE_EVERY
-    print(f"F.2 band life-cycle (CC-1 patch + bonded r={MATE_R}, {len(SEEDS)} seeds × {STEPS} steps, tail half; "
+    print(f"F.2/F.3 band life-cycle (CC-1 patch + bonded r={MATE_R}, {len(SEEDS)} seeds × {STEPS} steps, tail half; "
           f"persistence filter ≥{pst_steps} steps)")
-    print(f"  RAW (instantaneous component):  median {agg['raw_median']:.1f} | agent-weighted {agg['raw_awt']:.1f} "
-          f"| max {agg['raw_max']:.0f} | solo frac {agg['singleton_frac']:.2f}")
-    print(f"  PERSISTENT (sustained ≥{pst_steps} steps): median {agg['pst_median']:.1f} | mean {agg['pst_mean']:.1f} "
-          f"| agent-weighted {agg['pst_awt']:.1f} | max {agg['pst_max']:.0f} | pop-in-persistent-band {agg['pst_frac']:.2f}")
-    print(f"  life-cycle events / 100 steps: merge {agg['merge']:.1f} | split {agg['split']:.1f} | "
-          f"collapse {agg['collapse']:.1f} | form {agg['form']:.1f}")
-    print(f"  Wobst/Dunbar ~25 ⇒ persistent agent-weighted band = {agg['pst_awt']:.0f}  [{time.time()-t0:.0f}s]")
+    for pair in (False, True):
+        rows = [run_one(s, pair_bonds=pair) for s in SEEDS]
+        agg = {k: statistics.mean([r[k] for r in rows]) for k in rows[0]}
+        lab = "F.3 pair-bonds" if pair else "F.2 baseline  "
+        print(f"\n[{lab}]")
+        print(f"  RAW (instantaneous):  median {agg['raw_median']:.1f} | agent-weighted {agg['raw_awt']:.1f} "
+              f"| max {agg['raw_max']:.0f} | solo frac {agg['singleton_frac']:.2f}")
+        print(f"  PERSISTENT (≥{pst_steps} steps): median {agg['pst_median']:.1f} | agent-weighted {agg['pst_awt']:.1f} "
+              f"| max {agg['pst_max']:.0f} | POP-IN-DURABLE-BAND {agg['pst_frac']:.2f}")
+        print(f"  events/100: merge {agg['merge']:.1f} | split {agg['split']:.1f} | "
+              f"collapse {agg['collapse']:.1f} | form {agg['form']:.1f}  [{time.time()-t0:.0f}s]")
 
 
 if __name__ == "__main__":
