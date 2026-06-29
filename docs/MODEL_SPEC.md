@@ -1069,6 +1069,37 @@ capacity field used here is now a library module (`sic_games/capacity.py: NPPCap
 
 ---
 
+### §4.8.6 F.2 — risk-dilution mortality (SHELVED, negative result) + band life-cycle diagnostics (2026-06-29)
+
+**Risk-dilution-as-mortality — TESTED and SHELVED (`enable_band_risk`, default OFF).** Hypothesis: a group-size
+risk-dilution penalty on the exogenous biome hazard (a loner loses the safety-in-numbers mitigation that the lit
+biome accident rate — Hill/Hurtado/Walker 2007, measured on *band-living* people — already bakes in; **Hamilton
+1971** selfish-herd), scaled by the cell's incident rate, would — together with density-disease (which *rises*
+with crowding) — yield an emergent **optimal band size**. **It does not** (prototype `run_3i`, 5 seeds × 800
+steps): higher penalty → *fewer* people in *smaller* bands (penalty 0→6: pop 281→64, mean band 56→5), a **death
+spiral, not an optimum**. The reason is mechanistic: **mortality does not cause aggregation** — aggregation is the
+**E.1 movement safety-drive's** job (§4.8.1); a loner-mortality penalty just *culls* the population, lowering
+density → smaller bands → more loners → more penalty. So **risk-dilution belongs in movement (E.1), not
+mortality**, and banding already has *fitness teeth* via the **F.1 mate-gate** (loners can't reproduce). The
+channel is left in, default-OFF with a caveat, for future experiments only — it is not used.
+
+**Band life-cycle diagnostics — BUILT (`TerrainWorld.bands()`; `run_3j`).** `bands(radius)` partitions the live
+population into spatially-connected components (incl singletons) at the mate-gate radius — the band unit for
+tracking. Characterization on the corrected substrate (CC-1 patch + bonded r=1, 5 seeds × 1000 steps, durable
+events sampled every 20 steps to debounce single-step boundary flicker):
+- **Size distribution is heavy-tailed:** median band ~3, **agent-weighted band size ~25–47** (the band the
+  *average agent* lives in; rises with equilibrium density — in/above the Wobst ~25 / Dunbar band-society range),
+  max ~170, **~17 % of agents transiently solo**.
+- **A balanced dynamic equilibrium:** **merge ≈ split (~21–22 / 100 steps)** and **collapse ≈ form (~6–7 / 100
+  steps)** — bands are *fluid* (members flow between them) and turn over at matching rates, not rigid persistent
+  units. (Collapse of sub-viable/isolated bands happens on its own from ordinary mortality — no risk penalty
+  needed.) This is the merge/split/collapse the E.1/E.2 grouping + F.1/F.2 bonded-mating mechanisms produce.
+
+*Remaining roadmap:* **F.3** — per-band society + persistent pair-bonds (the deferred "C": a durable
+mother+children(+father) unit that moves together, and society attached to the band rather than the cell).
+
+---
+
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
 resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7), emergent bands & corrected band
 substrate (§4.8).*

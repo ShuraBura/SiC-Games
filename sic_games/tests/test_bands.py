@@ -157,3 +157,22 @@ def test_homogenize_flattens_status_within_band():
     assert abs(a.cred - 1.0) < 1e-9 and abs(b.cred - 1.0) < 1e-9      # band mean cred
     assert abs(a.prowess - 1.0) < 1e-9 and abs(b.prowess - 1.0) < 1e-9  # band mean prowess
     assert abs(c.cred - 4.0) < 1e-9 and abs(c.prowess - 9.0) < 1e-9   # singleton untouched (no band to lump)
+
+
+def test_bands_method_connected_components():
+    # F.2 diagnostics: bands() partitions the live population into spatially-connected components (incl singletons)
+    # at the configured mate radius. Movement frozen so the placement is the partition.
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0,
+                         move_cost_flat=1e12)
+    pos = [(10, 10), (11, 10), (50, 50), (50, 51), (80, 80)]      # two adjacent pairs + one singleton
+    w = TerrainWorld(n_agents=5, kcal_cfg=KcalEconomyConfig(), seed=1, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=pos,
+                     demography_cfg=DemographyConfig(bonded_mate_radius=1))
+    w.step()
+    assert sorted(len(b) for b in w.bands()) == [1, 2, 2]        # r=1: two adjacent pairs band up + one singleton
+    assert sorted(len(b) for b in w.bands(radius=0)) == [1, 1, 1, 1, 1]  # r=0 (per-cell): the pairs are on separate cells
+
+
+def test_band_risk_shelved_off_by_default():
+    # F.2 risk-dilution mortality was shelved (death spiral, run_3i) — the flag must stay OFF by default.
+    assert DemographyConfig().enable_band_risk is False

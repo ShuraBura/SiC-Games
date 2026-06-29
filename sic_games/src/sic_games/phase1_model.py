@@ -937,6 +937,40 @@ class TerrainWorld(mesa.Model):
                                else sc.copy(update={"contest_exponent": kappa}))
         self._society = name
 
+    def bands(self, radius: int | None = None) -> list[list]:
+        """Public band identifier (F.2 diagnostics): the live population partitioned into spatially-connected
+        BANDS — cells linked when Chebyshev-adjacent within `radius` (default = the configured bonded_mate_radius,
+        the operative band extent) are one band. Returns a list of agent-lists INCLUDING singletons (unlike the
+        internal `_band_groups`, which drops them for the lumping flatten). The unit for merge/split/collapse
+        tracking + the size distribution."""
+        if radius is None:
+            radius = getattr(self._demog, "bonded_mate_radius", 1) if self._demog is not None else 1
+        radius = max(0, radius)
+        occ_lists: dict[tuple[int, int], list] = {}
+        for a in self.agent_list:
+            occ_lists.setdefault(a.pos, []).append(a)
+        if radius == 0:
+            return list(occ_lists.values())
+        cellset = set(occ_lists)
+        parent = {c: c for c in cellset}
+
+        def find(c):
+            while parent[c] != c:
+                parent[c] = parent[parent[c]]
+                c = parent[c]
+            return c
+
+        for (x, y) in cellset:
+            for dx in range(-radius, radius + 1):
+                for dy in range(-radius, radius + 1):
+                    nb = (x + dx, y + dy)
+                    if nb in cellset:
+                        parent[find((x, y))] = find(nb)
+        groups: dict[tuple[int, int], list] = {}
+        for c, occ in occ_lists.items():
+            groups.setdefault(find(c), []).extend(occ)
+        return list(groups.values())
+
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell
         is its own band (per-cell); radius≥1 ⇒ cells linked when Chebyshev-adjacent within `radius` (the mate-gate
@@ -973,6 +1007,16 @@ class TerrainWorld(mesa.Model):
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
+        if cfg.enable_band_risk and cfg.band_risk_penalty > 0.0:
+            # F.2 band risk-dilution: a sub-band group faces elevated biome (accident/predation) risk, scaled by
+            # the cell's own incident rate; a full band (g ≥ band_risk_size) → factor 1 (anchored baseline).
+            x0, y0 = a.pos
+            r = cfg.bonded_mate_radius
+            g = sum(occ_count.get((x0 + dx, y0 + dy), 0)
+                    for dx in range(-r, r + 1) for dy in range(-r, r + 1))   # band size (mate-gate neighbourhood)
+            biome_risk = (float(self._fields.risk[y0, x0]) / self._risk_ref) if self._risk_ref > 0.0 else 1.0
+            loner = max(0.0, 1.0 - g / cfg.band_risk_size)
+            m *= 1.0 + cfg.band_risk_penalty * biome_risk * loner
         if cfg.enable_terrain_pathogen:                        # S2 biome disease-ecology (Cashdan; NPP proxy)
             m *= pathogen_mult(float(self._fields.npp[a.pos[1], a.pos[0]]), self._pathogen_npp_ref,
                                cfg.pathogen_gamma, cfg.pathogen_cap)

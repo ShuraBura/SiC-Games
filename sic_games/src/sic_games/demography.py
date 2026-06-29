@@ -253,6 +253,21 @@ class DemographyConfig(BaseModel):
     # rarely on the mother's EXACT cell. radius=0 = the original per-cell gate (a loner with no neighbours can't
     # reproduce); radius≥1 = an unrelated adult male anywhere within the band territory (Chebyshev r) qualifies.
     bonded_mate_radius: int = Field(0, ge=0)
+    # F.2 band risk-dilution (safety-in-numbers on the EXOGENOUS biome hazard). The lit biome accident/incident
+    # rate (the terrain-risk channel, anchored on people LIVING IN BANDS — Hill/Hurtado/Walker 2007) is the
+    # band-level baseline; a SUB-band group loses that mitigation → elevated a2 mortality, SCALED by the biome's
+    # own incident rate (being alone is dangerous in a risky biome, ~harmless in a safe one — Hamilton 1971
+    # selfish-herd / domain-of-danger). A full band (size ≥ band_risk_size, summed over bonded_mate_radius)
+    # faces the anchored baseline (factor → 1, so the validated biome-mortality calibration is unchanged). With
+    # density-disease (which RISES with crowding) this was hypothesized to give an emergent OPTIMAL band size.
+    # ⚠ CAVEAT (F.2 prototype, run_3i, 2026-06-29 — KEEP OFF): it does NOT. Mortality doesn't cause aggregation
+    # (that is the E.1 movement safety-drive's job); a loner-mortality penalty just CULLS the population, which
+    # lowers density → smaller bands → more loners → more penalty = a DEATH SPIRAL, not a stabilizing optimum
+    # (penalty 0→6: pop 281→64, mean band 56→5). Risk-dilution is properly expressed in MOVEMENT (E.1), and
+    # banding already has fitness teeth via the F.1 mate-gate. Left in (default OFF) for future experiments only.
+    enable_band_risk: bool = False
+    band_risk_penalty: float = Field(0.0, ge=0.0)   # max extra a2 multiplier for a LONER in a mean-risk biome
+    band_risk_size: int = Field(25, ge=1)           # band size at which the biome risk is fully mitigated (Wobst ~25)
     # ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is
     # internally homogeneous in status (no within-band heterogeneity). Tests whether the individual status
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the
