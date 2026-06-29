@@ -445,15 +445,13 @@ class TerrainWorld(mesa.Model):
                 occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
-        _dm = self._demog
-        tether_thr = (_dm.storage_tether_reserves * self._reserve_full
-                      if (_dm is not None and _dm.enable_storage and _dm.storage_tether_reserves > 0.0) else 0.0)
+        # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
+        # is superseded by the emergent-bands grouping drives + bonded mating — the morph now fires from emergent
+        # density+storage alone, validated in run_3h. MODEL_SPEC §4.8.5.)
         agents = list(self.agent_list)
         self.random.shuffle(agents)
         for agent in agents:
             old = agent.pos
-            if tether_thr > 0.0 and self._cell_store.get(old, 0.0) >= tether_thr:
-                continue   # S.4 storage tethering: a stocked band stays put (Testart sedentism) → it concentrates
             temp = None
             tfn = getattr(agent._decision, "temperature", None)
             if callable(tfn):

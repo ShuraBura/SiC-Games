@@ -241,10 +241,9 @@ class DemographyConfig(BaseModel):
     # localization — per-cell mate-choice etc. — is a follow-on, reproduction still reads the global config.)
     enable_morph: bool = False
     morph_settle_steps: int = Field(300, ge=1)                  # T: sustained-settlement steps to morph (~1 generation; Bocquet-Appel)
-    # Storage TETHERING (Testart: stored food → sedentism; the user's step 4 "they gravitate and stay"): a band
-    # whose cell granary exceeds storage_tether_reserves × reserve_cap STAYS PUT (stops diffusing) → it
-    # concentrates (births accrue, density rises) + the store/surplus persists → the precondition the morph needs.
-    storage_tether_reserves: float = Field(0.0, ge=0.0)        # 0 = no tethering (mobile); >0 = sedentary once stocked
+    # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
+    # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
+    # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)
     # F.1 bonded mating (emergent bands via SELECTION): a female reproduces only if her cell has a co-resident
     # adult male who is NOT her own son (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and
     # the population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only (R-18/19).

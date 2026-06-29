@@ -388,6 +388,11 @@ older ages) is the inter-group conflict subsystem — deferred to the C-vs-Si co
 Tallavaara 2018 (PNAS), HG density vs NPP; 1360 g/m²/yr = their low/high threshold. **Transformation:**
 linear density–NPP relation anchored to the ethnographic ~0.1–0.5/km² band, capped 0.5, slope 0.3 so
 density(1360)=0.3; `npp_gm2 = npp·3400`. **PROVISIONAL** — the full CC-1 stage fits Tallavaara's regression.
+**Library home (2026-06-29):** this field is now `sic_games/capacity.py: NPPCapacityField(fields, burn,
+patch=None)` (`E = density·100·burn`; optional patch mask bounds K so the population equilibrates). It is the
+substrate the demographic + emergent-bands + morph validations run on (R-18/19, E.3-proper §4.8.5, the morph
+§4.5.11) — **not** the bare `forage_kcal` field (§4.8.4). (The validated R-18/19 harnesses still carry their own
+inline copy, `SubWindowCapacity`, numerically identical.)
 
 ### §4.3.2 Climate seam — temperature & humidity [PLACEHOLDER]
 `temperature=14.0 °C`, `humidity=0.70`, **homogeneous (constant)**. **Source:** global mean surface air
@@ -786,12 +791,15 @@ egalitarian 0 … stratified 2) for the meat pool + the store draw; a settlement
 surplus (store/cap) each step and morphs `egalitarian→complex→stratified` with a `morph_settle_steps` (≈1
 generation) hysteresis timer; abandoned/collapsed cells decay back to egalitarian. **Per-cell (RT-1 decision):**
 a "band" = a cell's occupants (no band entity; the cell is the sharing unit), so society attaches to the cell;
-stratified bands are sedentary so this is stable. **Storage TETHERING (`storage_tether_reserves`, the
-feasibility fix — RETIREMENT PENDING, see §4.8.5):** agents diffuse so thin (max occupancy 2) that without it no
-cell ever settles; a stocked band STAYS PUT (Testart sedentism) → occupancy 2→19, packing reachable, surplus
-persists → the morph fires. *(This was a band-aid for the pre-bands max-occupancy-2 dispersal; with the emergent
-bands of §4.8 now providing cohesion, the morph should hinge on storage/packing directly and the tether is slated
-for retirement — verify bands stay dense + morph still fires without it.)*
+stratified bands are sedentary so this is stable. **Storage TETHERING — RETIRED 2026-06-29
+(`storage_tether_reserves` deleted; was: a stocked band STAYS PUT → forced concentration).** It was a band-aid for
+the pre-bands max-occupancy-2 dispersal (no cell ever reached packing, so the morph couldn't fire). With the
+emergent bands of §4.8 (grouping drives + bonded mating) now providing real cohesion, **the morph fires from
+emergent density + storage alone** — verified in `run_3h_tether_retirement.py` (5 seeds × 800 steps, corrected
+substrate: packing reached, 220 cells morph to `complex_forager` with NO tether). The tether's only distinct
+effects were over-concentration artifacts (≈4× pop; a few cells forced to surplus ≥ 0.7 → `stratified_chiefdom`,
+itself an artifact since stratified chiefdoms need a delayed-return surplus base, not generic foraging). The morph
+scenario tests (`test_morph.py`) now run on the corrected substrate without it. See §4.8.5.
 **Scenario gates:** cold/storable+tether → `complex_forager` emerges; no tether → no morph; warm world
 (ET-gated off) → never morphs (immediate-return geography); **sustained famine → cells collapse back to
 egalitarian**; flag off → no morph state. `stratified_chiefdom` is the rare apex (needs packed AND surplus≥0.7).
@@ -1051,10 +1059,13 @@ replicate** — it was a bare-forage/corpse artifact. Corrected three-part findi
 skew** (the corrected, sharper replacement for the old E.3 claim). Methods/data:
 `outputs/phase1_biome_mortality/run_3g_e3_proper.py`, `results_3g.json`.
 
-> **Pending cleanup (next):** the storage **tethering** band-aid (§4.5.11) was introduced because pre-bands
-> diffusion left max-occupancy 2 so no cell ever settled. With bands now cohering (§4.8.1–2), the morph should
-> hinge on storage/packing directly → tethering is slated for **retirement** (verify bands stay dense + morph
-> still fires without it).
+**Cleanup DONE — storage-tethering RETIRED (2026-06-29; run_3h).** The tether band-aid (§4.5.11) was deleted:
+on the corrected substrate the emergent bands (§4.8.1–2) reach Binford packing on their own and the
+egalitarian→complex morph fires from emergent density + storage alone (5 seeds × 800 steps: packing reached, 220
+cells → `complex_forager`, no tether). The tether's distinct effects were over-concentration artifacts (≈4× pop;
+a few cells forced to `stratified_chiefdom` — itself an artifact, as stratified chiefdoms need a delayed-return
+surplus base, not generic foraging). `test_morph.py` now validates the morph on the corrected substrate. The CC-1
+capacity field used here is now a library module (`sic_games/capacity.py: NPPCapacityField`, §4.3.1).
 
 ---
 
