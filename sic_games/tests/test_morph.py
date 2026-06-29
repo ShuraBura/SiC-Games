@@ -48,11 +48,13 @@ def _band_seed(fields, cap, n, band_size=25, sep=4):
     return pos[:n]
 
 
-def _world(temp_threshold, morph=True, seed=7, n=150):
+def _world(temp_threshold, morph=True, seed=7, n=150, affiliation=False):
     knobs = _knobs(seed)
     fields = generate_world(knobs)
     cap = NPPCapacityField(fields, _BURN, patch=_PATCH)
     pos = _band_seed(fields, cap, n)
+    extra = dict(enable_pair_bonds=True, enable_band_affiliation=True, band_cohesion=0.3,
+                 band_split_size=45, band_merge_size=10) if affiliation else {}
     demog = DemographyConfig(
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
@@ -60,7 +62,7 @@ def _world(temp_threshold, morph=True, seed=7, n=150):
         enable_bonded_mating=True, bonded_mate_radius=1,
         enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
         storage_temp_threshold_c=temp_threshold, storage_decay=0.05,   # S.3 spoilage → stores aren't immortal
-        enable_morph=morph, morph_settle_steps=60)
+        enable_morph=morph, morph_settle_steps=60, **extra)
     w = TerrainWorld(n_agents=n, kcal_cfg=_KC, terrain_knobs=knobs, game_stream=False, seed=seed,
                      carbon_cfg=CarbonConfig(kappa=1.5), harvest_field=cap, placement_positions=pos,
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -114,3 +116,22 @@ def test_morph_off_no_society_state():
     for _ in range(200):
         w.step()
     assert len(w._cell_society) == 0                          # flag off ⇒ no morph state (back-compat)
+
+
+# ── F.3c-2 per-BAND society (the morph attaches to the band_id, not the cell) ──
+def test_per_band_morph_fires_and_bypasses_cells():
+    # F.3c-2: with band affiliation, society morphs on the BAND's aggregate character → _band_society populates
+    # and the per-CELL detector is bypassed (_cell_society stays empty).
+    w = _world(temp_threshold=100.0, affiliation=True)
+    for _ in range(400):
+        w.step()
+    assert any(s == "complex_forager" for s in w._band_society.values())   # a band morphed egalitarian→complex
+    assert len(w._cell_society) == 0                          # per-cell society NOT used under per-band
+
+
+def test_per_band_morph_warm_world_stays_egalitarian():
+    # warm everywhere (storage ET-gated off) ⇒ no surplus ⇒ no band morphs (Testart/Woodburn geography, per-band)
+    w = _world(temp_threshold=-100.0, affiliation=True)
+    for _ in range(400):
+        w.step()
+    assert len(w._band_society) == 0 and len(w._cell_society) == 0

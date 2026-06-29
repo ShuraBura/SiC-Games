@@ -1165,8 +1165,31 @@ biome-linked. Newborns inherit the mother's vector; marriage updates `band_id`.
 - **eq_pop preserved (~330)** — band cohesion did not over-constrain movement or starve the population (red-team §3.3 OK).
 - Band counts stable (no fission/fusion thrash) under the split=45 / merge=10 hysteresis.
 
-*Remaining roadmap:* **F.3c-2** — per-band society: re-key the morph + κ + family knobs from the **cell** to the
-**band_id** (band density = members / occupied-footprint area, D3); reproduction reads the band's society knobs.
+### §4.8.9 F.3c-2 — per-band society (the morph relocates from the cell to the band; built 2026-06-29)
+
+The society morph (§4.5.11 S.4) now attaches to the **band** (band_id), not the cell — the agent-based society the
+handoff deferred. Active when `enable_band_affiliation` AND `enable_morph` (`band_society_on`); else the original
+per-cell path (back-compat).
+- **Per-band settlement detector.** Each step, per band: **density = members / occupied-FOOTPRINT area** (D3 — a
+  tight band reads as packed even on a large territory, vs the cell metric), **surplus = the band's pooled cell
+  granaries / its band-scaled capacity**; `society_from_character(density, surplus)` → the band's society, with the
+  `morph_settle_steps` hysteresis. Bands not seen this step (extinct/merged) decay to egalitarian.
+- **Per-band κ.** A cell's contest exponent (the meat-pool + store-draw inequality lever) reads its occupants'
+  **band** society κ (`_band_society` → `SOCIETY_PRESETS[...]["kappa"]`), not the cell's. The per-cell detector +
+  abandoned-cell collapse are bypassed under per-band.
+
+**RESULTS (run_3k config + storage/morph, 600 steps):** society is a **band property** — all live bands morph
+**egalitarian→complex_forager** (via the Testart storage-SURPLUS route, the correct delayed-return path; their
+footprint density ~0.03/km² is below Binford packing so the packing-driven `stratified` apex does not fire — bands
+aren't tight enough, a fair follow-on), `_cell_society` stays empty (per-cell bypassed). Tests: per-band morph
+fires + bypasses cells; warm-world (no surplus) stays egalitarian. Back-compat: `enable_band_affiliation` off ⇒
+the per-cell morph is bit-exact (the per-cell `test_morph` scenarios unchanged).
+
+*Remaining (F.3c-2b / F.3c-3):* **family-knob localization** — reproduction still reads the GLOBAL
+mate_choice_strength/assortment/patriline/paternal-provision; localizing these per-band (from the band's society
+preset) is the next refinement. Then **F.3c-3 dynamic fission/fusion** — replace the hard band_split/merge
+constants with a condition-dependent `tolerable_size = base × resource × cohesion(assabiyah) × season`, activating
+the `assabiyah` seam (the per-band resource/surplus state F.3c-2 now provides is what it conditions on).
 
 ---
 

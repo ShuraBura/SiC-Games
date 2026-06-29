@@ -254,6 +254,8 @@ class TerrainWorld(mesa.Model):
         self._cell_store: dict[tuple[int, int], float] = {}   # collective band granary per cell (delayed-return; §4.5.11 S.1)
         self._cell_society: dict[tuple[int, int], str] = {}    # S.4 per-cell morphed society type (absent ⇒ egalitarian_forager)
         self._cell_settle: dict[tuple[int, int], int] = {}     # S.4 per-cell settlement timer (hysteresis)
+        self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
+        self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
 
         # demographic layer
         self._reproduction = reproduction
@@ -552,14 +554,22 @@ class TerrainWorld(mesa.Model):
                     self._cell_store[k] = s
                 else:
                     del self._cell_store[k]
-        morph_on = demog is not None and demog.enable_morph    # S.4 per-cell society morph
+        morph_on = demog is not None and demog.enable_morph    # S.4 society morph
         settle_T = demog.morph_settle_steps if morph_on else 0
+        # F.3c-2: when band affiliation is on, SOCIETY attaches to the BAND (band_id), not the cell — the morph
+        # detector runs per-band (below) and a cell's contest κ is read from its occupants' BAND society.
+        band_society_on = morph_on and getattr(demog, "enable_band_affiliation", False)
+        band_kappa = {b: SOCIETY_PRESETS[s]["kappa"] for b, s in self._band_society.items()} if band_society_on else {}
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
         for (cx, cy), occ in occ_lists.items():
             S = tf.level(cx, cy)
-            # S.4: the cell's CURRENT society sets its contest exponent (egalitarian κ=0 … stratified κ=2) for
-            # this step's meat pool + store draw; the morph detector below updates it for the next step.
-            kappa_cell = SOCIETY_PRESETS[self._cell_society[(cx, cy)]]["kappa"] if (cx, cy) in self._cell_society else kappa
+            # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
+            # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
+            # cell-occupants' band society; else per-cell (the original S.4).
+            if band_society_on:
+                kappa_cell = band_kappa.get(occ[0]._group.band_id, kappa)
+            else:
+                kappa_cell = SOCIETY_PRESETS[self._cell_society[(cx, cy)]]["kappa"] if (cx, cy) in self._cell_society else kappa
             if game_on:
                 # Two-stream economy (§4.5.5 / blueprint v2): forage = household (literal κ=0); meat =
                 # band-pooled, Cred-weighted at κ>0 (the Carbon mechanism on high-variance game). Energy-
@@ -631,7 +641,7 @@ class TerrainWorld(mesa.Model):
                             a.wealth += g
                             store -= g
                 self._cell_store[key] = store
-                if morph_on:
+                if morph_on and not band_society_on:
                     # S.4 settlement detector → society_from_character (the morph hook, finally called). A cell
                     # that stays packed (≥ Binford) with a defendable store for ~settle_T steps (≈1 generation)
                     # morphs egalitarian→complex→stratified; it DE-morphs when surplus/density collapse (the
@@ -649,7 +659,7 @@ class TerrainWorld(mesa.Model):
                         self._cell_settle.pop(key, None)
                     else:
                         self._cell_settle[key] = c                # hysteresis band: hold the current society
-        if morph_on:
+        if morph_on and not band_society_on:
             # Abandoned settlements collapse: a morphed cell that is no longer occupied this step decays its
             # settle timer toward 0 and reverts to egalitarian (the band is gone / dispersed — sustained
             # collapse, with the same hysteresis as a morph). Without this, abandoned cells freeze their label.
@@ -661,6 +671,42 @@ class TerrainWorld(mesa.Model):
                         self._cell_settle.pop(key, None)
                     else:
                         self._cell_settle[key] = c
+        if band_society_on:
+            # F.3c-2 PER-BAND settlement detector: a band morphs egalitarian→complex→stratified on its OWN
+            # aggregate character — density = members / occupied-FOOTPRINT area (D3: a tight band reads as packed
+            # even on a large territory), surplus = the band's pooled cell granaries / its band-scaled capacity.
+            # Same hysteresis (settle_T). Bands not seen this step decay toward egalitarian (dispersed/extinct).
+            band_members: dict[int, int] = {}
+            band_cells: dict[int, set] = {}
+            for (cx, cy), occ in occ_lists.items():
+                for a in occ:
+                    bid = a._group.band_id
+                    band_members[bid] = band_members.get(bid, 0) + 1
+                    band_cells.setdefault(bid, set()).add((cx, cy))
+            for bid, n in band_members.items():
+                footprint_km2 = len(band_cells[bid]) * _CELL_KM2
+                density = n / footprint_km2 if footprint_km2 > 0 else 0.0
+                store_sum = sum(self._cell_store.get(c, 0.0) for c in band_cells[bid])
+                cap_band = store_cap_mult * self._reserve_full * n
+                surplus_frac = store_sum / cap_band if cap_band > 0.0 else 0.0
+                target = society_from_character(density, surplus_frac)
+                c0 = self._band_settle.get(bid, 0)
+                c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
+                if c >= settle_T:
+                    self._band_society[bid] = target
+                    self._band_settle[bid] = c
+                elif c <= 0:
+                    self._band_society.pop(bid, None)
+                    self._band_settle.pop(bid, None)
+                else:
+                    self._band_settle[bid] = c
+            for bid in list(self._band_society):              # gone bands (extinct/merged) decay to egalitarian
+                if bid not in band_members:
+                    c = self._band_settle.get(bid, 0) - 1
+                    if c <= 0:
+                        self._band_society.pop(bid, None); self._band_settle.pop(bid, None)
+                    else:
+                        self._band_settle[bid] = c
 
         # Mother-linked provisioning: dependent children (age < forage_age_min) draw their deficit from
         # their mother. C.2b tier = the mother's wasted harvest overflow. S1 tier = the mother also dips
