@@ -1232,6 +1232,23 @@ localize too, inert until a stratified/pastoralist society arises.)
 just rise); **religion** (the other vector seam) amplifying assabiyah → larger polities + biome differences;
 season-coupled **fusion** for stronger seasonal aggregation.
 
+### §4.8.12 Full-stack integration validation — the monogamy↔von-Rueden tension (run_3m, 2026-06-29)
+
+The whole social architecture turned on at once (Carbon status + game + density-disease + F.1/F.2 bonded mating +
+F.3a/b families + F.3c-1 band affiliation + F.3c-2 per-band society + F.3c-2b family knobs + F.3c-3 dynamic bands/
+assabiyah), CC-1 substrate, 6 seeds × 1500 steps. **Coheres:** 6/6 sustain, eq_pop 353, N_e 55; bands
+agent-weighted **26.4** non-kin (dominant-lineage 0.35), 98 % morphed, assabiyah 0.95; cred homeostat bounded
+(mean 2.27, Gini 0.30); **R-18 survival anti-fragility SURVIVES** (death-deficit **+1.077** — low-status die first).
+**The one failure — status→RS collapsed:** corr(prowess, surviving offspring) = **−0.04** (E.3 was +0.19), and it
+is *not* an age artifact (corr(age,prowess)≈0; prime-age-controlled still −0.55; cred→RS≈0).
+**Diagnosis (lit-grounded — von Rueden & Jaeggi 2016, PDF read):** the status→RS skew runs through the
+**mating/fertility** channel, and is **marriage-system specific** — polygyny (more mates) is the main amplifier,
+and even monogamy gives r≈0.15 only via **wife quality**. The model under **strict monogamy (F.3a)** has *neither*
+channel (no polygyny; partner fertility is status-blind), so status decouples from reproduction (it still drives
+SURVIVAL via R-18, just not reproduction). **Resolution:** add **modest polygyny** (the deferred F.3a option —
+status-gated multiple partners; ~4–11 % polygynous, von Rueden/Marlowe) and/or status-linked partner quality, then
+re-run the full-stack gate to confirm status→RS returns toward 0.19 with everything else still healthy. *(Pending.)*
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
