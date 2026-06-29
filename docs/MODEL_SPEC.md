@@ -662,9 +662,11 @@ the code — and found **one BLOCKER (now fixed):**
   neutral in current configs.
 
 **VALIDATED — RESULTS R-19** (run_3c, N=8 seeds × 1500 steps): **`mate_choice_strength` m≈4 → status→RS
-r=+0.190 = von Rueden r≈0.19** (the calibrated value); the homeostat holds live (mean cred bounded 1.2–3.1,
-Gini 0.18–0.23 — the BLOCKER fix works in practice); the compositional anti-fragility (R-18) survives on the
-**combined** status (death-deficit +0.04→+0.11); male N_e healthy (111–170). **Operating envelope: m≲4, ρ≥0.1**
+r=+0.190 = von Rueden r≈0.19** (the calibrated value, **on the IFD/dispersed substrate**); the homeostat holds
+live (mean cred bounded 1.2–3.1, Gini 0.18–0.23 — the BLOCKER fix works in practice); the compositional
+anti-fragility (R-18) survives on the **combined** status (death-deficit +0.04→+0.11); male N_e healthy (111–170).
+**Operating envelope: m≲4, ρ≥0.1** *(NB: on the BANDED substrate the band-territory mate-gate dilutes the skew, so
+r≈0.19 recalibrates to **m≈5** — see §4.8.5, R-21. This IFD m≈4 is uncontaminated and stands for the IFD case.)*
 (the cred equilibrium rises with m but is scale-invariant in the shares; Gini is the meaningful inequality).
 **`paternal_provision_frac` calibration (life-history run, run_3d, 2026-06-21) — Marlowe 58% is ALREADY captured,
 by a different channel.** Sweeping the knob, the male share of *deficit-provisioning* to <3-yr children saturates
@@ -785,8 +787,11 @@ surplus (store/cap) each step and morphs `egalitarian→complex→stratified` wi
 generation) hysteresis timer; abandoned/collapsed cells decay back to egalitarian. **Per-cell (RT-1 decision):**
 a "band" = a cell's occupants (no band entity; the cell is the sharing unit), so society attaches to the cell;
 stratified bands are sedentary so this is stable. **Storage TETHERING (`storage_tether_reserves`, the
-feasibility fix):** agents diffuse so thin (max occupancy 2) that without it no cell ever settles; a stocked
-band STAYS PUT (Testart sedentism) → occupancy 2→19, packing reachable, surplus persists → the morph fires.
+feasibility fix — RETIREMENT PENDING, see §4.8.5):** agents diffuse so thin (max occupancy 2) that without it no
+cell ever settles; a stocked band STAYS PUT (Testart sedentism) → occupancy 2→19, packing reachable, surplus
+persists → the morph fires. *(This was a band-aid for the pre-bands max-occupancy-2 dispersal; with the emergent
+bands of §4.8 now providing cohesion, the morph should hinge on storage/packing directly and the tether is slated
+for retirement — verify bands stay dense + morph still fires without it.)*
 **Scenario gates:** cold/storable+tether → `complex_forager` emerges; no tether → no morph; warm world
 (ET-gated off) → never morphs (immediate-return geography); **sustained famine → cells collapse back to
 egalitarian**; flag off → no morph state. `stratified_chiefdom` is the rare apex (needs packed AND surplus≥0.7).
@@ -900,9 +905,12 @@ mortality outputs (out of scope — total q(x) only).
 The model is **agent-based individuals** running on a **band/biome-level ecology**. Different layers live
 at different scales, deliberately:
 - **Ecology / demography** (food capacity, mortality schedule, disease, density, birth/death rates, age
-  structure) — **band/biome-level**. Within a cell the harvest is split **per-capita**, so a cell IS the
-  *band* (the sharing unit); a band is fed or not *as a unit*. **Per-agent (intra-band) nutritional variance
-  is ≈0 by construction, and that is physically correct** for a monthly step + band sharing (R-14).
+  structure) — **band/biome-level**. Within a cell the harvest is split **per-capita**, so a cell is the
+  *harvest sharing unit*; a cell's occupants are fed or not *as a unit*. **Per-agent (intra-cell) nutritional
+  variance is ≈0 by construction, and that is physically correct** for a monthly step + sharing (R-14). *(NB: the
+  HARVEST grain is the cell, but the **social/spatial band** — for mating, lumping, society — is the larger
+  **mate-gate NEIGHBOURHOOD** (`bonded_mate_radius`): a band of ~25 spreads ~1/cell over a multi-cell territory,
+  §4.8. "Cell = band" holds for sharing; "band = territory" holds for social structure.)*
 - **Strategy / Cred / status** — **individual-level**, entering through the **sharing-rule weights** and the
   Carbon decision logic. This is where individuality is load-bearing and is *not* lumped.
 
@@ -952,8 +960,107 @@ density compute-win is not worth the loss.
 
 ---
 
+## Emergent bands, bonded mating & the corrected band substrate (built 2026-06-26 … re-validated 2026-06-29; RESULTS R-21)
+
+**The social/spatial grain.** Earlier stages treated "a cell = the band = the sharing unit" (§4.7.1) — correct for
+the *harvest* mechanic (per-cell per-capita split), but a band of ~25 cannot live on one 100 km² cell: at forager
+densities (**Binford 2001** packing ≤ 9.1 persons/100 km²; **Tallavaara 2018** NPP-density ~0.1–0.5/km²) a single
+cell supports ~1–9 people, so **a real band is a spatially-EXTENDED entity, spread ~1 agent/cell over a multi-cell
+territory.** This section builds the band as that extended entity and corrects the substrate it runs on.
+
+### §4.8.1 Emergent-bands grouping drives (E.1 safety, E.2 mating-access) — movement utility (built abc5435)
+Bands EMERGE from two multipliers on the per-cell movement utility (`substrate.py: diffusion_select_target`),
+traded against the falling per-capita yield so an optimal band size self-organizes (not an imposed N). For
+post-move group size `g`: **E.1 safety** (risk dilution — **Hamilton 1971** selfish-herd) `ypc ×= 1 + s_max·(1 −
+e^{−g/g_s})` (saturating safety-in-numbers); **E.2 mating access** (**Wobst 1974** minimum-viable connubium ~25)
+`ypc ×= floor + (1−floor)·min(1, g/g_mate)` (being below the minimum band size is actively penalized). Both default
+0 ⇒ bit-exact IFD. Result: agents in groups ≥ 5 rose 29% → 62%.
+
+### §4.8.2 Bonded mating (F.1) + the neighbourhood mate-gate (F.2) — the band = the mate-gate territory
+**F.1** (`enable_bonded_mating`, built 67950d1) makes being a loner bad for FITNESS, not just movement: a female
+reproduces only if a co-resident **non-son adult male** is present — loner lineages die out, the population
+concentrates in bands by *selection*. **F.2** (`bonded_mate_radius`, Chebyshev; built a6a4ccf): because a band
+spreads ~1/cell over its territory (above), a mate co-resident in the BAND is rarely on the mother's exact 100 km²
+cell. radius 0 = the original per-cell gate; **radius ≥ 1 = an unrelated adult male anywhere within the band
+territory.** This is **the operative definition of "the band" everywhere downstream** (the lumping ablation,
+§4.8.5, flattens within the same neighbourhood). *Why it is required:* on the IFD substrate agents disperse to
+~1/cell (per-capita-yield maximization), so the per-cell gate (r=0) finds no mate → extinction; **r=1 sustains a
+turning-over population** (CC-1 substrate: r=0 → extinct 227→3; r=1 → 250→1624; r=2 → 250→4192, over 1500 steps).
+Methods: `scripts/calib_bands_cc1.py`.
+
+### §4.8.3 Banded seeding + founder mobile reserve — surviving the founding transient
+Real foragers START banded (a gas of singletons can't bootstrap bands — no co-resident mates → ~0 births), so
+bands are SEEDED. `seed_band_positions` (67950d1): ~n/25 kin bands of 25, allocated per-biome by capacity,
+territory-spaced. `seed_band_positions_spread` (a6a4ccf): capacity-gated — spreads each band's members over the
+viable cells of its territory (≤ ~`S_cell/burn` per cell) rather than stacking 25 on one cell (which starves
+instantly, §4.8.4). **Founder mobile reserve** (`founder_buffer_steps`, a6a4ccf): each FOUNDER carries
+`founder_buffer_steps × burn` kcal, drawn down to cover any per-step shortfall during the dispersal transient —
+the carried/body-fat reserve a mobile band lives off the land with (**Kelly 1995** forager mobility; the model's
+~1-step wealth buffer = (reserve_full−floor)/burn ≈ 1.07 cannot bridge it). Founder-only + decaying ⇒ no
+steady-state effect on prior validations. Calibration (`scripts/calib_band_survival.py`): **spread seeding +
+buffer ≥ 3 steps** survives the first season and sustains a live population; stacked seeding crashes at any buffer
+(one cell can't feed 25). [PROVISIONAL founding device — `founder_buffer_steps` is a transient-bridge number, not a
+fitted ethnographic value.]
+
+### §4.8.4 Two corrections the bands work forced (a6a4ccf)
+**(a) Measurement — corpse counting.** `phase1_model` pruned `agent_list` on death but never called
+`agent.remove()`, so dead agents lingered in Mesa's `self.agents` AgentSet, frozen at their death cell. Any metric
+read off `self.agents` counted CORPSES: the seeded-bands test was passing on 25-deep corpse piles (254 "agents",
+12 alive; the **"96% in bands" claim was this artifact** — live ≈ 0% on bare forage). Fix: `agent.remove()` on
+death; band metrics read live `agent_list`. The DYNAMICS were always correct (they run off `agent_list`), so this
+is a measurement-correctness fix. **Audit:** morph (per-cell state on live occupancy) and storage (eq_pop on live
+counts) claims survive; **R-18/19 used `agent_list` + the CC-1 field and STAND.**
+**(b) Capacity — bare forage vs CC-1.** The emergent-bands runs used the **bare forage field**
+(`TerrainField.level` = forage_kcal × hours; ~1–8 persons/cell) — its own §4.1 docstring flags it as a provisional
+under-estimate. The validated demographic substrate (R-18/19) uses the **CC-1 NPP-capacity field** (§4.3.1, `E =
+density(NPP)·100·burn`; ~30–50 persons/cell). On the bare field a band starves instantly; on the CC-1 field the
+population thrives (non-bonded 250 → 9113 / 1500 steps) and **density-disease** regulates it. **⇒ bands must run on
+the CC-1 capacity field, not the bare forage field** — the regime where a cell can hold a band and crowding is
+disease-regulated rather than starvation-limited.
+
+### §4.8.5 E.3-proper — m recalibration on the banded substrate + the lumping ablation (RESULTS R-21; run_3g, 2026-06-29)
+Supersedes the contaminated E.3 (0f39c2d — bare forage + per-cell gate + `w.agents`). Substrate: CC-1
+`SubWindowCapacity` (bounded-K patch → equilibrates) + `bonded_mate_radius=1` + banded seeding + grouping drives;
+otherwise identical to R-19 (de-warfared Siler, δ=3, meat_frac 0.55, CV 0.73, ρ=0.1, full B+). 6 seeds × 1200 steps.
+
+**Calibration: `mate_choice_strength` m=5 → status→RS r = +0.190 = von Rueden 0.19 exactly** (m=4 → 0.162; m=6 →
+0.216). The banded substrate needs a **higher m than R-19's IFD m≈4** because the band-territory mate-gate dilutes
+the skew (mate competition spans the whole band, not the cell). Homeostat holds (mean_cred ~2.2–2.7, Gini ~0.20),
+N_e healthy 37–58, eq_pop fertility-pinned ~435–500. *(R-19's IFD m≈4 calibration, §4.5.7, is uncontaminated and
+stands for the IFD substrate; m=5 is the BANDED-substrate value.)*
+
+**Lumping ablation (band-aware homogenize — flatten WITHIN the connected band via `_band_groups` union-find, not a
+1-agent cell; `homogenize_cred` = lineage facet, `homogenize_prowess` = achieved facet flattened *after* its EMA =
+the strict band-as-unit lump).** The old claim ("homogenizing collapses status→RS 0.48→0.13") **does NOT
+replicate** — it was a bare-forage/corpse artifact. Corrected three-part finding (m=5):
+
+| arm | status→RS | offspring-Gini | cred-Gini | death-deficit (R-18) |
+|---|---|---|---|---|
+| IFD | +0.233 | 0.854 | 0.22 | +0.021 |
+| bands-full | +0.190 | 0.831 | 0.21 | **+0.127** |
+| bands, cred flat | +0.269 | 0.845 | 0.01 | **−0.071** |
+| bands, full lump (cred+prowess) | +0.162 | 0.793 | 0.005 | **−0.087** |
+
+1. The status→RS *correlation* is **prowess-driven** (the achieved/hunting axis, Smith 2004) → flattening cred
+   barely dents it; cred-only flattening even *raises* it (skew shifts onto prowess).
+2. RS *inequality* (offspring-Gini) is mostly **demographic** (age/Poisson) → full lumping trims it only ~5%.
+3. The load-bearing role of within-band individualism is **R-18 compositional anti-fragility (death-deficit)**:
+   flattening within-band status **FLIPS** mortality from concentrating on the low-status (+0.127) to not (−0.087).
+
+⇒ **"Do NOT lump to band-as-unit" STANDS — but for the MORTALITY-SELECTION mechanism, not the von Rueden RS
+skew** (the corrected, sharper replacement for the old E.3 claim). Methods/data:
+`outputs/phase1_biome_mortality/run_3g_e3_proper.py`, `results_3g.json`.
+
+> **Pending cleanup (next):** the storage **tethering** band-aid (§4.5.11) was introduced because pre-bands
+> diffusion left max-occupancy 2 so no cell ever settled. With bands now cohering (§4.8.1–2), the morph should
+> hinge on storage/packing directly → tethering is slated for **retirement** (verify bands stay dense + morph
+> still fires without it).
+
+---
+
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
-resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7).*
+resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7), emergent bands & corrected band
+substrate (§4.8).*
 
 > **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
 coefficients, fertility params) are authoritative in `docs/PARAMETERS.md`. This document records

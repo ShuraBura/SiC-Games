@@ -50,7 +50,7 @@
 
 **Seam:** Decision rule in A-2 §10 reads cell yield but does not define it — the yield is read from `forage_kcal` / `game_kcal` per-cell fields. Swapping out how those fields are populated (from biome-scaled → NPP-derived extractable rate) changes numbers, not logic. Rivalry switches on by dividing the per-cell extractable rate among co-located agents (currently non-rivalrous, tagged CC-1). Also re-derives the superseded `c_max` / `α_growback` sugar cluster ceiling in kcal.
 
-**Status:** RECAL-ADJACENT — not built here; all current cell yields are PROVISIONAL pending CC-1.
+**Status:** RECAL-ADJACENT — not built here; all current cell yields are PROVISIONAL pending CC-1. **NB (2026-06-29):** the demographic/bands validations run on the *provisional* CC-1 capacity field (`SubWindowCapacity`: `E = density(NPP)·100·burn`, ~30–50 persons/cell; MODEL_SPEC §4.3.1/§4.8.4), NOT the bare `forage_kcal` field (~1–8/cell), which is too poor to hold a band (a stacked 25-band starves instantly). **Emergent bands REQUIRE the CC-1 capacity field** — this is the regime where a cell can hold a band and crowding is density-disease-regulated rather than starvation-limited. The full Tallavaara-regression CC-1 still supersedes this provisional field.
 
 ---
 
@@ -94,7 +94,7 @@
 
 **Seam:** A second short-horizon buffer above the reserve; not built now. The integration step `reserve += intake − burn` would split into `provision += intake; reserve += min(provision, provision_capacity) - burn` (simplified). No seam placed yet; the single-reserve variable is the structural predecessor.
 
-**Status:** SURVEY-PENDING — not built; single reserve in use (A-1, 2026-06-14).
+**Status:** PARTIALLY REALIZED (founder-only) — `founder_buffer_steps` (a6a4ccf, 2026-06-26; MODEL_SPEC §4.8.3) is a first, *founder-only* carried-provision buffer: each founder carries `founder_buffer_steps × burn` kcal drawn down to cover per-step shortfalls during the band's founding/dispersal transient (Kelly mobile-reserve rationale, now in LITERATURE.md). It is transient (decays, founder-only ⇒ no steady-state effect), NOT the general days-scale provision-vs-reserve split MR-2 describes. The full MR-2 (a standing second buffer for ALL agents, anchored to ethnographic carry load/trip duration) remains SURVEY-PENDING.
 
 ---
 
@@ -136,7 +136,7 @@
 
 **Seam:** child placement (`_do_births_ibi`: `child.pos = parent.pos`) + the diffusion mover. FD-1 keeps the child bound to the mother's position (move as a unit) until maturation, and routes the child's subsistence through the mother (provisioning) rather than independent harvest. Connects to the JV-1 age-gate (`is_juvenile`) and the MR-2 provisioning seam.
 
-**Status:** DEFERRED — child currently independent at birth (Step-2, 2026-06-19); family unit not built. Part of the Resource-Ecology stage; supports TARGET T-4 (provisioning load → emergent nutritional child mortality).
+**Status:** PARTIALLY ADVANCED — mother→child provisioning IS built (C.2b/S1 + B+ paternal tiers; MODEL_SPEC §4.5.4/§4.5.7), and the **F.1/F.2 bonded mating** (MODEL_SPEC §4.8.2) added the missing *mate bond* (a birth now requires a co-resident band male). What REMAINS for FD-1 is **persistent co-residence / pair-bonds + per-band society** — the deferred "F.3 / C": a durable mother+children (and father) unit that moves as a unit, and a society entity attached to the *band* (mate-gate neighbourhood) rather than the cell. Children still disperse independently after birth (no move-as-a-unit bond). Targeted next after the storage-tethering retirement (see MODEL_SPEC §4.8.5 "Pending cleanup" and the F.2-then-F.3 roadmap).
 
 > **Resource-Ecology stage grouping (2026-06-19):** GD-1 (depletion) + CL-1 (climate/seasonality) + MR-1 per-class reserves + MR-2 (provisioning) + FD-1 (family) compose the next stage — the economy that gives the demographic `a2` modulators nutritional *variance* to act on (they are inert without it; RESULTS R-5) and that enables the T-4 emergent-child-mortality validation.
 
