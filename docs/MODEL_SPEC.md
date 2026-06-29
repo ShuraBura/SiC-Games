@@ -1138,7 +1138,8 @@ Config (`DemographyConfig`, default OFF): `enable_pair_bonds`, `divorce_rate`, `
 The band becomes a **persistent multi-family entity** (~25), not the fluid connected-component of F.2. Anchors:
 **Birdsell** (the "magic number" ~25 band, nesting in a ~500 connubium); **Hamilton et al. 2007** (HG social
 structure is nested/self-similar, family→band→community, ratio ≈3.8); **Hill et al. 2011** (bands mostly NON-kin,
-marriage-linked). *(Birdsell + Hamilton 2007 flagged for PDF verification — web search was rate-limited.)*
+marriage-linked). *(Birdsell + Hamilton 2007 now web-verified — vol/pages/DOI confirmed; PDFs not yet filed. NB:
+Birdsell's ~500 connubium is contested in the lit; the ~25 band — what we target — is independently corroborated.)*
 
 **The collective-identity vector (`agent._group`, `sic_games/group.py: GroupVector`).** The affiliation is a
 **vector, not a scalar** — the Carbon "hive-mind": `band_id` is the ACTIVE cell (F.3c band membership); `assabiyah`
