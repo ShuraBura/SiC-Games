@@ -477,13 +477,16 @@ class TerrainWorld(mesa.Model):
         occ_lists: dict[tuple[int, int], list[BaseAgent]] = {}
         for a in self.agent_list:
             occ_lists.setdefault(a.pos, []).append(a)
-        # ABLATION: flatten within-band cred to the band mean (band = the unit, no internal status heterogeneity)
+        # ABLATION (lumping = band-as-unit): flatten the within-BAND status DISTRIBUTION to the band mean. The band
+        # is the mate-gate NEIGHBOURHOOD, not a single 100 km² cell — on the IFD substrate a band spreads ~1/cell
+        # over its territory, so a per-cell flatten would be a no-op (`_band_groups` partitions occupied cells into
+        # spatially-connected bands). `homogenize_cred` flattens the lineage facet HERE; `homogenize_prowess`
+        # flattens the achieved facet AFTER its EMA update below (else the EMA re-differentiates it within the step).
         if self._demog is not None and getattr(self._demog, "homogenize_cred", False):
-            for occ in occ_lists.values():
-                if len(occ) > 1:
-                    mc = sum(a.cred for a in occ) / len(occ)
-                    for a in occ:
-                        a.cred = mc
+            for members in self._band_groups(occ_lists, getattr(self._demog, "bonded_mate_radius", 0)):
+                mc = sum(a.cred for a in members) / len(members)
+                for a in members:
+                    a.cred = mc
         demog = self._demog
         provisioning = demog is not None and demog.enable_provisioning
         pat_prov = (demog is not None and getattr(demog, "enable_paternity", False)
@@ -680,6 +683,15 @@ class TerrainWorld(mesa.Model):
                 if mm > 0.0:
                     for a in grp:
                         a.prowess = (1.0 - lam) * a.prowess + lam * (getattr(a, "_meat_intake", 0.0) / mm)
+
+        # ABLATION (full band-as-unit lump): flatten the achieved PROWESS facet within the band AFTER its EMA
+        # update — so next step's mate-choice + contest see a band-uniform prowess (a per-step start flatten would
+        # be re-differentiated by the EMA above). With homogenize_cred this erases ALL within-band status variance.
+        if demog is not None and getattr(demog, "homogenize_prowess", False):
+            for members in self._band_groups(occ_lists, getattr(demog, "bonded_mate_radius", 0)):
+                mp = sum(getattr(a, "prowess", 1.0) for a in members) / len(members)
+                for a in members:
+                    a.prowess = mp
 
         # GD-1 depletion (opt-in): the harvest field draws down its per-cell stock under harvest
         # pressure and regrows it. No-op for non-depletable fields (the default), so existing
@@ -926,6 +938,32 @@ class TerrainWorld(mesa.Model):
         self._substrate_cfg = (sc.model_copy(update={"contest_exponent": kappa}) if scp
                                else sc.copy(update={"contest_exponent": kappa}))
         self._society = name
+
+    def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
+        """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell
+        is its own band (per-cell); radius≥1 ⇒ cells linked when Chebyshev-adjacent within `radius` (the mate-gate
+        neighbourhood) are one band (union-find). Returns the member-lists with >1 agent (singletons can't lump)."""
+        if radius <= 0:
+            return [occ for occ in occ_lists.values() if len(occ) > 1]
+        cellset = set(occ_lists)
+        parent = {c: c for c in cellset}
+
+        def find(c):
+            while parent[c] != c:
+                parent[c] = parent[parent[c]]
+                c = parent[c]
+            return c
+
+        for (x, y) in cellset:
+            for dx in range(-radius, radius + 1):
+                for dy in range(-radius, radius + 1):
+                    nb = (x + dx, y + dy)
+                    if nb in cellset:
+                        parent[find((x, y))] = find(nb)
+        bands: dict[tuple[int, int], list] = {}
+        for c, occ in occ_lists.items():
+            bands.setdefault(find(c), []).extend(occ)
+        return [m for m in bands.values() if len(m) > 1]
 
     def _a2_mult(self, a, occ_count) -> float:
         """Step-2 baseline-mortality (a2) multiplier from the live modulators (1.0 if all flags off) —

@@ -139,3 +139,21 @@ def test_founder_buffer_extends_survival():
         return 40
 
     assert survival(6) >= survival(0) + 4                        # carried reserve bridges several extra steps
+
+
+def test_homogenize_flattens_status_within_band():
+    # Band-as-unit lump (E.3-proper): with homogenize_cred + homogenize_prowess and a band radius, every agent in
+    # a spatially-connected band ends the step with the band-mean cred AND prowess (no within-band heterogeneity).
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0,
+                         move_cost_flat=1e12)                     # freeze movement → the band stays connected
+    w = TerrainWorld(n_agents=3, kcal_cfg=KcalEconomyConfig(), seed=2, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=[(20, 20), (21, 20), (40, 40)],
+                     demography_cfg=DemographyConfig(bonded_mate_radius=1, homogenize_cred=True,
+                                                     homogenize_prowess=True))
+    a, b, c = w.agent_list                                        # a,b adjacent (one band); c isolated
+    a.cred, b.cred, c.cred = 0.5, 1.5, 4.0
+    a.prowess, b.prowess, c.prowess = 0.4, 1.6, 9.0
+    w.step()
+    assert abs(a.cred - 1.0) < 1e-9 and abs(b.cred - 1.0) < 1e-9      # band mean cred
+    assert abs(a.prowess - 1.0) < 1e-9 and abs(b.prowess - 1.0) < 1e-9  # band mean prowess
+    assert abs(c.cred - 4.0) < 1e-9 and abs(c.prowess - 9.0) < 1e-9   # singleton untouched (no band to lump)

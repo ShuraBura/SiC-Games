@@ -259,6 +259,10 @@ class DemographyConfig(BaseModel):
     # DISTRIBUTION is load-bearing for R-18 (mortality-on-low-cred), R-19 (compositional anti-fragility), and the
     # inequality contest — i.e., whether the model could lump to band-as-unit. Default OFF (full individualism).
     homogenize_cred: bool = False
+    # Full band-as-unit lump: ALSO flatten the achieved PROWESS facet within the band (applied after the prowess
+    # EMA each step). With homogenize_cred this erases ALL within-band status heterogeneity (cred AND prowess) →
+    # the strict "treat each band as a single status unit" ablation. Default OFF.
+    homogenize_prowess: bool = False
     # Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait,
     # when ON (else φ — preserves the Sugarscape contest tests). Founder cred is seeded lognormally
     # (cred_seed_sigma; median 1) and inherited at IBI birth as a noisy lineage copy `mother.cred·exp(N(0,σ))`
