@@ -599,10 +599,15 @@ class TerrainWorld(mesa.Model):
             msh = m_sh if game_on else [0.0] * len(occ)
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
-                # female gatherers. Independent of the Cred-weighted consumption share below.
-                n_m = sum(1 for a in occ if a.sex == "male")
+                # female gatherers. Independent of the Cred-weighted consumption share below. The credit is split
+                # among PRODUCERS (non-juvenile adults), NOT all occupants — so a hunter's reputation is not diluted
+                # by co-resident DEPENDENT children (incl. his own sons); that dilution corrupted prowess as a
+                # status signal under co-residence/families (full-stack finding, MODEL_SPEC §4.8.12).
+                adult = demog.menarche_months                  # producer-age threshold (lh_config-independent)
+                n_m = sum(1 for a in occ if a.sex == "male" and a.age >= adult)
+                n_f = sum(1 for a in occ if a.sex == "female" and a.age >= adult)
                 male_credit = (meat_pool / n_m) if n_m else 0.0
-                female_credit = ((1.0 - meat_frac) * S / (len(occ) - n_m)) if (len(occ) - n_m) else 0.0
+                female_credit = ((1.0 - meat_frac) * S / n_f) if n_f else 0.0
             in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)
             cell_contrib = 0.0
             for a, sh, m in zip(occ, shares, msh):
@@ -768,7 +773,10 @@ class TerrainWorld(mesa.Model):
                 # prowess = hunting reputation, decoupled from the Cred-weighted consumption share → independent
                 # of lineage). Female prowess (forage) is lower-variance — expected (male hunting = the facet).
                 for sx in ("male", "female"):
-                    grp = [a for a in al if a.sex == sx and getattr(a, "_use_prowess", False)]
+                    # PRODUCERS only (adults ≥ menarche): juveniles don't hunt → excluding them keeps their prowess
+                    # at baseline (not decayed by ~0 credit) and stops them dragging the producer mean (§4.8.12 fix).
+                    grp = [a for a in al if a.sex == sx and a.age >= demog.menarche_months
+                           and getattr(a, "_use_prowess", False)]
                     sigs = [getattr(a, "_prod_credit", 0.0) for a in grp]
                     mm = (sum(sigs) / len(sigs)) if sigs else 0.0
                     if mm > 0.0:

@@ -1257,10 +1257,19 @@ reputation." This **cancels** the polygyny signal (prowess→#wives only +0.12, 
 −0.40 ⇒ net corr(prowess, offspring) ≈ 0). So polygyny was necessary-but-insufficient: the broken link is
 **prowess→pairing**, not the marriage system. (E.3 got +0.19 because the per-conception lottery re-selected
 fathers by CURRENT prowess each birth; a fixed pair-bond lets the son-dilution accumulate over the bond.)
-**Resolution options (pending supervisor):** (a) fix the prowess prod-credit to normalise by ADULT hunters only
-(exclude dependent sons) so reproduction doesn't depress prowess; (b) key mate-choice on the clean heritable
-lineage status (`cred`) rather than the corrupted `prowess`; (c) measure status→RS against prowess-AT-PAIRING. The
-polygyny→offspring channel itself is sound and stays.
+**Resolution attempt 2 — fix the prowess prod-credit (BUILT, supervisor-chosen option a):** the sex-divided
+production credit now splits among **adult producers (age ≥ menarche)**, not all occupants — so a hunter's
+reputation is no longer diluted by co-resident **dependent children (incl. his own sons)**, and juveniles are
+excluded from the prowess EMA. **Effect:** the corruption halves (corr(prowess, #males-in-cell) −0.40 → −0.15) and
+**full-stack status→RS recovers from ~0 to +0.057 (monogamy) / +0.079 (polygyny — polygyny now adds skew as it
+should)**, while **E.3 in isolation is PRESERVED** (m=5 → status→RS **+0.194** ≈ 0.19, unchanged). (Side effects:
+the cleaner prowess shifts the equilibrium — eq_pop 357→~530, mean_cred 1.9→1.4, Gini 0.28→0.20 — all still
+healthy/bounded, R-18 death-deficit still >0.)
+**Remaining gap (0.08 vs 0.19):** prowess **volatility** — mate-choice acts on prowess AT PAIRING, but the fast
+mean-pinned EMA regresses, so the end-snapshot underestimates the pairing-time skew (E.3's per-conception lottery
+avoided this by re-selecting fathers by *current* prowess each birth). Closing it would need a **slower/stickier
+prowess EMA** (a more persistent reputation), a **full-stack m re-calibration** (the pair-bond substrate dilutes
+the skew, like the IFD→banded shift did), or a **prowess-at-pairing** RS metric. *(Pending.)*
 
 ---
 
