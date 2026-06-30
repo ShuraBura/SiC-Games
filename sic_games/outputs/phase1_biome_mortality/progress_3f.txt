@@ -1,0 +1,1 @@
+3f stratified_chiefdom: stratified_chiefdom          1016  +0.11     +0.73    75       5%     0.48    0.36    2.3 | 140s

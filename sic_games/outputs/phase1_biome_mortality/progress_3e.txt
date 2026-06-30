@@ -1,0 +1,1 @@
+3e α=4: mate-corr +0.80 | #lineages 56 | largest 9% | lineageGini 0.53 | status→RS +0.10 | mean_cred 1.4 | 149s

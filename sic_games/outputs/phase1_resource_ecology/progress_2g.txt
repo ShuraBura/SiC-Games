@@ -1,0 +1,1 @@
+2g: C.1 (childhood deficit, no provisioning): final_pop 1518 (eq 1504, flat) | children 477 adults 1041 | elapsed 38s

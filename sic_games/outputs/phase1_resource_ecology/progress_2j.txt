@@ -1,0 +1,1 @@
+2j: C.2b seasonal (s=0.4): eq_pop 3223 | starv deaths/step lean 34.1 vs good 0.3 (pulse 68×) | juv synergy>1.2 0.0% | elapsed 155s

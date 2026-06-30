@@ -1,59 +1,59 @@
 {
-  "verdict": "RECOMMENDED \u03b4 \u2248 3 \u2014 e0 27.2yr, density 0.083/km\u00b2, starvation 9% (joint-fit 2/3: forager e0 27\u201343, Tallavaara density 0.1\u20130.5, starvation\u22480). \u03b4 is a calibrated FREE lever (PARAMETERS \u00a715); the multi-biome sweep re-runs with this \u03b4 next. NOTE: if no \u03b4 hits all three, the trade-off (realistic density vs starvation\u21920) is itself a finding about the forage-only economy.",
-  "recommended_delta": 3.0,
+  "verdict": "RECOMMENDED \u03b4 \u2248 8 \u2014 e0 26.3yr, density 0.082/km\u00b2, starvation 3% (joint-fit 2/3: forager e0 27\u201343, Tallavaara density 0.1\u20130.5, starvation\u22480). \u03b4 is a calibrated FREE lever (PARAMETERS \u00a715); the multi-biome sweep re-runs with this \u03b4 next. NOTE: if no \u03b4 hits all three, the trade-off (realistic density vs starvation\u21920) is itself a finding about the forage-only economy.",
+  "recommended_delta": 8.0,
   "conditions": [
     {
       "delta": 0.0,
-      "eq_pop": 18534.67,
-      "e0": 22.525512932944785,
-      "density": 0.11584168749999998,
-      "starv_frac": 0.49382086890049687
+      "eq_pop": 19113.68625,
+      "e0": 22.069747544282635,
+      "density": 0.1194605390625,
+      "starv_frac": 0.5829756903898939
     },
     {
       "delta": 1.0,
-      "eq_pop": 17137.6525,
-      "e0": 23.580906949817866,
-      "density": 0.107110328125,
-      "starv_frac": 0.36056030236265607
+      "eq_pop": 18673.36875,
+      "e0": 22.386595853393324,
+      "density": 0.11670855468750001,
+      "starv_frac": 0.5076510193511936
     },
     {
       "delta": 2.0,
-      "eq_pop": 15648.52125,
-      "e0": 24.759693090768202,
-      "density": 0.0978032578125,
-      "starv_frac": 0.23952587002440376
+      "eq_pop": 18125.2,
+      "e0": 23.134464271142313,
+      "density": 0.11328250000000001,
+      "starv_frac": 0.4370269098669512
     },
     {
       "delta": 3.0,
-      "eq_pop": 13258.52625,
-      "e0": 27.24377085776227,
-      "density": 0.0828657890625,
-      "starv_frac": 0.086533902323376
+      "eq_pop": 17404.6575,
+      "e0": 23.670134261120673,
+      "density": 0.108779109375,
+      "starv_frac": 0.35727677939719826
     },
     {
       "delta": 4.0,
-      "eq_pop": 10462.9875,
-      "e0": 28.490088170686256,
-      "density": 0.06539367187499999,
-      "starv_frac": 0.0010779984003894704
+      "eq_pop": 17144.385,
+      "e0": 23.543977216786214,
+      "density": 0.10715240624999998,
+      "starv_frac": 0.2942299798325927
     },
     {
       "delta": 6.0,
-      "eq_pop": 8642.3,
-      "e0": 25.483198244790326,
-      "density": 0.054014374999999996,
-      "starv_frac": 0.0
+      "eq_pop": 15527.73875,
+      "e0": 24.881175277646882,
+      "density": 0.0970483671875,
+      "starv_frac": 0.14875519960265723
     },
     {
       "delta": 8.0,
-      "eq_pop": 5979.3725,
-      "e0": 25.071683848690338,
-      "density": 0.037371078125000005,
-      "starv_frac": 0.0
+      "eq_pop": 13155.0175,
+      "e0": 26.290956499364476,
+      "density": 0.082218859375,
+      "starv_frac": 0.025175508524699772
     }
   ],
   "founders": 400,
   "steps": 2000,
   "seed": 42,
-  "elapsed_sec": 909.2716693878174
+  "elapsed_sec": 1354.2264256477356
 }

@@ -1,0 +1,1 @@
+2l: S0+S1 sk=0.4: eq_pop 3026 | STARV lean 18.2 | DISEASE lean 6.4/good 6.5 | juv cond 1.00->1.00 | adult cond 1.00->1.00 | elapsed 150s

@@ -1,0 +1,33 @@
+{
+  "verdict": "GROWTH-PHASE e\u2080 RECOVERS THE INPUT SILER. Ach\u00e9-total \u2192 e\u2080 38.2yr (input Siler 36.5; ethnographic Ach\u00e9 37) at r +3.38%/yr, density 0.016/km\u00b2 (\u226a K\u22480.116), starvation 0%. De-warfared \u2192 e\u2080 45.1yr (input 42.7). CONFIRMS R-16: the equilibrium collapse to e\u2080~28 is a REGIME effect (r=0, fertility-pinned), NOT the coefficients \u2014 below K the model reproduces the Ach\u00e9 in the regime they were measured in. e\u2080(growth 37) vs e\u2080(stationary 28) is a regime difference the model EXPLAINS, not a fit.",
+  "window_density": [
+    0.005,
+    0.04
+  ],
+  "founders": 400,
+  "steps": 1000,
+  "seeds": [
+    42,
+    7,
+    99
+  ],
+  "baselines": {
+    "ache_total": {
+      "e0": 38.154952708136484,
+      "target": 36.5,
+      "r_pct": 3.3839635659272798,
+      "density": 0.015969832659440204,
+      "starv_frac": 0.0,
+      "person_years": 456336.1666666667
+    },
+    "dewarfared": {
+      "e0": 45.06705706336522,
+      "target": 42.7,
+      "r_pct": 3.726411276279777,
+      "density": 0.016532297881529365,
+      "starv_frac": 0.0,
+      "person_years": 442661.0833333333
+    }
+  },
+  "elapsed_sec": 91.47176504135132
+}

@@ -1,0 +1,1 @@
+2n: delta=  16: eq_pop   2871 | starvation    0% of deaths (disease 9502, starv 0) | elapsed 405s

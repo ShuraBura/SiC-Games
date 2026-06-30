@@ -1,0 +1,1 @@
+3c m=4: pop 1067 | status→RS +0.190±0.015 | mean_cred 3.08 Gini 0.23 | N_e 111 | death-deficit +0.105 | 321s

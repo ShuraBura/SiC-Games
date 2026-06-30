@@ -57,6 +57,16 @@ AND a regime/ENSO downturn now visibly depresses surplus/assabiyah and a recover
 storage/mobility enhancement and to the dynastic-cycle stress design). Build a CONTROLLED-climate test harness for
 the dynamic-social benchmarks.**
 
+**CONTROLLED-CLIMATE HARNESS — BUILT (run_se0, 2026-06-30, R-28).** `ClimateDriver` (climate.py): a deterministic,
+pure `t→[0,1]` regime waveform (`flat`/`step`/`pulse`/`ramp`/`square`/`piecewise`) wired via
+`ClimateField(regime_driver=…)`, OVERRIDING the stochastic telegraph on the regime channel (`regime_driver=None` ⇒
+telegraph, bit-exact — locked by test). Reusable `run_controlled(driver, …)` → a per-step trajectory; Stage 1+
+import it. The estimator is the BETWEEN-ARM gap at matched times (diff-in-diff): control & shock are bit-identical
+until the scripted onset, so ΔPRE≈0 is the placebo and ΔDURING/ΔPOST are the climate-attributable response, free
+of the population-growth trend. Demo (FLAT vs −30% PULSE): **ΔPRE = −0.00** (placebo exact), −70 pop footprint
+DURING, −135 lagged scar POST; assabiyah near-invariant to one pulse (a null for Stage 3). 5 driver unit tests +
+full suite 562/1xf green. **⇒ Stage 0 fully closed; Stage 1 leader-coherence benchmarks against this harness.**
+
 ---
 
 ## Stage 1 — Leader coherence  `[enable_leader_coherence]`

@@ -146,6 +146,89 @@ def draw_world_climate(rng, a_earth: float) -> dict:
     )
 
 
+class ClimateDriver:
+    """A DETERMINISTIC, scriptable climate driver for CONTROLLED experiments (the dynamic-social benchmark
+    harness; blueprint Stage 0 verdict / R-27 red-team #3). It REPLACES the stochastic regime telegraph with a
+    known waveform on the regime channel: a callable `t → regime multiplier ∈ [0,1]` (1.0 = good times / no
+    stress; <1 = a depressed multi-generation period). Wire it via `ClimateField(regime_driver=…)`.
+
+    WHY (R-27): a single stochastic telegraph buried in a long mixed run gives a noisy, lag-confounded "response"
+    — you cannot tell a social outcome (band fission, leader turnover, assabiyah swing) from a *random* climate
+    crash. With a scripted "good-vs-bad periods at known times" driver, any change in a social metric is
+    attributable to the SOCIAL response, so the leader-coherence / dynastic-cycle stages can be benchmarked
+    cleanly. The stochastic `ClimateField` telegraph remains the *production* substrate once a mechanism is
+    validated against this controlled driver.
+
+    The named factories are EXPERIMENTAL-DESIGN constructs (NOT lit-anchored climate). For a realism-bounded
+    stress set the depressed multiplier within the C.3 regime band (1−[0.10,0.15] = ±10–15% CC, REGIME_AMP_*);
+    use 1−REGIME_AMP_TAIL = 0.70 (±30%) for an explicitly-flagged catastrophe. The driver is a pure function of
+    `t` ⇒ fully reproducible (red-team #4)."""
+
+    def __init__(self, fn, label: str = ""):
+        self._fn = fn
+        self.label = label
+
+    def __call__(self, t: int) -> float:
+        return max(0.0, min(1.0, self._fn(int(t))))
+
+    @classmethod
+    def flat(cls, mult: float = 1.0) -> "ClimateDriver":
+        """Constant level (the CONTROL arm). `mult=1.0` ⇒ no regime stress at all — the clean baseline a stage's
+        social metric is measured against."""
+        return cls(lambda t: mult, f"flat({mult:g})")
+
+    @classmethod
+    def step(cls, t_onset: int, mult: float) -> "ClimateDriver":
+        """A sustained downshift: 1.0 before `t_onset`, then `mult` for ever after — a permanent regime plateau
+        (the Ibn-Khaldun "hard times set in" press)."""
+        return cls(lambda t: 1.0 if t < t_onset else mult, f"step(t={t_onset},m={mult:g})")
+
+    @classmethod
+    def pulse(cls, t_onset: int, duration: int, mult: float) -> "ClimateDriver":
+        """A single bad period of KNOWN onset + length: `mult` on [t_onset, t_onset+duration), 1.0 otherwise —
+        the catastrophe-and-recovery waveform (measure fission DURING, re-aggregation AFTER)."""
+        return cls(lambda t: mult if t_onset <= t < t_onset + duration else 1.0,
+                   f"pulse(t={t_onset},d={duration},m={mult:g})")
+
+    @classmethod
+    def square(cls, period: int, mult: float, duty: float = 0.5, phase: int = 0) -> "ClimateDriver":
+        """A periodic good/bad alternation (a DETERMINISTIC replacement for the telegraph): `mult` for the first
+        `duty` fraction of each `period`, 1.0 otherwise. For dose-response across repeated, identical cycles."""
+        bad = max(1, int(round(duty * period)))
+        return cls(lambda t: mult if ((t - phase) % period) < bad else 1.0,
+                   f"square(P={period},duty={duty:g},m={mult:g})")
+
+    @classmethod
+    def ramp(cls, t_start: int, t_end: int, mult: float) -> "ClimateDriver":
+        """A gradual linear decline: 1.0 at `t_start` → `mult` at `t_end`, held at `mult` after. A slow squeeze
+        (vs the `step` shock) — to separate press- from shock-driven social responses."""
+        span = max(1, t_end - t_start)
+
+        def f(t):
+            if t <= t_start:
+                return 1.0
+            if t >= t_end:
+                return mult
+            return 1.0 + (mult - 1.0) * (t - t_start) / span
+        return cls(f, f"ramp(t={t_start}->{t_end},m={mult:g})")
+
+    @classmethod
+    def piecewise(cls, breakpoints) -> "ClimateDriver":
+        """The most general "known times" driver: `breakpoints = [(t0,m0),(t1,m1),…]`, step-held — the multiplier
+        is `m_i` for t ∈ [t_i, t_{i+1}); 1.0 before the first breakpoint. step/flat are special cases."""
+        bps = sorted(breakpoints)
+
+        def f(t):
+            m = 1.0
+            for (ti, mi) in bps:
+                if t >= ti:
+                    m = mi
+                else:
+                    break
+            return m
+        return cls(f, f"piecewise({len(bps)}bp)")
+
+
 class ClimateField:
     """Wrap a base carrying-capacity field (any object exposing `.level(x,y)`; width/height/consume/etc. are
     delegated) with the time-varying climate multiplier M(t). **C.1 = the seasonal layer only:**
@@ -161,6 +244,7 @@ class ClimateField:
                  mean_factor: float = 1.0, interannual_amp: float = 0.0,
                  interannual_period: int = 0, interannual_phase: float = 0.0,
                  regime_amp: float = 0.0, regime_duration: int = 0, regime_recurrence: int = 0, rng=None,
+                 regime_driver=None,
                  caribou_amp: float = 0.0, caribou_period: int = 0, caribou_phase: float = 0.0,
                  steppe_mask=None, llanos_flood_amp: float = 0.0, llanos_mask=None,
                  water_weight=None, agg_mask=None, intercept_on: bool = True):
@@ -178,6 +262,9 @@ class ClimateField:
         self.regime_duration = regime_duration                  # mean excursion length (steps); P(end)=1/duration
         self.regime_recurrence = regime_recurrence              # mean onset spacing (steps); P(onset)=1/recurrence
         self._rng = rng                                         # drives the telegraph (per-world, seeded)
+        # CONTROLLED-experiment hook: a deterministic ClimateDriver (t→[0,1]) that OVERRIDES the stochastic
+        # telegraph on the regime channel (blueprint Stage 0 / R-27). None ⇒ the production telegraph (bit-exact).
+        self.regime_driver = regime_driver
         self._regime_state = 0                                  # current state (0/1); a sustained PLATEAU, not a wiggle
         self._regime_last_t = 0
         # C.4b caribou herd-swing (GRASS_STEPPE meat-channel quasi-cycle):
@@ -195,8 +282,9 @@ class ClimateField:
         self.t = 0
 
     def set_step(self, t: int) -> None:
-        # Advance the regime telegraph once per forward step (state persists → a sustained plateau).
-        if (self.regime_amp > 0.0 and self._rng is not None
+        # Advance the regime telegraph once per forward step (state persists → a sustained plateau). Skipped when
+        # a deterministic regime_driver is in control (it needs no RNG and ignores _regime_state).
+        if (self.regime_driver is None and self.regime_amp > 0.0 and self._rng is not None
                 and self.regime_duration > 0 and self.regime_recurrence > 0):
             for _ in range(max(0, t - self._regime_last_t)):
                 if self._regime_state == 0:
@@ -237,7 +325,11 @@ class ClimateField:
     def regime(self) -> float:
         """C.3 regime-shift: a sustained CC PLATEAU while the telegraph sits in the excursion state (state·A_reg
         depression), 1.0 in the normal state. Multi-generational because the dwell time is ~100–500 yr ≫ a
-        ~25-yr generation. NOT mean-reverting — it holds the level until the chain switches back."""
+        ~25-yr generation. NOT mean-reverting — it holds the level until the chain switches back. A CONTROLLED
+        `regime_driver`, when set, supplies this multiplier DETERMINISTICALLY (overriding the telegraph) for the
+        benchmark harness."""
+        if self.regime_driver is not None:
+            return self.regime_driver(self.t)
         if self.regime_amp <= 0.0:
             return 1.0
         return 1.0 - self.regime_amp * self._regime_state

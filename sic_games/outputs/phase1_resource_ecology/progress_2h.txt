@@ -1,0 +1,1 @@
+2h: C.2a (body-scaled reserves): final_pop 0 (eq 0, flat, slope -0.2) | children 0 | elapsed 36s

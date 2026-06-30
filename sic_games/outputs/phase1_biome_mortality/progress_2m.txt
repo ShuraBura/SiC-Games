@@ -1,0 +1,1 @@
+2m: lush       gamma=1.0: eq_pop   1955 | e0  32.1 yr | q(<5)   28% | CDR   37/1000 | elapsed 539s

@@ -10,7 +10,7 @@ import random
 import numpy as np
 
 from sic_games.climate import (
-    ClimateField, obliquity_to_amplitude, draw_obliquity, A_SEAS_EARTH, OBLIQUITY_EARTH_DEG,
+    ClimateField, ClimateDriver, obliquity_to_amplitude, draw_obliquity, A_SEAS_EARTH, OBLIQUITY_EARTH_DEG,
     eccentricity_mean_factor, draw_eccentricity, draw_stellar_flux, flux_to_temperature, draw_world_climate,
     ECCENTRICITY_MAX, STELLAR_FLUX_MIN, STELLAR_FLUX_MAX,
     REGIME_AMP_MIN, REGIME_AMP_MAX, REGIME_DURATION_MIN_YR, REGIME_RECURRENCE_MAX_YR,
@@ -354,6 +354,66 @@ def test_intercept_and_caribou_compose_on_disjoint_biomes():
     assert f.meat_factor(3, 5) > 1.0                           # intercept boost on the agg row
     a = 0.871
     assert abs(f.meat_factor(3, 10) - (1.0 - a) / (1.0 + a)) < 1e-2   # caribou depression on the steppe row (phase π near trough)
+
+
+# ── Controlled-climate DRIVER (deterministic regime waveforms; blueprint Stage 0) ──────
+def test_driver_waveforms_shapes_and_bounds():
+    # flat = control; step = permanent downshift; pulse = single window; ramp = linear; piecewise = general.
+    assert all(ClimateDriver.flat()(t) == 1.0 for t in range(50))
+    assert all(ClimateDriver.flat(0.8)(t) == 0.8 for t in range(50))
+    st = ClimateDriver.step(100, 0.7)
+    assert st(99) == 1.0 and st(100) == 0.7 and st(500) == 0.7              # before/at/after onset
+    pu = ClimateDriver.pulse(100, 50, 0.7)
+    assert pu(99) == 1.0 and pu(100) == 0.7 and pu(149) == 0.7 and pu(150) == 1.0   # half-open [onset, onset+dur)
+    rp = ClimateDriver.ramp(100, 200, 0.6)
+    assert rp(100) == 1.0 and abs(rp(150) - 0.8) < 1e-9 and rp(200) == 0.6 and rp(300) == 0.6   # linear then held
+    pw = ClimateDriver.piecewise([(0, 1.0), (100, 0.7), (200, 1.0)])
+    assert pw(50) == 1.0 and pw(150) == 0.7 and pw(250) == 1.0               # step-held breakpoints
+    sq = ClimateDriver.square(period=40, mult=0.7, duty=0.5)
+    vals = [sq(t) for t in range(40)]
+    assert vals[:20] == [0.7] * 20 and vals[20:] == [1.0] * 20              # 50% bad / 50% good per cycle
+    assert all(0.0 <= ClimateDriver.step(10, 5.0)(t) <= 1.0 for t in range(20))   # clamped to [0,1]
+
+
+def test_driver_is_deterministic_and_pure():
+    # a pure function of t: identical across instances/calls, no hidden state, no RNG (red-team #4 reproducibility).
+    d1 = ClimateDriver.pulse(300, 100, 0.65); d2 = ClimateDriver.pulse(300, 100, 0.65)
+    assert [d1(t) for t in range(700)] == [d2(t) for t in range(700)]
+    assert [d1(t) for t in range(700)] == [d1(t) for t in range(700)]       # re-callable, order-independent
+
+
+def test_driver_overrides_telegraph_in_field():
+    # With a regime_driver set, regime() follows the driver and IGNORES the stochastic telegraph / regime_amp.
+    drv = ClimateDriver.pulse(10, 5, 0.7)
+    f = ClimateField(_MockField(), a_seas=0.0, regime_amp=0.13, regime_duration=99, regime_recurrence=99,
+                     rng=random.Random(0), regime_driver=drv)
+    seq = []
+    for t in range(20):
+        f.set_step(t); seq.append(f.regime())
+    assert seq[9] == 1.0 and seq[10] == 0.7 and seq[14] == 0.7 and seq[15] == 1.0   # exactly the pulse
+    assert f._regime_state == 0                                              # telegraph never advanced (driver in control)
+    f.set_step(12); assert abs(f.level(1, 1) - 70.0) < 1e-9                  # 100 × driver mult, deterministic
+
+
+def test_driver_none_is_bit_exact_telegraph():
+    # regime_driver=None ⇒ unchanged stochastic behaviour (bit-exact vs a field built without the param).
+    kw = dict(a_seas=0.4, interannual_amp=0.2, interannual_period=48, regime_amp=0.12,
+              regime_duration=240, regime_recurrence=1200)
+    a = ClimateField(_MockField(), **kw, rng=random.Random(7))
+    b = ClimateField(_MockField(), **kw, rng=random.Random(7), regime_driver=None)
+    for t in range(1, 2000):
+        a.set_step(t); b.set_step(t)
+        assert a.level(2, 2) == b.level(2, 2) and a._regime_state == b._regime_state
+
+
+def test_driver_flat_control_equals_no_regime():
+    # the control arm (flat(1.0)) is identical to a field with no regime layer at all — a clean baseline.
+    drv = ClimateField(_MockField(), a_seas=0.6, interannual_amp=0.2, interannual_period=48,
+                       regime_driver=ClimateDriver.flat(1.0))
+    none = ClimateField(_MockField(), a_seas=0.6, interannual_amp=0.2, interannual_period=48)
+    for t in range(96):
+        drv.set_step(t); none.set_step(t)
+        assert abs(drv.level(3, 3) - none.level(3, 3)) < 1e-12
 
 
 # ── model wiring: the climate clock advances each step ────────────────────────

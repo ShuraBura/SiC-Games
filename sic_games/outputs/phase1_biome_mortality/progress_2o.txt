@@ -1,0 +1,1 @@
+2o: delta= 8.0: eq_pop  13155 | e0  26.3yr  | density 0.082/km²✓ | starv   3%✓ | elapsed 1354s

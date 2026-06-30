@@ -1,0 +1,1 @@
+2f: move_cost 0.35*burn: eq_pop 4912 | moves/yr 0.1 | range 1.3 cells | occ_CV 0.51 | under-fed 0.0% (max 0.0%) | elapsed 402s

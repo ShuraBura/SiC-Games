@@ -179,6 +179,7 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 | Dynamic bands + assabiyah (F.3c-3) | 2026-06-29 | validation | does assabiyah make band size condition-dependent? | R-25: corr(assabiyah,size)=+0.27; eq_pop preserved. | `run_3l_dynamic_bands.py` |
 | **Full-stack integration** | 2026-06-29 | integration gate | does the whole social stack cohere + keep its results? | R-26: coheres; status→RS **≈0.13** (monogamy-appropriate); R-18 intact. | `run_3m_fullstack.py` |
 | Climate integration (Stage 0) | 2026-06-29 | integration | does the social stack run on a varying (ClimateField) world? | R-27: coheres but TROUGH-LIMITED (eq_pop −27%…4× crash); social response needs a controlled driver. | `run_3o_climate_social.py` |
+| **Controlled-climate harness** (SE Stage 0) | 2026-06-30 | benchmark tool | can a deterministic driver isolate the climate-attributable social response? | R-28: YES — FLAT vs PULSE diff-in-diff, ΔPRE=−0.00 placebo, −70 pop footprint / −135 lagged scar; reusable `run_controlled`. | `outputs/phase1_social_evolution/run_se0_controlled_climate.py` |
 
 ### Blueprints commissioned this arc (specs, not results)
 `…_Climate_OrbitalLottery_Scoping`, `…_Storage_Morph_Scoping`, `…_EmergentBands_Scoping`,

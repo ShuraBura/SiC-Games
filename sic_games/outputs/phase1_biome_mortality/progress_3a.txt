@@ -1,0 +1,1 @@
+3a kappa=2: eq_pop    668 | mean_cred(alive) 1.198 (founder 1.130) | Gini(cred) 0.275 | elapsed 44s

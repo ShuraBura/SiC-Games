@@ -1,0 +1,1 @@
+2e: seasonal×depletion (s=0.4): eq_pop 3658 (17% peak) | synergy mean 1.00 | frac>1.2 0% | freshness 0.56 | elapsed 231s

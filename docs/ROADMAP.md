@@ -1,6 +1,6 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-06-29
+**Last updated:** 2026-06-30
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 
@@ -225,7 +225,7 @@ Always check the C/Si distinction table above before implementing reproduction m
 | F.2 risk-mortality (SHELVED) + band life-cycle | ✓ | risk-as-mortality = death spiral (shelved); balanced fluid band equilibrium. R-24. §4.8.6 |
 | F.3 — persistent families → non-kin ~25 band → per-band society → assabiyah | ✓ | the complete dynamic band (collective-identity vector; Hill-2011 non-kin; Ibn Khaldun solidarity). R-25. §4.8.7–11 |
 | Full-stack integration + modest polygyny + prowess fix | ✓ | architecture coheres; status→RS ≈0.13 (monogamy-appropriate); prowess-credit + reputation fixes. R-26. §4.8.12 |
-| **Dynamic Social Evolution (NEW STAGE — active)** | ⏳ in progress | Stage 0 climate integration done (trough-limiting found, R-27); **NEXT: controlled-climate harness → Stage 1 leader coherence → genealogy → Ibn Khaldun cycle → dynamic polygyny.** Fully-ablatable flags. Blueprint `…_SocialEvolution_Dynamic_Scoping.md`. |
+| **Dynamic Social Evolution (NEW STAGE — active)** | ⏳ in progress | Stage 0 climate integration done (trough-limiting, R-27); **controlled-climate harness done** (`ClimateDriver` + `run_se0`, diff-in-diff ΔPRE≈0 placebo, R-28). **NEXT: Stage 1 leader coherence → genealogy logger → Ibn Khaldun cycle → dynamic polygyny.** Fully-ablatable flags. Blueprint `…_SocialEvolution_Dynamic_Scoping.md`. |
 
 > **Currency note (2026-06-29):** the Current-status table had not been updated since 2026-06-14 (through Stage
 > 6.0a); the entire Phase 1 demographic/carbon/climate/bands/social arc is consolidated in the block above (full

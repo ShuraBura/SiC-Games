@@ -1,0 +1,1 @@
+2p dewarfared: dewarfared : e0  45.1yr (Siler target 42.7✓) | r +3.73%/yr✓ | density 0.017/km² | starv   0%✓ | PY 442661 | elapsed 91s

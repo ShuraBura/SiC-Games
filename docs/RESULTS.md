@@ -335,4 +335,12 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-28 — Controlled-climate harness (Social-Evolution Stage 0): a deterministic driver resolves the climate-attributable social response that R-27 smeared out (2026-06-30)
+
+**Origin:** `outputs/phase1_social_evolution/run_se0_controlled_climate.py` + 5 `ClimateDriver` unit tests. Answers R-27's "needs a controlled driver." Methods: MODEL_SPEC §4.1.9; mechanism: MECHANISMS §16.
+
+**What we know:** the new `ClimateDriver` (a deterministic, pure `t→[0,1]` regime waveform that overrides the stochastic telegraph; `regime_driver=None` ⇒ bit-exact telegraph — locked by `test_driver_none_is_bit_exact_telegraph`) gives the dynamic-social stages a **clean benchmark**. Demonstration (full social stack, 3 seeds × 1500 steps, a_seas=0.25; FLAT control vs a scripted −30% PULSE on [600,900)): because the arms are **bit-identical until the scripted onset**, the climate-attributable response = the **between-arm gap at matched times** (difference-in-differences). Result — the **placebo check passes exactly (ΔPRE = −0.00** on pop/band/surplus/assabiyah), then a **−70 pop catastrophe footprint DURING** and a **−135 lagged demographic scar POST** (the population resumes growth after the pulse lifts but does not catch the counterfactual within the window). Band size and surplus track down cleanly; **assabiyah is near-invariant to a single pulse (ΔPOST ≈ −0.01)** — an informative null the future dynastic-cycle stage (Ibn Khaldun) must reckon with (solidarity does not erode from one shock). **Why it matters:** ΔPRE≈0 proves the harness isolates the social response free of the population-growth trend that confounds the within-arm PRE→POST read; the stochastic R-27 run could not. 562 passed/1 xfailed.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

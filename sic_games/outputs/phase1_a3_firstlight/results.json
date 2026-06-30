@@ -1,0 +1,63 @@
+{
+  "config": {
+    "combos": [
+      [
+        4,
+        3
+      ],
+      [
+        8,
+        5
+      ]
+    ],
+    "seeds": [
+      42
+    ],
+    "total_N": 1000,
+    "steps": 100,
+    "repro": {
+      "reproduction": true,
+      "repro_min_age": 15,
+      "birth_threshold": 22000.0,
+      "birth_cost": 1500.0,
+      "child_endowment": 24000.0,
+      "p_birth": 0.05
+    },
+    "substrate": {
+      "enabled": true,
+      "k_cell": 0,
+      "movement_mode": "diffusion",
+      "contest_exponent": 0.0,
+      "move_cost_flat": 0.0
+    },
+    "capacity": {
+      "npp_thresh": 1360.0,
+      "dens_slope": 0.3,
+      "dens_cap": 0.5,
+      "cell_km2": 100.0
+    },
+    "window_start": 40
+  },
+  "habitability": {
+    "wetland": 36.3,
+    "forest": 25.6,
+    "savanna": 13.4,
+    "grass": 8.0,
+    "desert": 5.9,
+    "mountain": 0.7
+  },
+  "terrain_total_capacity": 138021.0271647601,
+  "land_K_ge1_pct": 99.91945227547322,
+  "capacity_mean": 4502.945,
+  "capacity_std": 591.9549999999999,
+  "capacity_spread_pct": 13.14595226013198,
+  "finals": {
+    "4c_3p_s42": 3910.99,
+    "8c_5p_s42": 5094.9
+  },
+  "onset_max": 63,
+  "determinism_ok": true,
+  "rails_clean": true,
+  "rail_violations": {},
+  "elapsed_sec": 9.273146629333496
+}

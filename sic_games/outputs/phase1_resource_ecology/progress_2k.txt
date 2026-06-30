@@ -1,0 +1,1 @@
+2k: synergy on condition (S0): eq_pop 3222 | STARV lean 33.7/good 0.2 | DISEASE lean 6.8/good 6.7 | juv cond lean 1.00/good 1.00 | elapsed 104s

@@ -1,0 +1,1 @@
+2c: 4/4 | A+B: eq_pop 3 (0% ceiling) | eq_reserve 25000 (band 0.06) | >50k 0% | near-floor 0% | slope -0.0 | elapsed 221s

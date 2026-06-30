@@ -299,6 +299,28 @@ noise (density-regulated regime — the boost fattens foragers, doesn't add bodi
 (meat-only). Lit: Hadza 518→745 kcal/hr; Hiwi caiman ~11× (game-at-water corroboration); always-on baseline in
 terrain.py:529.
 
+**§4.1.9 Controlled-climate benchmark harness — the `ClimateDriver` (BUILT 2026-06-30; methods home).** A
+**methodological tool**, not a climate mechanic: it lets the dynamic-social stages be benchmarked against *known*
+climate, separating a social response from the production telegraph's noise. **Motivation (R-27 red-team #3):** on
+the stochastic `ClimateField` telegraph a single run gives a noisy, lag-confounded "response" — a band fission or
+pop crash cannot be told from a *random* climate excursion. **Construct:** `ClimateDriver` is a deterministic,
+pure callable `t → regime multiplier ∈ [0,1]` (1.0 = good times; <1 = a depressed multi-generation period) that,
+when passed as `ClimateField(regime_driver=…)`, **overrides the stochastic telegraph on the regime channel** (the
+seasonal/ENSO/caribou/llanos layers are untouched; `regime_driver=None` ⇒ telegraph, bit-exact). Named waveform
+factories — `flat` (the control arm), `step` (a permanent downshift / press), `pulse` (a single catastrophe of
+known onset+length), `ramp` (a slow squeeze), `square` (a deterministic good/bad alternation), and `piecewise`
+(an arbitrary "known-times" trajectory). These are **experimental-design constructs, NOT lit-anchored climate**;
+for realism-bounded stress set the depressed multiplier within the C.3 band (1−[0.10,0.15]), or use
+1−`REGIME_AMP_TAIL`=0.70 for an explicit catastrophe. **Estimator (the harness's point):** because the control
+and shock arms are *bit-identical until the scripted onset*, the clean climate-attributable response is the
+**between-arm difference at matched times** (a difference-in-differences read: ΔPRE ≈ 0 is the common-trend /
+placebo check, and ΔDURING / ΔPOST are the response) — free of the underlying population-growth trend that
+confounds a within-arm PRE→POST comparison. The harness (`run_se0_controlled_climate.py`) exposes a reusable
+`run_controlled(driver, …)` returning a per-step trajectory; Stage 1+ import it and pass their own driver +
+mechanism flags. The stochastic telegraph remains the *production* substrate once a mechanism is validated here.
+Validation: R-28 (5 driver unit tests: waveform shapes, purity/determinism, telegraph override, `None`
+bit-exactness, `flat`=no-regime; + the demo's ΔPRE = −0.00 placebo).
+
 ---
 
 ## Demographic Layer: Literature Treatment (added 2026-06-18)

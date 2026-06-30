@@ -1,0 +1,1 @@
+2d: seasonal (s_min=0.4): eq_pop 7765 (37% peak-ceiling) | reserve 99312–100000 | synergy mean 1.00 max 1.01 | elapsed 408s
