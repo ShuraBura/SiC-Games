@@ -60,7 +60,7 @@ def band_positions_patch(fields, cap, n, band_size=25, sep=4):
     return pos[:n]
 
 
-def run_one(seed, polygyny_rate=0.0, max_wives=1):
+def run_one(seed, polygyny_rate=0.0, max_wives=1, prowess_decay=0.05):   # 0.05 = stickier reputation (Smith 2004)
     fields = generate_world(knobs_for(seed)); cap = SubWindowCapacity(fields)
     pos = band_positions_patch(fields, cap, FOUNDERS)
     demog = DemographyConfig(
@@ -69,7 +69,7 @@ def run_one(seed, polygyny_rate=0.0, max_wives=1):
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
-        enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0,
+        enable_prowess_facet=True, prowess_decay=prowess_decay, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
         enable_bonded_mating=True, bonded_mate_radius=1,
         enable_pair_bonds=True,                                   # F.3a/b

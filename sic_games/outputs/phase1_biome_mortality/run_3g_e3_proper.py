@@ -70,7 +70,7 @@ def band_positions_patch(fields, cap, n, band_size=25, territory_radius=4):
     return pos[:n]
 
 
-def run_one(m, seed, arm):
+def run_one(m, seed, arm, prowess_decay=0.1):
     """arm: 'ifd' (dispersed, no mate-gate = run_3c baseline) | 'bands' | 'bands_homog' (cred flat) |
     'bands_lump' (cred AND prowess flat = strict band-as-unit)."""
     import random
@@ -89,7 +89,7 @@ def run_one(m, seed, arm):
                          enable_density_disease=True, dens_delta=DELTA, dens_rho_half=0.2,
                          enable_game=True, game_meat_frac=MEAT_FRAC, game_meat_cv=CV,
                          enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
-                         enable_prowess_facet=True, prowess_decay=0.1, sex_division=1.0,
+                         enable_prowess_facet=True, prowess_decay=prowess_decay, sex_division=1.0,
                          enable_paternity=True, mate_choice_strength=m, patriline_weight=0.5, lineage_reversion=RHO,
                          enable_bonded_mating=bonded, bonded_mate_radius=(MATE_R if bonded else 0),
                          homogenize_cred=(arm in ("bands_homog", "bands_lump")),
