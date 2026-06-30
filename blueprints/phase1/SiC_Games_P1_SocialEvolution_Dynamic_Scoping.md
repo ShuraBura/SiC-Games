@@ -38,6 +38,25 @@ all FILED); the layers are already gate-validated in isolation (test_climate).
 **Gate.** Full stack coheres on the varying world (eq_pop ~stable, bands ~25 non-kin, status→RS ~0.13 preserved),
 AND a regime/ENSO downturn now visibly depresses surplus/assabiyah and a recovery restores them.
 
+**RESULTS (run_3o, 2026-06-29) — integration sound; red-team confirmed; clean response needs a controlled driver.**
+- **Coheres** (no extinction) under realistic climate; bands ~25 preserved.
+- **Red-team #1 CONFIRMED — carrying-capacity reduction (Liebig).** Climate variability lowers eq_pop: ~27 % under
+  gentle (a_seas 0.2, ENSO 0.15), ~44 % under moderate (+regime), and a **4× crash** under a harsh compressed regime
+  (amp 0.30 / recurrence 250) — the population is **trough-limited** (limited by the lean season, not the mean) and
+  the current storage does NOT fully buffer multi-generation regime down-excursions. (A real finding → better
+  storage / mobility responses, or gentler drivers.)
+- **Red-team #3 sharper than expected — the social response is config-sensitive + noisy.** status→RS ranged
+  0.06–0.19 across climate configs (vs 0.136 static), and a single stochastic-telegraph run gives a noisy regime
+  "response" (lag + brevity confound an instantaneous down-state measurement). **⇒ a clean study of climate-driven
+  social dynamics needs a CONTROLLED / deterministic climate driver** (good vs bad periods at known times,
+  trajectory-tracked), not a stochastic telegraph buried in a long mixed run. **The dynamic-social stages (1, 3,
+  4) should be benchmarked against a controlled climate driver**, with the stochastic ClimateField as the
+  production substrate once the mechanisms are validated.
+
+**Stage-0 verdict: integration WIRED + coherent; capacity-reduction + trough-limiting are real (carry forward to a
+storage/mobility enhancement and to the dynastic-cycle stress design). Build a CONTROLLED-climate test harness for
+the dynamic-social benchmarks.**
+
 ---
 
 ## Stage 1 — Leader coherence  `[enable_leader_coherence]`
