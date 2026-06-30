@@ -291,4 +291,48 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-21 — E.3-proper: status→RS r≈0.19 at m=5 on the BANDED substrate; the lumping ablation REVISED (2026-06-29)
+
+**Origin:** `outputs/phase1_biome_mortality/run_3g_e3_proper.py`, 6 seeds × 1200 steps, CC-1 SubWindowCapacity patch + `bonded_mate_radius=1` + banded seeding. Supersedes the contaminated E.3 (0f39c2d — bare-forage + per-cell gate + `w.agents` corpse-counting). MODEL_SPEC §4.8.5.
+
+**What we know:** **`mate_choice_strength` m=5 → status→RS = +0.190 = von Rueden 0.19 exactly** (m=4→0.162, m=6→0.216). The banded substrate needs m=5 vs R-19's IFD m≈4 because the band-territory mate-gate dilutes the skew. Homeostat holds, N_e 37–58, eq_pop fertility-pinned. **The old lumping claim ("homogenizing collapses status→RS 0.48→0.13") does NOT replicate** — it was a corpse/bare-forage artifact. Corrected, nuanced finding: the status→RS *correlation* is **prowess-driven** (robust to flattening cred), but **lumping a band to a single unit destroys R-18 compositional anti-fragility** (death-deficit +0.127 → −0.087). ⇒ "don't lump to band-as-unit" stands, but for the **mortality-selection** mechanism, NOT the RS skew.
+
+## R-22 — The "frozen band" was a corpse-counting MEASUREMENT bug + a substrate/mate-gate error (2026-06-26)
+
+**Origin:** turnover-fix diagnosis, commit a6a4ccf. MODEL_SPEC §4.8.4.
+
+**What we know:** the seeded-bands "96% in bands / pop stable 254" claim was an **artifact of counting CORPSES** — `phase1_model` pruned `agent_list` on death but never called `agent.remove()`, so dead agents lingered in Mesa's `self.agents`, stacked 25-deep at their death cells. Fixed (`agent.remove()`; band metrics read live `agent_list`). Two further errors: bands were run on the **bare forage field** (~1–8/cell, starves a 25-band instantly) instead of the **CC-1 capacity field** (~30–50/cell, where R-18/19 are valid); and the per-CELL bonded mate-gate fails at the substrate's ~1/cell density. Fix: run bands on CC-1 + **`bonded_mate_radius=1`** (band-territory mate-gate) → population sustains and turns over (CC-1: r=0 extinct, r=1 250→1624). **Audit:** R-18/19 used `agent_list` + CC-1 and STAND; morph/storage claims survive on live counts.
+
+## R-23 — Storage-tethering RETIRED: the morph fires from emergent bands alone (2026-06-29)
+
+**Origin:** `run_3h_tether_retirement.py`, 5 seeds × 800 steps. MODEL_SPEC §4.5.11/§4.8.5.
+
+**What we know:** the `storage_tether_reserves` band-aid (froze stocked bands to force packing) is unnecessary — on the corrected substrate emergent bands reach Binford packing on their own and the egal→complex morph fires from emergent density+storage (220 cells → complex_forager, no tether). The tether's only distinct effects were over-concentration artifacts (≈4× pop, spurious `stratified_chiefdom`). Config field + movement guard deleted; CC-1 capacity promoted to `sic_games/capacity.py: NPPCapacityField`.
+
+## R-24 — F.2: risk-dilution-as-MORTALITY is a death spiral (SHELVED); the band life-cycle is a balanced fluid equilibrium (2026-06-29)
+
+**Origin:** `run_3i` (risk), `run_3j` (life-cycle). MODEL_SPEC §4.8.6.
+
+**What we know:** wiring safety-in-numbers into the *mortality* schedule (a loner penalty) FAILS — higher penalty → fewer people in smaller bands (penalty 0→6: pop 281→64), a **death spiral, not an optimum**, because mortality culls but does not *aggregate* (aggregation is the E.1 movement drive's job). **Risk-dilution belongs in movement (E.1); banding's fitness teeth are the F.1 mate-gate.** `enable_band_risk` kept default-OFF with a caveat. Band life-cycle (`TerrainWorld.bands()`): a **balanced dynamic equilibrium** — merge ≈ split (~21/100 steps), collapse ≈ form (~6/100); a time-together persistence filter shows ~30% of agents in *durable* bands (the rest fluid), motivating F.3 (no persistent bond yet).
+
+## R-25 — The complete dynamic band: persistent families → a first-class non-kin ~25 band entity → per-band society → assabiyah-driven size (2026-06-29)
+
+**Origin:** F.3a/b (d457794), F.3c-1 (c870165), F.3c-2/2b/3 (175e15f, 29b9922, 61042e8). `run_3k`/`run_3l`. MODEL_SPEC §4.8.7–11.
+
+**What we know:** (a) **persistent monogamous pair-bonds + nuclear-family co-movement** raise the durable-band fraction 0.30→0.41 and resolve the connectivity macroband artifact (bands become discrete family cores). (b) The band becomes a **first-class multi-family entity via the collective-identity VECTOR** (`GroupVector`: band_id active; assabiyah/religion reserved seams — the Carbon "hive-mind"): emergent affiliation + exogamy (spouse→larger band) + cohesion + hysteretic fission/fusion → **agent-weighted band size 28.7, median 25.3 ≈ Wobst/Birdsell 25**, and **NON-kin** (dominant-lineage 0.38, ~7 lineages/band, only 30% of adults co-reside with a parent — Hill 2011 ✓). (c) **Society relocates from the cell to the band**; (d) **assabiyah** (Ibn Khaldun solidarity) builds from band surplus and makes `tolerable_size` condition-dependent — **corr(assabiyah, band size) = +0.27** (rich/high-solidarity bands stay together larger). All flags independent + default-OFF.
+
+## R-26 — Full-stack: the architecture coheres; status→RS settles at ≈0.13, the marriage-system-appropriate value (2026-06-29)
+
+**Origin:** `run_3m_fullstack.py`, 6 seeds × 1500 steps, the entire social stack on CC-1. MODEL_SPEC §4.8.12.
+
+**What we know:** with everything on, the model **coheres** (eq_pop ~360–540, N_e ~65, bands ~26 non-kin, per-band societies, assabiyah, **R-18 survival anti-fragility intact** death-deficit >0). The von Rueden status→RS, validated at 0.19 in the simpler lottery model, **becomes ≈0.13** under the family stack — and **0.13 is CORRECT**: von Rueden & Jaeggi 2016's own marriage-system breakdown puts MONOGAMOUS societies at r≈0.15 (the 0.19 is the polygyny-inflated cross-system average), and the family model is monogamy-dominant. Getting there required fixing two bugs: the **prowess prod-credit was corrupted** (diluted by a father's co-resident dependent sons → reproduction *depressed* prowess; fixed by crediting adult producers only), and prowess was **too volatile** (`prowess_decay` 0.10→0.05 = a persistent reputation, Smith 2004). The skew is **polygyny-carried** (strict monogamy ≈+0.03 — the model lacks a status→partner-fertility "wife-quality" channel, a noted future enrichment). E.3's lottery m=5→0.19 stands as the superseded simpler-mechanism calibration.
+
+## R-27 — Climate integration (Stage 0): coheres but the population is TROUGH-LIMITED; the social response needs a controlled driver (2026-06-29)
+
+**Origin:** `run_3o_climate_social.py`. Blueprint `…_SocialEvolution_Dynamic_Scoping.md` Stage 0.
+
+**What we know:** running the social stack on a `ClimateField`-modulated capacity (so conditions vary) is mechanically sound (coheres, bands preserved), but **climate variability lowers carrying capacity** (Liebig lean-season binding): eq_pop −27% gentle, −44% moderate, **4× crash under a harsh compressed regime** — the population is **trough-limited and the current storage does NOT buffer multi-generation downturns** (→ a future storage/mobility enhancement). The social metrics are **config-sensitively perturbed** (status→RS 0.06–0.19 across climate configs); a single stochastic-telegraph run gives a noisy "regime response" ⇒ **the dynamic-social stages need a CONTROLLED/deterministic climate driver** for clean benchmarking, with the stochastic ClimateField as the production substrate once validated.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

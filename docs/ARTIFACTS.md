@@ -165,4 +165,25 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 
 ---
 
-*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14; resource-ecology + biome-mortality + scale-resolution arc (R-5…R-14) 2026-06-20.*
+### Carbon status → emergent bands → full social stack (R-18…R-27; all under `outputs/phase1_biome_mortality/`)
+| Artifact | Date | Type | Question | Headline | Location |
+|---|---|---|---|---|---|
+| Carbon Tier-1 statval | 2026-06-21 | multi-seed statval | Does the Cred sharing-rule create a compositional survival gradient? | R-18: κ>0 + meat variance → starvation kills low-cred (death-deficit>0); eq_pop κ-invariant. | `run_3b_carbon_statval.py` + `results_3b.json` |
+| Cred-vector B+ statval | 2026-06-21 | calibration | status→RS r≈0.19? homeostat? N_e? | R-19: m≈4 (IFD) → status→RS 0.19; homeostat bounded; N_e healthy. | `run_3c_bplus_statval.py` + `results_3c.json` |
+| B++ assortment | 2026-06-21 | paired control | does assortment consolidate dynasties? | R-20: NO — homogamy spreads RS, doesn't skew it (counterintuitive). | `run_3e_bpp_assortment.py` |
+| **E.3-proper** | 2026-06-29 | recalibration + ablation | m for status→RS 0.19 on bands; does lumping collapse it? | R-21: **m=5 → +0.190**; lumping revised (R-18 mortality-selection is load-bearing, not the RS skew). | `run_3g_e3_proper.py` + `results_3g.json` |
+| Tether retirement | 2026-06-29 | comparison | does the morph fire without the storage tether? | R-23: YES — emergent bands reach packing; tether deleted. | `run_3h_tether_retirement.py` |
+| F.2 risk-mortality proto | 2026-06-29 | sweep | does risk-as-mortality yield an optimal band size? | R-24: NO — death spiral; SHELVED. | `run_3i_band_risk_proto.py` |
+| Band life-cycle | 2026-06-29 | diagnostic | merge/split/collapse + size distribution | R-24: balanced fluid equilibrium; ~30% in durable bands (persistence filter). | `run_3j_band_lifecycle.py` |
+| Band affiliation (F.3c-1) | 2026-06-29 | validation | ~25 non-kin band entity? | R-25: agent-wt 28.7/median 25.3; dominant-lineage 0.38 (non-kin). | `run_3k_band_affiliation.py` |
+| Dynamic bands + assabiyah (F.3c-3) | 2026-06-29 | validation | does assabiyah make band size condition-dependent? | R-25: corr(assabiyah,size)=+0.27; eq_pop preserved. | `run_3l_dynamic_bands.py` |
+| **Full-stack integration** | 2026-06-29 | integration gate | does the whole social stack cohere + keep its results? | R-26: coheres; status→RS **≈0.13** (monogamy-appropriate); R-18 intact. | `run_3m_fullstack.py` |
+| Climate integration (Stage 0) | 2026-06-29 | integration | does the social stack run on a varying (ClimateField) world? | R-27: coheres but TROUGH-LIMITED (eq_pop −27%…4× crash); social response needs a controlled driver. | `run_3o_climate_social.py` |
+
+### Blueprints commissioned this arc (specs, not results)
+`…_Climate_OrbitalLottery_Scoping`, `…_Storage_Morph_Scoping`, `…_EmergentBands_Scoping`,
+`…_F3c_PerBandSociety_Scoping`, `…_SocialEvolution_Dynamic_Scoping` (all `blueprints/phase1/`).
+
+---
+
+*End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14; resource-ecology + biome-mortality + scale-resolution arc (R-5…R-14) 2026-06-20; Carbon → emergent bands → full social stack (R-18…R-27) 2026-06-29.*

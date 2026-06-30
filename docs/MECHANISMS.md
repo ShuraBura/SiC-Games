@@ -417,6 +417,33 @@ Pool gate criterion (ROADMAP Rule 12): `pool_draw_unmet_frac < 20%` evaluated as
 
 ---
 
+## 16. Carbon status & social-structure mechanisms (R-18…R-27; added 2026-06-29)
+
+Registry of the Carbon-status + bands/family/society constructs. **The rule/math/lit for each lives in
+MODEL_SPEC §4.5–§4.8 (methods home) — referenced here, not restated** (charter §2 "pointers, not copies").
+Values: PARAMETERS §17–18. Impl: `sic_games/src/sic_games/{phase1_model,demography,substrate,group,capacity}.py`.
+Category: C1 (shared, param-differentiated) / C2 (re-pointed) / C3 (new architecture).
+
+| Mechanism | What it is | Cat | Impl pointer | Ref |
+|---|---|---|---|---|
+| CC-1 capacity field | NPP→density carrying capacity (the substrate bands/demography run on; NOT bare forage) | C1 | `capacity.py::NPPCapacityField` | §4.3.1/§4.8.4; R-22 |
+| Cred-vector + prowess | ascribed lineage `cred` × achieved `prowess` (decaying EMA of relative meat) Cobb–Douglas status | C1 | `substrate.py::base_status` | §4.5.6–7; R-18 |
+| Paternity / mate-choice | father by prowess-weighted choice; bilateral lineage blend + mean-reversion homeostat | C2 | `phase1_model::_do_births_ibi` | §4.5.7; R-19/R-21 |
+| Storage + per-cell/per-band morph | collective granary (Binford ET) + cred-weighted draw (Hayden); society egal→complex→stratified | C3 | `phase1_model::_step_rivalrous` | §4.5.11/§4.8.9; R-23 |
+| Emergent-band grouping drives | E.1 safety + E.2 mating multipliers in the diffusion movement utility | C1 | `substrate.py::diffusion_select_target` | §4.8.1 |
+| Bonded mate-gate (F.1/F.2) | a birth needs an unrelated adult male within the band (Chebyshev `bonded_mate_radius`) | C3 | `phase1_model::_do_births_ibi` | §4.8.4; R-22 |
+| Band life-cycle diagnostic | bands = connected components; merge/split/collapse + persistence filter | C3 (obs) | `phase1_model::bands` | §4.8.6; R-24 |
+| Persistent families (F.3a/b) | durable monogamous pair-bond (`_partner`/`_wives`) + nuclear-family co-movement; detach at maturity | C3 | `phase1_model::_do_pairing,_family_head` | §4.8.7; R-25 |
+| Modest polygyny | high-status males take ≤`max_wives` wives (von Rueden status→RS amplifier) | C1 | `phase1_model::_do_pairing` | §4.8.12; R-26 |
+| Collective-identity vector | per-agent `GroupVector` (band_id active; assabiyah/religion seams) — the Carbon "hive-mind" | C3 | `group.py::GroupVector` | §4.8.8; R-25 |
+| Band affiliation + fission/fusion | persistent band_id + exogamy + cohesion drive + hysteretic split/merge → ~25 non-kin bands | C3 | `phase1_model::_maintain_bands` | §4.8.8 |
+| Per-band society + family knobs | morph attaches to band_id; reproduction reads band-society knobs (additive-delta-from-egalitarian) | C2 | `phase1_model::_band_knob` | §4.8.9/§4.8.11 |
+| Assabiyah (dynamic bands) | per-band solidarity from surplus → condition-dependent `tolerable_size` (Ibn Khaldun) | C3 | `phase1_model::_maintain_bands` | §4.8.10; R-25 |
+| Climate integration | run the social stack on a `ClimateField`-modulated capacity (seasonal/ENSO/regime drive surplus/adversity) | C1 | `climate.py::ClimateField` | §4.1.9/§4.8 Stage 0; R-27 |
+
+> **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4); **RETIRED:**
+> `storage_tether_reserves` (DE-3). Both default-OFF.
+
 ## 14. Parameter registry (pointer)
 
 **Authoritative parameter values + lock/sweep history: `docs/PARAMETERS.md`** (extracted 2026-06-08, charter §6 — supersedes the former interim table in `sic_games/CLAUDE.md`). Do NOT copy parameter values into this section; that would create two-homes drift.

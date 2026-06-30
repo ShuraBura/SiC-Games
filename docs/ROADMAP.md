@@ -1,6 +1,6 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-06-14
+**Last updated:** 2026-06-29
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 
@@ -212,6 +212,24 @@ Always check the C/Si distinction table above before implementing reproduction m
 | Stage 5.x | ⏳ Pending | Full nD LHS scan (pyDOE2). c1/c2 hooks. Extended ψ co-evolution. Inter-pool connectivity. |
 | Stage 6 (Phase 0 label) | ✓ Disambiguated 2026-06-15 | **RESOLVED (supervisor, 2026-06-15):** in Phase 0 records the "Stage 6" label refers **exclusively to the resource-ecology substrate arc** (6.0a substrate, 6.0a-perf, 6.0b terrain). The old "Statistical framework" meaning is retired from this number. The statistics/power-analysis framework is **unnumbered backlog** (see OWE-10) and will be scheduled as a **Phase 1 stage** when it is built — it does not reclaim a Phase 0 number. No live collision remains; the Phase boundary (Phase 1 restarts at Stage 1) already prevents recurrence. |
 | Stage 7+ | ⏳ Pending | Heuristic drift, HiveMind, biparental for Si (if designed), full 100-world run. |
+
+### Phase 1 — Demographic → Carbon → Climate → Bands → Social arc (the active line; detail in RESULTS R-2…R-27, MODEL_SPEC §4.2–§4.8)
+| Milestone | Status | Key output |
+|---|---|---|
+| Demographic core (Siler + IBI) | ✓ | sex-specific Aché Siler + energetic fertility + provisioning; e₀ validated. R-2…R-14. §4.2/§4.5 |
+| Carbon-on-substrate Tier-1 + Cred-vector B+ | ✓ | heritable cred + achieved prowess + paternity; status→RS r≈0.19 (IFD m≈4). R-18/R-19/R-20. §4.5.6–9 |
+| Climate (orbital lottery C.1–C.5) + catastrophes | ✓ built (SEAMS) | seasonal/eccentricity/ENSO/regime + caribou/llanos + intercept hunting; gate-validated **in isolation**. **NOT yet wired into the live social runs** (Stage 0 below). §4.1.9 |
+| Storage (delayed-return) + per-cell society morph | ✓ | collective granary (Binford ET), cred-weighted draw (Hayden), egal→complex→stratified morph. §4.5.11 |
+| Emergent bands + E.3-proper + turnover fix | ✓ | corpse-bug fixed; bands on CC-1 + bonded_mate_radius=1; m=5→status→RS 0.19; lumping revised. R-21/R-22. §4.8.1–5 |
+| Storage-tethering RETIRED | ✓ | morph fires from emergent bands; CC-1 capacity → lib `capacity.py`. R-23. §4.8.5 |
+| F.2 risk-mortality (SHELVED) + band life-cycle | ✓ | risk-as-mortality = death spiral (shelved); balanced fluid band equilibrium. R-24. §4.8.6 |
+| F.3 — persistent families → non-kin ~25 band → per-band society → assabiyah | ✓ | the complete dynamic band (collective-identity vector; Hill-2011 non-kin; Ibn Khaldun solidarity). R-25. §4.8.7–11 |
+| Full-stack integration + modest polygyny + prowess fix | ✓ | architecture coheres; status→RS ≈0.13 (monogamy-appropriate); prowess-credit + reputation fixes. R-26. §4.8.12 |
+| **Dynamic Social Evolution (NEW STAGE — active)** | ⏳ in progress | Stage 0 climate integration done (trough-limiting found, R-27); **NEXT: controlled-climate harness → Stage 1 leader coherence → genealogy → Ibn Khaldun cycle → dynamic polygyny.** Fully-ablatable flags. Blueprint `…_SocialEvolution_Dynamic_Scoping.md`. |
+
+> **Currency note (2026-06-29):** the Current-status table had not been updated since 2026-06-14 (through Stage
+> 6.0a); the entire Phase 1 demographic/carbon/climate/bands/social arc is consolidated in the block above (full
+> per-stage detail lives in RESULTS R-2…R-27 + MODEL_SPEC §4.2–§4.8 — pointers, not restated here).
 
 ---
 

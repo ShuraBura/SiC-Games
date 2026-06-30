@@ -343,6 +343,53 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 ---
 
+## §17 — Carbon status: Cred-vector + prowess + paternity (R-18…R-21; MODEL_SPEC §4.5.6–9, §4.8.5, §4.8.12)
+
+| Name | Value | Status | Grounding / history |
+|------|-------|--------|---------------------|
+| enable_cred_status | **False** (default) | OPT-IN | meat/contest weight reads accumulated `cred` not `φ`. §4.5.6 |
+| cred_seed_sigma | **0.5–0.6** | LOCKED (run-config) | founder log-status spread (lognormal median 1). §4.5.6 |
+| cred_inherit_sigma | **0.1** | LOCKED | lineage-copy noise (mean-1 lognormal). §4.5.7 |
+| enable_prowess_facet | **False** (default) | OPT-IN | achieved (hunting-reputation) facet joins the Cobb–Douglas contest weight. §4.5.7 |
+| **prowess_decay** (λ) | **0.05** (family stack) / 0.10 (E.3 lottery) | **LOCKED 2026-06-29** | prowess EMA rate = reputation persistence (Smith 2004). Family stack RAISED 0.10→0.05 (half-life ~7→~14 mo) to lift full-stack status→RS 0.08→0.13; E.3 lottery keeps 0.10 (m=5→0.19). §4.8.12 |
+| sex_division | **1.0** (full-stack) | OPT-IN | prowess prod-credit split among ADULT producers (age≥menarche), NOT dependent sons (the §4.8.12 corruption fix). §4.5.7 |
+| enable_paternity | **False** (default) | OPT-IN | a father assigned at conception (lottery) or = the durable partner (pair-bonds). §4.5.7 |
+| **mate_choice_strength** (m) | **5** (banded) / 4 (IFD) | **LOCKED 2026-06-29** | prowess-weighted mate-choice skew → status→RS r≈0.19 (von Rueden). Banded substrate needs m=5 (band-territory gate dilutes skew); IFD m=4 (R-19). §4.8.5 |
+| patriline_weight (pw) | **0.5** | LOCKED | father-vs-mother weight in bilateral lineage inheritance. §4.5.7 |
+| lineage_reversion (ρ) | **0.1** | LOCKED | mean-reversion of inherited lineage toward the fixed founder anchor (the homeostat). §4.5.7 |
+| paternal_provision_frac | **0.5** (forager societies) | OPT-IN | father gives this frac of overflow to own children. §4.5.7 |
+| assortative_strength (α) | **0** (B+ paired control) | OPT-IN | B++ status-similarity mate kernel; 0 = no assortment. §4.5.8 |
+| homogenize_cred / _prowess | **False** | ABLATION-ONLY | flatten within-band status (lumping test); flatten within the connected band (mate-gate hood), not the cell. §4.8.5 |
+
+## §18 — Social structure: storage · morph · bands · families · band-society · polygyny (F.1–F.3c; §4.5.11, §4.8.1–12)
+
+| Name | Value | Status | Grounding / history |
+|------|-------|--------|---------------------|
+| enable_storage / storable_fraction / store_capacity_reserves | False / **0.5** / **3.0** | OPT-IN | collective band granary in the overwintering zone (Binford ET 15.25°C). §4.5.11 |
+| storage_temp_threshold_c | **15.25** °C | LIT-ANCHORED | Binford 2001 ET storage threshold. §4.5.11 |
+| storage_decay | **0.05** (S.3) | OPT-IN | per-step granary spoilage. §4.5.11 |
+| enable_morph / morph_settle_steps | False / **60–300** | OPT-IN | society morph (egal→complex→stratified) hysteresis timer (~1 gen). §4.5.11 |
+| ~~storage_tether_reserves~~ | **RETIRED 2026-06-29** | RETIRED | band-aid for pre-bands max-occ-2; morph now fires from emergent bands alone (run_3h). §4.5.11/§4.8.5 |
+| group_safety_max / _scale, group_mate_min / _floor | **8 / 15, 15 / 0.2** | OPT-IN | E.1/E.2 movement grouping drives (risk-dilution + mate-access). §4.8.1 |
+| founder_buffer_steps | **0** (default) | OPT-IN | carried mobile reserve bridging the founding transient (bare-forage only). §4.8.3 |
+| enable_bonded_mating / **bonded_mate_radius** | False / **1** | OPT-IN/**LOCKED** | F.1/F.2 mate-gate: a birth needs an unrelated adult male within the band (Chebyshev r). r=1 sustains turnover; r=0 (per-cell) → extinction. §4.8.4 |
+| enable_band_risk / band_risk_penalty | **False (SHELVED)** | SHELVED | F.2 risk-dilution mortality = death spiral; risk-dilution belongs in E.1 movement. Default OFF, do not use. §4.8.6 |
+| enable_pair_bonds / divorce_rate / family_maturity_months | False / 0 / **180** | OPT-IN | F.3a/b persistent monogamous pair-bonds + nuclear-family co-movement; child detaches at maturity (Kaplan 2000). §4.8.7 |
+| **polygyny_rate / max_wives** | **0.3 / 3** (realistic) / 0 / 1 (monogamy) | OPT-IN | F.3a modest polygyny — high-status males take ≤max_wives wives (von Rueden; the status→RS amplifier). §4.8.12 |
+| enable_band_affiliation / band_cohesion | False / **0.3** | OPT-IN | F.3c-1 collective-identity-vector band_id + cohesion movement drive → ~25 non-kin bands. §4.8.8 |
+| band_split_size / band_merge_size / band_base_tolerable | **45 / 10 / 25** | OPT-IN | band fission/fusion thresholds (Birdsell/Wobst ~25; band_split = hard cap). §4.8.8/§4.8.10 |
+| enable_dynamic_bands / assabiyah_gain / assabiyah_decay | False / **0.05 / 0.02** | OPT-IN | F.3c-3 condition-dependent tolerable_size = base+(cap−base)·assabiyah; solidarity from surplus (Ibn Khaldun). §4.8.10 |
+| season_aggregation | **0** (default) | OPT-IN | scale tolerable_size by ClimateField.season() (wet/dry aggregation); weak realized effect. §4.8.10 |
+| enable_band_family_knobs | **False** (default) | OPT-IN | F.3c-2b reproduction reads the band-society family knobs via additive-delta-from-egalitarian (egalitarian band = global EXACTLY → E.3 safe). §4.8.11 |
+
+> **§17–18 currency note (2026-06-29):** added to close the audit gap — PARAMETERS had not been updated through
+> the entire Carbon-status (R-18…R-21) → storage/morph → emergent-bands → full F.3 family/band/society arc →
+> full-stack work. The **canonical realistic-forager full-stack config** (status→RS ≈ 0.13) = the values flagged
+> "realistic"/"family stack" above (run_3m). Most flags default-OFF (bit-exact baseline); the social architecture
+> is an opt-in, fully-ablatable bundle (each flag independent).
+
+---
+
 ## Discrepancy resolution log
 
 The following D-items from ARCHITECTURE.md §15 are resolved by this document:
