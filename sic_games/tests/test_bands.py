@@ -8,7 +8,7 @@ from collections import Counter
 import pytest
 
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
-from sic_games.demography import DemographyConfig
+from sic_games.demography import DemographyConfig, LEADER_SOCIETY_WEIGHT, REPULSION_SOCIETY_FACTOR, size_repulsion
 from sic_games.phase1_model import TerrainWorld, seed_band_positions, _DEFAULT_KNOBS
 from sic_games.terrain import generate_world
 
@@ -276,3 +276,221 @@ def test_band_knob_additive_delta():
 def test_dynamic_band_seams_off_by_default():
     cfg = DemographyConfig()
     assert cfg.enable_dynamic_bands is False and cfg.season_aggregation == 0.0 and cfg.enable_band_family_knobs is False
+
+
+# ── Social-Evolution Stage 1: LEADER COHERENCE (additive 2nd cohesion source, Boehm-gated) ────────
+def _leader_world(n=8, seed=1, base=5, cap=9, **cfg_kw):
+    # One connected spatial cluster (some x/y spread so a fission has a real median cut), all forced into ONE
+    # band_id — isolates `_maintain_bands`'s split-threshold arithmetic from the seeding/affiliation machinery
+    # (same direct-call convention as test_band_knob_additive_delta).
+    positions = [(10 + i % 4, 10 + i // 4) for i in range(n)]
+    sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0, move_cost_flat=1e12)
+    w = TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False, substrate_cfg=sc,
+                     harvest_field=_UniformCapacity(3.0), placement_positions=positions,
+                     demography_cfg=DemographyConfig(enable_dynamic_bands=True, band_base_tolerable=base,
+                                                     band_split_size=cap, band_merge_size=1, assabiyah_decay=0.0,
+                                                     **cfg_kw))
+    for a in w.agent_list:
+        a._group.band_id = 0
+        a.cred, a.prowess = 1.0, 1.0
+    w._next_band_id = 1                                           # fission needs a fresh id counter (normally
+                                                                    # seeded by enable_band_affiliation; bypassed here)
+    return w
+
+
+def test_leader_coherence_off_by_default():
+    cfg = DemographyConfig()
+    assert cfg.enable_leader_coherence is False and cfg.leader_coherence_gain == 0.0
+
+
+def test_leader_society_weight_boehm_ladder():
+    # egalitarian bands actively LEVEL leaders (Boehm 1999) → the mechanism is INERT there (weight 0), not just
+    # weak; complex/stratified rise. Unclassified/None defaults to the conservative egalitarian weight.
+    assert LEADER_SOCIETY_WEIGHT["egalitarian_forager"] == 0.0
+    assert 0.0 < LEADER_SOCIETY_WEIGHT["complex_forager"] < LEADER_SOCIETY_WEIGHT["stratified_chiefdom"]
+    from sic_games.demography import leader_society_weight
+    assert leader_society_weight(None) == 0.0 and leader_society_weight("egalitarian_forager") == 0.0
+
+
+def test_leader_term_zero_when_flag_off():
+    # flag off ⇒ leader_term ≡ 0 regardless of gain (bit-exact-when-off contract).
+    w = _leader_world(enable_leader_coherence=False, leader_coherence_gain=5.0)
+    w.agent_list[0].cred = 100.0                                  # a stark status outlier
+    w._band_society[0] = "stratified_chiefdom"
+    w._maintain_bands()
+    assert w._band_leader_term[0] == 0.0
+
+
+def test_leader_term_zero_in_egalitarian_band():
+    # Boehm gate: flag+gain ON but the band is (unclassified ⇒) egalitarian ⇒ leader_term still 0.
+    w = _leader_world(enable_leader_coherence=True, leader_coherence_gain=1.0)
+    w.agent_list[0].cred = 100.0
+    w._maintain_bands()
+    assert w._band_leader_term[0] == 0.0
+
+
+def test_leader_term_positive_and_scales_with_society_weight():
+    # Same stark leader in a complex vs. a stratified band → term scales with the Boehm weight (0.5 vs 1.0),
+    # i.e. exactly double for the identical leader_strength (weight is a pure multiplier).
+    terms = {}
+    for soc in ("complex_forager", "stratified_chiefdom"):
+        w = _leader_world(enable_leader_coherence=True, leader_coherence_gain=1.0)
+        w.agent_list[0].cred = 100.0
+        w._band_society[0] = soc
+        w._maintain_bands()
+        terms[soc] = w._band_leader_term[0]
+    assert terms["complex_forager"] > 0.0
+    assert abs(terms["stratified_chiefdom"] - 2.0 * terms["complex_forager"]) < 1e-9
+
+
+def test_leader_coherence_prevents_premature_fission():
+    # THE benchmark payoff: band_base_tolerable=5 < size(8) ≤ band_split_size=9. With leader coherence OFF the
+    # band has no cohesion (assabiyah=0) ⇒ tolerable=base=5 ⇒ 8>5 FISSIONS. With a stark leader in a stratified
+    # band, the added cohesion lifts tolerable above 8 ⇒ the SAME band stays intact.
+    off = _leader_world(enable_leader_coherence=False)
+    off._maintain_bands()
+    assert len({a._group.band_id for a in off.agent_list}) > 1              # fissioned
+
+    on = _leader_world(enable_leader_coherence=True, leader_coherence_gain=1.0)
+    on.agent_list[0].cred = 100.0                                            # one stark leader
+    on._band_society[0] = "stratified_chiefdom"
+    on._maintain_bands()
+    assert len({a._group.band_id for a in on.agent_list}) == 1               # stayed together
+
+
+def test_leader_coherence_hard_cap_still_holds():
+    # RED-TEAM #4: no amount of leader_coherence_gain can push tolerable_size above band_split_size (the cap is
+    # on cohesion_frac ≤ 1.0, not on the gain). A band bigger than the cap fissions regardless.
+    w = _leader_world(n=12, enable_leader_coherence=True, leader_coherence_gain=1000.0)
+    w.agent_list[0].cred = 100.0
+    w._band_society[0] = "stratified_chiefdom"
+    w._maintain_bands()
+    assert len({a._group.band_id for a in w.agent_list}) > 1                 # 12 > cap(9) ⇒ still fissions
+
+
+def test_leader_coherence_additive_to_assabiyah_not_a_relabel():
+    # RED-TEAM #1: assabiyah and leader coherence are SEPARATE additive terms, each independently ablatable.
+    # Give the band positive surplus (⇒ assabiyah > 0 after one step) with leader coherence OFF, then ON, and
+    # confirm the leader-only term is on top of (not a substitute for) the assabiyah contribution.
+    w = _leader_world(enable_leader_coherence=False, assabiyah_gain=0.5)
+    w._band_surplus[0] = 1.0
+    w._maintain_bands()
+    assert w._band_assabiyah[0] > 0.0 and w._band_leader_term[0] == 0.0     # assabiyah alone, leader inert
+
+    w2 = _leader_world(enable_leader_coherence=True, leader_coherence_gain=1.0, assabiyah_gain=0.5)
+    w2._band_surplus[0] = 1.0
+    w2.agent_list[0].cred = 100.0
+    w2._band_society[0] = "stratified_chiefdom"
+    w2._maintain_bands()
+    assert w2._band_assabiyah[0] > 0.0 and w2._band_leader_term[0] > 0.0    # BOTH contribute
+
+
+def test_band_leaders_diagnostic_identifies_top_status():
+    w = _leader_world(n=4, enable_leader_coherence=True, leader_coherence_gain=1.0)
+    w.agent_list[2].cred = 50.0                                             # a clear top-status agent
+    leaders = w.band_leaders()
+    assert leaders[0] is w.agent_list[2]
+
+
+def test_band_leaders_reflects_a_forced_removal():
+    # The controlled-experiment hook: force-remove the current leader (set .alive=False, then apply the same
+    # pruning `step()` does) and confirm `band_leaders()` picks up the new (2nd-highest-status) leader.
+    w = _leader_world(n=4, enable_leader_coherence=True, leader_coherence_gain=1.0)
+    w.agent_list[2].cred = 50.0
+    w.agent_list[1].cred = 10.0
+    leader1 = w.band_leaders()[0]
+    assert leader1 is w.agent_list[2]
+    leader1.alive = False
+    w.agent_list = [a for a in w.agent_list if a.alive]
+    leader2 = w.band_leaders()[0]
+    assert leader2 is not leader1 and leader2.cred == 10.0                  # the next-highest status takes over
+
+
+# ── Social-Evolution Stage 1b: SIZE-DRIVEN REPULSION (Johnson 1982 scalar stress) ─────────────────
+def test_size_repulsion_off_by_default():
+    cfg = DemographyConfig()
+    assert cfg.enable_size_repulsion is False and cfg.repulsion_gain == 0.0
+
+
+def test_size_repulsion_function_shape():
+    # A logistic in band size: ~0 for tiny bands, rising monotone, saturating toward gain·factor for large ones.
+    f = lambda n, soc="egalitarian_forager": size_repulsion(n, gain=1.0, midpoint=25.0, width=6.0, society=soc)
+    assert f(0) == 0.0 or f(5) < 0.05                                       # small band → negligible scalar stress
+    assert f(10) < f(25) < f(40)                                           # monotone rising in size
+    assert abs(f(25) - 0.5) < 1e-9                                         # at the midpoint → half of gain·factor
+    assert f(60) > 0.95                                                    # large band → saturates toward gain
+    assert size_repulsion(40, gain=0.0, midpoint=25, width=6, society="egalitarian_forager") == 0.0   # gain 0 ⇒ 0
+
+
+def test_size_repulsion_relieved_by_hierarchy():
+    # Johnson's thesis: organizational structure ABSORBS scalar stress, so at the SAME size a hierarchical band
+    # feels less repulsion than an egalitarian one (egalitarian 1.0 > complex 0.5 > stratified 0.25).
+    kw = dict(gain=1.0, midpoint=25.0, width=6.0)
+    eg = size_repulsion(40, society="egalitarian_forager", **kw)
+    cx = size_repulsion(40, society="complex_forager", **kw)
+    st = size_repulsion(40, society="stratified_chiefdom", **kw)
+    assert eg > cx > st > 0.0
+    assert abs(cx - 0.5 * eg) < 1e-9 and abs(st - 0.25 * eg) < 1e-9        # exactly the society-factor ladder
+    assert REPULSION_SOCIETY_FACTOR["egalitarian_forager"] == 1.0
+    assert size_repulsion(40, society=None, **kw) == eg                    # None → egalitarian (full stress)
+
+
+def test_repulsion_term_zero_when_flag_off():
+    # flag off ⇒ repulsion ≡ 0 regardless of gain (bit-exact-when-off contract), even for a large band.
+    w = _leader_world(n=12, enable_size_repulsion=False, repulsion_gain=5.0)
+    w._maintain_bands()
+    assert w._band_repulsion[0] == 0.0
+
+
+def test_repulsion_causes_fission_of_a_large_mobile_band():
+    # THE Stage-1b payoff: a large EGALITARIAN (mobile) band that assabiyah would otherwise hold together
+    # fissions under size-driven repulsion — resource-INDEPENDENTLY (surplus/assabiyah are maxed here).
+    # base=5, cap=15 (headroom 10), n=10. OFF: assabiyah≈1 ⇒ tolerable≈cap=15 ⇒ n=10 not > 15 ⇒ stays whole.
+    off = _leader_world(n=10, base=5, cap=15, enable_size_repulsion=False, assabiyah_gain=1.0)
+    off._band_surplus[0] = 1.0
+    off._maintain_bands()
+    assert len({a._group.band_id for a in off.agent_list}) == 1            # cohesive, intact
+
+    # ON: the same maxed assabiyah, but repulsion knocks cohesion_frac down ⇒ tolerable falls below 10 ⇒ fissions.
+    on = _leader_world(n=10, base=5, cap=15, enable_size_repulsion=True, repulsion_gain=0.8, repulsion_midpoint=6.0,
+                       repulsion_width=2.0, assabiyah_gain=1.0)
+    on._band_surplus[0] = 1.0
+    on._maintain_bands()
+    assert len({a._group.band_id for a in on.agent_list}) > 1              # scalar stress fissioned it
+
+
+def test_repulsion_relieved_band_stays_together():
+    # Same large band + same repulsion, but STRATIFIED (hierarchy absorbs scalar stress) → the relieved repulsion
+    # is small enough that assabiyah still holds it together. The "settling/hierarchy unlocks larger groups" lever.
+    rep = dict(base=5, cap=15, enable_size_repulsion=True, repulsion_gain=0.8, repulsion_midpoint=6.0,
+               repulsion_width=2.0, assabiyah_gain=1.0)
+    st = _leader_world(n=10, **rep)
+    st._band_surplus[0] = 1.0
+    st._band_society[0] = "stratified_chiefdom"
+    st._maintain_bands()
+    assert len({a._group.band_id for a in st.agent_list}) == 1            # hierarchy-relieved → stays whole
+    # and it genuinely felt LESS repulsion than the egalitarian arm did (which fissioned above):
+    eg = _leader_world(n=10, **rep)
+    eg._band_surplus[0] = 1.0
+    eg._maintain_bands()
+    assert st._band_repulsion[0] < eg._band_repulsion[0]
+    assert len({a._group.band_id for a in eg.agent_list}) > 1             # egalitarian arm fissioned
+
+
+def test_repulsion_restores_headroom_for_leader_coherence():
+    # The measured full-stack problem (assabiyah saturates cohesion_frac at 1.0 ⇒ leader term is absorbed by the
+    # clamp): with repulsion pulling cohesion_frac off the ceiling, the leader term again MOVES tolerable_size.
+    def tol(leader_on):
+        w = _leader_world(n=10, base=5, cap=15, enable_size_repulsion=True, repulsion_gain=0.6,
+                          repulsion_midpoint=6.0, repulsion_width=2.0, assabiyah_gain=1.0,
+                          enable_leader_coherence=leader_on, leader_coherence_gain=1.0)
+        w._band_surplus[0] = 1.0
+        w.agent_list[0].cred = 100.0                                       # a stark leader
+        w._band_society[0] = "stratified_chiefdom"
+        w._maintain_bands()
+        # reconstruct the band's split threshold the same way _maintain_bands did
+        cfg = w._demog
+        a = w._band_assabiyah[0]; lt = w._band_leader_term[0]; rp = w._band_repulsion[0]
+        frac = min(1.0, max(0.0, a + lt - rp))
+        return cfg.band_base_tolerable + (cfg.band_split_size - cfg.band_base_tolerable) * frac
+    assert tol(True) > tol(False)                                         # leader coherence now lifts tolerable

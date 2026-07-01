@@ -1,6 +1,6 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-06-30
+**Last updated:** 2026-07-01
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 
@@ -225,7 +225,7 @@ Always check the C/Si distinction table above before implementing reproduction m
 | F.2 risk-mortality (SHELVED) + band life-cycle | ✓ | risk-as-mortality = death spiral (shelved); balanced fluid band equilibrium. R-24. §4.8.6 |
 | F.3 — persistent families → non-kin ~25 band → per-band society → assabiyah | ✓ | the complete dynamic band (collective-identity vector; Hill-2011 non-kin; Ibn Khaldun solidarity). R-25. §4.8.7–11 |
 | Full-stack integration + modest polygyny + prowess fix | ✓ | architecture coheres; status→RS ≈0.13 (monogamy-appropriate); prowess-credit + reputation fixes. R-26. §4.8.12 |
-| **Dynamic Social Evolution (NEW STAGE — active)** | ⏳ in progress | Stage 0 climate integration done (trough-limiting, R-27); **controlled-climate harness done** (`ClimateDriver` + `run_se0`, diff-in-diff ΔPRE≈0 placebo, R-28). **NEXT: Stage 1 leader coherence → genealogy logger → Ibn Khaldun cycle → dynamic polygyny.** Fully-ablatable flags. Blueprint `…_SocialEvolution_Dynamic_Scoping.md`. |
+| **Dynamic Social Evolution (NEW STAGE — active)** | ⏳ in progress | Stage 0 climate integration + controlled-climate harness done (R-27/R-28). **Stage 1 done:** the band-size force balance — size-repulsion (Johnson scalar stress) BINDS + fixes assabiyah saturation (R-29, the Stage-1 deliverable); leader coherence built + unit-valid but leader-death→fission is a principled null in the complex-forager regime → benchmark DEFERRED to the dynastic stage (R-30). **NEXT: revisit fission drivers / double-counting (food-scarcity dispersion 1c) → genealogy logger → Ibn Khaldun dynastic cycle (where leader-death→fission belongs) → dynamic polygyny.** Fully-ablatable flags. Blueprint `…_SocialEvolution_Dynamic_Scoping.md`. |
 
 > **Currency note (2026-06-29):** the Current-status table had not been updated since 2026-06-14 (through Stage
 > 6.0a); the entire Phase 1 demographic/carbon/climate/bands/social arc is consolidated in the block above (full

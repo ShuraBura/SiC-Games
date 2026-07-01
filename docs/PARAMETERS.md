@@ -381,6 +381,8 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | enable_dynamic_bands / assabiyah_gain / assabiyah_decay | False / **0.05 / 0.02** | OPT-IN | F.3c-3 condition-dependent tolerable_size = base+(cap−base)·assabiyah; solidarity from surplus (Ibn Khaldun). §4.8.10 |
 | season_aggregation | **0** (default) | OPT-IN | scale tolerable_size by ClimateField.season() (wet/dry aggregation); weak realized effect. §4.8.10 |
 | enable_band_family_knobs | **False** (default) | OPT-IN | F.3c-2b reproduction reads the band-society family knobs via additive-delta-from-egalitarian (egalitarian band = global EXACTLY → E.3 safe). §4.8.11 |
+| enable_leader_coherence / leader_coherence_gain | **False / 0** | OPT-IN | Stage 1a: 2nd cohesion source from a band's top-status member, Boehm-gated (`LEADER_SOCIETY_WEIGHT` egalitarian 0 / complex 0.5 / stratified 1.0). Gain UNANCHORED (bracket). Built + unit-valid; behavioural benchmark DEFERRED to the dynastic stage (R-30). §4.8.13 |
+| enable_size_repulsion / repulsion_gain / repulsion_midpoint / repulsion_width | **False / 0 / 25 / 6** | OPT-IN | Stage 1b: Johnson scalar-stress DISPERSIVE term (logistic in band size, Alberti shape), society-relieved (`REPULSION_SOCIETY_FACTOR` egal 1.0 / complex 0.5 / stratified 0.25). midpoint=Wobst-band, width=Alberti re-anchored to band scale; gain UNANCHORED. Binds (max band 44→31) + fixes assabiyah saturation (R-29). §4.8.13 |
 
 > **§17–18 currency note (2026-06-29):** added to close the audit gap — PARAMETERS had not been updated through
 > the entire Carbon-status (R-18…R-21) → storage/morph → emergent-bands → full F.3 family/band/society arc →

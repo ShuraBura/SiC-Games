@@ -1322,6 +1322,55 @@ forager society with modest polygyny (von Rueden monogamous r≈0.15), a **refin
 superseded by the family stack for the full model. **Remaining limitation (future):** the monogamous "wife-quality"
 channel (status→partner fertility) is absent; adding it would let strict monogamy reach r≈0.15 on its own.
 
+### §4.8.13 Social-Evolution Stage 1 — the band-size FORCE BALANCE: leader coherence + size repulsion (built 2026-07-01)
+
+`tolerable_size` becomes an explicit **cohesion − dispersion** balance (Layton et al. 2012 two-force frame), each
+term an independent opt-in flag (default OFF, bit-exact). The combination, per band, in `_maintain_bands`:
+`cohesion_frac = clamp(assabiyah + leader_term − repulsion, 0, 1)`; `tolerable = base + (cap−base)·cohesion_frac·
+season_ab`. The `[0,1]` clamp keeps `band_split_size` the absolute hard cap and `band_base_tolerable` (Wobst floor)
+the minimum — the new terms only redistribute *within* that envelope. All three prior terms nest bit-exact when the
+new flags are off (both new terms → 0 ⇒ `min(1, assabiyah+0)`, the §4.8.10 form).
+
+**(1a) LEADER COHERENCE (`enable_leader_coherence`, `leader_coherence_gain`).** A SECOND cohesion source (distinct
+from assabiyah — solidarity-from-success — this is charismatic/organizational): a band's top-status member lends
+`leader_term = gain · weight(society) · leader_strength`, where `leader_strength = 1 − mean_status/top_status`
+(self-normalizing ∈[0,1), read FRESH each step — no accumulated state, so a leader's death drops it immediately) and
+`weight` is the **Boehm 1999 reverse-dominance gate** (`LEADER_SOCIETY_WEIGHT`: egalitarian **0** — mobile bands
+LEVEL leaders → the mechanism is INERT, not just weak — complex **0.5**, stratified **1.0**). Magnitude UNANCHORED
+(bracket/sweep, don't fit). Lit: Hooper/Kaplan/Boone 2010; Boehm 1999. Diagnostic: `band_leaders()` (top cred·prowess
+per band) — also the controlled-experiment hook for scripted leader removal.
+
+**(1b) SIZE REPULSION (`enable_size_repulsion`, `repulsion_gain/midpoint/width`).** Johnson 1982 **scalar stress** as
+a DISPERSIVE term — a logistic in band size (Alberti 2014 shape), `size_repulsion = gain · factor(society) ·
+1/(1+exp(−(N−midpoint)/width))` — SUBTRACTED from cohesion, so a large band needs MORE cohesion to stay whole.
+**Resource-INDEPENDENT** (pure coordination cost — DISTINCT from the existing resource-scarcity fission that runs
+through assabiyah↓ when surplus falls). **Johnson-coupled society relief** (`REPULSION_SOCIETY_FACTOR`: egalitarian
+**1.0** — full scalar stress, mobile bands stay small — complex **0.5**, stratified **0.25** — hierarchy ABSORBS the
+coordination cost → settling/institutions unlock larger groups). The `midpoint≈25` is the band-scale scalar-stress
+onset (Wobst-minimal band); `width≈6` is Alberti's logistic shape **re-anchored from village scale (N≈127) to band
+scale** — a bracket, not a fit (cf. the regime °C→CC% re-anchoring; Alberti's absolute 127 is a category error at
+band scale). Magnitudes UNANCHORED.
+
+**RESULTS (run_se1, 6 seeds × 900-step burn, realistic full-stack config).**
+- **R-29 — repulsion BINDS + resolves assabiyah saturation.** With repulsion ON, max band size dropped **44 → 31**
+  and the cohesion balance came **off the ceiling** (assabiyah 0.86 + leader 0.23 − repulsion 0.19 ≈ 0.89, no
+  longer clamped at 1.0) — restoring headroom so *any* second cohesion term can move `tolerable_size` again. 7 unit
+  tests (shape, Boehm/Johnson society relief, large-mobile-band fission, hierarchy-relieved persistence, hard-cap
+  guard, headroom restoration).
+- **R-30 — leader-death→fission is a PRINCIPLED NULL in the complex-forager regime (benchmark deferred).** A
+  cohort-specific event study (kill each complex/stratified band's leader vs. a matched random adult; track how the
+  bereaved band's ORIGINAL member cohort fragments) found **no leader-specific fission** — Δ(leader−placebo) distinct
+  bands ≈ **−0.02 … −0.25** across checkpoints (slightly NEGATIVE, robust over 6 seeds). Two structural reasons, both
+  correct-by-design: **(i) fission is not the equilibrium-binding size constraint** — bands settle ~20 (mortality +
+  mate-gate + movement) *below* tolerable_size, so a small leader-loss tolerable drop rarely crosses the split
+  threshold; **(ii) leadership is a DISTRIBUTIONAL property here** (top/mean-status ratio), so killing the top
+  instantly promotes a near-identical runner-up — no irreplaceable KEYSTONE, no succession gap, no collapse. This is
+  anthropologically right for the regime: Boehm's foragers have *no fixed keystone chiefs*; the leader-death-collapse
+  signature belongs to **hereditary chiefs with succession crises** — the STRATIFIED **Ibn Khaldun dynastic-cycle
+  stage (Stage 3)**, where a keystone chief + a succession gap makes a leader's loss consequential. **Verdict:** leader
+  coherence is BUILT + unit-valid (a correct, ablatable cohesion source); its behavioural benchmark is **deferred to
+  the dynastic stage**, not claimed here. Repulsion is the validated Stage-1 deliverable.
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),

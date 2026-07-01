@@ -88,6 +88,21 @@ Glowacki & von Rueden 2015; **Boehm 1999** (reverse-dominance — egalitarian ba
 **Benchmark.** **Leader death → fission spike** (testable signature); leader-coherence raises mean band size only
 in complex/stratified bands, not egalitarian ones.
 
+**RESULTS (run_se1, 2026-07-01) — leader coherence BUILT + unit-valid; the FORCE-BALANCE frame adopted; benchmark
+DEFERRED.** During the build, the full-stack check surfaced that **assabiyah saturates cohesion at 1.0**, so a lone
+cohesion term is absorbed by the `min(1,·)` clamp — a cohesion source only means something against an opposing
+DISPERSION force. So `tolerable_size` was refactored into an explicit **cohesion − dispersion** balance and
+**Stage 1b size-repulsion** (Johnson 1982 scalar stress, Alberti 2014 logistic, hierarchy-relieved) was built
+alongside — it **binds** (max band 44→31) and **restores the headroom** (R-29). But the leader-coherence
+**benchmark itself is a principled NULL** (R-30): a cohort event study (6 seeds) shows killing a band's leader does
+NOT fission it more than killing a random adult (Δ ≈ −0.02…−0.25), because (i) fission is not the equilibrium-binding
+size constraint and (ii) leadership here is *distributional* (top/mean ratio) → smooth succession, no keystone
+collapse. That is anthropologically correct for the egalitarian/complex-forager regime (Boehm: no fixed chiefs);
+**leader-death→fission belongs to Stage 3 (Ibn Khaldun dynastic cycle)** — hereditary keystone chief + succession
+crisis. **Verdict:** leader coherence retained (correct, ablatable); size-repulsion is the validated Stage-1
+deliverable; the leader benchmark is re-scoped to the dynastic stage. Papers filed: Johnson 1982, Alberti 2014,
+Layton et al. 2012. `enable_leader_coherence`, `enable_size_repulsion` — both default-OFF, bit-exact.
+
 ---
 
 ## Stage 2 — Genealogy / lineage logger  `[enable_genealogy_log]`

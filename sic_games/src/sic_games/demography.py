@@ -310,6 +310,30 @@ class DemographyConfig(BaseModel):
     # wet/abundant season AGGREGATION, lean-season DISPERSAL (Kelly/Marlowe fission-fusion). 0 = off (no season
     # effect); 1 = the tolerable headroom fully scales with seasonal abundance. Needs a ClimateField harvest field.
     season_aggregation: float = Field(0.0, ge=0.0, le=1.0)
+    # Social-Evolution Stage 1: LEADER COHERENCE (a SECOND, distinct cohesion source added to `tolerable_size`,
+    # additive alongside assabiyah, not a relabel). A band's top-status member (highest cred·prowess) lends extra
+    # cohesion, scaled by a Boehm 1999 reverse-dominance GATE on the band's society type (egalitarian bands LEVEL
+    # would-be leaders → weight≈0; complex/stratified bands institutionalize authority → weight rises). Read FRESH
+    # every step from current membership (no accumulated state, unlike assabiyah) so the benchmark signature —
+    # leader death/removal → an IMMEDIATE cohesion drop → a fission spike next check — is not smoothed by a decay
+    # lag. Requires enable_dynamic_bands (the term feeds the same tolerable_size headroom). Default OFF = bit-exact
+    # (leader_term≡0 regardless of gain when the flag is off).
+    enable_leader_coherence: bool = False
+    leader_coherence_gain: float = Field(0.0, ge=0.0)    # UNANCHORED magnitude (red-team: bracket/sweep, don't fit)
+    # Social-Evolution Stage 1b: SIZE-DRIVEN REPULSION (Johnson 1982 scalar stress) — a DISPERSIVE counterweight
+    # to cohesion, rising with band size N via a logistic (Alberti 2014 shape), SUBTRACTED from the cohesion_frac
+    # so a large band needs MORE cohesion (assabiyah+leader) to stay whole. DISTINCT from the existing resource-
+    # scarcity fission (that runs through assabiyah↓ when surplus is low; this is resource-INDEPENDENT, purely
+    # coordination cost). Boehm/Johnson coupling: scalar stress is what organizational HIERARCHY exists to absorb,
+    # so the repulsion is scaled by REPULSION_SOCIETY_FACTOR — FULL in egalitarian mobile bands (no hierarchy →
+    # capped ~small), RELIEVED in complex/stratified (settling + institutions let a group grow toward the hard
+    # cap). The midpoint is the band-scale scalar-stress onset (≈ the Wobst-minimal band); the width is Alberti's
+    # logistic shape re-anchored to band scale (village-scale N≈127 → band scale — a bracket, not a fit, cf. the
+    # regime °C→CC% re-anchoring). Requires enable_dynamic_bands. Default OFF ⇒ repulsion≡0, bit-exact.
+    enable_size_repulsion: bool = False
+    repulsion_gain: float = Field(0.0, ge=0.0)           # max repulsion (subtracted from cohesion_frac); UNANCHORED
+    repulsion_midpoint: float = Field(25.0, gt=0.0)      # band size at half-max repulsion (≈ Wobst-minimal band)
+    repulsion_width: float = Field(6.0, gt=0.0)          # logistic steepness in band-size units (Alberti shape ~6.7)
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from
@@ -419,6 +443,55 @@ SOCIETY_PRESETS: dict[str, dict] = {
                                 patriline_weight=0.8, lineage_reversion=0.04, paternal_provision_frac=0.5,
                                 sex_division=1.0),
 }
+
+
+# Leader-coherence Boehm gate (Social-Evolution Stage 1): how much a band's top-status member's authority
+# translates into extra group cohesion, by society type. Egalitarian foragers actively LEVEL would-be leaders via
+# mockery/desertion/assassination (Boehm 1999 reverse dominance) → weight 0 (the mechanism is INERT there, not
+# just weak). Complex foragers show incipient institutionalized rank/leadership in collective action (Hooper,
+# Kaplan & Boone 2010; Ames 1994) → a moderate weight. Stratified chiefdoms institutionalize chiefly authority
+# (Sahlins 1958; Service 1962) → the full weight. UNANCHORED magnitudes (no measured "how much cohesion" number
+# exists) — these are a bracketed 0 / 0.5 / 1.0 ladder for sensitivity sweeps, not a fitted scale.
+LEADER_SOCIETY_WEIGHT: dict[str, float] = {
+    "egalitarian_forager": 0.0,
+    "complex_forager": 0.5,
+    "stratified_chiefdom": 1.0,
+}
+
+
+def leader_society_weight(society: str | None) -> float:
+    """Boehm-gate lookup for leader coherence; an unclassified/None band defaults to the EGALITARIAN weight (0.0)
+    — the conservative default (no leader effect until a band is positively morphed toward complexity)."""
+    return LEADER_SOCIETY_WEIGHT.get(society, 0.0)
+
+
+# Scalar-stress RELIEF by society type (Social-Evolution Stage 1b, Johnson 1982): the FRACTION of coordination
+# cost NOT absorbed by organizational structure. Egalitarian mobile bands have no hierarchy → they retain the
+# FULL scalar stress (1.0) → mobile forager bands stay small. Complex foragers' incipient rank + a settled/stored
+# base absorb some (0.5); stratified chiefdoms' institutionalized authority absorbs most (0.25) → hierarchy is
+# precisely what lets a group grow larger (Johnson's thesis). UNANCHORED ladder — bracketed for sensitivity.
+REPULSION_SOCIETY_FACTOR: dict[str, float] = {
+    "egalitarian_forager": 1.0,
+    "complex_forager": 0.5,
+    "stratified_chiefdom": 0.25,
+}
+
+
+def repulsion_society_factor(society: str | None) -> float:
+    """Scalar-stress retention by society type; an unclassified/None band defaults to the EGALITARIAN factor (1.0)
+    — a mobile band feels the FULL coordination cost until it positively morphs toward hierarchy."""
+    return REPULSION_SOCIETY_FACTOR.get(society, 1.0)
+
+
+def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: str | None) -> float:
+    """Johnson 1982 scalar stress as a per-band DISPERSIVE term ∈ [0, gain): a logistic in band size `n` (Alberti
+    2014 shape) scaled by `gain` and the society scalar-stress-retention factor. ≈0 for small bands, saturating
+    toward `gain·factor` as the band grows past the coordination-cost midpoint. Resource-INDEPENDENT (pure
+    coordination cost) — the size-driven counterweight to the assabiyah/leader cohesion terms."""
+    if gain <= 0.0:
+        return 0.0
+    logistic = 1.0 / (1.0 + math.exp(-(n - midpoint) / width))
+    return gain * repulsion_society_factor(society) * logistic
 
 
 def society_knobs(name: str) -> tuple[float, dict]:

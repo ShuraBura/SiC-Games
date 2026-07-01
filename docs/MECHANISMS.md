@@ -441,6 +441,8 @@ Category: C1 (shared, param-differentiated) / C2 (re-pointed) / C3 (new architec
 | Assabiyah (dynamic bands) | per-band solidarity from surplus → condition-dependent `tolerable_size` (Ibn Khaldun) | C3 | `phase1_model::_maintain_bands` | §4.8.10; R-25 |
 | Climate integration | run the social stack on a `ClimateField`-modulated capacity (seasonal/ENSO/regime drive surplus/adversity) | C1 | `climate.py::ClimateField` | §4.1.9/§4.8 Stage 0; R-27 |
 | Controlled-climate driver (harness) | deterministic `t→[0,1]` regime waveform (flat/step/pulse/ramp/square/piecewise) overriding the telegraph for clean diff-in-diff social benchmarks | C1 (tool) | `climate.py::ClimateDriver`; `run_se0_controlled_climate.py` | §4.1.9; R-28 |
+| Leader coherence (Stage 1a) | 2nd cohesion source from a band's top-status member, Boehm-gated (egal 0 / complex 0.5 / stratified 1.0); read fresh each step | C1 | `phase1_model::_maintain_bands`; `demography::leader_society_weight`, `band_leaders()` | §4.8.13; R-30 (benchmark deferred) |
+| Size repulsion (Stage 1b) | Johnson scalar-stress DISPERSIVE term (logistic in band size, Alberti shape), hierarchy-relieved; resource-independent counterweight to cohesion | C1 | `demography::size_repulsion`; `phase1_model::_maintain_bands` | §4.8.13; R-29 |
 
 > **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4); **RETIRED:**
 > `storage_tether_reserves` (DE-3). Both default-OFF.

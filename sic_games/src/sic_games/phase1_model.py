@@ -57,7 +57,7 @@ from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
-    society_from_character, SOCIETY_PRESETS,
+    society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion,
 )
 from sic_games.group import GroupVector, NO_BAND
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
@@ -258,6 +258,8 @@ class TerrainWorld(mesa.Model):
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
+        self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
+        self._band_repulsion: dict[int, float] = {}            # Stage 1b: per-band size-repulsion (scalar stress; diagnostic)
 
         # demographic layer
         self._reproduction = reproduction
@@ -1094,6 +1096,17 @@ class TerrainWorld(mesa.Model):
             groups.setdefault(find(c), []).extend(occ)
         return list(groups.values())
 
+    def band_leaders(self) -> dict[int, "BaseAgent"]:
+        """Public diagnostic (Stage 1 leader coherence): map each live band_id (the affiliation `_group.band_id`,
+        NOT the spatial `bands()` grouping) to its current highest cred·prowess member. Used by the
+        leader-coherence benchmark to identify — and, in a controlled experiment, force-remove — a band's leader
+        at a scripted step (set `.alive = False`; the model's own death-pruning cleans it up next `step()`), and
+        to track leader-identity turnover."""
+        members: dict[int, list] = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+        return {bid: max(ms, key=lambda a: a.cred * getattr(a, "prowess", 1.0)) for bid, ms in members.items()}
+
     def _family_head(self, a) -> "BaseAgent | None":
         """F.3b nuclear-family movement: the agent's MOVEMENT ANCHOR, or None if it moves independently. A dependent
         child (age < family_maturity_months, living mother) follows its MOTHER; a bonded adult male follows his
@@ -1200,7 +1213,19 @@ class TerrainWorld(mesa.Model):
             season_ab = 1.0
             if sa > 0.0 and hasattr(self._harvest_field, "season"):
                 season_ab = (1.0 - sa) + sa * self._harvest_field.season()
+            # Stage 1 leader coherence: a SECOND, additive cohesion source (Boehm-gated by society type), read
+            # FRESH each step from current membership (no accumulated state) so a leader's death/removal drops it
+            # immediately — the benchmark signature is an instant cohesion drop, not a decayed one.
+            leader_on = getattr(cfg, "enable_leader_coherence", False)
+            leader_gain = getattr(cfg, "leader_coherence_gain", 0.0)
+            # Stage 1b size-driven repulsion (Johnson scalar stress): a DISPERSIVE term subtracted from cohesion.
+            repulsion_on = getattr(cfg, "enable_size_repulsion", False)
+            rep_gain = getattr(cfg, "repulsion_gain", 0.0)
+            rep_mid = getattr(cfg, "repulsion_midpoint", 25.0)
+            rep_width = getattr(cfg, "repulsion_width", 6.0)
             new_assab: dict[int, float] = {}
+            new_leader: dict[int, float] = {}
+            new_repulsion: dict[int, float] = {}
             for bid, ms in members.items():
                 surplus = self._band_surplus.get(bid, 0.0)
                 a_prev = self._band_assabiyah.get(bid, 0.0)
@@ -1208,8 +1233,32 @@ class TerrainWorld(mesa.Model):
                 new_assab[bid] = a_new
                 for a in ms:                                   # mirror onto the collective-identity vector
                     a._group.assabiyah = a_new
-                split_thr[bid] = base + (cap - base) * a_new * season_ab   # tolerable grows w/ solidarity, scaled by season
+                society = self._band_society.get(bid)
+
+                leader_term = 0.0
+                if leader_on and leader_gain > 0.0:
+                    statuses = [a.cred * getattr(a, "prowess", 1.0) for a in ms]
+                    mean_status = sum(statuses) / len(statuses)
+                    top_status = max(statuses)
+                    ratio = top_status / (mean_status + 1e-9)          # ≥1; 1 = no distinct leader
+                    leader_strength = 1.0 - 1.0 / ratio                # self-normalizing, saturating ∈ [0,1)
+                    weight = leader_society_weight(society)            # Boehm gate
+                    leader_term = leader_gain * weight * leader_strength
+                new_leader[bid] = leader_term
+
+                repulsion = 0.0
+                if repulsion_on and rep_gain > 0.0:
+                    repulsion = size_repulsion(len(ms), rep_gain, rep_mid, rep_width, society)
+                new_repulsion[bid] = repulsion
+
+                # cohesion − dispersion, clamped: a large mobile band (high repulsion) needs strong assabiyah+leader
+                # to stay whole; the [0,1] clamp keeps band_split_size the absolute hard cap (repulsion can't push
+                # tolerable below base_tolerable, the Wobst viability floor). Off ⇒ repulsion 0 ⇒ min(1, a+l), bit-exact.
+                cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion))
+                split_thr[bid] = base + (cap - base) * cohesion_frac * season_ab
             self._band_assabiyah = new_assab
+            self._band_leader_term = new_leader
+            self._band_repulsion = new_repulsion
 
         # FUSION (small → nearest other band)
         for bid in [b for b, ms in members.items() if len(ms) < cfg.band_merge_size]:
