@@ -357,4 +357,12 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-31 — The fission threshold is DORMANT at equilibrium; band size is movement-set, not fission-set (+ R-29 correction) (2026-07-01)
+
+**Origin:** controlled probe (realistic full-stack config, repulsion off-vs-on) during the fission-driver design review. Supersedes part of R-29's headline. Feeds the movement-channel blueprint (`…_MovementChannel_ResourceResponse_Scoping.md`).
+
+**What we know:** at equilibrium **0/26 bands sit near their `tolerable_size`** — bands settle at N≈20 while tolerable≈42. So the entire cohesion−dispersion balance (assabiyah + leader − repulsion − season) is **inert for setting *central* band size**; size is set upstream by the **movement (diffusion) + mortality + mate-gate** complex. The fission threshold is a **tail safety-valve** (runaway prevention + the future settled/dynastic regime), NOT the primary band-size regulator. **R-29 CORRECTION:** repulsion's *clean* controlled effect (off-vs-on, all else equal) is **max band 37→36, mean 20.7→20.0** + a modest pop drop (539→441 via tail-fission) — NOT the "max 44→31 cap" R-29 first reported (that 44 baseline was an unclean cross-config comparison). Repulsion *does* pull `cohesion_frac` off the 1.0 ceiling (0.975→0.875 — that part of R-29 holds), but it is **moot** while tolerable (42) ≫ N (20). Repulsion trims the tail; it does not cap the typical band. **Driver taxonomy + the three-channel architecture** (movement sets central size / threshold = tail valve / mortality = failure mode) and the non-monotonic resource response (moderate lean → aggregate, severe scarcity → disperse, catastrophe → die) are recorded in the blueprint; `season_aggregation`'s lean→fission sign is mis-signed AND inert → to be retired (DE-7). **No mechanism claim is overturned** — leader coherence (R-30) and repulsion (R-29) remain correct, ablatable mechanisms doing their (tail) job; the review re-scopes what job that is.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

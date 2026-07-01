@@ -41,6 +41,11 @@
 **What it was:** the temptation to bump `mate_choice_strength` until the monogamy-dominant family model hits 0.19.
 **Why not pursued:** 0.19 is the polygyny-inflated cross-cultural *average*; von Rueden's monogamous-society value is r≈0.15, so forcing 0.19 would *over*-skew a monogamy-dominant society relative to the evidence. **0.13 is accepted as the marriage-system-appropriate target** (R-26). The honest route to a higher per-band skew is *condition-dependent polygyny* (rich bands) + a future *wife-quality* channel, not a global m bump.
 
+## DE-7 — `season_aggregation` as a threshold cohesion-multiplier (to be retired 2026-07-01; pre-registered)
+
+**What it is:** `season_aggregation` scales the `tolerable_size` headroom by `ClimateField.season()` — so a lean season LOWERS tolerable → *fission* (lean → disperse), a threshold-channel term.
+**Why retired:** two faults found in the fission-driver review (R-31). **(1) Mis-signed:** the ethnography says *moderate* lean drives **aggregation** (risk-pooling — Cashdan 1985, Wiessner 1982; Hadza dry-season water aggregation — Hawkes 1991), not fission; only *severe* scarcity fissions (and that as movement-dispersal, ahead of mortality). **(2) Inert:** it acts on the fission threshold, which is DORMANT at equilibrium (0/26 bands near tolerable, R-31) — so it does nothing anyway. **Superseded by** the movement-channel non-monotonic resource response (blueprint `…_MovementChannel_ResourceResponse_Scoping.md`, stages M1 risk-pool aggregation / M2 starvation dispersal): seasonal lean now enters through realized per-capita adequacy `a = ypc/need` on the *binding* movement channel, with the correct sign. `season_aggregation=0` was already the default ⇒ removal is bit-exact. *Revive only if a threshold-channel seasonal term is ever shown to bind.* (Pre-registered here; the field is removed when M1/M2 land.)
+
 ---
 
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*
