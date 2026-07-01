@@ -279,16 +279,18 @@ def test_dynamic_band_seams_off_by_default():
 
 
 # ── Social-Evolution Stage 1: LEADER COHERENCE (additive 2nd cohesion source, Boehm-gated) ────────
-def _leader_world(n=8, seed=1, base=5, cap=9, **cfg_kw):
+def _leader_world(n=8, seed=1, base=5, cap=9, merge=1, positions=None, **cfg_kw):
     # One connected spatial cluster (some x/y spread so a fission has a real median cut), all forced into ONE
     # band_id — isolates `_maintain_bands`'s split-threshold arithmetic from the seeding/affiliation machinery
-    # (same direct-call convention as test_band_knob_additive_delta).
-    positions = [(10 + i % 4, 10 + i // 4) for i in range(n)]
+    # (same direct-call convention as test_band_knob_additive_delta). `positions`/`merge` let the fusion tests
+    # place several distinct bands with a chosen merge threshold.
+    if positions is None:
+        positions = [(10 + i % 4, 10 + i // 4) for i in range(n)]
     sc = SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion", contest_exponent=0.0, move_cost_flat=1e12)
     w = TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), seed=seed, game_stream=False, substrate_cfg=sc,
                      harvest_field=_UniformCapacity(3.0), placement_positions=positions,
                      demography_cfg=DemographyConfig(enable_dynamic_bands=True, band_base_tolerable=base,
-                                                     band_split_size=cap, band_merge_size=1, assabiyah_decay=0.0,
+                                                     band_split_size=cap, band_merge_size=merge, assabiyah_decay=0.0,
                                                      **cfg_kw))
     for a in w.agent_list:
         a._group.band_id = 0
@@ -494,3 +496,102 @@ def test_repulsion_restores_headroom_for_leader_coherence():
         frac = min(1.0, max(0.0, a + lt - rp))
         return cfg.band_base_tolerable + (cfg.band_split_size - cfg.band_base_tolerable) * frac
     assert tol(True) > tol(False)                                         # leader coherence now lifts tolerable
+
+
+# ── M2: malnutrition fission (severe scarcity → LARGE bands break up; realized-starvation signal) ────
+def test_malnutrition_fission_off_by_default():
+    cfg = DemographyConfig()
+    assert cfg.enable_malnutrition_fission is False and cfg.malnutrition_fission_gain == 0.0
+    assert cfg.malnutrition_starv_rate == 0.05 and cfg.malnutrition_ema_alpha == 0.3
+
+
+def test_malnutrition_term_fires_on_realized_starvation_only():
+    # pressure = gain·min(1, ema/rate); the EMA is built from THIS step's per-band starvation deaths. No deaths ⇒ 0.
+    fed = _leader_world(n=6, assabiyah_gain=1.0, enable_malnutrition_fission=True,
+                        malnutrition_fission_gain=1.0, malnutrition_starv_rate=0.05)
+    fed._band_surplus[0] = 1.0
+    fed._band_starv_this_step = {}                                       # no starvation deaths this step
+    fed._maintain_bands()
+    assert fed._band_malnutrition[0] == 0.0
+
+    starv = _leader_world(n=6, assabiyah_gain=1.0, enable_malnutrition_fission=True,
+                          malnutrition_fission_gain=1.0, malnutrition_starv_rate=0.05, malnutrition_ema_alpha=0.3)
+    starv._band_surplus[0] = 1.0
+    starv._band_starv_this_step = {0: 3}                                 # 3 of (6+3) starved → rate 1/3
+    starv._maintain_bands()
+    ema = 0.3 * (3 / 9)                                                  # prev 0 → alpha·rate = 0.1
+    assert abs(starv._band_malnutrition[0] - 1.0 * min(1.0, ema / 0.05)) < 1e-9   # saturates (0.1/0.05 → 1)
+
+
+def test_malnutrition_fissions_large_starving_band():
+    # THE M2 payoff: a large band that assabiyah holds together with NO deaths breaks up once it starts starving.
+    fed = _leader_world(n=8, base=5, cap=9, assabiyah_gain=1.0, enable_malnutrition_fission=True,
+                        malnutrition_fission_gain=1.5, malnutrition_starv_rate=0.05)
+    fed._band_surplus[0] = 1.0
+    fed._band_starv_this_step = {}                                       # no starvation
+    fed._maintain_bands()
+    assert len({a._group.band_id for a in fed.agent_list}) == 1          # well-fed large band stays whole
+
+    starv = _leader_world(n=8, base=5, cap=9, assabiyah_gain=1.0, enable_malnutrition_fission=True,
+                          malnutrition_fission_gain=1.5, malnutrition_starv_rate=0.05)
+    starv._band_surplus[0] = 1.0
+    starv._band_starv_this_step = {0: 3}                                 # losing members to starvation
+    starv._maintain_bands()
+    assert len({a._group.band_id for a in starv.agent_list}) > 1         # starving large band broke up
+
+
+def test_malnutrition_size_gate_spares_small_bands():
+    # Intrinsic size-gate: tolerable floors at base_tolerable, so a starving band SMALLER than base can't fission.
+    small = _leader_world(n=4, base=5, cap=9, assabiyah_gain=1.0, enable_malnutrition_fission=True,
+                          malnutrition_fission_gain=1.5, malnutrition_starv_rate=0.05)
+    small._band_surplus[0] = 1.0
+    small._band_starv_this_step = {0: 3}                                 # starving, but only 4 < base 5
+    small._maintain_bands()
+    assert len({a._group.band_id for a in small.agent_list}) == 1        # untouched (below the base floor)
+
+
+def test_malnutrition_zero_and_bit_exact_when_off():
+    off = _leader_world(n=8, base=5, cap=9, assabiyah_gain=1.0, enable_malnutrition_fission=False,
+                        malnutrition_fission_gain=1.5)
+    off._band_surplus[0] = 1.0
+    off._band_starv_this_step = {0: 5}                                   # heavy starvation, but flag OFF
+    off._maintain_bands()
+    assert off._band_malnutrition[0] == 0.0
+    assert len({a._group.band_id for a in off.agent_list}) == 1          # off ⇒ assabiyah holds it, no fission
+
+
+# ── F: resource-directed fusion (starving remnant → RICHEST nearby band, not nearest) ───────────────
+_FUSE_POS = [(10, 10), (10, 11),                       # band 0: remnant (size 2 < merge 3)
+             (14, 10), (14, 11), (14, 12),             # band 1: NEAR, poor (size 3)
+             (30, 30), (30, 31), (30, 32)]             # band 2: FAR, rich (size 3)
+
+
+def _fusion_world(rdf, radius=40.0):
+    w = _leader_world(n=8, merge=3, positions=_FUSE_POS,
+                      enable_resource_directed_fusion=rdf, fusion_search_radius=radius)
+    for i, a in enumerate(w.agent_list):
+        a._group.band_id = 0 if i < 2 else (1 if i < 5 else 2)
+    w._band_surplus = {0: 0.0, 1: 0.0, 2: 1.0}          # the FAR band is the rich one
+    return w
+
+
+def test_resource_directed_fusion_off_by_default():
+    assert DemographyConfig().enable_resource_directed_fusion is False
+
+
+def test_fusion_joins_nearest_when_off():
+    off = _fusion_world(rdf=False)
+    off._maintain_bands()
+    assert off.agent_list[0]._group.band_id == 1        # nearest to the remnant is the NEAR poor band
+
+
+def test_fusion_joins_richest_nearby_when_on():
+    on = _fusion_world(rdf=True, radius=40.0)            # rich far band (~29 away) is within radius
+    on._maintain_bands()
+    assert on.agent_list[0]._group.band_id == 2         # joined the RICH band, though it's farther
+
+
+def test_fusion_radius_bounds_the_search():
+    on = _fusion_world(rdf=True, radius=10.0)            # rich far band (~29) is OUT of range → nearest only
+    on._maintain_bands()
+    assert on.agent_list[0]._group.band_id == 1         # falls back to the near (poor) band

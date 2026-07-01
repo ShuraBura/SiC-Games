@@ -365,4 +365,18 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-32 — `_condition` is a survivor-biased FED-moment signal; it cannot drive malnutrition responses (2026-07-01)
+
+**Origin:** M2 integration probe (severe scarcity pulse on the realistic full-stack). A red-team catch mid-build.
+
+**What we know:** `agent._condition` (the EMA of nutritional status, §4.2) is **pinned at ~1.0 even under a population-crashing scarcity pulse** — probe: pop 383→133, hundreds of starvation deaths, reserves at the 0.25 floor, yet mean `_condition` = 1.000 throughout. Two causes: (1) it is captured from `_fed_reserve = wealth` at the **post-harvest / pre-burn** moment (phase1_model.py:814), i.e. the FED peak, so it never sees the post-burn hunger trough; (2) **survivor bias** — agents who aren't refilled die and are pruned, so the living always look fed. Consequence: **scarcity in this model manifests as death, not as a lingering low-condition state**, so any mechanism that reads mean band `_condition` as a malnutrition signal is silent exactly when it should fire. Practical impact: M2 was first built on `_condition` and would never have triggered. **Fix:** M2 now reads a per-band **realized starvation-rate EMA** (`_band_starv_ema`) instead. (Wider implication: `_condition`-gated mechanisms measure the fed survivors, not scarcity — noted for the density-disease synergy which also reads it.)
+
+## R-33 — M2 malnutrition fission VALIDATED (dispersal substitutes for starvation death); resource-directed fusion built (2026-07-01)
+
+**Origin:** `outputs/phase1_social_evolution/run_se2_malnutrition_fission.py` (substitution test) + 9 M2/F unit tests. Blueprint `…_ResourceResponse_Scoping.md`; methods MODEL_SPEC §4.8.13; supervisor-chosen realized-starvation anchor.
+
+**What we know:** **M2** — a band losing members to realized starvation (`_band_starv_ema`) gets a dispersive term that lowers `tolerable_size` toward `band_base_tolerable` → a LARGE band fissions (intrinsically size-gated: tolerable floors at base, so bands <25 can't be fissioned — "large bands, not small," for free), the child band diffuses apart. **Substitution test (the decisive validation)**, severe −50% pulse, M2 off vs on, 3 seeds: **starvation deaths DROP with M2 on in all 3** (−120, −31, −24), M2 fires (max pressure 0.6–1.2), and 2/3 seeds end with *higher* surviving population — dispersal reroutes the scarcity cost from death (spreads out → higher per-capita yield → fewer subsequent deaths), not merely more fission. Net demographic effect modest/mixed (dispersing to avoid starving can cost the best patches — honest). REACTIVE to realized starvation, not a forecast (supervisor: anticipatory dispersal would need "wise leadership" — a future feature). **F** — resource-directed fusion: a band below `band_merge_size` joins the RICHEST neighbour within `fusion_search_radius` (highest `_band_surplus`) instead of the nearest (starving remnants merge into well-provisioned bands; Wiessner hxaro), falling back to nearest if none in range; unit-tested (nearest when off = bit-exact, richest-nearby when on, radius bound). Both flags default OFF, bit-exact. `season_aggregation`'s severe-scarcity role is now superseded by M2 (DE-7; field retained inert pending a cleanup removal). 588 passed/1 xfailed.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

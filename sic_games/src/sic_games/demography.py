@@ -334,6 +334,26 @@ class DemographyConfig(BaseModel):
     repulsion_gain: float = Field(0.0, ge=0.0)           # max repulsion (subtracted from cohesion_frac); UNANCHORED
     repulsion_midpoint: float = Field(25.0, gt=0.0)      # band size at half-max repulsion (≈ Wobst-minimal band)
     repulsion_width: float = Field(6.0, gt=0.0)          # logistic steepness in band-size units (Alberti shape ~6.7)
+    # Resource-response redesign (blueprint …_ResourceResponse_Scoping):
+    # M2 — MALNUTRITION FISSION: a band losing members to REALIZED starvation adds a DISPERSIVE term that lowers
+    # tolerable_size toward band_base_tolerable → a large band breaks up (fission), the child band diffuses apart
+    # → lower local density → higher per-capita yield → the subsequent starvation mortality relaxes (dispersal
+    # SUBSTITUTES for further death). REACTIVE, not a forecast (supervisor: real bands disperse when starvation
+    # actually bites, not on anticipation — anticipatory dispersal would be a future "wise leadership" feature).
+    # Signal = an EMA of the band's per-capita starvation-death rate (`_band_starv_ema`); NOT `_condition` (which
+    # samples the post-harvest FED reserve → pinned ~1.0 under scarcity, survivor-biased — see RESULTS R-32).
+    # Intrinsically size-gated: tolerable floors at band_base_tolerable, so only bands LARGER than it can fission
+    # (small bands just shrink/die). Default OFF.
+    enable_malnutrition_fission: bool = False
+    malnutrition_fission_gain: float = Field(0.0, ge=0.0)      # max dispersion (subtracted from cohesion); UNANCHORED
+    malnutrition_starv_rate: float = Field(0.05, gt=0.0)       # per-capita recent-starvation rate (EMA) at which the pressure SATURATES
+    malnutrition_ema_alpha: float = Field(0.3, gt=0.0, le=1.0)  # smoothing of the per-band starvation-rate signal
+    # F — RESOURCE-DIRECTED FUSION: a band below band_merge_size joins the RICHEST nearby neighbour (highest
+    # `_band_surplus`) instead of the NEAREST — starving remnants merge into well-provisioned bands (Wiessner hxaro).
+    # Bounded to `fusion_search_radius` cells (stay local; fall back to nearest if none in range). Default OFF ⇒
+    # nearest-neighbour join, bit-exact.
+    enable_resource_directed_fusion: bool = False
+    fusion_search_radius: float = Field(25.0, gt=0.0)          # cells; locality bound for the richest-neighbour search
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from

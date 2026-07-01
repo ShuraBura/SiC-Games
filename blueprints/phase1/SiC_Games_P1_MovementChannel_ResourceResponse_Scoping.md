@@ -1,145 +1,154 @@
-# SiC Games P1 — Movement-Channel Resource Response (SCOPING + RED-TEAM)
+# SiC Games P1 — Resource → Band-Size Response, corrected (SCOPING + RED-TEAM)
 
-**Goal.** Recast the resource→band-size response as a **non-monotonic drive on the MOVEMENT channel** (where band
-size is actually set), replacing the mis-signed and inert `season_aggregation` fission term. As a band's realized
-per-capita food adequacy falls: **abundant → mild cohesion · moderate lean → PEAK cohesion (aggregate / risk-pool)
-· severe scarcity → dispersion (fission-as-movement) · catastrophic → mortality (failure mode).** This makes the
-resource response bind on the equilibrium (the movement channel controls central band size), keeps the fission
-threshold as a tail safety-valve, and de-double-counts by mapping each resource regime to ONE response.
+**Goal.** Fix the mis-signed, inert `season_aggregation` (lean → fission) and give the band-size model the *correct*
+resource response, honestly scoped after a design review (R-31) that (a) found the fission threshold DORMANT at
+equilibrium and (b) tested each candidate driver against "does it actually help food-wise?". The surviving design
+is deliberately minimal:
+- **Retire `season_aggregation`** — moderate lean should NOT drive fission. Removing it is the whole fix for the
+  moderate range (bands then just carry on, following food via existing movement). No aggregation force is added.
+- **M2 — malnutrition fission** (severe scarcity → large bands break up), anchored to the model's OWN starvation
+  onset (`_condition`), and intrinsically size-gated to large bands.
+- **F — resource-directed fusion** (a starving/small band joins the RICHEST reachable neighbour, not the nearest)
+  — the "starving families join the big pool" behaviour, cleanly a fusion refinement (resource-seeking), NOT
+  anti-fission cohesion.
 
-**Governing principle (supervisor, standing): FULL CUSTOMIZABILITY.** Every drive below is an independent opt-in
-flag (default OFF, bit-exact when off). `season_aggregation` is RETIRED into this redesign (dead-ended, not
-silently kept).
+**M1 (moderate-lean aggregation cohesion) — DROPPED (review 2026-07-01).** It failed the food-wise test: the one
+real payoff (risk-pooling variance reduction) is already implicit in within-cell meat sharing, and bands already
+equilibrate at ~20 ≈ Wobst 25 (not under-aggregated). The "Hadza waterhole aggregation" case is agents *following
+concentrated resources* — already the IFD movement, not a new anti-fission force. So there is no needed
+moderate-lean cohesion driver; the correct moderate-lean behaviour is simply "no fission pressure" (= retire
+season_aggregation). See DEAD_ENDS DE-8.
+
+**Governing principle: FULL CUSTOMIZABILITY.** Each of M2, F is an independent opt-in flag (default OFF, bit-exact).
 
 ---
 
-## Motivating review findings (2026-07-01; RESULTS R-29 corrected, R-31)
+## Motivating review findings (R-29 corrected, R-31, 2026-07-01)
 
-1. **The fission threshold is DORMANT at equilibrium.** Controlled probe (realistic full-stack config): **0/26
-   bands sit near their `tolerable_size`** — bands equilibrate at N≈20 while tolerable≈42. So the whole
-   cohesion−dispersion balance (assabiyah + leader − repulsion − season) is INERT for setting *central* band size;
-   size is set upstream by **movement (diffusion) + mortality + the mate-gate**.
-2. **R-29 correction.** Repulsion's clean effect (controlled off-vs-on) is **max band 37→36, mean 20.7→20.0** + a
-   modest pop drop (539→441 via tail-fission) — NOT the "44→31 cap" first reported (unclean baseline). It trims the
-   tail, it does not cap the typical band, because the threshold it acts on isn't binding.
-3. **`season_aggregation` is mis-signed AND inert.** It makes *lean → fission* (monotone), but the ethnography says
-   *moderate* lean → **aggregation** (risk-pooling; Hadza dry-season water aggregation). And it does nothing anyway
-   (bands sit below tolerable). Wrong sign, wrong channel, no effect.
+1. **Fission threshold DORMANT at equilibrium** (0/26 bands near `tolerable_size`; bands ~20, tolerable ~42). Band
+   size is set by movement + mortality + mate-gate, not the cohesion−dispersion balance. **This is correct** — the
+   threshold SHOULD be dormant in normal times and bind only under stress. M2 is precisely what makes it bind under
+   severe scarcity (for large bands). So M2 does not fight the dormant-threshold finding — it completes it.
+2. **R-29 corrected:** repulsion trims the tail (max band 37→36, pop 539→441), does not cap the typical band.
+3. **`season_aggregation` mis-signed + inert** → retired (DE-7).
 
-## The three-channel architecture (the frame this blueprint commits to)
+## The three-channel architecture (the frame)
 
-| Channel | Role | Drivers | Binds on |
+| Channel | Role | Drivers | Binds |
 |---|---|---|---|
-| **Movement / spatial** | sets *central* band size (~20–25) | selfish-herd safety *(built, E.1)*, **risk-pool aggregation (moderate lean)** *(M1, new)*, **starvation dispersal (severe scarcity)** *(M2, new)*, IFD + local depletion *(built)* | the equilibrium |
-| **Fission threshold** | tail safety-valve + settled/dynastic regime | assabiyah, leader, scalar-stress repulsion | runaway prevention, transients |
-| **Mortality** | failure mode (dispersal failed) | starvation + density-disease | absolute deficit |
-
-The resource-responsive drives (M1, M2) go on the **movement channel** (the binding one); the threshold keeps its
-tail/dynastic job; mortality stays the failure mode. `season_aggregation` (a threshold term) is removed.
+| Movement / spatial | central band size (~20–25) | selfish-herd safety, IFD, local depletion *(all built)* | always (the equilibrium) |
+| **Fission threshold** | tail valve + **stress response** | assabiyah, leader, scalar-stress repulsion, **M2 malnutrition** *(new)* | under stress / large size |
+| Fusion | re-absorb small bands | nearest-neighbour join → **F resource-directed** *(new)* | when band < merge_size |
+| Mortality | failure mode | starvation + density-disease | absolute deficit |
 
 ---
 
-## The signal — realized per-capita adequacy `a = ypc / need`
+## The signal — band mean body-condition `cond = mean(a._condition)`
 
-`diffusion_select_target` already computes each candidate cell's per-capita yield `ypc` (§substrate.py). Define the
-adequacy `a = ypc / subsistence_need` (need = the monthly burn already in the kcal economy). `a ≫ 1` abundant,
-`a ≈ 1` balanced, `a < 1` lean, `a ≪ 1` severe. This signal **already carries season × ENSO × regime × local
-depletion** (they all move `ypc` through the harvest field), so ONE signal drives the whole non-monotonic response
-— no separate season/ENSO/regime/acute subtractors (the de-double-count, by construction). Smoothing / hysteresis
-per red-team #4 below.
+`agent._condition` (phase1_model.py:402/820) is a slow EMA of nutritional status ∈ [0,1] (1 = chronically well-fed;
+→0 = chronically at the starvation reserve-floor). It already potentiates mortality (line 1337:
+`m *= 1 + (mu_max−1)·(1−cond)`) — so it IS the model's starvation-onset variable, and being an EMA it is
+pre-smoothed (no per-step thrash; red-team #4 handled by construction). M2 reads each band's mean `_condition`.
+This carries season × ENSO × regime × local depletion through realized intake → one signal, no double-count.
 
----
+## Stage M2 — Malnutrition fission (severe scarcity → large bands break up)  `[enable_malnutrition_fission]`
 
-## Stage M1 — Risk-pool aggregation (moderate lean → aggregate)  `[enable_riskpool_aggregation]`
-
-**Scope.** Under *moderate* lean (a in a band around, say, 0.6–0.95), STRENGTHEN the group-attraction in the
-movement utility — a band pulls together to pool risk / share / aggregate at concentrating resources. Mechanically:
-a resource-gated boost to the existing E.1 safety multiplier (or an additive aggregation multiplier on `ypc` that
-rises with post-move group size `g`), scaled by a hump function of `a` that peaks at moderate lean and → 0 at both
-abundance (no need) and severe scarcity (M2 takes over).
-**Lit.** Cashdan 1985 (*Coping with risk*, Man) — sharing/reciprocity intensifies under variance; Wiessner 1982
-(hxaro risk-reduction); Kaplan & Hill 1985 (food-sharing as variance reduction); Hawkes 1991 (Hadza dry-season
-aggregation at water); Dyson-Hudson & Smith 1978 (economic defensibility → aggregate at concentrated resources);
-Hamilton 1971 (the existing selfish-herd safety drive this modulates).
+**Scope.** When a band's mean `_condition` falls below a threshold (chronic malnutrition), add a DISPERSIVE term to
+the threshold balance that lowers effective `tolerable_size` toward `band_base_tolerable` — so a LARGE band splits
+(the child band gets a new band_id, its members diffuse apart → lower local density). Form: a scarcity term on the
+dispersion side, `malnutrition_pressure = gain · smoothstep(threshold − cond)`, subtracted from `cohesion_frac`
+alongside repulsion (`cohesion_frac = clamp(assabiyah + leader − repulsion − malnutrition, 0, 1)`).
+**Intrinsic size-gate (the key property):** because `tolerable_size` floors at `band_base_tolerable`=25 (the Wobst
+viability floor, the `[0,1]` clamp), malnutrition can ONLY fission bands LARGER than 25 — small bands are untouched.
+That is "large bands, not small ones" for free, no explicit size test.
+**Anchor (supervisor choice):** the threshold is tied to the model's OWN starvation onset — `cond` at which the
+mortality synergy `1 + (mu_max−1)(1−cond)` becomes serious (default ~0.5, halfway to the floor; bracketed). NO
+invented quantitative "malnutrition% → fission" number (the lit gives this only qualitatively).
+**Lit (qualitative — direction + "large bands first"):** Colson 1979 (*In good years and in bad*, famine
+coping/fragmentation — PENDING JSTOR, supporting only); Turnbull 1972 (*The Mountain People* / Ik — social
+fragmentation under famine); Kelly 1995 (fission-fusion, foraging spectrum, *filed*); Layton et al. 2012 (dispersal
+pull under resource stress, *filed*).
 **RED-TEAM.**
-1. **Double-count vs. E.1 safety (`group_safety_max`).** E.1 is an ALWAYS-ON risk dilution; M1 is a RESOURCE-GATED
-   aggregation. Must be either (a) a *modulation of* the E.1 term by `a` (cleanest — one aggregation drive, resource-
-   gated), or (b) a clearly additive, separately-ablatable term. Decide up front; do NOT stack two always-on
-   safety terms.
-2. **Concentration vs. spreading (biome direction).** "Lean → aggregate" holds when scarcity CONCENTRATES resources
-   (waterholes: Hadza); it flips to disperse when scarcity SPREADS resources thin (!Kung). M1 should couple to the
-   resource's spatial structure (the aggregation biomes / `wateracc` seam already exist) OR be scoped to the
-   concentrating case and documented. Don't assume aggregation universally.
-3. **Stability (oscillation).** aggregate → crowd → `ypc`↓ → `a`↓ → M2 disperse → `a`↑ → aggregate … a limit cycle.
-   Needs the hump + M2 to compose to a STABLE optimum group size at each `a` (as E.1×IFD already does), not a
-   flip-flop → hysteresis or a smooth `a`→drive map; validate for band-size stability.
-4. **Magnitude unanchored.** The strength of the aggregation boost is not measured → BRACKET/sweep, report
-   sensitivity, don't fit.
-**Gate.** Under a scripted **moderate-lean** climate step (run_se0 driver), mean band size / band membership RISES
-vs. the flat control; eq_pop preserved; the effect vanishes at both abundance and severe scarcity.
+1. **Double-count vs. mortality (THE one).** Scarcity already kills. M2 must ROUTE the scarcity cost from death to
+   dispersal, not add to it. VALIDATION (the substitution test): a scarcity pulse with M2 on → the fissioned
+   members diffuse apart → local density falls → density-mortality relaxes → M2-on shows *lower* starvation
+   mortality + *higher* dispersal than M2-off. If mortality does NOT relax, M2 is double-charging → reconsider.
+2. **Mate-gate collapse / death spiral (DE-4 trap).** Over-fissioning drops sub-bands below mate-viable size → birth
+   collapse. The `band_base_tolerable`=25 floor + the E.2 `group_mate_min` movement floor jointly guard this;
+   validate births survive a pulse.
+3. **Threshold vs. graded.** Use a smoothstep in `cond` (steep but continuous) to avoid a hard-step thrash; the
+   `_condition` EMA already smooths the signal. Bracket the threshold + gain.
+4. **Interaction with repulsion.** M2 and size-repulsion both lower `tolerable` for large bands — but repulsion is
+   size-driven (always), M2 is malnutrition-driven (stress-gated). Additive on the dispersion side, separately
+   ablatable; a large well-fed band feels only repulsion, a large starving band feels both (correctly harsher).
+**Gate.** Scripted **severe-scarcity** climate pulse (run_se0 driver): large bands fission / band count rises,
+mean band size falls; **starvation mortality is LOWER with M2 on than off** (substitution); births survive; the
+population recovers when the pulse lifts (transient, not a permanent scar); small bands (<25) untouched; baseline
+(no pulse) bit-exact-ish (M2 near-silent when well-fed).
 
-## Stage M2 — Starvation dispersal (severe scarcity → disperse, before death)  `[enable_scarcity_dispersion]`
+## Stage F — Resource-directed fusion (starving/small band → richest neighbour)  `[enable_resource_directed_fusion]`
 
-**Scope.** Under *severe* scarcity (a below a threshold, say ≲ 0.5), add a CROWDING PENALTY to the movement utility
-— a band fragments and sub-groups disperse to spread the load / access more patches, BEFORE starvation kills. This
-lowers local density, which (via the existing density-disease + per-capita competition) auto-relieves the very
-mortality it precedes: **dispersal substitutes for death, not adds to it.** A push (repulsion from crowded cells)
-that switches on only when `a` is severely low; 0 in the moderate/abundant range (M1's domain).
-**Lit.** Colson 1979 (*In good years and in bad* — famine coping / relocation; PENDING, JSTOR); Wiessner 1982
-(relocate to exchange partners in famine); Kelly 1995 (fission-fusion, foraging spectrum); Layton et al. 2012
-(dispersal pull vs. cooperation pull — the band as their balance); Fretwell & Lucas 1970 (IFD, the existing
-dispersal baseline M2 sharpens under deficit).
+**Scope.** Currently a band below `band_merge_size` joins its NEAREST neighbour (`_maintain_bands`). Change: it
+joins the RICHEST reachable neighbour — highest `_band_surplus` (or mean `_condition`) among bands within a bounded
+radius — so starving remnants merge INTO well-provisioned bands (improving their nutrition via the larger shared
+pool), rather than merging blindly by distance. Score = resource-state, restricted to nearby bands (bounded so a
+remnant doesn't teleport across the map). Default OFF ⇒ nearest-neighbour join, bit-exact.
+**Lit.** Wiessner 1982 (hxaro — relocate to well-provisioned exchange partners in hard times); Cashdan 1985
+(reciprocity/sharing draws the needy to surplus holders); Kelly 1995 (fusion-fusion demography).
 **RED-TEAM.**
-1. **Double-count vs. IFD / depletion.** The diffusion movement ALREADY disperses agents from crowded/depleted
-   cells (falling `ypc`). M2 must be the ACUTE EXTRA push under severe deficit (a distinct regime), OR recast as
-   "IFD gets steeper when `a` is severely low." Don't add a second generic dispersal on top of IFD.
-2. **Double-count vs. mortality (the key one).** Scarcity currently KILLS (mortality). If M2 disperses AND mortality
-   still fires at the old rate, scarcity is double-charged. **Requirement:** M2 dispersal must measurably lower local
-   density → the density-dependent mortality relaxes → net scarcity cost is rerouted from death to movement, not
-   added. VALIDATE: a scarcity pulse with M2 on should show *lower* mortality + *higher* dispersal than M2 off (a
-   substitution, not an addition). If density-mortality doesn't relax enough, gate it under M2.
-3. **Over-dispersal → mate-gate collapse.** Fragmenting too hard drops bands below the mate-viable size (Wobst ~25 /
-   the E.2 `group_mate_min` floor) → birth collapse → a death spiral (cf. the SHELVED band-risk mortality, DE-4).
-   The E.2 mating-access penalty must remain the floor M2 can't push through; validate births survive a scarcity
-   pulse.
-4. **Threshold vs. graded.** Severe-scarcity dispersal is threshold-like (kicks in below `a*`), not a gentle slope
-   — but a hard step risks thrash (red-team #3 of M1). Use a smooth-but-steep sigmoid in `a`; bracket `a*`.
-**Gate.** Under a scripted **severe-scarcity** climate pulse (run_se0 driver): band size DROPS / spatial spread
-RISES vs. flat control; **mortality is LOWER with M2 on than off** (substitution); births survive (no mate-gate
-collapse); the population recovers when the pulse lifts (transient dispersal, not a permanent scar).
+1. **Runaway aggregation.** Everyone piling into the one rich band → a mega-band → then M2/repulsion should split
+   it back (the balance). Validate the rich band doesn't grow unbounded (repulsion + M2 cap it).
+2. **Distance bound.** Must stay LOCAL (a remnant joins a nearby rich band, not the global richest) — keep the
+   nearby-radius restriction; bracket it.
+3. **Signal choice.** `_band_surplus` (stored granary) vs mean `_condition` (current nutrition) — surplus = "who has
+   the reserve to absorb us"; pick surplus (the pool the needy seek), document.
+**Gate.** Under a scarcity pulse, remnant small bands preferentially merge into higher-surplus neighbours (measure
+the surplus of chosen targets vs the nearest-neighbour baseline); eq_pop preserved; no unbounded mega-band.
 
-## Retire `season_aggregation`  `[DEAD-END]`
+## Retire `season_aggregation`  `[DEAD-END DE-7]`
 
-`season_aggregation` (a threshold cohesion-multiplier, lean→fission) is superseded by M1/M2 on the movement channel:
-seasonal lean now enters through `a = ypc/need` (the harvest field already carries `season()`), driving aggregation
-(moderate) or dispersal (severe) on the binding channel, with the correct sign. Remove the config field + the
-`_maintain_bands` `season_ab` factor (or hard-default it to inert); add a DEAD_ENDS entry (DE-7). Confirm bit-exact
-removal (season_aggregation=0 was already the default → no baseline change).
+Superseded: seasonal lean now enters (correctly) through realized nutrition — moderate lean → nothing (bands carry
+on), severe lean → M2 fission via `_condition`. Remove the config field + the `_maintain_bands` `season_ab` factor
+(default 0 → bit-exact removal). DE-7 already pre-registered.
 
 ---
 
-## Validation plan (the binding test + substitution test)
+## Validation plan
 
-1. **Binding test (the point).** Unlike the dormant threshold, the movement channel should make **central band size
-   RESPOND to resource level**: sweep a flat climate driver at several `a` levels (run_se0 `ClimateDriver.flat` at
-   scaled capacities); mean band size should trace the hump (rise into moderate lean, fall at severe). This is the
-   test the threshold failed (R-31).
-2. **Substitution test (M2 red-team #2).** Scarcity pulse, M2 on vs off: M2 on → higher dispersal + LOWER mortality
-   (rerouting), not higher dispersal + same mortality (double-charge).
-3. **Non-monotonic shape.** The moderate-lean-step (M1) and severe-scarcity-pulse (M2) gates above, back to back on
-   one driver trajectory, reproduce the aggregate-then-disperse curve.
-4. **Baseline preservation.** At a moderate/balanced config the realistic full-stack anchors hold: eq_pop, ~25
-   non-kin bands (Wobst/Hamilton), status→RS ≈ 0.13, R-18 death-deficit > 0.
-5. **Ablation.** Each flag independently off → bit-exact; both off → the current model exactly.
+1. **Substitution test (M2 red-team #1 — the decisive one):** scarcity pulse, M2 on vs off → M2-on shows LOWER
+   starvation mortality + HIGHER dispersal (fission). Dispersal reroutes the cost; it does not add to death.
+2. **Size-gate check:** under the pulse, bands > 25 fission; bands < 25 untouched (falls out of the base floor).
+3. **Transient, not scar:** population recovers after the pulse lifts.
+4. **F check:** remnant bands merge into higher-surplus neighbours (vs nearest baseline); no unbounded mega-band.
+5. **Baseline preservation:** no-pulse realistic config keeps eq_pop, ~25 non-kin bands, status→RS ≈0.13,
+   R-18 death-deficit > 0. Both flags off ⇒ current model bit-exact.
 
-## Open questions / deferred refinements
+## Open items
 
-- **Concentration vs. spreading (M1 red-team #2):** couple the aggregation *direction* to the resource's spatial
-  structure (aggregation biomes / `wateracc`) so lean→aggregate fires only where scarcity concentrates resources,
-  and lean→disperse where it spreads them. A refinement after the core M1/M2 land.
-- **The abundant end:** does super-abundance actively *reduce* cohesion (no need to band)? Probably neutral; leave
-  M1's hump → 0 at high `a` and revisit only if a signal demands it.
-- **Colson 1979** to be obtained (JSTOR) for the M2 famine-dispersal anchor.
+- **Colson 1979** to obtain (JSTOR) — supporting M2 cite only; not a blocker.
+- **Concentration vs. spreading** (biome-dependent direction of the resource response) — deferred; the surviving
+  design doesn't add moderate-lean aggregation, so this only matters if M1 is ever revived.
 
-**Sequencing:** M1 (aggregation) → M2 (dispersal) → retire season → full non-monotonic validation. Each stage:
-scope → lit → RED-TEAM → implement → gate → commit. Build only after this blueprint is reviewed.
+**Sequencing:** M2 (malnutrition fission) → F (resource-directed fusion) → retire season → substitution/size-gate
+validation. Each: scope → lit → RED-TEAM → implement → gate → commit.
+
+---
+
+## RESULTS (built 2026-07-01, R-32/R-33)
+
+**Signal red-team catch (R-32).** M2 was first built on mean band `_condition`, but a probe showed `_condition`
+stays pinned ~1.0 under a population-crashing pulse (it samples the post-harvest FED reserve + survivor bias). So
+scarcity here is expressed as DEATH, not lingering low condition. **Supervisor steer:** disperse on REALIZED
+starvation (reactive), not a forecast (anticipatory = future "wise leadership"). M2 re-anchored to a per-band
+realized starvation-rate EMA (`_band_starv_ema`).
+
+**M2 VALIDATED — the substitution test (run_se2).** Severe −50 % pulse, M2 off vs on, 3 seeds: **starvation deaths
+−120 / −31 / −24 (all lower)**, M2 fires (pressure 0.6–1.2), 2/3 seeds higher end-pop. Dispersal reroutes the
+scarcity cost from death (spread → higher per-capita yield → fewer subsequent deaths). Size-gate confirmed (base
+floor → large bands only). REACTIVE, ablatable, off ⇒ bit-exact.
+
+**F built.** Resource-directed fusion (richest nearby band, radius-bounded, else nearest); unit-tested; off ⇒
+nearest bit-exact.
+
+**M1 DROPPED (DE-8)** — no food-wise payoff. **`season_aggregation` superseded by M2 (DE-7)** — physical field
+removal is a pending cleanup (inert meanwhile). 9 M2/F unit tests; full suite 588 passed / 1 xfailed.

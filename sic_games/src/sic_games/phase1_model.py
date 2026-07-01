@@ -260,6 +260,9 @@ class TerrainWorld(mesa.Model):
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
         self._band_repulsion: dict[int, float] = {}            # Stage 1b: per-band size-repulsion (scalar stress; diagnostic)
+        self._band_malnutrition: dict[int, float] = {}         # M2: per-band malnutrition-fission pressure (diagnostic)
+        self._band_starv_this_step: dict[int, int] = {}        # M2: starvation deaths per band THIS step (band_id → count)
+        self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
 
         # demographic layer
         self._reproduction = reproduction
@@ -413,6 +416,7 @@ class TerrainWorld(mesa.Model):
         self.births_this_step = 0
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0
+        self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
         self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
         self.prov_young_maternal = 0.0   # diagnostic: kcal provisioned to <3-yr children by mother (Marlowe calib)
@@ -833,6 +837,7 @@ class TerrainWorld(mesa.Model):
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
                     a.alive = False
                     self.deaths_starv_this_step += 1
+                    self._note_band_starv(a)                          # M2: attribute this starvation death to its band
                     self.starv_cred_this_step.append(a.cred)
                     self.starv_status_this_step.append(a.cred * getattr(a, "prowess", 1.0))
                 else:
@@ -843,9 +848,16 @@ class TerrainWorld(mesa.Model):
             elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
+                self._note_band_starv(a)
             elif a.age >= a.max_age:
                 a.alive = False
                 self.deaths_senesc_this_step += 1
+
+    def _note_band_starv(self, a) -> None:
+        """M2: tally a starvation death against the agent's band (band_id → count this step)."""
+        bid = getattr(getattr(a, "_group", None), "band_id", None)
+        if bid is not None:
+            self._band_starv_this_step[bid] = self._band_starv_this_step.get(bid, 0) + 1
 
     def _step_agent(self, agent: BaseAgent) -> None:
         tf = self.terrain_field
@@ -882,6 +894,7 @@ class TerrainWorld(mesa.Model):
         if agent.wealth <= agent.reserve_floor:
             agent.alive = False
             self.deaths_starv_this_step += 1
+            self._note_band_starv(agent)
         elif agent.age >= agent.max_age:
             agent.alive = False
             self.deaths_senesc_this_step += 1
@@ -1223,9 +1236,18 @@ class TerrainWorld(mesa.Model):
             rep_gain = getattr(cfg, "repulsion_gain", 0.0)
             rep_mid = getattr(cfg, "repulsion_midpoint", 25.0)
             rep_width = getattr(cfg, "repulsion_width", 6.0)
+            # M2 malnutrition fission: a band losing members to REALIZED starvation gets a DISPERSIVE term
+            # (dispersal-in-response-to-death). Signal = EMA of the band's per-capita starvation-death rate.
+            mal_on = getattr(cfg, "enable_malnutrition_fission", False)
+            mal_gain = getattr(cfg, "malnutrition_fission_gain", 0.0)
+            mal_rate = getattr(cfg, "malnutrition_starv_rate", 0.05)
+            mal_alpha = getattr(cfg, "malnutrition_ema_alpha", 0.3)
+            starv_step = self._band_starv_this_step
             new_assab: dict[int, float] = {}
             new_leader: dict[int, float] = {}
             new_repulsion: dict[int, float] = {}
+            new_malnutrition: dict[int, float] = {}
+            new_starv_ema: dict[int, float] = {}
             for bid, ms in members.items():
                 surplus = self._band_surplus.get(bid, 0.0)
                 a_prev = self._band_assabiyah.get(bid, 0.0)
@@ -1251,22 +1273,46 @@ class TerrainWorld(mesa.Model):
                     repulsion = size_repulsion(len(ms), rep_gain, rep_mid, rep_width, society)
                 new_repulsion[bid] = repulsion
 
-                # cohesion − dispersion, clamped: a large mobile band (high repulsion) needs strong assabiyah+leader
-                # to stay whole; the [0,1] clamp keeps band_split_size the absolute hard cap (repulsion can't push
-                # tolerable below base_tolerable, the Wobst viability floor). Off ⇒ repulsion 0 ⇒ min(1, a+l), bit-exact.
-                cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion))
+                # M2: update the band's per-capita starvation-rate EMA (this step's starvation deaths / pre-death
+                # band size), then a saturating dispersion pressure. Off ⇒ 0 (bit-exact). REACTIVE to realized death.
+                starv_ct = starv_step.get(bid, 0)
+                pre_n = len(ms) + starv_ct                             # pre-death band size (survivors + starved)
+                rate = starv_ct / pre_n if pre_n > 0 else 0.0
+                ema = (1.0 - mal_alpha) * self._band_starv_ema.get(bid, 0.0) + mal_alpha * rate
+                new_starv_ema[bid] = ema
+                malnutrition = 0.0
+                if mal_on and mal_gain > 0.0:
+                    malnutrition = mal_gain * min(1.0, ema / mal_rate)  # saturates at the reference starvation rate
+                new_malnutrition[bid] = malnutrition
+
+                # cohesion − dispersion, clamped: a large band (high repulsion / malnutrition) needs strong
+                # assabiyah+leader to stay whole; the [0,1] clamp keeps band_split_size the hard cap and can't push
+                # tolerable below base_tolerable (the Wobst floor) — so malnutrition fissions ONLY bands > base
+                # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
+                cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
                 split_thr[bid] = base + (cap - base) * cohesion_frac * season_ab
             self._band_assabiyah = new_assab
             self._band_leader_term = new_leader
             self._band_repulsion = new_repulsion
+            self._band_malnutrition = new_malnutrition
+            self._band_starv_ema = new_starv_ema
 
-        # FUSION (small → nearest other band)
+        # FUSION (small band joins another band). Default = NEAREST neighbour. F: resource-directed — the RICHEST
+        # (`_band_surplus`) neighbour within `fusion_search_radius` (a starving remnant merges into a well-provisioned
+        # band; Wiessner hxaro), falling back to nearest if none is in range. Off ⇒ nearest, bit-exact.
+        rdf_on = getattr(cfg, "enable_resource_directed_fusion", False)
+        rdf_r2 = getattr(cfg, "fusion_search_radius", 25.0) ** 2
         for bid in [b for b, ms in members.items() if len(ms) < cfg.band_merge_size]:
             if len(members) <= 1:
                 break
             cx, cy = _centroid(members[bid])
             others = [b for b in members if b != bid]
-            nb = min(others, key=lambda b: (lambda c: (c[0] - cx) ** 2 + (c[1] - cy) ** 2)(_centroid(members[b])))
+            _d2 = lambda b: (lambda c: (c[0] - cx) ** 2 + (c[1] - cy) ** 2)(_centroid(members[b]))
+            if rdf_on:
+                nearby = [b for b in others if _d2(b) <= rdf_r2]
+                nb = max(nearby, key=lambda b: self._band_surplus.get(b, 0.0)) if nearby else min(others, key=_d2)
+            else:
+                nb = min(others, key=_d2)
             for a in members[bid]:
                 a._group.band_id = nb
             members[nb].extend(members.pop(bid))

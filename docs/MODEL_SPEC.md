@@ -1371,6 +1371,37 @@ band scale). Magnitudes UNANCHORED.
   coherence is BUILT + unit-valid (a correct, ablatable cohesion source); its behavioural benchmark is **deferred to
   the dynastic stage**, not claimed here. Repulsion is the validated Stage-1 deliverable.
 
+### §4.8.14 Resource → band-size response, corrected (M2 malnutrition fission + F resource-directed fusion; built 2026-07-01)
+
+The fission-driver review (R-31) found the threshold DORMANT and, testing each candidate "does it help food-wise?",
+DROPPED the moderate-lean aggregation cohesion (M1 — no functional payoff: the risk-pooling benefit is already
+implicit in within-cell meat sharing, bands aren't under-aggregated at ~20≈Wobst-25, and "Hadza waterhole
+aggregation" is just following concentrated resources = the existing IFD movement). Surviving design:
+
+**M2 — malnutrition fission (`enable_malnutrition_fission`, `malnutrition_fission_gain`, `malnutrition_starv_rate`,
+`malnutrition_ema_alpha`).** A DISPERSIVE term on the threshold balance:
+`cohesion_frac = clamp(assabiyah + leader − repulsion − malnutrition, 0, 1)`, `malnutrition = gain·min(1, ema/rate)`,
+where `ema` is a per-band EMA of the **realized per-capita starvation-death rate** (`_band_starv_ema`; each starvation
+death is attributed to its band via `_note_band_starv`). Fissioning a large band gives the child a new band_id → it
+diffuses apart → lower local density → higher per-capita yield → fewer SUBSEQUENT starvation deaths: **dispersal
+substitutes for death.** **Intrinsically size-gated** — `tolerable` floors at `band_base_tolerable` (the `[0,1]`
+clamp), so only bands LARGER than base fission; small bands just shrink/die ("large bands, not small," no explicit
+test). **REACTIVE, not a forecast** (supervisor: bands disperse when starvation bites, not on anticipation;
+anticipatory dispersal is a future "wise-leadership" feature). **Signal choice is load-bearing (R-32):** M2 does NOT
+read `_condition` — that samples the post-harvest FED reserve and stays pinned ~1.0 under scarcity (survivor-biased),
+so a condition-gated M2 never fires; scarcity here is expressed as death, so realized starvation is the honest signal.
+Magnitude/rate UNANCHORED (bracket). Lit (qualitative — direction + "large bands first"): Colson 1979 (PENDING),
+Turnbull 1972 (Ik), Kelly 1995, Layton 2012. **Validation (run_se2 substitution test):** severe −50% pulse, M2 off
+vs on, 3 seeds → starvation deaths −120/−31/−24 (all lower), M2 fires (pressure 0.6–1.2), 2/3 seeds higher end-pop.
+Off ⇒ bit-exact.
+
+**F — resource-directed fusion (`enable_resource_directed_fusion`, `fusion_search_radius`).** A band below
+`band_merge_size` joins the RICHEST neighbour (highest `_band_surplus`) within `fusion_search_radius` cells (else
+falls back to nearest), instead of the nearest — a starving remnant merges into a well-provisioned band (Wiessner
+hxaro; resource-SEEKING fusion, NOT anti-fission cohesion). Off ⇒ nearest-neighbour, bit-exact.
+
+**M1 DROPPED (DE-8); `season_aggregation`'s severe-scarcity role superseded by M2 (DE-7).**
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
