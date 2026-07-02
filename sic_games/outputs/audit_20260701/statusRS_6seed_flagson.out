@@ -1,0 +1,13 @@
+Full-stack coherence (ALL flags on, flat climate, 900 steps):
+  seed    eq_pop  band_awt  status->RS  mean_cred   gini
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  0          560      23.0      +0.018       1.37   0.17
+  1          146      22.1      -0.009       1.81   0.13
+  2          329      22.8      -0.022       1.54   0.20
+  3          364      21.7      +0.070       1.59   0.20
+  4          354      22.8      +0.059       1.38   0.17
+  5          279      21.4      -0.032       1.60   0.17
+  MEAN       339      22.3      +0.014       1.55   0.17
+
+  vs documented (R-26 realistic): eq_pop ~360-540, band ~25 non-kin, status->RS ~0.13, gini ~0.19-0.30

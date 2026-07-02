@@ -379,4 +379,12 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 ---
 
+## R-34 — Deep audit (pre-big-run): no regressions; stack healthy + cheap; one perf win (2026-07-01)
+
+**Origin:** `outputs/audit_20260701/` (profile_fullstack, coherence_fullstack, statusRS_6seed_flagson) + full suite. Four passes after the Social-Evolution arc.
+
+**What we know:** (1) **Tests** 592 passed/1 xfailed. (2) **Perf** full stack 13.5 ms/step (0.057 ms/step/agent); the recent social machinery is CHEAP — `_maintain_bands` (leader+repulsion+M2+F) is 2.4% of runtime, genealogy negligible. The cost is the core loop (`diffusion_select_target` + `climate.level`); the **climate temporal multiplier (season·regime·interannual) is recomputed per-cell-eval (~28% of runtime) though it's cell-independent** → OPT-1: cache per `set_step` (~25% saving, bit-exact). (3) **Coherence** full stack (all flags on, 6 seeds) coheres: eq_pop 339, bands 22.3, Gini 0.17, no extinctions; eq_pop below static-R-26 is the expected seasonal trough-limiting (R-27), not a regression. (4) **status→RS is NOT regressed:** ≈+0.014 (flags on) vs +0.029 (flags off) — both near-zero on the CLIMATE substrate, within seed noise; the documented **0.13 is the STATIC + new-flags-OFF value (R-26)**, guaranteed by bit-exactness, and climate depresses it to ~0.01–0.03 (R-27, reconfirmed). **status→RS needs the full 6-seed×1500-step protocol — unreliable (±0.1) at small samples.** (5) **Flag interactions clean:** one dependency to note — leader/repulsion/M2 are no-ops unless `enable_dynamic_bands=True` (they live in that block); F + genealogy are independent. No degenerate combinations. **No blocker for CC-1 or the big run.** Findings + actions: `outputs/audit_20260701/AUDIT_FINDINGS.md`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
