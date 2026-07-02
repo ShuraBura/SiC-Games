@@ -1,0 +1,6 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  a=0.0  composite->RS +0.012 +/- 0.026   cred_gini 0.180   [87s]
+  a=2.5  composite->RS +0.128 +/- 0.029   cred_gini 0.177   [178s]
+  a=3.5  composite->RS +0.143 +/- 0.021   cred_gini 0.170   [268s]
+  a=4.5  composite->RS +0.122 +/- 0.014   cred_gini 0.167   [354s]
