@@ -187,16 +187,17 @@ def test_per_band_family_knobs_localize():
     assert abs(w._band_knob(cbands[0], "mate_choice_strength") - 7.0) < 1e-9   # 5 + (3 − 1) localized
 
 
-def test_season_aggregation_runs():
-    # F.3c-3 season coupling: a seasonal (ClimateField) capacity + season_aggregation runs and still morphs bands
-    # (the tolerable headroom is scaled by ClimateField.season(); integration sanity).
+def test_dynamic_bands_on_seasonal_capacity_runs():
+    # A seasonal (ClimateField) capacity + dynamic bands runs and still morphs bands (integration sanity).
+    # (season_aggregation RETIRED 2026-07-01, DE-7 — seasonal lean→fission was mis-signed + inert; M2 handles the
+    # only legitimate resource→fission role via realized starvation. This test now just checks the seasonal-field
+    # integration still runs.)
     from sic_games.climate import ClimateField
     knobs = _knobs(7); fields = generate_world(knobs)
     cap = ClimateField(NPPCapacityField(fields, _BURN, patch=_PATCH), a_seas=0.5)
     pos = _band_seed(fields, cap, 150)
     w = _world(temp_threshold=100.0, affiliation=True, dynamic=True, n=150)
     w._harvest_field = cap
-    w._demog = w._demog.model_copy(update={"season_aggregation": 1.0})
     for _ in range(300):
         w.step()
     assert len(w.agent_list) > 0 and w._band_assabiyah                 # ran; bands + assabiyah present

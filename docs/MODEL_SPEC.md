@@ -1227,14 +1227,13 @@ bands are larger; poor ones fission smaller), with **eq_pop preserved** (497 vs 
 destabilization). Tests: assabiyah builds from surplus + mirrors to the vector; warm-world (no surplus) → assabiyah
 ~0; default-off back-compat.
 
-**SEASON factor — BUILT (`season_aggregation`).** `tolerable_size`'s headroom is scaled by the current seasonal
-abundance: `tolerable = base + (cap − base)·assabiyah·[(1−sa) + sa·ClimateField.season()]` — wet/abundant season
-→ aggregation, lean → dispersal (Kelly/Marlowe). Needs a `ClimateField` harvest field. **Honest caveat:** the
-coupling is plumbed and directionally correct, but in the current regime its realized effect on band size is
-SMALL (corr(season, mean band size) ≈ 0.05) — bands (~25) sit *below* the seasonal tolerable (≈34–43), so the
-threshold rarely binds, and re-aggregation (fusion) is slower than the 12-step seasonal cycle. Stronger seasonal
-aggregation would need season-coupled FUSION (not just the split threshold) or a regime where bands sit near the
-cap — a follow-on.
+**SEASON factor — RETIRED 2026-07-01 (`season_aggregation`, DE-7).** It scaled `tolerable_size`'s headroom by
+`ClimateField.season()` (lean → *fission*). Removed on two grounds (R-31 review): **mis-signed** — moderate lean
+should drive *aggregation*, not fission (Cashdan/Wiessner risk-pooling; Hadza dry-season water aggregation) — AND
+**inert** (the threshold is dormant, bands sit below it, realized effect ≈ 0.05). The only legitimate
+resource→fission role (severe scarcity) is now carried by **M2 malnutrition fission** (§4.8.14) via REALIZED
+starvation, on the correct sign. Field + `season_ab` factor deleted; `season_aggregation=0` was the default, so
+removal is bit-exact for all prior configs.
 
 ### §4.8.11 F.3c-2b — per-band family-knob localization (built 2026-06-29)
 
@@ -1400,7 +1399,16 @@ Off ⇒ bit-exact.
 falls back to nearest), instead of the nearest — a starving remnant merges into a well-provisioned band (Wiessner
 hxaro; resource-SEEKING fusion, NOT anti-fission cohesion). Off ⇒ nearest-neighbour, bit-exact.
 
-**M1 DROPPED (DE-8); `season_aggregation`'s severe-scarcity role superseded by M2 (DE-7).**
+**M1 DROPPED (DE-8); `season_aggregation` RETIRED (DE-7, field removed).**
+
+### §4.8.15 Genealogy logger — the Stage-3 analytic substrate (built 2026-07-01)
+
+`enable_genealogy_log` — a PURE OBSERVER (no dynamics/RNG change; write-AFTER-step; bit-exact on↔off, locked by
+`test_genealogy_is_observer_only_bit_exact`). Appends a flat record per birth/death — `(step, event, uid,
+mother_uid, father_uid, lineage, band_id, cred)` — to an in-memory buffer (O(births+deaths), not a live tree per
+the red-team); uses Mesa's stable monotonic `unique_id` (not `id()`); `dump_genealogy(path)` writes a CSV for
+OFFLINE analysis. Enables lineage-extinction curves, time-to-MRCA, dynasty depth vs. assabiyah, and who-fathered-
+dynasties — the substrate the Ibn Khaldun dynastic-cycle stage (Stage 3) will need. Names/viewer deferred.
 
 ---
 

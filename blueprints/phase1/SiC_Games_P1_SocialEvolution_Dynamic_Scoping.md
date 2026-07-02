@@ -116,9 +116,28 @@ step, cred)` to disk, for OFFLINE analysis. **No runtime dynamics change** — a
 **Benefit / benchmark.** Enables lineage-extinction curves, time-to-MRCA, dynasty depth vs assabiyah, who-fathered
 dynasties — the analytic substrate for Stage 3. (Names = cosmetic; deferred to a viewer, not built here.)
 
+**DONE (2026-07-01).** `enable_genealogy_log` (default OFF): a pure observer appending `(step, event, uid,
+mother_uid, father_uid, lineage, band_id, cred)` per birth/death to a flat buffer (Mesa `unique_id`, not `id()`);
+`dump_genealogy(path)` → CSV. Bit-exact on↔off (4 tests incl. observer-only equality). MODEL_SPEC §4.8.15.
+
 ---
 
 ## Stage 3 — Ibn Khaldun dynastic cycle  `[enable_dynastic_cycle]`
+
+**⚠️ PREREQUISITE GAP (assessment 2026-07-01, supervisor-flagged): the model has NO settlements / large polities.**
+The dynastic cycle is meaningful only at POLITY scale — a large (hundreds), settled, stratified group with a
+keystone chief whose fall fragments it. The current model tops out at **mobile-forager bands ~20–25 (hard cap
+`band_split_size`=45)**; even "stratified" bands are band-scale. There is no dynasty to cycle, no keystone whose
+succession crisis fragments hundreds, no sedentism/luxury to erode assabiyah at scale. **Building Stage 3 now would
+run the cycle on ~25-person bands — trivial and ahistorical.** The real blocker is the **settlement / high-tier-
+resource substrate** (proto-agriculture or intensive storable resource, e.g. salmon/fishing) that raises local
+carrying capacity enough to support sedentary villages of hundreds and LIFTS the band-size cap for settled
+societies (the "hard 45 cap awaits the high-tier resource layer" note, recurring since the storage/morph work).
+That is essentially the **forager→chiefdom / Neolithic-intensification transition** — its own arc, and the true
+Stage-3 prerequisite. **Also unblocks here:** the deferred leader-death→fission benchmark (R-30) — a keystone
+hereditary chief is exactly the stratified-polity setting where it should bite. **Recommendation:** do NOT build the
+dynastic cycle until the settlement substrate exists; either build that substrate next (a major stage) or take
+band-scale social stages (dynamic polygyny, belief seam) / pivot to the world/weather arc meanwhile.
 **Scope.** Assabiyah doesn't only RISE with surplus — it **DECAYS with sustained luxury / size / sedentism**: a
 band that grows large + rich + stratified erodes its solidarity → weakens → fissions/collapses → a leaner
 high-assabiyah group rises. Adds a luxury-decay term to the assabiyah update so cohesion **oscillates** (rise →

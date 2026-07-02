@@ -306,10 +306,9 @@ class DemographyConfig(BaseModel):
     band_base_tolerable: int = Field(25, ge=2)           # tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline)
     assabiyah_gain: float = Field(0.05, ge=0.0)          # solidarity gained per step per unit band surplus
     assabiyah_decay: float = Field(0.02, ge=0.0)         # baseline solidarity decay per step (luxury/turnover erosion)
-    # F.3c-3 SEASON factor: couple `tolerable_size` to the current seasonal abundance (ClimateField.season()) →
-    # wet/abundant season AGGREGATION, lean-season DISPERSAL (Kelly/Marlowe fission-fusion). 0 = off (no season
-    # effect); 1 = the tolerable headroom fully scales with seasonal abundance. Needs a ClimateField harvest field.
-    season_aggregation: float = Field(0.0, ge=0.0, le=1.0)
+    # (RETIRED 2026-07-01, DE-7: `season_aggregation` coupled tolerable_size to seasonal abundance → lean-season
+    # fission. Mis-signed (moderate lean should not fission) + inert (dormant threshold, R-31). Superseded by M2
+    # malnutrition fission. Field removed; configs that set it will now error — intended, it is retired.)
     # Social-Evolution Stage 1: LEADER COHERENCE (a SECOND, distinct cohesion source added to `tolerable_size`,
     # additive alongside assabiyah, not a relabel). A band's top-status member (highest cred·prowess) lends extra
     # cohesion, scaled by a Boehm 1999 reverse-dominance GATE on the band's society type (egalitarian bands LEVEL
@@ -354,6 +353,11 @@ class DemographyConfig(BaseModel):
     # nearest-neighbour join, bit-exact.
     enable_resource_directed_fusion: bool = False
     fusion_search_radius: float = Field(25.0, gt=0.0)          # cells; locality bound for the richest-neighbour search
+    # Social-Evolution Stage 2: GENEALOGY LOGGER — opt-in append-only logging of each birth/death (uid, mother,
+    # father, lineage, band_id, step, cred) to an in-memory flat buffer (O(births+deaths); dump to disk offline).
+    # A PURE OBSERVER: writes AFTER the step, reads nothing back, never touches the RNG or dynamics (bit-exact).
+    # The analytic substrate for Stage 3 (lineage-extinction curves, dynasty depth vs assabiyah, who-fathered-whom).
+    enable_genealogy_log: bool = False
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from

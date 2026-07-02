@@ -445,9 +445,42 @@ Category: C1 (shared, param-differentiated) / C2 (re-pointed) / C3 (new architec
 | Size repulsion (Stage 1b) | Johnson scalar-stress DISPERSIVE term (logistic in band size, Alberti shape), hierarchy-relieved; resource-independent counterweight to cohesion | C1 | `demography::size_repulsion`; `phase1_model::_maintain_bands` | §4.8.13; R-29/R-31 |
 | Malnutrition fission (M2) | realized-starvation dispersive term → large bands break up; dispersal substitutes for death; size-gated by base floor | C1 | `phase1_model::_maintain_bands`, `_note_band_starv` (`_band_starv_ema`) | §4.8.14; R-32/R-33 |
 | Resource-directed fusion (F) | a sub-merge band joins the RICHEST nearby band (not nearest) — remnants merge into provisioned bands | C1 | `phase1_model::_maintain_bands` | §4.8.14; R-33 |
+| Genealogy logger (Stage 2) | pure-observer append-only birth/death log (uid, mother, father, lineage, band_id, step, cred); Stage-3 substrate | C1 (tool) | `phase1_model::_log_genea`, `dump_genealogy` | §4.8.15 |
 
-> **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4); **RETIRED:**
-> `storage_tether_reserves` (DE-3). Both default-OFF.
+> **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4). **RETIRED:**
+> `storage_tether_reserves` (DE-3); `season_aggregation` (DE-7, lean→fission mis-signed+inert); M1 moderate-lean
+> aggregation (DE-8, never built — no food-wise payoff). Shelved/retired items default-OFF or removed.
+
+## 16b. Band-size driver taxonomy — the cohesion ↔ dispersion balance (design reference, 2026-07-01)
+
+The definitive "what sets band size" map, from the fission-driver review (R-31). Band size is governed by THREE
+channels — **movement/spatial** sets the *central* size (~20–25, the binding one), the **fission threshold**
+(`tolerable_size = base + (cap−base)·clamp(cohesion − dispersion)`) is a *tail/stress valve* (dormant in normal
+times, R-31), and **mortality** is the failure mode. Each driver enters ONE channel; the resource response is
+**non-monotonic** (moderate lean → carry on / aggregate at concentrated resources via movement; severe scarcity →
+disperse; catastrophe → die). `⟳` = fires per step; `△` = stress/tail only.
+
+**COHESION (raise tolerable / hold together):**
+| Driver | Signal | Rationale | Lit | Channel | Status |
+|---|---|---|---|---|---|
+| Assabiyah | accumulated stored surplus | success → durable solidarity | Ibn Khaldun; Turchin 2003 | threshold △ | ✅ |
+| Leader coherence | top-status member | organizational/charismatic pull; Boehm-gated | Hooper/Kaplan/Boone 2010; Boehm 1999 | threshold △ | ✅ (benchmark deferred, R-30) |
+| Selfish-herd safety | predation/raid risk | risk dilution in a group | Hamilton 1971 | movement ⟳ | ✅ |
+| Cooperative production | big-game / labour division | group needed for returns (~7 hunters) | Janssen & Hill 2014; Layton 2012 | economy | ◐ |
+| Mating-pool viability | band < ~25 | stay aggregated to find mates | Wobst 1974; Birdsell 1953 | births (mate-gate) | ✅ |
+| ~~Risk-pool aggregation (M1)~~ | moderate lean | (no food-wise payoff — already in meat-sharing) | Cashdan 1985; Wiessner 1982 | — | ❌ DROPPED (DE-8) |
+
+**DISPERSION / FISSION (lower tolerable / split):**
+| Driver | Signal | Rationale | Lit | Channel | Status |
+|---|---|---|---|---|---|
+| Size repulsion | band size N | Johnson scalar stress; hierarchy-relieved | Johnson 1982; Alberti 2014 | threshold △ | ✅ |
+| Malnutrition fission (M2) | realized starvation (`_band_starv_ema`) | large band can't feed N → disperse (subsumes death) | Colson 1979*; Kelly 1995; Layton 2012 | threshold △ | ✅ |
+| IFD / local depletion | thin/depleted cell yield | spread to cover ground | Fretwell & Lucas 1970; Charnov 1976 | movement ⟳ | ✅ |
+| Starvation mortality | absolute food deficit | dispersal failed → death culls | Siler; density-disease | mortality | ✅ |
+| ~~Seasonal lean → fission~~ | annual lean | (mis-signed + inert) | — | — | ❌ RETIRED (DE-7) |
+
+**FUSION (re-absorb small bands):** nearest-neighbour join → **F resource-directed** (join the richest nearby
+band; Wiessner hxaro). *Colson 1979 PENDING (JSTOR).*
 
 ## 14. Parameter registry (pointer)
 

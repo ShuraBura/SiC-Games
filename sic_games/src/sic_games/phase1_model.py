@@ -263,6 +263,9 @@ class TerrainWorld(mesa.Model):
         self._band_malnutrition: dict[int, float] = {}         # M2: per-band malnutrition-fission pressure (diagnostic)
         self._band_starv_this_step: dict[int, int] = {}        # M2: starvation deaths per band THIS step (band_id → count)
         self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
+        # Stage 2 genealogy logger: a flat append-only event buffer (None ⇒ off). Pure observer (write-after-step).
+        self._genealogy_log: list | None = (
+            [] if (demography_cfg is not None and getattr(demography_cfg, "enable_genealogy_log", False)) else None)
 
         # demographic layer
         self._reproduction = reproduction
@@ -440,6 +443,7 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             if not a.alive:
                 self.occupied.discard(a.pos)
+                self._log_genea("death", a)                # Stage 2: observer log (band_id/lineage at death)
                 # F.3a bond dissolution on death: a dead WIFE leaves her husband's _wives; a dead HUSBAND widows
                 # ALL his wives (they re-enter the pairing pool — serial monogamy / re-marriage).
                 if a._partner is not None:
@@ -859,6 +863,31 @@ class TerrainWorld(mesa.Model):
         if bid is not None:
             self._band_starv_this_step[bid] = self._band_starv_this_step.get(bid, 0) + 1
 
+    def _log_genea(self, event: str, a) -> None:
+        """Stage 2 genealogy logger (pure observer): append one (step, event, uid, mother, father, lineage,
+        band_id, cred) record. `event` ∈ {'birth','death'}. Missing parents → uid −1. No RNG, no read-back."""
+        if self._genealogy_log is None:
+            return
+        self._genealogy_log.append((
+            self.step_count, event, a.unique_id,
+            getattr(getattr(a, "_mother", None), "unique_id", -1),
+            getattr(getattr(a, "_father", None), "unique_id", -1),
+            getattr(a, "_lineage", None),
+            getattr(getattr(a, "_group", None), "band_id", None),
+            round(getattr(a, "cred", 0.0), 4),
+        ))
+
+    def dump_genealogy(self, path: str) -> int:
+        """Write the genealogy buffer to a CSV (offline analysis substrate). Returns the record count."""
+        if not self._genealogy_log:
+            return 0
+        import csv
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            wr = csv.writer(f)
+            wr.writerow(["step", "event", "uid", "mother_uid", "father_uid", "lineage", "band_id", "cred"])
+            wr.writerows(self._genealogy_log)
+        return len(self._genealogy_log)
+
     def _step_agent(self, agent: BaseAgent) -> None:
         tf = self.terrain_field
 
@@ -938,6 +967,9 @@ class TerrainWorld(mesa.Model):
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
+        if self._genealogy_log is not None:               # Stage 2: observer log (after birth, parents/lineage set)
+            for c in newborns:
+                self._log_genea("birth", c)
 
     def _do_births_ibi(self) -> None:
         """Demographic-stage reproduction: female-only, IBI-gated (Siler+IBI core). Maternal folded
@@ -1058,6 +1090,9 @@ class TerrainWorld(mesa.Model):
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
+        if self._genealogy_log is not None:               # Stage 2: observer log (after birth, parents/lineage set)
+            for c in newborns:
+                self._log_genea("birth", c)
 
     def morph_to_society(self, name: str) -> None:
         """Evolving-society hook: re-bundle the family/status knobs to a new society preset mid-run — swaps the
@@ -1220,12 +1255,10 @@ class TerrainWorld(mesa.Model):
         split_thr: dict[int, float] = {}
         if dynamic:
             base, cap = cfg.band_base_tolerable, cfg.band_split_size
-            # F.3c-3 season factor: scale the tolerable headroom by the current seasonal abundance → wet-season
-            # aggregation / lean-season dispersal. 1.0 (no effect) unless a ClimateField + season_aggregation>0.
-            sa = getattr(cfg, "season_aggregation", 0.0)
-            season_ab = 1.0
-            if sa > 0.0 and hasattr(self._harvest_field, "season"):
-                season_ab = (1.0 - sa) + sa * self._harvest_field.season()
+            # (RETIRED 2026-07-01, DE-7: the F.3c-3 `season_aggregation` factor scaled tolerable headroom by
+            # seasonal abundance → lean-season *fission*. It was mis-signed — moderate lean should not fission
+            # (Cashdan/Hawkes) — AND inert (the threshold is dormant, R-31). Superseded by M2 malnutrition fission,
+            # which handles the only legitimate resource→fission role via REALIZED starvation.)
             # Stage 1 leader coherence: a SECOND, additive cohesion source (Boehm-gated by society type), read
             # FRESH each step from current membership (no accumulated state) so a leader's death/removal drops it
             # immediately — the benchmark signature is an instant cohesion drop, not a decayed one.
@@ -1290,7 +1323,7 @@ class TerrainWorld(mesa.Model):
                 # tolerable below base_tolerable (the Wobst floor) — so malnutrition fissions ONLY bands > base
                 # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
                 cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
-                split_thr[bid] = base + (cap - base) * cohesion_frac * season_ab
+                split_thr[bid] = base + (cap - base) * cohesion_frac
             self._band_assabiyah = new_assab
             self._band_leader_term = new_leader
             self._band_repulsion = new_repulsion

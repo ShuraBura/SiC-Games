@@ -53,7 +53,7 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
         storage_temp_threshold_c=100.0, storage_decay=0.05, enable_morph=True, morph_settle_steps=60,
         enable_band_family_knobs=True, enable_dynamic_bands=True, band_base_tolerable=25,
-        assabiyah_gain=0.05, assabiyah_decay=0.02, season_aggregation=1.0)
+        assabiyah_gain=0.05, assabiyah_decay=0.02)
 
 
 def band_positions_patch(fields, cap, n, band_size=25, sep=4):

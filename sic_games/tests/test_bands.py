@@ -275,7 +275,7 @@ def test_band_knob_additive_delta():
 
 def test_dynamic_band_seams_off_by_default():
     cfg = DemographyConfig()
-    assert cfg.enable_dynamic_bands is False and cfg.season_aggregation == 0.0 and cfg.enable_band_family_knobs is False
+    assert cfg.enable_dynamic_bands is False and cfg.enable_band_family_knobs is False
 
 
 # ── Social-Evolution Stage 1: LEADER COHERENCE (additive 2nd cohesion source, Boehm-gated) ────────
