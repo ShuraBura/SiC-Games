@@ -1,0 +1,15 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  forest   done (5 survived / 5)  [16s]
+  savanna  done (1 survived / 5)  [24s]
+  desert   done (0 survived / 5)  [27s]
+  montane  done (1 survived / 5)  [34s]
+  mixed    done (2 survived / 5)  [43s]
+
+=== BIOME -> SOCIETY (Tallavaara CC-1, 5 seeds/archetype, canonical config) ===
+  archetype survive    cap  eq_pop density   band %complex  assab status_RS  gini starv%
+  forest        5/5  16435     134   0.084   22.6      98%   1.00    +0.016  0.11    50%
+  savanna       1/5   8517       8   0.005    7.9     100%   1.00    +0.000  0.00    62%
+  desert        0/5  (all extinct)
+  montane       1/5   9355      13   0.008   12.9     100%   1.00    +0.244  0.07    66%
+  mixed         2/5  10733       8   0.005    7.9     100%   1.00    +0.000  0.03    64%
