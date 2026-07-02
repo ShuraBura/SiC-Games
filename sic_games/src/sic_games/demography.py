@@ -518,16 +518,19 @@ def repulsion_society_factor(society: str | None) -> float:
 # matter (0.5); stratified chiefdoms fully value it (1.0) — chiefly marriage / hypergamy. Parallels
 # LEADER_SOCIETY_WEIGHT. UNANCHORED ladder — calibrated against the von Rueden 0.13(egalitarian)→0.19(stratified) gradient.
 MATE_ASCRIBED_WEIGHT: dict[str, float] = {
-    "egalitarian_forager": 0.0,
-    "complex_forager": 0.5,
-    "stratified_chiefdom": 1.0,
+    "egalitarian_forager": 0.25,   # non-zero FLOOR: family/kin standing sways marriage even among egalitarians
+                                   # (bride-service, parental say, alliance — Chagnon), but SMALL (Hadza/Ju favour
+                                   # the achieved/hunting channel — Marlowe). Boehm levels political authority, not
+                                   # family marriage reputation. NB largely latent until a stratification RANGE exists.
+    "complex_forager": 0.6,        # incipient rank lets ascribed status matter more.
+    "stratified_chiefdom": 1.0,    # chiefly marriage / hypergamy — ascribed status fully valued.
 }
 
 
 def mate_ascribed_weight(society: str | None) -> float:
-    """Society gate for ascribed(cred) mate-choice; an unclassified/None band defaults to EGALITARIAN (0.0) — the
-    conservative default (ascribed status buys no marriage until a band positively morphs toward stratification)."""
-    return MATE_ASCRIBED_WEIGHT.get(society, 0.0)
+    """Society gate for ascribed(cred) mate-choice; an unclassified/None band = the EGALITARIAN default (the floor):
+    a band that hasn't positively morphed is in the egalitarian state, so it gets the small egalitarian floor."""
+    return MATE_ASCRIBED_WEIGHT.get(society, MATE_ASCRIBED_WEIGHT["egalitarian_forager"])
 
 
 def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: str | None) -> float:

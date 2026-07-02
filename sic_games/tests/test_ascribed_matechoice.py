@@ -16,11 +16,11 @@ def test_ascribed_mate_choice_off_by_default():
 
 
 def test_society_gate_ladder():
-    assert mate_ascribed_weight("egalitarian_forager") == 0.0
-    assert mate_ascribed_weight("complex_forager") == 0.5
-    assert mate_ascribed_weight("stratified_chiefdom") == 1.0
-    assert mate_ascribed_weight(None) == 0.0                       # unclassified → egalitarian (conservative)
-    assert MATE_ASCRIBED_WEIGHT["stratified_chiefdom"] == 1.0
+    # non-zero egalitarian FLOOR (family matters a little even among egalitarians), rising with stratification.
+    assert 0.0 < mate_ascribed_weight("egalitarian_forager") < mate_ascribed_weight("complex_forager")
+    assert mate_ascribed_weight("complex_forager") < mate_ascribed_weight("stratified_chiefdom") == 1.0
+    assert mate_ascribed_weight(None) == mate_ascribed_weight("egalitarian_forager")   # unclassified → egalitarian floor
+    assert MATE_ASCRIBED_WEIGHT["egalitarian_forager"] == 0.25
 
 
 def _pairing_world(asc_on, asc_a=1.0, seed=1, n=40):
@@ -44,20 +44,17 @@ def _pairing_world(asc_on, asc_a=1.0, seed=1, n=40):
 
 
 def test_flag_off_is_prowess_only_bitexact():
-    # off vs on-but-egalitarian must give the SAME pairings (both collapse to prowess-only) for the same seed.
-    def pairings(asc_on, society):
-        w = _pairing_world(asc_on=asc_on, seed=7)
+    # FLAG OFF ⇒ prowess-only regardless of society (the bit-exact contract). Anti-correlated cred/prowess so cred
+    # WOULD flip the outcome if it entered — under flag-off the pairings must be society-independent.
+    def pairings(society):
+        w = _pairing_world(asc_on=False, seed=7)
         w._band_society[0] = society
-        # deterministic status: give every male a distinct prowess and an ANTI-correlated cred (so cred WOULD change
-        # the outcome if it entered) — under prowess-only they must match regardless of cred.
         males = [a for a in w.agent_list if a.sex == "male"]
         for i, m in enumerate(males):
             m.prowess = 1.0 + 0.1 * i; m.cred = 5.0 - 0.1 * i
         w._do_pairing()
         return [(f.unique_id, (f._partner.unique_id if f._partner else None)) for f in w.agent_list if f.sex == "female"]
-    off = pairings(asc_on=False, society="stratified_chiefdom")
-    egal = pairings(asc_on=True, society="egalitarian_forager")     # gate 0 ⇒ cred^0 ⇒ prowess-only
-    assert off == egal                                              # bit-exact: gate 0 == flag off
+    assert pairings("stratified_chiefdom") == pairings("egalitarian_forager")   # flag off ⇒ society-independent prowess-only
 
 
 def test_ascribed_raises_high_cred_mating_in_stratified():
