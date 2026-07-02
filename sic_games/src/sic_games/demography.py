@@ -358,6 +358,12 @@ class DemographyConfig(BaseModel):
     # A PURE OBSERVER: writes AFTER the step, reads nothing back, never touches the RNG or dynamics (bit-exact).
     # The analytic substrate for Stage 3 (lineage-extinction curves, dynasty depth vs assabiyah, who-fathered-whom).
     enable_genealogy_log: bool = False
+    # Ascribed-status mate-choice (blueprint …_AscribedMateChoice): let cred (ascribed lineage) earn a mating
+    # advantage, SOCIETY-GATED (Boehm) — ≈0 egalitarian, rising complex→stratified. Mate weight interpolates from
+    # prowess (egalitarian) to base_status=cred·prowess (stratified): w = (prowess · cred^(a·sw))^mate_choice_strength.
+    # Fixes the composite status→RS ~0 (R-35: cred had no mating channel). Default OFF ⇒ prowess-only, bit-exact.
+    enable_ascribed_mate_choice: bool = False
+    ascribed_mate_strength: float = Field(0.0, ge=0.0)   # global scale `a` of the ascribed(cred) mating exponent; UNANCHORED
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from
@@ -505,6 +511,23 @@ def repulsion_society_factor(society: str | None) -> float:
     """Scalar-stress retention by society type; an unclassified/None band defaults to the EGALITARIAN factor (1.0)
     — a mobile band feels the FULL coordination cost until it positively morphs toward hierarchy."""
     return REPULSION_SOCIETY_FACTOR.get(society, 1.0)
+
+
+# Ascribed-status mate-choice: the Boehm society gate on how much cred (ascribed) enters mate-choice. Egalitarian
+# bands LEVEL ascribed status (0 — a lineage name buys no marriage); complex foragers' incipient rank lets it
+# matter (0.5); stratified chiefdoms fully value it (1.0) — chiefly marriage / hypergamy. Parallels
+# LEADER_SOCIETY_WEIGHT. UNANCHORED ladder — calibrated against the von Rueden 0.13(egalitarian)→0.19(stratified) gradient.
+MATE_ASCRIBED_WEIGHT: dict[str, float] = {
+    "egalitarian_forager": 0.0,
+    "complex_forager": 0.5,
+    "stratified_chiefdom": 1.0,
+}
+
+
+def mate_ascribed_weight(society: str | None) -> float:
+    """Society gate for ascribed(cred) mate-choice; an unclassified/None band defaults to EGALITARIAN (0.0) — the
+    conservative default (ascribed status buys no marriage until a band positively morphs toward stratification)."""
+    return MATE_ASCRIBED_WEIGHT.get(society, 0.0)
 
 
 def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: str | None) -> float:

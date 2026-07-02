@@ -57,7 +57,7 @@ from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
-    society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion,
+    society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
 )
 from sic_games.group import GroupVector, NO_BAND
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
@@ -1187,6 +1187,9 @@ class TerrainWorld(mesa.Model):
         loc = getattr(cfg, "enable_band_family_knobs", False)        # F.3c-2b per-band family knobs
         poly = getattr(cfg, "polygyny_rate", 0.0)
         max_wives = getattr(cfg, "max_wives", 1)
+        # Ascribed-status mate-choice: cred enters the weight, society-gated (0 egalitarian → full stratified).
+        asc_on = getattr(cfg, "enable_ascribed_mate_choice", False)
+        asc_a = getattr(cfg, "ascribed_mate_strength", 0.0)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         for band in self.bands(cfg.bonded_mate_radius):
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
@@ -1207,7 +1210,14 @@ class TerrainWorld(mesa.Model):
                     continue
                 m_f = self._band_knob(f._group.band_id, "mate_choice_strength") if loc else mexp   # per-band skew
                 if m_f > 0.0:
-                    w = [(getattr(x, "prowess", 1.0) + 1e-6) ** m_f for x in avail]
+                    # base weight = prowess (achieved). Ascribed(cred) joins, society-gated: g = a·sw(female's band).
+                    # sw=0 (egalitarian / off) ⇒ cred^0 = 1 ⇒ prowess-only (bit-exact). sw=1,a=1 ⇒ (prowess·cred).
+                    g = asc_a * mate_ascribed_weight(self._band_society.get(f._group.band_id)) if asc_on else 0.0
+                    if g > 0.0:
+                        w = [((getattr(x, "prowess", 1.0) + 1e-6) * (getattr(x, "cred", 1.0) + 1e-6) ** g) ** m_f
+                             for x in avail]
+                    else:
+                        w = [(getattr(x, "prowess", 1.0) + 1e-6) ** m_f for x in avail]
                     male = self.random.choices(avail, weights=w, k=1)[0]
                 else:
                     male = self.random.choice(avail)
