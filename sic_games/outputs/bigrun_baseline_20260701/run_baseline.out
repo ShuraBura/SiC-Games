@@ -1,0 +1,30 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  seed 0: eq_pop 952 | band 26.1 | RS -0.010 | gini 0.19   [26s]
+  seed 1: eq_pop 240 | band 26.9 | RS -0.060 | gini 0.13   [33s]
+  seed 2: eq_pop 795 | band 25.9 | RS +0.042 | gini 0.20   [53s]
+  seed 3: eq_pop 785 | band 25.9 | RS -0.038 | gini 0.20   [75s]
+  seed 4: eq_pop 703 | band 26.1 | RS +0.030 | gini 0.17   [92s]
+  seed 5: eq_pop 630 | band 26.3 | RS +0.065 | gini 0.16   [111s]
+  seed 6: eq_pop 1048 | band 26.1 | RS +0.015 | gini 0.18   [139s]
+  seed 7: eq_pop 512 | band 25.6 | RS -0.021 | gini 0.16   [154s]
+
+=== BASELINE MEAN (8 live / 8 seeds) ===
+  eq_pop               708.122
+  pop_cv                 0.052
+  band_awt              26.119
+  n_bands               31.399
+  mean_cred              2.267
+  cred_gini              0.173
+  status_rs              0.003
+  mean_assab             0.951
+  frac_egal              0.000
+  frac_complex           0.838
+  frac_strat             0.000
+  cum_starv           1864.125
+  cum_senesc          2951.250
+  cum_births          5262.500
+  n_lineages_alive      23.875
+  largest_lineage      142.875
+
+saved -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\bigrun_baseline_20260701\baseline_results.json   [total 154s]
