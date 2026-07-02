@@ -38,8 +38,9 @@ GRP = dict(group_safety_max=8.0, group_safety_scale=15.0, group_mate_min=15.0, g
 
 
 def realistic_forager_demog() -> DemographyConfig:
-    """The canonical full-stack config (families + bands + per-band society + assabiyah + modest polygyny),
-    matching run_3m/run_3o (PARAMETERS §18). Stage 1+ flip on their own extra flag and pass an edited copy."""
+    """The canonical full-stack config (families + bands + per-band society + assabiyah + modest polygyny +
+    society-gated ASCRIBED mate-choice), matching run_3m/run_3o + the ascribed-mate-choice recalibration
+    (PARAMETERS §18). Stage 1+ flip on their own extra flag and pass an edited copy."""
     return DemographyConfig(
         polygyny_rate=0.3, max_wives=3,
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
@@ -48,6 +49,10 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
         enable_prowess_facet=True, prowess_decay=0.05, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
+        # CANONICAL 2026-07-02: ascribed(cred) mate-choice, society-gated. Recovers composite status→RS ≈0.13
+        # (von Rueden) — pinned a=2.5 (sweep: 0.128 at complex gate 0.6; Gini stable, no runaway). Stratified
+        # ~0.19 endpoint to validate in the settlement arc.
+        enable_ascribed_mate_choice=True, ascribed_mate_strength=2.5,
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
         enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
