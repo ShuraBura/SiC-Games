@@ -1,0 +1,24 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  seed 0 done  [26s]
+  seed 1 done  [38s]
+  seed 2 done  [61s]
+  seed 3 done  [86s]
+  seed 4 done  [106s]
+  seed 5 done  [127s]
+  seed 6 done  [162s]
+  seed 7 done  [184s]
+  seed 8 done  [198s]
+  seed 9 done  [211s]
+  seed 10 done  [229s]
+  seed 11 done  [249s]
+  seed 12 done  [277s]
+  seed 13 done  [301s]
+  seed 14 done  [334s]
+  seed 15 done  [362s]
+
+=== RS decomposition: OFF vs ON (ascribed_mate_strength=2.0, complex gate 0.5) ===
+  cred   OFF -0.066+/-0.016   ON +0.082+/-0.013   delta +0.147
+  prow   OFF +0.101+/-0.020   ON +0.080+/-0.020   delta -0.020
+  comp   OFF +0.001+/-0.018   ON +0.105+/-0.014   delta +0.104
+  gini   OFF +0.177+/-0.007   ON +0.174+/-0.009   delta -0.003
