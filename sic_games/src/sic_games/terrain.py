@@ -406,6 +406,39 @@ def _classify_water_components(
             largest_ext_cells, largest_ext_mask)
 
 
+# ── World lottery — a diverse per-world ENSEMBLE ────────────────────────────
+# Parallel to the climate orbital-lottery (climate.py): instead of fixed knobs for every seed (→ every world the
+# same dry-savanna, biome 3), draw per-world knobs so the ensemble spans world-TYPES — biome-DOMINATED worlds
+# (forest / savanna / desert / montane) AND well-MIXED worlds. Ranges are EMPIRICALLY calibrated (knob→biome
+# sweep 2026-07-02): forest/savanna/desert dominate cleanly; montane = mountainous-with-lowlands (peaks are
+# naturally sparse) ; mixed = high-roughness multi-biome. Each archetype draws its knobs uniformly (jitter);
+# the seed cycles through the archetypes so a small ensemble covers every type. Deterministic per seed.
+WORLD_ARCHETYPES: dict[str, dict[str, tuple[float, float]]] = {
+    # archetype:  (relief),      (rough),      (waterK),     (forestK),    (aridK)
+    "forest":  dict(relief=(0.30, 0.55), rough=(0.40, 0.60), waterK=(0.30, 0.45), forestK=(0.80, 0.95), aridK=(0.05, 0.20)),
+    "savanna": dict(relief=(0.35, 0.55), rough=(0.45, 0.65), waterK=(0.25, 0.40), forestK=(0.45, 0.62), aridK=(0.35, 0.52)),
+    "desert":  dict(relief=(0.35, 0.60), rough=(0.45, 0.65), waterK=(0.08, 0.20), forestK=(0.10, 0.25), aridK=(0.72, 0.90)),
+    "montane": dict(relief=(0.82, 0.96), rough=(0.72, 0.90), waterK=(0.25, 0.45), forestK=(0.40, 0.65), aridK=(0.30, 0.55)),
+    "mixed":   dict(relief=(0.45, 0.70), rough=(0.70, 0.90), waterK=(0.30, 0.50), forestK=(0.55, 0.72), aridK=(0.30, 0.48)),
+}
+WORLD_ARCHETYPE_ORDER = ("forest", "savanna", "desert", "montane", "mixed")
+
+
+def world_lottery(seed: int, archetype: str | None = None) -> dict:
+    """Per-world knob draw for a DIVERSE ensemble. `seed` cycles through `WORLD_ARCHETYPE_ORDER` (so seeds 0–4 give
+    forest/savanna/desert/montane/mixed, 5–9 repeat, …) unless `archetype` is forced; knobs are drawn uniformly
+    within the archetype ranges, seeded by `seed` (reproducible). Returns a `generate_world` knobs dict tagged with
+    the archetype in `seedStr`."""
+    import random as _random
+    arch = archetype or WORLD_ARCHETYPE_ORDER[seed % len(WORLD_ARCHETYPE_ORDER)]
+    rng = _random.Random(20260702 + seed)
+    ranges = WORLD_ARCHETYPES[arch]
+    knobs = {k: rng.uniform(lo, hi) for k, (lo, hi) in ranges.items()}
+    knobs["seedStr"] = f"{arch}{seed}"
+    knobs["archetype"] = arch
+    return knobs
+
+
 # ── Main generator ─────────────────────────────────────────────────────────
 
 def generate_world(knobs: dict) -> WorldFields:
