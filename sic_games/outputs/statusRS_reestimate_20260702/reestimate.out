@@ -1,0 +1,26 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  seed 0: RS_full +0.154  prime +0.218  cred +0.007  prowess +0.305  (pop 981)  [25s]
+  seed 1: RS_full +0.084  prime +0.232  cred -0.038  prowess +0.175  (pop 210)  [34s]
+  seed 2: RS_full -0.047  prime -0.055  cred -0.050  prowess -0.045  (pop 707)  [56s]
+  seed 3: RS_full -0.091  prime -0.044  cred -0.125  prowess +0.010  (pop 738)  [81s]
+  seed 4: RS_full +0.108  prime -0.313  cred +0.043  prowess +0.132  (pop 533)  [100s]
+  seed 5: RS_full -0.011  prime +0.087  cred -0.066  prowess +0.111  (pop 515)  [114s]
+  seed 6: RS_full -0.016  prime +0.150  cred -0.039  prowess +0.044  (pop 912)  [127s]
+  seed 7: RS_full -0.032  prime +0.153  cred -0.107  prowess +0.120  (pop 472)  [137s]
+  seed 8: RS_full -0.103  prime +0.062  cred -0.128  prowess +0.044  (pop 233)  [146s]
+  seed 9: RS_full +0.069  prime +0.099  cred +0.047  prowess +0.030  (pop 254)  [156s]
+  seed 10: RS_full +0.017  prime +0.092  cred -0.043  prowess +0.114  (pop 448)  [172s]
+  seed 11: RS_full +0.027  prime -0.039  cred -0.047  prowess +0.127  (pop 497)  [193s]
+  seed 12: RS_full +0.004  prime +0.210  cred -0.115  prowess +0.174  (pop 958)  [211s]
+  seed 13: RS_full -0.067  prime +0.057  cred -0.146  prowess +0.085  (pop 777)  [222s]
+  seed 14: RS_full -0.099  prime -0.036  cred -0.172  prowess +0.042  (pop 1038)  [239s]
+  seed 15: RS_full +0.020  prime +0.040  cred -0.075  prowess +0.142  (pop 1062)  [253s]
+
+=== status->RS DISTRIBUTION (16 live seeds) ===
+  rs_full     mean +0.001 +/- 0.018 (SE)  95%CI [-0.035,+0.037]  range [-0.103,+0.154]
+  rs_prime    mean +0.057 +/- 0.033 (SE)  95%CI [-0.008,+0.122]  range [-0.313,+0.232]
+  rs_cred     mean -0.066 +/- 0.016 (SE)  95%CI [-0.096,-0.035]  range [-0.172,+0.047]
+  rs_prowess  mean +0.101 +/- 0.020 (SE)  95%CI [+0.062,+0.140]  range [-0.045,+0.305]
+
+  vs documented 0.13 (R-26). Is 0.13 inside the CI?
