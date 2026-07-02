@@ -125,7 +125,8 @@ on), severe lean → M2 fission via `_condition`. Remove the config field + the 
 
 ## Open items
 
-- **Colson 1979** to obtain (JSTOR) — supporting M2 cite only; not a blocker.
+- **Colson 1979** — FILED + verified (2026-07-01). Directly anchors M2: famine → "the breakup into small family
+  groups which comb the region" (verbatim); "refusal to share" corroborates that cohesion can't avert absolute deficit.
 - **Concentration vs. spreading** (biome-dependent direction of the resource response) — deferred; the surviving
   design doesn't add moderate-lean aggregation, so this only matters if M1 is ever revived.
 

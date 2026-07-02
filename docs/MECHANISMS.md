@@ -474,13 +474,13 @@ disperse; catastrophe → die). `⟳` = fires per step; `△` = stress/tail only
 | Driver | Signal | Rationale | Lit | Channel | Status |
 |---|---|---|---|---|---|
 | Size repulsion | band size N | Johnson scalar stress; hierarchy-relieved | Johnson 1982; Alberti 2014 | threshold △ | ✅ |
-| Malnutrition fission (M2) | realized starvation (`_band_starv_ema`) | large band can't feed N → disperse (subsumes death) | Colson 1979*; Kelly 1995; Layton 2012 | threshold △ | ✅ |
+| Malnutrition fission (M2) | realized starvation (`_band_starv_ema`) | large band can't feed N → disperse (subsumes death) | Colson 1979 (filed); Kelly 1995; Layton 2012 | threshold △ | ✅ |
 | IFD / local depletion | thin/depleted cell yield | spread to cover ground | Fretwell & Lucas 1970; Charnov 1976 | movement ⟳ | ✅ |
 | Starvation mortality | absolute food deficit | dispersal failed → death culls | Siler; density-disease | mortality | ✅ |
 | ~~Seasonal lean → fission~~ | annual lean | (mis-signed + inert) | — | — | ❌ RETIRED (DE-7) |
 
 **FUSION (re-absorb small bands):** nearest-neighbour join → **F resource-directed** (join the richest nearby
-band; Wiessner hxaro). *Colson 1979 PENDING (JSTOR).*
+band; Wiessner hxaro).
 
 ## 14. Parameter registry (pointer)
 

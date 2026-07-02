@@ -1389,8 +1389,8 @@ test). **REACTIVE, not a forecast** (supervisor: bands disperse when starvation 
 anticipatory dispersal is a future "wise-leadership" feature). **Signal choice is load-bearing (R-32):** M2 does NOT
 read `_condition` — that samples the post-harvest FED reserve and stays pinned ~1.0 under scarcity (survivor-biased),
 so a condition-gated M2 never fires; scarcity here is expressed as death, so realized starvation is the honest signal.
-Magnitude/rate UNANCHORED (bracket). Lit (qualitative — direction + "large bands first"): Colson 1979 (PENDING),
-Turnbull 1972 (Ik), Kelly 1995, Layton 2012. **Validation (run_se2 substitution test):** severe −50% pulse, M2 off
+Magnitude/rate UNANCHORED (bracket). Lit (qualitative — direction + fragmentation pattern): **Colson 1979** (FILED —
+famine → "the breakup into small family groups which comb the region"), Turnbull 1972 (Ik), Kelly 1995, Layton 2012. **Validation (run_se2 substitution test):** severe −50% pulse, M2 off
 vs on, 3 seeds → starvation deaths −120/−31/−24 (all lower), M2 fires (pressure 0.6–1.2), 2/3 seeds higher end-pop.
 Off ⇒ bit-exact.
 
