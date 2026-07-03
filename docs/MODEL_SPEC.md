@@ -1500,11 +1500,17 @@ need `enable_pair_bonds`): **(i) `comove_anticipate`** — the root's move utili
 `comove_footprint=k`** — followers take the lowest-occupancy land cell within Chebyshev `k` of the head (a dispersed
 camp, not a stack); **(iii) `comove_provision_exclude`** — JUVENILE followers take no forage share (Kaplan: children
 are provisioned, not self-extracting) so they don't dilute the mother's cell. **Comparison (R-42): FOOTPRINT is the
-load-bearing fix** — footprint=2 recovers savanna 8→378 (82% of the no-co-movement reference) while the forest
-control stays healthy; anticipation alone barely helps (the family still lands on one cell); provision-exclusion is
-partial (only juveniles). **Canonicalizing footprint (+ radius) is a science/calibration change pending supervisor
-sign-off.** Helpers `substrate::diffusion_select_target(extra_occupants=…)`, `phase1_model` footprint scatter +
-`_forage_excl`; blueprint `…_CoMovementCentralPlace_Scoping.md`; R-41→R-42.
+load-bearing fix**; anticipation alone barely helps (the family still lands on one cell); provision-exclusion is
+partial (only juveniles). **CANONICAL 2026-07-03: `comove_footprint=1`** (a 3×3 ≈ 900 km² monthly camp on the
+uniform grid). Full biome table (R-43): uniform footprint=1 recovers the collapse in EVERY biome (savanna 8→243,
+montane 14→276, mixed 18→519, forest 145→426, desert 0→64); the NPP-scaled footprint (`comove_footprint_scaled`) is
+FALSIFIED (agents self-select onto local NPP maxima → occupied-cell NPP reads "rich" → k=0 → collapse). Cell-size
+design answer: keep the uniform lattice + behavioural footprint, NOT coarser per-biome cells (which break the grid +
+double-count the Tallavaara capacity). Safety gate (R-44): footprint=1 PRESERVES status→RS +0.127 / band_awt 26 /
+Gini 0.21 / %complex 83 / assabiyah; eq_pop re-baselines ~2× up (the co-movement brake removed — a correctness gain,
+so absolute-population claims re-read on the footprint=1 substrate). Helpers
+`substrate::diffusion_select_target(extra_occupants=…)`, `demography::footprint_radius`, `phase1_model` footprint
+scatter + `_forage_excl`; blueprint `…_CoMovementCentralPlace_Scoping.md`; R-41→R-44.
 
 ---
 

@@ -56,6 +56,12 @@ def realistic_forager_demog() -> DemographyConfig:
         # (von Rueden) — pinned a=2.5 (sweep: 0.128 at complex gate 0.6; Gini stable, no runaway). Stratified
         # ~0.19 endpoint to validate in the settlement arc.
         enable_ascribed_mate_choice=True, ascribed_mate_strength=2.5,
+        # CANONICAL 2026-07-03: central-place FOOTPRINT (R-42/R-43/R-44). Family co-movement snapped the whole
+        # family onto the mother's single cell → over-subscription → energetic-fertility collapse in marginal
+        # biomes (the biome→society collapse). Real foragers co-reside but forage DISPERSED + share (Isaac 1978).
+        # footprint=1 (a 3×3 camp) recovers the collapse in EVERY biome (savanna 8→243…mixed 18→519) while
+        # preserving status→RS 0.13 / band ~26 / Gini 0.21 (R-44); eq_pop re-baselines ~2× up (brake removed).
+        comove_footprint=1,
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
         enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
