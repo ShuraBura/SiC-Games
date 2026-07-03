@@ -310,6 +310,35 @@ def miami_npp(temperature_c, precip_mm):
     npp_t = MIAMI_MAX / (1.0 + np.exp(MIAMI_T_A - MIAMI_T_B * np.asarray(temperature_c, dtype=float)))
     npp_p = MIAMI_MAX * (1.0 - np.exp(-MIAMI_P_C * np.asarray(precip_mm, dtype=float)))
     return np.minimum(npp_t, npp_p)
+
+
+# ── Economy-from-Climate C4: WHITTAKER biome from (annual T × annual P) — biome is an OUTCOME of climate, not a
+#    label. Thresholds rise with temperature (evapotranspiration: warmer needs more rain for the same class), mapped
+#    onto the model's coarse codes: DESERT (arid, any T) / FOREST (wet) / SAVANNA (warm grassland) / GRASS (cool
+#    grassland-steppe). Cold+wet → FOREST (taiga); cold+dry → GRASS (steppe/tundra). Terrain overrides (MOUNTAIN,
+#    WETLAND, WATER) apply on top. Thresholds PROVISIONAL. ──
+WHIT_DESERT_BASE   = 200.0    # P (mm/yr) below (BASE + SLOPE·max(T,0)) → DESERT
+WHIT_DESERT_SLOPE  = 15.0
+WHIT_FOREST_BASE   = 500.0    # P (mm/yr) above (BASE + SLOPE·max(T,0)) → FOREST
+WHIT_FOREST_SLOPE  = 35.0
+
+
+def whittaker_biome(temperature_c, precip_mm):
+    """Whittaker CLIMATE biome (BIOME_DESERT/SAVANNA/GRASS/FOREST) from annual mean T (°C) and annual P (mm/yr).
+    Temperature-scaled aridity/forest thresholds (warm → higher P needed). Vectorized; terrain overrides
+    (MOUNTAIN/WETLAND/WATER) are applied by the caller. Returns a uint8 code array (or scalar)."""
+    T = np.asarray(temperature_c, dtype=float)
+    P = np.asarray(precip_mm, dtype=float)
+    Tp = np.maximum(T, 0.0)                                   # evapotranspiration scales with warmth
+    desert_thr = WHIT_DESERT_BASE + WHIT_DESERT_SLOPE * Tp
+    forest_thr = WHIT_FOREST_BASE + WHIT_FOREST_SLOPE * Tp
+    biome = np.full(T.shape, BIOME_GRASS, dtype=np.uint8)     # default: cool grassland/steppe
+    warm = T >= GRASS_TROPICAL_THRESHOLD_C                    # 18 °C tropical isotherm → SAVANNA vs GRASS
+    grass_zone = (P >= desert_thr) & (P < forest_thr)
+    biome[grass_zone & warm] = BIOME_SAVANNA
+    biome[P >= forest_thr] = BIOME_FOREST
+    biome[P < desert_thr] = BIOME_DESERT
+    return biome
 GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
 GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
@@ -693,20 +722,33 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
 
     is_land    = (isWater == 0)
     is_mtn     = is_land & (elev > mtn_elev_thresh) & (slope > mtn_slope_thresh)
-    is_desert  = is_land & ~is_mtn & (npp < 0.10)
-    is_wetland = is_land & ~is_mtn & ~is_desert & (dist <= 2) & (npp > 0.45) & (slope < 0.12)
-    remaining  = is_land & ~is_mtn & ~is_desert & ~is_wetland
-    is_forest  = remaining & (forestness >= W_FOREST)
-    is_savanna = remaining & (forestness >= W_SAV) & (forestness < W_FOREST)
-    is_grass   = remaining & (forestness < W_SAV)
 
-    biome = np.zeros((N, N), dtype=np.uint8)  # default 0 = BIOME_WATER
-    biome[is_mtn]     = BIOME_MOUNTAIN
-    biome[is_desert]  = BIOME_DESERT
-    biome[is_wetland] = BIOME_WETLAND
-    biome[is_forest]  = BIOME_FOREST
-    biome[is_savanna] = BIOME_SAVANNA
-    biome[is_grass]   = BIOME_GRASS
+    if mode == "climate":
+        # C4: biome EMERGES from Whittaker(T, P); MOUNTAIN/WETLAND are TERRAIN overrides on top; water stays water.
+        biome = whittaker_biome(temperature, precip_mm)
+        is_wetland = is_land & ~is_mtn & (dist <= 2) & (npp > 0.45) & (slope < 0.12)
+        biome[is_mtn]     = BIOME_MOUNTAIN
+        biome[is_wetland] = BIOME_WETLAND
+        biome[isWater == 1] = BIOME_WATER
+        # (is_desert/is_forest/is_savanna kept below only for the legacy branch)
+        is_desert = biome == BIOME_DESERT
+        is_forest = biome == BIOME_FOREST
+        is_savanna = biome == BIOME_SAVANNA
+    else:
+        is_desert  = is_land & ~is_mtn & (npp < 0.10)
+        is_wetland = is_land & ~is_mtn & ~is_desert & (dist <= 2) & (npp > 0.45) & (slope < 0.12)
+        remaining  = is_land & ~is_mtn & ~is_desert & ~is_wetland
+        is_forest  = remaining & (forestness >= W_FOREST)
+        is_savanna = remaining & (forestness >= W_SAV) & (forestness < W_FOREST)
+        is_grass   = remaining & (forestness < W_SAV)
+
+        biome = np.zeros((N, N), dtype=np.uint8)  # default 0 = BIOME_WATER
+        biome[is_mtn]     = BIOME_MOUNTAIN
+        biome[is_desert]  = BIOME_DESERT
+        biome[is_wetland] = BIOME_WETLAND
+        biome[is_forest]  = BIOME_FOREST
+        biome[is_savanna] = BIOME_SAVANNA
+        biome[is_grass]   = BIOME_GRASS
 
     # ── NPP physical units (Task 4 — Tallavaara 2018 single-point anchor) ──
     # Anchor: generator forest-onset npp≈0.4 → empirical saturation ~1360 g/m²/yr.

@@ -6,7 +6,8 @@ elevation lapse (montane cools) + a latitude-rising, maritime-damped seasonal ha
 """
 import numpy as np
 
-from sic_games.terrain import generate_world, world_lottery, LAPSE_C_PER_KM, N, miami_npp, NPP_GM2_SCALE
+from sic_games.terrain import (generate_world, world_lottery, LAPSE_C_PER_KM, N, miami_npp, NPP_GM2_SCALE,
+                               whittaker_biome, BIOME_FOREST, BIOME_SAVANNA, BIOME_GRASS, BIOME_DESERT)
 
 
 def _k(arch="montane", seed=0):
@@ -159,3 +160,43 @@ def test_climate_npp_cold_highlands_low():
     warm = land & (C.temperature > 15.0)
     if cold.any() and warm.any():
         assert C.npp_gm2[cold].mean() < C.npp_gm2[warm].mean()
+
+
+# --------------------------------------------------------------------------- C4 Whittaker biome
+
+def test_whittaker_helper_climate_biomes():
+    """Whittaker(T,P): warm+wet→forest, warm+seasonal→savanna, warm+arid→desert, cool+moderate→grass; cold+wet→
+    forest (taiga), cold+arid→desert."""
+    assert whittaker_biome(26, 2500) == BIOME_FOREST
+    assert whittaker_biome(24, 800) == BIOME_SAVANNA
+    assert whittaker_biome(20, 250) == BIOME_DESERT
+    assert whittaker_biome(8, 700) == BIOME_GRASS
+    assert whittaker_biome(3, 1200) == BIOME_FOREST      # taiga
+    assert whittaker_biome(0, 150) == BIOME_DESERT       # cold desert
+
+
+def test_whittaker_desert_forest_thresholds_rise_with_temperature():
+    """Warmer needs more rain for the same class (evapotranspiration): the desert→grass and grass→forest edges
+    shift to higher P as T rises."""
+    # a P that is 'forest' when cool becomes 'grass/savanna' when hot (higher forest threshold)
+    assert whittaker_biome(5, 700) == BIOME_FOREST
+    assert whittaker_biome(28, 700) != BIOME_FOREST
+    # a P that is 'grass' when cool becomes 'desert' when hot (higher desert threshold)
+    assert whittaker_biome(2, 300) != BIOME_DESERT
+    assert whittaker_biome(28, 300) == BIOME_DESERT
+
+
+def test_climate_biome_emerges_from_regional_climate():
+    """On FLAT terrain the biome follows the regional climate: tropical→forest-dominant, subtropical→dry
+    (desert/savanna/grass, little forest), temperate→forest+grass mosaic."""
+    from collections import Counter
+    base = dict(world_lottery(0, archetype="forest")); base["relief"] = 0.08
+    def frac(cl, code):
+        k = dict(base); k["climate_latitude"] = cl
+        b = generate_world(k, mode="climate").biome
+        land = b[generate_world(k, mode="climate").isWater == 0]
+        return np.mean(land == code)
+    assert frac(0.08, BIOME_FOREST) > 0.7                       # tropical → rainforest-dominant
+    subtrop_dry = frac(0.30, BIOME_DESERT) + frac(0.30, BIOME_SAVANNA) + frac(0.30, BIOME_GRASS)
+    assert subtrop_dry > 0.6                                    # subtropical → dry (open) biomes dominate
+    assert frac(0.30, BIOME_FOREST) < 0.3                       # subtropical → little forest
