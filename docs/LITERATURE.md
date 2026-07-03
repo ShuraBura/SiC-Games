@@ -821,6 +821,21 @@ USDA Forest Service, Dunham et al. (2001) "Salmonid Behavior and Water Temperatu
 **What was lifted — storable aquatic surplus → forager complexity:** the paradigm that dense, STORABLE, seasonally-concentrated AQUATIC resources (NW-Coast salmon) underwrite delayed-return, ranked/stratified complex foragers — complexity is the exception, tied to this specific resource configuration, not to terrestrial productivity or seasonality per se. **How used:** the theoretical warrant for gating the society MORPH on an aquatic-food field rather than on biome/seasonality (R-46→R-48 → this stage). **Status: REFERENCE (framing); INLINE — PDF not filed.**
 **Citation tag:** [REFERENCE — storable aquatic surplus → complexity (aquatic-food stage)]
 
+## GD-1 finite resources — depletion, biome/season regrowth & central-place mobility (blueprint …_GD1_FiniteResources; added 2026-07-03, web-sourced)
+
+### Coe, M.J., Cumming, D.H., Phillipson, J. (1976). "Biomass and production of large African herbivores in relation to rainfall and primary production." *Oecologia* 22:341–354.
+**What was lifted — game STOCK & PRODUCTION ∝ rainfall/NPP:** standing herbivore biomass and secondary production in African savannas correlate strongly with mean annual rainfall and above-ground primary production. **How used:** the depletable-stock CEILING `K` scales with the (Miami-NPP) productivity already in the model — biome productivity sets the game stock; life-history sets the regrowth rate. **Status: REFERENCE (web abstract); PDF not filed.**
+**Citation tag:** [MECHANISM — game stock/production ∝ NPP (GD-1 K)]
+
+### Cortés, E. (2016). "Perspectives on the intrinsic rate of population growth." *Methods in Ecology and Evolution* 7:1136–1145; + Southeast-Asian ungulate post-poaching recovery (muntjac r≈0.44, gaur r≈0.31).
+**What was lifted — the REGROWTH RATE r:** intrinsic rate of increase r_max for medium ungulates ≈0.3–0.4/yr (recover in a few years); megafauna (elephant, sambar) far slower (decades) and deplete first. **How used:** the biome-specific logistic regrowth `r_biome` (GD-1 §2) — fast for small/grassland grazers, slow for forest megafauna. **Status: REFERENCE (web abstract); PDFs not filed. Anchor: r_max ≈0.3–0.4/yr medium ungulate.**
+**Citation tag:** [PARAMETER — game regrowth r_biome (GD-1)]
+
+### Central-place prey-depletion halos & marginal-value residential mobility — web-sourced 2026-07-03.
+Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local depletion of terrestrial game vertebrates by central-place hunters in rural Amazonia" (PMC5645145); "Hunter-gatherer residential mobility and the marginal value of rainforest patches" (PMC5373393).
+**What was lifted — the CAMP↔DEPLETION↔MOVE link:** a central-place camp depletes its foraging catchment (a hunt-out HALO, gradient with distance); when the catchment's marginal return drops below the regional average the camp RELOCATES — Charnov's marginal-value theorem at the camp scale. **How used:** the GD-1 residential-mobility mechanism (deplete-then-move) and the basis for EMERGENT sedentism (stay where regrowth+storage ≥ depletion). **Status: REFERENCE (web abstracts); PDFs not filed.**
+**Citation tag:** [MECHANISM — central-place depletion halo + MVT residential mobility (GD-1 / camp)]
+
 ## Climate → NPP (the Miami model) — Economy-from-Climate stage anchor (added 2026-07-03)
 
 ### Lieth, H. (1972/1975). The MIAMI MODEL of climatic net primary productivity. (Lieth 1972 *Nature and Resources*; Lieth & Box in Lieth & Whittaker eds. 1975 *Primary Productivity of the Biosphere*, Springer.)
