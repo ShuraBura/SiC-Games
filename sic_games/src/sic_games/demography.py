@@ -383,6 +383,19 @@ class DemographyConfig(BaseModel):
     aggregation_site_sep: float = Field(10.0, gt=0.0)     # min cell separation between aggregation sites (≈ one per region)
     aggregation_residence: str = Field("virilocal")       # {virilocal (bride→groom), uxorilocal (groom→bride), flexible (smaller→larger band)}
     aggregation_rank_homogamy: float = Field(0.0, ge=0.0)  # 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient
+    # PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales
+    # inversely with STATIC local geographic productivity (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
+    # Low-NPP (savanna/desert) → longer stride → agents spread over sparse territory instead of piling on the few
+    # rich cells (the R-37/R-39 collapse root). High-NPP (forest) → stride→base=1 → dense-forest dynamics unchanged.
+    # r = clamp(round(base·(npp_ref/max(local_npp, npp_floor))**exp), base, r_max). Default OFF / base=1 ⇒ bit-exact.
+    # Calibration (ref/exp/max) PROVISIONAL — mechanism ships ablatable; locking the law for canonical runs needs
+    # supervisor sign-off. (§4.8.19; R-39.)
+    enable_productivity_mobility: bool = False
+    mobility_base_radius: int = Field(1, ge=1)               # stride at/above npp_ref
+    mobility_max_radius: int = Field(6, ge=1)                # cap on stride (bounds cost + jump-over risk); PROVISIONAL
+    mobility_npp_ref: float = Field(900.0, gt=0.0)           # forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL
+    mobility_npp_floor: float = Field(50.0, gt=0.0)          # denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL
+    mobility_exponent: float = Field(1.0, ge=0.0)            # Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket)
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from
@@ -561,6 +574,22 @@ def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: 
         return 0.0
     logistic = 1.0 / (1.0 + math.exp(-(n - midpoint) / width))
     return gain * repulsion_society_factor(society) * logistic
+
+
+def mobility_radius(local_npp: float, cfg) -> int:
+    """Productivity-scaled movement STRIDE (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
+
+    r = clamp(round(base · (npp_ref / max(local_npp, npp_floor))**exponent), base, r_max).
+    Low local NPP → long stride (spread over sparse land); high NPP → r=base (=1 by default, bit-exact).
+    Returns `base` unconditionally when the flag is off. `cfg` is a DemographyConfig (or any object with the
+    mobility_* fields). Calibration (ref/exp/max) PROVISIONAL pending supervisor sign-off."""
+    base = cfg.mobility_base_radius
+    if not cfg.enable_productivity_mobility:
+        return base
+    denom = max(local_npp, cfg.mobility_npp_floor)
+    ratio = cfg.mobility_npp_ref / denom
+    r = base * (ratio ** cfg.mobility_exponent)
+    return int(max(base, min(cfg.mobility_max_radius, round(r))))
 
 
 def society_knobs(name: str) -> tuple[float, dict]:

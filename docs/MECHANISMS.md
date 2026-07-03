@@ -450,6 +450,7 @@ Category: C1 (shared, param-differentiated) / C2 (re-pointed) / C3 (new architec
 | Ascribed(cred) mate-choice | female mate-weight `(prowess·cred^(a·sw))^m`, society-gated `sw` (egal 0.25/complex 0.6/strat 1.0); recovers composite status→RS ≈0.13 at a=2.5 | C2 | `demography::mate_ascribed_weight`, `MATE_ASCRIBED_WEIGHT`; `phase1_model::_pair_from_pool` | §4.8.16; R-35 |
 | Life-history wiring (canonical) | Kaplan-2000 graded η/consumption/reserve + provisioning now ENGAGED (`enable_life_history` auto-builds month-scaled cfg); retires JV-1 | C1 | `agents/base.py::eta/consumption_factor/reserve_scale`; `phase1_model::_init_agents` | §4.8.17; R-38 |
 | The gathering (marriage aggregation) | seasonal cross-band exogamous pairing at abundant sites; residence (viri/uxori/flexible) + rank-homogamy toggles; decouples mate-finding from reproducing | C2 | `phase1_model::_do_gathering`, `_pair_from_pool` | §4.8.18; R-39 |
+| Productivity-scaled mobility | diffusion STRIDE scales ∝1/static-local-NPP (Kelly/Binford); water-aware glide; low-NPP agents spread instead of piling → fixes the biome→society collapse root | C1 | `demography::mobility_radius`; `substrate::diffusion_select_target(move_radius,water)` | §4.8.19; R-39 |
 
 > **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4). **RETIRED:**
 > `storage_tether_reserves` (DE-3); `season_aggregation` (DE-7, lean→fission mis-signed+inert); M1 moderate-lean

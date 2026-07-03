@@ -1466,6 +1466,24 @@ the DEEPER root is **fixed-r=1 diffusion mobility** (no biome-aware ranging; Kel
 The next stage (productivity-scaled movement range) supersedes the family-spread band-aid. Blueprint
 `…_MarriageAggregation_Scoping.md`.
 
+### §4.8.19 Productivity-scaled mobility — biome-aware movement range (built 2026-07-03)
+
+**Why (R-39):** diffusion movement was hard-coded to a **r=1** von-Neumann step (`diffusion_select_target`'s `cands`
+= 4 cardinals at distance 1). Real foragers spread over sparse territory by **ranging farther** where productivity
+is low (Kelly 1995 / Binford 2001: residential mobility ∝ 1/productivity) — our low-NPP agents couldn't, so they
+piled onto the few rich cells and starved (the savanna collapse). **Mechanism:** `enable_productivity_mobility`
+makes the cardinal-candidate distance a per-agent **stride** `r = clamp(round(base·(npp_ref/max(local_npp,
+npp_floor))^exponent), base, r_max)`, computed in the model from the **STATIC** local `npp_gm2` (geographic, NOT the
+ClimateField instantaneous level — so the *range* doesn't oscillate with the season; transhumance is a deferred
+extension). Low NPP → long stride → agents spread out; high NPP (forest) → `r→base=1` → the validated dense-forest
+dynamics are untouched. **Water-aware glide:** each cardinal ray walks 1..r and takes the farthest reachable LAND
+cell, **stopping at the first water** (foragers don't cross a lake; the `isWater` mask is passed into the mover).
+`enable…=False` or `base=1`+`water=None` ⇒ **bit-exact** legacy r=1. **Calibration** (`exponent`/`npp_ref`/`r_max`)
+is PROVISIONAL (bracket) — the mechanism ships ablatable/default-OFF; **locking the scaling law for canonical runs
+needs supervisor sign-off** (Kelly gives the ∝1/productivity direction, Binford the cross-cultural magnitude).
+Helper `demography::mobility_radius`; blueprint `…_ProductivityScaledMobility_Scoping.md`; R-39 (root), R-40 pending
+(biome→society re-run).
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),

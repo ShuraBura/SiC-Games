@@ -70,9 +70,17 @@ def diffusion_select_target(
     temperature: float | None,
     cohesion_target: tuple[int, int] | None = None,
     cohesion_strength: float = 0.0,
+    move_radius: int = 1,
+    water: "np.ndarray | None" = None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
-    r=1 neighbourhood (4 cardinal + current), NO unoccupied filter.
+    neighbourhood (4 cardinal + current), NO unoccupied filter.
+
+    Productivity-scaled mobility (§4.8.19): the cardinal candidates sit at distance `move_radius` (the STRIDE),
+    not always 1. `move_radius=1` ⇒ the legacy r=1 neighbourhood (bit-exact). When `water` (the isWater mask)
+    is supplied, each cardinal ray GLIDES outward 1..move_radius and takes the farthest reachable LAND cell,
+    STOPPING at the first water cell (foragers don't cross a lake); a direction whose immediate neighbour is
+    water yields no candidate. `water=None` ⇒ pure stride (the model's post-hoc water guard still applies).
 
     Full-form utility with trait hooks at neutral values (6.0a):
         U = expected_per_capita_yield × affinity(=1) × crowd_response(=1) − move_cost
@@ -93,7 +101,22 @@ def diffusion_select_target(
     g_s = getattr(sc, "group_safety_scale", 8.0)
     g_mate = getattr(sc, "group_mate_min", 0.0)         # E.2 mating-access drive (0 = off)
     m_floor = getattr(sc, "group_mate_floor", 0.3)
-    cands = [(x, y), ((x + 1) % w, y), ((x - 1) % w, y), (x, (y + 1) % h), (x, (y - 1) % h)]
+    r = move_radius if move_radius >= 1 else 1
+    if r == 1 and water is None:
+        # legacy path — identical candidate list ⇒ bit-exact
+        cands = [(x, y), ((x + 1) % w, y), ((x - 1) % w, y), (x, (y + 1) % h), (x, (y - 1) % h)]
+    else:
+        # productivity-scaled glide: farthest reachable LAND cell per cardinal ray, stopping at the first water
+        cands = [(x, y)]
+        for (dx, dy) in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            far = None
+            for step in range(1, r + 1):
+                cx, cy = (x + dx * step) % w, (y + dy * step) % h
+                if water is not None and water[cy, cx] != 0:
+                    break               # ray blocked by water — cannot cross
+                far = (cx, cy)
+            if far is not None and far != (x, y):
+                cands.append(far)
     w_self = base_status(agent, eps) ** kappa if (kappa > 0.0 and agent.strategy == "carbon") else 1.0
     # F.3c-1 band cohesion: a bounded per-step nudge toward the agent's band centroid (food stays dominant — this
     # only re-weights the same von-Neumann candidates; the gain on a step TOWARD the centroid is 1+coh, AWAY 1−coh).

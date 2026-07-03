@@ -58,6 +58,7 @@ from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConf
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
+    mobility_radius,
 )
 from sic_games.group import GroupVector, NO_BAND
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
@@ -494,6 +495,10 @@ class TerrainWorld(mesa.Model):
         # is superseded by the emergent-bands grouping drives + bonded mating — the morph now fires from emergent
         # density+storage alone, validated in run_3h. MODEL_SPEC §4.8.5.)
         fam_move = self._demog is not None and getattr(self._demog, "enable_pair_bonds", False)
+        # §4.8.19 productivity-scaled mobility: per-agent STRIDE from the STATIC local NPP (Kelly/Binford ∝1/NPP).
+        mobility_on = self._demog is not None and getattr(self._demog, "enable_productivity_mobility", False)
+        npp_gm2 = getattr(self._fields, "npp_gm2", None) if mobility_on else None
+        water_mask = self._fields.isWater if mobility_on else None
         # F.3c-1 band cohesion: pull each mover (family-root / unpaired adult) toward its band's centroid.
         coh_str = (self._demog.band_cohesion if (self._demog is not None
                    and getattr(self._demog, "enable_band_affiliation", False)) else 0.0)
@@ -527,7 +532,12 @@ class TerrainWorld(mesa.Model):
             if callable(tfn):
                 temp = tfn(agent)
             ct = band_centroid.get(agent._group.band_id) if coh_str > 0.0 else None
-            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str)
+            mr = 1
+            if mobility_on:
+                local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
+                mr = mobility_radius(local_npp, self._demog)
+            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str,
+                                             move_radius=mr, water=water_mask)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
