@@ -1481,8 +1481,11 @@ cell, **stopping at the first water** (foragers don't cross a lake; the `isWater
 `enable…=False` or `base=1`+`water=None` ⇒ **bit-exact** legacy r=1. **Calibration** (`exponent`/`npp_ref`/`r_max`)
 is PROVISIONAL (bracket) — the mechanism ships ablatable/default-OFF; **locking the scaling law for canonical runs
 needs supervisor sign-off** (Kelly gives the ∝1/productivity direction, Binford the cross-cultural magnitude).
-Helper `demography::mobility_radius`; blueprint `…_ProductivityScaledMobility_Scoping.md`; R-39 (root), R-40 pending
-(biome→society re-run).
+Helper `demography::mobility_radius`; blueprint `…_ProductivityScaledMobility_Scoping.md`. **OUTCOME (R-40): this is
+NOT the biome→society fix** — the ablation is negative (mildly harmful) and the pile-up premise is falsified (no
+persistent crowding; the real lever is family CO-MOVEMENT, savanna 3 w/ co-move vs 327 w/o). The mechanism is
+retained (valid, ablatable, default-OFF) for its own uses (mobility gradients / transhumance), NOT as the collapse
+remedy (DEAD_ENDS DE-9).
 
 ---
 

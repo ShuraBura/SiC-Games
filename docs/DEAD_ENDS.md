@@ -53,4 +53,12 @@
 
 ---
 
+## DE-9 — Productivity-scaled mobility as the biome→society collapse fix (falsified 2026-07-03)
+
+**What it was:** the hypothesis (R-39, supervisor-flagged) that the low-NPP (savanna/desert/mixed) biome→society collapse is caused by **fixed-r=1 diffusion mobility** — agents can't spread over sparse territory, pile onto the few rich cells, overcrowd, and starve — fixable by a productivity-scaled movement stride (Kelly/Binford mobility ∝ 1/productivity).
+**Why falsified:** the mechanism was BUILT (`enable_productivity_mobility`, §4.8.19, default-OFF, bit-exact, 10 unit tests) and ablated (R-40). It does **not** rescue the collapse and is consistently **mildly harmful** (savanna survival 2/3→0/3; every archetype eq_pop ON ≤ OFF). Two probes killed the pile-up premise: (1) the founder seed-stack decompresses to occ/cell ~1.7 within 25 steps in BOTH arms — **there is no persistent pile-up**; the collapse is a slow chronic bleed. (2) The **actual** lever is FAMILY CO-MOVEMENT: savanna @900 steps → pop 3 with co-movement, **327 without**, 3 with mobility ON. Co-movement forces dependents onto the head's cell, coupling the family to one marginal cell's yield → chronic per-capita deficit. Ranging farther worsens dispersal below mate/band viability without touching the co-location cause.
+**Status of the code:** the mobility mechanism is **kept** — valid, ablatable, default-OFF; it is simply not the biome fix, and its calibration was never locked. **Revive** the mobility LINE only for its own purpose (residential-mobility gradients / annual range, seasonal transhumance), not as the biome→society remedy. The live next lever is the co-movement mechanic (footprint / provisioning-off-head / productivity-gated co-movement) — see R-40. (MODEL_SPEC §4.8.19; R-39→R-40.)
+
+---
+
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*
