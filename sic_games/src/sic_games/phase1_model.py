@@ -980,6 +980,13 @@ class TerrainWorld(mesa.Model):
                 a.alive = False
                 self.deaths_senesc_this_step += 1
 
+        # GD-1: advance the depletable resource stock (deplete by this step's foraging pressure, regrow at the
+        # biome/season rate). No-op unless the harvest field has depletion enabled. `season` from the climate field
+        # if present (growing-season pulse), else aseasonal.
+        if hasattr(tf, "deplete_and_regrow"):
+            season = tf.season() if hasattr(tf, "season") else 1.0
+            tf.deplete_and_regrow(occ_count, season)
+
     def _note_band_starv(self, a) -> None:
         """M2: tally a starvation death against the agent's band (band_id → count this step)."""
         bid = getattr(getattr(a, "_group", None), "band_id", None)

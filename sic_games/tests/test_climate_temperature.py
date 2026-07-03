@@ -251,6 +251,33 @@ def test_c6_montane_rivers_more_salmon_capable_than_air_suggests():
         assert by_water > by_air + 0.1                                   # headwater sourcing opens up cold-water rivers
 
 
+def test_gd1_deplete_and_recover():
+    """GD-1: a cell foraged hard hunts out (yield → floor) and recovers over a fallow; default OFF ⇒ static field."""
+    from sic_games.terrain import world_lottery_climate
+    from sic_games.capacity import NPPCapacityField
+    k = world_lottery_climate(0, terrain="flat", climate="temperate")
+    F = generate_world(k, mode="climate")
+    burn = 75000.0
+    ys, xs = np.where((F.isWater == 0) & (F.npp_gm2 > 800))
+    x, y = int(xs[0]), int(ys[0])
+    # depletion OFF ⇒ deplete_and_regrow is a no-op (static)
+    off = NPPCapacityField(F, burn, mode="tallavaara", enable_depletion=False)
+    y0 = off.level(x, y)
+    off.deplete_and_regrow({(x, y): 500}, 1.0)
+    assert off.level(x, y) == y0                              # no-op when disabled
+
+    on = NPPCapacityField(F, burn, mode="tallavaara", enable_depletion=True)
+    full = on.level(x, y)
+    for _ in range(24):
+        on.deplete_and_regrow({(x, y): 200}, 1.0)            # 2 yr heavy foraging
+    hunted = on.level(x, y)
+    for _ in range(120):
+        on.deplete_and_regrow({}, 1.0)                       # fallow
+    recovered = on.level(x, y)
+    assert hunted < full * 0.5                                # hunted-out
+    assert recovered > hunted * 1.5                           # recovers over fallow
+
+
 def test_c8_aquatic_capacity_subsidy():
     """C8: aquatic=True adds capacity on aquatic cells (super-terrestrial) but leaves interior (aquatic_food=0)
     byte-identical; aquatic=False ⇒ base field unchanged."""
