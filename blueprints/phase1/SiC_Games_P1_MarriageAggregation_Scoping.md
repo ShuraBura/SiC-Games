@@ -37,6 +37,11 @@ abundant sites and pair across bands:
    often near water.)
 3. **WHO (the regional connubium).** Each band is assigned to its nearest site within `aggregation_radius`; the bands
    sharing a site are that gathering's marriage pool = the emergent **community/connubium** (the band→community nest).
+   **Radius = a realistic TRAVEL-TO-GATHERING distance**, lit-anchored: Wobst 1974 connubium (~500 people) + forager
+   marriage/mobility ranges ≈ tens–~100 km → **~5–10 cells** (cell edge = 10 km, cell = 100 km²). NOT density-
+   adaptive (people won't walk 1000 km for a wedding); a fixed travel radius. **A band with no other band within
+   range gets no gathering → no cross-mating → it may die out. That is ACCEPTABLE/realistic** (isolated marginal
+   bands do go extinct — supervisor "se la vi"); do NOT artificially rescue it.
 4. **MARRIAGE (cross-band, exogamous — with virilocal absorption + rank homogamy; red-team #2).** For each site,
    pool the site's bands' **unpaired adults** → run the prowess·cred-weighted, kin-avoiding `_do_pairing` on that
    REGIONAL pool → durable pair-bonds (F.3a). Two lineage-preserving rules: **(i) virilocal residence** — the bride
@@ -44,7 +49,11 @@ abundant sites and pair across bands:
    preventing male-line flattening; **(ii) rank homogamy** — pairing weights combine the directional ascribed-mate-
    choice (high-cred groom preferred) with B++ status assortment (like-cred pairs), so the cred gradient survives the
    mixing. So a low-density band's members find spouses at the gathering even though their daily neighbourhood is
-   empty — without dissolving lineages. Config: `aggregation_virilocal:bool`, `aggregation_rank_homogamy:float`.
+   empty — without dissolving lineages. **Residence is a switchable ENUM** `aggregation_residence ∈ {virilocal
+(bride→groom, default), uxorilocal (groom→bride), flexible (the existing smaller→larger-band rule)}` — both
+directions wired so we can run virilocal- vs uxorilocal-world experiments (Ember & Ember subsistence link;
+biome-localized residence is a future study, not hard-coded). **Rank matching is a switch** `aggregation_rank_
+homogamy ∈ [0,1]` (0 = random/directional only; 1 = strong like-cred homogamy).
 5. **DISPERSE + REPRODUCE year-round.** After the window, no new pairing until next gathering; **births proceed
    throughout the year via the persistent pair-bond** (the bond, set at the gathering, is the birth licence — the
    daily co-residence mate-gate is replaced by "has a living partner"). Bands disperse via the normal movement.
@@ -54,8 +63,9 @@ from *reproducing* (year-round via the durable bond). It reuses `_do_pairing` + 
 **widening the pairing POOL to the regional connubium at the seasonal gathering**, instead of daily-local.
 
 **Config:** `enable_marriage_aggregation: bool=False`, `aggregation_period:int=12`, `aggregation_season_threshold:
-float` (peak window), `aggregation_radius:float` (connubium range, cells), `aggregation_site_sep:float`. When ON,
-the daily bonded-mate-gate for *pairing* is superseded by the gathering; births gate on the pair-bond.
+float` (peak window), `aggregation_radius:float≈5–10` (connubium/travel range, cells), `aggregation_site_sep:float`,
+`aggregation_residence ∈ {virilocal,uxorilocal,flexible}`, `aggregation_rank_homogamy:float∈[0,1]`. When ON, the
+daily bonded-mate-gate for *pairing* is superseded by the gathering; births gate on the pair-bond.
 
 ## Literature (to file — supervisor to grab the gated ones)
 
@@ -70,6 +80,12 @@ the daily bonded-mate-gate for *pairing* is superseded by the gathering; births 
 - **Wobst (1974)** (FILED) — the connubium (~500) is viable only via periodic gatherings; daily co-residence is far
   too small a mating pool. Anchors the connubium scale.
 - **Hamilton et al. 2007** (FILED) — the nested band→community→connubium (~4× ratio) that aggregation realizes.
+
+*Residence-mode (virilocal/uxorilocal):* **Marlowe 2004, "Marital residence among foragers"** (FILED) — foragers
+modally multilocal with a virilocal lean; **Hill et al. 2011** (FILED) — bilateral, flexible, low-relatedness co-
+residence; **Ember & Ember 1971, "Conditions Favoring Matrilocal vs Patrilocal Residence"** (*to grab*) — matri-
+locality where women's subsistence dominates + external warfare, patrilocality where male hunting dominates — the
+subsistence→residence link that motivates a (future) biome-localized residence rule; Divale 1974 corroborates.
 
 ## RED-TEAM
 
@@ -103,8 +119,10 @@ the daily bonded-mate-gate for *pairing* is superseded by the gathering; births 
    blocked by the old daily gate). Off ⇒ old behaviour bit-exact.
 6. **Static / no-climate worlds.** No `season()` ⇒ fire on a fixed phase of `aggregation_period` (deterministic), so
    the mechanism works on the biome→society harness (which is static Tallavaara).
-7. **Isolated bands (no site in range).** A band with no aggregation site within `aggregation_radius` → falls back to
-   local pairing (or joins the nearest gathering regardless of range). Don't strand a band into sterility.
+7. **Isolated bands (no connubium in range) — DIE, and that's fine.** A band with no other band within
+   `aggregation_radius` gets no gathering → no cross-mating → it may go extinct. Do NOT artificially rescue it
+   (supervisor "se la vi") — isolated marginal bands going extinct is realistic and a feature, not a bug. (The
+   radius is set to a realistic travel distance so this happens only to genuinely isolated bands, not normal ones.)
 
 ## Validation
 
@@ -115,6 +133,16 @@ the daily bonded-mate-gate for *pairing* is superseded by the gathering; births 
 - **Preserve forest:** the productive-biome complex society (R-37 forest) is unchanged/robust.
 - **Lineage dynamics survive** (red-team #2): cred Gini / status→RS / dominant-lineage not flattened.
 - **Off ⇒ bit-exact** (locked by test).
+
+## Long-term studies (flagged now; not this build)
+
+- **Virilocal vs uxorilocal societies** — compare whole-world runs at each residence mode: does descent direction
+  change band composition, lineage concentration, status→RS, dynastic dynamics? (Both wired now; the comparison is
+  its own study.)
+- **Biome-localized residence** — a rule that sets residence from the biome's subsistence balance (male-hunting →
+  virilocal, female-gathering → uxorilocal; Ember & Ember). Would let *residence itself* be part of the biome→
+  society signal. Deferred — wire the options first, study the correlation, then decide whether to make it emergent.
+- **Random per-world residence** — assign residence mode per world (lottery) to see its effect across the ensemble.
 
 ## Sequencing
 
