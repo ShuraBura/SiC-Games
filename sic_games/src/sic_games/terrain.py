@@ -295,6 +295,8 @@ P_ORO_MIN        = 0.25       # clamp floor on the orographic multiplier (deep r
 P_ORO_MAX        = 3.2        # clamp cap (windward/peak enhancement)
 P_MARITIME_GAIN  = 0.3        # moisture supply: near-water (wateracc) cells wetter
 P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind is to the −x (west) side
+CLIMATE_ARIDITY_DAMP = 0.75   # climate_aridity∈[0,1] scales precip DOWN by up to this fraction (continental/leeward
+                              # dryness independent of latitude — e.g. a temperate but arid interior like central Asia)
 # ── Economy-from-Climate C3 (mode="climate"): the MIAMI MODEL — NPP from temperature & precipitation ──
 # Lieth 1972/1975 (PDF filed; eqs 12-1/12-2, VERIFIED). NPP = min(temperature-limited, precipitation-limited),
 # g dry-matter/m²/yr. Coefficients are the published least-squares fit (50 sites / 5 continents). LITERATURE.md.
@@ -508,6 +510,46 @@ WORLD_ARCHETYPES: dict[str, dict[str, tuple[float, float]]] = {
 }
 WORLD_ARCHETYPE_ORDER = ("forest", "savanna", "desert", "montane", "mixed")
 
+# ── Economy-from-Climate C4 (part B): worlds are drawn as INDEPENDENT terrain × climate; biomes fall out of
+#    Whittaker(T,P) at generate_world(mode="climate"). TERRAIN = physical geography (relief, water/coast); CLIMATE =
+#    latitude band + extra aridity. Any pairing is legal (tropical-lowland → rainforest; tropical-montane → Andes;
+#    subtropical-flat-arid → Sahara; temperate-montane → Rockies; boreal-flat → taiga). Ranges PROVISIONAL. ──
+TERRAIN_PRESETS: dict[str, dict[str, tuple[float, float]]] = {
+    "flat":        dict(relief=(0.05, 0.15), rough=(0.35, 0.55), waterK=(0.25, 0.40)),
+    "hilly":       dict(relief=(0.35, 0.55), rough=(0.55, 0.75), waterK=(0.25, 0.42)),
+    "mountainous": dict(relief=(0.82, 0.96), rough=(0.72, 0.90), waterK=(0.25, 0.45)),
+    "coastal":     dict(relief=(0.20, 0.45), rough=(0.45, 0.65), waterK=(0.45, 0.62)),
+}
+CLIMATE_PRESETS: dict[str, dict[str, tuple[float, float]]] = {
+    # climate: (climate_latitude), (climate_aridity)
+    "tropical":    dict(climate_latitude=(0.05, 0.15), climate_aridity=(0.00, 0.20)),
+    "subtropical": dict(climate_latitude=(0.28, 0.38), climate_aridity=(0.40, 0.75)),  # the arid Hadley-descent belt
+    "temperate":   dict(climate_latitude=(0.48, 0.62), climate_aridity=(0.10, 0.45)),
+    "boreal":      dict(climate_latitude=(0.78, 0.92), climate_aridity=(0.15, 0.45)),
+}
+TERRAIN_ORDER = ("flat", "hilly", "mountainous", "coastal")
+CLIMATE_ORDER = ("tropical", "subtropical", "temperate", "boreal")
+
+
+def world_lottery_climate(seed: int, terrain: str | None = None, climate: str | None = None) -> dict:
+    """Economy-from-Climate world draw: INDEPENDENT terrain × climate → knobs for `generate_world(…, mode="climate")`,
+    where the biome EMERGES from Whittaker(T,P). `seed` cycles terrain and climate on co-prime periods (4 × 4 = 16
+    distinct pairings over seeds 0–15) unless forced. `forestK`/`aridK` (legacy moisture knobs) are neutralised —
+    climate, not a knob, sets moisture. Use with `mode="climate"`."""
+    import random as _random
+    terr = terrain or TERRAIN_ORDER[seed % len(TERRAIN_ORDER)]
+    clim = climate or CLIMATE_ORDER[(seed // len(TERRAIN_ORDER)) % len(CLIMATE_ORDER)]
+    rng = _random.Random(20260703 + seed)
+    knobs = {k: rng.uniform(lo, hi) for k, (lo, hi) in TERRAIN_PRESETS[terr].items()}
+    knobs.update({k: rng.uniform(lo, hi) for k, (lo, hi) in CLIMATE_PRESETS[clim].items()})
+    knobs["forestK"] = 0.5    # neutral (climate sets moisture; forestK is a legacy woody-cover knob)
+    knobs["aridK"] = 0.0      # neutral (legacy aridity; superseded by climate_aridity)
+    knobs["mode"] = "climate"
+    knobs["seedStr"] = f"{terr}-{clim}{seed}"
+    knobs["terrain"] = terr
+    knobs["climate"] = clim
+    return knobs
+
 
 def world_lottery(seed: int, archetype: str | None = None) -> dict:
     """Per-world knob draw for a DIVERSE ensemble. `seed` cycles through `WORLD_ARCHETYPE_ORDER` (so seeds 0–4 give
@@ -678,7 +720,8 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
             upwind_max = np.maximum(upwind_max, np.roll(elev, _s * P_ORO_WIND_DX, axis=1))
         shadow = np.clip(1.0 - P_ORO_SHADOW_GAIN * np.maximum(0.0, upwind_max - elev), P_ORO_MIN, 1.0)
         oro = np.clip(uplift * shadow, P_ORO_MIN, P_ORO_MAX)
-        precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
+        aridity = 1.0 - CLIMATE_ARIDITY_DAMP * float(knobs.get("climate_aridity", 0.0))   # continental/leeward dryness
+        precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist) * aridity, 0.0, None)
         precip_mm[isWater == 1] = 0.0
     else:
         temperature = temp_lat

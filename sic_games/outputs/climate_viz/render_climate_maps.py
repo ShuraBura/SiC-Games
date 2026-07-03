@@ -15,7 +15,13 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "biome_society_20260702"))
-from sic_games.terrain import generate_world, world_lottery, N
+from sic_games.terrain import generate_world, world_lottery, world_lottery_climate, N
+
+# representative terrain × climate worlds (biomes fall out of Whittaker) — the eyeball set
+REPRESENTATIVE = [
+    ("flat", "tropical"), ("flat", "subtropical"), ("flat", "temperate"), ("flat", "boreal"),
+    ("mountainous", "temperate"), ("coastal", "tropical"),
+]
 
 # biome palette (matches the sic_terrain_prototype BIOME_COL)
 BIOME_COL = np.array([
@@ -49,6 +55,15 @@ def _worlds(archetype, seed):
     return [(lbl, cl, generate_world({**base, "climate_latitude": cl}, mode="climate")) for cl, lbl in LATS]
 
 
+def _rep_worlds(seed):
+    """Representative terrain × climate worlds (biomes emergent) — for eyeballing realistic landscapes."""
+    out = []
+    for terr, clim in REPRESENTATIVE:
+        k = world_lottery_climate(seed, terrain=terr, climate=clim)
+        out.append((f"{terr}\n{clim}", f"{terr}-{clim}", generate_world(k, mode="climate")))
+    return out
+
+
 def _render_cell(ax, F, layer):
     name, acc, cmap, label, vlim = layer
     data = acc(F)
@@ -62,8 +77,7 @@ def _render_cell(ax, F, layer):
     return im, label
 
 
-def contact_sheet(archetype, seed, path_png):
-    worlds = _worlds(archetype, seed)
+def contact_sheet(worlds, path_png, suptitle):
     nrow, ncol = len(worlds), len(LAYERS)
     fig, axes = plt.subplots(nrow, ncol, figsize=(2.6 * ncol, 2.6 * nrow))
     for r, (lbl, cl, F) in enumerate(worlds):
@@ -73,18 +87,17 @@ def contact_sheet(archetype, seed, path_png):
             if r == 0:
                 ax.set_title(label, fontsize=9)
             if c == 0:
-                ax.set_ylabel(f"{lbl}\n(lat={cl})", fontsize=9)
+                ax.set_ylabel(lbl, fontsize=9)
             if layer[0] in ("temperature", "precip", "npp"):
                 fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
-    fig.suptitle(f"EFC climate layers — archetype={archetype}, seed={seed}  (rows = regional latitude)", fontsize=12)
+    fig.suptitle(suptitle, fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.98))
     fig.savefig(path_png, dpi=90, bbox_inches="tight")
     plt.close(fig)
 
 
-def per_layer_pngs(archetype, seed):
-    """base64 PNG per (latitude, layer) for the interactive HTML toggle."""
-    worlds = _worlds(archetype, seed)
+def per_layer_pngs(worlds):
+    """base64 PNG per (world, layer) for the interactive HTML toggle."""
     imgs = {}
     for lbl, cl, F in worlds:
         for layer in LAYERS:
@@ -98,27 +111,30 @@ def per_layer_pngs(archetype, seed):
     return imgs
 
 
-def write_html(archetype, seed, path_html):
-    imgs = per_layer_pngs(archetype, seed)
-    lats = [lbl for _, lbl in LATS]
+def write_html(worlds, path_html, title):
+    imgs = per_layer_pngs(worlds)
+    names = [w[1] for w in worlds]                       # stable key per world (cl)
+    labels = {w[1]: w[0].replace("\n", " ") for w in worlds}
     layers = [l[0] for l in LAYERS]
-    data_js = "{" + ",".join(f'"{lbl}|{ly}":"{imgs[(lbl,ly)]}"' for lbl in lats for ly in layers) + "}"
-    html = f"""<!doctype html><meta charset=utf-8><title>EFC climate — {archetype}</title>
+    data_js = "{" + ",".join(f'"{nm}|{ly}":"{imgs[(lbl, ly)]}"'
+                             for (lbl, nm, _F) in worlds for ly in layers) + "}"
+    lab_js = "{" + ",".join(f'"{nm}":"{labels[nm]}"' for nm in names) + "}"
+    html = f"""<!doctype html><meta charset=utf-8><title>EFC climate — {title}</title>
 <style>body{{font-family:system-ui;background:#12181f;color:#dde;margin:0;padding:16px}}
 button{{background:#223;color:#dde;border:1px solid #445;padding:6px 12px;margin:2px;border-radius:5px;cursor:pointer}}
 button.on{{background:#2a6;color:#012;border-color:#2a6}} h2{{font-weight:600}} .row{{margin:8px 0}}
 img{{background:#0b1a28;border-radius:6px;max-width:min(560px,90vw)}}</style>
-<h2>EFC climate layers — archetype <b>{archetype}</b>, seed {seed}</h2>
-<div class=row>Region (latitude): <span id=lat></span></div>
+<h2>EFC climate layers — {title}</h2>
+<div class=row>World (terrain × climate): <span id=lat></span></div>
 <div class=row>Layer: <span id=lay></span></div>
 <div class=row><img id=img></div>
-<p style="color:#89a;max-width:640px">What to look for — <b>temperature</b>: mountains as distinct cold patches (elevation, not latitude, drives the spread).
-<b>precip</b>: coherent wet/dry (wetter near water + windward), tropical region wet / subtropical region dry.
-<b>NPP</b>: green where warm AND wet; low where cold OR dry. <b>biome</b>: coherent regions, not confetti (pre-Whittaker classifier for now).</p>
-<script>const D={data_js},LATS={lats!r},LAYS={layers!r};let cl=LATS[2],cy=LAYS[1];
+<p style="color:#89a;max-width:660px">What to look for — <b>temperature</b>: mountains as distinct cold patches (elevation drives the spread).
+<b>precip</b>: mountains wet, their lee dry (rain shadow); tropical world wet / subtropical world dry.
+<b>NPP</b>: green where warm AND wet; low where cold OR dry. <b>biome</b>: EMERGES from Whittaker(T,P) — tropical→forest, subtropical→desert, temperate→forest/grass mosaic.</p>
+<script>const D={data_js},LAB={lab_js},NAMES={names!r},LAYS={layers!r};let cl=NAMES[0],cy=LAYS[1];
 function draw(){{document.getElementById('img').src='data:image/png;base64,'+D[cl+'|'+cy];
-[['lat',LATS,v=>cl=v],['lay',LAYS,v=>cy=v]].forEach(([id,arr,set])=>{{const box=document.getElementById(id);box.innerHTML='';
-arr.forEach(v=>{{const b=document.createElement('button');b.textContent=v;b.className=(v==cl||v==cy)?'on':'';
+[['lat',NAMES,v=>cl=v,n=>LAB[n]],['lay',LAYS,v=>cy=v,n=>n]].forEach(([id,arr,set,lab])=>{{const box=document.getElementById(id);box.innerHTML='';
+arr.forEach(v=>{{const b=document.createElement('button');b.textContent=lab(v);b.className=(v==cl||v==cy)?'on':'';
 b.onclick=()=>{{set(v);draw();}};box.appendChild(b);}});}});}}
 draw();</script>"""
     with open(path_html, "w", encoding="utf-8") as f:
@@ -127,16 +143,24 @@ draw();</script>"""
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--archetype", default="montane")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--archetype", default=None, help="legacy: fix a terrain archetype, vary latitude (rows)")
     a = ap.parse_args()
     out = os.path.dirname(os.path.abspath(__file__))
-    png = os.path.join(out, f"climate_{a.archetype}_seed{a.seed}.png")
-    html = os.path.join(out, f"climate_{a.archetype}_seed{a.seed}.html")
-    contact_sheet(a.archetype, a.seed, png)
-    write_html(a.archetype, a.seed, html)
+    if a.archetype:                                     # legacy view: one terrain, four latitudes
+        worlds = _worlds(a.archetype, a.seed)
+        png = os.path.join(out, f"climate_{a.archetype}_seed{a.seed}.png")
+        html = os.path.join(out, f"climate_{a.archetype}_seed{a.seed}.html")
+        title = f"archetype {a.archetype}, seed {a.seed} (rows = latitude)"
+    else:                                               # representative terrain × climate worlds (biomes emergent)
+        worlds = _rep_worlds(a.seed)
+        png = os.path.join(out, f"climate_representative_seed{a.seed}.png")
+        html = os.path.join(out, f"climate_representative_seed{a.seed}.html")
+        title = f"representative terrain × climate worlds, seed {a.seed}"
+    contact_sheet(worlds, png, f"EFC climate layers — {title}")
+    write_html(worlds, html, title)
     print(f"contact sheet: {png}")
-    print(f"interactive:   {html}   (open in a browser; toggle region + layer)")
+    print(f"interactive:   {html}   (open in a browser; toggle world + layer)")
 
 
 if __name__ == "__main__":

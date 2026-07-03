@@ -200,3 +200,29 @@ def test_climate_biome_emerges_from_regional_climate():
     subtrop_dry = frac(0.30, BIOME_DESERT) + frac(0.30, BIOME_SAVANNA) + frac(0.30, BIOME_GRASS)
     assert subtrop_dry > 0.6                                    # subtropical → dry (open) biomes dominate
     assert frac(0.30, BIOME_FOREST) < 0.3                       # subtropical → little forest
+
+
+def test_world_lottery_climate_terrain_x_climate():
+    """Independent terrain × climate draws → emergent biomes: flat-tropical = forest, flat-subtropical = desert."""
+    from collections import Counter
+    from sic_games.terrain import world_lottery_climate
+
+    def dominant(terr, clim):
+        k = world_lottery_climate(0, terrain=terr, climate=clim)
+        assert k["mode"] == "climate"
+        f = generate_world(k, mode="climate")
+        land = f.biome[f.isWater == 0]
+        return Counter(int(x) for x in land).most_common(1)[0][0]
+
+    assert dominant("flat", "tropical") == BIOME_FOREST        # rainforest world
+    assert dominant("flat", "subtropical") == BIOME_DESERT     # desert world (aridity + Hadley descent)
+
+
+def test_world_lottery_climate_aridity_dries_precip():
+    """The climate_aridity axis scales precip down independent of latitude (continental/leeward dryness)."""
+    from sic_games.terrain import world_lottery_climate
+    humid = dict(world_lottery_climate(0, terrain="flat", climate="temperate")); humid["climate_aridity"] = 0.0
+    arid = dict(humid); arid["climate_aridity"] = 0.9
+    ph = generate_world(humid, mode="climate").precip_mm
+    pa = generate_world(arid, mode="climate").precip_mm
+    assert pa[pa > 0].mean() < ph[ph > 0].mean() * 0.7         # aridity markedly reduces precip
