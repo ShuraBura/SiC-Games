@@ -297,6 +297,13 @@ P_MARITIME_GAIN  = 0.3        # moisture supply: near-water (wateracc) cells wet
 P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind is to the −x (west) side
 CLIMATE_ARIDITY_DAMP = 0.75   # climate_aridity∈[0,1] scales precip DOWN by up to this fraction (continental/leeward
                               # dryness independent of latitude — e.g. a temperate but arid interior like central Asia)
+# Orographic rain is MOISTURE-LIMITED — a mountain can only wring out the moisture the air carries. So the uplift
+# enhancement scales with the regional air moisture (base precip × aridity); dry subtropical highlands stay arid.
+P_MOISTURE_REF_MM  = 1500.0   # base precip at which orographic uplift is FULL; below → proportionally weaker
+P_UPLIFT_MIN_AVAIL = 0.12     # floor on moisture-availability (even dry air gives a little orographic rain)
+# Polar-cell dryness: descending dry air toward the pole → precip declines past the mid-latitude storm track.
+POLAR_DRY_ONSET    = 0.72     # cell_lat beyond which polar dryness ramps in
+POLAR_DRY_GAIN     = 0.55     # max fractional precip reduction at the pole edge
 # ── Economy-from-Climate C3 (mode="climate"): the MIAMI MODEL — NPP from temperature & precipitation ──
 # Lieth 1972/1975 (PDF filed; eqs 12-1/12-2, VERIFIED). NPP = min(temperature-limited, precipitation-limited),
 # g dry-matter/m²/yr. Coefficients are the published least-squares fit (50 sites / 5 continents). LITERATURE.md.
@@ -323,6 +330,7 @@ WHIT_DESERT_BASE   = 200.0    # P (mm/yr) below (BASE + SLOPE·max(T,0)) → DES
 WHIT_DESERT_SLOPE  = 15.0
 WHIT_FOREST_BASE   = 500.0    # P (mm/yr) above (BASE + SLOPE·max(T,0)) → FOREST
 WHIT_FOREST_SLOPE  = 35.0
+WHIT_TUNDRA_T      = -5.0     # below this mean-annual T it is too cold for trees → would-be FOREST becomes GRASS (tundra)
 
 
 def whittaker_biome(temperature_c, precip_mm):
@@ -340,6 +348,8 @@ def whittaker_biome(temperature_c, precip_mm):
     biome[grass_zone & warm] = BIOME_SAVANNA
     biome[P >= forest_thr] = BIOME_FOREST
     biome[P < desert_thr] = BIOME_DESERT
+    # cold cap: too cold for trees → tundra (open, → GRASS); a would-be FOREST becomes GRASS. Cold+dry stays DESERT.
+    biome[(T < WHIT_TUNDRA_T) & (biome == BIOME_FOREST)] = BIOME_GRASS
     return biome
 GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
@@ -712,16 +722,19 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         # C2: precip regime set by the cell's ABSOLUTE latitude on the Hadley/ITCZ curve × orographic × maritime × noise.
         itcz = P_ITCZ_MM * np.exp(-(cell_lat / P_ITCZ_WIDTH) ** 2)
         midlat = P_MIDLAT_MM * np.exp(-((cell_lat - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
-        p_band = P_BASE_MM + itcz + midlat
-        # orographic uplift (high ground wetter) × rain shadow (dry in the lee of upwind high terrain)
-        uplift = 1.0 + P_ELEV_UPLIFT * elev
+        # polar-cell dryness: precip declines past the mid-latitude storm track toward the pole
+        polar_dry = 1.0 - POLAR_DRY_GAIN * np.clip((cell_lat - POLAR_DRY_ONSET) / (1.0 - POLAR_DRY_ONSET), 0.0, 1.0)
+        aridity = 1.0 - CLIMATE_ARIDITY_DAMP * float(knobs.get("climate_aridity", 0.0))   # continental/leeward dryness
+        p_band = (P_BASE_MM + itcz + midlat) * polar_dry * aridity            # the REGIONAL air-moisture supply
+        # orographic uplift is MOISTURE-LIMITED (scales with available air moisture) × rain shadow (dry lee)
+        moist_avail = np.clip(p_band / P_MOISTURE_REF_MM, P_UPLIFT_MIN_AVAIL, 1.0)
+        uplift = 1.0 + P_ELEV_UPLIFT * elev * moist_avail
         upwind_max = elev.copy()
         for _s in range(1, P_ORO_SHADOW_CELLS + 1):
             upwind_max = np.maximum(upwind_max, np.roll(elev, _s * P_ORO_WIND_DX, axis=1))
         shadow = np.clip(1.0 - P_ORO_SHADOW_GAIN * np.maximum(0.0, upwind_max - elev), P_ORO_MIN, 1.0)
         oro = np.clip(uplift * shadow, P_ORO_MIN, P_ORO_MAX)
-        aridity = 1.0 - CLIMATE_ARIDITY_DAMP * float(knobs.get("climate_aridity", 0.0))   # continental/leeward dryness
-        precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist) * aridity, 0.0, None)
+        precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
         precip_mm[isWater == 1] = 0.0
     else:
         temperature = temp_lat
