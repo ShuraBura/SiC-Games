@@ -265,6 +265,21 @@ TEMP_SEAS_AMP_MAX = 15.0      # max half-amplitude of the seasonal T cycle (°C)
                               # (→ ±15 °C = ~30 °C annual range, cf. continental temperate/boreal interiors); PROVISIONAL
 MARITIME_DAMP    = 0.6        # fraction by which coastal/near-water cells (high wateracc) DAMP the seasonal amplitude
                               # (maritime moderation: oceans buffer the annual swing); PROVISIONAL
+# ── Economy-from-Climate C2 (mode="climate"): structured annual PRECIPITATION (mm/yr) — Hadley/ITCZ bands +
+#    orographic rain-shadow + maritime supply + noise texture. All PROVISIONAL (sign-off). Ranges tuned so the
+#    latitudinal profile lands in Earth-like biome bins: equatorial ITCZ ~2600 mm (rainforest), subtropical ~30°
+#    trough ~300 mm (desert), mid-latitude storm track ~1350 mm (temperate forest), subpolar edge ~300 mm.
+P_BASE_MM        = 250.0      # dry-background precipitation (subtropical/polar deserts floor near here)
+P_ITCZ_MM        = 2400.0     # equatorial ITCZ wet peak (added at lat_frac≈0)
+P_ITCZ_WIDTH     = 0.15       # ITCZ Gaussian half-width in lat_frac
+P_MIDLAT_MM      = 1100.0     # mid-latitude storm-track wet peak
+P_MIDLAT_CENTER  = 0.70       # lat_frac of the mid-latitude peak (~50° on the equator→subpolar span)
+P_MIDLAT_WIDTH   = 0.18       # mid-latitude Gaussian half-width
+P_ORO_GAIN       = 1.0        # orographic: windward (rising in wind dir) wetter, lee (rain-shadow) drier
+P_ORO_MIN        = 0.5        # clamp on the orographic multiplier (leeward shadow floor)
+P_ORO_MAX        = 1.8        # clamp on the orographic multiplier (windward enhancement cap)
+P_MARITIME_GAIN  = 0.3        # moisture supply: near-water (wateracc) cells wetter
+P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind neighbour is x-1
 GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
 GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
@@ -308,6 +323,7 @@ class WorldFields:
     # per-cell seasonal HALF-AMPLITUDE is `temp_seas_amp` (0 in legacy mode; the monthly wave is applied by the
     # climate layer). Under mode="legacy" temperature is the latitudinal placeholder and temp_seas_amp is 0.
     temp_seas_amp: np.ndarray = None  # (N,N) float64 °C seasonal half-amplitude (0 = legacy/aseasonal)
+    precip_mm:     np.ndarray = None  # (N,N) float64 annual precipitation mm/yr (C2; 0 in legacy mode)
     # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
     grass_subtype: np.ndarray = None  # (N,N) uint8
 
@@ -689,6 +705,21 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         temp_seas_amp = TEMP_SEAS_AMP_MAX * lat_frac * np.ones((1, N)) * (1.0 - MARITIME_DAMP * wateracc)
     else:
         temperature = temp_lat
+    # Economy-from-Climate C2: structured annual precipitation (mm/yr) — legacy leaves it 0 (unused).
+    precip_mm = np.zeros((N, N), dtype=np.float64)
+    if mode == "climate":
+        # Hadley/ITCZ latitude bands: equatorial wet peak (ITCZ) + mid-latitude storm-track peak, over a dry base;
+        # the gap between them is the subtropical (~30°) desert belt, the tail beyond is the subpolar dry edge.
+        itcz = P_ITCZ_MM * np.exp(-(lat_frac / P_ITCZ_WIDTH) ** 2)
+        midlat = P_MIDLAT_MM * np.exp(-((lat_frac - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
+        p_band = (P_BASE_MM + itcz + midlat) * np.ones((1, N))                    # (N,N)
+        # Orographic rain-shadow: prevailing westerly (+x) → windward = rising eastward (wet), lee = descending (dry).
+        elev_upwind = np.roll(elev, P_ORO_WIND_DX, axis=1)                        # cell x sees its upwind (x-1) neighbour
+        oro = np.clip(1.0 + P_ORO_GAIN * (elev - elev_upwind), P_ORO_MIN, P_ORO_MAX)
+        maritime = 1.0 + P_MARITIME_GAIN * wateracc                              # moisture supply near water
+        texture = 0.7 + 0.6 * moist                                             # retained noise (organic variation, RT-7)
+        precip_mm = np.clip(p_band * oro * maritime * texture, 0.0, None)
+        precip_mm[isWater == 1] = 0.0                                            # precip undefined on open water
     humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
     # grass_subtype: split BIOME_GRASS by the tropical isotherm (warm → llanos, cool → steppe); 0 elsewhere.
     grass_subtype = np.zeros((N, N), dtype=np.uint8)
@@ -700,7 +731,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
                 npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype,
-                temp_seas_amp):
+                temp_seas_amp, precip_mm):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -711,7 +742,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
-        grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp,
+        grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp, precip_mm=precip_mm,
     )
 
 

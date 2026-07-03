@@ -6,7 +6,7 @@ elevation lapse (montane cools) + a latitude-rising, maritime-damped seasonal ha
 """
 import numpy as np
 
-from sic_games.terrain import generate_world, world_lottery, LAPSE_C_PER_KM
+from sic_games.terrain import generate_world, world_lottery, LAPSE_C_PER_KM, N
 
 
 def _k(arch="montane", seed=0):
@@ -64,3 +64,47 @@ def test_climate_seasonal_amplitude_rises_with_latitude_and_damps_near_water():
         wet = amp[wa > np.median(wa)].mean()
         dry = amp[wa <= np.median(wa)].mean()
         assert wet <= dry + 1e-9
+
+
+# --------------------------------------------------------------------------- C2 precipitation
+
+def _band(land, lo, hi):
+    rows = np.arange(N)[:, None]
+    return land & (rows >= lo) & (rows < hi)
+
+
+def test_legacy_precip_zero_climate_nonzero():
+    k = _k("mixed")
+    assert np.all(generate_world(k).precip_mm == 0.0)                 # legacy: unused
+    assert generate_world(k, mode="climate").precip_mm.max() > 0.0    # climate: real field
+
+
+def test_precip_hadley_itcz_latitude_bands():
+    """Earth-like profile: wet equator (ITCZ) → dry subtropics (~30°) → wet mid-latitudes (storm track)."""
+    C = generate_world(_k("mixed"), mode="climate")
+    land = (C.isWater == 0)
+    eq = C.precip_mm[_band(land, 0, 10)].mean()
+    subtrop = C.precip_mm[_band(land, 30, 45)].mean()
+    midlat = C.precip_mm[_band(land, 60, 80)].mean()
+    assert eq > subtrop * 3            # equator much wetter than the subtropical desert belt
+    assert midlat > subtrop * 2        # mid-latitude storm track wetter than the subtropical trough
+    assert subtrop < 600               # subtropical belt is desert-dry
+
+
+def test_precip_range_earthlike():
+    C = generate_world(_k("mixed"), mode="climate")
+    land = (C.isWater == 0)
+    assert C.precip_mm[land].min() >= 0.0
+    assert C.precip_mm[land].max() > 2000            # wettest cells reach rainforest levels
+    assert C.precip_mm[land].min() < 500             # driest cells reach desert levels
+
+
+def test_precip_orographic_windward_wetter():
+    """Rain-shadow sign: precipitation correlates positively with the up-wind (eastward) elevation gradient."""
+    C = generate_world(_k("montane"), mode="climate")
+    land = (C.isWater == 0)
+    band = _band(land, 40, 70)
+    grad = (C.elev - np.roll(C.elev, 1, axis=1))[band]
+    p = C.precip_mm[band]
+    if grad.std() > 1e-3:
+        assert np.corrcoef(grad, p)[0, 1] > 0.0      # windward (rising eastward) wetter than lee
