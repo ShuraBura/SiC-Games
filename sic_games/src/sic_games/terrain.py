@@ -259,6 +259,12 @@ MEAN_REL_HUMIDITY = 0.70     # near-surface relative humidity, land-ish average 
 TEMP_EQUATOR_C  = 27.0       # mean-annual T at the equatorial edge (tropical savanna/llanos ≈ 27 °C)
 TEMP_HIGHLAT_C  = 1.0        # mean-annual T at the high-latitude edge (temperate/boreal steppe ≈ 1 °C); mean (27+1)/2 = 14
 GRASS_TROPICAL_THRESHOLD_C = 18.0   # Köppen tropical-A boundary (18 °C isotherm): GRASS warmer → llanos, cooler → steppe
+# ── Economy-from-Climate C1 (mode="climate"): real temperature field constants (PROVISIONAL — sign-off) ──
+LAPSE_C_PER_KM   = 6.5        # environmental lapse rate (°C per 1000 m elevation) — montane cooling
+TEMP_SEAS_AMP_MAX = 15.0      # max half-amplitude of the seasonal T cycle (°C) at a high-latitude CONTINENTAL interior
+                              # (→ ±15 °C = ~30 °C annual range, cf. continental temperate/boreal interiors); PROVISIONAL
+MARITIME_DAMP    = 0.6        # fraction by which coastal/near-water cells (high wateracc) DAMP the seasonal amplitude
+                              # (maritime moderation: oceans buffer the annual swing); PROVISIONAL
 GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
 GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
@@ -298,6 +304,10 @@ class WorldFields:
     # spatial/seasonal (solar-forced) field is the deferred climate-season stage. [PLACEHOLDER]
     temperature:   np.ndarray = None  # (N,N) float64 °C; LATITUDINAL gradient (C.4a; was a flat placeholder)
     humidity:      np.ndarray = None  # (N,N) float64 [0,1] rel. humidity; constant = MEAN_REL_HUMIDITY
+    # Economy-from-Climate C1 (mode="climate"): `temperature` = ANNUAL-MEAN (lat − lapse·elev + maritime); the
+    # per-cell seasonal HALF-AMPLITUDE is `temp_seas_amp` (0 in legacy mode; the monthly wave is applied by the
+    # climate layer). Under mode="legacy" temperature is the latitudinal placeholder and temp_seas_amp is 0.
+    temp_seas_amp: np.ndarray = None  # (N,N) float64 °C seasonal half-amplitude (0 = legacy/aseasonal)
     # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
     grass_subtype: np.ndarray = None  # (N,N) uint8
 
@@ -441,12 +451,17 @@ def world_lottery(seed: int, archetype: str | None = None) -> dict:
 
 # ── Main generator ─────────────────────────────────────────────────────────
 
-def generate_world(knobs: dict) -> WorldFields:
+def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     """Generate terrain from knob dict; return frozen WorldFields.
 
     knobs keys: relief, rough, waterK, forestK, aridK, seedStr (string).
     Determinism: same (knobs, seedStr) → byte-identical arrays.
+
+    `mode`: "legacy" (default) = the historical substrate (bit-exact). "climate" = Economy-from-Climate: the
+    `temperature` field becomes a real annual mean (latitude − elevation lapse + maritime moderation) with a
+    per-cell seasonal amplitude `temp_seas_amp` (C1). `mode` may also be supplied via knobs["mode"].
     """
+    mode = str(knobs.get("mode", mode))
     relief  = float(knobs['relief'])
     rough   = float(knobs['rough'])
     waterK  = float(knobs['waterK'])
@@ -659,10 +674,21 @@ def generate_world(knobs: dict) -> WorldFields:
     nc[:, 1:, 2]  = cost[:, :-1]   # west:  target (y, x-1)
     nc[:, :-1, 3] = cost[:, 1:]    # east:  target (y, x+1)
 
-    # ── Climate: latitudinal temperature gradient + GRASS sub-biome tag (C.4a) ─────
-    # temperature: linear equator (row 0, warm) → high latitude (row N-1, cold); area-mean = MEAN_GLOBAL_TEMP_C.
+    # ── Climate: temperature field + GRASS sub-biome tag ─────
+    # legacy: latitudinal gradient only (row 0 warm → row N-1 cold), area-mean = MEAN_GLOBAL_TEMP_C.
     lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # 0 at equator → 1 at the pole edge
-    temperature = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
+    temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
+    temp_seas_amp = np.zeros((N, N), dtype=np.float64)
+    if mode == "climate":
+        # Economy-from-Climate C1: annual-mean T = latitude − elevation lapse (cool the highlands). elev_m =
+        # elev × reliefAmpM; lapse = 6.5 °C/km. (Maritime moderation acts on the AMPLITUDE below; its mean effect
+        # is second-order and left out at C1.) Seasonal HALF-amplitude rises with |latitude| (continentality proxy)
+        # and is DAMPED near water (maritime buffering) — the monthly wave itself is applied by the climate layer.
+        elev_m = elev * reliefAmpM
+        temperature = temp_lat - LAPSE_C_PER_KM * elev_m / 1000.0
+        temp_seas_amp = TEMP_SEAS_AMP_MAX * lat_frac * np.ones((1, N)) * (1.0 - MARITIME_DAMP * wateracc)
+    else:
+        temperature = temp_lat
     humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
     # grass_subtype: split BIOME_GRASS by the tropical isotherm (warm → llanos, cool → steppe); 0 elsewhere.
     grass_subtype = np.zeros((N, N), dtype=np.uint8)
@@ -673,7 +699,8 @@ def generate_world(knobs: dict) -> WorldFields:
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
-                npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype):
+                npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype,
+                temp_seas_amp):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -684,7 +711,7 @@ def generate_world(knobs: dict) -> WorldFields:
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
-        grass_subtype=grass_subtype,
+        grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp,
     )
 
 
