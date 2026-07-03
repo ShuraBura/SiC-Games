@@ -251,6 +251,27 @@ def test_c6_montane_rivers_more_salmon_capable_than_air_suggests():
         assert by_water > by_air + 0.1                                   # headwater sourcing opens up cold-water rivers
 
 
+def test_c8_aquatic_capacity_subsidy():
+    """C8: aquatic=True adds capacity on aquatic cells (super-terrestrial) but leaves interior (aquatic_food=0)
+    byte-identical; aquatic=False ⇒ base field unchanged."""
+    from sic_games.terrain import world_lottery_climate
+    from sic_games.capacity import NPPCapacityField, AQUATIC_DENSITY_MAX
+    F = generate_world(world_lottery_climate(0, terrain="mountainous", climate="tropical"), mode="climate")
+    burn = 75000.0
+    off = NPPCapacityField(F, burn, mode="tallavaara", aquatic=False)
+    on = NPPCapacityField(F, burn, mode="tallavaara", aquatic=True)
+    interior = (F.isWater == 0) & (F.aquatic_food == 0)
+    aquatic = (F.isWater == 0) & (F.aquatic_food > 0.3)
+    assert np.array_equal(off._E[interior], on._E[interior])                 # interior bit-exact
+    if aquatic.any():
+        assert (on._E[aquatic] > off._E[aquatic]).all()                      # aquatic cells subsidised
+        # a full aquatic cell (aq=1) gets ~+AQUATIC_DENSITY_MAX persons/cell
+        full = (F.aquatic_food > 0.95) & (F.isWater == 0)
+        if full.any():
+            gained = (on._E[full] - off._E[full]) / burn
+            assert abs(gained.mean() - AQUATIC_DENSITY_MAX) < 1.0
+
+
 def test_c7_aquatic_food_helper():
     """aquatic_food_field: cold sea-connected river → anadromous; warm river → less; shore → shellfish; dry interior → 0."""
     from sic_games.terrain import aquatic_food_field

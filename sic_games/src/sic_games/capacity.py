@@ -19,6 +19,12 @@ import numpy as np
 
 NPP_THRESH, DENS_SLOPE, DENS_CAP, CELL_KM2 = 1360.0, 0.3, 0.5, 100.0
 
+# EFC C8: a dense storable AQUATIC resource (salmon rivers / shellfish coasts; the terrain `aquatic_food` field ∈
+# [0,1]) subsidises carrying capacity ABOVE the terrestrial Tallavaara ceiling — coastal complex foragers reached
+# ~8–10× typical forager density (NW Coast). A full aquatic cell adds AQUATIC_DENSITY_MAX persons/cell; this is the
+# super-density that lets a concentrated band cross Binford packing → the substrate for stratification (C9). PROVISIONAL.
+AQUATIC_DENSITY_MAX = 80.0    # persons/cell added by a full (aquatic_food=1) cell — ~8× the Tallavaara median (~12)
+
 # CC-1 FITTED: Tallavaara et al. 2018 segmented (2-piece) regression of ln(density) on NPP (LITERATURE.md,
 # extracted from their data-analyses SI + validated vs Dataset_4). density in #/100km² = persons/CELL (our cell =
 # 100 km²), so `E = density·burn` directly (no ×CELL_KM2, unlike the linear-provisional per-km² form).
@@ -38,7 +44,8 @@ class NPPCapacityField:
     'tallavaara' = the FITTED segmented regression (persons/cell = density·burn); 'linear' = the provisional
     linear-clamp `min(0.5, 0.3·npp/1360)·100` (per-km²×100). Default 'linear' keeps prior runs bit-exact."""
 
-    def __init__(self, fields, burn: float, patch: tuple[int, int, int] | None = None, mode: str = "linear") -> None:
+    def __init__(self, fields, burn: float, patch: tuple[int, int, int] | None = None, mode: str = "linear",
+                 aquatic: bool = False) -> None:
         npp = np.asarray(fields.npp_gm2, dtype=float)
         self.height, self.width = npp.shape
         self.mode = mode
@@ -46,6 +53,11 @@ class NPPCapacityField:
             ppl_per_cell = density_tallavaara(npp)                     # #/100km² = persons/cell
         else:
             ppl_per_cell = np.minimum(DENS_CAP, DENS_SLOPE * npp / NPP_THRESH) * CELL_KM2   # per-km²×100
+        # C8: aquatic subsidy (opt-in) — coasts/rivers support super-terrestrial density. Interior (aquatic_food=0)
+        # is unchanged ⇒ inland equilibria bit-exact; aquatic-food=0 or aquatic=False ⇒ identical to the base field.
+        aq = getattr(fields, "aquatic_food", None)
+        if aquatic and aq is not None:
+            ppl_per_cell = ppl_per_cell + AQUATIC_DENSITY_MAX * np.asarray(aq, dtype=float)
         E = ppl_per_cell * burn
         if patch is not None:
             x0, y0, size = patch
