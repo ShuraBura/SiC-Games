@@ -49,6 +49,9 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
         enable_prowess_facet=True, prowess_decay=0.05, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
+        # CANONICAL 2026-07-02: newborn→adult life-history (Kaplan 2000) — graded juvenile yield/burn/reserve +
+        # provisioning of the childhood deficit. (Was OFF — newborns foraged at full adult rate.)
+        enable_life_history=True, enable_provisioning=True,
         # CANONICAL 2026-07-02: ascribed(cred) mate-choice, society-gated. Recovers composite status→RS ≈0.13
         # (von Rueden) — pinned a=2.5 (sweep: 0.128 at complex gate 0.6; Gini stable, no runaway). Stratified
         # ~0.19 endpoint to validate in the settlement arc.

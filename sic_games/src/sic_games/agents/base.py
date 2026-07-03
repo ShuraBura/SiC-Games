@@ -153,7 +153,9 @@ class BaseAgent(mesa.Agent):
             remaining = self.max_age - a_max
             if remaining <= 0:
                 return self._eta_old
-            return 1.0 - (1.0 - self._eta_old) * (a - a_max) / remaining
+            # clamp the elder decline at eta_old: a Siler-tail agent living PAST max_age must not ramp η negative
+            # (that made prowess/base_status<0 → `base_status**kappa` complex, crashing the movement).
+            return max(self._eta_old, 1.0 - (1.0 - self._eta_old) * (a - a_max) / remaining)
 
     def consumption_factor(self) -> float:
         """Age-graded maintenance c(a) ∈ [cons_min, 1.0] (Resource-Ecology Phase C.1).

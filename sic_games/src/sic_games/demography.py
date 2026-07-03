@@ -185,6 +185,12 @@ class DemographyConfig(BaseModel):
     # Flow-based (adults at the cap have no reserve headroom to give); the variance lands on the
     # mother's cell quality. Forage-only = the gathered-plant kin-sharing tier (Gurven 2004).
     enable_provisioning: bool = False
+    # Newborn→adult LIFE-HISTORY transition (Kaplan 2000 cooperative breeding): when ON, the model auto-uses a
+    # MONTH-scaled LifeHistoryConfig (forage_age_min=180=15yr, forage_age_max_offset=120=10yr) so a child's
+    # production (η ramp 0.2→1), maintenance (0.3→1) and reserve (0.3→1) all ramp over childhood — the graded
+    # juvenile deficit that provisioning covers. Fixes the gap where lh_config was never passed → newborns foraged
+    # at full adult rate. Pair with enable_provisioning (feed the deficit). Default OFF ⇒ no juvenile penalty.
+    enable_life_history: bool = False
     # Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease
     # synergy reads a slow EMA of nutritional status (`_condition`) instead of the instantaneous (bang-bang)
     # reserve — so sustained undernutrition potentiates DISEASE mortality (Pelletier), routing the seasonal

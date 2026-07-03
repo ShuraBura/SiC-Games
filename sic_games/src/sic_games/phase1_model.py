@@ -245,6 +245,10 @@ class TerrainWorld(mesa.Model):
         self._reserve_floor = kcal_cfg.reserve_floor_kcal
         self._game_stream = game_stream
         self._lh_cfg = lh_cfg
+        # Newborn→adult life-history: if enable_life_history and no explicit lh_cfg, auto-build the MONTH-scaled
+        # canonical (the class defaults are legacy YEARS — forage_age_min=15 would ramp childhood over 15 months).
+        if self._lh_cfg is None and demography_cfg is not None and getattr(demography_cfg, "enable_life_history", False):
+            self._lh_cfg = LifeHistoryConfig(forage_age_min=180, forage_age_max_offset=120)
         self._carbon_cfg = carbon_cfg
         self._placement_positions = placement_positions
         self._founder_buffer_steps = founder_buffer_steps
@@ -295,7 +299,7 @@ class TerrainWorld(mesa.Model):
         self.deaths_starv_this_step: int = 0
         self.deaths_senesc_this_step: int = 0
 
-        self._init_agents(n_agents, kcal_cfg, lh_cfg)
+        self._init_agents(n_agents, kcal_cfg, self._lh_cfg)   # self._lh_cfg = the (possibly auto-built) canonical lh
 
     # ── Initialisation ─────────────────────────────────────────────────────
 
@@ -849,6 +853,9 @@ class TerrainWorld(mesa.Model):
                     if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m):
                         a.alive = False                   # Siler baseline+senescence
                         self.deaths_senesc_this_step += 1
+                    elif a.age >= a.max_age:              # hard lifespan cap (Siler-tail backstop; was DEAD CODE
+                        a.alive = False                   # under demog — the elif below is only reached when
+                        self.deaths_senesc_this_step += 1  # demog is None, so ancient agents slipped through to 1111)
             elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
