@@ -461,7 +461,10 @@ class TerrainWorld(mesa.Model):
         # Demographic layer: pairing (F.3a) then births (opt-in)
         if self._demog is not None:
             if getattr(self._demog, "enable_pair_bonds", False):
-                self._do_pairing()
+                if getattr(self._demog, "enable_marriage_aggregation", False):
+                    self._do_gathering()          # seasonal cross-band gathering replaces daily within-band pairing
+                else:
+                    self._do_pairing()
             if getattr(self._demog, "enable_band_affiliation", False):
                 self._maintain_bands()
             self._do_births_ibi()
@@ -1183,61 +1186,126 @@ class TerrainWorld(mesa.Model):
         """F.3a serial monogamy (+ modest polygyny): match unpaired adults WITHIN each band (mate-gate
         neighbourhood) into durable bonds, prowess-weighted (mate_choice_strength), kin-avoiding (not son/father).
         Widowed/divorced agents re-enter the pool automatically. With polygyny_rate>0 an already-married male can
-        take additional wives (≤ max_wives), prowess-weighted → high-status males accumulate wives (von Rueden)."""
+        take additional wives (≤ max_wives), prowess-weighted → high-status males accumulate wives (von Rueden).
+        (Superseded by `_do_gathering` when `enable_marriage_aggregation`.)"""
         cfg = self._demog
         if cfg.divorce_rate > 0.0:
             for a in self.agent_list:
                 if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
                     a._partner._wives.discard(a); a._partner = None
-        mexp = cfg.mate_choice_strength
         affil = getattr(cfg, "enable_band_affiliation", False)
-        loc = getattr(cfg, "enable_band_family_knobs", False)        # F.3c-2b per-band family knobs
-        poly = getattr(cfg, "polygyny_rate", 0.0)
-        max_wives = getattr(cfg, "max_wives", 1)
-        # Ascribed-status mate-choice: cred enters the weight, society-gated (0 egalitarian → full stratified).
-        asc_on = getattr(cfg, "enable_ascribed_mate_choice", False)
-        asc_a = getattr(cfg, "ascribed_mate_strength", 0.0)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         for band in self.bands(cfg.bonded_mate_radius):
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
             males = [a for a in band if a.sex == "male" and a.age >= cfg.menarche_months]
             if not females or not males:
                 continue
-            self.random.shuffle(females)
-            for f in females:
-                avail = []
-                for x in males:
-                    if x._mother is f or x is f._father:             # kin-avoidance (not son / father)
-                        continue
-                    if not x._wives:                                 # unpaired male — always a candidate
-                        avail.append(x)
-                    elif poly > 0.0 and len(x._wives) < max_wives and self.random.random() < poly:
-                        avail.append(x)                              # modest polygyny: an already-married male, gated
-                if not avail:
+            self._pair_from_pool(females, males, "flexible", 0.0, band_sizes)
+
+    def _pair_from_pool(self, females, males, residence, rank_homogamy, band_sizes) -> None:
+        """Pair a POOL of unpaired females with candidate males (kin-avoiding, prowess·cred-weighted). `residence`:
+        virilocal (bride→groom's band), uxorilocal (groom→bride's band), flexible (smaller→larger — the F.3a default).
+        `rank_homogamy` ≥0 adds like-cred assortment. Shared by the daily within-band `_do_pairing` (flexible, 0.0 =
+        bit-exact) and the regional `_do_gathering` (cross-band). RNG order preserved: shuffle → polygyny-gate → choose."""
+        cfg = self._demog
+        mexp = cfg.mate_choice_strength
+        loc = getattr(cfg, "enable_band_family_knobs", False)
+        poly = getattr(cfg, "polygyny_rate", 0.0)
+        max_wives = getattr(cfg, "max_wives", 1)
+        asc_on = getattr(cfg, "enable_ascribed_mate_choice", False)
+        asc_a = getattr(cfg, "ascribed_mate_strength", 0.0)
+        affil = band_sizes is not None
+        self.random.shuffle(females)
+        for f in females:
+            avail = []
+            for x in males:
+                if x._mother is f or x is f._father:                 # kin-avoidance (not son / father)
                     continue
-                m_f = self._band_knob(f._group.band_id, "mate_choice_strength") if loc else mexp   # per-band skew
-                if m_f > 0.0:
-                    # base weight = prowess (achieved). Ascribed(cred) joins, society-gated: g = a·sw(female's band).
-                    # sw=0 (egalitarian / off) ⇒ cred^0 = 1 ⇒ prowess-only (bit-exact). sw=1,a=1 ⇒ (prowess·cred).
-                    g = asc_a * mate_ascribed_weight(self._band_society.get(f._group.band_id)) if asc_on else 0.0
-                    if g > 0.0:
-                        w = [((getattr(x, "prowess", 1.0) + 1e-6) * (getattr(x, "cred", 1.0) + 1e-6) ** g) ** m_f
-                             for x in avail]
-                    else:
-                        w = [(getattr(x, "prowess", 1.0) + 1e-6) ** m_f for x in avail]
-                    male = self.random.choices(avail, weights=w, k=1)[0]
+                if not x._wives:
+                    avail.append(x)
+                elif poly > 0.0 and len(x._wives) < max_wives and self.random.random() < poly:
+                    avail.append(x)
+            if not avail:
+                continue
+            m_f = self._band_knob(f._group.band_id, "mate_choice_strength") if loc else mexp
+            if m_f > 0.0:
+                g = asc_a * mate_ascribed_weight(self._band_society.get(f._group.band_id)) if asc_on else 0.0
+                if g > 0.0:
+                    w = [((getattr(x, "prowess", 1.0) + 1e-6) * (getattr(x, "cred", 1.0) + 1e-6) ** g) ** m_f for x in avail]
                 else:
-                    male = self.random.choice(avail)
-                f._partner = male; male._wives.add(f)
-                if affil:
-                    # D2 exogamy/residence: the spouse from the SMALLER band joins the LARGER (flexible/multilocal;
-                    # tie → the female's band). Mixing lineages across bands keeps bands mostly non-kin (Hill 2011).
-                    fb, mb = f._group.band_id, male._group.band_id
-                    if fb != mb:
-                        if band_sizes[mb] > band_sizes[fb]:
-                            band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
-                        else:
-                            band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+                    w = [(getattr(x, "prowess", 1.0) + 1e-6) ** m_f for x in avail]
+                if rank_homogamy > 0.0:                              # like-cred assortment (rank homogamy)
+                    fc = getattr(f, "cred", 1.0) + 1e-6
+                    w = [wi * math.exp(-rank_homogamy * abs(math.log((getattr(x, "cred", 1.0) + 1e-6) / fc)))
+                         for wi, x in zip(w, avail)]
+                male = self.random.choices(avail, weights=w, k=1)[0]
+            else:
+                male = self.random.choice(avail)
+            f._partner = male; male._wives.add(f)
+            if affil:
+                fb, mb = f._group.band_id, male._group.band_id
+                if fb != mb:
+                    if residence == "virilocal":                    # bride joins the groom's band + lineage
+                        band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
+                    elif residence == "uxorilocal":                 # groom joins the bride's band
+                        band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+                    elif band_sizes[mb] > band_sizes[fb]:           # flexible: smaller → larger (F.3a default)
+                        band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
+                    else:
+                        band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+
+    def _do_gathering(self) -> None:
+        """Seasonal marriage-aggregation ('the gathering'): every `aggregation_period` steps, in the abundance
+        window, dispersed bands converge on abundant SITES; unpaired adults pair ACROSS the bands sharing a site
+        (the regional connubium); then disperse. Replaces the daily within-band `_do_pairing`. Isolated bands (no
+        site in range) get no gathering → may die (realistic)."""
+        cfg = self._demog
+        if self.step_count % cfg.aggregation_period != 0:            # not a gathering step
+            return
+        hf = self._harvest_field
+        if hasattr(hf, "season") and hf.season() < cfg.aggregation_season_threshold:
+            return                                                  # not the abundance window (static fields: no season → always fire)
+        if cfg.divorce_rate > 0.0:
+            for a in self.agent_list:
+                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
+                    a._partner._wives.discard(a); a._partner = None
+        affil = getattr(cfg, "enable_band_affiliation", False)
+        band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
+        members: dict = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+        if not members:
+            return
+        # aggregation SITES: top-capacity cells, min-separated (≈ one abundant gathering-place per region)
+        W = getattr(hf, "width", N); H = getattr(hf, "height", N)
+        sep = cfg.aggregation_site_sep
+        cands = sorted(((hf.level(x, y), x, y) for y in range(H) for x in range(W) if hf.level(x, y) > 0.0), reverse=True)
+        sites: list = []
+        for (_, x, y) in cands:
+            if all(max(abs(x - sx), abs(y - sy)) >= sep for (sx, sy) in sites):
+                sites.append((x, y))
+            if len(sites) >= 40:
+                break
+        if not sites:
+            return
+        # assign each band to its NEAREST site within `aggregation_radius` → connubium pools (bands sharing a site)
+        r2 = cfg.aggregation_radius ** 2
+        pools: dict = {}
+        for bid, ms in members.items():
+            n = len(ms); cx = sum(a.pos[0] for a in ms) / n; cy = sum(a.pos[1] for a in ms) / n
+            best, bestd = None, r2
+            for i, (sx, sy) in enumerate(sites):
+                d = (cx - sx) ** 2 + (cy - sy) ** 2
+                if d <= bestd:
+                    bestd = d; best = i
+            if best is not None:
+                pools.setdefault(best, []).append(bid)
+        for bids in pools.values():
+            pool = [a for bid in bids for a in members[bid]]
+            females = [a for a in pool if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
+            males = [a for a in pool if a.sex == "male" and a.age >= cfg.menarche_months]
+            if females and males:
+                self._pair_from_pool(females, males, cfg.aggregation_residence, cfg.aggregation_rank_homogamy, band_sizes)
 
     def _band_knob(self, band_id: int, name: str) -> float:
         """F.3c-2b: the per-band value of a family knob = the GLOBAL config (egalitarian baseline) + the additive

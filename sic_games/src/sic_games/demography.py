@@ -370,6 +370,19 @@ class DemographyConfig(BaseModel):
     # Fixes the composite status→RS ~0 (R-35: cred had no mating channel). Default OFF ⇒ prowess-only, bit-exact.
     enable_ascribed_mate_choice: bool = False
     ascribed_mate_strength: float = Field(0.0, ge=0.0)   # global scale `a` of the ascribed(cred) mating exponent; UNANCHORED
+    # Seasonal MARRIAGE-AGGREGATION ("the gathering"; blueprint …_MarriageAggregation): dispersed bands converge on
+    # abundant sites in the abundance window; unpaired adults pair ACROSS bands (regional connubium) → durable
+    # bonds; then disperse. Fixes the low-density mate-gate collapse (R-37) — families form in every biome via a
+    # regional marriage network (Wobst/Steward/Lee), not a daily within-camp mate-gate. When ON, the daily
+    # `_do_pairing` is REPLACED by the periodic gathering; births still gate on the persistent pair-bond year-round.
+    # Default OFF ⇒ daily within-band pairing, bit-exact.
+    enable_marriage_aggregation: bool = False
+    aggregation_period: int = Field(12, ge=1)             # steps between gatherings (12 = annual)
+    aggregation_season_threshold: float = Field(0.8, ge=0.0, le=1.0)  # gather only when ClimateField.season() ≥ this (abundance window); ignored on static fields
+    aggregation_radius: float = Field(8.0, gt=0.0)        # connubium/travel range: a band's site must be within this many cells (~80 km); isolated bands get no gathering (die — "se la vi")
+    aggregation_site_sep: float = Field(10.0, gt=0.0)     # min cell separation between aggregation sites (≈ one per region)
+    aggregation_residence: str = Field("virilocal")       # {virilocal (bride→groom), uxorilocal (groom→bride), flexible (smaller→larger band)}
+    aggregation_rank_homogamy: float = Field(0.0, ge=0.0)  # 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from
