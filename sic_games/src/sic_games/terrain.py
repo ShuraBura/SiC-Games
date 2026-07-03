@@ -260,6 +260,15 @@ TEMP_EQUATOR_C  = 27.0       # mean-annual T at the equatorial edge (tropical sa
 TEMP_HIGHLAT_C  = 1.0        # mean-annual T at the high-latitude edge (temperate/boreal steppe ≈ 1 °C); mean (27+1)/2 = 14
 GRASS_TROPICAL_THRESHOLD_C = 18.0   # Köppen tropical-A boundary (18 °C isotherm): GRASS warmer → llanos, cooler → steppe
 # ── Economy-from-Climate C1 (mode="climate"): real temperature field constants (PROVISIONAL — sign-off) ──
+# A 1000×1000 km grid (100 cells × 10 km) spans only ~9° of latitude — so the WITHIN-GRID latitudinal temperature
+# gradient is MODEST (~a few °C); the big spatial variability is ELEVATION (lapse) + rain-shadow + coast (a
+# mountainous coastal region like Montana/Oregon legitimately holds 4–6 biomes). The world sits at a REGIONAL
+# latitude `climate_latitude` (knob, 0=equator … 1=subpolar edge; sets the base T + precip regime); within the grid
+# only a narrow band around it is traversed.
+CLIMATE_FULL_LAT_DEG   = 65.0     # latitude (°) at the subpolar edge (climate_latitude=1); equator=0
+GRID_SPAN_DEG          = 9.0      # N–S extent of the 1000 km grid (1000 km / ~111 km per degree)
+REGIONAL_SPAN_FRAC     = GRID_SPAN_DEG / CLIMATE_FULL_LAT_DEG   # ≈0.14 of the full span traversed within the grid
+CLIMATE_LATITUDE_DEFAULT = 0.5    # temperate mid-latitude region (knobs['climate_latitude'] overrides)
 LAPSE_C_PER_KM   = 6.5        # environmental lapse rate (°C per 1000 m elevation) — montane cooling
 TEMP_SEAS_AMP_MAX = 15.0      # max half-amplitude of the seasonal T cycle (°C) at a high-latitude CONTINENTAL interior
                               # (→ ±15 °C = ~30 °C annual range, cf. continental temperate/boreal interiors); PROVISIONAL
@@ -608,18 +617,25 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     wet = np.clip((0.45 * moist + 0.55 * wateracc) * (1 - aridK * 0.92), 0.0, 1.0)
 
     # ── Climate fields (C1 temperature / C2 precipitation) — computed BEFORE NPP so Miami (C3) can read them ──
-    lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # 0 at equator → 1 at the pole edge
-    temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
+    lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # local grid row 0 → 1 (N to S)
+    temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))   # legacy full transect
     temp_seas_amp = np.zeros((N, N), dtype=np.float64)
     precip_mm = np.zeros((N, N), dtype=np.float64)
     if mode == "climate":
-        # C1: annual-mean T = latitude − elevation lapse (6.5 °C/km); seasonal half-amplitude ∝ |latitude|, maritime-damped.
-        temperature = temp_lat - LAPSE_C_PER_KM * (elev * reliefAmpM) / 1000.0
-        temp_seas_amp = TEMP_SEAS_AMP_MAX * lat_frac * np.ones((1, N)) * (1.0 - MARITIME_DAMP * wateracc)
-        # C2: annual precip = Hadley/ITCZ latitude bands × orographic rain-shadow × maritime supply × noise texture.
-        itcz = P_ITCZ_MM * np.exp(-(lat_frac / P_ITCZ_WIDTH) ** 2)
-        midlat = P_MIDLAT_MM * np.exp(-((lat_frac - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
-        p_band = (P_BASE_MM + itcz + midlat) * np.ones((1, N))
+        # REGIONAL climate: the grid is a ~9°-wide swath centred on `climate_latitude` (0=equator … 1=subpolar). The
+        # WITHIN-GRID latitudinal gradient is therefore MODEST (~REGIONAL_SPAN_FRAC of the full 26 °C ≈ 3.6 °C); the
+        # big variability comes from elevation (lapse) + rain-shadow + coast. `cell_lat` = each cell's ABSOLUTE
+        # latitude fraction (for the base T level, the seasonal amplitude, and the precip regime).
+        climate_latitude = float(knobs.get("climate_latitude", CLIMATE_LATITUDE_DEFAULT))
+        cell_lat = np.clip(climate_latitude + REGIONAL_SPAN_FRAC * (lat_frac - 0.5), 0.0, 1.0) * np.ones((1, N))
+        # C1: annual-mean T = regional-latitude base (modest gradient) − elevation lapse; amplitude ∝ absolute latitude.
+        temperature = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * cell_lat) \
+            - LAPSE_C_PER_KM * (elev * reliefAmpM) / 1000.0
+        temp_seas_amp = TEMP_SEAS_AMP_MAX * cell_lat * (1.0 - MARITIME_DAMP * wateracc)
+        # C2: precip regime set by the cell's ABSOLUTE latitude on the Hadley/ITCZ curve × orographic × maritime × noise.
+        itcz = P_ITCZ_MM * np.exp(-(cell_lat / P_ITCZ_WIDTH) ** 2)
+        midlat = P_MIDLAT_MM * np.exp(-((cell_lat - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
+        p_band = P_BASE_MM + itcz + midlat
         oro = np.clip(1.0 + P_ORO_GAIN * (elev - np.roll(elev, P_ORO_WIND_DX, axis=1)), P_ORO_MIN, P_ORO_MAX)
         precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
         precip_mm[isWater == 1] = 0.0
