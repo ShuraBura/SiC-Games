@@ -396,6 +396,14 @@ class DemographyConfig(BaseModel):
     mobility_npp_ref: float = Field(900.0, gt=0.0)           # forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL
     mobility_npp_floor: float = Field(50.0, gt=0.0)          # denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL
     mobility_exponent: float = Field(1.0, ge=0.0)            # Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket)
+    # CENTRAL-PLACE FORAGING fixes (blueprint …_CoMovementCentralPlace; R-41): family co-movement snaps the whole
+    # family onto the mother's (root's) single cell → she extracts S/(n+family) not S/(n+1) → energetic-fertility
+    # collapse in marginal biomes. Real foragers CO-RESIDE but forage DISPERSED and SHARE (Isaac 1978 central-place;
+    # Hawkes/Marlowe Hadza; Kaplan children-are-provisioned). Three ablatable prototypes (all default OFF ⇒ bit-exact
+    # exact-snap co-movement); at most one should be canonicalized after the comparison. Need enable_pair_bonds.
+    comove_anticipate: bool = False        # (i) the root's move utility counts its followers: per-capita on S/(n+family_size), so she picks emptier/richer ground
+    comove_footprint: int = Field(0, ge=0)  # (ii) followers scatter to lowest-occupancy cells within this Chebyshev radius of the head (0 = exact snap); a dispersed camp
+    comove_provision_exclude: bool = False  # (iii) JUVENILE followers (age<forage_age_min) take NO forage share (central-place: children are provisioned, not self-extracting) → don't dilute the mother's cell
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
     # the E.3 m calibration): the global config is the EGALITARIAN BASELINE; a band applies the ADDITIVE DELTA from

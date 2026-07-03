@@ -433,6 +433,25 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 | **B** `enable_pair_bonds=False` (daily mate-gate, no bond, no co-move) | 327 | 936 | 420 | 409 |
 Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→249** (~76% of the full 327) — so **co-movement is the dominant killer**, confirming R-40. **But the CHANNEL is FERTILITY, not starvation:** A→C births **163→672 (4.1×)** while starvation is ~flat (273 vs 283). **Refined mechanism:** the **mother is the movement ROOT** (her bonded male + dependent children follow HER). She selects her cell to maximise her *own* per-capita share `S/(n+1)` as if moving alone — then the family snaps onto that exact cell, spiking its occupancy (measured **occ/head-cell 3.73 vs population-mean 1.71**, a 2.2× over-subscription) → her realised share drops to `S/(n+family)` → her **energetic-fertility factor** falls → births collapse; seasonal troughs add the secondary starvation. Note food is NOT globally scarce (per-capita yield 4–8× burn at equilibrium) — the deficit is LOCAL to the over-subscribed root cell and expresses through fertility first. **Fix must target the occupancy spike on the ROOT's cell** (not mobility range): (i) family **footprint** — followers occupy adjacent cells, not the exact cell; (ii) **move-anticipation** — the mother chooses her cell against `S/(n + family_size)`, so she picks emptier/richer ground; (iii) **provisioning-exclusion** — followers on the cell don't take a forage share (they eat from the mother's provision), so they don't inflate `n`. All three prevent the root-cell over-subscription; (ii) is the most physically-grounded (a mother knows she's feeding a family). B's higher births (936) reflect the daily mate-gate out-reproducing persistent monogamy — a separate, expected finding (strict monogamy ≈ lower fertility; MODEL_SPEC §4.8.12), NOT the biome fix.
 
+## R-42 — Central-place fix: FOOTPRINT (dispersed camp) resolves the savanna collapse; anticipation doesn't (2026-07-03)
+
+**Origin:** the conceptual re-frame (supervisor: "real savanna tribes proliferated — what are we missing?") + the three-prototype comparison (`outputs/biome_society_20260702/run_comove_fixes.py`), savanna (collapse) + forest (control), 3 seeds × 900 steps. Blueprint `…_CoMovementCentralPlace_Scoping.md`.
+
+**The missing physics:** the model **conflated co-RESIDENCE with co-FORAGING**. Real foragers are CENTRAL-PLACE (Isaac 1978; Hadza/Ju — Hawkes/Marlowe/Lee): they co-reside + share, but forage DISPERSED by day; dependents eat the pooled return, not the patch they stand on. Our exact-snap co-movement forced the whole family to *extract* `S/n` from ONE 100 km² cell → self-competition → the R-41 fertility collapse. (The model *without* co-movement already forages dispersed — hence it thrives.)
+
+**Three ablatable prototypes built** (`comove_anticipate` / `comove_footprint=k` / `comove_provision_exclude`; all default OFF ⇒ bit-exact; 5 unit tests; full suite 628 passed). Comparison (savanna pop → OFF-ref 461; forest pop → OFF-ref 808):
+| arm | savanna pop | savanna births | forest pop |
+|---|---|---|---|
+| A canon (exact snap) | 8 | 176 | 145 |
+| (i) anticipate | 4 | 192 | 133 |
+| **(ii) footprint=1** | **243** | 669 | 426 |
+| **(ii) footprint=2** | **378** | 882 | 451 |
+| (iii) provision-exclude | 22 | 276 | 221 |
+| (i)+(ii) anticipate+fp1 | **393** | 907 | 408 |
+| OFF (no pair_bonds) | 461 | 1065 | 808 |
+
+**Verdict:** **FOOTPRINT (dispersed camp) is the load-bearing fix** — footprint=2 → savanna 8→**378** (82% of the OFF reference) while the forest control stays healthy (145→451). It works because it physically spreads the family over adjacent cells (the "camp"), killing the one-cell over-subscription — exactly the central-place mechanism. **(i) anticipation alone barely helps** (8→4): the mother picks emptier ground but the family still lands on her single cell, so the spike persists. **(iii) provision-exclusion helps only partially** (8→22): only juveniles are excluded; the co-locating husband still over-subscribes. **(i)+(ii) combined** ≈ footprint=2 (savanna 393). The residual gap to OFF is the pair-bond-vs-daily-mate-gate fertility difference (R-41), NOT the co-location bug. Note footprint also lifts the FOREST (co-movement over-subscription was suppressing it too, 145 vs OFF 808 — not fatally). **Mechanism is ablatable/default-OFF; canonicalizing footprint (+ its radius) is a science/calibration change pending supervisor sign-off.** MODEL_SPEC §4.8.20.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

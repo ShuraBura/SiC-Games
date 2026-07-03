@@ -72,6 +72,7 @@ def diffusion_select_target(
     cohesion_strength: float = 0.0,
     move_radius: int = 1,
     water: "np.ndarray | None" = None,
+    extra_occupants: int = 0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -131,12 +132,15 @@ def diffusion_select_target(
             continue  # full cell, blocked by K_cell ceiling
         S = sugar_field.level(cx, cy)
         n_cell = occ_count.get((cx, cy), 0)
+        # Central-place move-anticipation (§ co-movement fix i): a family-root anticipates the `extra_occupants`
+        # (its followers) that will co-locate on the chosen cell, so it evaluates per-capita against the FULL
+        # family load (n + family) rather than as if moving alone. extra_occupants=0 ⇒ bit-exact.
         if kappa == 0.0:
-            n_after = n_cell if is_cur else n_cell + 1
+            n_after = (n_cell if is_cur else n_cell + 1) + extra_occupants
             ypc = S / n_after if n_after > 0 else S
         else:
             Wsum = occ_wsum.get((cx, cy), 0.0) if occ_wsum is not None else 0.0
-            denom = Wsum if is_cur else Wsum + w_self
+            denom = (Wsum if is_cur else Wsum + w_self) + extra_occupants * w_self
             ypc = (S * w_self / denom) if denom > 0 else S
         move_cost = 0.0 if is_cur else sc.move_cost_flat
         # Emergent-bands grouping multipliers on the cell value (the crowd_response hook), traded against the

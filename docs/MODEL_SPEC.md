@@ -1487,6 +1487,25 @@ persistent crowding; the real lever is family CO-MOVEMENT, savanna 3 w/ co-move 
 retained (valid, ablatable, default-OFF) for its own uses (mobility gradients / transhumance), NOT as the collapse
 remedy (DEAD_ENDS DE-9).
 
+### §4.8.20 Central-place co-movement — the family forages dispersed and shares (built 2026-07-03)
+
+**Why (R-41→R-42):** F.3b family co-movement snapped the whole family onto the mother's (root's) single 100 km²
+cell, where each member extracted `S/n` — self-competition that over-subscribed her cell (occ/head-cell 3.73 vs
+population-mean 1.71) and collapsed her energetic fertility in marginal biomes (savanna births 4× lower → the
+biome→society collapse). **The missing physics:** real foragers are CENTRAL-PLACE (Isaac 1978; Hadza/Ju) — they
+co-reside + share but forage DISPERSED; dependents eat the pooled return, not the patch they stand on. The model
+conflated co-residence with co-foraging. **Three ablatable prototypes** (all default OFF ⇒ bit-exact exact-snap;
+need `enable_pair_bonds`): **(i) `comove_anticipate`** — the root's move utility counts its followers
+(`extra_occupants` → per-capita on `S/(n+family)`), so she picks emptier/richer ground; **(ii)
+`comove_footprint=k`** — followers take the lowest-occupancy land cell within Chebyshev `k` of the head (a dispersed
+camp, not a stack); **(iii) `comove_provision_exclude`** — JUVENILE followers take no forage share (Kaplan: children
+are provisioned, not self-extracting) so they don't dilute the mother's cell. **Comparison (R-42): FOOTPRINT is the
+load-bearing fix** — footprint=2 recovers savanna 8→378 (82% of the no-co-movement reference) while the forest
+control stays healthy; anticipation alone barely helps (the family still lands on one cell); provision-exclusion is
+partial (only juveniles). **Canonicalizing footprint (+ radius) is a science/calibration change pending supervisor
+sign-off.** Helpers `substrate::diffusion_select_target(extra_occupants=…)`, `phase1_model` footprint scatter +
+`_forage_excl`; blueprint `…_CoMovementCentralPlace_Scoping.md`; R-41→R-42.
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),

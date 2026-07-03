@@ -495,6 +495,16 @@ class TerrainWorld(mesa.Model):
         # is superseded by the emergent-bands grouping drives + bonded mating — the morph now fires from emergent
         # density+storage alone, validated in run_3h. MODEL_SPEC §4.8.5.)
         fam_move = self._demog is not None and getattr(self._demog, "enable_pair_bonds", False)
+        # Central-place co-movement fixes (R-41): anticipation (root foresees its family) + footprint (followers
+        # scatter near the head rather than exact-snap). Build the per-root follower count once.
+        anticipate = fam_move and getattr(self._demog, "comove_anticipate", False)
+        footprint = getattr(self._demog, "comove_footprint", 0) if fam_move else 0
+        followers_by_root: dict = {}
+        if anticipate or footprint > 0:
+            for a in self.agent_list:
+                h = self._family_head(a)
+                if h is not None:
+                    followers_by_root[h] = followers_by_root.get(h, 0) + 1
         # §4.8.19 productivity-scaled mobility: per-agent STRIDE from the STATIC local NPP (Kelly/Binford ∝1/NPP).
         mobility_on = self._demog is not None and getattr(self._demog, "enable_productivity_mobility", False)
         npp_gm2 = getattr(self._fields, "npp_gm2", None) if mobility_on else None
@@ -536,19 +546,41 @@ class TerrainWorld(mesa.Model):
             if mobility_on:
                 local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
                 mr = mobility_radius(local_npp, self._demog)
+            extra = followers_by_root.get(agent, 0) if anticipate else 0
             target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str,
-                                             move_radius=mr, water=water_mask)
+                                             move_radius=mr, water=water_mask, extra_occupants=extra)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
                 _shift(agent, old, target)
         if fam_move:
             # F.3b nuclear-family co-movement: followers (dependent children + bonded males) snap to their head's
-            # final cell, so the family forages + co-resides as a unit.
+            # final cell, so the family forages + co-resides as a unit. Central-place FOOTPRINT (fix ii): if
+            # comove_footprint>0, a follower instead takes the LOWEST-occupancy land cell within that Chebyshev
+            # radius of the head (a dispersed camp, not a stack) — so co-residence doesn't over-subscribe one cell.
+            w_grid, h_grid = self._fields.isWater.shape[1], self._fields.isWater.shape[0]
             for agent in self.agent_list:
                 head = self._family_head(agent)
-                if head is not None and agent.pos != head.pos:
-                    _shift(agent, agent.pos, head.pos)
+                if head is None:
+                    continue
+                if footprint > 0:
+                    hx, hy = head.pos
+                    best, best_occ = None, None
+                    for dy in range(-footprint, footprint + 1):
+                        for dx in range(-footprint, footprint + 1):
+                            cx, cy = (hx + dx) % w_grid, (hy + dy) % h_grid
+                            if self._fields.isWater[cy, cx] != 0:
+                                continue
+                            oc = occ_count.get((cx, cy), 0)
+                            # deterministic: prefer lower occupancy, tie-break toward the head cell (smaller Chebyshev)
+                            key = (oc, max(abs(dx), abs(dy)))
+                            if best_occ is None or key < best_occ:
+                                best_occ, best = key, (cx, cy)
+                    tgt = best if best is not None else head.pos
+                else:
+                    tgt = head.pos
+                if agent.pos != tgt:
+                    _shift(agent, agent.pos, tgt)
         self.occupied = set(occ_count.keys())
 
         # 3. per-cell harvest split (forage-only; S = cell total return rate, flow)
@@ -595,7 +627,29 @@ class TerrainWorld(mesa.Model):
         band_society_on = morph_on and getattr(demog, "enable_band_affiliation", False)
         band_kappa = {b: SOCIETY_PRESETS[s]["kappa"] for b, s in self._band_society.items()} if band_society_on else {}
         provision_pool: dict = {}              # C.2b: mother → harvest overflow available to dependents
+        # Central-place PROVISIONING-EXCLUSION (fix iii): a JUVENILE follower takes NO forage share (Kaplan:
+        # children are provisioned, not self-extracting) → it doesn't dilute the mother's cell; its subsistence
+        # comes from the (now larger) provision pool + the band-pooled meat. Adults keep foraging normally.
+        excl_on = fam_move and getattr(self._demog, "comove_provision_exclude", False)
+
+        def _forage_excl(occ_c, total, kap, mask):
+            """Split `total` (κ=kap) among NON-excluded occupants only; excluded get 0. Redistributes the
+            excluded juveniles' share to the actual foragers (so the mother keeps her undiluted share)."""
+            idx = [i for i, e in enumerate(mask) if not e]
+            if not idx:
+                return [0.0] * len(occ_c)
+            sub = compute_harvest_shares([occ_c[i] for i in idx], total, kap, phi_eps)
+            out = [0.0] * len(occ_c)
+            for j, i in enumerate(idx):
+                out[i] = sub[j]
+            return out
+
         for (cx, cy), occ in occ_lists.items():
+            excl_mask = None
+            if excl_on:
+                excl_mask = [(a.is_juvenile() and self._family_head(a) is not None) for a in occ]
+                if not any(excl_mask):
+                    excl_mask = None
             S = tf.level(cx, cy)
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
@@ -618,11 +672,13 @@ class TerrainWorld(mesa.Model):
                     # decides who crosses the floor (Carbon scoping). One model-RNG draw → deterministic.
                     sig = math.sqrt(math.log(1.0 + meat_cv * meat_cv))
                     meat_pool = math.exp(self.random.normalvariate(math.log(meat_pool) - 0.5 * sig * sig, sig))
-                f_sh = compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps)
+                f_sh = (_forage_excl(occ, (1.0 - meat_frac) * S, 0.0, excl_mask) if excl_mask
+                        else compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps))
                 m_sh = compute_harvest_shares(occ, meat_pool, kappa_cell, phi_eps)
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
-                shares = compute_harvest_shares(occ, S, kappa_cell, phi_eps)
+                shares = (_forage_excl(occ, S, kappa_cell, excl_mask) if excl_mask
+                          else compute_harvest_shares(occ, S, kappa_cell, phi_eps))
             msh = m_sh if game_on else [0.0] * len(occ)
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
