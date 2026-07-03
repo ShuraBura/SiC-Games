@@ -630,6 +630,14 @@ class TerrainWorld(mesa.Model):
         if store_seas_gated and self._seasonal_amp is None:
             from sic_games.climate import seasonal_amplitude_field
             self._seasonal_amp = seasonal_amplitude_field(self._fields.biome)
+        # AQUATIC-gated MORPH (§4.5.10 v2): storage stays a broad survival BUFFER (every forager caches for the lean
+        # season → marginal biomes survive), but COMPLEXITY (surplus→complex) requires a dense STORABLE AQUATIC
+        # resource (wateracc: coast/river/lake — NW-Coast salmon/shellfish; Testart/Ames). A band in the terrestrial
+        # interior stays EGALITARIAN regardless of buffer surplus (Mbuti/Hadza/Ju); only aquatic-rich bands morph
+        # complex. This SEPARATES storage-as-survival from storage-as-complexity (fixes desert: buffered → survives,
+        # non-aquatic → egalitarian). Applied in the per-band morph detector below.
+        morph_aq_gated = demog is not None and demog.enable_morph and getattr(demog, "morph_aquatic_gated", False)
+        morph_aq_thr = demog.morph_aquatic_threshold if morph_aq_gated else 0.0
         if store_decay > 0.0 and self._cell_store:
             # S.3 spoilage/maintenance: every granary loses a fraction each step (incl. abandoned ones → no
             # stale free stores for wanderers, RT free-rider); prune the negligible remainder.
@@ -809,6 +817,12 @@ class TerrainWorld(mesa.Model):
                 surplus_frac = store_sum / cap_band if cap_band > 0.0 else 0.0
                 self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
                 target = society_from_character(density, surplus_frac)
+                if morph_aq_gated and target != "egalitarian_forager":
+                    # complexity requires a dense STORABLE AQUATIC resource: unless the band's mean water access
+                    # clears the threshold (coast/river/lake), it stays EGALITARIAN however much buffer it holds.
+                    mean_wa = sum(self._fields.wateracc[cy, cx] for (cx, cy) in band_cells[bid]) / len(band_cells[bid])
+                    if mean_wa < morph_aq_thr:
+                        target = "egalitarian_forager"
                 c0 = self._band_settle.get(bid, 0)
                 c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
                 if c >= settle_T:

@@ -507,7 +507,23 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 | desert (0.45) | 100% complex | 100% complex | 57 |
 | montane | 73% complex | 76% complex | 418 |
 | mixed (81% savanna) | 84% complex | 76% complex | 622 |
-**The aseasonal FOREST flips 88% complex → 99% EGALITARIAN while the seasonal biomes stay complex** — the Testart/Binford storability signal (rich-but-aseasonal forest foragers are egalitarian, like the Mbuti; seasonal-storage biomes develop complexity). Forest SURVIVES (588, healthy — the storage buffer was not load-bearing there). **NB the ordering is SEASONALITY-driven, not productivity** (savanna, seasonal-but-marginal, can be complex; forest, rich-but-aseasonal, is egalitarian — the OPPOSITE of a productivity ordering, and the intended/correct Testart pattern). **OPEN:** `stratified` still needs packing/settlement density (roadmap); the Hadza-savanna-egalitarian nuance (seasonal but glut too small to store) is finer than the current gate (RT-4); desert/mountain/wetland amplitudes are PROVISIONAL. **Canonicalization pending supervisor sign-off** (+ confirm status→RS/band under the gate — forest going egalitarian lowers its ascribed-mate pull, which SHOULD lower forest reproductive skew, the correct direction).
+**The aseasonal FOREST flips 88% complex → 99% EGALITARIAN while the seasonal biomes stay complex** — the Testart/Binford storability signal (rich-but-aseasonal forest foragers are egalitarian, like the Mbuti; seasonal-storage biomes develop complexity). Forest SURVIVES (588, healthy — the storage buffer was not load-bearing there). **NB the ordering is SEASONALITY-driven, not productivity** (savanna, seasonal-but-marginal, can be complex; forest, rich-but-aseasonal, is egalitarian — the OPPOSITE of a productivity ordering, and the intended/correct Testart pattern). **OPEN:** `stratified` still needs packing/settlement density (roadmap); the Hadza-savanna-egalitarian nuance (seasonal but glut too small to store) is finer than the current gate (RT-4); desert/mountain/wetland amplitudes are PROVISIONAL. **Canonicalization pending supervisor sign-off.** **[SUPERSEDED by R-47 — the seasonality gate mis-orders desert (complex); the correct driver is AQUATIC.]**
+
+## R-47 — The morph driver is AQUATIC, not seasonal: gate COMPLEXITY (not storage) on water access (2026-07-03)
+
+**Origin:** supervisor pushback on R-46 ("forest and desert misbehave — what can we do?"). The seasonality gate (R-46) made **desert 100% complex** (WRONG — desert foragers Ju/'hoansi, Aboriginal Australians are the paradigm EGALITARIANS) and only got forest right by accident. Blueprint `…_StorabilityGatedMorph_Scoping.md` v2.
+
+**The correct anthropology:** MOST foragers in MOST biomes are egalitarian (Mbuti forest, Hadza savanna, Ju desert). Complex foragers are the RARE exception and are overwhelmingly tied to a dense STORABLE AQUATIC resource — NW Coast salmon, Calusa estuaries, Jomon, Chumash (Testart 1982; Kelly; Ames). The driver is not terrestrial seasonality; it is a **storable aquatic glut**. The model has the signals (`wateracc`, `is_shore`, `isRiver`, Bird-1997 shore bonus).
+
+**Two-role bug found + fixed:** storage plays TWO roles — a survival BUFFER (ride out the lean season) AND the complexity trigger. Gating STORAGE on water (first attempt, `storage_aquatic_gated`) removed the buffer from dry biomes → **desert went EXTINCT**. Fix = **separate them**: keep storage a broad buffer (every forager caches → marginal biomes survive), gate only the **MORPH** (`morph_aquatic_gated`) — a band morphs complex only where its mean `wateracc ≥ threshold`; otherwise egalitarian however much buffer it holds. **Result (thr=0.6, 3 seeds × 1300):**
+| biome | baseline %complex | morph-aquatic %complex | pop |
+|---|---|---|---|
+| forest | 88% | 8% | 697 |
+| savanna | 88% | 1% | 396 |
+| **desert** | 100% | **0% (egalitarian)** | **28 (SURVIVES)** |
+| montane | 73% | 22% | 484 |
+| mixed | 84% | 1% | 762 |
+**The correct pattern: mostly egalitarian; complexity RARE and water-linked** (montane river valleys 22% — cf. Plateau/Columbia salmon cultures; forest 8% — riverine). **Desert FIXED — egalitarian AND surviving** (buffer keeps it alive, no aquatic resource → no complexity — the Ju/'hoansi pattern). Off ⇒ ungated morph (bit-exact). The R-46 `storage_seasonality_gated` is retained ablatable but SUPERSEDED for the morph purpose (it conflates buffer+complexity and mis-orders desert). **Recommend canonical `morph_aquatic_gated=True, threshold=0.6`**; thr/wateracc-cutoff PROVISIONAL. Canonicalization pending sign-off.
 
 ---
 

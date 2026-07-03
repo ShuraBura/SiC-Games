@@ -787,7 +787,19 @@ egalitarian; seasonal biome → storable glut → surplus → complex) via `clim
 0.25. **Result:** aseasonal FOREST flips 88% complex → **99% egalitarian** while seasonal biomes stay complex (forest
 survives, 588) — the morph now FITS the biome. Ordering is **seasonality-driven, not productivity** (rich-but-
 aseasonal forest = egalitarian like the Mbuti; seasonal biomes complex — the intended Testart pattern). Off ⇒ the
-temperature gate (bit-exact). Canonicalization pending sign-off; `stratified` still awaits settlement density.
+temperature gate (bit-exact). **SUPERSEDED (R-47):** the seasonality gate mis-orders desert (→ complex; real desert
+foragers are the paradigm egalitarians) — the correct driver is AQUATIC.
+
+**AQUATIC-GATED MORPH (built 2026-07-03; R-47) — the corrected driver.** Most foragers in most biomes are
+EGALITARIAN (Mbuti/Hadza/Ju); complex foragers are the rare exception, tied to a dense STORABLE AQUATIC resource
+(NW-Coast salmon, Calusa, Jomon; Testart/Kelly/Ames). **Two-role fix:** storage plays two roles — a survival BUFFER
+and the complexity trigger; gating STORAGE on water removed the buffer from dry biomes → desert EXTINCT. So keep
+storage a broad buffer (marginal biomes survive) and gate only the **MORPH**: `morph_aquatic_gated` forces a band to
+`egalitarian_forager` unless its mean `wateracc ≥ morph_aquatic_threshold` (0.6). **Result (thr=0.6):** terrestrial
+interiors (forest/savanna/desert) EGALITARIAN + surviving; complexity RARE + water-linked (montane river valleys
+22% ≈ Plateau/Columbia salmon cultures; forest 8%); **desert FIXED — egalitarian AND surviving** (Ju/'hoansi
+pattern). Off ⇒ ungated morph (bit-exact). `stratified` still awaits settlement density. Recommend canonical
+`morph_aquatic_gated=True, threshold=0.6` (PROVISIONAL); pending sign-off.
 
 ---
 
