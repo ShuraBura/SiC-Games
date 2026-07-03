@@ -446,6 +446,10 @@ Category: C1 (shared, param-differentiated) / C2 (re-pointed) / C3 (new architec
 | Malnutrition fission (M2) | realized-starvation dispersive term → large bands break up; dispersal substitutes for death; size-gated by base floor | C1 | `phase1_model::_maintain_bands`, `_note_band_starv` (`_band_starv_ema`) | §4.8.14; R-32/R-33 |
 | Resource-directed fusion (F) | a sub-merge band joins the RICHEST nearby band (not nearest) — remnants merge into provisioned bands | C1 | `phase1_model::_maintain_bands` | §4.8.14; R-33 |
 | Genealogy logger (Stage 2) | pure-observer append-only birth/death log (uid, mother, father, lineage, band_id, step, cred); Stage-3 substrate | C1 (tool) | `phase1_model::_log_genea`, `dump_genealogy` | §4.8.15 |
+| CC-1 Tallavaara capacity | NPP→density via the fitted segmented regression (mode='tallavaara'); ~57% of provisional; world-lottery diverse worlds | C1 | `capacity.py::density_tallavaara`, `NPPCapacityField(mode=…)`; `terrain.py::world_lottery` | §4.3.1; R-36 |
+| Ascribed(cred) mate-choice | female mate-weight `(prowess·cred^(a·sw))^m`, society-gated `sw` (egal 0.25/complex 0.6/strat 1.0); recovers composite status→RS ≈0.13 at a=2.5 | C2 | `demography::mate_ascribed_weight`, `MATE_ASCRIBED_WEIGHT`; `phase1_model::_pair_from_pool` | §4.8.16; R-35 |
+| Life-history wiring (canonical) | Kaplan-2000 graded η/consumption/reserve + provisioning now ENGAGED (`enable_life_history` auto-builds month-scaled cfg); retires JV-1 | C1 | `agents/base.py::eta/consumption_factor/reserve_scale`; `phase1_model::_init_agents` | §4.8.17; R-38 |
+| The gathering (marriage aggregation) | seasonal cross-band exogamous pairing at abundant sites; residence (viri/uxori/flexible) + rank-homogamy toggles; decouples mate-finding from reproducing | C2 | `phase1_model::_do_gathering`, `_pair_from_pool` | §4.8.18; R-39 |
 
 > **SHELVED:** `enable_band_risk` (F.2 risk-dilution-as-mortality — death spiral, DE-4). **RETIRED:**
 > `storage_tether_reserves` (DE-3); `season_aggregation` (DE-7, lean→fission mis-signed+inert); M1 moderate-lean

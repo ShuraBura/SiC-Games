@@ -182,10 +182,16 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 | **Controlled-climate harness** (SE Stage 0) | 2026-06-30 | benchmark tool | can a deterministic driver isolate the climate-attributable social response? | R-28: YES — FLAT vs PULSE diff-in-diff, ΔPRE=−0.00 placebo, −70 pop footprint / −135 lagged scar; reusable `run_controlled`. | `outputs/phase1_social_evolution/run_se0_controlled_climate.py` |
 | **Leader coherence + size repulsion** (SE Stage 1) | 2026-07-01 | mechanism + cohort event study | does the band-size cohesion↔dispersion balance work; does leader-death fission a band? | R-29: repulsion trims tail (R-31 corrected the "44→31" claim). R-30: leader-death→fission a principled NULL in the complex regime (Δ≈−0.02..−0.25) → deferred to dynastic stage. | `outputs/phase1_social_evolution/run_se1_leader_coherence.py` |
 | **M2 malnutrition fission (substitution test)** | 2026-07-01 | validation | does severe-scarcity fission lower starvation mortality (dispersal substitutes for death)? | R-33: YES — starv deaths −120/−31/−24 (3 seeds), M2 fires, 2/3 higher end-pop. Signal = realized starvation (R-32: `_condition` survivor-biased). | `outputs/phase1_social_evolution/run_se2_malnutrition_fission.py` |
+| **status→RS re-estimation + ascribed mate-choice** | 2026-07-02 | re-estimation + recalibration | is the 0.13 composite robust; why is cred-negative; recover it? | R-35: composite ≈0 at 16 seeds (0.13 was 6-seed optimism); prowess→RS +0.10, cred→RS −0.07 (no mating channel); ascribed mate-choice a=2.5 → +0.128. | `outputs/statusRS_reestimate_20260702/` |
+| **CC-1 Tallavaara + world-lottery** | 2026-07-02 | recalibration | fit the real Tallavaara density regression; diverse worlds | R-36: fitted segmented regression, ~57% of provisional capacity, eq_pop −40% (correctness); forest/savanna/desert/montane/mixed lottery. | `capacity.py`, `terrain.py`; `test_cc1_tallavaara.py`, `test_world_lottery.py` |
+| **Biome → society** | 2026-07-02 | hypothesis test | does a biome-dominated world grow a biome-specific society? | R-37: forest thrives (complex); low-NPP biomes COLLAPSE — but simple reproduction sustains them → the bonded-family/co-residence structure is productivity-gated (a model gap, not a real pattern). | `outputs/biome_society_20260702/run_biome_society.py` |
+| **The gathering (marriage aggregation)** | 2026-07-02 | mechanism + diagnosis | does seasonal cross-band pairing fix low-density mate-finding? | R-39: fixes mate-finding (savanna 50 pairs/forest 93% paired, eq_pop 433) but savanna still collapses = family co-movement pile-up (savanna+co-move=5, without=279) + fixed-r=1 mobility → productivity-scaled movement is next. | `phase1_model::_do_gathering`; `test_marriage_aggregation.py` |
 
 ### Blueprints commissioned this arc (specs, not results)
 `…_Climate_OrbitalLottery_Scoping`, `…_Storage_Morph_Scoping`, `…_EmergentBands_Scoping`,
-`…_F3c_PerBandSociety_Scoping`, `…_SocialEvolution_Dynamic_Scoping` (all `blueprints/phase1/`).
+`…_F3c_PerBandSociety_Scoping`, `…_SocialEvolution_Dynamic_Scoping`, `…_ResourceResponse_Scoping`,
+`…_AscribedMateChoice_Scoping`, `…_CC1_TallavaaraCapacity_Scoping`, `…_MarriageAggregation_Scoping`,
+`…_MovementChannel_ResourceResponse_Scoping` (all `blueprints/phase1/`).
 
 ---
 

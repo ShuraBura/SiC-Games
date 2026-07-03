@@ -321,10 +321,13 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 | Name | Value | Status | Grounding / history |
 |------|-------|--------|---------------------|
-| CC-1 density slope | **0.3** | PROVISIONAL | Tallavaara 2018; density = min(0.5, 0.3·npp_gm2/1360). §4.3.1 |
-| CC-1 density cap | **0.5**/km² | PROVISIONAL | Tallavaara high bound |
-| NPP threshold | **1360** g/m²/yr | PROVISIONAL | Tallavaara low/high |
-| NPP_GM2_SCALE | **3400** | PROVISIONAL | npp_gm2 = npp × 3400 |
+| **CC-1 capacity mode** | **'linear' (default) / 'tallavaara' (FITTED)** | linear PROVISIONAL, tallavaara **FITTED 2026-07-02** | `NPPCapacityField(…, mode=…)`. linear = provisional rows below; tallavaara = the fitted segmented regression (next 4 rows). §4.3.1; R-36 |
+| CC-1 density slope | **0.3** | PROVISIONAL (linear mode) | Tallavaara 2018; density = min(0.5, 0.3·npp_gm2/1360). §4.3.1 |
+| CC-1 density cap | **0.5**/km² | PROVISIONAL (linear mode) | Tallavaara high bound |
+| NPP threshold | **1360** g/m²/yr | PROVISIONAL (linear mode) | Tallavaara low/high |
+| NPP_GM2_SCALE | **3400** | PROVISIONAL | npp_gm2 = npp × 3400 (both modes) |
+| CC-1 Tallavaara coeffs (TALL_INT / TALL_B1 / TALL_U1 / TALL_BP) | **−0.1352714 / 0.0028623 / −0.0030745 / 1371.664** | **FITTED 2026-07-02** | `ln(density#/100km²) = INT + B1·NPP + U1·(NPP−BP)₊`; extracted from Tallavaara data-analyses SI, cross-checked vs Dataset_4 (357 groups, median 11.9). ~57% of linear capacity. `capacity.py::density_tallavaara`. §4.3.1; R-36 |
+| world-lottery archetypes | forest/savanna/desert/montane/mixed (NPP ~175→856) | DIAGNOSTIC | `terrain.py::world_lottery(seed, archetype=None)`, `WORLD_ARCHETYPES` — per-world knob draws to characterize CC-1 across productivity; arid-biased (median ~500 vs forager ~900). R-36/R-37 |
 | seasonality s_min | **0.4** (test) | PROVISIONAL | forage seasonal trough; biome-specific per §4.1.4 (forest flat, llanos high) — NOT yet biome-wired. R-6/R-10 (forest-as-seasonal = artifact, R-14) |
 | depletion deplete_rate | **0.30** | PROVISIONAL (phenomenological, NOT lit-anchored) | GD-1 freshness. §4.4.2 |
 | depletion regrow_rate | **0.10** | PROVISIONAL (phenomenological) | " |
@@ -388,6 +391,9 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | enable_resource_directed_fusion / fusion_search_radius | **False / 25** | OPT-IN | F: a band < merge_size joins the RICHEST (`_band_surplus`) neighbour within radius (else nearest) — starving remnants merge into well-provisioned bands (Wiessner hxaro). Off ⇒ nearest, bit-exact. §4.8.14 |
 | enable_genealogy_log | **False** (default) | OPT-IN | Stage 2: pure-observer append-only log of births/deaths (uid, mother, father, lineage, band_id, step, cred) → `dump_genealogy(path)`. Bit-exact when off/on (write-after-step). §4.8.15 |
 | ~~season_aggregation~~ | **REMOVED** 2026-07-01 | — | RETIRED (DE-7): mis-signed lean→fission + inert; superseded by M2 malnutrition fission. §4.8.14 |
+| enable_life_history / enable_provisioning | **True / True** (CANONICAL 2026-07-02) | **CANONICAL** | Kaplan-2000 childhood: auto-builds a MONTH-scaled `LifeHistoryConfig` (`forage_age_min=180`, `forage_age_max_offset=120` — class defaults are legacy YEARS) → graded η/consumption/reserve + band provisioning of the child deficit. Was OFF (newborns foraged at adult rate). Retires JV-1. Fixed 3 latent bugs (max_age dead code→maxage 899; negative-η complex crash→clamp; founder-lh). §4.8.17; R-38 |
+| enable_marriage_aggregation / aggregation_period / aggregation_season_threshold | **False / 12 / 0.6** | OPT-IN | "the gathering": convene bands every `period` months when `ClimateField.season() ≥ threshold` (spring pulse). Decouples mate-finding (seasonal/regional) from reproducing (year-round pair-bond). Mauss/Steward/Lee/Conkey. §4.8.18; R-39 |
+| aggregation_radius / aggregation_site_sep / aggregation_residence / aggregation_rank_homogamy | **8 / 4 / "flexible" / False** | OPT-IN | connubium radius (terrain/lit-sourced); site separation; residence ∈ virilocal/uxorilocal/flexible (Marlowe 2004/Hill 2011/Ember&Ember 1971 — whole-world compare deferred); rank-homogamy = similarly-ranked lineages marry (R-35 anti-flattening). residence="flexible"/homogamy=False ⇒ bit-exact legacy pairing. §4.8.18 |
 
 > **§17–18 currency note (2026-06-29):** added to close the audit gap — PARAMETERS had not been updated through
 > the entire Carbon-status (R-18…R-21) → storage/morph → emergent-bands → full F.3 family/band/society arc →

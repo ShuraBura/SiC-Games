@@ -405,16 +405,27 @@ older ages) is the inter-group conflict subsystem — deferred to the C-vs-Si co
 
 ## Terrain / Climate methodology
 
-### §4.3.1 CC-1 cell capacity — NPP → density [PROVISIONAL]
-`K = density(NPP)·100 km²`, `density = min(0.5, 0.3·npp_gm2/1360)` people/km²; `E = K·burn`. **Source:**
-Tallavaara 2018 (PNAS), HG density vs NPP; 1360 g/m²/yr = their low/high threshold. **Transformation:**
-linear density–NPP relation anchored to the ethnographic ~0.1–0.5/km² band, capped 0.5, slope 0.3 so
-density(1360)=0.3; `npp_gm2 = npp·3400`. **PROVISIONAL** — the full CC-1 stage fits Tallavaara's regression.
-**Library home (2026-06-29):** this field is now `sic_games/capacity.py: NPPCapacityField(fields, burn,
-patch=None)` (`E = density·100·burn`; optional patch mask bounds K so the population equilibrates). It is the
+### §4.3.1 CC-1 cell capacity — NPP → density [FITTED 2026-07-02; provisional form kept selectable]
+`K = density(NPP)·100 km²`, `E = K·burn`; `density` has two modes on `NPPCapacityField(…, mode=…)`:
+- **`mode='linear'` [PROVISIONAL, default for back-compat]** — `density = min(0.5, 0.3·npp_gm2/1360)` people/km²;
+  a linear density–NPP relation anchored to the ethnographic ~0.1–0.5/km² band, capped 0.5, slope 0.3 so
+  density(1360)=0.3; `npp_gm2 = npp·3400`. Over-generous at low NPP (where ~97% of our cells sit).
+- **`mode='tallavaara'` [FITTED 2026-07-02, CC-1]** — the actual Tallavaara 2018 (PNAS) segmented regression,
+  `ln(density) = −0.1352714 + 0.0028623·NPP_gm2 − 0.0030745·(NPP_gm2 − 1371.664)₊` (density in #/100 km² =
+  persons/cell; hump-shaped, peaking near the 1372 g/m²/yr breakpoint). **Extraction:** coefficients read from the
+  Tallavaara data-analyses SI (`TALL_INT/TALL_B1/TALL_U1/TALL_BP` in `capacity.py::density_tallavaara`) and
+  cross-checked against Dataset_4 (357 HG groups, median density 11.9/100 km²). **Impact:** ~57% of the linear
+  patch capacity → eq_pop ~40% lower — a **correctness** gain (Tallavaara ~0.05/km² at NPP 633 matches the record).
+  See LITERATURE.md (Tallavaara) and R-36.
+
+**Library home (2026-06-29):** the field is `sic_games/capacity.py: NPPCapacityField(fields, burn, patch=None,
+mode='linear')` (`E = density·100·burn`; optional patch mask bounds K so the population equilibrates). It is the
 substrate the demographic + emergent-bands + morph validations run on (R-18/19, E.3-proper §4.8.5, the morph
 §4.5.11) — **not** the bare `forage_kcal` field (§4.8.4). (The validated R-18/19 harnesses still carry their own
-inline copy, `SubWindowCapacity`, numerically identical.)
+inline copy, `SubWindowCapacity`, numerically identical to the linear mode.) **World-lottery (2026-07-02):**
+`terrain.py::world_lottery(seed, archetype=None)` draws per-world knob sets cycling the archetypes
+forest/savanna/desert/montane/mixed (`WORLD_ARCHETYPES`, NPP ~175→856) so CC-1 is characterized across a
+productivity range; NB the archetype set is arid-biased (median NPP ~500 vs forager-median ~900).
 
 ### §4.3.2 Climate seam — temperature & humidity [PLACEHOLDER]
 `temperature=14.0 °C`, `humidity=0.70`, **homogeneous (constant)**. **Source:** global mean surface air
@@ -1409,6 +1420,51 @@ mother_uid, father_uid, lineage, band_id, cred)` — to an in-memory buffer (O(b
 the red-team); uses Mesa's stable monotonic `unique_id` (not `id()`); `dump_genealogy(path)` writes a CSV for
 OFFLINE analysis. Enables lineage-extinction curves, time-to-MRCA, dynasty depth vs. assabiyah, and who-fathered-
 dynasties — the substrate the Ibn Khaldun dynastic-cycle stage (Stage 3) will need. Names/viewer deferred.
+
+### §4.8.16 Ascribed-status mate-choice — the cred→RS channel (built + canonical 2026-07-02)
+
+**Problem (R-35):** the 16-seed re-estimate found the composite (cred·prowess)→RS ≈ 0 [CI −0.035,+0.037], NOT the
+6-seed 0.13 of R-26. It decomposes into **prowess(achieved)→RS +0.10** (the working von-Rueden channel) and
+**cred(ascribed)→RS −0.07** — because mate-choice weighted *prowess only* (`_do_pairing`), cred had no mating
+channel and its RS sign was a weak diffuse non-causal confound. **Mechanism:** `enable_ascribed_mate_choice` makes
+the female's mate-weight `(prowess · cred^(a·sw))^mate_choice_strength`, where `sw = MATE_ASCRIBED_WEIGHT[society]`
+society-gates the ascribed pull (egalitarian **0.25** floor / complex **0.6** / stratified **1.0**) — family sways
+marriage even among egalitarians (Ember & Ember), harder as society stratifies — and `a = ascribed_mate_strength`.
+**Calibration:** swept `a`; **canonical `a=2.5`** → composite **+0.128 ≈ von-Rueden 0.13**, Gini stable (no dynastic
+runaway; the rank-homogamy + virilocal knobs of the gathering §4.8.18 prevent lineage-flattening). Off ⇒ bit-exact
+prowess-only. **The full reframe of R-19/R-21/R-26's 0.13/0.19 headline is HELD** pending settlement-arc validation
+of the stratified ~0.19 endpoint. Blueprint `…_AscribedMateChoice_Scoping.md`.
+
+### §4.8.17 Newborn→adult life-history — canonical wiring + latent-bug fixes (built 2026-07-02)
+
+The Kaplan-2000 childhood machinery (§4.4/§4.5: graded η production, `consumption_factor` maintenance,
+`reserve_scale` neonatal reserve, provisioning) was **fully built but never engaged** — no `LifeHistoryConfig` was
+passed, so newborns foraged at full adult rate. **Canonical:** `enable_life_history` auto-builds a MONTH-scaled
+config (`forage_age_min=180`, `forage_age_max_offset=120` — the class defaults are legacy YEARS) + `enable_provisioning`.
+**Three latent bugs fixed** (R-38): (1) the hard `max_age` cap was DEAD CODE under demog (an `elif` on the
+`demog is None` branch) → Siler-tail agents reached age 1111 → now enforced inside the demog branch (maxage 899);
+(2) the elder η ramp went NEGATIVE past max_age → `base_status<0` → `base_status**κ` returned a COMPLEX number →
+movement crash → η now clamped at `eta_old` (`base.py::eta`); (3) founders received lh from the constructor param,
+not the auto-built `self._lh_cfg` → fixed (`_init_agents(n, kcal_cfg, self._lh_cfg)`). Forest childhood-ON eq_pop
+322, 41% children foraging at η 0.57. Retires DEFERRED JV-1 (juvenile curve now live, not a binary gate).
+
+### §4.8.18 The gathering — seasonal cross-band exogamous marriage-aggregation (built 2026-07-02)
+
+**Why (R-39):** at low band density a bonded-pair society can't *find* mates locally — reproduction (year-round via
+pair-bond) was coupled to mate-finding (needs an eligible unbonded partner in range). The gathering DECOUPLES them:
+`enable_marriage_aggregation` convenes bands at abundant sites every `aggregation_period` months when the season
+exceeds `aggregation_season_threshold` (spring pulse; Mauss/Steward/Lee/Conkey — the ethnographic aggregation
+festival), draws sites `aggregation_site_sep` apart, and pairs across bands within `aggregation_radius`
+(connubium; terrain/lit-sourced). **Residence wired both ways** (`aggregation_residence` ∈ virilocal/uxorilocal/
+flexible — Marlowe 2004/Hill 2011/Ember&Ember 1971; whole-world comparison deferred to long-term studies) + optional
+`aggregation_rank_homogamy` (similarly-ranked lineages marry — the R-35 anti-flattening knob). Implemented by
+refactoring `_do_pairing` into a reusable `_pair_from_pool(females, males, residence, rank_homogamy, band_sizes)`
+(bit-exact via residence="flexible"/homogamy=0) + `_do_gathering`. **Result:** fixes mate-finding (savanna 50 pairs
+at the first gathering; forest 93% paired, eq_pop 433) — but savanna still collapses, because the residual root is
+**family co-movement piling the family on one cell → overcrowd → starve** (savanna+co-movement=5, without=279), and
+the DEEPER root is **fixed-r=1 diffusion mobility** (no biome-aware ranging; Kelly/Binford mobility ∝ 1/productivity).
+The next stage (productivity-scaled movement range) supersedes the family-spread band-aid. Blueprint
+`…_MarriageAggregation_Scoping.md`.
 
 ---
 

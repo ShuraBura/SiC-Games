@@ -26,7 +26,12 @@
 
 ---
 
-## JV-1 — Age-graded juvenile productivity
+## JV-1 — Age-graded juvenile productivity  — **BUILT + CANONICAL 2026-07-02 (RETIRED as deferred)**
+
+**Status (2026-07-02):** DONE. The graded curve is live via `enable_life_history` (Kaplan-2000 η production ramp +
+`consumption_factor` maintenance + `reserve_scale` neonatal reserve + provisioning) — the binary gate is superseded.
+MODEL_SPEC §4.8.17, R-38. Three latent bugs found+fixed on wiring (dead `max_age`, negative-η complex crash,
+founder-lh). This entry is retained for provenance only.
 
 **What:** Replace the binary child age-gate (A-2 §12: below `age_productive_min` → zero subsistence) with a graded productivity-by-age curve. Curve rises from ~0 at birth to full adult productivity by early adulthood, with a faster-than-linear acceleration in adolescence.
 
@@ -40,7 +45,14 @@
 
 ---
 
-## CC-1 — Carrying-capacity-from-NPP (cell extractable rate + rivalry)
+## CC-1 — Carrying-capacity-from-NPP (cell extractable rate + rivalry)  — **NPP-DENSITY CEILING FITTED 2026-07-02**
+
+**Status (2026-07-02):** the **NPP→density ceiling is now FITTED** to Tallavaara's actual segmented regression
+(`NPPCapacityField(mode='tallavaara')`, `capacity.py::density_tallavaara`; MODEL_SPEC §4.3.1, R-36) — ~57% of the
+provisional linear capacity, eq_pop ~40% lower. The **rivalry / game-ceiling / sugar-cluster re-derivation halves of
+CC-1 remain DEFERRED** (co-located agents still divide via the density-disease channel, not a finite extractable
+rate; ungulate-NPP game ceiling not yet built). So CC-1 is PARTIALLY REALIZED: capacity ceiling done, rivalry/game
+pending. The `mode='linear'` provisional form is kept selectable (default) for back-compat.
 
 **What:** Replace provisional biome-scaled cell yields (`forage_kcal`, `game_kcal`) with a literature-grounded ceiling: cell characterized by total *extractable* kcal rate = f(biome carrying capacity, replenishment rate); co-located agents divide the finite rate → rivalry emerges; density and starvation become emergent properties of the resource ceiling, not tuned parameters. This is also where the superseded sugar-cluster resource ceiling is re-derived in kcal.
 
