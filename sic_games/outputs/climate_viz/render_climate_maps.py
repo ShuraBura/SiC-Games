@@ -39,6 +39,7 @@ LAYERS = [
     ("npp",         lambda F: _mask(F, F.npp_gm2),     "YlGn",   "NPP Miami (g/m²/yr)",(0, 2500)),
     ("biome",       lambda F: F.biome.astype(float),   None,     "biome",              None),
     ("river_temp",  lambda F: _river_only(F),          "RdBu_r", "river water T (°C)",  None),
+    ("aquatic",     lambda F: _mask(F, F.aquatic_food),"cividis","aquatic food [0-1]",  (0, 1)),
     ("wateracc",    lambda F: F.wateracc,    "Blues",   "water access [0-1]",         (0, 1)),
 ]
 LATS = [(0.12, "tropical"), (0.32, "subtropical"), (0.52, "temperate"), (0.82, "subpolar")]

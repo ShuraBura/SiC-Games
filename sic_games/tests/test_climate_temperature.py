@@ -251,6 +251,38 @@ def test_c6_montane_rivers_more_salmon_capable_than_air_suggests():
         assert by_water > by_air + 0.1                                   # headwater sourcing opens up cold-water rivers
 
 
+def test_c7_aquatic_food_helper():
+    """aquatic_food_field: cold sea-connected river → anadromous; warm river → less; shore → shellfish; dry interior → 0."""
+    from sic_games.terrain import aquatic_food_field
+    z = np.zeros((5, 5)); water_cold = np.full((5, 5), 8.0); water_warm = np.full((5, 5), 25.0)
+    river = np.zeros((5, 5), np.uint8); river[2, 2] = 1
+    shore = np.zeros((5, 5), np.uint8); shore[0, 0] = 1
+    sea = np.ones((5, 5), bool); npp01 = np.full((5, 5), 0.5)
+    cold = aquatic_food_field(water_cold, river, np.zeros((5, 5), np.uint8), sea, npp01)
+    warm = aquatic_food_field(water_warm, river, np.zeros((5, 5), np.uint8), sea, npp01)
+    assert cold[2, 2] > 0.8                         # cold river cell = strong anadromous
+    assert warm[2, 2] < cold[2, 2]                  # warm river = weaker (salmon lethal)
+    sh = aquatic_food_field(water_warm, np.zeros((5, 5), np.uint8), shore, sea, npp01)
+    assert sh[0, 0] > 0.3                            # coastal shore = shellfish (warm-tolerant)
+    interior = aquatic_food_field(water_warm, np.zeros((5, 5), np.uint8), np.zeros((5, 5), np.uint8), sea, npp01)
+    assert np.all(interior == 0.0)                   # no river, no shore → no aquatic food
+
+
+def test_c7_aquatic_food_rare_and_water_linked():
+    """The aquatic-food field is 0 in legacy, rare in climate, and concentrated on cold rivers + shores."""
+    from sic_games.terrain import world_lottery_climate
+    assert np.all(generate_world(_k("montane")).aquatic_food == 0.0)               # legacy: unused
+    F = generate_world(world_lottery_climate(0, terrain="mountainous", climate="tropical"), mode="climate")
+    land = (F.isWater == 0)
+    assert F.aquatic_food[land].max() > 0.5                                          # some genuinely rich fishery cells
+    assert (F.aquatic_food[land] > 0.3).mean() < 0.25                               # but RARE (water-linked, not everywhere)
+    riv = F.isRiver.astype(bool) & land
+    if riv.any():                                                                   # cold rivers richer than warm rivers
+        cold = riv & (F.water_temp < 16); warm = riv & (F.water_temp >= 16)
+        if cold.any() and warm.any():
+            assert F.aquatic_food[cold].mean() > F.aquatic_food[warm].mean()
+
+
 def test_world_lottery_climate_aridity_dries_precip():
     """The climate_aridity axis scales precip down independent of latitude (continental/leeward dryness)."""
     from sic_games.terrain import world_lottery_climate

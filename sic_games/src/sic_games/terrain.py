@@ -278,6 +278,31 @@ MARITIME_DAMP    = 0.6        # fraction by which coastal/near-water cells (high
 # so a valley river can be cold even where the air is warm (the salmon-fishery enabler; lit: river T by source).
 # T_river = air_T − RIVER_COLD_RETENTION · lapse · (headwater_elev − local_elev); headwater = max upstream elevation.
 RIVER_COLD_RETENTION = 0.6    # fraction of the headwater-elevation cooling a river retains by the time it reaches a cell
+# ── Economy-from-Climate C7: AQUATIC-FOOD field ∈ [0,1] — the dense STORABLE aquatic resource that underwrites
+#    forager complexity (Testart/Ames). Two limbs, per LITERATURE: ANADROMOUS (cold-water salmon runs in sea-
+#    connected rivers — salmonid thermal: opt ~16 °C, lethal ~21 °C) and SHELLFISH/marine (coastal littoral, the
+#    Bird shore-bonus zone, warm-tolerant). Constants PROVISIONAL. ──
+SALMON_T_OPT     = 16.0       # water_temp (°C) at/below which anadromous coldness is FULL
+SALMON_T_LETHAL  = 21.0       # water_temp at/above which anadromous coldness is 0
+AQUATIC_SEA_CONN_FLOOR = 0.25 # anadromous factor for rivers NOT draining to the sea (endorheic — some lacustrine fish)
+SHELLFISH_RICHNESS = 0.7      # coastal littoral aquatic-food level on shore cells (Bird 1997 reef/intertidal richness)
+
+
+def aquatic_food_field(water_temp, isRiver, is_shore, drains_to_sea, npp01):
+    """C7 aquatic-food density ∈ [0,1] on land cells (0 on open water): max of the anadromous (cold sea-connected
+    river) and shellfish (coastal) limbs. `npp01` = normalised terrestrial NPP [0,1] (proxy for littoral
+    productivity). All inputs (N,N). Vectorized."""
+    coldness = np.clip((SALMON_T_LETHAL - water_temp) / (SALMON_T_LETHAL - SALMON_T_OPT), 0.0, 1.0)
+    sea_conn = np.where(drains_to_sea, 1.0, AQUATIC_SEA_CONN_FLOOR)
+    river_cold = coldness * isRiver.astype(np.float64) * sea_conn        # anadromous ON the river cells
+    # foragers harvest from the BANK → spread the river fishery to 4-neighbour land cells (max)
+    anadromous = river_cold.copy()
+    anadromous[:, 1:]  = np.maximum(anadromous[:, 1:],  river_cold[:, :-1])
+    anadromous[:, :-1] = np.maximum(anadromous[:, :-1], river_cold[:, 1:])
+    anadromous[1:, :]  = np.maximum(anadromous[1:, :],  river_cold[:-1, :])
+    anadromous[:-1, :] = np.maximum(anadromous[:-1, :], river_cold[1:, :])
+    shellfish = is_shore.astype(np.float64) * SHELLFISH_RICHNESS * (0.5 + 0.5 * npp01)   # coastal, productivity-scaled
+    return np.clip(np.maximum(anadromous, shellfish), 0.0, 1.0)
 # ── Economy-from-Climate C2 (mode="climate"): structured annual PRECIPITATION (mm/yr) — Hadley/ITCZ bands +
 #    orographic rain-shadow + maritime supply + noise texture. All PROVISIONAL (sign-off). Ranges tuned so the
 #    latitudinal profile lands in Earth-like biome bins: equatorial ITCZ ~2600 mm (rainforest), subtropical ~30°
@@ -400,6 +425,7 @@ class WorldFields:
     temp_seas_amp: np.ndarray = None  # (N,N) float64 °C seasonal half-amplitude (0 = legacy/aseasonal)
     precip_mm:     np.ndarray = None  # (N,N) float64 annual precipitation mm/yr (C2; 0 in legacy mode)
     water_temp:    np.ndarray = None  # (N,N) float64 °C river/surface-water temp (C6, headwater-sourced; 0 in legacy)
+    aquatic_food:  np.ndarray = None  # (N,N) float64 [0,1] dense storable aquatic-food density (C7; 0 in legacy)
     # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
     grass_subtype: np.ndarray = None  # (N,N) uint8
 
@@ -642,6 +668,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
 
     flow = np.ones(N * N, dtype=np.float64)
     src_elev = elev_flat.copy()          # C6: max upstream (headwater) elevation draining through each cell
+    downstream = np.full(N * N, -1, dtype=np.int64)     # C7: the cell each land cell flows to (−1 = pit/endorheic)
     D8 = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
     for idx in order:                    # descending elevation ⇒ a cell's upstream contributors are processed first
         x_c = int(idx % N)
@@ -656,10 +683,19 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
                 if ej < le:
                     le = ej
                     lowest_j = j
+        downstream[idx] = lowest_j
         if lowest_j >= 0:
             flow[lowest_j] += flow[idx]
             if src_elev[idx] > src_elev[lowest_j]:
                 src_elev[lowest_j] = src_elev[idx]      # carry the headwater elevation downstream
+
+    # C7 sea-connectivity: a river drains to the SEA if its downstream path terminates at open water (not an
+    # endorheic pit). Propagate UPSTREAM (ascending elevation): a cell drains-to-sea iff its downstream cell does.
+    drains_to_sea = isWater_flat.astype(bool).copy()    # open water IS the sea
+    for idx in land_idx[np.argsort(elev_flat[land_idx], kind='stable')]:   # ascending: downstream processed first
+        d = downstream[idx]
+        if d >= 0 and drains_to_sea[d]:
+            drains_to_sea[idx] = True
 
     land_flow = flow[land_idx]
     fmax = float(land_flow.max()) if len(land_flow) > 0 else 1.0
@@ -831,6 +867,14 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
                       padded_w[1:-1, :-2] | padded_w[1:-1, 2:]) > 0)
     is_shore = ((isWater == 0) & has_water_nbr).astype(np.uint8)
 
+    # ── C7 aquatic-food field (climate mode): dense storable aquatic resource (anadromous cold rivers + shellfish
+    #    coasts). 0 in legacy mode (unused). Uses C6 water_temp + sea-connectivity from the flow routing. ──
+    aquatic_food = np.zeros((N, N), dtype=np.float64)
+    if mode == "climate":
+        aquatic_food = aquatic_food_field(water_temp, isRiver, is_shore,
+                                          drains_to_sea.reshape(N, N), np.clip(npp, 0.0, 1.0))
+        aquatic_food[isWater == 1] = 0.0
+
     # ── forage_kcal: per-biome mean-scaling (Task 1) + shore bonus (Task 3) ─
     # Original normalised forage[] is preserved. forage_kcal is a separate field.
     forage_kcal = np.zeros((N, N), dtype=np.float64)
@@ -883,7 +927,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
                 npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype,
-                temp_seas_amp, precip_mm, water_temp):
+                temp_seas_amp, precip_mm, water_temp, aquatic_food):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -895,6 +939,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
         grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp, precip_mm=precip_mm, water_temp=water_temp,
+        aquatic_food=aquatic_food,
     )
 
 
