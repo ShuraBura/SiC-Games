@@ -284,11 +284,17 @@ P_ITCZ_WIDTH     = 0.15       # ITCZ Gaussian half-width in lat_frac
 P_MIDLAT_MM      = 1100.0     # mid-latitude storm-track wet peak
 P_MIDLAT_CENTER  = 0.70       # lat_frac of the mid-latitude peak (~50° on the equator→subpolar span)
 P_MIDLAT_WIDTH   = 0.18       # mid-latitude Gaussian half-width
-P_ORO_GAIN       = 1.0        # orographic: windward (rising in wind dir) wetter, lee (rain-shadow) drier
-P_ORO_MIN        = 0.5        # clamp on the orographic multiplier (leeward shadow floor)
-P_ORO_MAX        = 1.8        # clamp on the orographic multiplier (windward enhancement cap)
+# Orographic precipitation — the DOMINANT terrain control (mountains wet, lee dry). Two parts:
+#  (i) UPLIFT: air forced up high ground cools & rains → precip rises with elevation (windward + peaks very wet);
+#  (ii) RAIN SHADOW: cells DOWNWIND of high terrain are dry (the air already dumped its moisture) — a multi-cell
+#       shadow (a big range dries ~tens of km to its lee, e.g. Cascades → high desert). Prevailing wind = +x.
+P_ELEV_UPLIFT      = 1.6      # elevation → orographic uplift multiplier (elev=1 ⇒ ×(1+1.6)=2.6 wetter)
+P_ORO_SHADOW_CELLS = 6        # rain-shadow reach: max upwind elevation is taken over this many cells (≈60 km)
+P_ORO_SHADOW_GAIN  = 1.6      # drying strength in the lee of upwind high terrain
+P_ORO_MIN        = 0.25       # clamp floor on the orographic multiplier (deep rain-shadow)
+P_ORO_MAX        = 3.2        # clamp cap (windward/peak enhancement)
 P_MARITIME_GAIN  = 0.3        # moisture supply: near-water (wateracc) cells wetter
-P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind neighbour is x-1
+P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind is to the −x (west) side
 # ── Economy-from-Climate C3 (mode="climate"): the MIAMI MODEL — NPP from temperature & precipitation ──
 # Lieth 1972/1975 (PDF filed; eqs 12-1/12-2, VERIFIED). NPP = min(temperature-limited, precipitation-limited),
 # g dry-matter/m²/yr. Coefficients are the published least-squares fit (50 sites / 5 continents). LITERATURE.md.
@@ -636,7 +642,13 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         itcz = P_ITCZ_MM * np.exp(-(cell_lat / P_ITCZ_WIDTH) ** 2)
         midlat = P_MIDLAT_MM * np.exp(-((cell_lat - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
         p_band = P_BASE_MM + itcz + midlat
-        oro = np.clip(1.0 + P_ORO_GAIN * (elev - np.roll(elev, P_ORO_WIND_DX, axis=1)), P_ORO_MIN, P_ORO_MAX)
+        # orographic uplift (high ground wetter) × rain shadow (dry in the lee of upwind high terrain)
+        uplift = 1.0 + P_ELEV_UPLIFT * elev
+        upwind_max = elev.copy()
+        for _s in range(1, P_ORO_SHADOW_CELLS + 1):
+            upwind_max = np.maximum(upwind_max, np.roll(elev, _s * P_ORO_WIND_DX, axis=1))
+        shadow = np.clip(1.0 - P_ORO_SHADOW_GAIN * np.maximum(0.0, upwind_max - elev), P_ORO_MIN, 1.0)
+        oro = np.clip(uplift * shadow, P_ORO_MIN, P_ORO_MAX)
         precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
         precip_mm[isWater == 1] = 0.0
     else:

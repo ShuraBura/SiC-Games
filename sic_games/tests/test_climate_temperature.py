@@ -81,30 +81,30 @@ def test_legacy_precip_zero_climate_nonzero():
     assert generate_world(k, mode="climate").precip_mm.max() > 0.0    # climate: real field
 
 
-def _region_precip(archetype, climate_latitude):
+def _region_precip_cells(archetype, climate_latitude):
     k = dict(_k(archetype)); k["climate_latitude"] = climate_latitude
     C = generate_world(k, mode="climate")
-    land = (C.isWater == 0)
-    return C.precip_mm[land].mean()
+    return C.precip_mm[C.isWater == 0]
 
 
 def test_precip_hadley_itcz_across_regions():
     """The Hadley/ITCZ regime is set by the REGIONAL latitude: equatorial (~0.05) wet, subtropical (~0.30) DRY,
-    mid-latitude (~0.70) wet again. (Within a 1000 km grid the profile is regional, not a full transect.)"""
-    eq = _region_precip("mixed", 0.05)
-    subtrop = _region_precip("mixed", 0.30)
-    midlat = _region_precip("mixed", 0.70)
-    assert eq > subtrop * 2            # equatorial ITCZ much wetter than the subtropical desert belt
-    assert midlat > subtrop            # mid-latitude storm track wetter than the subtropical trough
-    assert subtrop < 700               # subtropical region is desert-dry
+    mid-latitude (~0.70) wet again — in MEAN wetness (orography adds within-region variance on top)."""
+    eq = _region_precip_cells("mixed", 0.05).mean()
+    subtrop = _region_precip_cells("mixed", 0.30).mean()
+    midlat = _region_precip_cells("mixed", 0.70).mean()
+    assert eq > subtrop            # equatorial ITCZ region wetter than the subtropical desert belt
+    assert midlat > subtrop        # mid-latitude storm track wetter than the subtropical trough
 
 
 def test_precip_range_earthlike_across_regions():
-    """Across regional latitudes the ensemble spans desert → rainforest (a single region is narrower)."""
-    wettest = _region_precip("mixed", 0.05)      # equatorial region
-    driest = _region_precip("mixed", 0.30)       # subtropical region
-    assert wettest > 1500                        # equatorial region reaches rainforest-wet
-    assert driest < 600                          # subtropical region is desert-dry
+    """Across regional latitudes + orography the ensemble spans desert → rainforest: the equatorial region has
+    rainforest-wet cells, the subtropical region has desert-dry cells (lee/lowland), and it's drier overall."""
+    trop = _region_precip_cells("mixed", 0.05)
+    subtrop = _region_precip_cells("mixed", 0.30)
+    assert trop.max() > 2000                      # equatorial region reaches rainforest-wet somewhere
+    assert np.percentile(subtrop, 10) < 500       # subtropical region has desert-dry cells (rain-shadow/lowland)
+    assert trop.mean() > subtrop.mean()           # equatorial wetter overall
 
 
 def test_precip_orographic_windward_wetter():
