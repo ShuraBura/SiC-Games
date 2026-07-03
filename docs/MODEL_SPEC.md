@@ -776,6 +776,19 @@ lifts density past the threshold. The hook is wired; the trigger awaits that mec
 patrilineal/matrilineal — are set by history/biome, NOT reached by the density ladder.) **C (full pair-bonding)
 deferred.**
 
+**STORABILITY-GATED MORPH (built 2026-07-03; R-46) — the biome differentiator.** On the canonical footprint=1
+substrate the morph was "complex everywhere" (R-45): no band is ever packed (density ~0.011 ≪ 0.091 → `stratified`
+unreachable without settlement) and `surplus_frac ≥ 0.5` in every biome (storage was NOT biome-gated — the canonical
+`storage_temp_threshold_c=100°C` + constant-14°C placeholder temperature fired storage everywhere). Fix:
+`storage_seasonality_gated` gates the overwintering store on the cell's **biome SEASONAL AMPLITUDE** (the
+Testart/Binford storability signal — aseasonal biome → no glut→lean cycle → no storage → immediate-return
+egalitarian; seasonal biome → storable glut → surplus → complex) via `climate.py::BIOME_SEASONAL_AMP_BY_CODE`
+(forest 0.05 / savanna 0.40 / grass 0.60 LIT; desert 0.45 / mountain 0.55 / wetland 0.30 PROVISIONAL), threshold
+0.25. **Result:** aseasonal FOREST flips 88% complex → **99% egalitarian** while seasonal biomes stay complex (forest
+survives, 588) — the morph now FITS the biome. Ordering is **seasonality-driven, not productivity** (rich-but-
+aseasonal forest = egalitarian like the Mbuti; seasonal biomes complex — the intended Testart pattern). Off ⇒ the
+temperature gate (bit-exact). Canonicalization pending sign-off; `stratified` still awaits settlement density.
+
 ---
 
 ### §4.5.11 Storage — the delayed-return economy (built 2026-06-25; the morph trigger's first piece)

@@ -135,19 +135,30 @@ def _biome_world(update, seed=0, steps=60):
     return w
 
 
-def test_default_off_matches_canonical():
-    """All three fix flags default OFF ⇒ identical trajectory to the plain canonical config (bit-exact)."""
+def test_canonical_footprint_is_stable():
+    """CANONICAL 2026-07-03: realistic_forager_demog carries comove_footprint=1 (R-44). Explicitly re-setting it
+    to the canonical value (+ the other central-place flags at their OFF defaults) reproduces the plain canonical
+    config exactly — the canonical central-place path is stable/bit-exact."""
     from collections import Counter
     w0 = _biome_world({})
-    w1 = _biome_world(dict(comove_anticipate=False, comove_footprint=0, comove_provision_exclude=False))
+    w1 = _biome_world(dict(comove_footprint=1, comove_anticipate=False, comove_provision_exclude=False))
     assert len(w0.agent_list) == len(w1.agent_list)
     assert Counter(a.pos for a in w0.agent_list) == Counter(a.pos for a in w1.agent_list)
+
+
+def test_footprint_zero_differs_from_canonical():
+    """Sanity: comove_footprint=0 (legacy exact-snap) is NOT the canonical config anymore (footprint=1) — the flag
+    is live, so turning it off changes the trajectory."""
+    from collections import Counter
+    canon = _biome_world({})
+    snap = _biome_world(dict(comove_footprint=0))
+    assert Counter(a.pos for a in canon.agent_list) != Counter(a.pos for a in snap.agent_list)
 
 
 def test_footprint_lowers_max_cell_occupancy():
     """Footprint>0 disperses families: the busiest cell holds FEWER agents than under exact-snap co-movement."""
     from collections import Counter
-    snap = _biome_world({})
+    snap = _biome_world(dict(comove_footprint=0))   # explicit exact-snap (canonical is now footprint=1)
     fp = _biome_world(dict(comove_footprint=2))
     if not snap.agent_list or not fp.agent_list:
         return   # (don't assert on an extinct arm; the behavioural claim is covered by run_comove_fixes)

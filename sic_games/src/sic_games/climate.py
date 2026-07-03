@@ -22,6 +22,31 @@ A_SEAS_EARTH = {
     "llanos":  0.60,   # Hiwi — wet-season flood access loss, Liebig (Hurtado & Hill 1987)
 }
 
+# §4.5.10 Storability-gated morph: per-cell seasonal amplitude keyed by BIOME CODE (terrain.BIOME_*). This is the
+# TESTART/BINFORD storability signal — an aseasonal biome (equatorial forest) has no glut→lean cycle → no storage →
+# immediate-return/egalitarian (Mbuti); a strongly-seasonal biome has a storable glut → delayed-return → complexity
+# (NW-Coast-style). forest/savanna/grass(=llanos) are the lit-anchored A_SEAS_EARTH values; wetland/desert/mountain
+# are PROVISIONAL (seasonal-but-not-directly-anchored — flagged, pending supervisor). water=0 (no land storage).
+BIOME_SEASONAL_AMP_BY_CODE = {
+    0: 0.00,   # WATER    — no land storage
+    1: 0.30,   # WETLAND  — seasonal flooding [PROVISIONAL]
+    2: 0.05,   # FOREST   — Aché aseasonal [LIT, A_SEAS_EARTH]
+    3: 0.40,   # SAVANNA  — Hadza wet/dry [LIT, A_SEAS_EARTH]
+    4: 0.60,   # GRASS    — llanos/Hiwi strongly seasonal [LIT, A_SEAS_EARTH llanos]
+    5: 0.45,   # DESERT   — arid, strong seasonal rain/temperature swings [PROVISIONAL]
+    6: 0.55,   # MOUNTAIN — montane strong seasonality / cold winters [PROVISIONAL]
+}
+
+
+def seasonal_amplitude_field(biome):
+    """Per-cell seasonal amplitude [0,1] from a biome-code array (terrain.WorldFields.biome) — the storability
+    signal for the storability-gated morph (§4.5.10). Vectorized lookup over BIOME_SEASONAL_AMP_BY_CODE."""
+    import numpy as np
+    amp = np.zeros(biome.shape, dtype=np.float64)
+    for code, a in BIOME_SEASONAL_AMP_BY_CODE.items():
+        amp[biome == code] = a
+    return amp
+
 
 def obliquity_to_amplitude(epsilon_deg: float, a_earth: float) -> float:
     """Q1-(B): map obliquity to seasonal amplitude by SCALING the empirical Earth amplitude `a_earth` (§4.1.4)

@@ -239,6 +239,12 @@ class DemographyConfig(BaseModel):
     store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
     storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
+    # STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's
+    # biome SEASONAL AMPLITUDE (Testart/Binford storability) instead of the constant-placeholder temperature — an
+    # aseasonal biome (forest, amp 0.05) can't store → egalitarian; a seasonal biome (savanna 0.40, grass 0.60)
+    # stores → surplus → complex. Makes the society MORPH fit the biome. Default OFF ⇒ the temperature gate (bit-exact).
+    storage_seasonality_gated: bool = False
+    storage_seasonality_threshold: float = Field(0.25, ge=0.0, le=1.0)  # storage viable where biome amp ≥ this (above forest 0.05, below savanna 0.40) [PROVISIONAL]
     # ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable
     # surplus for ~1 generation morphs egalitarian_forager → complex_forager → stratified_chiefdom (the cell's κ
     # rises → unequal store/meat sharing); it DE-morphs back when the surplus/density collapse (hysteresis via the

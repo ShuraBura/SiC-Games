@@ -262,6 +262,7 @@ class TerrainWorld(mesa.Model):
         self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
+        self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
         self._band_repulsion: dict[int, float] = {}            # Stage 1b: per-band size-repulsion (scalar stress; diagnostic)
@@ -622,6 +623,13 @@ class TerrainWorld(mesa.Model):
         store_cap_mult = demog.store_capacity_reserves if store_on else 0.0
         store_temp_thr = demog.storage_temp_threshold_c if store_on else 0.0
         store_decay = demog.storage_decay if store_on else 0.0
+        # Storability-gated morph (§4.5.10): gate the store on biome SEASONAL AMPLITUDE (Testart storability) rather
+        # than the constant-placeholder temperature. Cache the per-cell amplitude field once.
+        store_seas_gated = store_on and getattr(demog, "storage_seasonality_gated", False)
+        store_seas_thr = demog.storage_seasonality_threshold if store_seas_gated else 0.0
+        if store_seas_gated and self._seasonal_amp is None:
+            from sic_games.climate import seasonal_amplitude_field
+            self._seasonal_amp = seasonal_amplitude_field(self._fields.biome)
         if store_decay > 0.0 and self._cell_store:
             # S.3 spoilage/maintenance: every granary loses a fraction each step (incl. abandoned ones → no
             # stale free stores for wanderers, RT free-rider); prune the negligible remainder.
@@ -702,7 +710,10 @@ class TerrainWorld(mesa.Model):
                 n_f = sum(1 for a in occ if a.sex == "female" and a.age >= adult)
                 male_credit = (meat_pool / n_m) if n_m else 0.0
                 female_credit = ((1.0 - meat_frac) * S / n_f) if n_f else 0.0
-            in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)
+            if store_seas_gated:
+                in_owz = self._seasonal_amp[cy, cx] >= store_seas_thr   # storability: seasonal biome → store (Testart)
+            else:
+                in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)
             cell_contrib = 0.0
             for a, sh, m in zip(occ, shares, msh):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)

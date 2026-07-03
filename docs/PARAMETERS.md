@@ -369,7 +369,8 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | Name | Value | Status | Grounding / history |
 |------|-------|--------|---------------------|
 | enable_storage / storable_fraction / store_capacity_reserves | False / **0.5** / **3.0** | OPT-IN | collective band granary in the overwintering zone (Binford ET 15.25°C). §4.5.11 |
-| storage_temp_threshold_c | **15.25** °C | LIT-ANCHORED | Binford 2001 ET storage threshold. §4.5.11 |
+| storage_temp_threshold_c | **15.25** °C | LIT-ANCHORED (but INERT — temperature is a constant-14°C placeholder; realistic config sets 100 = storage-everywhere) | Binford 2001 ET storage threshold. §4.5.11 |
+| storage_seasonality_gated / storage_seasonality_threshold | **False / 0.25** (candidate CANONICAL, pending sign-off) | OPT-IN | R-46: gate the store on biome SEASONAL AMPLITUDE (Testart storability) instead of the placeholder temperature → aseasonal forest (amp 0.05) egalitarian, seasonal biomes complex. Amplitudes `climate.BIOME_SEASONAL_AMP_BY_CODE` (forest 0.05/savanna 0.40/grass 0.60 LIT; desert 0.45/mountain 0.55/wetland 0.30 PROVISIONAL). threshold 0.25 splits forest from seasonal. Off ⇒ temperature gate, bit-exact. §4.5.10 |
 | storage_decay | **0.05** (S.3) | OPT-IN | per-step granary spoilage. §4.5.11 |
 | enable_morph / morph_settle_steps | False / **60–300** | OPT-IN | society morph (egal→complex→stratified) hysteresis timer (~1 gen). §4.5.11 |
 | ~~storage_tether_reserves~~ | **RETIRED 2026-06-29** | RETIRED | band-aid for pre-bands max-occ-2; morph now fires from emergent bands alone (run_3h). §4.5.11/§4.8.5 |
