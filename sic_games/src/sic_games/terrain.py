@@ -280,6 +280,21 @@ P_ORO_MIN        = 0.5        # clamp on the orographic multiplier (leeward shad
 P_ORO_MAX        = 1.8        # clamp on the orographic multiplier (windward enhancement cap)
 P_MARITIME_GAIN  = 0.3        # moisture supply: near-water (wateracc) cells wetter
 P_ORO_WIND_DX    = 1          # prevailing wind = +x (westerlies): upwind neighbour is x-1
+# ── Economy-from-Climate C3 (mode="climate"): the MIAMI MODEL — NPP from temperature & precipitation ──
+# Lieth 1972/1975 (PDF filed; eqs 12-1/12-2, VERIFIED). NPP = min(temperature-limited, precipitation-limited),
+# g dry-matter/m²/yr. Coefficients are the published least-squares fit (50 sites / 5 continents). LITERATURE.md.
+MIAMI_MAX = 3000.0            # asymptotic NPP ceiling of both limbs (g/m²/yr)
+MIAMI_T_A = 1.315            # temperature-limb: NPP_T = MAX / (1 + exp(A − B·T)), T in °C
+MIAMI_T_B = 0.119
+MIAMI_P_C = 0.000664          # precip-limb: NPP_P = MAX · (1 − exp(−C·P)), P in mm/yr
+
+
+def miami_npp(temperature_c, precip_mm):
+    """Miami model NPP (Lieth 1972/1975), g dry-matter/m²/yr: the MINIMUM of a temperature-limited and a
+    precipitation-limited saturating curve — cold OR dry both cap productivity. Vectorized (arrays or scalars)."""
+    npp_t = MIAMI_MAX / (1.0 + np.exp(MIAMI_T_A - MIAMI_T_B * np.asarray(temperature_c, dtype=float)))
+    npp_p = MIAMI_MAX * (1.0 - np.exp(-MIAMI_P_C * np.asarray(precip_mm, dtype=float)))
+    return np.minimum(npp_t, npp_p)
 GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
 GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
@@ -592,10 +607,35 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     # ── Effective moisture ─────────────────────────────────────────────
     wet = np.clip((0.45 * moist + 0.55 * wateracc) * (1 - aridK * 0.92), 0.0, 1.0)
 
+    # ── Climate fields (C1 temperature / C2 precipitation) — computed BEFORE NPP so Miami (C3) can read them ──
+    lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # 0 at equator → 1 at the pole edge
+    temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
+    temp_seas_amp = np.zeros((N, N), dtype=np.float64)
+    precip_mm = np.zeros((N, N), dtype=np.float64)
+    if mode == "climate":
+        # C1: annual-mean T = latitude − elevation lapse (6.5 °C/km); seasonal half-amplitude ∝ |latitude|, maritime-damped.
+        temperature = temp_lat - LAPSE_C_PER_KM * (elev * reliefAmpM) / 1000.0
+        temp_seas_amp = TEMP_SEAS_AMP_MAX * lat_frac * np.ones((1, N)) * (1.0 - MARITIME_DAMP * wateracc)
+        # C2: annual precip = Hadley/ITCZ latitude bands × orographic rain-shadow × maritime supply × noise texture.
+        itcz = P_ITCZ_MM * np.exp(-(lat_frac / P_ITCZ_WIDTH) ** 2)
+        midlat = P_MIDLAT_MM * np.exp(-((lat_frac - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
+        p_band = (P_BASE_MM + itcz + midlat) * np.ones((1, N))
+        oro = np.clip(1.0 + P_ORO_GAIN * (elev - np.roll(elev, P_ORO_WIND_DX, axis=1)), P_ORO_MIN, P_ORO_MAX)
+        precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
+        precip_mm[isWater == 1] = 0.0
+    else:
+        temperature = temp_lat
+
     # ── NPP ────────────────────────────────────────────────────────────
-    elev_pen = 1.0 - np.clip((elev - 0.6) / 0.4, 0.0, None)
-    slope_pen = 1.0 - slope * 0.7
-    npp = np.where(isWater, 0.0, np.maximum(0.0, wet * elev_pen * slope_pen))
+    # legacy: noise-moisture × terrain penalties. climate (C3): MIAMI(T,P) g/m²/yr, normalised by NPP_GM2_SCALE so
+    # the downstream `npp_gm2 = npp × NPP_GM2_SCALE` recovers the real Miami g/m²/yr (Miami ≤ 3000 < 3400 ⇒ npp ≤ 0.88).
+    # Elevation enters climate-NPP through TEMPERATURE (cold highlands → low NPP_T), so no separate elev penalty.
+    if mode == "climate":
+        npp = np.where(isWater, 0.0, miami_npp(temperature, precip_mm) / NPP_GM2_SCALE)
+    else:
+        elev_pen = 1.0 - np.clip((elev - 0.6) / 0.4, 0.0, None)
+        slope_pen = 1.0 - slope * 0.7
+        npp = np.where(isWater, 0.0, np.maximum(0.0, wet * elev_pen * slope_pen))
 
     # ── Forestness ─────────────────────────────────────────────────────
     forestness = np.where(isWater, 0.0,
@@ -690,36 +730,9 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     nc[:, 1:, 2]  = cost[:, :-1]   # west:  target (y, x-1)
     nc[:, :-1, 3] = cost[:, 1:]    # east:  target (y, x+1)
 
-    # ── Climate: temperature field + GRASS sub-biome tag ─────
-    # legacy: latitudinal gradient only (row 0 warm → row N-1 cold), area-mean = MEAN_GLOBAL_TEMP_C.
-    lat_frac = (np.arange(N, dtype=np.float64) / (N - 1)).reshape(N, 1)        # 0 at equator → 1 at the pole edge
-    temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))
-    temp_seas_amp = np.zeros((N, N), dtype=np.float64)
-    if mode == "climate":
-        # Economy-from-Climate C1: annual-mean T = latitude − elevation lapse (cool the highlands). elev_m =
-        # elev × reliefAmpM; lapse = 6.5 °C/km. (Maritime moderation acts on the AMPLITUDE below; its mean effect
-        # is second-order and left out at C1.) Seasonal HALF-amplitude rises with |latitude| (continentality proxy)
-        # and is DAMPED near water (maritime buffering) — the monthly wave itself is applied by the climate layer.
-        elev_m = elev * reliefAmpM
-        temperature = temp_lat - LAPSE_C_PER_KM * elev_m / 1000.0
-        temp_seas_amp = TEMP_SEAS_AMP_MAX * lat_frac * np.ones((1, N)) * (1.0 - MARITIME_DAMP * wateracc)
-    else:
-        temperature = temp_lat
-    # Economy-from-Climate C2: structured annual precipitation (mm/yr) — legacy leaves it 0 (unused).
-    precip_mm = np.zeros((N, N), dtype=np.float64)
-    if mode == "climate":
-        # Hadley/ITCZ latitude bands: equatorial wet peak (ITCZ) + mid-latitude storm-track peak, over a dry base;
-        # the gap between them is the subtropical (~30°) desert belt, the tail beyond is the subpolar dry edge.
-        itcz = P_ITCZ_MM * np.exp(-(lat_frac / P_ITCZ_WIDTH) ** 2)
-        midlat = P_MIDLAT_MM * np.exp(-((lat_frac - P_MIDLAT_CENTER) / P_MIDLAT_WIDTH) ** 2)
-        p_band = (P_BASE_MM + itcz + midlat) * np.ones((1, N))                    # (N,N)
-        # Orographic rain-shadow: prevailing westerly (+x) → windward = rising eastward (wet), lee = descending (dry).
-        elev_upwind = np.roll(elev, P_ORO_WIND_DX, axis=1)                        # cell x sees its upwind (x-1) neighbour
-        oro = np.clip(1.0 + P_ORO_GAIN * (elev - elev_upwind), P_ORO_MIN, P_ORO_MAX)
-        maritime = 1.0 + P_MARITIME_GAIN * wateracc                              # moisture supply near water
-        texture = 0.7 + 0.6 * moist                                             # retained noise (organic variation, RT-7)
-        precip_mm = np.clip(p_band * oro * maritime * texture, 0.0, None)
-        precip_mm[isWater == 1] = 0.0                                            # precip undefined on open water
+    # (Climate temperature + precipitation fields are computed EARLIER — before NPP — so Miami NPP can read them
+    #  under mode="climate"; see the "Climate fields (C1/C2)" block above the NPP section. `temperature`,
+    #  `temp_seas_amp`, `precip_mm` are already in scope here.)
     humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
     # grass_subtype: split BIOME_GRASS by the tropical isotherm (warm → llanos, cool → steppe); 0 elsewhere.
     grass_subtype = np.zeros((N, N), dtype=np.uint8)

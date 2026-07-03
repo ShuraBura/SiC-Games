@@ -6,7 +6,7 @@ elevation lapse (montane cools) + a latitude-rising, maritime-damped seasonal ha
 """
 import numpy as np
 
-from sic_games.terrain import generate_world, world_lottery, LAPSE_C_PER_KM, N
+from sic_games.terrain import generate_world, world_lottery, LAPSE_C_PER_KM, N, miami_npp, NPP_GM2_SCALE
 
 
 def _k(arch="montane", seed=0):
@@ -108,3 +108,46 @@ def test_precip_orographic_windward_wetter():
     p = C.precip_mm[band]
     if grad.std() > 1e-3:
         assert np.corrcoef(grad, p)[0, 1] > 0.0      # windward (rising eastward) wetter than lee
+
+
+# --------------------------------------------------------------------------- C3 Miami NPP
+
+def test_legacy_npp_bit_exact():
+    """The C3 reorder must leave legacy NPP/npp_gm2 byte-identical."""
+    k = _k("mixed")
+    a = generate_world(k)
+    b = generate_world(k, mode="legacy")
+    assert np.array_equal(a.npp, b.npp)
+    assert np.array_equal(a.npp_gm2, b.npp_gm2)
+
+
+def test_miami_helper_cold_or_dry_limits():
+    """Miami = min(temp-limb, precip-limb): cold OR dry both cap NPP; warm+wet is high; monotone in each."""
+    assert miami_npp(-5, 2000) < 500          # cold-limited (tundra) despite ample rain
+    assert miami_npp(28, 150) < 500           # precip-limited (desert) despite heat
+    assert miami_npp(28, 2500) > 2000         # warm + wet → rainforest
+    assert miami_npp(15, 1200) > 1000         # temperate forest
+    assert miami_npp(20, 800) > miami_npp(20, 300)     # monotone up in precip
+    assert miami_npp(20, 1500) > miami_npp(2, 1500)    # monotone up in temperature (in the growth range)
+
+
+def test_climate_npp_is_miami_of_TP():
+    """Under climate mode npp_gm2 == Miami(temperature, precip) on land (0 on water)."""
+    C = generate_world(_k("montane"), mode="climate")
+    land = (C.isWater == 0)
+    expect = miami_npp(C.temperature, C.precip_mm)
+    assert np.allclose(C.npp_gm2[land], expect[land], rtol=1e-9, atol=1e-6)
+    assert np.all(C.npp_gm2[C.isWater == 1] == 0.0)
+    # npp (normalised) = npp_gm2 / NPP_GM2_SCALE and stays ≤ ~0.88 (Miami ≤ 3000 < 3400)
+    assert np.allclose(C.npp[land], C.npp_gm2[land] / NPP_GM2_SCALE)
+    assert C.npp[land].max() <= 3000.0 / NPP_GM2_SCALE + 1e-9
+
+
+def test_climate_npp_cold_highlands_low():
+    """Cold high-elevation cells (low NPP_T) are low-NPP even if wet — the elevation effect enters via temperature."""
+    C = generate_world(_k("montane"), mode="climate")
+    land = (C.isWater == 0)
+    cold = land & (C.temperature < 5.0)
+    warm = land & (C.temperature > 15.0)
+    if cold.any() and warm.any():
+        assert C.npp_gm2[cold].mean() < C.npp_gm2[warm].mean()
