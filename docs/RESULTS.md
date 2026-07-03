@@ -452,6 +452,22 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 
 **Verdict:** **FOOTPRINT (dispersed camp) is the load-bearing fix** — footprint=2 → savanna 8→**378** (82% of the OFF reference) while the forest control stays healthy (145→451). It works because it physically spreads the family over adjacent cells (the "camp"), killing the one-cell over-subscription — exactly the central-place mechanism. **(i) anticipation alone barely helps** (8→4): the mother picks emptier ground but the family still lands on her single cell, so the spike persists. **(iii) provision-exclusion helps only partially** (8→22): only juveniles are excluded; the co-locating husband still over-subscribes. **(i)+(ii) combined** ≈ footprint=2 (savanna 393). The residual gap to OFF is the pair-bond-vs-daily-mate-gate fertility difference (R-41), NOT the co-location bug. Note footprint also lifts the FOREST (co-movement over-subscription was suppressing it too, 145 vs OFF 808 — not fatally). **Mechanism is ablatable/default-OFF; canonicalizing footprint (+ its radius) is a science/calibration change pending supervisor sign-off.** MODEL_SPEC §4.8.20.
 
+## R-43 — Full biome table: UNIFORM footprint=1 wins everywhere; the NPP-scaled footprint is falsified (2026-07-03)
+
+**Origin:** the cell-size design question (supervisor: "10 km cell = forest monthly range; sparser biomes need a larger range — coarser cells per biome, or footprint?") + the full biome→society validation across ALL archetypes (`outputs/biome_society_20260702/run_comove_biome_table.py`). Blueprint `…_CoMovementCentralPlace_Scoping.md` §3.
+
+**Design answer (cell size):** keep the **uniform** lattice + behavioural footprint, NOT coarser per-biome cells: variable cell sizes break the uniform grid (movement/neighbourhood/diffusion assume it) and can't handle gradient/mixed worlds; and the Tallavaara CC-1 **already** biome-scales carrying capacity per unit area, so bigger poor-biome cells would double-count it. The footprint IS the biome-scaled monthly range expressed on a uniform grid.
+
+**But the "principled" NPP-scaled footprint (k∝1/NPP: forest≈0 tight, savanna≈2–3) is FALSIFIED empirically.** Full table (eq_pop, 3 seeds × 900 steps; OFF = no-co-movement ceiling):
+| archetype | exact-snap | **footprint=1** | footprint-scaled | OFF |
+|---|---|---|---|---|
+| forest | 145 | 426 | 192 | 808 |
+| savanna | 8 | **243** | 29 | 461 |
+| desert | 0 (0/3) | **64** (1/3) | 2 | 16 |
+| montane | 14 | **276** | 43 | 360 |
+| mixed | 18 | **519** | 105 | 697 |
+**Uniform footprint=1 recovers the collapse in EVERY biome; the scaled form barely helps.** Root cause (verified): agents **self-select onto local NPP maxima** — in a savanna world (mean NPP 474) occupied cells have **median NPP 912** (near the forest ref 900), so the scaled rule reads "rich" and returns **k=0 for 75% of families** → tight camp → collapse. The scaled footprint keys on the agent's *chosen rich spot*, not the biome's sparseness, so it can't detect marginality. Uniform footprint works because it's unconditional. (A world-mean-NPP-keyed scaling could in principle fix this but adds a world statistic + fails on mixed worlds; not pursued — uniform footprint=1 already works robustly and does well in the forest, 426, not pathological.) **RECOMMEND canonical `comove_footprint=1`** (a 3×3 = ~900 km² monthly camp on the uniform grid). **Pending before the flip (supervisor gate):** confirm forest E.3 status→RS + the full-stack results survive footprint=1, then set it in `realistic_forager_demog`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

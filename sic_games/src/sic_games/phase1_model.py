@@ -58,7 +58,7 @@ from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConf
 from sic_games.demography import (
     DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
-    mobility_radius,
+    mobility_radius, footprint_radius,
 )
 from sic_games.group import GroupVector, NO_BAND
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
@@ -499,8 +499,11 @@ class TerrainWorld(mesa.Model):
         # scatter near the head rather than exact-snap). Build the per-root follower count once.
         anticipate = fam_move and getattr(self._demog, "comove_anticipate", False)
         footprint = getattr(self._demog, "comove_footprint", 0) if fam_move else 0
+        footprint_scaled = fam_move and getattr(self._demog, "comove_footprint_scaled", False)
+        footprint_on = footprint > 0 or footprint_scaled
+        fp_npp = getattr(self._fields, "npp_gm2", None) if footprint_scaled else None
         followers_by_root: dict = {}
-        if anticipate or footprint > 0:
+        if anticipate:
             for a in self.agent_list:
                 h = self._family_head(a)
                 if h is not None:
@@ -563,11 +566,19 @@ class TerrainWorld(mesa.Model):
                 head = self._family_head(agent)
                 if head is None:
                     continue
-                if footprint > 0:
+                if footprint_on:
                     hx, hy = head.pos
+                    # scaled ⇒ per-family radius from the HEAD's local NPP (biome-scaled monthly range); else fixed
+                    fp = (footprint_radius(float(fp_npp[hy, hx]) if fp_npp is not None else 0.0, self._demog)
+                          if footprint_scaled else footprint)
+                    if fp <= 0:
+                        tgt = head.pos
+                        if agent.pos != tgt:
+                            _shift(agent, agent.pos, tgt)
+                        continue
                     best, best_occ = None, None
-                    for dy in range(-footprint, footprint + 1):
-                        for dx in range(-footprint, footprint + 1):
+                    for dy in range(-fp, fp + 1):
+                        for dx in range(-fp, fp + 1):
                             cx, cy = (hx + dx) % w_grid, (hy + dy) % h_grid
                             if self._fields.isWater[cy, cx] != 0:
                                 continue

@@ -7,6 +7,38 @@ don't stack); (iii) provision-exclusion zeroing a juvenile follower's forage sha
 import numpy as np
 
 from sic_games.substrate import diffusion_select_target
+from sic_games.demography import DemographyConfig, footprint_radius
+
+
+# --------------------------------------------------------------------------- scaled footprint (biome monthly range)
+
+def _fp_cfg(**kw):
+    base = dict(comove_footprint=0, comove_footprint_scaled=True, comove_footprint_max=3,
+                mobility_npp_ref=900.0, mobility_npp_floor=50.0, mobility_exponent=1.0)
+    base.update(kw)
+    return DemographyConfig(**base)
+
+
+def test_footprint_fixed_when_not_scaled():
+    c = DemographyConfig(comove_footprint=2, comove_footprint_scaled=False)
+    assert footprint_radius(100.0, c) == 2 and footprint_radius(2000.0, c) == 2
+
+
+def test_footprint_scaled_forest_tight_savanna_wide():
+    c = _fp_cfg()
+    assert footprint_radius(900.0, c) == 0      # forest (NPP≥ref) → tight camp = 1 cell
+    assert footprint_radius(2000.0, c) == 0     # richer still → 0
+    assert footprint_radius(450.0, c) == 1      # 900/450=2 → round-1 = 1
+    assert footprint_radius(300.0, c) == 2      # 900/300=3 → 2
+    assert footprint_radius(50.0, c) == 3       # capped at footprint_max
+
+
+def test_footprint_scaled_monotone_and_capped():
+    c = _fp_cfg(comove_footprint_max=5)
+    xs = [50, 150, 300, 600, 900, 1500]
+    ks = [footprint_radius(x, c) for x in xs]
+    assert all(ks[i] >= ks[i + 1] for i in range(len(ks) - 1))
+    assert min(ks) == 0 and max(ks) <= 5
 
 
 class _Field:

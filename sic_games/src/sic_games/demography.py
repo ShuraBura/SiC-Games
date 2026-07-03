@@ -403,6 +403,12 @@ class DemographyConfig(BaseModel):
     # exact-snap co-movement); at most one should be canonicalized after the comparison. Need enable_pair_bonds.
     comove_anticipate: bool = False        # (i) the root's move utility counts its followers: per-capita on S/(n+family_size), so she picks emptier/richer ground
     comove_footprint: int = Field(0, ge=0)  # (ii) followers scatter to lowest-occupancy cells within this Chebyshev radius of the head (0 = exact snap); a dispersed camp
+    # (ii-scaled) the footprint = the biome-scaled MONTHLY RANGE on the uniform grid: the 10 km cell = forest
+    # monthly range → forest k≈0 (tight camp), sparser biomes k grows ∝1/NPP. Honors the cell-size calibration
+    # without variable cells (which would break the lattice + double-count the Tallavaara capacity). Reuses the
+    # mobility_* scaling shape; overrides the fixed comove_footprint when True.
+    comove_footprint_scaled: bool = False
+    comove_footprint_max: int = Field(3, ge=0)   # cap on the scaled footprint radius
     comove_provision_exclude: bool = False  # (iii) JUVENILE followers (age<forage_age_min) take NO forage share (central-place: children are provisioned, not self-extracting) → don't dilute the mother's cell
     # F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew,
     # descent, heritability, paternal investment) instead of the global config. Decision (so it does NOT override
@@ -598,6 +604,19 @@ def mobility_radius(local_npp: float, cfg) -> int:
     ratio = cfg.mobility_npp_ref / denom
     r = base * (ratio ** cfg.mobility_exponent)
     return int(max(base, min(cfg.mobility_max_radius, round(r))))
+
+
+def footprint_radius(local_npp: float, cfg) -> int:
+    """Central-place family FOOTPRINT radius (cells) = the biome-scaled monthly range on the uniform grid.
+    Fixed `comove_footprint` unless `comove_footprint_scaled`, in which case k ∝ 1/NPP (reusing the mobility
+    scaling shape): k = clamp(round((npp_ref/max(npp,floor))**exp) − 1, 0, footprint_max). At NPP≥ref (forest)
+    → 0 (tight camp = 1 cell = the calibrated forest monthly range); sparser biomes → larger camp."""
+    if not getattr(cfg, "comove_footprint_scaled", False):
+        return cfg.comove_footprint
+    denom = max(local_npp, cfg.mobility_npp_floor)
+    ratio = cfg.mobility_npp_ref / denom
+    k = round(ratio ** cfg.mobility_exponent) - 1
+    return int(max(0, min(cfg.comove_footprint_max, k)))
 
 
 def society_knobs(name: str) -> tuple[float, dict]:
