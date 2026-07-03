@@ -218,6 +218,39 @@ def test_world_lottery_climate_terrain_x_climate():
     assert dominant("flat", "subtropical") == BIOME_DESERT     # desert world (aridity + Hadley descent)
 
 
+def test_c6_river_source_temperature():
+    """C6: river water temperature carries the cold of its montane HEADWATER (snowmelt), so a montane world's rivers
+    read COLDER than the local air, while a flat world's rivers ≈ local air. Legacy water_temp is 0."""
+    from sic_games.terrain import world_lottery_climate
+    # legacy: water_temp field is zero (unused)
+    assert np.all(generate_world(_k("montane")).water_temp == 0.0)
+    mtn = generate_world(world_lottery_climate(0, terrain="mountainous", climate="temperate"), mode="climate")
+    flat = generate_world(world_lottery_climate(0, terrain="flat", climate="temperate"), mode="climate")
+    for F, cold_gap in ((mtn, 1.5), (flat, None)):
+        riv = F.isRiver.astype(bool)
+        if not riv.any():
+            continue
+        gap = F.temperature[riv].mean() - F.water_temp[riv].mean()      # air − water (positive = water colder)
+        if cold_gap is not None:
+            assert gap > cold_gap                                        # montane rivers markedly colder than air
+        else:
+            assert abs(gap) < 1.0                                        # flat rivers ≈ air temp
+    # water is never warmer than air (headwater cooling only cools)
+    assert np.all(mtn.water_temp <= mtn.temperature + 1e-9)
+
+
+def test_c6_montane_rivers_more_salmon_capable_than_air_suggests():
+    """A tropical MONTANE world has cold (salmon-capable, <16 °C) rivers via headwater sourcing, even though its air
+    is warm — so water-temp gives MORE cold rivers than air-temp would."""
+    from sic_games.terrain import world_lottery_climate
+    F = generate_world(world_lottery_climate(0, terrain="mountainous", climate="tropical"), mode="climate")
+    riv = F.isRiver.astype(bool)
+    if riv.any():
+        by_air = (F.temperature[riv] < 16.0).mean()
+        by_water = (F.water_temp[riv] < 16.0).mean()
+        assert by_water > by_air + 0.1                                   # headwater sourcing opens up cold-water rivers
+
+
 def test_world_lottery_climate_aridity_dries_precip():
     """The climate_aridity axis scales precip down independent of latitude (continental/leeward dryness)."""
     from sic_games.terrain import world_lottery_climate

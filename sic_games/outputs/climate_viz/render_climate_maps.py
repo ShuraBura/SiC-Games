@@ -38,6 +38,7 @@ LAYERS = [
     ("precip",      lambda F: _mask(F, F.precip_mm),   "YlGnBu", "precip (mm/yr)",     (0, 3000)),
     ("npp",         lambda F: _mask(F, F.npp_gm2),     "YlGn",   "NPP Miami (g/m²/yr)",(0, 2500)),
     ("biome",       lambda F: F.biome.astype(float),   None,     "biome",              None),
+    ("river_temp",  lambda F: _river_only(F),          "RdBu_r", "river water T (°C)",  None),
     ("wateracc",    lambda F: F.wateracc,    "Blues",   "water access [0-1]",         (0, 1)),
 ]
 LATS = [(0.12, "tropical"), (0.32, "subtropical"), (0.52, "temperate"), (0.82, "subpolar")]
@@ -47,6 +48,14 @@ def _mask(F, fld):
     """NaN out open water so it renders blank (colormap 'bad' colour)."""
     out = fld.astype(float).copy()
     out[F.isWater == 1] = np.nan
+    return out
+
+
+def _river_only(F):
+    """Show river water temperature (C6) only on river cells; NaN elsewhere (so montane-fed cold rivers stand out)."""
+    out = np.full(F.water_temp.shape, np.nan)
+    riv = (F.isRiver == 1)
+    out[riv] = F.water_temp[riv]
     return out
 
 

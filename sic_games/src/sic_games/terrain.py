@@ -274,6 +274,10 @@ TEMP_SEAS_AMP_MAX = 15.0      # max half-amplitude of the seasonal T cycle (°C)
                               # (→ ±15 °C = ~30 °C annual range, cf. continental temperate/boreal interiors); PROVISIONAL
 MARITIME_DAMP    = 0.6        # fraction by which coastal/near-water cells (high wateracc) DAMP the seasonal amplitude
                               # (maritime moderation: oceans buffer the annual swing); PROVISIONAL
+# C6 river-source temperature: a river carries the cold of its montane HEADWATER (snowmelt), not the local air —
+# so a valley river can be cold even where the air is warm (the salmon-fishery enabler; lit: river T by source).
+# T_river = air_T − RIVER_COLD_RETENTION · lapse · (headwater_elev − local_elev); headwater = max upstream elevation.
+RIVER_COLD_RETENTION = 0.6    # fraction of the headwater-elevation cooling a river retains by the time it reaches a cell
 # ── Economy-from-Climate C2 (mode="climate"): structured annual PRECIPITATION (mm/yr) — Hadley/ITCZ bands +
 #    orographic rain-shadow + maritime supply + noise texture. All PROVISIONAL (sign-off). Ranges tuned so the
 #    latitudinal profile lands in Earth-like biome bins: equatorial ITCZ ~2600 mm (rainforest), subtropical ~30°
@@ -395,6 +399,7 @@ class WorldFields:
     # climate layer). Under mode="legacy" temperature is the latitudinal placeholder and temp_seas_amp is 0.
     temp_seas_amp: np.ndarray = None  # (N,N) float64 °C seasonal half-amplitude (0 = legacy/aseasonal)
     precip_mm:     np.ndarray = None  # (N,N) float64 annual precipitation mm/yr (C2; 0 in legacy mode)
+    water_temp:    np.ndarray = None  # (N,N) float64 °C river/surface-water temp (C6, headwater-sourced; 0 in legacy)
     # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
     grass_subtype: np.ndarray = None  # (N,N) uint8
 
@@ -636,8 +641,9 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     order = land_idx[np.argsort(-elev_flat[land_idx], kind='stable')]
 
     flow = np.ones(N * N, dtype=np.float64)
+    src_elev = elev_flat.copy()          # C6: max upstream (headwater) elevation draining through each cell
     D8 = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
-    for idx in order:
+    for idx in order:                    # descending elevation ⇒ a cell's upstream contributors are processed first
         x_c = int(idx % N)
         y_c = int(idx // N)
         lowest_j = -1
@@ -652,6 +658,8 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
                     lowest_j = j
         if lowest_j >= 0:
             flow[lowest_j] += flow[idx]
+            if src_elev[idx] > src_elev[lowest_j]:
+                src_elev[lowest_j] = src_elev[idx]      # carry the headwater elevation downstream
 
     land_flow = flow[land_idx]
     fmax = float(land_flow.max()) if len(land_flow) > 0 else 1.0
@@ -708,6 +716,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     temp_lat = (TEMP_EQUATOR_C + (TEMP_HIGHLAT_C - TEMP_EQUATOR_C) * lat_frac) * np.ones((1, N))   # legacy full transect
     temp_seas_amp = np.zeros((N, N), dtype=np.float64)
     precip_mm = np.zeros((N, N), dtype=np.float64)
+    water_temp = np.zeros((N, N), dtype=np.float64)      # C6 river/surface-water temperature (0 in legacy mode)
     if mode == "climate":
         # REGIONAL climate: the grid is a ~9°-wide swath centred on `climate_latitude` (0=equator … 1=subpolar). The
         # WITHIN-GRID latitudinal gradient is therefore MODEST (~REGIONAL_SPAN_FRAC of the full 26 °C ≈ 3.6 °C); the
@@ -736,6 +745,10 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         oro = np.clip(uplift * shadow, P_ORO_MIN, P_ORO_MAX)
         precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
         precip_mm[isWater == 1] = 0.0
+        # C6: river/surface-water temperature carries the cold of its montane HEADWATER (snowmelt), not the local
+        # air — a valley river can be cold where the air is warm. headwater = max upstream elevation (src_elev).
+        water_temp = temperature - RIVER_COLD_RETENTION * LAPSE_C_PER_KM \
+            * (src_elev.reshape(N, N) - elev) * reliefAmpM / 1000.0
     else:
         temperature = temp_lat
 
@@ -870,7 +883,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,
                 forage, game, cost, nc, risk, biome, npp, forestness, dist,
                 npp_gm2, is_shore, forage_kcal, game_kcal, game_mobility, temperature, humidity, grass_subtype,
-                temp_seas_amp, precip_mm):
+                temp_seas_amp, precip_mm, water_temp):
         arr.flags.writeable = False
 
     return WorldFields(
@@ -881,7 +894,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         dist=dist, reliefAmpM=reliefAmpM, SEA_LEVEL_M=SEA_LEVEL_M,
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
-        grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp, precip_mm=precip_mm,
+        grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp, precip_mm=precip_mm, water_temp=water_temp,
     )
 
 
