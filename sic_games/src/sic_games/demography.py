@@ -245,16 +245,16 @@ class DemographyConfig(BaseModel):
     # stores → surplus → complex. Makes the society MORPH fit the biome. Default OFF ⇒ the temperature gate (bit-exact).
     storage_seasonality_gated: bool = False
     storage_seasonality_threshold: float = Field(0.25, ge=0.0, le=1.0)  # storage viable where biome amp ≥ this (above forest 0.05, below savanna 0.40) [PROVISIONAL]
-    # AQUATIC-gated MORPH (blueprint …_StorabilityGatedMorph v2; R-46): the ANTHROPOLOGICALLY CORRECT driver of
-    # forager complexity is a dense STORABLE AQUATIC resource (NW-Coast salmon, shellfish, sea-mammals — Testart,
-    # Kelly, Ames), NOT terrestrial seasonality. Storage stays a broad survival BUFFER (marginal biomes still cache
-    # for the lean season → survive); but COMPLEXITY (surplus→complex morph) requires the band's mean WATER ACCESS
-    # (wateracc: coast/river/lake proximity) ≥ threshold → terrestrial interiors (forest/savanna/desert) stay
-    # EGALITARIAN (Mbuti/Hadza/Ju), only aquatic-rich bands morph COMPLEX (rare, water-linked — the real pattern).
-    # SEPARATES storage-as-survival from storage-as-complexity (fixes the desert extinction the storage-gate caused).
-    # Default OFF ⇒ ungated morph (bit-exact).
+    # SEASONAL-AQUATIC-GLUT MORPH (blueprint …_StorabilityGatedMorph v3; R-46/R-47): the ANTHROPOLOGICALLY CORRECT
+    # driver of forager complexity is a dense STORABLE resource = a SEASONAL AQUATIC GLUT — the anadromous run /
+    # seasonal fishery that must be stored through the lean season (NW-Coast salmon; Testart/Kelly/Ames). Storage
+    # stays a broad survival BUFFER (marginal biomes cache → survive); COMPLEXITY requires the band's
+    # mean(wateracc) × mean(seasonal_amplitude) ≥ threshold. So an ASEASONAL watery forest (Mbuti) stays EGALITARIAN
+    # despite rivers, a DRY seasonal desert (Ju) stays egalitarian for lack of water; only SEASONAL-WATERY bands
+    # (montane salmon rivers) morph COMPLEX. SEPARATES survival-storage from complexity. Default OFF ⇒ bit-exact.
     morph_aquatic_gated: bool = False
-    morph_aquatic_threshold: float = Field(0.6, ge=0.0, le=1.0)  # a band morphs complex only where mean wateracc ≥ this [PROVISIONAL]
+    morph_aquatic_threshold: float = Field(0.15, ge=0.0, le=1.0)  # complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL]
+    morph_npp_floor: float = Field(500.0, ge=0.0)  # AND a PRODUCTIVE setting: mean(npp_gm2) ≥ this — the true-desert(≈400) vs river-desert/Nile(≳550) distinguisher [PROVISIONAL, from R-47 occupied-cell data]
     # ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable
     # surplus for ~1 generation morphs egalitarian_forager → complex_forager → stratified_chiefdom (the cell's κ
     # rises → unequal store/meat sharing); it DE-morphs back when the surplus/density collapse (hysteresis via the

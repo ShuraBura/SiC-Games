@@ -627,17 +627,19 @@ class TerrainWorld(mesa.Model):
         # than the constant-placeholder temperature. Cache the per-cell amplitude field once.
         store_seas_gated = store_on and getattr(demog, "storage_seasonality_gated", False)
         store_seas_thr = demog.storage_seasonality_threshold if store_seas_gated else 0.0
-        if store_seas_gated and self._seasonal_amp is None:
-            from sic_games.climate import seasonal_amplitude_field
-            self._seasonal_amp = seasonal_amplitude_field(self._fields.biome)
-        # AQUATIC-gated MORPH (§4.5.10 v2): storage stays a broad survival BUFFER (every forager caches for the lean
-        # season → marginal biomes survive), but COMPLEXITY (surplus→complex) requires a dense STORABLE AQUATIC
-        # resource (wateracc: coast/river/lake — NW-Coast salmon/shellfish; Testart/Ames). A band in the terrestrial
-        # interior stays EGALITARIAN regardless of buffer surplus (Mbuti/Hadza/Ju); only aquatic-rich bands morph
-        # complex. This SEPARATES storage-as-survival from storage-as-complexity (fixes desert: buffered → survives,
-        # non-aquatic → egalitarian). Applied in the per-band morph detector below.
+        # SEASONAL-AQUATIC-GLUT MORPH (§4.5.10 v3): storage stays a broad survival BUFFER (marginal biomes cache for
+        # the lean season → survive), but COMPLEXITY (surplus→complex) requires a dense STORABLE resource = a SEASONAL
+        # AQUATIC GLUT — high water access (coast/river/lake) AND high seasonality (the anadromous run / seasonal
+        # fishery that must be stored through the lean season; NW-Coast salmon — Testart/Ames). glut = mean(wateracc)
+        # × mean(seasonal_amplitude): an ASEASONAL watery forest (Mbuti, amp 0.05) stays EGALITARIAN despite rivers, a
+        # DRY seasonal desert (Ju) stays egalitarian for lack of water; only a SEASONAL-WATERY band (montane salmon
+        # rivers) morphs complex — the real driver. SEPARATES survival-storage from complexity.
         morph_aq_gated = demog is not None and demog.enable_morph and getattr(demog, "morph_aquatic_gated", False)
         morph_aq_thr = demog.morph_aquatic_threshold if morph_aq_gated else 0.0
+        morph_npp_floor = demog.morph_npp_floor if morph_aq_gated else 0.0
+        if (store_seas_gated or morph_aq_gated) and self._seasonal_amp is None:
+            from sic_games.climate import seasonal_amplitude_field
+            self._seasonal_amp = seasonal_amplitude_field(self._fields.biome)
         if store_decay > 0.0 and self._cell_store:
             # S.3 spoilage/maintenance: every granary loses a fraction each step (incl. abandoned ones → no
             # stale free stores for wanderers, RT free-rider); prune the negligible remainder.
@@ -818,10 +820,19 @@ class TerrainWorld(mesa.Model):
                 self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
                 target = society_from_character(density, surplus_frac)
                 if morph_aq_gated and target != "egalitarian_forager":
-                    # complexity requires a dense STORABLE AQUATIC resource: unless the band's mean water access
-                    # clears the threshold (coast/river/lake), it stays EGALITARIAN however much buffer it holds.
-                    mean_wa = sum(self._fields.wateracc[cy, cx] for (cx, cy) in band_cells[bid]) / len(band_cells[bid])
-                    if mean_wa < morph_aq_thr:
+                    # complexity requires a STORABLE SEASONAL AQUATIC GLUT in a PRODUCTIVE setting (salmon-river /
+                    # Nile-floodplain signature). TWO conditions on the band's cells:
+                    #   (a) seasonal aquatic glut  = mean(wateracc × seasonal_amplitude) ≥ morph_aq_thr
+                    #       (aseasonal watery forest [Mbuti] fails on seasonality);
+                    #   (b) productive setting     = mean(npp_gm2) ≥ morph_npp_floor
+                    #       — the true-desert vs river-desert (Nile) distinguisher: a desert OASIS is a poor setting
+                    #       (npp_gm2≈400, a waterhole not a fishery) → egalitarian; a productive floodplain/river
+                    #       (npp_gm2≳550) can be complex. (Diagnosed R-47: wateracc/seasonality DON'T separate desert
+                    #       — it has the highest of both; only absolute productivity does.)
+                    cells = band_cells[bid]; nc = len(cells)
+                    glut = sum(self._fields.wateracc[cy, cx] * self._seasonal_amp[cy, cx] for (cx, cy) in cells) / nc
+                    mean_npp = sum(self._fields.npp_gm2[cy, cx] for (cx, cy) in cells) / nc
+                    if glut < morph_aq_thr or mean_npp < morph_npp_floor:
                         target = "egalitarian_forager"
                 c0 = self._band_settle.get(bid, 0)
                 c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)

@@ -794,12 +794,17 @@ foragers are the paradigm egalitarians) — the correct driver is AQUATIC.
 EGALITARIAN (Mbuti/Hadza/Ju); complex foragers are the rare exception, tied to a dense STORABLE AQUATIC resource
 (NW-Coast salmon, Calusa, Jomon; Testart/Kelly/Ames). **Two-role fix:** storage plays two roles — a survival BUFFER
 and the complexity trigger; gating STORAGE on water removed the buffer from dry biomes → desert EXTINCT. So keep
-storage a broad buffer (marginal biomes survive) and gate only the **MORPH**: `morph_aquatic_gated` forces a band to
-`egalitarian_forager` unless its mean `wateracc ≥ morph_aquatic_threshold` (0.6). **Result (thr=0.6):** terrestrial
-interiors (forest/savanna/desert) EGALITARIAN + surviving; complexity RARE + water-linked (montane river valleys
-22% ≈ Plateau/Columbia salmon cultures; forest 8%); **desert FIXED — egalitarian AND surviving** (Ju/'hoansi
-pattern). Off ⇒ ungated morph (bit-exact). `stratified` still awaits settlement density. Recommend canonical
-`morph_aquatic_gated=True, threshold=0.6` (PROVISIONAL); pending sign-off.
+storage a broad buffer (marginal biomes survive) and gate only the **MORPH** (R-48 final form): `morph_aquatic_gated`
+forces a band to `egalitarian_forager` unless BOTH (a) **seasonal aquatic glut** `mean(wateracc × seasonal_amp) ≥
+morph_aquatic_threshold` (0.15) — the anadromous-run/seasonal-fishery signature, so an aseasonal watery forest
+(Mbuti) stays egalitarian despite rivers — AND (b) **productive setting** `mean(npp_gm2) ≥ morph_npp_floor` (500) —
+the true-desert vs river-desert distinguisher (diagnosed R-48: wateracc/seasonality DON'T separate desert, which has
+the HIGHEST of both; only absolute productivity does — a desert oasis npp≈400 is a waterhole not a fishery; a Nile
+floodplain ≳550 can be complex). **Result:** forest EGALITARIAN (aseasonal), **desert EGALITARIAN + surviving** (poor
+setting — Kalahari/Ju), montane/savanna COMPLEX (seasonal productive rivers — Plateau/Columbia salmon). The correct
+forager-complexity signature (Testart/Ames/Kelly): complexity rare + water×season×productivity-linked. Off ⇒ ungated
+morph (bit-exact). `stratified` still awaits settlement density. Recommend canonical `morph_aquatic_gated=True,
+morph_aquatic_threshold=0.15, morph_npp_floor=500` (PROVISIONAL); pending sign-off.
 
 ---
 

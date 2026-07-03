@@ -523,7 +523,23 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 | **desert** | 100% | **0% (egalitarian)** | **28 (SURVIVES)** |
 | montane | 73% | 22% | 484 |
 | mixed | 84% | 1% | 762 |
-**The correct pattern: mostly egalitarian; complexity RARE and water-linked** (montane river valleys 22% — cf. Plateau/Columbia salmon cultures; forest 8% — riverine). **Desert FIXED — egalitarian AND surviving** (buffer keeps it alive, no aquatic resource → no complexity — the Ju/'hoansi pattern). Off ⇒ ungated morph (bit-exact). The R-46 `storage_seasonality_gated` is retained ablatable but SUPERSEDED for the morph purpose (it conflates buffer+complexity and mis-orders desert). **Recommend canonical `morph_aquatic_gated=True, threshold=0.6`**; thr/wateracc-cutoff PROVISIONAL. Canonicalization pending sign-off.
+**The correct pattern: mostly egalitarian; complexity RARE and water-linked** (montane river valleys 22% — cf. Plateau/Columbia salmon cultures; forest 8% — riverine). **Desert FIXED — egalitarian AND surviving** (buffer keeps it alive, no aquatic resource → no complexity — the Ju/'hoansi pattern). Off ⇒ ungated morph (bit-exact). **[REFINED by R-48 — the pure-wateracc gate over-flags marginal biomes whose only habitable cells are watered; the corrected form is a SEASONAL AQUATIC GLUT in a PRODUCTIVE setting.]**
+
+## R-48 — The morph driver, finalized: seasonal aquatic glut × productivity floor (true-desert vs river-desert) (2026-07-03)
+
+**Origin:** two supervisor refinements — "aquatic richness is wired to seasonality, should be" (→ multiply by seasonality) and "distinguish true-desert from river-desert" (Nile vs Kalahari). Occupied-cell component diagnosis + threshold/floor sweeps.
+
+**Diagnosis (occupied-cell components, per biome):** `shore%`/`river%` are 0 everywhere (agents sit on LAND near water, not on water cells) → those signals are useless. **wateracc and seasonality do NOT separate desert** — desert survivors have the HIGHEST wateracc (0.55) and seasonal amplitude (0.54), because in a marginal biome the only habitable cells are the watered ones. **The one signal that separates true-desert is ABSOLUTE PRODUCTIVITY** `npp_gm2`: desert 401 vs montane 552 vs savanna 667 vs forest 1172. A desert oasis is a poor setting (a waterhole, not a fishery); a Nile floodplain / salmon river is productive.
+
+**Final mechanism (`morph_aquatic_gated`):** storage stays a broad survival BUFFER; a band morphs complex only if BOTH (a) **seasonal aquatic glut** `mean(wateracc × seasonal_amplitude) ≥ morph_aquatic_threshold` (0.15) — so aseasonal watery forest (Mbuti, amp 0.05) stays egalitarian despite rivers — AND (b) **productive setting** `mean(npp_gm2) ≥ morph_npp_floor` (500) — the true-desert (401, below floor → egalitarian) vs river-desert/Nile (≳550 → can be complex) distinguisher. **Result (floor 500, glut 0.12–0.18):**
+| biome | %complex | reads as |
+|---|---|---|
+| **forest** | **0%** | Mbuti — aseasonal → egalitarian |
+| **desert** | **0%** | Kalahari/Ju — poor setting → egalitarian (FIXED) |
+| montane | 24–51% | Plateau/Columbia — seasonal productive rivers → complex |
+| savanna | 18–76% | seasonal floodplain (tunable) |
+| mixed | 2–54% | intermediate |
+**All three anchor cases now correct: aseasonal-rich forest EGALITARIAN, poor desert EGALITARIAN, seasonal-productive-riverine COMPLEX** — complexity is rare, water+season+productivity-linked (the real forager-complexity signature; Testart/Ames/Kelly). Off ⇒ ungated morph (bit-exact). **Recommend canonical `morph_aquatic_gated=True, morph_aquatic_threshold=0.15, morph_npp_floor=500`** (all PROVISIONAL, sweep-chosen from the occupied-cell data). `stratified` still awaits settlement density. Canonicalization pending sign-off.
 
 ---
 
