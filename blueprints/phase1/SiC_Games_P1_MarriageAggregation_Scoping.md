@@ -37,10 +37,14 @@ abundant sites and pair across bands:
    often near water.)
 3. **WHO (the regional connubium).** Each band is assigned to its nearest site within `aggregation_radius`; the bands
    sharing a site are that gathering's marriage pool = the emergent **community/connubium** (the band→community nest).
-4. **MARRIAGE (cross-band, exogamous).** For each site, pool the site's bands' **unpaired adults** → run the existing
-   prowess·cred-weighted, kin-avoiding `_do_pairing` on that REGIONAL pool → durable pair-bonds (F.3a). Spouse-
-   residence uses the existing exogamy/residence rule (smaller band → larger). So a low-density band's members find
-   spouses at the gathering even though their daily neighborhood is empty.
+4. **MARRIAGE (cross-band, exogamous — with virilocal absorption + rank homogamy; red-team #2).** For each site,
+   pool the site's bands' **unpaired adults** → run the prowess·cred-weighted, kin-avoiding `_do_pairing` on that
+   REGIONAL pool → durable pair-bonds (F.3a). Two lineage-preserving rules: **(i) virilocal residence** — the bride
+   joins the GROOM's band + adopts his lineage (children patrilineal; the wife's natal lineage doesn't propagate),
+   preventing male-line flattening; **(ii) rank homogamy** — pairing weights combine the directional ascribed-mate-
+   choice (high-cred groom preferred) with B++ status assortment (like-cred pairs), so the cred gradient survives the
+   mixing. So a low-density band's members find spouses at the gathering even though their daily neighbourhood is
+   empty — without dissolving lineages. Config: `aggregation_virilocal:bool`, `aggregation_rank_homogamy:float`.
 5. **DISPERSE + REPRODUCE year-round.** After the window, no new pairing until next gathering; **births proceed
    throughout the year via the persistent pair-bond** (the bond, set at the gathering, is the birth licence — the
    daily co-residence mate-gate is replaced by "has a living partner"). Bands disperse via the normal movement.
@@ -74,10 +78,20 @@ the daily bonded-mate-gate for *pairing* is superseded by the gathering; births 
    POOL** (pool the unpaired adults for `_do_pairing` WITHOUT forcing physical co-location), not a sustained
    residence. Physical convergence-to-site (a movement drive during the window) is a REFINEMENT, deferred; if built,
    it must be transient (pair then disperse before starving) and the site genuinely abundant.
-2. **Over-mixing / erasing lineage structure.** Regional exogamy mixes lineages hard → could homogenise cred/band-
-   lineage structure (undercutting the ascribed-status + dynastic-concentration dynamics). → exogamy is realistic
-   (bands ARE non-kin, Hill 2011), but VALIDATE that the connubium doesn't flatten cred Gini / status→RS or dissolve
-   the dominant-lineage signal; bracket `aggregation_radius` (smaller = more local = less mixing).
+2. **Over-mixing / erasing lineage structure — RESOLVED by two real mechanisms (supervisor 2026-07-02).** Regional
+   exogamy mixes *who marries whom*, but real societies keep it from dissolving lineages via: **(a) virilocal +
+   patrilineal absorption** — the bride joins the GROOM's band and adopts his lineage; children are reckoned
+   patrilineally, so the wife's natal lineage does NOT propagate through her and the male line carries through
+   (Marlowe 2004 virilocal-modal residence; the model has `patriline_weight` + the exogamy-residence rule — make
+   residence strictly bride→groom's-band at the gathering). **(b) rank homogamy** — similarly-ranked lineages marry
+   (status assortment / hypergamy; bride-wealth + family negotiation), so the cred gradient is preserved, not
+   averaged. The model already has the B++ assortment machinery + the new ascribed mate-choice (high-cred grooms
+   preferred, directional) — combine them at the gathering for directional-preference × assortative-matching =
+   like-marries-like. **Reconciliation with R-20** (assortment SPREADS RS, doesn't CONSOLIDATE dynasties): that is
+   about dynastic concentration, not lineage preservation, and predates ascribed-mate-choice/aggregation — no
+   contradiction; preserving the rank STRUCTURE is the goal. **VALIDATE** in the re-run: with virilocal + rank-
+   homogamy on, the connubium does NOT flatten cred Gini / status→RS / the dominant-lineage signal. `aggregation_
+   radius` remains a secondary lever (smaller = more local = less mixing).
 3. **Timing/period sensitivity + adult backlog.** Annual gathering ⇒ an adult who matures just after a gathering
    waits ~a year to pair. If the period is long or the window short, reproduction lags → check eq_pop isn't
    throttled; a maturing adult should pair at the NEXT gathering (not miss several). Bracket period + threshold.
