@@ -317,6 +317,15 @@ class DemographyConfig(BaseModel):
     # like fishery villages (the generality payoff — farming villages via one field). Layer B (soil-depletion +
     # landesque + relocation → the dynastic bust) follows. Default OFF ⇒ S_pot = aquatic_food only ⇒ bit-exact.
     enable_agriculture: bool = False
+    # AGRICULTURE TIER Layer B1 — SOIL DEPLETION (the bust driver fisheries lack). A FARM settlement (cultivability >
+    # aquatic at its site) degrades a per-site SOIL stock ∈[SOIL_FLOOR,1] under farming pressure; tier-2 farm yield ×
+    # soil. Regrowth is SLOW (swidden fallow ~10–20 yr) — depleted land only recovers on a long fallow (after the
+    # village leaves). FISHERIES are exempt (aquatic-dominant sites never deplete → R-53 stable villages preserved).
+    # This gives boom → soil-degrade → yield-fall → bust (relocation = Layer B3). Default OFF ⇒ soil≡1 ⇒ bit-exact.
+    enable_soil_depletion: bool = False
+    soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
+    soil_deplete_frac: float = Field(0.6, ge=0.0)           # depletion strength at pressure=1 (soil equilibrates ~1−frac) [PROVISIONAL]
+    soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

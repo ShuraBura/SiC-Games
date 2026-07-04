@@ -143,6 +143,41 @@ def test_shock_ar1_rho0_is_bit_identical_to_iid():
         assert abs(s_ar - s_iid) < 1e-12
 
 
+def _soil_self(sites, agent_positions, soil=None, aq_hi=False):
+    cfg = DemographyConfig(enable_soil_depletion=True, settle_radius=2, settle_catchment_radius=2,
+                           soil_regrow_per_yr=1.2, soil_deplete_frac=0.6, soil_carry_per_cell=8.0)
+    cult = np.zeros((100, 100)); cult[50, 50] = 0.8
+    aq = np.zeros((100, 100))
+    if aq_hi:
+        aq[50, 50] = 0.9                                  # aquatic-dominant → fishery (exempt)
+    f = SimpleNamespace(_fields=SimpleNamespace(cultivability=cult, aquatic_food=aq), _demog=cfg,
+                        _settlement_sites=dict(sites), _settlement_soil=dict(soil or {}),
+                        agent_list=[SimpleNamespace(pos=p) for p in agent_positions])
+    f._torus_cheby = lambda ax, ay, bx, by: TerrainWorld._torus_cheby(f, ax, ay, bx, by)
+    return f
+
+
+def test_farm_soil_depletes_under_pressure():
+    f = _soil_self({(50, 50): 12}, [(50, 50)] * 100)      # heavy farming pressure
+    for _ in range(60):
+        TerrainWorld._update_settlement_soil(f)
+    assert f._settlement_soil[(50, 50)] < 0.8             # degraded (equilibrium ~1−0.6·pressure)
+
+
+def test_fishery_site_exempt_from_soil():
+    f = _soil_self({(50, 50): 12}, [(50, 50)] * 100, aq_hi=True)
+    for _ in range(60):
+        TerrainWorld._update_settlement_soil(f)
+    assert (50, 50) not in f._settlement_soil             # aquatic-dominant → never depleted (R-53 preserved)
+
+
+def test_abandoned_farm_soil_recovers_on_fallow():
+    f = _soil_self({}, [], soil={(50, 50): 0.3})          # depleted field, no active settlement
+    for _ in range(300):
+        TerrainWorld._update_settlement_soil(f)
+    assert f._settlement_soil.get((50, 50), 1.0) > 0.9    # fallow recovered (popped or ~1)
+
+
 def test_shock_ar1_regimes_autocorrelated_and_mean_preserving():
     """ρ>0 → the shock series has lag-1 autocorrelation ≈ ρ (multi-year regimes) while its marginal mean stays 1."""
     import math

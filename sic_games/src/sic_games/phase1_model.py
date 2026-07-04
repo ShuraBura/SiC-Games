@@ -268,6 +268,7 @@ class TerrainWorld(mesa.Model):
         self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
+        self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -622,6 +623,43 @@ class TerrainWorld(mesa.Model):
                 if self._settlement_sites[site] <= 0:
                     self._settlement_sites.pop(site, None)
 
+    def _update_settlement_soil(self) -> None:
+        """Layer B1 soil depletion: a FARM settlement (cultivability > aquatic at its site) degrades a per-site SOIL
+        stock under farming pressure (members/catchment carrying); tier-2 farm yield × soil (applied in the harvest).
+        Slow fallow regrowth — a DEPLETED site recovers only over a long fallow (whether still settled or abandoned,
+        so an abandoned field heals for later re-settlement). FISHERIES (aquatic-dominant) are exempt → soil stays 1
+        → R-53 stable villages unchanged. Soil ∈ [SOIL_FLOOR=0.05, 1]."""
+        cfg = self._demog
+        cult = getattr(self._fields, "cultivability", None)
+        if cult is None:
+            return
+        aq = getattr(self._fields, "aquatic_food", None)
+        rad = cfg.settle_radius
+        r = cfg.soil_regrow_per_yr / 12.0
+        carry = cfg.soil_carry_per_cell * (2 * cfg.settle_catchment_radius + 1) ** 2
+        counts: dict[tuple[int, int], int] = {}
+        for a in self.agent_list:
+            ax, ay = a.pos
+            for s in self._settlement_sites:
+                if self._torus_cheby(ax, ay, s[0], s[1]) <= rad:
+                    counts[s] = counts.get(s, 0) + 1
+        active_farm = set()
+        for s in self._settlement_sites:
+            if aq is not None and aq[s[1], s[0]] >= cult[s[1], s[0]]:
+                continue                                       # aquatic-dominant → a FISHERY, exempt (R-53)
+            active_farm.add(s)
+            soil = self._settlement_soil.get(s, 1.0)
+            pressure = counts.get(s, 0) / carry if carry > 0 else 0.0
+            soil += r * ((1.0 - soil) - cfg.soil_deplete_frac * pressure)   # deplete-and-regrow, slow R
+            self._settlement_soil[s] = min(1.0, max(0.05, soil))
+        for s in list(self._settlement_soil):                  # FALLOW: abandoned (or non-farm) sites heal slowly
+            if s not in active_farm:
+                soil = self._settlement_soil[s] + r * (1.0 - self._settlement_soil[s])
+                if soil >= 0.999:
+                    self._settlement_soil.pop(s, None)
+                else:
+                    self._settlement_soil[s] = soil
+
     def _step_rivalrous(self) -> None:
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
         Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
@@ -666,6 +704,8 @@ class TerrainWorld(mesa.Model):
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
             self._maintain_settlements()
+            if getattr(self._demog, "enable_soil_depletion", False):
+                self._update_settlement_soil()   # Layer B1: farm sites degrade their soil (fisheries exempt)
             # Layer 2b SHOCK: redraw the REGIONAL tier-2 yield multiplier once per year (mean-preserving lognormal —
             # same draw as game meat-cv); a low year = a bad run/drought that storage must buffer. Held within the year.
             if getattr(self._demog, "enable_tier2_shock", False) and self.step_count % self._demog.aggregation_period == 0:
@@ -887,7 +927,9 @@ class TerrainWorld(mesa.Model):
                     excl_mask = None
             S = tf.level(cx, cy)
             if settle_on and (cx, cy) in self._settlement_sites:
-                S += self._settlement_catchment_yield((cx, cy)) * self._tier2_shock   # Layer 2 catchment tier-2 (2b: × yearly shock)
+                # Layer 2 catchment tier-2 (2b: × yearly shock; B1: × per-site soil — farms degrade it, fisheries stay 1)
+                S += (self._settlement_catchment_yield((cx, cy)) * self._tier2_shock
+                      * self._settlement_soil.get((cx, cy), 1.0))
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
