@@ -266,6 +266,7 @@ class TerrainWorld(mesa.Model):
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
         self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
+        self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -650,8 +651,11 @@ class TerrainWorld(mesa.Model):
             if getattr(self._demog, "enable_tier2_shock", False) and self.step_count % self._demog.aggregation_period == 0:
                 cv = self._demog.shock_cv
                 if cv > 0.0:
-                    sig = math.sqrt(math.log(1.0 + cv * cv))
-                    self._tier2_shock = math.exp(self.random.normalvariate(-0.5 * sig * sig, sig))
+                    sig2 = math.log(1.0 + cv * cv)                  # target STATIONARY log-variance (marginal CV = shock_cv, any ρ)
+                    rho = self._demog.shock_rho
+                    eps = self.random.normalvariate(0.0, math.sqrt(sig2 * (1.0 - rho * rho)))
+                    self._shock_x = rho * self._shock_x + eps       # AR(1): ρ=0 ⇒ IID (bit-identical to the prior draw)
+                    self._tier2_shock = math.exp(self._shock_x - 0.5 * sig2)   # mean-preserving
                 else:
                     self._tier2_shock = 1.0
 

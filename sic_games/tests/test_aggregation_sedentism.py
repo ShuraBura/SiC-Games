@@ -123,3 +123,36 @@ def test_shock_draw_is_mean_preserving():
 
 def test_tier2_shock_defaults_off():
     assert DemographyConfig().enable_tier2_shock is False       # default OFF ⇒ shock stays 1.0 ⇒ bit-exact
+    assert DemographyConfig().shock_rho == 0.0                  # default ρ=0 ⇒ IID (bit-identical to the pre-AR(1) draw)
+
+
+def test_shock_ar1_rho0_is_bit_identical_to_iid():
+    """The AR(1) draw at ρ=0 reproduces the IID mean-preserving lognormal draw-for-draw (same RNG consumption)."""
+    import math
+    import random
+    cv = 0.6; sig2 = math.log(1.0 + cv * cv); sig = math.sqrt(sig2)
+    r_ar, r_iid = random.Random(42), random.Random(42)
+    x = 0.0
+    for _ in range(200):
+        eps = r_ar.normalvariate(0.0, math.sqrt(sig2 * (1.0 - 0.0 * 0.0)))
+        x = 0.0 * x + eps
+        s_ar = math.exp(x - 0.5 * sig2)
+        s_iid = math.exp(r_iid.normalvariate(-0.5 * sig2, sig))
+        assert abs(s_ar - s_iid) < 1e-12
+
+
+def test_shock_ar1_regimes_autocorrelated_and_mean_preserving():
+    """ρ>0 → the shock series has lag-1 autocorrelation ≈ ρ (multi-year regimes) while its marginal mean stays 1."""
+    import math
+    import random
+    cv, rho = 0.6, 0.85
+    sig2 = math.log(1.0 + cv * cv)
+    rng = random.Random(0); x = 0.0; xs = []
+    for _ in range(40000):
+        eps = rng.normalvariate(0.0, math.sqrt(sig2 * (1.0 - rho * rho)))
+        x = rho * x + eps; xs.append(x)
+    m = sum(xs) / len(xs)
+    ac1 = sum((xs[i] - m) * (xs[i + 1] - m) for i in range(len(xs) - 1)) / sum((v - m) ** 2 for v in xs)
+    assert abs(ac1 - rho) < 0.05                                # regimes: lag-1 autocorr ≈ ρ
+    s = [math.exp(v - 0.5 * sig2) for v in xs]
+    assert abs(sum(s) / len(s) - 1.0) < 0.05                    # still mean-preserving at high ρ
