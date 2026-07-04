@@ -292,8 +292,16 @@ class DemographyConfig(BaseModel):
     settle_min_pool: int = Field(40, ge=2)                     # min people aggregated within settle_radius to found/hold a settlement (multi-band; Natufian dozens+) [PROVISIONAL]
     settle_persist_threshold: float = Field(0.3, ge=0.0)      # site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL]
     settle_radius: int = Field(2, ge=1)                       # Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells)
-    settlement_cohesion: float = Field(1.5, ge=0.0)          # cohesion strength pinning settled members onto the site (overrides IFD per-capita → pack) [PROVISIONAL]
+    settlement_cohesion: float = Field(1.5, ge=0.0)          # (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation)
     settle_release_steps: int = Field(12, ge=1)              # hysteresis: steps a settlement survives below settle_min_pool before it dissolves
+    # LAYER 2 — residence ≠ foraging (Binford collectors). A settlement of ~dozens is « one 100 km² cell, so settled
+    # members RESIDE on the single site cell (→ residential density ≫ Binford packing → the morph fires) and FORAGE a
+    # CATCHMENT. The catchment yields an intensive TIER-2 resource UNLOCKED only by settlement (gated: a mobile band
+    # gets only the small tier-1 return; the intensive fishery/proto-ag needs the settled labour + storage — Testart
+    # delayed-return / Boserup intensification). RESOURCE-AGNOSTIC: reads S_pot (= aquatic_food now; a cultivability
+    # source drops in later — one field, many sources). This sustains the packed pool that reside-on-cluster starved.
+    settle_catchment_radius: int = Field(2, ge=0)            # cells the settlement forages tier-2 from (a day's logistical range) [PROVISIONAL]
+    settle_tier2_yield: float = Field(40.0, ge=0.0)          # intensive tier-2 yield per unit S_pot per catchment cell, unlocked by settlement (gated) [PROVISIONAL — sweep]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

@@ -7,6 +7,8 @@ and dissolves (hysteresis) once the pool leaves.
 """
 from types import SimpleNamespace
 
+import numpy as np
+
 from sic_games.phase1_model import TerrainWorld
 from sic_games.demography import DemographyConfig
 
@@ -65,3 +67,42 @@ def test_nearest_settlement_picks_closest():
 def test_torus_wrap_distance():
     f = _fake({(1, 50): 12}, [], rad=3)
     assert TerrainWorld._nearest_settlement(f, (99, 50)) == (1, 50)    # wraps: |99-1|→2 across the seam
+
+
+# --------------------------------------------------------------------------- Layer 2: residence pin + catchment tier-2
+
+def _land():
+    return SimpleNamespace(_fields=SimpleNamespace(isWater=np.zeros((100, 100))))
+
+
+def test_toward_steps_one_cell_toward_site():
+    f = _land()
+    assert TerrainWorld._toward(f, (50, 50), (55, 50)) == (51, 50)     # +x toward site
+    assert TerrainWorld._toward(f, (50, 50), (50, 50)) == (50, 50)     # already on site → stay
+    assert TerrainWorld._toward(f, (50, 50), (50, 45)) == (50, 49)     # -y
+
+
+def test_toward_larger_axis_first():
+    f = _land()
+    assert TerrainWorld._toward(f, (50, 50), (54, 52)) == (51, 50)     # dx=4 > dy=2 → step x
+
+
+def test_toward_blocked_by_water_uses_other_axis():
+    w = np.zeros((100, 100)); w[50, 51] = 1                            # cell (x=51,y=50) is water
+    f = SimpleNamespace(_fields=SimpleNamespace(isWater=w))
+    assert TerrainWorld._toward(f, (50, 50), (55, 52)) == (50, 51)     # x-step blocked → y-step
+
+
+def test_catchment_yield_sums_spot_times_multiplier():
+    aq = np.zeros((100, 100))
+    for (x, y) in [(50, 50), (51, 50), (49, 50)]:
+        aq[y, x] = 0.5                                                 # 3 cells × 0.5 = 1.5 within radius 1
+    cfg = DemographyConfig(settle_catchment_radius=1, settle_tier2_yield=10.0)
+    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=aq), _demog=cfg)
+    assert abs(TerrainWorld._settlement_catchment_yield(f, (50, 50)) - 15.0) < 1e-9   # 1.5 × 10
+
+
+def test_catchment_yield_zero_without_spot_field():
+    cfg = DemographyConfig()
+    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=None), _demog=cfg)
+    assert TerrainWorld._settlement_catchment_yield(f, (50, 50)) == 0.0

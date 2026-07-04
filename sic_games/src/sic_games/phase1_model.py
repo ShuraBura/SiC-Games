@@ -542,6 +542,41 @@ class TerrainWorld(mesa.Model):
                 bestd, best = d, site
         return best
 
+    def _toward(self, pos: tuple[int, int], site: tuple[int, int]) -> tuple[int, int]:
+        """One cardinal step from `pos` toward `site` on the torus (larger axis first); stays if blocked by water.
+        Layer 2 residence pin: settled members converge onto the SINGLE site cell (a village « one 100 km² cell)."""
+        x, y = pos; sx, sy = site
+        if (x, y) == (sx, sy):
+            return pos
+        def _dir(a, b):
+            raw = (b - a) % N
+            return 0 if raw == 0 else (1 if raw <= N - raw else -1)
+        dxs, dys = _dir(x, sx), _dir(y, sy)
+        dxd = min((sx - x) % N, (x - sx) % N); dyd = min((sy - y) % N, (y - sy) % N)
+        water = self._fields.isWater
+        cands = []
+        if dxd >= dyd and dxs: cands.append(((x + dxs) % N, y))
+        if dys: cands.append((x, (y + dys) % N))
+        if dxd < dyd and dxs: cands.append(((x + dxs) % N, y))
+        for (nx, ny) in cands:
+            if water[ny, nx] == 0:
+                return (nx, ny)
+        return pos
+
+    def _settlement_catchment_yield(self, site: tuple[int, int]) -> float:
+        """Layer 2: the settlement-UNLOCKED intensive tier-2 yield, pooled over the catchment (residence ≠ foraging).
+        RESOURCE-AGNOSTIC — reads S_pot (= aquatic_food now; cultivability later). Gated: only settlement sites get it,
+        so a mobile band passing a reach gets only the tier-1 cell return (explains GATE-3)."""
+        sp = getattr(self._fields, "aquatic_food", None)     # S_pot source (the only place 'aquatic' appears)
+        if sp is None:
+            return 0.0
+        rad = self._demog.settle_catchment_radius
+        sx, sy = site; tot = 0.0
+        for dy in range(-rad, rad + 1):
+            for dx in range(-rad, rad + 1):
+                tot += sp[(sy + dy) % N, (sx + dx) % N]
+        return self._demog.settle_tier2_yield * tot
+
     def _maintain_settlements(self) -> None:
         """Aggregation-sedentism lifecycle: an active settlement PERSISTS while ≥ settle_min_pool people are within
         settle_radius of its site (membership is emergent proximity — robust to band fission/fusion); otherwise its
@@ -609,7 +644,6 @@ class TerrainWorld(mesa.Model):
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
             self._maintain_settlements()
-            settle_coh = self._demog.settlement_cohesion
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
@@ -665,15 +699,16 @@ class TerrainWorld(mesa.Model):
             tfn = getattr(agent._decision, "temperature", None)
             if callable(tfn):
                 temp = tfn(agent)
-            # cohesion target: a settled member is pinned to its settlement SITE (strong, pool-scale); else the band
-            # centroid (mild). Settlement pin overrides the band nudge.
+            # Layer 2 RESIDENCE PIN: a settled member steps onto the SINGLE settlement site cell (residence ≠ foraging);
+            # its food comes from the catchment tier-2 (harvest step), not the cell it stands on. Mobile agents diffuse.
             site = self._nearest_settlement(agent.pos) if settle_on else None
             if site is not None:
-                ct, agent_coh = site, settle_coh
-            elif coh_str > 0.0:
-                ct, agent_coh = band_centroid.get(agent._group.band_id), coh_str
-            else:
-                ct, agent_coh = None, 0.0
+                target = self._toward(agent.pos, site)
+                if target != agent.pos and self._fields.isWater[target[1], target[0]] == 0:
+                    _shift(agent, agent.pos, target)
+                continue
+            ct = band_centroid.get(agent._group.band_id) if coh_str > 0.0 else None
+            agent_coh = coh_str
             mr = 1
             if mobility_on:
                 local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
@@ -698,6 +733,11 @@ class TerrainWorld(mesa.Model):
             for agent in self.agent_list:
                 head = self._family_head(agent)
                 if head is None:
+                    continue
+                if settle_on and self._nearest_settlement(head.pos) is not None:
+                    tgt = head.pos                          # Layer 2: a SETTLED family STACKS on the site cell (the
+                    if agent.pos != tgt:                    # village), overriding the footprint scatter → packs
+                        _shift(agent, agent.pos, tgt)
                     continue
                 if footprint_on:
                     hx, hy = head.pos
@@ -812,6 +852,8 @@ class TerrainWorld(mesa.Model):
                 if not any(excl_mask):
                     excl_mask = None
             S = tf.level(cx, cy)
+            if settle_on and (cx, cy) in self._settlement_sites:
+                S += self._settlement_catchment_yield((cx, cy))   # Layer 2: residents eat the catchment tier-2, not this cell
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
