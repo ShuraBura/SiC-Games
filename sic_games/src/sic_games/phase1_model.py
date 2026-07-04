@@ -267,6 +267,7 @@ class TerrainWorld(mesa.Model):
         self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
         self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
+        self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -565,11 +566,30 @@ class TerrainWorld(mesa.Model):
                 return (nx, ny)
         return pos
 
+    def _s_pot_field(self):
+        """RESOURCE-AGNOSTIC settlement-resource potential S_pot. = aquatic_food (fishery); with enable_agriculture,
+        = max(aquatic_food, cultivability) so FARMING villages form on fertile land via the same machinery. Cached
+        (static fields). Default (no agriculture) ⇒ aquatic_food ⇒ bit-exact."""
+        if self._spot_cache is None:
+            aq = getattr(self._fields, "aquatic_food", None)
+            if aq is None:
+                return None
+            if self._demog is not None and getattr(self._demog, "enable_agriculture", False):
+                cult = getattr(self._fields, "cultivability", None)
+                if cult is not None:
+                    import numpy as np
+                    self._spot_cache = np.maximum(aq, cult)
+                else:
+                    self._spot_cache = aq
+            else:
+                self._spot_cache = aq
+        return self._spot_cache
+
     def _settlement_catchment_yield(self, site: tuple[int, int]) -> float:
         """Layer 2: the settlement-UNLOCKED intensive tier-2 yield, pooled over the catchment (residence ≠ foraging).
-        RESOURCE-AGNOSTIC — reads S_pot (= aquatic_food now; cultivability later). Gated: only settlement sites get it,
+        RESOURCE-AGNOSTIC — reads S_pot (= max(aquatic_food, cultivability)). Gated: only settlement sites get it,
         so a mobile band passing a reach gets only the tier-1 cell return (explains GATE-3)."""
-        sp = getattr(self._fields, "aquatic_food", None)     # S_pot source (the only place 'aquatic' appears)
+        sp = self._s_pot_field()
         if sp is None:
             return 0.0
         rad = self._demog.settle_catchment_radius
@@ -1617,7 +1637,7 @@ class TerrainWorld(mesa.Model):
         # Aggregation-sedentism (Layer 1): a pool at a PERSISTENT-ABUNDANT site that reaches settle_min_pool FOUNDS /
         # refreshes a settlement — the gathering that stops dispersing. Held + released each step by _maintain_settlements.
         if getattr(cfg, "enable_aggregation_sedentism", False):
-            aqf = getattr(self._fields, "aquatic_food", None)
+            aqf = self._s_pot_field()            # S_pot = max(aquatic, cultivability) → farming sites qualify too
             rad = cfg.settle_radius
             for si in pools:                      # sites that pooled ≥1 band this gathering
                 site = sites[si]

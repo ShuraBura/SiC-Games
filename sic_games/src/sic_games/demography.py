@@ -312,6 +312,11 @@ class DemographyConfig(BaseModel):
     enable_tier2_shock: bool = False
     shock_cv: float = Field(0.6, ge=0.0)                     # inter-annual tier-2 yield CV (salmon-run anchored) [PROVISIONAL — sweep]
     shock_rho: float = Field(0.0, ge=0.0, lt=1.0)           # AR(1) persistence: 0 = IID single bad years; →1 = multi-year good/bad REGIMES (ENSO/PDO/drought). Storage matters most at high ρ (must carry a multi-year bad regime). [PROVISIONAL — sweep]
+    # AGRICULTURE TIER Layer A (blueprint …_AgricultureTier): add `cultivability` (EFC-derived, resource-agnostic) as
+    # a SECOND S_pot source → S_pot = max(aquatic_food, cultivability), so settlements form on FERTILE LAND and behave
+    # like fishery villages (the generality payoff — farming villages via one field). Layer B (soil-depletion +
+    # landesque + relocation → the dynastic bust) follows. Default OFF ⇒ S_pot = aquatic_food only ⇒ bit-exact.
+    enable_agriculture: bool = False
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

@@ -339,3 +339,21 @@ def test_world_lottery_climate_aridity_dries_precip():
     ph = generate_world(humid, mode="climate").precip_mm
     pa = generate_world(arid, mode="climate").precip_mm
     assert pa[pa > 0].mean() < ph[ph > 0].mean() * 0.7         # aridity markedly reduces precip
+
+
+def test_cultivability_emergent_from_climate():
+    """Agriculture Layer A: cultivability EMERGES from climate — high in temperate/subtropical sub-humid land,
+    ~0 in desert (arid), tundra (too cold), and steep/water terrain."""
+    import numpy as np
+    from sic_games.terrain import cultivability_field
+
+    def cul(Tm, A, P, slope=0.0, water=0):
+        return float(cultivability_field(np.array([[float(Tm)]]), np.array([[float(A)]]), np.array([[float(P)]]),
+                                         np.array([[float(slope)]]), np.array([[water]], dtype=np.uint8))[0, 0])
+
+    assert cul(12, 10, 700) > 0.6        # temperate sub-humid fertile belt → cultivable
+    assert cul(17, 9, 500) > 0.6         # Mediterranean / fertile-crescent → cultivable
+    assert cul(25, 8, 50) < 0.05         # hot desert (arid) → not cultivable
+    assert cul(-3, 12, 400) < 0.05       # tundra (season too short) → not cultivable
+    assert cul(12, 10, 700, slope=1.0) < cul(12, 10, 700)   # steep ground less arable
+    assert cul(12, 10, 700, water=1) == 0.0                 # water cells never cultivable

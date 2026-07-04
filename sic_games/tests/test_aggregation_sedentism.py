@@ -98,13 +98,15 @@ def test_catchment_yield_sums_spot_times_multiplier():
     for (x, y) in [(50, 50), (51, 50), (49, 50)]:
         aq[y, x] = 0.5                                                 # 3 cells × 0.5 = 1.5 within radius 1
     cfg = DemographyConfig(settle_catchment_radius=1, settle_tier2_yield=10.0)
-    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=aq), _demog=cfg)
+    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=aq, cultivability=None), _demog=cfg, _spot_cache=None)
+    f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
     assert abs(TerrainWorld._settlement_catchment_yield(f, (50, 50)) - 15.0) < 1e-9   # 1.5 × 10
 
 
 def test_catchment_yield_zero_without_spot_field():
     cfg = DemographyConfig()
-    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=None), _demog=cfg)
+    f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=None, cultivability=None), _demog=cfg, _spot_cache=None)
+    f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
     assert TerrainWorld._settlement_catchment_yield(f, (50, 50)) == 0.0
 
 

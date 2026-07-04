@@ -384,6 +384,40 @@ GRASS_NONE   = 0             # grass_subtype codes
 GRASS_LLANOS = 1             # tropical GRASS (Hurtado & Hill Hiwi/Cuiva) → wet/dry flood-tail regime (C.4c)
 GRASS_STEPPE = 2             # temperate/arctic GRASS (caribou/bison) → migratory-herd quasi-cycle (C.4b)
 
+# ── Agriculture tier — cultivability (Layer A; blueprint …_AgricultureTier_Scoping). Agro-climatic cultivation
+# potential that EMERGES from climate (like Miami-NPP / Whittaker-biome), not a hand-drawn mask. Anchors: FAO
+# agro-ecological zones (crop suitability from climate); growing-degree-days / growing-season length; UNEP aridity
+# index P/PET. PROVISIONAL thresholds — sign-off. ──
+CULT_T_BASE      = 8.0     # °C crop base temperature — a growing month has monthly-mean T ≥ this (wheat~5, maize~10)
+CULT_GS_LOW      = 0.33    # growing-season fraction (~4 mo/yr) below which cultivation fails (too short/cold)
+CULT_GS_HIGH     = 0.60    # season fraction (~7 mo) at/above which the season is non-limiting
+CULT_PET_PER_DEG = 55.0    # mm/yr potential evapotranspiration per °C annual mean (simple Thornthwaite-style PET proxy)
+CULT_AI_LOW      = 0.20    # aridity index P/PET below which rain-fed ag fails (UNEP arid limit)
+CULT_AI_HIGH     = 0.50    # AI at/above which water is non-limiting (sub-humid; UNEP)
+CULT_SLOPE_PEN   = 1.5     # slope penalty — steep ground is not arable
+
+
+def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water):
+    """Agro-climatic cultivation potential ∈[0,1], EMERGENT from climate — the `cultivability` S_pot source
+    (agriculture tier Layer A). Product of three limiters (min-of-Liebig style, multiplicative):
+      f_gs  GROWING SEASON — fraction of the annual temperature cosine (mean ± seasonal half-amplitude) with
+            monthly T ≥ CULT_T_BASE; cold/short-season land (tundra, high montane) → 0.
+      f_ai  WATER — aridity index AI = P/PET (PET ≈ CULT_PET_PER_DEG·max(T,1)); arid (AI<LOW) → 0, sub-humid+ → 1.
+      f_terr ARABLE — low slope, not water.
+    Peaks in temperate/subtropical/Mediterranean sub-humid low-relief land (the fertile belt); ~0 in desert,
+    tundra, and steep terrain. PROVISIONAL (sign-off)."""
+    Tm = temperature
+    A = np.maximum(temp_seas_amp, 1e-6)
+    c = np.clip((CULT_T_BASE - Tm) / A, -1.0, 1.0)              # cosine level for the crop base temperature
+    gs = np.arccos(c) / np.pi                                   # fraction of the year above CULT_T_BASE (0..1)
+    f_gs = np.clip((gs - CULT_GS_LOW) / (CULT_GS_HIGH - CULT_GS_LOW), 0.0, 1.0)
+    ai = precip_mm / (CULT_PET_PER_DEG * np.maximum(Tm, 1.0))
+    f_ai = np.clip((ai - CULT_AI_LOW) / (CULT_AI_HIGH - CULT_AI_LOW), 0.0, 1.0)
+    f_terr = np.clip(1.0 - CULT_SLOPE_PEN * slope, 0.0, 1.0)
+    cult = f_gs * f_ai * f_terr
+    cult[is_water == 1] = 0.0
+    return cult
+
 
 @dataclass
 class WorldFields:
@@ -426,6 +460,7 @@ class WorldFields:
     precip_mm:     np.ndarray = None  # (N,N) float64 annual precipitation mm/yr (C2; 0 in legacy mode)
     water_temp:    np.ndarray = None  # (N,N) float64 °C river/surface-water temp (C6, headwater-sourced; 0 in legacy)
     aquatic_food:  np.ndarray = None  # (N,N) float64 [0,1] dense storable aquatic-food density (C7; 0 in legacy)
+    cultivability: np.ndarray = None  # (N,N) float64 [0,1] agro-climatic cultivation potential (agriculture Layer A; 0 in legacy)
     # C.4a GRASS sub-biome tag: 0 non-grass, GRASS_LLANOS=1 (tropical), GRASS_STEPPE=2 (temperate) — by isotherm.
     grass_subtype: np.ndarray = None  # (N,N) uint8
 
@@ -875,6 +910,11 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
                                           drains_to_sea.reshape(N, N), np.clip(npp, 0.0, 1.0))
         aquatic_food[isWater == 1] = 0.0
 
+    # ── Agriculture tier Layer A: cultivability (climate mode) — the 2nd S_pot source, EMERGENT from climate. ──
+    cultivability = np.zeros((N, N), dtype=np.float64)
+    if mode == "climate":
+        cultivability = cultivability_field(temperature, temp_seas_amp, precip_mm, slope, isWater)
+
     # ── forage_kcal: per-biome mean-scaling (Task 1) + shore bonus (Task 3) ─
     # Original normalised forage[] is preserved. forage_kcal is a separate field.
     forage_kcal = np.zeros((N, N), dtype=np.float64)
@@ -939,7 +979,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         forage_kcal=forage_kcal, npp_gm2=npp_gm2, is_shore=is_shore,
         game_kcal=game_kcal, game_mobility=game_mobility, temperature=temperature, humidity=humidity,
         grass_subtype=grass_subtype, temp_seas_amp=temp_seas_amp, precip_mm=precip_mm, water_temp=water_temp,
-        aquatic_food=aquatic_food,
+        aquatic_food=aquatic_food, cultivability=cultivability,
     )
 
 
