@@ -263,6 +263,22 @@ class DemographyConfig(BaseModel):
     # localization — per-cell mate-choice etc. — is a follow-on, reproduction still reads the global config.)
     enable_morph: bool = False
     morph_settle_steps: int = Field(300, ge=1)                  # T: sustained-settlement steps to morph (~1 generation; Bocquet-Appel)
+    # ── ECONOMIC DEFENSIBILITY / OWNED-PATCH (blueprint …_EconomicDefensibility; Dyson-Hudson & Smith 1978): the
+    # BETWEEN-band driver of concentration. Movement is Ideal FREE Distribution → no band can monopolise a dense
+    # storable resource → it dilutes to the landscape average → no private surplus → no tether (diagnosed GATE-3 /
+    # R-51). A band that LEAD-occupies a DEFENSIBLE cell (dense × predictable resource: aquatic_food/S_pot ≥
+    # defensibility_min) for defensibility_claim_dwell steps CLAIMS it; then OUTSIDERS perceive a reduced per-capita
+    # there (× defensibility_exclusion — the shadow of defence, so IFD routes them away) while OWNER members get a
+    # tether bonus (× defensibility_tether) pulling them onto their reach → per-capita stays high → concentration →
+    # packing → the density morph fires. Soft / no-violence v1 (a perception change only). Resource-agnostic (a
+    # proto-agriculture `cultivability` source drops into S_pot later). Needs distinct band_ids
+    # (enable_band_affiliation) to be meaningful. Default OFF ⇒ owner map is None ⇒ movement/split bit-exact.
+    enable_economic_defensibility: bool = False
+    defensibility_min: float = Field(0.15, ge=0.0)              # D_min: min aquatic_food/S_pot for a cell to be CLAIMABLE (dense+predictable) [PROVISIONAL]
+    defensibility_claim_dwell: int = Field(6, ge=1)             # steps a band must lead-occupy a claimable cell before it OWNS it (bootstrapping toehold)
+    defensibility_claim_min: int = Field(3, ge=1)              # min owner members present to build/hold a claim (a family; below → the claim decays)
+    defensibility_exclusion: float = Field(0.2, ge=0.0, le=1.0)  # OUTSIDER's perceived per-capita on an OWNED cell × this (shadow of defence → routed away) [PROVISIONAL]
+    defensibility_tether: float = Field(6.0, ge=1.0)           # OWNER member's perceived per-capita on ITS band's owned cell × this (delayed-return tether → concentrate) [PROVISIONAL]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

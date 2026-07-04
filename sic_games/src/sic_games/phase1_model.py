@@ -262,6 +262,8 @@ class TerrainWorld(mesa.Model):
         self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
+        self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
+        self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -474,6 +476,54 @@ class TerrainWorld(mesa.Model):
             self._do_births()
         self.occupied = {a.pos for a in self.agent_list}
 
+    def _update_defensibility_claims(self) -> None:
+        """Economic-defensibility (Dyson-Hudson & Smith 1978) claim maintenance. A cell is CLAIMABLE when its
+        resource is dense+predictable (aquatic_food/S_pot ≥ defensibility_min — aquatic is high-π by construction,
+        the diffuse interior ≈ 0 so it never qualifies). A band that LEAD-occupies a claimable cell with ≥
+        defensibility_claim_min members builds a claim (+1/step); at ≥ defensibility_claim_dwell it OWNS the cell.
+        The incumbent owner keeps priority while present; a challenger erodes the claim (−1); ownership LAPSES
+        (hysteresis) when the claim decays to 0. Resource-agnostic: reads aquatic_food now, cultivability later."""
+        D = getattr(self._fields, "aquatic_food", None)
+        if D is None:
+            return
+        dmin = self._demog.defensibility_min
+        dwell = self._demog.defensibility_claim_dwell
+        claim_min = self._demog.defensibility_claim_min
+        cell_bands: dict[tuple[int, int], dict[int, int]] = {}
+        for a in self.agent_list:
+            x, y = a.pos
+            if D[y, x] >= dmin:
+                d = cell_bands.setdefault((x, y), {})
+                b = a._group.band_id
+                d[b] = d.get(b, 0) + 1
+        for cell in set(cell_bands) | set(self._cell_claim):
+            bands = cell_bands.get(cell, {})
+            owner = self._cell_owner.get(cell)
+            strength, who = self._cell_claim.get(cell, (0, None))
+            # who qualifies to hold this step: the incumbent owner if still present, else the leading band
+            holder = None
+            if owner is not None and bands.get(owner, 0) >= claim_min:
+                holder = owner
+            elif bands:
+                lead = max(bands, key=bands.get)
+                if bands[lead] >= claim_min:
+                    holder = lead
+            if holder is not None and (who is None or who == holder):
+                strength += 1; who = holder
+            elif holder is not None:            # a challenger erodes the accrued claim, then takes it over
+                strength -= 1
+                if strength <= 0:
+                    strength, who = 1, holder
+            else:                               # nobody qualifies → decay
+                strength -= 1
+            if who is not None and strength >= dwell:
+                self._cell_owner[cell] = who
+            if strength <= 0:
+                self._cell_claim.pop(cell, None)
+                self._cell_owner.pop(cell, None)
+            else:
+                self._cell_claim[cell] = (min(strength, dwell + 6), who)  # cap ⇒ ~6-step release hysteresis
+
     def _step_rivalrous(self) -> None:
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
         Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
@@ -490,6 +540,18 @@ class TerrainWorld(mesa.Model):
             if occ_wsum is not None:
                 wt = base_status(a, phi_eps) ** kappa if a.strategy == "carbon" else 1.0
                 occ_wsum[a.pos] = occ_wsum.get(a.pos, 0.0) + wt
+
+        # 1b. Economic-defensibility claim maintenance (Dyson-Hudson & Smith): update which bands OWN which
+        # defensible cells from the CURRENT occupancy, so movement (step 2) reads a fresh owner map. Off ⇒ owner=None.
+        def_on = (self._demog is not None and getattr(self._demog, "enable_economic_defensibility", False)
+                  and getattr(self._fields, "aquatic_food", None) is not None)
+        if def_on:
+            self._update_defensibility_claims()
+            cell_owner = self._cell_owner
+            def_excl = self._demog.defensibility_exclusion
+            def_teth = self._demog.defensibility_tether
+        else:
+            cell_owner, def_excl, def_teth = None, 1.0, 1.0
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
@@ -552,7 +614,10 @@ class TerrainWorld(mesa.Model):
                 mr = mobility_radius(local_npp, self._demog)
             extra = followers_by_root.get(agent, 0) if anticipate else 0
             target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str,
-                                             move_radius=mr, water=water_mask, extra_occupants=extra)
+                                             move_radius=mr, water=water_mask, extra_occupants=extra,
+                                             cell_owner=cell_owner,
+                                             agent_band=(agent._group.band_id if def_on else None),
+                                             owner_exclusion=def_excl, owner_tether=def_teth)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:

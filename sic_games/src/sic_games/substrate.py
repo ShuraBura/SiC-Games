@@ -73,6 +73,10 @@ def diffusion_select_target(
     move_radius: int = 1,
     water: "np.ndarray | None" = None,
     extra_occupants: int = 0,
+    cell_owner: dict | None = None,
+    agent_band: int | None = None,
+    owner_exclusion: float = 1.0,
+    owner_tether: float = 1.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -155,6 +159,13 @@ def diffusion_select_target(
         if coh > 0.0:
             d_cell = max(abs(cx - cohesion_target[0]), abs(cy - cohesion_target[1]))
             ypc *= max(0.05, 1.0 + coh * (d_cur - d_cell))      # toward centroid ↑, away ↓ (bounded)
+        # Economic defensibility (Dyson-Hudson & Smith): an OWNED cell tethers its owner-band's members (× tether,
+        # the delayed-return pull onto the reach) and excludes outsiders (× exclusion, the shadow of defence → IFD
+        # routes them away). cell_owner=None ⇒ untouched ⇒ bit-exact.
+        if cell_owner is not None:
+            own = cell_owner.get((cx, cy))
+            if own is not None:
+                ypc *= owner_tether if own == agent_band else owner_exclusion
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 
