@@ -264,6 +264,7 @@ class TerrainWorld(mesa.Model):
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
+        self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -524,6 +525,46 @@ class TerrainWorld(mesa.Model):
             else:
                 self._cell_claim[cell] = (min(strength, dwell + 6), who)  # cap ⇒ ~6-step release hysteresis
 
+    def _torus_cheby(self, ax: int, ay: int, bx: int, by: int) -> int:
+        """Chebyshev distance on the toroidal grid."""
+        dx = abs(ax - bx); dy = abs(ay - by)
+        return max(min(dx, N - dx), min(dy, N - dy))
+
+    def _nearest_settlement(self, pos: tuple[int, int]) -> tuple[int, int] | None:
+        """The active settlement whose site is within settle_radius of `pos` (nearest); None if outside all."""
+        if not self._settlement_sites:
+            return None
+        rad = self._demog.settle_radius
+        best, bestd = None, rad + 1
+        for site in self._settlement_sites:
+            d = self._torus_cheby(pos[0], pos[1], site[0], site[1])
+            if d <= rad and d < bestd:
+                bestd, best = d, site
+        return best
+
+    def _maintain_settlements(self) -> None:
+        """Aggregation-sedentism lifecycle: an active settlement PERSISTS while ≥ settle_min_pool people are within
+        settle_radius of its site (membership is emergent proximity — robust to band fission/fusion); otherwise its
+        hysteresis timer decays and it DISSOLVES (the pool disperses back to mobile bands). Formation is seasonal (in
+        `_do_gathering`); this runs every step to hold or release."""
+        if not self._settlement_sites:
+            return
+        rad = self._demog.settle_radius
+        min_pool = self._demog.settle_min_pool
+        counts = {site: 0 for site in self._settlement_sites}
+        for a in self.agent_list:
+            ax, ay = a.pos
+            for site in counts:
+                if self._torus_cheby(ax, ay, site[0], site[1]) <= rad:
+                    counts[site] += 1
+        for site, n in counts.items():
+            if n >= min_pool:
+                self._settlement_sites[site] = self._demog.settle_release_steps    # refresh
+            else:
+                self._settlement_sites[site] -= 1
+                if self._settlement_sites[site] <= 0:
+                    self._settlement_sites.pop(site, None)
+
     def _step_rivalrous(self) -> None:
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
         Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
@@ -562,6 +603,13 @@ class TerrainWorld(mesa.Model):
             band_primary = {b: c for b, (_, c) in best.items()}
         else:
             cell_owner, def_excl, def_teth, band_primary = None, 1.0, 1.0, None
+
+        # 1c. Aggregation-sedentism: hold/release active settlements (formed seasonally in _do_gathering), then the
+        # movement below pins members within a settlement's radius onto its site (cohesion → site, pool scale).
+        settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
+        if settle_on:
+            self._maintain_settlements()
+            settle_coh = self._demog.settlement_cohesion
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
@@ -617,13 +665,21 @@ class TerrainWorld(mesa.Model):
             tfn = getattr(agent._decision, "temperature", None)
             if callable(tfn):
                 temp = tfn(agent)
-            ct = band_centroid.get(agent._group.band_id) if coh_str > 0.0 else None
+            # cohesion target: a settled member is pinned to its settlement SITE (strong, pool-scale); else the band
+            # centroid (mild). Settlement pin overrides the band nudge.
+            site = self._nearest_settlement(agent.pos) if settle_on else None
+            if site is not None:
+                ct, agent_coh = site, settle_coh
+            elif coh_str > 0.0:
+                ct, agent_coh = band_centroid.get(agent._group.band_id), coh_str
+            else:
+                ct, agent_coh = None, 0.0
             mr = 1
             if mobility_on:
                 local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
                 mr = mobility_radius(local_npp, self._demog)
             extra = followers_by_root.get(agent, 0) if anticipate else 0
-            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, coh_str,
+            target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, agent_coh,
                                              move_radius=mr, water=water_mask, extra_occupants=extra,
                                              cell_owner=cell_owner,
                                              agent_band=(agent._group.band_id if def_on else None),
@@ -1502,6 +1558,19 @@ class TerrainWorld(mesa.Model):
             males = [a for a in pool if a.sex == "male" and a.age >= cfg.menarche_months]
             if females and males:
                 self._pair_from_pool(females, males, cfg.aggregation_residence, cfg.aggregation_rank_homogamy, band_sizes)
+        # Aggregation-sedentism (Layer 1): a pool at a PERSISTENT-ABUNDANT site that reaches settle_min_pool FOUNDS /
+        # refreshes a settlement — the gathering that stops dispersing. Held + released each step by _maintain_settlements.
+        if getattr(cfg, "enable_aggregation_sedentism", False):
+            aqf = getattr(self._fields, "aquatic_food", None)
+            rad = cfg.settle_radius
+            for si in pools:                      # sites that pooled ≥1 band this gathering
+                site = sites[si]
+                if aqf is not None and aqf[site[1], site[0]] < cfg.settle_persist_threshold:
+                    continue                       # not a persistent-abundant (storable) site
+                near = sum(1 for a in self.agent_list
+                           if self._torus_cheby(a.pos[0], a.pos[1], site[0], site[1]) <= rad)
+                if near >= cfg.settle_min_pool:    # a real multi-band aggregation within the cluster → found/refresh
+                    self._settlement_sites[site] = cfg.settle_release_steps
 
     def _band_knob(self, band_id: int, name: str) -> float:
         """F.3c-2b: the per-band value of a family knob = the GLOBAL config (egalitarian baseline) + the additive

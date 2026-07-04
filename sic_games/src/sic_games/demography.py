@@ -279,6 +279,21 @@ class DemographyConfig(BaseModel):
     defensibility_claim_min: int = Field(3, ge=1)              # min owner members present to build/hold a claim (a family; below → the claim decays)
     defensibility_exclusion: float = Field(0.2, ge=0.0, le=1.0)  # OUTSIDER's perceived per-capita on an OWNED cell × this (shadow of defence → routed away) [PROVISIONAL]
     defensibility_tether: float = Field(6.0, ge=1.0)           # OWNER member's perceived per-capita on ITS band's owned cell × this (delayed-return tether → concentrate) [PROVISIONAL]
+    # ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson): settlements as MULTI-BAND
+    # coalescence — "the gathering that stops dispersing". Q1 lit: villages form by COALESCENCE of several bands at a
+    # rich node (not one band packing); Q2: the landscape is ~6× below Binford packing, so the density must come from
+    # AGGREGATING bands. At a persistent-abundant site a seasonal pool (≥ settle_min_pool people) PERSISTS: members
+    # within settle_radius are held (cohesion → site, at the POOL scale where it is stable) so the aggregation packs →
+    # the density morph fires; scalar stress → hierarchy. Dissolves (hysteresis) when the pool can't be sustained.
+    # LAYER 1 (this): lifecycle + hold, reside-on-cluster harvest. LAYER 2 (later): logistical CATCHMENT foraging
+    # (residence ≠ foraging; Binford collectors) + catchment-grain defensibility. Needs enable_marriage_aggregation
+    # (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
+    enable_aggregation_sedentism: bool = False
+    settle_min_pool: int = Field(40, ge=2)                     # min people aggregated within settle_radius to found/hold a settlement (multi-band; Natufian dozens+) [PROVISIONAL]
+    settle_persist_threshold: float = Field(0.3, ge=0.0)      # site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL]
+    settle_radius: int = Field(2, ge=1)                       # Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells)
+    settlement_cohesion: float = Field(1.5, ge=0.0)          # cohesion strength pinning settled members onto the site (overrides IFD per-capita → pack) [PROVISIONAL]
+    settle_release_steps: int = Field(12, ge=1)              # hysteresis: steps a settlement survives below settle_min_pool before it dissolves
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)
