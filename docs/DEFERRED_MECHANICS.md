@@ -12,17 +12,27 @@
 
 ---
 
-## GD-1 — Game depletion
+## GD-1 — Finite resources (depletion + regrowth) — **BUILT 2026-07-03 (RETIRED as deferred)**
 
-**What:** Depletable local game stock drawn down by hunting, with regrowth. Agents who hunt a cell reduce its `game_kcal` stock; the stock regrows at a biome-specific rate.
+**Status (2026-07-03):** DONE — built as GENERAL resource-stock depletion (not the narrow game-only field
+originally scoped). `capacity.py::NPPCapacityField(enable_depletion=True)` holds a depletable stock `B∈[0.05,1]`
+per cell of its NPP/aquatic ceiling, with biome- and aquatic-specific logistic regrowth
+(`R_BIOME_PER_YR`/`AQUATIC_R_PER_YR`) minus foraging pressure (occupancy/capacity), hooked in
+`phase1_model.py::_step_rivalrous`. Default OFF ⇒ non-depleting standing flow (bit-exact; suite 660). Built +
+viable + lit-anchored (Coe 1976 / Cortés 2016 / central-place halos). See **MECHANISMS §9b.9** (narrative) +
+**MODEL_SPEC §4.3.11** (methods, regrowth rates + basis) + **PARAMETERS §19.7** (constants). **Finding (R-51):**
+depletion is a necessary but NOT sufficient substrate for sedentism — the population is demographically limited
+(land 0.4% filled), so Carneiro circumscription/saturation is the missing keystone. This entry is retained for
+provenance only. *(Note: the entry was originally scoped as game_kcal depletion; the realized mechanic depletes
+the NPP-capacity stock the agents actually forage from, superseding the game-field framing below.)*
 
-**Why deferred:** TMTS (Too Much Too Soon). Depends on the game-as-stock seam (A-2 §11) being live first. Depletion without a literature-grounded ceiling (CC-1) is placeholder stacked on placeholder — the depletion dynamics cannot be calibrated without knowing the real extractable rate.
+**What (original scope):** Depletable local game stock drawn down by hunting, with regrowth. Agents who hunt a cell reduce its `game_kcal` stock; the stock regrows at a biome-specific rate.
 
-**Literature-rationale anchor:** Redford & Robinson 1987; Vickers (various); Ross 1978 — depletion is a *sedentism* effect (hunt-out of a fixed catchment). Mobile bands avoid it via movement; large slow-breeders go first. [INLINE — in Blueprint A; not yet in LITERATURE.md]
+**Why deferred (historical):** TMTS (Too Much Too Soon). Depends on the game-as-stock seam (A-2 §11) being live first. Depletion without a literature-grounded ceiling (CC-1) is placeholder stacked on placeholder — the depletion dynamics cannot be calibrated without knowing the real extractable rate.
 
-**Seam:** Game-as-stock field (`game_kcal` per cell, readable, A-2 §11). GD-1 switches the field from read-only to a mutable stock with regrowth. No other code path needs to change; the seam is a writeable field + per-step regrowth kernel. Also depends on: local hunting pressure counter (new) + residence time metric (new).
+**Literature-rationale anchor:** Redford & Robinson 1987; Vickers (various); Ross 1978 — depletion is a *sedentism* effect (hunt-out of a fixed catchment). Mobile bands avoid it via movement; large slow-breeders go first. **[Build anchors: Coe 1976 (K∝NPP), Cortés 2016 (r_max by taxon) — in LITERATURE.md.]**
 
-**Status:** DEFERRED — seam placed (A-2, 2026-06-14); depletion OFF.
+**Seam:** Game-as-stock field (`game_kcal` per cell, readable, A-2 §11). GD-1 switches the field from read-only to a mutable stock with regrowth. No other code path needs to change; the seam is a writeable field + per-step regrowth kernel. **Realized as: the NPP-capacity stock `B` + `deplete_and_regrow` per-step kernel.**
 
 ---
 
@@ -134,7 +144,16 @@ pending. The `mode='linear'` provisional form is kept selectable (default) for b
 
 **Seam:** `terrain.py: temperature, humidity` fields (constant now) + `MEAN_GLOBAL_TEMP_C` / `MEAN_REL_HUMIDITY`. CL-1 makes them spatial (latitude / elevation lapse) + seasonal (insolation cycle, solar-forced). Consumers: (a) the demographic **pathogen field** (Step 2) reads T/humidity instead of the `wateracc × NPP` proxy; (b) the existing **seasonal-oscillation** mechanic (`test_seasonal_oscillation.py`) becomes physically driven rather than a painted-on sine; (c) forage seasonality. Placeholder-value derivation: `MODEL_SPEC.md` §4.3.2.
 
-**Status:** SEAM PLACED — homogeneous constant fields live (2026-06-18, Phase 1); the spatial/seasonal solar-forced field is DEFERRED to the climate-season stage.
+**Status:** **LARGELY ADVANCED under EFC `mode="climate"` (2026-07-03).** The **temperature** half is now a real
+spatial + seasonal field: annual-mean T = regional-latitude base − elevation lapse (`LAPSE_C_PER_KM=6.5`) with a
+per-cell seasonal half-amplitude `temp_seas_amp` (latitude-rising, maritime-damped), built as the EFC C1 stage
+(`generate_world(…, mode="climate")`; MODEL_SPEC §4.3.4, MECHANISMS §9b, R-49). Biome is now DERIVED from T×P via
+Whittaker (C4). **Still deferred:** (a) **humidity** stays the constant placeholder (`MEAN_REL_HUMIDITY=0.70`) in
+both modes; (b) full **solar/orbital forcing** of the seasonal cycle (obliquity/eccentricity/ENSO/Holocene) lives
+in the separate `climate.py` orbital-lottery (MODEL_SPEC §4.1.9) — EFC C1 provides the spatial mean field, the
+orbital lottery provides the temporal forcing; the two are not yet unified into one solar-driven T field; (c) the
+pathogen field still reads NPP (not T/humidity directly). Under `mode="legacy"` the homogeneous constant
+placeholders remain live.
 
 ---
 
