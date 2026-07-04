@@ -511,7 +511,10 @@ Settlements as MULTI-BAND coalescence — "the gathering that stops dispersing".
 | Name | Value | Status | Meaning / grounding |
 |------|-------|--------|---------------------|
 | settle_catchment_radius | **2** cells | PROVISIONAL | catchment the settlement forages tier-2 from (Binford collectors; residence pins to the single site cell). |
-| settle_tier2_yield | **40.0** /unit S_pot/cell | PROVISIONAL — sweep | intensive tier-2 yield per unit S_pot per catchment cell, UNLOCKED by settlement (gated; mobile bands get only tier-1). Resource-agnostic (S_pot = aquatic_food now, cultivability later). |
+| settle_tier2_yield | **40.0** /unit S_pot/cell | PROVISIONAL — sweep | intensive tier-2 yield per unit S_pot per catchment cell, UNLOCKED by settlement (gated; mobile bands get only tier-1). Resource-agnostic (S_pot = aquatic_food now, cultivability later). Note: ~7× a village's need ⇒ fisheries never food-stressed → stable (R-53). |
+| enable_tier2_shock | **False** (default) | OPT-IN | Layer 2b regional bad-year shock; off ⇒ shock=1.0 ⇒ bit-exact. |
+| shock_cv | **0.6** | PROVISIONAL — salmon-anchored | inter-annual tier-2 yield CV (salmon-run variability). |
+| shock_rho | **0.0** (default) | PROVISIONAL | AR(1) persistence: 0 = IID single bad years (bit-identical to pre-AR(1)); →1 = multi-year regimes (ENSO/PDO). Only regimes test storage (R-53). |
 
 ### §20.3 — Economic-defensibility (DE-10; kept default-OFF, superseded as concentration mechanism → folded to catchment grain)
 
