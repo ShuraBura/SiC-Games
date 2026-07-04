@@ -409,6 +409,90 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 ---
 
+## §19 — Economy-from-Climate (EFC) + GD-1 finite resources (R-49…R-51; MODEL_SPEC §4.3.4–§4.3.11; MECHANISMS §9b)
+
+**All EFC/GD-1 constants are PROVISIONAL** (opt-in `mode="climate"` / `enable_depletion=True`; legacy default is
+bit-exact). Values live in `terrain.py` (EFC C1–C7) and `capacity.py` (C8 + GD-1). Extraction/derivation:
+MODEL_SPEC §4.3.4–§4.3.11 (methods home). Findings: RESULTS R-49/R-50/R-51.
+
+### §19.1 — EFC grid geometry (`terrain.py`)
+
+| Name | Value | Status | Meaning / grounding (MODEL_SPEC ref) |
+|------|-------|--------|--------------------------------------|
+| CELL_EDGE_M | **10000.0** m | LOCKED | cell edge = 10 km (100 km²/cell; = §1 Cell area). Shared legacy+climate. §4.3.4 |
+| GRID_SPAN_DEG | **9.0**° | PROVISIONAL | N–S extent of the 1000 km grid (~111 km/°) → modest within-grid latitude gradient. §4.3.4 |
+| CLIMATE_FULL_LAT_DEG | **65.0**° | PROVISIONAL | latitude at the subpolar edge (climate_latitude=1); equator=0. §4.3.4 |
+| REGIONAL_SPAN_FRAC | **≈0.14** (=9/65) | DERIVED | fraction of the equator→subpolar span traversed within one grid. §4.3.4 |
+| CLIMATE_LATITUDE_DEFAULT | **0.5** | PROVISIONAL | default regional latitude (temperate mid-lat); knob `climate_latitude` overrides. §4.3.4 |
+
+### §19.2 — C1 temperature (`terrain.py`, mode="climate")
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| LAPSE_C_PER_KM | **6.5** °C/km | PROVISIONAL (std physics) | environmental lapse rate — montane cooling; fixes savanna-cold/montane-warm inversion. §4.3.4 |
+| TEMP_SEAS_AMP_MAX | **15.0** °C | PROVISIONAL | max seasonal HALF-amplitude (~30 °C range) at a high-lat continental interior. §4.3.4 |
+| MARITIME_DAMP | **0.6** | PROVISIONAL | fraction near-water (high wateracc) cells DAMP the seasonal amplitude (maritime moderation). §4.3.4 |
+| TEMP_EQUATOR_C / TEMP_HIGHLAT_C | **27.0 / 1.0** °C | PROVISIONAL | base-T latitude endpoints (14 °C area-mean); shared with the C.4a grass-subtype gradient. §4.3.4 |
+| GRASS_TROPICAL_THRESHOLD_C | **18.0** °C | LIT-ANCHORED (Köppen) | tropical-A isotherm: warm intermediate band → SAVANNA, cool → GRASS. §4.3.7 |
+
+### §19.3 — C2 precipitation (`terrain.py`, mode="climate")
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| P_BASE_MM | **250.0** | PROVISIONAL | dry-background precip (subtropical/polar desert floor). §4.3.5 |
+| P_ITCZ_MM / P_ITCZ_WIDTH | **2400.0 / 0.15** | PROVISIONAL | equatorial ITCZ wet peak + Gaussian half-width. §4.3.5 |
+| P_MIDLAT_MM / P_MIDLAT_CENTER / P_MIDLAT_WIDTH | **1100.0 / 0.70 / 0.18** | PROVISIONAL | mid-latitude storm-track peak, center (~50°), width. §4.3.5 |
+| P_ELEV_UPLIFT | **1.6** | PROVISIONAL | elevation → orographic uplift multiplier (elev=1 ⇒ ×2.6 at full moisture). §4.3.5 |
+| P_ORO_SHADOW_CELLS | **6** | PROVISIONAL | rain-shadow reach (max upwind elev over ~60 km). §4.3.5 |
+| P_ORO_SHADOW_GAIN | **1.6** | PROVISIONAL | drying strength in the lee of upwind high terrain. §4.3.5 |
+| P_ORO_MIN / P_ORO_MAX | **0.25 / 3.2** | PROVISIONAL | orographic multiplier clamp (deep lee / windward-peak). §4.3.5 |
+| P_MARITIME_GAIN | **0.3** | PROVISIONAL | near-water (wateracc) moisture-supply boost. §4.3.5 |
+| P_ORO_WIND_DX | **1** (+x) | PROVISIONAL | prevailing wind = +x (westerlies); upwind = −x. §4.3.5 |
+| P_MOISTURE_REF_MM / P_UPLIFT_MIN_AVAIL | **1500.0 / 0.12** | PROVISIONAL | moisture-limited uplift: base precip at full uplift / floor. §4.3.5 |
+| POLAR_DRY_ONSET / POLAR_DRY_GAIN | **0.72 / 0.55** | PROVISIONAL | polar dryness onset latitude / max fractional precip reduction. §4.3.5 |
+| CLIMATE_ARIDITY_DAMP | **0.75** | PROVISIONAL | `climate_aridity` knob scales precip DOWN by up to this (continental/leeward dryness). §4.3.5 |
+
+### §19.4 — C3 Miami NPP (`terrain.py::miami_npp`) [VERIFIED vs Lieth 1972/1975 PDF, eqs 12-1/12-2]
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| MIAMI_MAX | **3000.0** g/m²/yr | LOCKED (published) | asymptotic NPP ceiling of both limbs. Lieth 1972/1975. §4.3.6 |
+| MIAMI_T_A | **1.315** | LOCKED (published) | temperature limb: NPP_T = MAX/(1+exp(A−B·T)). §4.3.6 |
+| MIAMI_T_B | **0.119** | LOCKED (published) | temperature-limb slope. §4.3.6 |
+| MIAMI_P_C | **0.000664** | LOCKED (published) | precip limb: NPP_P = MAX·(1−exp(−C·P)). §4.3.6 |
+
+### §19.5 — C4 Whittaker biome (`terrain.py::whittaker_biome`)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| WHIT_DESERT_BASE / WHIT_DESERT_SLOPE | **200.0 / 15.0** | PROVISIONAL | `P < BASE+SLOPE·max(T,0)` → DESERT (warm needs more rain). §4.3.7 |
+| WHIT_FOREST_BASE / WHIT_FOREST_SLOPE | **500.0 / 35.0** | PROVISIONAL | `P ≥ BASE+SLOPE·max(T,0)` → FOREST. §4.3.7 |
+| WHIT_TUNDRA_T | **−5.0** °C | PROVISIONAL | below this a would-be FOREST → GRASS (tundra; too cold for trees). §4.3.7 |
+
+### §19.6 — C6 river temperature + C7 aquatic-food (`terrain.py`)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| RIVER_COLD_RETENTION | **0.6** | PROVISIONAL | fraction of the headwater-elevation cooling a river retains at a cell (salmon enabler). §4.3.8 |
+| SALMON_T_OPT | **16.0** °C | LIT-ANCHORED (salmonid thermal) | at/below → anadromous coldness FULL. §4.3.9 |
+| SALMON_T_LETHAL | **21.0** °C | LIT-ANCHORED (salmonid thermal) | at/above → anadromous coldness 0. §4.3.9 |
+| AQUATIC_SEA_CONN_FLOOR | **0.25** | PROVISIONAL | anadromous factor for endorheic rivers (not draining to sea). §4.3.9 |
+| SHELLFISH_RICHNESS | **0.7** | LIT-ANCHORED (Bird 1997) | coastal littoral aquatic-food level on shore cells. §4.3.9 |
+
+### §19.7 — C8 aquatic capacity subsidy + GD-1 finite resources (`capacity.py`)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| AQUATIC_DENSITY_MAX | **80.0** persons/cell | PROVISIONAL (Ames 1994) | persons added by a full aquatic cell (~8× Tallavaara median); opt-in `aquatic=True`. §4.3.10 |
+| R_BIOME_PER_YR | **{water 0.0, wetland 0.40, forest 0.15, savanna 0.60, grass 0.70, desert 0.15, mountain 0.20}** /yr | PROVISIONAL | GD-1 biome logistic regrowth rate; grass/savanna fast, forest/desert slow. Coe 1976 / Cortés 2016 r_max. §4.3.11 |
+| AQUATIC_R_PER_YR | **0.80** /yr | PROVISIONAL | fast aquatic-catchment restock (salmon/shellfish) — the sedentism enabler. §4.3.11 |
+| DEPLETE_FRAC | **0.5** | PROVISIONAL | depletion strength; at pressure=1, B equilibrates ~1−0.5. §4.3.11 |
+| B_FLOOR | **0.05** | PROVISIONAL | hunted-out cell floor (refugia/trickle). §4.3.11 |
+| enable_depletion / aquatic (NPPCapacityField) | **False / False** (default) | OPT-IN | GD-1 stock / C8 subsidy toggles; off ⇒ non-depleting standing flow, bit-exact (suite 660). §4.3.10/§4.3.11 |
+| mode (generate_world) | **"legacy"** (default) / "climate" | OPT-IN | EFC world-generation mode; legacy bit-exact. §4.3.4 |
+
+---
+
 ## Discrepancy resolution log
 
 The following D-items from ARCHITECTURE.md §15 are resolved by this document:
