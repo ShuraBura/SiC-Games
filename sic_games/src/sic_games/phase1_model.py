@@ -265,6 +265,7 @@ class TerrainWorld(mesa.Model):
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
+        self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -644,6 +645,15 @@ class TerrainWorld(mesa.Model):
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
             self._maintain_settlements()
+            # Layer 2b SHOCK: redraw the REGIONAL tier-2 yield multiplier once per year (mean-preserving lognormal —
+            # same draw as game meat-cv); a low year = a bad run/drought that storage must buffer. Held within the year.
+            if getattr(self._demog, "enable_tier2_shock", False) and self.step_count % self._demog.aggregation_period == 0:
+                cv = self._demog.shock_cv
+                if cv > 0.0:
+                    sig = math.sqrt(math.log(1.0 + cv * cv))
+                    self._tier2_shock = math.exp(self.random.normalvariate(-0.5 * sig * sig, sig))
+                else:
+                    self._tier2_shock = 1.0
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
@@ -853,7 +863,7 @@ class TerrainWorld(mesa.Model):
                     excl_mask = None
             S = tf.level(cx, cy)
             if settle_on and (cx, cy) in self._settlement_sites:
-                S += self._settlement_catchment_yield((cx, cy))   # Layer 2: residents eat the catchment tier-2, not this cell
+                S += self._settlement_catchment_yield((cx, cy)) * self._tier2_shock   # Layer 2 catchment tier-2 (2b: × yearly shock)
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).

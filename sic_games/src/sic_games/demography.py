@@ -302,6 +302,15 @@ class DemographyConfig(BaseModel):
     # source drops in later — one field, many sources). This sustains the packed pool that reside-on-cluster starved.
     settle_catchment_radius: int = Field(2, ge=0)            # cells the settlement forages tier-2 from (a day's logistical range) [PROVISIONAL]
     settle_tier2_yield: float = Field(40.0, ge=0.0)          # intensive tier-2 yield per unit S_pot per catchment cell, unlocked by settlement (gated) [PROVISIONAL — sweep]
+    # LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews — NW
+    # Coast stable millennia); the real dispersal driver is a correlated bad YEAR that STORAGE must buffer. Once per
+    # aggregation_period a mean-preserving REGIONAL lognormal `s ~ LN(CV=shock_cv)` scales that year's tier-2 yield
+    # (shared across settlements — a climate bad year can't be insured away). Full granaries ride it out; thin ones →
+    # deficit → the existing starvation + settlement-dissolve → dispersal EMERGES. Anchor: salmon run inter-annual
+    # CV ~0.5–1 (ENSO/ocean regimes). Soil-depletion + learning (landesque capital) deferred to the cultivability
+    # tier. Default OFF ⇒ shock=1.0 ⇒ bit-exact.
+    enable_tier2_shock: bool = False
+    shock_cv: float = Field(0.6, ge=0.0)                     # inter-annual tier-2 yield CV (salmon-run anchored) [PROVISIONAL — sweep]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

@@ -106,3 +106,20 @@ def test_catchment_yield_zero_without_spot_field():
     cfg = DemographyConfig()
     f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=None), _demog=cfg)
     assert TerrainWorld._settlement_catchment_yield(f, (50, 50)) == 0.0
+
+
+def test_shock_draw_is_mean_preserving():
+    """Layer 2b: the regional tier-2 shock is a mean-preserving lognormal — over many years its mean ≈ 1.0
+    (a bad run is a below-1 draw, a good run above-1), so it redistributes not depletes the long-run yield."""
+    import math
+    import random
+    rng = random.Random(0)
+    cv = 0.6
+    sig = math.sqrt(math.log(1.0 + cv * cv))
+    draws = [math.exp(rng.normalvariate(-0.5 * sig * sig, sig)) for _ in range(40000)]
+    assert abs(sum(draws) / len(draws) - 1.0) < 0.03            # mean-preserving
+    assert min(draws) < 0.5 and max(draws) > 2.0                # genuine bad + good years at CV 0.6
+
+
+def test_tier2_shock_defaults_off():
+    assert DemographyConfig().enable_tier2_shock is False       # default OFF ⇒ shock stays 1.0 ⇒ bit-exact

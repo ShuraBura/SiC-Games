@@ -100,3 +100,23 @@ Build aggregation-sedentism as the settlement mechanism, target **v2 logistical 
 - **Q3 — Extraction pressure shape:** uniform `N/n_cells` over the catchment, or distance-weighted (nearer cells worked harder → a sharper halo)? *Recommend uniform v1, distance-weighted if the halo needs to bite spatially.*
 
 **Recommendation:** build Layer 2b as GD-1-reuse tier-2 depletion with the foraging-pressure remap, `enable_tier2_depletion` default-OFF, disperse-on-collapse v1, resource-agnostic. Validate the **boom→degrade→bust→fallow→reboom cycle** on the aquatic world (does a rich reach cycle on a generational timescale without tuning to a target?), confirming the equilibrium village is *sustainable* and the bust is an *earned overshoot*.
+
+## 10b. Reframe + the TRACTABLE CORE we build now (2026-07-04)
+
+Straightening the resource ecology (supervisor) corrected §10's pure-depletion model — the tiers differ sharply:
+- **Fisheries ≈ SUSTAINABLE.** Salmon self-renews (oceanic stock); NW-Coast villages were stable for *millennia* (Ames). So a salmon settlement should PERSIST, not boom-bust from depletion. Its dynamic is seasonal **GLUT + STORAGE buffer + episodic SHOCK**, not slow exhaustion.
+- **Only proto-ag (swidden) has the generational soil-depletion → relocation cycle** (Boserup 1965; Blaikie & Brookfield 1987 landesque capital) — **DEFERRED to the `cultivability` tier** (§10 is that path).
+- **LEARNING / landesque capital** (yield rises durably with sustained investment — weirs/terraces/irrigation/skill) is a *stabilizing* positive feedback — **DEFERRED with ag**.
+- **Dispersal triggers are NOT inevitable depletion.** Four distinct: (1) **OVERSHOOT** (pop > carrying; Malthus/Boserup), (2) **SHOCK** (a bad year, buffered by storage), (3) soil-exhaustion (ag only — deferred), (4) **social scalar-stress** (already covered by size-repulsion).
+
+**THE CORE BUILD (this):** sustainable tier-2 (no long-term depletion) + seasonality + a regional **SHOCK** + **storage buffer** → dispersal EMERGES on deficit (unbuffered shock or overshoot). Soil-depletion + learning deferred to proto-ag.
+
+**SHOCK mechanism.** Once per `aggregation_period` (a year), a **mean-preserving regional lognormal multiplier** `s ~ LN(CV = shock_cv)` scales that year's `_settlement_catchment_yield` (reuses the `game_meat_cv` draw pattern already in `_step_rivalrous`; **shared across the region** — a correlated climate bad year, which cannot be insured away by exchange). Anchor: salmon run inter-annual CV ~0.5–1+ (ENSO/ocean regimes — *why* NW-Coast stored obsessively and occasionally relocated). **Storage buffers it** (`_cell_store`, already built — this finally makes storage *load-bearing*): full granaries ride out a bad year; thin ones → deficit. **Dispersal is EMERGENT** — the deficit runs the existing starvation mortality → the pool shrinks below `settle_min_pool` → `_maintain_settlements` hysteresis dissolves the settlement → residents revert to mobile. *No scripted dispersal rule.* (Optional v1.1: deficit-driven **out-migration**, settled→mobile, before death.)
+
+**Calibration target:** `shock_cv`/frequency tuned so a **well-stored equilibrium village survives ordinary bad years** (stable fishery = the NW-Coast benchmark) and only a **severe/multi-year shock or an OVERSHOT/under-stored village disperses** → "bust = *earned*".
+
+**New knobs:** `enable_tier2_shock` (default OFF ⇒ bit-exact), `shock_cv` [PROVISIONAL, salmon-anchored]; seasonality reuses `ClimateField.season()`.
+
+**Red-team (core):** RT-1 *shock too harsh → nothing survives* → tune so storage covers ordinary years; validate a stored village is stable. RT-2 *storage doesn't actually buffer settlements* → verify settled surplus banks to `_cell_store` and is drawn on deficit (may need wiring — check first). RT-3 *idiosyncratic vs regional* → regional (shared draw) so shocks are correlated (realistic, and produces real collapse events). RT-4 *bit-exact* → `enable_tier2_shock` gate. RT-5 *overshoot never bites* → confirm a village grown past carrying disperses on the first shock.
+
+**Validation:** salmon world → settlements PERSIST through ordinary shocks (stable villages); a severe/multi-year shock or an overshoot disperses; **storage level predicts survival**. Swidden relocation cycle + landesque intensification deferred to the `cultivability` tier (§10).
