@@ -324,7 +324,7 @@ No new tunable threshold beyond the A-1 placeholders. Risk-sensitivity (variance
 
 | Seam ID | What is deferred | Hook | Status |
 |---|---|---|---|
-| GD-1 | Game depletion | `game_kcal` per-cell field (read-only → writeable stock + regrowth) | Depletion OFF; field exposed. DEFERRED_MECHANICS.md. |
+| GD-1 | Game depletion → **BUILT as general resource depletion** | now a depletable NPP-capacity STOCK `B` (biome/season/aquatic regrowth), not the game_kcal field | **BUILT (opt-in, default OFF)** — see §9b.9; MODEL_SPEC §4.3.11. |
 | CC-1 | Non-rivalrous cap; kcal ceiling re-derivation | `terrain_field.py harvest()/game_level()` returns full per-agent rate; rivalry switches on here | Rivalry OFF [PROVISIONAL]. DEFERRED_MECHANICS.md. |
 | JV-1 | Age-graded juvenile curve | `is_juvenile()` hook in step loop; binary gate now | Binary gate (0 below a_forage_min=15; full above). DEFERRED_MECHANICS.md. |
 
@@ -351,6 +351,65 @@ Biomes NOT in the target dict (water; wetland/mountain for game) stay at 0. All 
 **Distribution-family choice = lognormal; spatial choice = terrain-coupled rescale** (supervisor, 2026-06-15) — see ARCHITECTURE.md §12.1-N.
 
 **Std sourcing rule (supervisor, 2026-06-15):** each biome's std is mined from the literature where the source reports a spread/SD/range; **where the literature std is unavailable, std = 10% of the mean** (`DEFAULT_STD_FRAC = 0.10`). So **every** biome uses the lognormal draw — none fall back to mean-only scaling. Literature-anchored stds: game forest (4,043), game desert (210), forage forest (600), forage desert (368); all other biomes use the 10% default. See PARAMETERS.md §12.4 / §13.3 for the per-biome tag ([LIT] vs [10%-DEFAULT]).
+
+## 9b. Economy-from-Climate (EFC) pipeline + GD-1 finite resources (Phase 1, built 2026-07-03)
+
+**Category: shared world machinery (C and Si read the same fields).** An OPT-IN world-generation MODE
+(`generate_world(knobs, mode="legacy"|"climate")`): **legacy is the DEFAULT and bit-exact**. In climate mode the
+food economy EMERGES from climate rather than a fractal-noise moisture field × terrain penalties. Values in
+PARAMETERS.md §19; all extractions/derivations + literature in MODEL_SPEC §4.3.4–§4.3.11; findings in RESULTS
+R-49/R-50/R-51. **All constants PROVISIONAL.** The pipeline is a strict causal chain (each stage feeds the next):
+
+```
+insolation(latitude, elevation)
+  C1 TEMPERATURE  T̄ = regional-lat base − 6.5°C/km·elev,  seasonal amp ∝ lat, maritime-damped
+  C2 PRECIPITATION P = Hadley/ITCZ bands × orographic(uplift × multi-cell rain-shadow) × maritime × aridity
+        ↓
+  C3 NPP = MIAMI(T,P) = min(NPP_T(T), NPP_P(P))     [Lieth 1972/1975, VERIFIED]  → npp_gm2
+        ↓
+  C4 BIOME = WHITTAKER(T̄, P̄)   biome is an OUTCOME of climate (temperature-scaled thresholds), not a label
+        ↓
+  C6 WATER_TEMP = air_T − headwater-elevation cooling (flow-routed src_elev; cold montane rivers)
+  C7 AQUATIC_FOOD = max(anadromous salmon [cold sea-connected river], shellfish [coastal])  ∈ [0,1]
+        ↓
+  C8 CAPACITY += AQUATIC_DENSITY_MAX·aquatic_food   (aquatic subsidy above the Tallavaara terrestrial ceiling)
+        ↓
+  AGENTS / SOCIETY  (unchanged mechanics)
+```
+
+### 9b.1–9b.8 The EFC chain (one-line each; math + constants in MODEL_SPEC)
+- **C1 temperature** (§4.3.4): annual-mean T = regional-latitude base − elevation lapse (`LAPSE_C_PER_KM=6.5`),
+  plus a per-cell seasonal half-amplitude `temp_seas_amp` (rises with absolute latitude, `TEMP_SEAS_AMP_MAX=15`,
+  damped near water). Fixes the pre-EFC savanna-cold/montane-warm inversion. New `WorldFields`: `temp_seas_amp`.
+- **C2 precipitation** (§4.3.5): `precip_mm` = Hadley/ITCZ latitude bands (`P_BASE/P_ITCZ/P_MIDLAT`) × orographic
+  (moisture-limited uplift `P_ELEV_UPLIFT` × multi-cell rain-shadow `P_ORO_SHADOW_CELLS=6`) × maritime × noise ×
+  `climate_aridity` × polar-dry. New `WorldFields`: `precip_mm`.
+- **C3 Miami NPP** (§4.3.6): `miami_npp(T,P) = min(3000/(1+e^{1.315−0.119·T}), 3000·(1−e^{−0.000664·P}))` g/m²/yr;
+  **VERIFIED against the primary Lieth 1972/1975 PDF, eqs 12-1/12-2.** Feeds `npp_gm2` → Tallavaara capacity.
+- **C4 Whittaker biome** (§4.3.7): `whittaker_biome(T,P)` with temperature-scaled aridity/forest thresholds
+  (`WHIT_DESERT_*`, `WHIT_FOREST_*`, cold-cap `WHIT_TUNDRA_T`); MOUNTAIN/WETLAND/WATER are terrain overrides.
+  Worlds are drawn as INDEPENDENT terrain × climate (`world_lottery_climate` + `TERRAIN_PRESETS`/`CLIMATE_PRESETS`).
+- **C6 water temperature** (§4.3.8): flow-routing propagates the max upstream (headwater) elevation `src_elev` →
+  `water_temp` (cooled by `RIVER_COLD_RETENTION=0.6` of the headwater lapse) — cold montane headwaters enable
+  salmon in warm valleys. New `WorldFields`: `water_temp`.
+- **C7 aquatic-food** (§4.3.9): `aquatic_food_field()` = max(anadromous [`SALMON_T_OPT=16`/`SALMON_T_LETHAL=21`
+  cold × river × sea-connectivity `AQUATIC_SEA_CONN_FLOOR`], shellfish [coastal `SHELLFISH_RICHNESS=0.7`]);
+  `drains_to_sea` propagated from open water. New `WorldFields`: `aquatic_food`.
+- **C8 aquatic capacity subsidy** (§4.3.10): `NPPCapacityField(…, aquatic=True)` adds `AQUATIC_DENSITY_MAX=80·
+  aquatic_food` persons/cell — the super-density for Binford packing. Opt-in; interior bit-exact. **GATE-3 (R-51):
+  the subsidy alone does not concentrate bands (IFD disperses).**
+
+### 9b.9 GD-1 finite resources — the depletable stock (Testart delayed-return substrate)
+`NPPCapacityField(…, enable_depletion=True)` turns the standing FLOW into a depletable STOCK `B ∈ [B_FLOOR, 1]`
+of the cell's ceiling; effective yield `E = base_E·B`. Per step, `deplete_and_regrow(occ_count, season)`:
+`B += r_step·season·((1−B) − DEPLETE_FRAC·occ/K_persons)`, clamped `[B_FLOOR=0.05, 1]`. Biome-specific logistic
+regrowth `R_BIOME_PER_YR` (grass/savanna fast ~0.6–0.7, forest/desert slow ~0.15) + `AQUATIC_R_PER_YR=0.80`
+(fast salmon/shellfish restock = the sedentism enabler), `DEPLETE_FRAC=0.5`. Hooked in `phase1_model.py::
+_step_rivalrous` (end of step, `hasattr` guard). Default OFF ⇒ non-depleting (bit-exact). Lit: Coe 1976 (K∝NPP),
+Cortés 2016 (r_max), central-place depletion halos (MODEL_SPEC §4.3.11 / LITERATURE.md). **Finding (R-51):**
+built + viable but sedentism did NOT fire — the population is demographically (not resource) limited, so
+Carneiro circumscription/saturation is the missing keystone. This realizes the DEFERRED_MECHANICS GD-1 seam
+(originally scoped as `game_kcal` depletion) as GENERAL resource-stock depletion.
 
 ## 9. World / resource substrate → see `ARCHITECTURE.md` §9
 
