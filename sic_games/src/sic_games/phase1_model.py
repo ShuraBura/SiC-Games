@@ -643,14 +643,17 @@ class TerrainWorld(mesa.Model):
             for s in self._settlement_sites:
                 if self._torus_cheby(ax, ay, s[0], s[1]) <= rad:
                     counts[s] = counts.get(s, 0) + 1
+        dep = cfg.soil_deplete_frac / 12.0                     # per-step exhaustion at pressure 1
         active_farm = set()
         for s in self._settlement_sites:
             if aq is not None and aq[s[1], s[0]] >= cult[s[1], s[0]]:
                 continue                                       # aquatic-dominant → a FISHERY, exempt (R-53)
             active_farm.add(s)
-            soil = self._settlement_soil.get(s, 1.0)
             pressure = counts.get(s, 0) / carry if carry > 0 else 0.0
-            soil += r * ((1.0 - soil) - cfg.soil_deplete_frac * pressure)   # deplete-and-regrow, slow R
+            # SWIDDEN: continuous cropping EXHAUSTS the soil (no regrowth while farmed) → progressive decline to the
+            # floor → yield crashes → bust/relocate. (Landesque capital, B2, is what damps this to a sustainable
+            # equilibrium — the intensification path.) Regrowth happens only on FALLOW (below).
+            soil = self._settlement_soil.get(s, 1.0) - dep * pressure
             self._settlement_soil[s] = min(1.0, max(0.05, soil))
         for s in list(self._settlement_soil):                  # FALLOW: abandoned (or non-farm) sites heal slowly
             if s not in active_farm:

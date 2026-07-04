@@ -324,7 +324,7 @@ class DemographyConfig(BaseModel):
     # This gives boom → soil-degrade → yield-fall → bust (relocation = Layer B3). Default OFF ⇒ soil≡1 ⇒ bit-exact.
     enable_soil_depletion: bool = False
     soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
-    soil_deplete_frac: float = Field(0.6, ge=0.0)           # depletion strength at pressure=1 (soil equilibrates ~1−frac) [PROVISIONAL]
+    soil_deplete_frac: float = Field(0.6, ge=0.0)           # per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL]
     soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
