@@ -411,6 +411,17 @@ built + viable but sedentism did NOT fire — the population is demographically 
 Carneiro circumscription/saturation is the missing keystone. This realizes the DEFERRED_MECHANICS GD-1 seam
 (originally scoped as `game_kcal` depletion) as GENERAL resource-stock depletion.
 
+## 9c. Aggregation-sedentism — settlements as multi-band coalescence (Phase 1, built 2026-07-04; R-52)
+
+**The problem it solves (R-51 + DE-10):** complexity needs residential PACKING, but an unsaturated landscape is ~6× below Binford density and IFD disperses; forcing ONE band onto a cell is inert or a death-spiral (DE-10). Lit (Q1): settlements form by **coalescence of several bands** at a rich node — "the seasonal aggregation phase gone year-round" (Mauss); the unit is ~100–300 people, not one ~25 band.
+
+**Mechanism = "the gathering that stops dispersing"** (extends `_do_gathering`, the marriage-aggregation seam):
+- **Lifecycle (Layer 1).** At a persistent-abundant site (`aquatic_food`/S_pot ≥ `settle_persist_threshold`) a seasonal pool of ≥ `settle_min_pool` people within `settle_radius` FOUNDS a settlement (`_settlement_sites`). `_maintain_settlements` holds it each step by **proximity membership** (people within radius — robust to band fission/fusion) or dissolves it with `settle_release_steps` hysteresis. Formation is seasonal (in the gathering); hold/release is every step.
+- **Residence ≠ foraging (Layer 2).** A village of dozens is « one 100 km² cell, so settled members **pin onto the SINGLE site cell** (`_toward`, a cardinal step toward the site) and settled families **STACK** there (override the footprint scatter) → residential density ≫ Binford packing *automatically* → the morph fires. This is safe (unlike DE-10) *because* food is decoupled from residence.
+- **Settlement-unlocked TIER-2 (Layer 2).** The site cell's harvest gains `_settlement_catchment_yield = settle_tier2_yield · Σ_catchment S_pot` — an intensive resource **GATED on settlement** (a mobile band gets only the tier-1 cell return; this also explains GATE-3). Sustains the packed pool that reside-on-cluster starved (Testart delayed-return / Boserup intensification; Binford collectors — logistical catchment). **RESOURCE-AGNOSTIC:** `S_pot = aquatic_food` now, a `cultivability` source (proto-agriculture) drops in later — one field, many sources.
+
+**Finding (R-52):** the chain closes — SETTLE holds 2–3 persistent settlements (~110), band_dens 0.19–0.34 (2–4× packing), %packed 38–75%, morph→complex, population survives+grows, vs 0% packed OFF. Anchors: Mauss & Beuchat 1979, Binford 2001 (collector/packing), Vita-Finzi & Higgs 1970 (catchment), Johnson 1982 (scalar stress), Testart 1982, Ames 1994. Default OFF ⇒ bit-exact. Params §20. **OPEN:** tier-2 is static (no collapse yet) → Layer 2b depletion→halo→bust; "complex" not yet "stratified"; single-seed provisional calibration.
+
 ## 9. World / resource substrate → see `ARCHITECTURE.md` §9
 
 *(Per charter §2.1 the world/resource substrate is the "how the world works" half and lives in **`ARCHITECTURE.md` §9**: grid, twin peaks, capacity function, growback G_α, k_grid rescale (§9.1–9.2), and the OWE-1 / OWE-1.1 / R0 physical-unit calibration (§9.3). Pointer kept here so the cross-references from §1.2, §3, etc. still resolve.)*

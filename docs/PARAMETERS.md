@@ -491,6 +491,36 @@ MODEL_SPEC §4.3.4–§4.3.11 (methods home). Findings: RESULTS R-49/R-50/R-51.
 | enable_depletion / aquatic (NPPCapacityField) | **False / False** (default) | OPT-IN | GD-1 stock / C8 subsidy toggles; off ⇒ non-depleting standing flow, bit-exact (suite 660). §4.3.10/§4.3.11 |
 | mode (generate_world) | **"legacy"** (default) / "climate" | OPT-IN | EFC world-generation mode; legacy bit-exact. §4.3.4 |
 
+## §20 — Aggregation-sedentism (settlements) + economic-defensibility (R-52; MECHANISMS §9c; blueprints `…_AggregationSedentism`, `…_EconomicDefensibility`)
+
+Settlements as MULTI-BAND coalescence — "the gathering that stops dispersing". All default-OFF ⇒ bit-exact.
+
+### §20.1 — Aggregation-sedentism lifecycle (Layer 1; `demography.py`, `phase1_model.py`)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| enable_aggregation_sedentism | **False** (default) | OPT-IN | master toggle; needs enable_marriage_aggregation + enable_band_affiliation. Off ⇒ no settlements, bit-exact. |
+| settle_min_pool | **40** persons | PROVISIONAL | min people within settle_radius to found/hold a settlement (multi-band; Natufian dozens+). |
+| settle_persist_threshold | **0.3** (S_pot) | PROVISIONAL | site `aquatic_food`/S_pot ≥ this = a persistent-abundant (storable) settlement site. |
+| settle_radius | **2** cells | PROVISIONAL | Chebyshev radius for membership + formation (a day's logistical range). |
+| settle_release_steps | **12** steps | PROVISIONAL | hysteresis: steps a settlement survives below settle_min_pool before dissolving. |
+| settlement_cohesion | **1.5** | SUPERSEDED | Layer 1 soft hold; replaced by the Layer 2 residence pin (kept for ablation). |
+
+### §20.2 — Layer 2: residence ≠ foraging + tier-2 unlock (`phase1_model.py`)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| settle_catchment_radius | **2** cells | PROVISIONAL | catchment the settlement forages tier-2 from (Binford collectors; residence pins to the single site cell). |
+| settle_tier2_yield | **40.0** /unit S_pot/cell | PROVISIONAL — sweep | intensive tier-2 yield per unit S_pot per catchment cell, UNLOCKED by settlement (gated; mobile bands get only tier-1). Resource-agnostic (S_pot = aquatic_food now, cultivability later). |
+
+### §20.3 — Economic-defensibility (DE-10; kept default-OFF, superseded as concentration mechanism → folded to catchment grain)
+
+| Name | Value | Status | Meaning / grounding |
+|------|-------|--------|---------------------|
+| enable_economic_defensibility | **False** (default) | OPT-IN | Dyson-Hudson & Smith owned-patch claim/exclusion. Superseded for concentration by R-52; kept for the between-settlement catchment-defense follow-on. |
+| defensibility_min / claim_dwell / claim_min | **0.15 / 6 / 3** | PROVISIONAL (DE-10) | claimable S_pot threshold; steps to own; min members to hold. |
+| defensibility_exclusion / tether | **0.2 / 6.0** | PROVISIONAL (DE-10) | outsider per-capita ×; owner tether × (did not pack — see DE-10). |
+
 ---
 
 ## Discrepancy resolution log
