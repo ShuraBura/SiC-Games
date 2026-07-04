@@ -427,7 +427,10 @@ inline copy, `SubWindowCapacity`, numerically identical to the linear mode.) **W
 forest/savanna/desert/montane/mixed (`WORLD_ARCHETYPES`, NPP ~175→856) so CC-1 is characterized across a
 productivity range; NB the archetype set is arid-biased (median NPP ~500 vs forager-median ~900).
 
-### §4.3.2 Climate seam — temperature & humidity [PLACEHOLDER]
+### §4.3.2 Climate seam — temperature & humidity [PLACEHOLDER; SUPERSEDED under mode="climate" by §4.3.4]
+**NB (2026-07-04):** under `generate_world(…, mode="climate")` the temperature field is a real annual mean
+(latitude − elevation lapse + maritime) with a seasonal amplitude — see the EFC C1 methods, **§4.3.4**. The
+placeholder below is the LEGACY-mode value (and `humidity` stays the constant placeholder in both modes).
 `temperature=14.0 °C`, `humidity=0.70`, **homogeneous (constant)**. **Source:** global mean surface air
 temperature ~14 °C; near-surface relative humidity land-ish ~70%. PLACEHOLDER seam
 (`terrain.py: MEAN_GLOBAL_TEMP_C, MEAN_REL_HUMIDITY`); the spatial/seasonal **solar-forced** field is the
@@ -466,6 +469,189 @@ seasonality + depletion) to act, so `μ_max` is not calibratable until then.
 
 ---
 
+## Economy-from-Climate (EFC) — first-principles food yield from climate (added 2026-07-04; RESULTS R-49/R-50/R-51)
+
+**Status: BUILT as an OPT-IN world-generation MODE.** `generate_world(knobs, mode="legacy"|"climate")` in
+`terrain.py`; **legacy is the DEFAULT and bit-exact** (a pure migration toggle — R-2…R-48 stay valid until EFC
+is validated and cut over). Blueprints: `…_ClimateEconomy_Scoping.md` (the umbrella; subsumes
+`…_BiomeClimate_AquaticFood_Scoping.md`). This is the deep first-principles substrate that makes the food
+economy EMERGE from climate rather than being a fractal-noise moisture field × terrain penalties with biome as
+a label (the pre-EFC substrate; §4.3.2 was the placeholder). The chain is C1 temperature → C2 precipitation →
+C3 Miami NPP → C4 Whittaker biome → C6 river-source temperature → C7 aquatic-food → C8 aquatic capacity
+subsidy. All EFC fields are 0 in legacy mode. This section is the METHODS home for every EFC lit-derived value;
+the pipeline narrative is MECHANISMS §9b; the constants table is PARAMETERS §19; findings are RESULTS
+R-49/R-50/R-51. **All EFC science constants are PROVISIONAL (pending supervisor sign-off + per-step sweeps).**
+
+**Grid geometry (shared by legacy + climate).** `N=100` cells, `CELL_EDGE_M=10000` (10 km × 10 km = 100 km²/
+cell), so the grid is 1000 × 1000 km. At ~111 km/degree that N–S extent is a **~9° swath** (`GRID_SPAN_DEG=9.0`),
+which is why the WITHIN-GRID latitudinal temperature gradient is MODEST — the big spatial variability is
+elevation (lapse) + rain-shadow + coast, so a mountainous coastal region legitimately holds 4–6 biomes.
+
+### §4.3.4 C1 — temperature field (`terrain.py`, `mode="climate"`)
+**Annual-mean T** `= regional-latitude base − elevation lapse`, with a per-cell seasonal HALF-amplitude
+`temp_seas_amp` (the monthly wave `T̄ ± amp·cos(2π·month/12)` is applied by the climate layer; in legacy mode
+`temperature` is the latitudinal placeholder and `temp_seas_amp=0`).
+- **Regional latitude.** The world sits at `climate_latitude ∈ [0,1]` (knob; 0 = equator, 1 = subpolar edge,
+  `CLIMATE_FULL_LAT_DEG=65°`; default `CLIMATE_LATITUDE_DEFAULT=0.5`). Each cell's ABSOLUTE latitude fraction
+  is `climate_latitude + REGIONAL_SPAN_FRAC·(lat_frac − 0.5)`, where `REGIONAL_SPAN_FRAC = GRID_SPAN_DEG /
+  CLIMATE_FULL_LAT_DEG ≈ 0.14` — so only ~14% of the full equator→subpolar span is traversed within one grid.
+  The base T at that cell-latitude interpolates the same endpoints the C.4a placeholder uses: `TEMP_EQUATOR_C
+  = 27 °C` (equator) → `TEMP_HIGHLAT_C = 1 °C` (subpolar), 14 °C area-mean by construction.
+- **Elevation lapse.** `− LAPSE_C_PER_KM·(elev·reliefAmpM)/1000`, `LAPSE_C_PER_KM = 6.5 °C/km` — the standard
+  **environmental lapse rate** (montane cooling). Anchor: standard atmospheric physics (6.5 °C/km is the ICAO/
+  environmental mean). This fixes the pre-EFC savanna-cold/montane-warm inversion (a montane cell at ~1550 m
+  reads 14 → ~3.9 °C, not warm). Elevation enters climate-NPP only through T (no separate elev penalty).
+- **Seasonal amplitude.** `temp_seas_amp = TEMP_SEAS_AMP_MAX·cell_lat·(1 − MARITIME_DAMP·wateracc)`,
+  `TEMP_SEAS_AMP_MAX = 15 °C` (max half-amplitude ⇒ ~30 °C annual range at a high-latitude CONTINENTAL interior,
+  cf. continental temperate/boreal interiors), `MARITIME_DAMP = 0.6` (maritime moderation: near-water cells DAMP
+  the swing — oceans buffer the annual cycle). Amplitude ∝ absolute latitude (tropics aseasonal, high-lat
+  strongly seasonal). PROVISIONAL.
+
+### §4.3.5 C2 — structured annual precipitation (mm/yr)
+`precip_mm` = Hadley/ITCZ latitude bands × orographic (uplift × multi-cell rain-shadow) × maritime × noise ×
+continental aridity × polar-dry. Ranges tuned so the latitudinal profile lands in Earth-like biome bins
+(R-49 realized: equator ~2865 mm rainforest, subtropical ~30° ~340 mm desert, mid-lat ~1489 mm temperate
+forest, subpolar ~501 mm). All constants PROVISIONAL.
+- **Latitude bands (the regional air-moisture supply).** `p_band = (P_BASE_MM + itcz + midlat)·polar_dry·
+  aridity`, with `P_BASE_MM = 250` (dry background — subtropical/polar desert floor), an equatorial ITCZ
+  Gaussian `itcz = P_ITCZ_MM·exp(−(cell_lat/P_ITCZ_WIDTH)²)` (`P_ITCZ_MM = 2400`, `P_ITCZ_WIDTH = 0.15`), and a
+  mid-latitude storm-track Gaussian `midlat = P_MIDLAT_MM·exp(−((cell_lat − P_MIDLAT_CENTER)/P_MIDLAT_WIDTH)²)`
+  (`P_MIDLAT_MM = 1100`, `P_MIDLAT_CENTER = 0.70` ≈ 50° on the span, `P_MIDLAT_WIDTH = 0.18`). Anchor: the
+  Hadley-cell / ITCZ general-circulation pattern (equatorial ascent wet, ~30° subsidence dry, mid-lat storm
+  track wet).
+- **Polar dryness.** `polar_dry = 1 − POLAR_DRY_GAIN·clip((cell_lat − POLAR_DRY_ONSET)/(1 − POLAR_DRY_ONSET),
+  0,1)`, `POLAR_DRY_ONSET = 0.72`, `POLAR_DRY_GAIN = 0.55` — descending dry polar air past the storm track.
+- **Continental aridity.** `aridity = 1 − CLIMATE_ARIDITY_DAMP·climate_aridity`, `CLIMATE_ARIDITY_DAMP = 0.75`
+  — the `climate_aridity ∈ [0,1]` knob scales precip DOWN by up to 75% (continental/leeward dryness independent
+  of latitude, e.g. a temperate-but-arid interior; the axis that lets a subtropical world be a genuine Sahara).
+- **Orographic uplift (moisture-limited).** `uplift = 1 + P_ELEV_UPLIFT·elev·moist_avail`, `P_ELEV_UPLIFT =
+  1.6` (elev=1 ⇒ ×2.6 at full moisture). Uplift is MOISTURE-LIMITED: `moist_avail = clip(p_band/P_MOISTURE_REF_MM,
+  P_UPLIFT_MIN_AVAIL, 1)`, `P_MOISTURE_REF_MM = 1500` (base precip at which uplift is full), `P_UPLIFT_MIN_AVAIL
+  = 0.12` (dry air still gives a little orographic rain) — a mountain can only wring out the moisture the air
+  carries, so dry subtropical highlands stay arid.
+- **Multi-cell rain-shadow.** Prevailing wind = +x (westerlies, `P_ORO_WIND_DX = 1`; upwind is −x). The max
+  upwind elevation is taken over `P_ORO_SHADOW_CELLS = 6` cells (~60 km reach); `shadow = clip(1 −
+  P_ORO_SHADOW_GAIN·max(0, upwind_max − elev), P_ORO_MIN, 1)`, `P_ORO_SHADOW_GAIN = 1.6`. The combined
+  orographic multiplier `oro = clip(uplift·shadow, P_ORO_MIN, P_ORO_MAX)`, `P_ORO_MIN = 0.25` (deep lee),
+  `P_ORO_MAX = 3.2` (windward/peak enhancement). Anchor: e.g. Cascades → high desert (a big range dries tens of
+  km to its lee).
+- **Maritime + noise.** `precip_mm = clip(p_band·oro·(1 + P_MARITIME_GAIN·wateracc)·(0.7 + 0.6·moist), 0, None)`,
+  `P_MARITIME_GAIN = 0.3` (near-water moisture supply); `moist` is the legacy fractal moisture-noise field
+  (texture). Water cells → 0.
+
+### §4.3.6 C3 — the MIAMI model: NPP from temperature & precipitation [VERIFIED]
+`NPP = min(NPP_T, NPP_P)` g dry-matter/m²/yr — cold OR dry both cap productivity (Liebig-style minimum). Source:
+**Lieth 1972/1975** (the Miami model), the published least-squares fit to ~50 sites across 5 continents. The
+primary PDF is filed (`literature/Lieth - 1975 …pdf`); the two limbs are **eqs 12-1 / 12-2, VERIFIED against
+the primary PDF** (LITERATURE.md).
+```
+NPP_T = MIAMI_MAX / (1 + exp(MIAMI_T_A − MIAMI_T_B·T))          T in °C
+NPP_P = MIAMI_MAX · (1 − exp(−MIAMI_P_C·P))                     P in mm/yr
+NPP   = min(NPP_T, NPP_P)
+```
+Constants (the published coefficients, used exactly — no re-fit): `MIAMI_MAX = 3000` (asymptotic ceiling of
+both limbs, g/m²/yr), `MIAMI_T_A = 1.315`, `MIAMI_T_B = 0.119` (temperature limb), `MIAMI_P_C = 0.000664`
+(precipitation limb). Helper `miami_npp(T, P)` (vectorized). **Sanity (R-49):** −5 °C/2000 mm → 387; 28 °C/150 mm
+→ 284; 28 °C/2500 mm → 2430; 15 °C/1200 mm → 1648 (matches the published Miami surface). Under `mode="climate"`
+NPP is stored normalized: `npp = min(3000, Miami(T,P))/NPP_GM2_SCALE` with `NPP_GM2_SCALE = 3400` (§4.3.1), so
+the downstream `npp_gm2 = npp·3400` recovers the real Miami g/m²/yr (Miami ≤ 3000 < 3400 ⇒ npp ≤ 0.88) and feeds
+the Tallavaara capacity (§4.3.1) — a coherent real-NPP pairing. NPP is now temperature-limited (cold → tundra)
+AND precipitation-limited (dry → desert).
+
+### §4.3.7 C4 — the WHITTAKER biome (biome as a climate OUTCOME)
+`whittaker_biome(T, P)` maps annual mean T (°C) × annual P (mm/yr) onto the model's coarse codes — biome
+EMERGES from climate rather than being a moisture label. Thresholds RISE with temperature (evapotranspiration:
+warmer needs more rain for the same class):
+- `desert_thr = WHIT_DESERT_BASE + WHIT_DESERT_SLOPE·max(T,0)`, `WHIT_DESERT_BASE = 200`, `WHIT_DESERT_SLOPE =
+  15`. `P < desert_thr` → DESERT.
+- `forest_thr = WHIT_FOREST_BASE + WHIT_FOREST_SLOPE·max(T,0)`, `WHIT_FOREST_BASE = 500`, `WHIT_FOREST_SLOPE =
+  35`. `P ≥ forest_thr` → FOREST; the intermediate band (`desert_thr ≤ P < forest_thr`) is SAVANNA if warm
+  (`T ≥ GRASS_TROPICAL_THRESHOLD_C = 18 °C`, the Köppen tropical-A isotherm) else GRASS (cool grassland-steppe).
+- **Cold cap (tundra/taiga):** a would-be FOREST below `WHIT_TUNDRA_T = −5 °C` becomes GRASS (too cold for
+  trees → tundra); cold+dry stays DESERT; cold+wet stays FOREST (taiga). Terrain overrides MOUNTAIN / WETLAND /
+  WATER apply on top (WETLAND = low-slope near-water high-NPP cells; MOUNTAIN = the joint elev×slope condition;
+  §4.3.1 biome ladder). Anchor: the Whittaker biome climate-diagram (T×P → biome). Thresholds PROVISIONAL.
+
+**Terrain × climate world lottery.** `world_lottery_climate(seed, terrain, climate)` draws INDEPENDENT
+`TERRAIN_PRESETS` (flat / hilly / mountainous / coastal — relief + water knobs) × `CLIMATE_PRESETS` (tropical /
+subtropical / temperate / boreal — `climate_latitude` + `climate_aridity` bands), cycling both on co-prime
+periods (4 × 4 = 16 pairings over seeds 0–15); the legacy moisture knobs `forestK`/`aridK` are neutralised
+(climate, not a knob, sets moisture). Any pairing is legal (tropical-lowland → rainforest; subtropical-flat-arid
+→ Sahara; temperate-montane → Rockies; boreal-flat → taiga). Emergent worlds validated + visualized in R-50.
+
+### §4.3.8 C6 — river-source (water) temperature by flow-routing
+A river carries the cold of its montane HEADWATER (snowmelt), not the local air — so a valley river can be cold
+where the air is warm (the salmon-fishery enabler). The D8 flow routing propagates the max upstream (headwater)
+elevation `src_elev` downstream; then `water_temp = air_T − RIVER_COLD_RETENTION·LAPSE_C_PER_KM·(src_elev −
+elev)·reliefAmpM/1000`, `RIVER_COLD_RETENTION = 0.6` (fraction of the headwater-elevation cooling a river
+retains by the time it reaches a cell). 0 in legacy mode. Anchor (LITERATURE.md): river temperature set by
+source — snowmelt/montane headwaters cold, lowland/pluvial warm. RT-B (the crux): agents live in warm valleys,
+not cold peaks, so local-air lapse does NOT cool occupied cells — the salmon signal REQUIRES the river to carry
+cold water down. `RIVER_COLD_RETENTION` PROVISIONAL.
+
+### §4.3.9 C7 — aquatic-food field ∈ [0,1] (`aquatic_food_field`)
+The dense STORABLE aquatic resource that underwrites forager complexity (Testart/Ames). On land cells (0 on
+open water) it is `max(anadromous, shellfish)`:
+- **Anadromous limb (salmon).** `coldness = clip((SALMON_T_LETHAL − water_temp)/(SALMON_T_LETHAL −
+  SALMON_T_OPT), 0, 1)`, `SALMON_T_OPT = 16 °C` (coldness FULL at/below), `SALMON_T_LETHAL = 21 °C` (coldness 0
+  at/above). `river_cold = coldness · isRiver · sea_conn`, where `sea_conn = 1` if the cell drains to the sea
+  else `AQUATIC_SEA_CONN_FLOOR = 0.25` (endorheic rivers get some lacustrine fish). `drains_to_sea` is
+  propagated upstream from open water along the flow routing. The river fishery is spread to the 4-neighbour
+  BANK cells (max) — foragers harvest from the bank. Anchor (LITERATURE.md): salmonid thermal tolerance (opt
+  ~16 °C, lethal ~21 °C).
+- **Shellfish limb.** `shellfish = is_shore · SHELLFISH_RICHNESS · (0.5 + 0.5·npp01)`, `SHELLFISH_RICHNESS =
+  0.7` (coastal littoral level; Bird 1997 reef/intertidal richness), productivity-scaled by normalized NPP.
+  Warm-tolerant (coastal, unlike the cold-water salmon limb).
+
+0 in legacy mode. Constants PROVISIONAL.
+
+### §4.3.10 C8 — aquatic capacity subsidy (`capacity.py: NPPCapacityField(aquatic=True)`)
+A dense storable aquatic resource subsidises carrying capacity ABOVE the terrestrial Tallavaara ceiling —
+coastal complex foragers reached ~8–10× typical forager density (NW Coast). `ppl_per_cell += AQUATIC_DENSITY_MAX·
+aquatic_food`, `AQUATIC_DENSITY_MAX = 80.0` (persons/cell added by a full `aquatic_food=1` cell — ~8× the
+Tallavaara median ~12). Opt-in: interior (`aquatic_food=0`) or `aquatic=False` ⇒ identical to the base field
+(inland equilibria bit-exact). This is the super-density that lets a concentrated band cross Binford packing —
+the substrate for stratification. Anchor: Ames 1994 (NW-Coast affluent foragers). PROVISIONAL. **GATE-3
+finding (R-51):** the subsidy ALONE does NOT concentrate bands — IFD movement disperses; concentration needs
+circumscription/saturation (GD-1 was built to test whether depletion supplies it — it does not either; the
+population is demographically, not resource, limited).
+
+### §4.3.11 GD-1 — finite resources: the depletable stock (`capacity.py`; RESULTS R-51)
+Testart's delayed-return substrate: a cell is a depletable STOCK, not an infinite standing flow.
+`NPPCapacityField(…, enable_depletion=True)` holds `B ∈ [B_FLOOR, 1]` per cell (fraction of the cell's ceiling
+flow `base_E = K·burn`); the effective yield is `E = base_E·B`. Each step,
+```
+deplete_and_regrow(occ_count, season):
+    pressure = occ / K_persons                              # foragers per unit capacity
+    B += r_step · season · ((1 − B) − DEPLETE_FRAC · pressure)
+    B = clip(B, B_FLOOR, 1)
+    E = base_E · B
+```
+so a lightly-used cell stays full; sustained/over-use hunts it out (equilibrium `B ≈ 1 − DEPLETE_FRAC·pressure`);
+it recovers logistically at the biome rate. `r_step = r_yr/12` (1 step = 1 month). Constants:
+- **`DEPLETE_FRAC = 0.5`** — depletion strength: at foraging pressure = 1 (occ = capacity) B equilibrates at
+  ~1−0.5. PROVISIONAL.
+- **`B_FLOOR = 0.05`** — a hunted-out cell never quite hits zero (refugia / trickle).
+- **Biome-specific logistic regrowth `R_BIOME_PER_YR`** (per year; `{water 0.0, wetland 0.40, forest 0.15,
+  savanna 0.60, grass 0.70, desert 0.15, mountain 0.20}`) — grassland/savanna fast, forest/desert slow.
+  **`AQUATIC_R_PER_YR = 0.80`** (a fast annual restock of a salmon/shellfish catchment — the sedentism enabler;
+  applied as `r = max(r_biome, 0.80·aquatic_food)`). Anchor (LITERATURE.md): **Coe 1976** (game/resource stock
+  K ∝ rainfall/NPP), **Cortés 2016** (intrinsic rate of increase `r_max` by taxon — grassland ungulates high,
+  forest/desert slow-breeders low; salmonids fast), central-place depletion halos. r/yr values PROVISIONAL
+  (sweep + sign-off pending).
+
+**Hook** (`phase1_model.py::_step_rivalrous`, end of step): `if hasattr(tf, "deplete_and_regrow"): season =
+tf.season() if hasattr(tf,"season") else 1.0; tf.deplete_and_regrow(occ_count, season)`. Default OFF ⇒
+non-depleting standing flow (bit-exact; full suite 660). **Finding (R-51):** GD-1 built + viable (deplete/
+recover validated; eq_pop stays viable ON), but emergent sedentism did NOT fire — the population equilibrates
+at ~320 against a patch ceiling of ~71,246 (land 0.4% filled), so it is DEMOGRAPHICALLY limited, not
+resource/space limited → IFD always has empty high-per-capita cells to disperse into → no circumscription →
+Carneiro 1970 circumscription/saturation is the missing keystone. This is why the DEFERRED_MECHANICS GD-1 entry
+(originally scoped as GAME depletion of `game_kcal`) is realized here as GENERAL resource depletion of the NPP
+capacity stock.
+
+---
+
 ## Resource-Ecology economy methods (added 2026-06-20; RESULTS R-6…R-8)
 
 The economy layer added to give the demographic modulators nutritional *variance*. Harnesses
@@ -480,7 +666,10 @@ PROVISIONAL** (no lit anchor yet; tied to the deferred climate-season stage CL-1
 (Liebig's law of the minimum; 95%→37% of peak food ceiling at s_min=0.4) but agents self-adjust and stay
 fed year-round (reserves ~full, synergy ~1) — **inert on its own**.
 
-### §4.4.2 Depletion (A.2, GD-1) — per-cell freshness `f` [PROVISIONAL]
+### §4.4.2 Depletion (A.2, early freshness `f`) — SUPERSEDED by the GD-1 stock (§4.3.11) [PROVISIONAL]
+**NB (2026-07-04):** this is the EARLY Resource-Ecology `consume()`/freshness mechanic (R-7). The canonical
+finite-resource substrate is now the GD-1 depletable STOCK `B` in `capacity.py` (biome/season/aquatic-specific
+logistic regrowth; §4.3.11, RESULTS R-51); this freshness field is the phenomenological predecessor.
 Each cell carries `f ∈ [0.05, 1]` (fraction of standing stock); `level = E·f·s(t)`. After harvest,
 `consume(occ_count)`: occupied cells `f −= deplete_rate·min(1, occ/K)`; all cells regrow
 `f += regrow_rate·(1−f)`. **Values `deplete_rate=0.30`, `regrow_rate=0.10` are PROVISIONAL — phenomenological,
