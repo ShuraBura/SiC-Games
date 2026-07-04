@@ -77,6 +77,7 @@ def diffusion_select_target(
     agent_band: int | None = None,
     owner_exclusion: float = 1.0,
     owner_tether: float = 1.0,
+    band_primary: dict | None = None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -165,7 +166,11 @@ def diffusion_select_target(
         if cell_owner is not None:
             own = cell_owner.get((cx, cy))
             if own is not None:
-                ypc *= owner_tether if own == agent_band else owner_exclusion
+                if own != agent_band:
+                    ypc *= owner_exclusion                       # outsider routed off any owned cell
+                elif band_primary is None or band_primary.get(agent_band) == (cx, cy):
+                    ypc *= owner_tether                          # tether members onto the band's PRIMARY reach
+                # else: a same-band SECONDARY owned cell → neutral (don't fragment the band across its plots)
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 

@@ -550,8 +550,18 @@ class TerrainWorld(mesa.Model):
             cell_owner = self._cell_owner
             def_excl = self._demog.defensibility_exclusion
             def_teth = self._demog.defensibility_tether
+            # CONSOLIDATE (Stage A): each band's PRIMARY reach = its RICHEST owned cell (tether target), so members
+            # converge on ONE central place rather than scattering across every plot the band happens to hold.
+            aqf = self._fields.aquatic_food
+            best: dict[int, tuple[float, tuple[int, int]]] = {}
+            for c, b in cell_owner.items():
+                val = float(aqf[c[1], c[0]])
+                cur = best.get(b)
+                if cur is None or val > cur[0] or (val == cur[0] and c < cur[1]):
+                    best[b] = (val, c)
+            band_primary = {b: c for b, (_, c) in best.items()}
         else:
-            cell_owner, def_excl, def_teth = None, 1.0, 1.0
+            cell_owner, def_excl, def_teth, band_primary = None, 1.0, 1.0, None
 
         # 2. diffusion movement (per-capita-yield, self-limiting)
         # (Storage-tethering RETIRED 2026-06-29: the band-aid that froze stocked bands in place to force packing
@@ -617,7 +627,8 @@ class TerrainWorld(mesa.Model):
                                              move_radius=mr, water=water_mask, extra_occupants=extra,
                                              cell_owner=cell_owner,
                                              agent_band=(agent._group.band_id if def_on else None),
-                                             owner_exclusion=def_excl, owner_tether=def_teth)
+                                             owner_exclusion=def_excl, owner_tether=def_teth,
+                                             band_primary=band_primary)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
