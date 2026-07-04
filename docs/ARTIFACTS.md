@@ -195,4 +195,17 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 
 ---
 
+### Economy-from-Climate (EFC) + GD-1 finite resources (R-49…R-51, 2026-07-03)
+| Artifact | Date | Type | Question answered | Headline result | Location |
+|---|---|---|---|---|---|
+| EFC field visualizer (`render_climate_maps.py`) | 2026-07-03 | figure generator | Render the real Python EFC fields (temperature, precip, NPP, biome, aquatic) as a contact sheet + interactive HTML | Renders each climate world × layer (toggle); produced `climate_representative_seed0.{html,png}` and `climate_montane_seed0.{html,png}`. R-50. | `sic_games/outputs/climate_viz/render_climate_maps.py` |
+| Circumscription test (`run_circumscription_test.py`) | 2026-07-03 | test harness | Does GD-1 depletion + aquatic subsidy make bands concentrate (emergent sedentism)? | R-51: NO — pop equilibrates ~320 against a ~71,246 patch ceiling (land 0.4% filled); demographically, not resource, limited → IFD disperses → circumscription is the missing keystone. | `sic_games/outputs/climate_viz/run_circumscription_test.py` |
+| Saturation long-run (`run_saturation_longrun.py`) | 2026-07-04 | long-run harness | Does a longer run saturate the habitable land (the R-51 circumscription follow-up)? | Harness for the emergent-sedentism saturation follow-up (R-51 NEXT step). | `sic_games/outputs/climate_viz/run_saturation_longrun.py` |
+| EFC/GD-1 unit tests (`test_climate_temperature.py`) | 2026-07-03 | test suite | Do the EFC chain (C1–C8) and GD-1 depletion behave + stay legacy-bit-exact? | 23 tests GREEN (Miami vs Lieth, Whittaker, salmon thermal, aquatic subsidy, deplete/regrow, legacy bit-exactness); full suite 660. | `sic_games/tests/test_climate_temperature.py` |
+| EFC climate world renders | 2026-07-03 | figures | Visualize emergent climate worlds (representative + montane) | Emergent biomes fall out of Whittaker(T,P): forest/desert/mosaic/taiga/Rockies etc. R-50. | `sic_games/outputs/climate_viz/climate_representative_seed0.{html,png}`, `climate_montane_seed0.{html,png}` |
+
+**EFC/GD-1 code:** `sic_games/src/sic_games/terrain.py` (C1–C7: `miami_npp`, `whittaker_biome`, `aquatic_food_field`, `world_lottery_climate`, `generate_world(…, mode="climate")`); `sic_games/src/sic_games/capacity.py` (C8 aquatic subsidy + GD-1 `NPPCapacityField(aquatic=…, enable_depletion=…)`, `deplete_and_regrow`); hook in `sic_games/src/sic_games/phase1_model.py::_step_rivalrous`. Methods: MODEL_SPEC §4.3.4–§4.3.11; findings: RESULTS R-49/R-50/R-51.
+
+---
+
 *End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14; resource-ecology + biome-mortality + scale-resolution arc (R-5…R-14) 2026-06-20; Carbon → emergent bands → full social stack (R-18…R-27) 2026-06-29.*
