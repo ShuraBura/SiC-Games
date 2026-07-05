@@ -78,6 +78,9 @@ def diffusion_select_target(
     owner_exclusion: float = 1.0,
     owner_tether: float = 1.0,
     band_primary: dict | None = None,
+    R_field=None,
+    aggl_alpha: float = 1.15,
+    aggl_half: float = 100.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -171,6 +174,15 @@ def diffusion_select_target(
                 elif band_primary is None or band_primary.get(agent_band) == (cx, cy):
                     ypc *= owner_tether                          # tether members onto the band's PRIMARY reach
                 # else: a same-band SECONDARY owned cell → neutral (don't fragment the band across its plots)
+        # AGGLOMERATION ECONOMICS (grand-unification rework): the intensive catchment economy adds a per-capita term
+        # with INCREASING RETURNS to co-location — R(c)·L(n)/n, L(n)=n^α/(n^α+half^α). A lone agent captures ~0 of the
+        # catchment (L(1)≈0); a co-located group unlocks it → aggregation/packing emerge under IFD. R_field=None ⇒ off.
+        if R_field is not None:
+            n_grp = (n_cell if is_cur else n_cell + 1) + extra_occupants
+            Rv = float(R_field[cy, cx])
+            if Rv > 0.0 and n_grp > 0:
+                na = n_grp ** aggl_alpha
+                ypc += Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 

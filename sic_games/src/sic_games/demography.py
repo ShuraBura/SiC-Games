@@ -326,6 +326,18 @@ class DemographyConfig(BaseModel):
     soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
     soil_deplete_frac: float = Field(0.6, ge=0.0)           # per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL]
     soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
+    # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
+    # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
+    # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so
+    # per-capita R·L(n)/n is SINGLE-PEAKED in n. Under IFD, agents then aggregate to the peak → villages/packing/optimal-
+    # size/relocation/bust all EMERGE, replacing the discrete settlement lifecycle. Applied CONSISTENTLY to movement
+    # (perceived) AND harvest (realized) so no over-subscription death. α anchored to Bettencourt ~1.15 (MODEL_SPEC
+    # §4.8.21) — SWEPT (band-scale at 1.15, village-scale needs sharper). Default OFF ⇒ legacy S/(n+1) ⇒ bit-exact.
+    enable_agglomeration: bool = False
+    aggl_alpha: float = Field(1.15, ge=1.0)                  # returns-to-co-location exponent L(n)~n^α (Bettencourt 1.15 floor; swept) [PROVISIONAL]
+    aggl_half: float = Field(100.0, gt=0.0)                  # half-saturation n of L(n) (~village scale; sets optimal size with α) [PROVISIONAL]
+    aggl_tier2: float = Field(40.0, ge=0.0)                  # intensive yield per unit S_pot per catchment cell (the R scale) [PROVISIONAL]
+    aggl_catchment_radius: int = Field(1, ge=0)             # cells R(c) pools S_pot over (Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

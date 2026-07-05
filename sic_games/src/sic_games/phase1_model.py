@@ -269,6 +269,7 @@ class TerrainWorld(mesa.Model):
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
+        self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -586,6 +587,22 @@ class TerrainWorld(mesa.Model):
                 self._spot_cache = aq
         return self._spot_cache
 
+    def _aggl_R_field(self):
+        """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} S_pot (soil=1 in P1).
+        The per-cell resource a co-located village can work. Cached (static S_pot). None if no S_pot."""
+        if self._aggl_R_cache is None:
+            sp = self._s_pot_field()
+            if sp is None:
+                return None
+            import numpy as np
+            r = self._demog.aggl_catchment_radius
+            acc = np.zeros_like(sp)
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    acc += np.roll(np.roll(sp, dy, axis=0), dx, axis=1)
+            self._aggl_R_cache = self._demog.aggl_tier2 * acc
+        return self._aggl_R_cache
+
     def _settlement_catchment_yield(self, site: tuple[int, int]) -> float:
         """Layer 2: the settlement-UNLOCKED intensive tier-2 yield, pooled over the catchment (residence ≠ foraging).
         RESOURCE-AGNOSTIC — reads S_pot (= max(aquatic_food, cultivability)). Gated: only settlement sites get it,
@@ -704,6 +721,13 @@ class TerrainWorld(mesa.Model):
 
         # 1c. Aggregation-sedentism: hold/release active settlements (formed seasonally in _do_gathering), then the
         # movement below pins members within a settlement's radius onto its site (cohesion → site, pool scale).
+        # Agglomeration economics (grand-unification rework): the intensive catchment-resource field + curve params,
+        # passed into IFD (perceived) and added in the harvest (realized). aggl_on=False ⇒ R_field=None ⇒ bit-exact.
+        aggl_on = self._demog is not None and getattr(self._demog, "enable_agglomeration", False)
+        aggl_R = self._aggl_R_field() if aggl_on else None
+        aggl_a = self._demog.aggl_alpha if aggl_on else 1.15
+        aggl_h = self._demog.aggl_half if aggl_on else 100.0
+
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
             self._maintain_settlements()
@@ -796,7 +820,8 @@ class TerrainWorld(mesa.Model):
                                              cell_owner=cell_owner,
                                              agent_band=(agent._group.band_id if def_on else None),
                                              owner_exclusion=def_excl, owner_tether=def_teth,
-                                             band_primary=band_primary)
+                                             band_primary=band_primary,
+                                             R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -933,6 +958,11 @@ class TerrainWorld(mesa.Model):
                 # Layer 2 catchment tier-2 (2b: × yearly shock; B1: × per-site soil — farms degrade it, fisheries stay 1)
                 S += (self._settlement_catchment_yield((cx, cy)) * self._tier2_shock
                       * self._settlement_soil.get((cx, cy), 1.0))
+            if aggl_on and aggl_R is not None:
+                # AGGLOMERATION: REALIZED intensive output R·L(n) added to the cell pool (split → R·L(n)/n each),
+                # matching the movement-perceived per-capita → increasing returns are real, no over-subscription death.
+                no = len(occ); na = no ** aggl_a
+                S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
