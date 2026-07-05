@@ -6,7 +6,7 @@ deliberate counterpart to HYPOTHESES.md: a place for generative ideas to live ho
 without masquerading as pre-registered predictions.
 **Maintainer:** Supervisor curates; Claude Code maintains.
 **Created:** 2026-06-05.
-**Not here:** *quantitative* empirical benchmarks (village size, density, catchment radius, agglomeration α — the values the model is calibrated/validated against) live in **`BENCHMARKS.md`** (the reduced-order standards matrix). This doc is for *qualitative emergent aspirations* only.
+**Not here:** *quantitative* empirical benchmarks (village size, density, catchment radius, agglomeration α — the values the model is calibrated/validated against, with extraction methods) live in **`MODEL_SPEC.md` §4.8.21** (the methods home). This doc is for *qualitative emergent aspirations* only.
 
 ---
 

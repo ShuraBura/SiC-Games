@@ -1731,6 +1731,25 @@ so absolute-population claims re-read on the footprint=1 substrate). Helpers
 `substrate::diffusion_select_target(extra_occupants=…)`, `demography::footprint_radius`, `phase1_model` footprint
 scatter + `_forage_excl`; blueprint `…_CoMovementCentralPlace_Scoping.md`; R-41→R-44.
 
+### §4.8.21 Settlement & agglomeration benchmarks — lit-derived values + extraction (2026-07-05; agglomeration-economics rework)
+
+The empirical standards the settlement / agriculture / agglomeration arc is calibrated + validated against — the "training set" for the reduced-order approach. Cell = 100 km² (10×10 km). (Already homed elsewhere: population density → §4.3.1 [Tallavaara median 11.9/100 km²]; packing threshold 0.091/km² + storage ET 15.25 °C → §4.5.11; band size ~25/500 + scalar-stress N≈127 → §4.8.8/§4.8.13. Not duplicated here.) Values route to `PARAMETERS.md`; citations to `LITERATURE.md`.
+
+**Agglomeration exponent — returns-to-co-location (Bettencourt 2013 [VERIFIED, pypdf 2026-07-05]).** Urban output scales `Y = Y0·N^β`: socioeconomic **super-linear β ≈ 1.15** (empirical Gross-Metropolitan-Product **1.126 ± 0.023**, 95% CI R²=0.96; theoretical **7/6 ≈ 1.167**); infrastructure **sub-linear β ≈ 0.85** (0.849 ± 0.038; 5/6). **Extraction →** the agglomeration production-function exponent `L(n)~n^α`, **α ≈ 1.13–1.17 (≈1.15)**, NOT the P0 provisional 1.5. **CAVEAT:** measured on MODERN CITIES (socioeconomic output) — an explicit cross-domain borrowing; subsistence returns-to-co-location (weirs/terraces/defense/storage) may be sharper — a *testable prediction*, not a fit. **FINDING (production-function math):** at α=1.15 the per-capita `L(n)/n` optimum sits at **BAND scale (~25)**, flat out to ~150 → the measured exponent predicts *band-sized* aggregation (matching the mobile-band default); **village-scale nucleation (~150) requires a sharper α (~1.4–1.6) or a supplementary force** (storage / circumscription). Hence α is SWEPT in P1: 1.15 = the measured floor, the village-producing α = the reported finding.
+
+**Site-catchment radius (Vita-Finzi & Higgs 1970 [VERIFIED, pypdf]).** Site exploitation territory = walking-time perimeter: **HG / non-agricultural ≈ 10 km radius** (2-hour perimeter); **agricultural ≈ 5 km radius** (return declines beyond 3–4 km; topography appreciable 3–5 km). **Extraction →** in 10 km cells, farming catchment ≈ radius 0–1, HG ≈ radius 1. **CORRECTION:** the built `settle_catchment_radius=2` (~20 km) exceeds the HG value → **trim to 1**.
+
+**Complex-forager village size (Ames 1994 [VERIFIED, pypdf]).** NW-Coast villages/towns **"a few score to over a thousand people"** (~40–1000+ residents); coast pre-contact population ≈ **188,000** (Boyd); complexity driven by salmon + reliance on **STORAGE** + population-size thresholds; **owned** resource rights (individuals → villages). **Extraction →** the emergent-village-size target (~100s); the fishery-stability + storage benchmark (R-53); the heritable-ownership → ascribed-rank material basis (deferred bridge, blueprint 5b/Q7).
+
+**Economic defensibility (Dyson-Hudson & Smith 1978 [VERIFIED concept]).** Defend a resource iff **dense × predictable** → the defensibility index `D = density × predictability` (DE-10; re-based to the catchment grain in the aggregation arc).
+
+**Swidden crop→fallow (Conklin 1961 [filed, concept]).** Short cropping → long fallow, field-forest rotation → the warrant for Layer-B1 progressive soil exhaustion + fallow recovery. Specific durations are system-specific (the quantitative R-value synthesis is Ruthenberg 1971, unfiled); `soil_regrow_per_yr≈0.06` is a provisional bracket, not a Conklin-fitted value.
+
+**Two calibration corrections this benchmark pass produced:** (1) `settle_catchment_radius` **2 → 1** (Vita-Finzi); (2) agglomeration α **1.5 → ~1.15** (Bettencourt; swept).
+
+**Reduced-order framing (supervisor 2026-07-04).** The rows above form a condition × observable matrix `M`; plan: SVD → ~2–3 characteristic modes (productivity / storability / aridity) → project a local condition → its canonical configuration (village size, density, catchment) cheaply; agents evolve the **deviations** (aggregation onset, swidden bust, Carneiro). Honest reduced-order / ML framing — architecture = the mechanisms, parameters = these benchmarks, generalization = the emergent transitions; discipline: **free parameters < independent benchmark rows** (compression). Blueprints `…_AggregationSedentism`, `…_AgricultureTier`, `…_AgglomerationEconomics`.
+
+
 ---
 
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
