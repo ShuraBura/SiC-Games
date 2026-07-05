@@ -844,13 +844,13 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 
 ---
 
-## Bettencourt, L.M.A. (2013). "The Origins of Scaling in Cities." *Science* 340(6139):1438–1441. DOI 10.1126/science.1235823. (SFI working paper 12-09-014 filed `literature/SiC_Games_AGG1_Bettencourt2013_UrbanScaling.pdf` — OA institutional preprint; **PDF downloaded, in-text CI NOT yet verified locally: poppler/pdftotext absent in this env, so page rendering fails — value below is from the abstract + the canonical Bettencourt-West 2007 PNAS empirics, VERIFICATION PENDING a PDF-text tool.**)
+## Bettencourt, L.M.A. (2013). "The Origins of Scaling in Cities." *Science* 340(6139):1438–1441. DOI 10.1126/science.1235823. (SFI working paper 12-09-014 filed `literature/SiC_Games_AGG1_Bettencourt2013_UrbanScaling.pdf` — OA institutional preprint. **[VERIFIED]** against the PDF text via pypdf 2026-07-05.)
 
-**What was lifted — the agglomeration exponent for the returns-to-co-location `L(n)` (agglomeration-economics rework, blueprint …_AgglomerationEconomics):** urban socioeconomic outputs (GDP, wages, patents, crime) scale **SUPER-LINEARLY** with population, `Y = Y0·N^β`, **β ≈ 1.15** (socioeconomic indicators ~1.1–1.3; mean ≈1.15); material infrastructure scales **SUB-LINEARLY**, β ≈ 0.85 (roads, cables ~0.8–0.9); housing/jobs ≈ linear. **How used:** anchors the increasing-returns exponent in the agglomeration production function `Y(n)=R·L(n)`, `L(n)~n^α` for small n → **α ≈ 1.15**, NOT the P0 provisional guess α=1.5 (which over-nucleates). The catchment carrying-capacity then saturates `L(n)` (a subsistence village has a resource ceiling a modern city does not).
+**What was lifted — the agglomeration exponent for the returns-to-co-location `L(n)` (agglomeration-economics rework, blueprint …_AgglomerationEconomics):** urban socioeconomic outputs (GDP/GMP, wages, patents, crime) scale **SUPER-LINEARLY** with population, `Y = Y0·N^β`, **β ≈ 1.15** (paper's stated value; empirical Gross-Metropolitan-Product fit **β = 1.126 ± 0.023**, 95% CI, R²=0.96; theoretical **7/6 ≈ 1.167**). Material infrastructure scales **SUB-LINEARLY**, **β ≈ 0.85** (empirical **0.849 ± 0.038**, 95% CI, R²=0.65; theoretical **5/6 ≈ 0.833**); housing/jobs ≈ linear. **How used:** anchors the increasing-returns exponent in the agglomeration production function `Y(n)=R·L(n)`, `L(n)~n^α` for small n → **α ≈ 1.13–1.17 (≈1.15)**, NOT the P0 provisional guess α=1.5 (which over-nucleates). The catchment carrying-capacity then saturates `L(n)` (a subsistence village has a resource ceiling a modern city does not).
 
 **CAVEAT (cross-domain borrowing — the "reinterpreting the data" honesty):** β≈1.15 is measured on **MODERN CITIES** (socioeconomic output), not subsistence fishing/farming villages. We borrow it as the closest *measured* agglomeration exponent, explicitly flagged — the true subsistence returns-to-co-location (weirs/terraces/defense/storage) may differ and is not directly measured. This is an inference, not a fitted subsistence value.
 
-**Status: PDF FILED; exponent from abstract/established empirics; local content-verification PENDING (no PDF-text tool in env). Re-anchors agglomeration P0 α 1.5 → ~1.15.**
+**Status: [VERIFIED] (PDF text, pypdf). Re-anchors agglomeration P0 α 1.5 → ~1.15 (theoretical 7/6; empirical 1.126±0.023).**
 
 ---
 
