@@ -851,3 +851,11 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 **CAVEAT (cross-domain borrowing — the "reinterpreting the data" honesty):** β≈1.15 is measured on **MODERN CITIES** (socioeconomic output), not subsistence fishing/farming villages. We borrow it as the closest *measured* agglomeration exponent, explicitly flagged — the true subsistence returns-to-co-location (weirs/terraces/defense/storage) may differ and is not directly measured. This is an inference, not a fitted subsistence value.
 
 **Status: PDF FILED; exponent from abstract/established empirics; local content-verification PENDING (no PDF-text tool in env). Re-anchors agglomeration P0 α 1.5 → ~1.15.**
+
+---
+
+## Dyson-Hudson, R. & Smith, E.A. (1978). "Human Territoriality: An Ecological Reassessment." *American Anthropologist* 80(1):21–41. DOI 10.1525/aa.1978.80.1.02a00020. (Author OA copy filed `literature/SiC_Games_AGG2_DysonHudsonSmith1978_HumanTerritoriality.pdf` — from co-author E.A. Smith's UW faculty page; **PDF downloaded; content-verification pending a PDF-text tool, poppler absent in env.**)
+
+**What was lifted — the ECONOMIC DEFENSIBILITY model (blueprint …_EconomicDefensibility; folded to catchment grain in …_AggregationSedentism):** territoriality/defense of a resource area is favoured when the resource is **DENSE + PREDICTABLE** (worth defending) and abandoned (open access) when sparse/unpredictable (defense cost > benefit) — the density×predictability quadrant. **How used:** the warrant for (a) the defensibility-index gate `D = density × predictability` (only dense-predictable reaches claimable — DE-10), and (b) re-based to the SETTLEMENT CATCHMENT in the aggregation-sedentism arc (a settled community defends its catchment; the contested-catchment case is the Carneiro follow-on). This is a CONCEPTUAL/mechanism anchor (a cost/benefit inequality), not a fitted number. **Retroactively grounds** the defensibility citations previously made from memory (the user's lit-fetch callout).
+
+**Status: PDF FILED (author OA); mechanism (not a number) — no local value to verify.**
