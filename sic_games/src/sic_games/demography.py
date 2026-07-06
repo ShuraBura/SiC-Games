@@ -336,7 +336,7 @@ class DemographyConfig(BaseModel):
     enable_agglomeration: bool = False
     aggl_alpha: float = Field(1.15, ge=1.0)                  # returns-to-co-location exponent L(n)~n^α (Bettencourt 1.15 floor; swept) [PROVISIONAL]
     aggl_half: float = Field(100.0, gt=0.0)                  # half-saturation n of L(n) (~village scale; sets optimal size with α) [PROVISIONAL]
-    aggl_tier2: float = Field(40.0, ge=0.0)                  # intensive yield per unit S_pot per catchment cell (the R scale) [PROVISIONAL]
+    aggl_tier2: float = Field(2.0, ge=0.0)                   # intensification FACTOR: R = tier2·Σ_catchment(S_pot·forage_level) — a dimensionless multiple of the catchment's own productivity (~1–5) [PROVISIONAL]
     aggl_catchment_radius: int = Field(1, ge=0)             # cells R(c) pools S_pot over (Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on

@@ -21,7 +21,7 @@ _f = generate_world(_k, mode="climate")
 _cult = _f.cultivability
 
 
-def run(aggl, alpha=1.15):
+def run(aggl, alpha=1.5, half=100.0, tier2=40.0):
     cap = NPPCapacityField(_f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
     farm = [(x, y) for y in range(100) for x in range(100)
             if cap.level(x, y) > 0 and _f.isWater[y, x] == 0 and _cult[y, x] >= 0.5]
@@ -30,11 +30,14 @@ def run(aggl, alpha=1.15):
                       if cap.level(cx, cy) > 0 and _f.isWater[cy, cx] == 0))
     pos = [zone[i % len(zone)] for i in range(FOUNDERS)]
     demog = realistic_forager_demog().model_copy(update=dict(
-        enable_agriculture=True, enable_agglomeration=aggl, aggl_alpha=alpha, aggl_half=100.0,
-        aggl_tier2=40.0, aggl_catchment_radius=1))
+        enable_agriculture=True, enable_agglomeration=aggl, aggl_alpha=alpha, aggl_half=half,
+        aggl_tier2=tier2, aggl_catchment_radius=1))
+    # RT-3: NEUTRALISE the GRP grouping drives (safety/mate) so the agglomeration curve is the ONLY grouping force
+    # (else the emergent-band drives cap cluster size at band scale, swamping the agglomeration signal).
+    grp = dict(group_safety_max=0.0, group_safety_scale=15.0, group_mate_min=0.0, group_mate_floor=0.2)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=_k, game_stream=False, seed=0,
         carbon_cfg=CarbonConfig(kappa=1.5), substrate_cfg=SubstrateConfig(enabled=True, k_cell=0,
-            movement_mode="diffusion", contest_exponent=1.5, move_cost_flat=0.0, **GRP),
+            movement_mode="diffusion", contest_exponent=1.5, move_cost_flat=0.0, **grp),
         harvest_field=cap, placement_positions=pos, demography_cfg=demog)
     for i in range(STEPS):
         w.step()
@@ -44,18 +47,23 @@ def run(aggl, alpha=1.15):
     occ = Counter(a.pos for a in al)
     packed = {c: n for c, n in occ.items() if n >= 9}          # ≥9/cell = Binford 0.091/km²
     pop_packed = sum(packed.values())
-    tag = "OFF (IFD)" if not aggl else f"α={alpha}"
-    return (f"  [{tag:9s}] pop={len(al):4d}  max/cell={max(occ.values()):4d}  "
+    tag = "OFF (IFD)" if not aggl else f"h={half:g} t={tier2:g}"
+    return (f"  [{tag:12s}] pop={len(al):4d}  max/cell={max(occ.values()):4d}  "
             f"packed_cells(≥9)={len(packed):3d}  %pop_packed={100*pop_packed/len(al):3.0f}%  "
             f"occupied_cells={len(occ):4d}")
 
 
 def main():
-    print("AGGLOMERATION P1 — nucleation vs α (increasing returns to co-location; no discrete settlements)\n")
+    print("AGGLOMERATION P1 — nucleation (α=1.5; R = tier2·Σ_catchment(S_pot·forage_level), dimensionless tier2)\n")
     print(run(False))
     print()
-    for a in (1.15, 1.3, 1.5, 2.0):
-        print(run(True, a))
+    print("  half sweep (tier2=2):")
+    for h in (5.0, 15.0, 30.0, 60.0, 120.0):
+        print(run(True, alpha=1.5, half=h, tier2=2.0))
+    print()
+    print("  tier2 sweep (half=30):")
+    for t in (0.5, 1.0, 2.0, 4.0):
+        print(run(True, alpha=1.5, half=30.0, tier2=t))
 
 
 if __name__ == "__main__":
