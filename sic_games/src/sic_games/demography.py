@@ -338,6 +338,15 @@ class DemographyConfig(BaseModel):
     aggl_half: float = Field(100.0, gt=0.0)                  # half-saturation n of L(n) (~village scale; sets optimal size with α) [PROVISIONAL]
     aggl_tier2: float = Field(2.0, ge=0.0)                   # intensification FACTOR: R = tier2·Σ_catchment(S_pot·forage_level) — a dimensionless multiple of the catchment's own productivity (~1–5) [PROVISIONAL]
     aggl_catchment_radius: int = Field(1, ge=0)             # cells R(c) pools S_pot over (Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
+    # PER-PERSON FORAGE CAP (the solitude fix): a forager can only WORK so much land — intake is capped at the biome
+    # return-rate × work hours (forage_kcal[cell] · forage_cap_hours), NOT the whole cell (S/n gave a lone agent ~27×
+    # subsistence → solitude over-rewarded → aggregation never paid; GATE-3). Grounds the economy in the Survey-A
+    # return-rate data (MODEL_SPEC §4.1; forage_kcal already a field, biome-dependent + right-skewed distribution).
+    # Flattens the forage per-capita (≈cap up to carrying) so grouping/agglomeration decide clustering. Applied in
+    # movement (perceived) AND harvest (realized). Default OFF ⇒ legacy S/n ⇒ bit-exact. (v2: × age-skill curve +
+    # cred-transmitted embodied capital — Walker 2002 / Gurven 2006 / Koster 2020, pending fetch.)
+    enable_forage_cap: bool = False
+    forage_cap_hours: float = Field(100.0, ge=0.0)          # foraging work-hours/period; cap = forage_kcal·hours (~1.6× BURN at hours=100) [PROVISIONAL — Hadza time-budget]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

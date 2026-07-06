@@ -270,6 +270,7 @@ class TerrainWorld(mesa.Model):
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot
+        self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -587,6 +588,16 @@ class TerrainWorld(mesa.Model):
                 self._spot_cache = aq
         return self._spot_cache
 
+    def _forage_cap_field(self):
+        """Per-person forage cap = forage_kcal · forage_cap_hours (the biome return-rate × work hours — the most one
+        forager can harvest). Cached. None if no forage_kcal field."""
+        if self._forage_cap_cache is None:
+            fk = getattr(self._fields, "forage_kcal", None)
+            if fk is None:
+                return None
+            self._forage_cap_cache = fk * self._demog.forage_cap_hours
+        return self._forage_cap_cache
+
     def _aggl_R_field(self):
         """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · forage_level)
         (soil=1 in P1). The intensive yield is a MULTIPLE of the catchment's actual productivity, S_pot-gated — so it is
@@ -733,6 +744,9 @@ class TerrainWorld(mesa.Model):
         aggl_R = self._aggl_R_field() if aggl_on else None
         aggl_a = self._demog.aggl_alpha if aggl_on else 1.15
         aggl_h = self._demog.aggl_half if aggl_on else 100.0
+        # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
+        cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
+        fcap = self._forage_cap_field() if cap_on else None
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
@@ -827,7 +841,8 @@ class TerrainWorld(mesa.Model):
                                              agent_band=(agent._group.band_id if def_on else None),
                                              owner_exclusion=def_excl, owner_tether=def_teth,
                                              band_primary=band_primary,
-                                             R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h)
+                                             R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
+                                             forage_cap=fcap)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -997,6 +1012,15 @@ class TerrainWorld(mesa.Model):
             else:
                 shares = (_forage_excl(occ, S, kappa_cell, excl_mask) if excl_mask
                           else compute_harvest_shares(occ, S, kappa_cell, phi_eps))
+            if cap_on and fcap is not None:
+                # PER-PERSON FORAGE CAP: a forager harvests at most forage_kcal·work_hours (the biome return-rate);
+                # the surplus of a lightly-occupied cell is UNharvested (removes the S/n lone-agent over-reward).
+                cv = float(fcap[cy, cx])
+                if game_on:
+                    f_sh = [f if f <= cv else cv for f in f_sh]
+                    shares = [f + m for f, m in zip(f_sh, m_sh)]
+                else:
+                    shares = [s if s <= cv else cv for s in shares]
             msh = m_sh if game_on else [0.0] * len(occ)
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →

@@ -81,6 +81,7 @@ def diffusion_select_target(
     R_field=None,
     aggl_alpha: float = 1.15,
     aggl_half: float = 100.0,
+    forage_cap=None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -150,6 +151,10 @@ def diffusion_select_target(
             Wsum = occ_wsum.get((cx, cy), 0.0) if occ_wsum is not None else 0.0
             denom = (Wsum if is_cur else Wsum + w_self) + extra_occupants * w_self
             ypc = (S * w_self / denom) if denom > 0 else S
+        if forage_cap is not None:                             # per-person forage cap (solitude fix): a forager can
+            cv = float(forage_cap[cy, cx])                     # only WORK so much land — cap the perceived per-capita
+            if ypc > cv:                                       # (removes the lone-agent whole-cell over-reward)
+                ypc = cv
         move_cost = 0.0 if is_cur else sc.move_cost_flat
         # Emergent-bands grouping multipliers on the cell value (the crowd_response hook), traded against the
         # falling per-capita yield ⇒ an optimal band size emerges. E.1 safety (risk dilution, saturating) +

@@ -21,7 +21,7 @@ _f = generate_world(_k, mode="climate")
 _cult = _f.cultivability
 
 
-def run(aggl, alpha=1.5, half=100.0, tier2=40.0):
+def run(aggl, alpha=1.5, half=100.0, tier2=40.0, cap=False, cap_hours=100.0):
     cap = NPPCapacityField(_f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
     farm = [(x, y) for y in range(100) for x in range(100)
             if cap.level(x, y) > 0 and _f.isWater[y, x] == 0 and _cult[y, x] >= 0.5]
@@ -31,7 +31,8 @@ def run(aggl, alpha=1.5, half=100.0, tier2=40.0):
     pos = [zone[i % len(zone)] for i in range(FOUNDERS)]
     demog = realistic_forager_demog().model_copy(update=dict(
         enable_agriculture=True, enable_agglomeration=aggl, aggl_alpha=alpha, aggl_half=half,
-        aggl_tier2=tier2, aggl_catchment_radius=1, comove_footprint=0))   # families STACK (not 3×3 scatter) → pack
+        aggl_tier2=tier2, aggl_catchment_radius=1, comove_footprint=0,   # families STACK (not 3×3 scatter) → pack
+        enable_forage_cap=cap, forage_cap_hours=cap_hours))
     # GRP grouping drives KEPT ON (canonical) — they penalise solitude (risk-pooling + mating); agglomeration adds
     # the economic returns that scale bands → villages. (Units fixed, so agglomeration now composes with GRP.)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=_k, game_stream=False, seed=0,
@@ -46,23 +47,23 @@ def run(aggl, alpha=1.5, half=100.0, tier2=40.0):
     occ = Counter(a.pos for a in al)
     packed = {c: n for c, n in occ.items() if n >= 9}          # ≥9/cell = Binford 0.091/km²
     pop_packed = sum(packed.values())
-    tag = "OFF (IFD)" if not aggl else f"h={half:g} t={tier2:g}"
-    return (f"  [{tag:12s}] pop={len(al):4d}  max/cell={max(occ.values()):4d}  "
+    tag = "OFF (IFD)" if not aggl else (f"h{half:g} t{tier2:g}" + (f" cap{cap_hours:g}" if cap else " nocap"))
+    return (f"  [{tag:14s}] pop={len(al):4d}  max/cell={max(occ.values()):4d}  "
             f"packed_cells(≥9)={len(packed):3d}  %pop_packed={100*pop_packed/len(al):3.0f}%  "
             f"occupied_cells={len(occ):4d}")
 
 
 def main():
-    print("AGGLOMERATION P1 — nucleation (α=1.5; R = tier2·Σ_catchment(S_pot·forage_level), dimensionless tier2)\n")
-    print(run(False))
+    print("AGGLOMERATION P1 — forage cap (solitude fix): does capping per-person forage drive more packing?\n")
+    print("  no forage cap (baseline, full stack h=15 t=2):")
+    print(run(True, alpha=1.5, half=15.0, tier2=2.0, cap=False))
     print()
-    print("  half sweep (tier2=2):")
-    for h in (5.0, 15.0, 30.0, 60.0, 120.0):
-        print(run(True, alpha=1.5, half=h, tier2=2.0))
+    print("  forage cap ON, sweep work-hours (cap = forage_kcal·hours; ~1.6×BURN at 100):")
+    for ch in (50.0, 100.0, 200.0):
+        print(run(True, alpha=1.5, half=15.0, tier2=2.0, cap=True, cap_hours=ch))
     print()
-    print("  tier2 sweep (half=30):")
-    for t in (0.5, 1.0, 2.0, 4.0):
-        print(run(True, alpha=1.5, half=30.0, tier2=t))
+    print("  cap ON without agglomeration (does the cap alone pack, via GRP?):")
+    print(run(False, cap=True, cap_hours=100.0))
 
 
 if __name__ == "__main__":
