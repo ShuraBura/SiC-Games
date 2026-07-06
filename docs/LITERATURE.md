@@ -873,3 +873,15 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 ## Ames, K.M. (1994). "The Northwest Coast: Complex Hunter-Gatherers, Ecology, and Social Evolution." *Annual Review of Anthropology* 23:209–229. DOI 10.1146/annurev.an.23.100194.001233. (Filed `literature/SiC_Games_AGG6_Ames1994_NorthwestCoast.pdf`. **[VERIFIED]** via pypdf 2026-07-05 — UPGRADES the prior reference-only citation.)
 
 **What was lifted — NW-Coast VILLAGE SIZE + the storage→intensification→complexity chain (R-52/R-53; blueprint …_AggregationSedentism):** NW-Coast **villages/towns "ranging from only a few score to over a thousand people"** (~40 → 1000+ residents) — the multi-band-coalescence village-size benchmark; coast pre-contact population estimated **~188,000** (Boyd). Complexity driven by **salmon abundance + reliance on STORAGE + population-size thresholds** → intensification, sedentism, ranking; **owned resource rights** ranging from individuals to villages (the heritable-ownership → ascribed-rank bridge, deferred blueprint 5b/Q7). **How used:** grounds (a) the emergent village-size target (100s), (b) the fishery-stability + storage benchmark (R-53: NW-Coast villages stable for millennia), (c) the ownership→rank material basis. **Status: [VERIFIED] — village ~40–1000+; storage/salmon intensification.**
+
+---
+
+## Skill-by-age / embodied capital (forage-cap v2): Walker et al. 2002; Gurven, Kaplan & Gutierrez 2006; Koster et al. 2020
+
+- **Walker, R. et al. (2002).** "Age-dependency in hunting ability among the Aché." *J. Hum. Evol.* 42:639–657. DOI 10.1006/jhev.2001.0541. (`literature/SiC_Games_SK1_Walker2002_HuntingAgeDependency.pdf`, **[VERIFIED]** pypdf.) Hunting outcomes **peak surprisingly LATE, significantly AFTER strength peaks** → productivity is **skill/embodied-capital-driven, not strength**.
+- **Gurven, M., Kaplan, H. & Gutierrez, M. (2006).** "How long does it take to become a proficient hunter?" *J. Hum. Evol.* 51:454–470. DOI 10.1016/j.jhevol.2006.05.003. (`…SK2_Gurven2006…`, **[VERIFIED]** pypdf.) **Hunting success peaks age 35–50; other FORAGING & fishing peak ~age 20**; skill rises age 10→40.
+- **Koster, J. et al. (2020).** "The life history of human foraging: cross-cultural and individual variation." *Sci. Adv.* 6:eaax9070. DOI 10.1126/sciadv.aax9070. (`…SK3_Koster2020…`, filed; cross-cultural age-productivity curves + individual variation.)
+
+**What is lifted (forage-cap v2):** the per-person forage cap gets an **age-skill factor** — for FORAGE (not hunting) the productivity curve **peaks ~age 20** with a juvenile ramp (10→20) and gentle later decline (Gurven). The "hereditary" component is **embodied capital** (learned, age-accumulated, culturally transmitted parent→child — Walker: skill not strength) → modelled via the existing `cred`/lineage cultural-transmission machinery, NOT a genetic trait. Grounds `forage_cap(agent,cell) = forage_kcal·hours·age_skill(agent)`. MODEL_SPEC §4.8.21 / §4.1.
+
+**Status: FILED; Walker + Gurven [VERIFIED] (forage peak ~20, hunting ~35–50, skill-driven); Koster filed. Grounds forage-cap v2 age-skill.**
