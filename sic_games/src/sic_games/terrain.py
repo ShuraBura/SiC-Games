@@ -395,17 +395,23 @@ CULT_PET_PER_DEG = 55.0    # mm/yr potential evapotranspiration per °C annual m
 CULT_AI_LOW      = 0.20    # aridity index P/PET below which rain-fed ag fails (UNEP arid limit)
 CULT_AI_HIGH     = 0.50    # AI at/above which water is non-limiting (sub-humid; UNEP)
 CULT_SLOPE_PEN   = 1.5     # slope penalty — steep ground is not arable
+CULT_WATER_BASE  = 0.25    # cultivability multiplier far from water (rain-fed only, no alluvium/irrigation)
+CULT_WATER_GAIN  = 1.75    # extra multiplier at max water-proximity (alluvial floodplain + irrigable → prime)
+CULT_PATCHINESS  = 1.8     # exponent concentrating cultivability onto the best patches (>1 ⇒ marginal land shrinks)
 
 
-def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water):
+def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water, wateracc=None):
     """Agro-climatic cultivation potential ∈[0,1], EMERGENT from climate — the `cultivability` S_pot source
-    (agriculture tier Layer A). Product of three limiters (min-of-Liebig style, multiplicative):
-      f_gs  GROWING SEASON — fraction of the annual temperature cosine (mean ± seasonal half-amplitude) with
-            monthly T ≥ CULT_T_BASE; cold/short-season land (tundra, high montane) → 0.
-      f_ai  WATER — aridity index AI = P/PET (PET ≈ CULT_PET_PER_DEG·max(T,1)); arid (AI<LOW) → 0, sub-humid+ → 1.
+    (agriculture tier Layer A). Product of climatic limiters × a WATER-PROXIMITY concentration, then sharpened so
+    PRIME PATCHES dominate (real prime arable is NOT smoothly distributed):
+      f_gs  GROWING SEASON — fraction of the annual temperature cosine with monthly T ≥ CULT_T_BASE.
+      f_ai  WATER (climate) — aridity index AI = P/PET; arid → 0, sub-humid+ → 1.
       f_terr ARABLE — low slope, not water.
-    Peaks in temperate/subtropical/Mediterranean sub-humid low-relief land (the fertile belt); ~0 in desert,
-    tundra, and steep terrain. PROVISIONAL (sign-off)."""
+      f_wp  WATER-PROXIMITY — prime arable is ALLUVIAL/FLOODPLAIN + irrigable, near rivers/water (Nile/Mesopotamia/
+            Indus): cult rises with `wateracc` (CULT_WATER_BASE far from water … +CULT_WATER_GAIN at the water).
+      then ^CULT_PATCHINESS to CONCENTRATE (the best patches dominate; marginal land shrinks toward 0).
+    → prime farmland is patchy + water-proximate (the point-resource geography that nucleates villages), NOT areal.
+    PROVISIONAL (sign-off)."""
     Tm = temperature
     A = np.maximum(temp_seas_amp, 1e-6)
     c = np.clip((CULT_T_BASE - Tm) / A, -1.0, 1.0)              # cosine level for the crop base temperature
@@ -415,6 +421,9 @@ def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water):
     f_ai = np.clip((ai - CULT_AI_LOW) / (CULT_AI_HIGH - CULT_AI_LOW), 0.0, 1.0)
     f_terr = np.clip(1.0 - CULT_SLOPE_PEN * slope, 0.0, 1.0)
     cult = f_gs * f_ai * f_terr
+    if wateracc is not None:                                    # (c) prime arable is WATER-PROXIMATE (alluvial/irrigable)
+        cult = cult * (CULT_WATER_BASE + CULT_WATER_GAIN * np.clip(wateracc, 0.0, 1.0))
+    cult = np.clip(cult, 0.0, 1.0) ** CULT_PATCHINESS           # (a) sharpen → the best patches dominate (not smooth)
     cult[is_water == 1] = 0.0
     return cult
 
@@ -913,7 +922,7 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     # ── Agriculture tier Layer A: cultivability (climate mode) — the 2nd S_pot source, EMERGENT from climate. ──
     cultivability = np.zeros((N, N), dtype=np.float64)
     if mode == "climate":
-        cultivability = cultivability_field(temperature, temp_seas_amp, precip_mm, slope, isWater)
+        cultivability = cultivability_field(temperature, temp_seas_amp, precip_mm, slope, isWater, wateracc=wateracc)
 
     # ── forage_kcal: per-biome mean-scaling (Task 1) + shore bonus (Task 3) ─
     # Original normalised forage[] is preserved. forage_kcal is a separate field.

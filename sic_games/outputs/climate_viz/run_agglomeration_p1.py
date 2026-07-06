@@ -31,13 +31,12 @@ def run(aggl, alpha=1.5, half=100.0, tier2=40.0):
     pos = [zone[i % len(zone)] for i in range(FOUNDERS)]
     demog = realistic_forager_demog().model_copy(update=dict(
         enable_agriculture=True, enable_agglomeration=aggl, aggl_alpha=alpha, aggl_half=half,
-        aggl_tier2=tier2, aggl_catchment_radius=1))
-    # RT-3: NEUTRALISE the GRP grouping drives (safety/mate) so the agglomeration curve is the ONLY grouping force
-    # (else the emergent-band drives cap cluster size at band scale, swamping the agglomeration signal).
-    grp = dict(group_safety_max=0.0, group_safety_scale=15.0, group_mate_min=0.0, group_mate_floor=0.2)
+        aggl_tier2=tier2, aggl_catchment_radius=1, comove_footprint=0))   # families STACK (not 3×3 scatter) → pack
+    # GRP grouping drives KEPT ON (canonical) — they penalise solitude (risk-pooling + mating); agglomeration adds
+    # the economic returns that scale bands → villages. (Units fixed, so agglomeration now composes with GRP.)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=_k, game_stream=False, seed=0,
         carbon_cfg=CarbonConfig(kappa=1.5), substrate_cfg=SubstrateConfig(enabled=True, k_cell=0,
-            movement_mode="diffusion", contest_exponent=1.5, move_cost_flat=0.0, **grp),
+            movement_mode="diffusion", contest_exponent=1.5, move_cost_flat=0.0, **GRP),
         harvest_field=cap, placement_positions=pos, demography_cfg=demog)
     for i in range(STEPS):
         w.step()
