@@ -1880,6 +1880,13 @@ class TerrainWorld(mesa.Model):
                 # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
                 cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
                 split_thr[bid] = base + (cap - base) * cohesion_frac
+                # Stage 1 SUPRA-BAND SCALING: net payoff ABOVE saturation (unclamped − 1) adds village headroom beyond
+                # the hard cap (Johnson: hierarchy+payoff overcome scalar stress). Since a_new≤1, net>1 REQUIRES the
+                # leader term ⇒ villages need hierarchy. Off ⇒ no headroom ⇒ hard cap, bit-exact.
+                if getattr(cfg, "enable_village_scaling", False) and cfg.village_gain > 0.0:
+                    net_raw = a_new + leader_term - repulsion - malnutrition
+                    if net_raw > 1.0:
+                        split_thr[bid] += cfg.village_gain * (cap - base) * (net_raw - 1.0)
             self._band_assabiyah = new_assab
             self._band_leader_term = new_leader
             self._band_repulsion = new_repulsion

@@ -470,6 +470,15 @@ class DemographyConfig(BaseModel):
     # nearest-neighbour join, bit-exact.
     enable_resource_directed_fusion: bool = False
     fusion_search_radius: float = Field(25.0, gt=0.0)          # cells; locality bound for the richest-neighbour search
+    # Stage 1 (village-nucleation arc) — SUPRA-BAND SCALING: band_split_size is normally a HARD cap (cohesion_frac
+    # clamped to [0,1] ⇒ tolerable ≤ band_split_size). Johnson 1982: a group exceeds scalar-stress-limited band scale
+    # ONLY when payoff + HIERARCHY overcome scalar stress. When enabled, net payoff ABOVE saturation (the UNCLAMPED
+    # assabiyah + leader − repulsion − malnutrition, minus 1) adds village HEADROOM beyond the hard cap:
+    #   tolerable = base + (cap−base)·min(1,net) + village_gain·(cap−base)·max(0, net−1).
+    # Since assabiyah alone caps at 1 (= the hard cap exactly), exceeding band scale REQUIRES the leader/hierarchy term
+    # (enable_leader_coherence) — villages need leadership (Johnson/Testart). Default OFF ⇒ hard cap, bit-exact.
+    enable_village_scaling: bool = False
+    village_gain: float = Field(0.0, ge=0.0)                   # headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep)
     # Social-Evolution Stage 2: GENEALOGY LOGGER — opt-in append-only logging of each birth/death (uid, mother,
     # father, lineage, band_id, step, cred) to an in-memory flat buffer (O(births+deaths); dump to disk offline).
     # A PURE OBSERVER: writes AFTER the step, reads nothing back, never touches the RNG or dynamics (bit-exact).

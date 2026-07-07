@@ -885,3 +885,23 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 **What is lifted (forage-cap v2):** the per-person forage cap gets an **age-skill factor** — for FORAGE (not hunting) the productivity curve **peaks ~age 20** with a juvenile ramp (10→20) and gentle later decline (Gurven). The "hereditary" component is **embodied capital** (learned, age-accumulated, culturally transmitted parent→child — Walker: skill not strength) → modelled via the existing `cred`/lineage cultural-transmission machinery, NOT a genetic trait. Grounds `forage_cap(agent,cell) = forage_kcal·hours·age_skill(agent)`. MODEL_SPEC §4.8.21 / §4.1.
 
 **Status: FILED; Walker + Gurven [VERIFIED] (forage peak ~20, hunting ~35–50, skill-driven); Koster filed. Grounds forage-cap v2 age-skill.**
+
+---
+
+## Settlement decision + band-fission payoff (village-nucleation arc): why settle, how find a place, why exceed band scale
+
+**A) Why bands settle (sedentism):**
+- **Binford, L. (1980).** "Willow smoke and dogs' tails: hunter-gatherer settlement systems…" *Am. Antiquity* 45:4–20. Forager↔COLLECTOR continuum: collectors REDUCE residential mobility, settle near concentrated key resources + forage logistically (temperate/boreal, patchy resources). [SEARCH-VERIFIED; PDF paywalled — TO-GRAB]
+- **Testart, A. (1982).** "The significance of food storage among hunter-gatherers…" *Current Anthropology* 23:523–537 (+ **Woodburn 1982** immediate/delayed-return). STORAGE of seasonal glut → sedentism + density + inequality: storage converts a seasonal peak into year-round sustaining capacity. [SEARCH-VERIFIED; paywalled — TO-GRAB]
+
+**B) How they find a place (site selection):**
+- **Kennett, Anderson & Winterhalder (2006); Kennett (2005) Channel Islands; Jazwa/Winterhalder (2010)** *J. Anthropol. Archaeol.* — IDEAL FREE DISTRIBUTION applied to settlement: settle HIGHEST-suitability habitat first; density-dependent suitability decline pushes to next-best. **Habitat-suitability ranking = the site-appraisal mechanism — the SAME IFD our model runs, but evaluated at CATCHMENT scale.** [SEARCH-VERIFIED; PDFs paywalled/RG — TO-GRAB]
+- **Vita-Finzi & Higgs (1970)** site catchment (already in MODEL_SPEC §4.8.21 as AGG4); **Orians & Pearson (1979)** central-place foraging; **Jochim (1976)** predictive settlement (water/arable/ecotone).
+
+**C) Why exceed band scale — the FISSION PAYOFF (the >45 ceiling):**
+- **Johnson, G. (1982).** "Organizational structure and scalar stress." SCALAR STRESS: in-group conflict/coordination cost rises super-linearly with n (~pairwise) → bands FISSION at ~25 ("magic numbers" 6 & 25). Remedies: fission, HIERARCHY (vertical decision-making DISSIPATES scalar stress), or ritual. When landscape fills/mobility limited → hierarchy evolves instead of fissioning. [SEARCH-VERIFIED; chapter paywalled — TO-GRAB]
+- **Alberti, G. (2014).** "Modeling Group Size and Scalar Stress by Logistic Regression." *PLOS One* 9:e91510. Quantitative scalar-stress thresholds. (`literature/SiC_Games_SET3_Alberti_ScalarStress2014.pdf`, SAVED, 15 pp.)
+- **Handley, C. & Mathew, S. (2020).** "Human large-scale cooperation as a product of competition between cultural groups." *Nat. Commun.* 11:702. Intergroup COMPETITION selects for large-scale in-group cooperation. (`literature/SiC_Games_SET2_Handley_CulturalGroupCompetition2020.pdf`, SAVED, 9 pp.)
+- **Turchin (multilevel selection / asabiya); Carneiro (1970) circumscription.** WARFARE is the selective force overcoming the maintenance cost of large-scale cooperation; asabiya = capacity for collective action; large polities arise where interpolity competition is intense. **NOTE: the model's `assabiyah` seam IS Turchin's asabiya — its native driver in the lit is intergroup warfare (currently fed by surplus proxy).** [SEARCH-VERIFIED; Turchin escholarship PDF needs browser — TO-GRAB]
+
+**Status: FILED. SAVED: Alberti 2014 (SET3), Handley & Mathew 2020 (SET2). TO-GRAB (paywalled/browser): Binford 1980, Testart 1982, Johnson 1982, Kennett/Winterhalder IFD-settlement, Turchin. Grounds the band-level catchment site-appraisal + cost-benefit fission ceiling (scalar-stress cost vs economic+military payoff vs hierarchy discount).**
