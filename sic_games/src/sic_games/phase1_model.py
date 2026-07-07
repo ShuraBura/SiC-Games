@@ -273,6 +273,7 @@ class TerrainWorld(mesa.Model):
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
+        self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -611,6 +612,34 @@ class TerrainWorld(mesa.Model):
             self._move_cost_cache = ct * self._demog.move_cost_kcal
         return self._move_cost_cache
 
+    def _site_suitability_field(self):
+        """Stage 1c catchment SITE-VALUE field (central-place appraisal). value(c) = Σ_{|d|≤radius} S_pot(c')·
+        exp(−λ·dist·(0.5+cost(c'))) — catchment resource potential discounted by cost-distance (rugged/far cells
+        contribute less). Normalized to [0,1] and scaled by site_gain·BURN → a PERCEIVED per-cell central-place bonus
+        (a static gradient toward prime real-estate; Kennett-Winterhalder IFD-suitability). Cached. None if no S_pot/cost."""
+        if self._site_cache is None:
+            sp = self._s_pot_field()
+            ct = getattr(self._fields, "cost", None)
+            if sp is None or ct is None:
+                return None
+            import numpy as np
+            r = self._demog.site_radius
+            lam = self._demog.site_lambda
+            acc = np.zeros_like(sp)
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    d = max(abs(dx), abs(dy))
+                    if d == 0:
+                        acc += sp                               # the site cell itself (no travel)
+                        continue
+                    rsp = np.roll(np.roll(sp, dy, axis=0), dx, axis=1)
+                    rct = np.roll(np.roll(ct, dy, axis=0), dx, axis=1)
+                    acc += rsp * np.exp(-lam * d * (0.5 + rct))  # far/rugged catchment cells contribute less
+            mx = float(acc.max())
+            norm = acc / mx if mx > 0 else acc
+            self._site_cache = self._demog.site_gain * self._burn * norm
+        return self._site_cache
+
     def _aggl_R_field(self):
         """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · cv_ref),
         where S_pot ∈ [0,1] is the cultivability/aquatic GATE and cv_ref = forage_kcal · forage_cap_hours is the
@@ -783,6 +812,9 @@ class TerrainWorld(mesa.Model):
         # Stage 1b terrain move cost: perceived in IFD (move_cost_field) + drained at metabolism for movers. Off ⇒ None.
         tmc_on = self._demog is not None and getattr(self._demog, "enable_terrain_move_cost", False)
         mcf = self._move_cost_field() if tmc_on else None
+        # Stage 1c catchment site-appraisal: a static central-place suitability gradient perceived in IFD. Off ⇒ None.
+        site_on = self._demog is not None and getattr(self._demog, "enable_site_appraisal", False)
+        sfield = self._site_suitability_field() if site_on else None
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
@@ -880,7 +912,8 @@ class TerrainWorld(mesa.Model):
                                              owner_exclusion=def_excl, owner_tether=def_teth,
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
-                                             aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf)
+                                             aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf,
+                                             site_field=sfield)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:

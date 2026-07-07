@@ -484,6 +484,17 @@ class DemographyConfig(BaseModel):
     # metabolism (moving repeatedly depletes reserve → selection for sedentism) AND PERCEIVED in the IFD utility
     # (agents prefer to stay / take cheap-terrain steps → central-place foraging, prime real-estate valued). Locomotion
     # was previously FREE (move_cost_flat=0, fixed per-step BURN). Default OFF ⇒ no move cost, bit-exact.
+    # Stage 1c — CATCHMENT SITE-APPRAISAL (Kennett-Winterhalder IFD-suitability + Vita-Finzi catchment + Orians-Pearson
+    # central place): a static per-cell SITE-VALUE field = Σ_{catchment} S_pot(c')·exp(−λ·dist·(0.5+cost(c'))) — the
+    # resource potential of the surrounding catchment DISCOUNTED by cost-distance (rugged/far cells contribute less).
+    # Normalized [0,1], scaled by site_gain·BURN, PERCEIVED in the IFD utility (occupancy-independent). This gives a
+    # GLOBAL gradient that agents climb toward prime central places → solves the ASSEMBLY problem (converge on best
+    # catchment, not coordinate) + values prime real-estate + tightens communities onto catchment cores. Perceived-only
+    # (anticipation) — actual food is still forage cap + point-superlinear + storage (no double-count). Default OFF ⇒ bit-exact.
+    enable_site_appraisal: bool = False
+    site_gain: float = Field(0.0, ge=0.0)                     # central-place bonus magnitude (× BURN × normalized suitability); UNANCHORED (sweep)
+    site_radius: int = Field(2, ge=1)                         # catchment radius (Vita-Finzi 5–10 km ≈ 1–2 cells) [VERIFIED-anchored]
+    site_lambda: float = Field(1.0, ge=0.0)                   # cost-distance decay of catchment contribution; UNANCHORED
     enable_terrain_move_cost: bool = False
     move_cost_kcal: float = Field(0.0, ge=0.0)                # kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest].
     # CALIBRATED ~750 (≈0.01·BURN): a ~10 km residential move costs a human ~50–75 kcal/km × 10 km ≈ 500–750 kcal

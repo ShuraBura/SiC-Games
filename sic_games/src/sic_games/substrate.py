@@ -84,6 +84,7 @@ def diffusion_select_target(
     aggl_mode: str = "point",
     forage_cap=None,
     move_cost_field=None,
+    site_field=None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -197,6 +198,11 @@ def diffusion_select_target(
                 else:
                     na = n_grp ** aggl_alpha
                     ypc += Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
+        # Stage 1c CATCHMENT SITE-APPRAISAL: a static central-place suitability bonus (occupancy-INDEPENDENT) — the
+        # anticipated value of the SITE (rich, cheap-to-work catchment). A global gradient agents climb toward prime
+        # real-estate (assembly) + tightens onto catchment cores. site_field=None ⇒ off, bit-exact.
+        if site_field is not None:
+            ypc += float(site_field[cy, cx])
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 
