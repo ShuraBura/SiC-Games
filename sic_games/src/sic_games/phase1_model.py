@@ -599,19 +599,23 @@ class TerrainWorld(mesa.Model):
         return self._forage_cap_cache
 
     def _aggl_R_field(self):
-        """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · forage_level)
-        (soil=1 in P1). The intensive yield is a MULTIPLE of the catchment's actual productivity, S_pot-gated — so it is
-        in the harvest field's own units (aggl_tier2 = a dimensionless intensification factor, ~1–5, not the raw S_pot
-        sum which under-scaled by ~10^4). Cached (static). None if no S_pot."""
+        """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · cv_ref),
+        where S_pot ∈ [0,1] is the cultivability/aquatic GATE and cv_ref = forage_kcal · forage_cap_hours is the
+        per-person REALIZABLE yield (kcal — the same scale as the forage cap). So R lives in realistic harvest units
+        and aggl_tier2 is a dimensionless INTENSIFICATION MULTIPLE (~1–5: intensive land yields a few× foraging per
+        area). Cached (static). None if no S_pot or forage_kcal.
+
+        [Bug-fix 2026-07: the previous form multiplied S_pot by `harvest_field.level()`, which returns kcal CAPACITY
+        (~10^6), not a 0–1 fraction — so R blew up to ~54M (≈18×S) and the intensive term SWAMPED the forage cap,
+        re-rewarding lone/spread agents (L(1)·54M ≈ 900k ≫ cap). Anchoring to cv_ref restores L(1)≈0.]"""
         if self._aggl_R_cache is None:
             sp = self._s_pot_field()
-            if sp is None:
+            fk = getattr(self._fields, "forage_kcal", None)
+            if sp is None or fk is None:
                 return None
             import numpy as np
-            tf = self._harvest_field
-            n = sp.shape[0]
-            lvl = np.array([[float(tf.level(x, y)) for x in range(n)] for y in range(n)])
-            weighted = sp * lvl                                   # S_pot-gated catchment productivity (forage units)
+            cv_ref = fk * self._demog.forage_cap_hours           # per-person realizable yield (kcal) — the cap's scale
+            weighted = sp * cv_ref                               # cultivability-gated realizable yield (kcal)
             r = self._demog.aggl_catchment_radius
             acc = np.zeros_like(weighted)
             for dy in range(-r, r + 1):
