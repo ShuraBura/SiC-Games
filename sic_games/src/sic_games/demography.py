@@ -333,11 +333,22 @@ class DemographyConfig(BaseModel):
     # size/relocation/bust all EMERGE, replacing the discrete settlement lifecycle. Applied CONSISTENTLY to movement
     # (perceived) AND harvest (realized) so no over-subscription death. α anchored to Bettencourt ~1.15 (MODEL_SPEC
     # §4.8.21) — SWEPT (band-scale at 1.15, village-scale needs sharper). Default OFF ⇒ legacy S/(n+1) ⇒ bit-exact.
+    # aggl_mode selects the returns-to-co-location FORM:
+    #  "point"     — Bettencourt-CORRECT (Branch A): the cell's OWN intensive output scales super-linearly with its
+    #                occupancy, O(n) = A_cell·n^β, so PER-CAPITA = A_cell·n^(β-1) RISES with n (β>1) → co-location is
+    #                genuinely more productive per head → packing NUCLEATES and reinforces GRP. A_cell = tier2·S_pot·cv_ref
+    #                (single cell — a POINT return, not an areal sum). This is the intended agglomeration economy.
+    #  "catchment" — FALSIFIED (kept for comparison): shared catchment pot R·L(n)/n with L saturating → per-capita PEAKS
+    #                then CONGESTS (∝1/n at scale) → areal-dispersive, monotonically REDUCES packing as tier2 rises. The
+    #                exponent there (aggl_alpha) is a logistic saturation-sharpness, NOT Bettencourt's scaling β. See
+    #                DEAD_ENDS + MODEL_SPEC §4.8.21.
     enable_agglomeration: bool = False
-    aggl_alpha: float = Field(1.15, ge=1.0)                  # returns-to-co-location exponent L(n)~n^α (Bettencourt 1.15 floor; swept) [PROVISIONAL]
-    aggl_half: float = Field(100.0, gt=0.0)                  # half-saturation n of L(n) (~village scale; sets optimal size with α) [PROVISIONAL]
-    aggl_tier2: float = Field(2.0, ge=0.0)                   # intensification FACTOR: R = tier2·Σ_catchment(S_pot·forage_level) — a dimensionless multiple of the catchment's own productivity (~1–5) [PROVISIONAL]
-    aggl_catchment_radius: int = Field(1, ge=0)             # cells R(c) pools S_pot over (Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
+    aggl_mode: str = "point"                                 # "point" (Bettencourt-correct) | "catchment" (falsified)
+    aggl_beta: float = Field(1.15, ge=1.0)                   # POINT super-linear exponent: per-capita ∝ n^(β-1) (Bettencourt β≈1.15) [VERIFIED-anchored]
+    aggl_alpha: float = Field(1.15, ge=1.0)                  # CATCHMENT logistic sharpness L(n)~n^α (falsified mode only) [PROVISIONAL]
+    aggl_half: float = Field(100.0, gt=0.0)                  # CATCHMENT half-saturation n of L(n) (falsified mode only) [PROVISIONAL]
+    aggl_tier2: float = Field(2.0, ge=0.0)                   # intensification MULTIPLE: A_cell/R = tier2·S_pot·cv_ref — dimensionless (~1–5) [PROVISIONAL]
+    aggl_catchment_radius: int = Field(1, ge=0)             # CATCHMENT pooling radius (falsified mode; Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
     # PER-PERSON FORAGE CAP (the solitude fix): a forager can only WORK so much land — intake is capped at the biome
     # return-rate × work hours (forage_kcal[cell] · forage_cap_hours), NOT the whole cell (S/n gave a lone agent ~27×
     # subsistence → solitude over-rewarded → aggregation never paid; GATE-3). Grounds the economy in the Survey-A

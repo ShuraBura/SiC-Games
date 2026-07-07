@@ -269,7 +269,8 @@ class TerrainWorld(mesa.Model):
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
-        self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot
+        self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
+        self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
@@ -624,6 +625,20 @@ class TerrainWorld(mesa.Model):
             self._aggl_R_cache = self._demog.aggl_tier2 * acc
         return self._aggl_R_cache
 
+    def _aggl_point_base_field(self):
+        """POINT agglomeration base A_cell = aggl_tier2 · S_pot · cv_ref (Bettencourt-correct, Branch A). The cell's OWN
+        intensive output scales super-linearly with its occupancy: O(n) = A_cell·n^β ⇒ per-capita A_cell·n^(β-1) RISES
+        with co-location (β>1). A_cell is a SINGLE cell (a POINT return — no catchment convolution), cultivability-gated,
+        in cap-kcal units so aggl_tier2 is a dimensionless intensification multiple. Cached. None if no S_pot/forage_kcal."""
+        if self._aggl_point_cache is None:
+            sp = self._s_pot_field()
+            fk = getattr(self._fields, "forage_kcal", None)
+            if sp is None or fk is None:
+                return None
+            cv_ref = fk * self._demog.forage_cap_hours           # per-person realizable yield (kcal) — the cap's scale
+            self._aggl_point_cache = self._demog.aggl_tier2 * sp * cv_ref
+        return self._aggl_point_cache
+
     def _settlement_catchment_yield(self, site: tuple[int, int]) -> float:
         """Layer 2: the settlement-UNLOCKED intensive tier-2 yield, pooled over the catchment (residence ≠ foraging).
         RESOURCE-AGNOSTIC — reads S_pot (= max(aquatic_food, cultivability)). Gated: only settlement sites get it,
@@ -745,8 +760,10 @@ class TerrainWorld(mesa.Model):
         # Agglomeration economics (grand-unification rework): the intensive catchment-resource field + curve params,
         # passed into IFD (perceived) and added in the harvest (realized). aggl_on=False ⇒ R_field=None ⇒ bit-exact.
         aggl_on = self._demog is not None and getattr(self._demog, "enable_agglomeration", False)
-        aggl_R = self._aggl_R_field() if aggl_on else None
-        aggl_a = self._demog.aggl_alpha if aggl_on else 1.15
+        aggl_mode = getattr(self._demog, "aggl_mode", "point") if aggl_on else "point"
+        # POINT (Bettencourt-correct): A_cell·n^(β-1) per capita on the cell's OWN output. CATCHMENT (falsified): R·L(n)/n.
+        aggl_R = (self._aggl_point_base_field() if aggl_mode == "point" else self._aggl_R_field()) if aggl_on else None
+        aggl_a = (self._demog.aggl_beta if aggl_mode == "point" else self._demog.aggl_alpha) if aggl_on else 1.15
         aggl_h = self._demog.aggl_half if aggl_on else 100.0
         # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
         cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
@@ -846,7 +863,7 @@ class TerrainWorld(mesa.Model):
                                              owner_exclusion=def_excl, owner_tether=def_teth,
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
-                                             forage_cap=fcap)
+                                             aggl_mode=aggl_mode, forage_cap=fcap)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -984,10 +1001,14 @@ class TerrainWorld(mesa.Model):
                 S += (self._settlement_catchment_yield((cx, cy)) * self._tier2_shock
                       * self._settlement_soil.get((cx, cy), 1.0))
             if aggl_on and aggl_R is not None:
-                # AGGLOMERATION: REALIZED intensive output R·L(n) added to the cell pool (split → R·L(n)/n each),
-                # matching the movement-perceived per-capita → increasing returns are real, no over-subscription death.
-                no = len(occ); na = no ** aggl_a
-                S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))
+                # AGGLOMERATION: REALIZED intensive output added to the cell pool, matching the movement-perceived
+                # per-capita → increasing returns are real, no over-subscription death.
+                no = len(occ)
+                if aggl_mode == "point":
+                    S += float(aggl_R[cy, cx]) * (no ** aggl_a - no)         # premium O(n)-baseline = A_cell·(n^β-n) → split n → A_cell·(n^(β-1)-1) each
+                else:
+                    na = no ** aggl_a
+                    S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))  # catchment R·L(n) (falsified)
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
