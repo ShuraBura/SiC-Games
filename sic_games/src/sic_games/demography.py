@@ -235,16 +235,16 @@ class DemographyConfig(BaseModel):
     # construction — Aché/Hadza/Hiwi/!Kung). Default OFF = exact back-compat. (Per-agent store is v1; the
     # collective-vs-individual grain + the storage→inequality morph is the next step.)
     enable_storage: bool = False
-    storable_fraction: float = Field(0.5, ge=0.0, le=1.0)        # QSTOR-anchored fraction of overflow that is storable [PROVISIONAL]
+    storable_fraction: float = Field(0.7, ge=0.0, le=1.0)        # fraction of overflow that is storable — lit ~0.5–0.8 (strongly-seasonal storers live mostly off stores; grain 50–70% stored) [LIT-CALIBRATED, storage survey]
     # RESOURCE-DEPENDENT STORABILITY (Testart 1982: it's the STORABLE seasonal resources — grain, nuts, dried fish —
     # that enable sedentism, NOT perishable fresh forage/meat). When enabled, storable_fraction becomes a per-cell
     # weighted average of the resource mix's storabilities: Σ(resource·s_r)/Σ(resource), s_grain 0.85 / s_fish 0.80 /
     # s_forage 0.15 / s_game 0.35 (STORABILITY_BY_RESOURCE). So grain/fishing cells accumulate granaries → sedentism/
     # complexity, while fresh-forage cells can't store → stay mobile (the Testart distinction). Default OFF ⇒ scalar, bit-exact.
     enable_resource_storability: bool = False
-    store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
+    store_capacity_reserves: float = Field(12.0, ge=0.0)        # store cap = this × reserve cap. reserve_full≈1.33 mo BURN ⇒ 12≈16 mo ≈ Halstead 1–2 yr granary (annual cycle + bad-year buffer). Old 3 (=4 mo) was far too low. [LIT-CALIBRATED, storage survey]
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
-    storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
+    storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss (0 = off). Realistic traditional ≈ 0.02/mo (~22%/yr; lit 10–30%/yr) [LIT-CALIBRATED when on]
     # STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's
     # biome SEASONAL AMPLITUDE (Testart/Binford storability) instead of the constant-placeholder temperature — an
     # aseasonal biome (forest, amp 0.05) can't store → egalitarian; a seasonal biome (savanna 0.40, grass 0.60)

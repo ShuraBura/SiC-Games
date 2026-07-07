@@ -64,8 +64,8 @@ def realistic_forager_demog() -> DemographyConfig:
         comove_footprint=1,
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
-        enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
-        storage_temp_threshold_c=100.0, storage_decay=0.05, enable_morph=True, morph_settle_steps=60,
+        enable_storage=True, storable_fraction=0.7, store_capacity_reserves=12.0,   # LIT-CALIBRATED (storage survey): 0.7 stored frac; 12≈16mo≈1-2yr granary (was 0.5/3=4mo)
+        storage_temp_threshold_c=100.0, storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
         enable_band_family_knobs=True, enable_dynamic_bands=True, band_base_tolerable=25,
         assabiyah_gain=0.05, assabiyah_decay=0.02)
 
