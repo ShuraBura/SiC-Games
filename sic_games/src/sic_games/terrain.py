@@ -398,9 +398,11 @@ CULT_SLOPE_PEN   = 1.5     # slope penalty — steep ground is not arable
 CULT_WATER_BASE  = 0.25    # cultivability multiplier far from water (rain-fed only, no alluvium/irrigation)
 CULT_WATER_GAIN  = 1.75    # extra multiplier at max water-proximity (alluvial floodplain + irrigable → prime)
 CULT_PATCHINESS  = 1.8     # exponent concentrating cultivability onto the best patches (>1 ⇒ marginal land shrinks)
+RIVER_RIBBON_LAMBDA = 0.8  # scarce-arable mode: cultivability decay length (cells) from the river CHANNEL → thin ribbons
 
 
-def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water, wateracc=None):
+def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water, wateracc=None,
+                        is_river=None, river_ribbon=False, ribbon_lambda=RIVER_RIBBON_LAMBDA):
     """Agro-climatic cultivation potential ∈[0,1], EMERGENT from climate — the `cultivability` S_pot source
     (agriculture tier Layer A). Product of climatic limiters × a WATER-PROXIMITY concentration, then sharpened so
     PRIME PATCHES dominate (real prime arable is NOT smoothly distributed):
@@ -424,6 +426,10 @@ def cultivability_field(temperature, temp_seas_amp, precip_mm, slope, is_water, 
     if wateracc is not None:                                    # (c) prime arable is WATER-PROXIMATE (alluvial/irrigable)
         cult = cult * (CULT_WATER_BASE + CULT_WATER_GAIN * np.clip(wateracc, 0.0, 1.0))
     cult = np.clip(cult, 0.0, 1.0) ** CULT_PATCHINESS           # (a) sharpen → the best patches dominate (not smooth)
+    if river_ribbon and is_river is not None:                   # SCARCE-ARABLE mode (R-57): prime arable is a thin
+        from scipy import ndimage                               # ALLUVIAL ribbon along the river CHANNEL, not the diffuse
+        d2r = ndimage.distance_transform_edt(~(is_river != 0))  # wateracc halo — the Nile/Mesopotamia geography. Sharp
+        cult = cult * np.exp(-d2r / max(ribbon_lambda, 1e-6))   # exp decay from the channel ⇒ ~few-% prime land in ribbons
     cult[is_water == 1] = 0.0
     return cult
 
@@ -616,11 +622,16 @@ TERRAIN_ORDER = ("flat", "hilly", "mountainous", "coastal")
 CLIMATE_ORDER = ("tropical", "subtropical", "temperate", "boreal")
 
 
-def world_lottery_climate(seed: int, terrain: str | None = None, climate: str | None = None) -> dict:
+def world_lottery_climate(seed: int, terrain: str | None = None, climate: str | None = None,
+                          scarce_arable: bool = False) -> dict:
     """Economy-from-Climate world draw: INDEPENDENT terrain × climate → knobs for `generate_world(…, mode="climate")`,
     where the biome EMERGES from Whittaker(T,P). `seed` cycles terrain and climate on co-prime periods (4 × 4 = 16
     distinct pairings over seeds 0–15) unless forced. `forestK`/`aridK` (legacy moisture knobs) are neutralised —
-    climate, not a knob, sets moisture. Use with `mode="climate"`."""
+    climate, not a knob, sets moisture. Use with `mode="climate"`.
+
+    `scarce_arable=True` (R-57): prime cultivability collapses to thin ALLUVIAL RIBBONS along river channels
+    (~few-% of land, Nile/Mesopotamia geography) rather than diffuse blobs — the resource-structured world where
+    circumscription/riverine-village nucleation activates. Default OFF ⇒ the diffuse water-proximate cultivability."""
     import random as _random
     terr = terrain or TERRAIN_ORDER[seed % len(TERRAIN_ORDER)]
     clim = climate or CLIMATE_ORDER[(seed // len(TERRAIN_ORDER)) % len(CLIMATE_ORDER)]
@@ -630,6 +641,7 @@ def world_lottery_climate(seed: int, terrain: str | None = None, climate: str | 
     knobs["forestK"] = 0.5    # neutral (climate sets moisture; forestK is a legacy woody-cover knob)
     knobs["aridK"] = 0.0      # neutral (legacy aridity; superseded by climate_aridity)
     knobs["mode"] = "climate"
+    knobs["scarce_arable"] = scarce_arable    # R-57: river-ribbon prime arable (default OFF ⇒ diffuse, bit-exact)
     knobs["seedStr"] = f"{terr}-{clim}{seed}"
     knobs["terrain"] = terr
     knobs["climate"] = clim
@@ -922,7 +934,9 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     # ── Agriculture tier Layer A: cultivability (climate mode) — the 2nd S_pot source, EMERGENT from climate. ──
     cultivability = np.zeros((N, N), dtype=np.float64)
     if mode == "climate":
-        cultivability = cultivability_field(temperature, temp_seas_amp, precip_mm, slope, isWater, wateracc=wateracc)
+        cultivability = cultivability_field(temperature, temp_seas_amp, precip_mm, slope, isWater, wateracc=wateracc,
+                                            is_river=isRiver, river_ribbon=knobs.get("scarce_arable", False),
+                                            ribbon_lambda=knobs.get("ribbon_lambda", RIVER_RIBBON_LAMBDA))
 
     # ── forage_kcal: per-biome mean-scaling (Task 1) + shore bonus (Task 3) ─
     # Original normalised forage[] is preserved. forage_kcal is a separate field.
