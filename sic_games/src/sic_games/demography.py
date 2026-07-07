@@ -479,6 +479,17 @@ class DemographyConfig(BaseModel):
     # (enable_leader_coherence) — villages need leadership (Johnson/Testart). Default OFF ⇒ hard cap, bit-exact.
     enable_village_scaling: bool = False
     village_gain: float = Field(0.0, ge=0.0)                   # headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep)
+    # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
+    # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
+    # metabolism (moving repeatedly depletes reserve → selection for sedentism) AND PERCEIVED in the IFD utility
+    # (agents prefer to stay / take cheap-terrain steps → central-place foraging, prime real-estate valued). Locomotion
+    # was previously FREE (move_cost_flat=0, fixed per-step BURN). Default OFF ⇒ no move cost, bit-exact.
+    enable_terrain_move_cost: bool = False
+    move_cost_kcal: float = Field(0.0, ge=0.0)                # kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest].
+    # CALIBRATED ~750 (≈0.01·BURN): a ~10 km residential move costs a human ~50–75 kcal/km × 10 km ≈ 500–750 kcal
+    # (locomotion energetics). This is BOTH the physical scale AND the beneficial sweet spot: at 750 packing 25.7→30.3%,
+    # max/cell 25.7→32, pop healthy (430); ABOVE it over-penalizes (per-step movement IS essential foraging → starves
+    # marginal agents; 0.1·BURN collapses pop). [VERIFIED-anchored to walking energetics; sweep-confirmed non-lethal window.]
     # Social-Evolution Stage 2: GENEALOGY LOGGER — opt-in append-only logging of each birth/death (uid, mother,
     # father, lineage, band_id, step, cred) to an in-memory flat buffer (O(births+deaths); dump to disk offline).
     # A PURE OBSERVER: writes AFTER the step, reads nothing back, never touches the RNG or dynamics (bit-exact).

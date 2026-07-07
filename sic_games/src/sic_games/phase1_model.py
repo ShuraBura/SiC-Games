@@ -272,6 +272,7 @@ class TerrainWorld(mesa.Model):
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
+        self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -599,6 +600,17 @@ class TerrainWorld(mesa.Model):
             self._forage_cap_cache = fk * self._demog.forage_cap_hours
         return self._forage_cap_cache
 
+    def _move_cost_field(self):
+        """Stage 1b per-cell terrain MOVE COST (kcal) = move_cost_kcal · cost, where `cost` ∈[0.15,1] is the terrain
+        traversal difficulty (slope/elev-driven, water=1). Perceived in the IFD utility and drained at metabolism when
+        an agent moves. Cached. None if no cost field."""
+        if self._move_cost_cache is None:
+            ct = getattr(self._fields, "cost", None)
+            if ct is None:
+                return None
+            self._move_cost_cache = ct * self._demog.move_cost_kcal
+        return self._move_cost_cache
+
     def _aggl_R_field(self):
         """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · cv_ref),
         where S_pot ∈ [0,1] is the cultivability/aquatic GATE and cv_ref = forage_kcal · forage_cap_hours is the
@@ -768,6 +780,9 @@ class TerrainWorld(mesa.Model):
         # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
         cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
         fcap = self._forage_cap_field() if cap_on else None
+        # Stage 1b terrain move cost: perceived in IFD (move_cost_field) + drained at metabolism for movers. Off ⇒ None.
+        tmc_on = self._demog is not None and getattr(self._demog, "enable_terrain_move_cost", False)
+        mcf = self._move_cost_field() if tmc_on else None
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
@@ -832,6 +847,8 @@ class TerrainWorld(mesa.Model):
                 occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
                 occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
             agent.pos = target
+            if mcf is not None:
+                agent._moved_this_step = True                # Stage 1b: flag movers for the terrain move-cost drain
 
         for agent in agents:
             if fam_move and self._family_head(agent) is not None:
@@ -863,7 +880,7 @@ class TerrainWorld(mesa.Model):
                                              owner_exclusion=def_excl, owner_tether=def_teth,
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
-                                             aggl_mode=aggl_mode, forage_cap=fcap)
+                                             aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -1285,6 +1302,9 @@ class TerrainWorld(mesa.Model):
                 _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
+            if mcf is not None and getattr(a, "_moved_this_step", False):
+                a.wealth -= float(mcf[a.pos[1], a.pos[0]])     # Stage 1b: realized terrain move cost (drain movers)
+                a._moved_this_step = False
             a.age += 1
             if a._founder_store > 0.0:
                 # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the

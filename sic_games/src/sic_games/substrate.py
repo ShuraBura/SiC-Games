@@ -83,6 +83,7 @@ def diffusion_select_target(
     aggl_half: float = 100.0,
     aggl_mode: str = "point",
     forage_cap=None,
+    move_cost_field=None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -157,6 +158,8 @@ def diffusion_select_target(
             if ypc > cv:                                       # (removes the lone-agent whole-cell over-reward)
                 ypc = cv
         move_cost = 0.0 if is_cur else sc.move_cost_flat
+        if move_cost_field is not None and not is_cur:         # Stage 1b: terrain-scaled move cost (perceived) — favours
+            move_cost += float(move_cost_field[cy, cx])        # staying + cheap-terrain steps (central-place foraging)
         # Emergent-bands grouping multipliers on the cell value (the crowd_response hook), traded against the
         # falling per-capita yield ⇒ an optimal band size emerges. E.1 safety (risk dilution, saturating) +
         # E.2 mating access (a penalty below the minimum viable band ⇒ being alone is actively bad).
