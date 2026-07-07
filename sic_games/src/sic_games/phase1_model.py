@@ -274,6 +274,7 @@ class TerrainWorld(mesa.Model):
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
+        self._storable_frac_cache = None                          # resource-dependent per-cell storable fraction (Testart; absent ⇒ scalar)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -640,6 +641,30 @@ class TerrainWorld(mesa.Model):
             self._site_cache = self._demog.site_gain * self._burn * norm
         return self._site_cache
 
+    def _storable_frac_field(self):
+        """Resource-dependent per-cell storable fraction (Testart): weighted average of the local resource mix's
+        storabilities = Σ(resource·s_r)/Σ(resource) over {grain=cultivability, fish=aquatic, forage, game}. Grain/
+        fishing cells → high (accumulate granaries → sedentism); fresh-forage cells → low (can't store → mobile).
+        Cached. None if no cultivability/forage. Falls back to the scalar storable_fraction where the mix is empty."""
+        if self._storable_frac_cache is None:
+            from sic_games.demography import STORABILITY_BY_RESOURCE as SB
+            f = self._fields
+            cult = getattr(f, "cultivability", None)
+            forage = getattr(f, "forage", None)
+            if cult is None or forage is None:
+                return None
+            import numpy as np
+            aq = getattr(f, "aquatic_food", None)
+            game = getattr(f, "game", None)
+            aq = aq if aq is not None else np.zeros_like(cult)
+            game = game if game is not None else np.zeros_like(cult)
+            num = cult * SB["grain"] + aq * SB["fish"] + forage * SB["forage"] + game * SB["game"]
+            den = cult + aq + forage + game
+            sf = np.full_like(cult, self._demog.storable_fraction, dtype=float)
+            np.divide(num, den, out=sf, where=den > 0)          # scalar fallback where the resource mix is empty (water)
+            self._storable_frac_cache = sf
+        return self._storable_frac_cache
+
     def _aggl_R_field(self):
         """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · cv_ref),
         where S_pot ∈ [0,1] is the cultivability/aquatic GATE and cv_ref = forage_kcal · forage_cap_hours is the
@@ -986,6 +1011,9 @@ class TerrainWorld(mesa.Model):
         # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
         store_on = demog is not None and demog.enable_storage
         store_frac = demog.storable_fraction if store_on else 0.0
+        # Resource-dependent storability (Testart): per-cell storable fraction from the local grain/fish/forage/game mix.
+        sfrac_field = (self._storable_frac_field() if (store_on and getattr(demog, "enable_resource_storability", False))
+                       else None)
         store_cap_mult = demog.store_capacity_reserves if store_on else 0.0
         store_temp_thr = demog.storage_temp_threshold_c if store_on else 0.0
         store_decay = demog.storage_decay if store_on else 0.0
@@ -1126,7 +1154,8 @@ class TerrainWorld(mesa.Model):
                     # S.1 collective storage (delayed-return): in the overwintering zone the storable fraction of
                     # the otherwise-wasted overflow is ENFORCED into the band granary; the remainder stays giveable.
                     if in_owz and store_frac > 0.0:
-                        banked = store_frac * overflow
+                        sf = float(sfrac_field[cy, cx]) if sfrac_field is not None else store_frac
+                        banked = sf * overflow
                         cell_contrib += banked
                         overflow -= banked
                     if (provisioning or pat_prov) and overflow > 0.0:        # remaining overflow → giveable to dependents

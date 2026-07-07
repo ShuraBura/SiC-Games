@@ -236,6 +236,12 @@ class DemographyConfig(BaseModel):
     # collective-vs-individual grain + the storage→inequality morph is the next step.)
     enable_storage: bool = False
     storable_fraction: float = Field(0.5, ge=0.0, le=1.0)        # QSTOR-anchored fraction of overflow that is storable [PROVISIONAL]
+    # RESOURCE-DEPENDENT STORABILITY (Testart 1982: it's the STORABLE seasonal resources — grain, nuts, dried fish —
+    # that enable sedentism, NOT perishable fresh forage/meat). When enabled, storable_fraction becomes a per-cell
+    # weighted average of the resource mix's storabilities: Σ(resource·s_r)/Σ(resource), s_grain 0.85 / s_fish 0.80 /
+    # s_forage 0.15 / s_game 0.35 (STORABILITY_BY_RESOURCE). So grain/fishing cells accumulate granaries → sedentism/
+    # complexity, while fresh-forage cells can't store → stay mobile (the Testart distinction). Default OFF ⇒ scalar, bit-exact.
+    enable_resource_storability: bool = False
     store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
     storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
@@ -670,6 +676,17 @@ SOCIETY_PRESETS: dict[str, dict] = {
 # Kaplan & Boone 2010; Ames 1994) → a moderate weight. Stratified chiefdoms institutionalize chiefly authority
 # (Sahlins 1958; Service 1962) → the full weight. UNANCHORED magnitudes (no measured "how much cohesion" number
 # exists) — these are a bracketed 0 / 0.5 / 1.0 ladder for sensitivity sweeps, not a fitted scale.
+# Per-resource storability (Testart 1982): grain/cereal & dried fish keep for a lean season; fresh forage & meat
+# perish. Used by the resource-dependent storable_fraction (a weighted average over a cell's resource mix). Meat gets
+# a partial value (jerky/pemmican preservation exists but is riskier than grain). UNANCHORED ladder — bracketed.
+STORABILITY_BY_RESOURCE: dict[str, float] = {
+    "grain": 0.85,      # cultivability (cereal/nut agriculture)
+    "fish": 0.80,       # aquatic_food (smoked/dried fish — NW Coast salmon)
+    "forage": 0.15,     # fresh wild plants (perishable)
+    "game": 0.35,       # meat (partial: dried/smoked possible but riskier)
+}
+
+
 LEADER_SOCIETY_WEIGHT: dict[str, float] = {
     "egalitarian_forager": 0.0,
     "complex_forager": 0.5,
