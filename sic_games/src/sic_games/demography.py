@@ -235,10 +235,16 @@ class DemographyConfig(BaseModel):
     # construction — Aché/Hadza/Hiwi/!Kung). Default OFF = exact back-compat. (Per-agent store is v1; the
     # collective-vs-individual grain + the storage→inequality morph is the next step.)
     enable_storage: bool = False
-    storable_fraction: float = Field(0.5, ge=0.0, le=1.0)        # QSTOR-anchored fraction of overflow that is storable [PROVISIONAL]
-    store_capacity_reserves: float = Field(3.0, ge=0.0)         # store cap = this × the reserve cap (overwinter buffer)
+    storable_fraction: float = Field(0.7, ge=0.0, le=1.0)        # fraction of overflow that is storable — lit ~0.5–0.8 (strongly-seasonal storers live mostly off stores; grain 50–70% stored) [LIT-CALIBRATED, storage survey]
+    # RESOURCE-DEPENDENT STORABILITY (Testart 1982: it's the STORABLE seasonal resources — grain, nuts, dried fish —
+    # that enable sedentism, NOT perishable fresh forage/meat). When enabled, storable_fraction becomes a per-cell
+    # weighted average of the resource mix's storabilities: Σ(resource·s_r)/Σ(resource), s_grain 0.85 / s_fish 0.80 /
+    # s_forage 0.15 / s_game 0.35 (STORABILITY_BY_RESOURCE). So grain/fishing cells accumulate granaries → sedentism/
+    # complexity, while fresh-forage cells can't store → stay mobile (the Testart distinction). Default OFF ⇒ scalar, bit-exact.
+    enable_resource_storability: bool = False
+    store_capacity_reserves: float = Field(12.0, ge=0.0)        # store cap = this × reserve cap. reserve_full≈1.33 mo BURN ⇒ 12≈16 mo ≈ Halstead 1–2 yr granary (annual cycle + bad-year buffer). Old 3 (=4 mo) was far too low. [LIT-CALIBRATED, storage survey]
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
-    storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss of the granary (0 = no decay)
+    storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss (0 = off). Realistic traditional ≈ 0.02/mo (~22%/yr; lit 10–30%/yr) [LIT-CALIBRATED when on]
     # STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's
     # biome SEASONAL AMPLITUDE (Testart/Binford storability) instead of the constant-placeholder temperature — an
     # aseasonal biome (forest, amp 0.05) can't store → egalitarian; a seasonal biome (savanna 0.40, grass 0.60)
@@ -326,6 +332,38 @@ class DemographyConfig(BaseModel):
     soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
     soil_deplete_frac: float = Field(0.6, ge=0.0)           # per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL]
     soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
+    # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
+    # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
+    # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so
+    # per-capita R·L(n)/n is SINGLE-PEAKED in n. Under IFD, agents then aggregate to the peak → villages/packing/optimal-
+    # size/relocation/bust all EMERGE, replacing the discrete settlement lifecycle. Applied CONSISTENTLY to movement
+    # (perceived) AND harvest (realized) so no over-subscription death. α anchored to Bettencourt ~1.15 (MODEL_SPEC
+    # §4.8.21) — SWEPT (band-scale at 1.15, village-scale needs sharper). Default OFF ⇒ legacy S/(n+1) ⇒ bit-exact.
+    # aggl_mode selects the returns-to-co-location FORM:
+    #  "point"     — Bettencourt-CORRECT (Branch A): the cell's OWN intensive output scales super-linearly with its
+    #                occupancy, O(n) = A_cell·n^β, so PER-CAPITA = A_cell·n^(β-1) RISES with n (β>1) → co-location is
+    #                genuinely more productive per head → packing NUCLEATES and reinforces GRP. A_cell = tier2·S_pot·cv_ref
+    #                (single cell — a POINT return, not an areal sum). This is the intended agglomeration economy.
+    #  "catchment" — FALSIFIED (kept for comparison): shared catchment pot R·L(n)/n with L saturating → per-capita PEAKS
+    #                then CONGESTS (∝1/n at scale) → areal-dispersive, monotonically REDUCES packing as tier2 rises. The
+    #                exponent there (aggl_alpha) is a logistic saturation-sharpness, NOT Bettencourt's scaling β. See
+    #                DEAD_ENDS + MODEL_SPEC §4.8.21.
+    enable_agglomeration: bool = False
+    aggl_mode: str = "point"                                 # "point" (Bettencourt-correct) | "catchment" (falsified)
+    aggl_beta: float = Field(1.15, ge=1.0)                   # POINT super-linear exponent: per-capita ∝ n^(β-1) (Bettencourt β≈1.15) [VERIFIED-anchored]
+    aggl_alpha: float = Field(1.15, ge=1.0)                  # CATCHMENT logistic sharpness L(n)~n^α (falsified mode only) [PROVISIONAL]
+    aggl_half: float = Field(100.0, gt=0.0)                  # CATCHMENT half-saturation n of L(n) (falsified mode only) [PROVISIONAL]
+    aggl_tier2: float = Field(2.0, ge=0.0)                   # intensification MULTIPLE: A_cell/R = tier2·S_pot·cv_ref — dimensionless (~1–5) [PROVISIONAL]
+    aggl_catchment_radius: int = Field(1, ge=0)             # CATCHMENT pooling radius (falsified mode; Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored]
+    # PER-PERSON FORAGE CAP (the solitude fix): a forager can only WORK so much land — intake is capped at the biome
+    # return-rate × work hours (forage_kcal[cell] · forage_cap_hours), NOT the whole cell (S/n gave a lone agent ~27×
+    # subsistence → solitude over-rewarded → aggregation never paid; GATE-3). Grounds the economy in the Survey-A
+    # return-rate data (MODEL_SPEC §4.1; forage_kcal already a field, biome-dependent + right-skewed distribution).
+    # Flattens the forage per-capita (≈cap up to carrying) so grouping/agglomeration decide clustering. Applied in
+    # movement (perceived) AND harvest (realized). Default OFF ⇒ legacy S/n ⇒ bit-exact. (v2: × age-skill curve +
+    # cred-transmitted embodied capital — Walker 2002 / Gurven 2006 / Koster 2020, pending fetch.)
+    enable_forage_cap: bool = False
+    forage_cap_hours: float = Field(100.0, ge=0.0)          # foraging work-hours/period; cap = forage_kcal·hours (~1.6× BURN at hours=100) [PROVISIONAL — Hadza time-budget]
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)
@@ -438,6 +476,37 @@ class DemographyConfig(BaseModel):
     # nearest-neighbour join, bit-exact.
     enable_resource_directed_fusion: bool = False
     fusion_search_radius: float = Field(25.0, gt=0.0)          # cells; locality bound for the richest-neighbour search
+    # Stage 1 (village-nucleation arc) — SUPRA-BAND SCALING: band_split_size is normally a HARD cap (cohesion_frac
+    # clamped to [0,1] ⇒ tolerable ≤ band_split_size). Johnson 1982: a group exceeds scalar-stress-limited band scale
+    # ONLY when payoff + HIERARCHY overcome scalar stress. When enabled, net payoff ABOVE saturation (the UNCLAMPED
+    # assabiyah + leader − repulsion − malnutrition, minus 1) adds village HEADROOM beyond the hard cap:
+    #   tolerable = base + (cap−base)·min(1,net) + village_gain·(cap−base)·max(0, net−1).
+    # Since assabiyah alone caps at 1 (= the hard cap exactly), exceeding band scale REQUIRES the leader/hierarchy term
+    # (enable_leader_coherence) — villages need leadership (Johnson/Testart). Default OFF ⇒ hard cap, bit-exact.
+    enable_village_scaling: bool = False
+    village_gain: float = Field(0.0, ge=0.0)                   # headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep)
+    # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
+    # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
+    # metabolism (moving repeatedly depletes reserve → selection for sedentism) AND PERCEIVED in the IFD utility
+    # (agents prefer to stay / take cheap-terrain steps → central-place foraging, prime real-estate valued). Locomotion
+    # was previously FREE (move_cost_flat=0, fixed per-step BURN). Default OFF ⇒ no move cost, bit-exact.
+    # Stage 1c — CATCHMENT SITE-APPRAISAL (Kennett-Winterhalder IFD-suitability + Vita-Finzi catchment + Orians-Pearson
+    # central place): a static per-cell SITE-VALUE field = Σ_{catchment} S_pot(c')·exp(−λ·dist·(0.5+cost(c'))) — the
+    # resource potential of the surrounding catchment DISCOUNTED by cost-distance (rugged/far cells contribute less).
+    # Normalized [0,1], scaled by site_gain·BURN, PERCEIVED in the IFD utility (occupancy-independent). This gives a
+    # GLOBAL gradient that agents climb toward prime central places → solves the ASSEMBLY problem (converge on best
+    # catchment, not coordinate) + values prime real-estate + tightens communities onto catchment cores. Perceived-only
+    # (anticipation) — actual food is still forage cap + point-superlinear + storage (no double-count). Default OFF ⇒ bit-exact.
+    enable_site_appraisal: bool = False
+    site_gain: float = Field(0.0, ge=0.0)                     # central-place bonus magnitude (× BURN × normalized suitability); UNANCHORED (sweep)
+    site_radius: int = Field(2, ge=1)                         # catchment radius (Vita-Finzi 5–10 km ≈ 1–2 cells) [VERIFIED-anchored]
+    site_lambda: float = Field(1.0, ge=0.0)                   # cost-distance decay of catchment contribution; UNANCHORED
+    enable_terrain_move_cost: bool = False
+    move_cost_kcal: float = Field(0.0, ge=0.0)                # kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest].
+    # CALIBRATED ~750 (≈0.01·BURN): a ~10 km residential move costs a human ~50–75 kcal/km × 10 km ≈ 500–750 kcal
+    # (locomotion energetics). This is BOTH the physical scale AND the beneficial sweet spot: at 750 packing 25.7→30.3%,
+    # max/cell 25.7→32, pop healthy (430); ABOVE it over-penalizes (per-step movement IS essential foraging → starves
+    # marginal agents; 0.1·BURN collapses pop). [VERIFIED-anchored to walking energetics; sweep-confirmed non-lethal window.]
     # Social-Evolution Stage 2: GENEALOGY LOGGER — opt-in append-only logging of each birth/death (uid, mother,
     # father, lineage, band_id, step, cred) to an in-memory flat buffer (O(births+deaths); dump to disk offline).
     # A PURE OBSERVER: writes AFTER the step, reads nothing back, never touches the RNG or dynamics (bit-exact).
@@ -607,6 +676,17 @@ SOCIETY_PRESETS: dict[str, dict] = {
 # Kaplan & Boone 2010; Ames 1994) → a moderate weight. Stratified chiefdoms institutionalize chiefly authority
 # (Sahlins 1958; Service 1962) → the full weight. UNANCHORED magnitudes (no measured "how much cohesion" number
 # exists) — these are a bracketed 0 / 0.5 / 1.0 ladder for sensitivity sweeps, not a fitted scale.
+# Per-resource storability (Testart 1982): grain/cereal & dried fish keep for a lean season; fresh forage & meat
+# perish. Used by the resource-dependent storable_fraction (a weighted average over a cell's resource mix). Meat gets
+# a partial value (jerky/pemmican preservation exists but is riskier than grain). UNANCHORED ladder — bracketed.
+STORABILITY_BY_RESOURCE: dict[str, float] = {
+    "grain": 0.85,      # cultivability (cereal/nut agriculture)
+    "fish": 0.80,       # aquatic_food (smoked/dried fish — NW Coast salmon)
+    "forage": 0.15,     # fresh wild plants (perishable)
+    "game": 0.35,       # meat (partial: dried/smoked possible but riskier)
+}
+
+
 LEADER_SOCIETY_WEIGHT: dict[str, float] = {
     "egalitarian_forager": 0.0,
     "complex_forager": 0.5,

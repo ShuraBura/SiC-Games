@@ -64,10 +64,27 @@ def realistic_forager_demog() -> DemographyConfig:
         comove_footprint=1,
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
-        enable_storage=True, storable_fraction=0.5, store_capacity_reserves=3.0,
-        storage_temp_threshold_c=100.0, storage_decay=0.05, enable_morph=True, morph_settle_steps=60,
+        enable_storage=True, storable_fraction=0.7, store_capacity_reserves=12.0,   # LIT-CALIBRATED (storage survey): 0.7 stored frac; 12≈16mo≈1-2yr granary (was 0.5/3=4mo)
+        storage_temp_threshold_c=100.0, storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
         enable_band_family_knobs=True, enable_dynamic_bands=True, band_base_tolerable=25,
         assabiyah_gain=0.05, assabiyah_decay=0.02)
+
+
+def emergent_village_demog():
+    """CANONICAL FULL EMERGENT-VILLAGE preset (agglomeration rework, branch gu-point-superlinear; RESULTS R-54…R-57).
+    realistic_forager_demog() + the emergent village stack turned on in one call: point-superlinear agglomeration
+    (Bettencourt β≈1.15) + forage cap (solitude fix) + hierarchy-gated village scaling (Johnson scalar stress + leader)
+    + terrain movement metabolism (~750 kcal/move) + catchment site-appraisal (Kennett-Winterhalder IFD-suitability →
+    emergent Carneiro on scarce_arable worlds). Storage already lit-calibrated in the base. Validated to compose across
+    worlds (run_fullstack_validation.py). Use with `world_lottery_climate(..., scarce_arable=True)` for riverine villages."""
+    return realistic_forager_demog().model_copy(update=dict(
+        enable_agriculture=True, enable_agglomeration=True, aggl_mode="point", aggl_beta=1.15, aggl_tier2=5.0,
+        comove_footprint=0, enable_forage_cap=True, forage_cap_hours=100.0,
+        enable_leader_coherence=True, leader_coherence_gain=2.0, enable_size_repulsion=True, repulsion_gain=0.3,
+        enable_village_scaling=True, village_gain=5.0,
+        enable_site_appraisal=True, site_gain=0.3, site_radius=2, site_lambda=1.0,
+        enable_terrain_move_cost=True, move_cost_kcal=750.0,          # 0.01·BURN ≈ a 10 km move (locomotion energetics)
+        enable_resource_storability=True))
 
 
 def band_positions_patch(fields, cap, n, band_size=25, sep=4):

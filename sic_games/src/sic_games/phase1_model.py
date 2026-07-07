@@ -269,6 +269,12 @@ class TerrainWorld(mesa.Model):
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
+        self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
+        self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
+        self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
+        self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
+        self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
+        self._storable_frac_cache = None                          # resource-dependent per-cell storable fraction (Testart; absent ⇒ scalar)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
         self._band_leader_term: dict[int, float] = {}          # Stage 1: per-band leader-coherence contribution (diagnostic)
@@ -586,6 +592,119 @@ class TerrainWorld(mesa.Model):
                 self._spot_cache = aq
         return self._spot_cache
 
+    def _forage_cap_field(self):
+        """Per-person forage cap = forage_kcal · forage_cap_hours (the biome return-rate × work hours — the most one
+        forager can harvest). Cached. None if no forage_kcal field."""
+        if self._forage_cap_cache is None:
+            fk = getattr(self._fields, "forage_kcal", None)
+            if fk is None:
+                return None
+            self._forage_cap_cache = fk * self._demog.forage_cap_hours
+        return self._forage_cap_cache
+
+    def _move_cost_field(self):
+        """Stage 1b per-cell terrain MOVE COST (kcal) = move_cost_kcal · cost, where `cost` ∈[0.15,1] is the terrain
+        traversal difficulty (slope/elev-driven, water=1). Perceived in the IFD utility and drained at metabolism when
+        an agent moves. Cached. None if no cost field."""
+        if self._move_cost_cache is None:
+            ct = getattr(self._fields, "cost", None)
+            if ct is None:
+                return None
+            self._move_cost_cache = ct * self._demog.move_cost_kcal
+        return self._move_cost_cache
+
+    def _site_suitability_field(self):
+        """Stage 1c catchment SITE-VALUE field (central-place appraisal). value(c) = Σ_{|d|≤radius} S_pot(c')·
+        exp(−λ·dist·(0.5+cost(c'))) — catchment resource potential discounted by cost-distance (rugged/far cells
+        contribute less). Normalized to [0,1] and scaled by site_gain·BURN → a PERCEIVED per-cell central-place bonus
+        (a static gradient toward prime real-estate; Kennett-Winterhalder IFD-suitability). Cached. None if no S_pot/cost."""
+        if self._site_cache is None:
+            sp = self._s_pot_field()
+            ct = getattr(self._fields, "cost", None)
+            if sp is None or ct is None:
+                return None
+            import numpy as np
+            r = self._demog.site_radius
+            lam = self._demog.site_lambda
+            acc = np.zeros_like(sp)
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    d = max(abs(dx), abs(dy))
+                    if d == 0:
+                        acc += sp                               # the site cell itself (no travel)
+                        continue
+                    rsp = np.roll(np.roll(sp, dy, axis=0), dx, axis=1)
+                    rct = np.roll(np.roll(ct, dy, axis=0), dx, axis=1)
+                    acc += rsp * np.exp(-lam * d * (0.5 + rct))  # far/rugged catchment cells contribute less
+            mx = float(acc.max())
+            norm = acc / mx if mx > 0 else acc
+            self._site_cache = self._demog.site_gain * self._burn * norm
+        return self._site_cache
+
+    def _storable_frac_field(self):
+        """Resource-dependent per-cell storable fraction (Testart): weighted average of the local resource mix's
+        storabilities = Σ(resource·s_r)/Σ(resource) over {grain=cultivability, fish=aquatic, forage, game}. Grain/
+        fishing cells → high (accumulate granaries → sedentism); fresh-forage cells → low (can't store → mobile).
+        Cached. None if no cultivability/forage. Falls back to the scalar storable_fraction where the mix is empty."""
+        if self._storable_frac_cache is None:
+            from sic_games.demography import STORABILITY_BY_RESOURCE as SB
+            f = self._fields
+            cult = getattr(f, "cultivability", None)
+            forage = getattr(f, "forage", None)
+            if cult is None or forage is None:
+                return None
+            import numpy as np
+            aq = getattr(f, "aquatic_food", None)
+            game = getattr(f, "game", None)
+            aq = aq if aq is not None else np.zeros_like(cult)
+            game = game if game is not None else np.zeros_like(cult)
+            num = cult * SB["grain"] + aq * SB["fish"] + forage * SB["forage"] + game * SB["game"]
+            den = cult + aq + forage + game
+            sf = np.full_like(cult, self._demog.storable_fraction, dtype=float)
+            np.divide(num, den, out=sf, where=den > 0)          # scalar fallback where the resource mix is empty (water)
+            self._storable_frac_cache = sf
+        return self._storable_frac_cache
+
+    def _aggl_R_field(self):
+        """Agglomeration: the intensive CATCHMENT-resource field R(c) = aggl_tier2 · Σ_{catchment} (S_pot · cv_ref),
+        where S_pot ∈ [0,1] is the cultivability/aquatic GATE and cv_ref = forage_kcal · forage_cap_hours is the
+        per-person REALIZABLE yield (kcal — the same scale as the forage cap). So R lives in realistic harvest units
+        and aggl_tier2 is a dimensionless INTENSIFICATION MULTIPLE (~1–5: intensive land yields a few× foraging per
+        area). Cached (static). None if no S_pot or forage_kcal.
+
+        [Bug-fix 2026-07: the previous form multiplied S_pot by `harvest_field.level()`, which returns kcal CAPACITY
+        (~10^6), not a 0–1 fraction — so R blew up to ~54M (≈18×S) and the intensive term SWAMPED the forage cap,
+        re-rewarding lone/spread agents (L(1)·54M ≈ 900k ≫ cap). Anchoring to cv_ref restores L(1)≈0.]"""
+        if self._aggl_R_cache is None:
+            sp = self._s_pot_field()
+            fk = getattr(self._fields, "forage_kcal", None)
+            if sp is None or fk is None:
+                return None
+            import numpy as np
+            cv_ref = fk * self._demog.forage_cap_hours           # per-person realizable yield (kcal) — the cap's scale
+            weighted = sp * cv_ref                               # cultivability-gated realizable yield (kcal)
+            r = self._demog.aggl_catchment_radius
+            acc = np.zeros_like(weighted)
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    acc += np.roll(np.roll(weighted, dy, axis=0), dx, axis=1)
+            self._aggl_R_cache = self._demog.aggl_tier2 * acc
+        return self._aggl_R_cache
+
+    def _aggl_point_base_field(self):
+        """POINT agglomeration base A_cell = aggl_tier2 · S_pot · cv_ref (Bettencourt-correct, Branch A). The cell's OWN
+        intensive output scales super-linearly with its occupancy: O(n) = A_cell·n^β ⇒ per-capita A_cell·n^(β-1) RISES
+        with co-location (β>1). A_cell is a SINGLE cell (a POINT return — no catchment convolution), cultivability-gated,
+        in cap-kcal units so aggl_tier2 is a dimensionless intensification multiple. Cached. None if no S_pot/forage_kcal."""
+        if self._aggl_point_cache is None:
+            sp = self._s_pot_field()
+            fk = getattr(self._fields, "forage_kcal", None)
+            if sp is None or fk is None:
+                return None
+            cv_ref = fk * self._demog.forage_cap_hours           # per-person realizable yield (kcal) — the cap's scale
+            self._aggl_point_cache = self._demog.aggl_tier2 * sp * cv_ref
+        return self._aggl_point_cache
+
     def _settlement_catchment_yield(self, site: tuple[int, int]) -> float:
         """Layer 2: the settlement-UNLOCKED intensive tier-2 yield, pooled over the catchment (residence ≠ foraging).
         RESOURCE-AGNOSTIC — reads S_pot (= max(aquatic_food, cultivability)). Gated: only settlement sites get it,
@@ -704,6 +823,24 @@ class TerrainWorld(mesa.Model):
 
         # 1c. Aggregation-sedentism: hold/release active settlements (formed seasonally in _do_gathering), then the
         # movement below pins members within a settlement's radius onto its site (cohesion → site, pool scale).
+        # Agglomeration economics (grand-unification rework): the intensive catchment-resource field + curve params,
+        # passed into IFD (perceived) and added in the harvest (realized). aggl_on=False ⇒ R_field=None ⇒ bit-exact.
+        aggl_on = self._demog is not None and getattr(self._demog, "enable_agglomeration", False)
+        aggl_mode = getattr(self._demog, "aggl_mode", "point") if aggl_on else "point"
+        # POINT (Bettencourt-correct): A_cell·n^(β-1) per capita on the cell's OWN output. CATCHMENT (falsified): R·L(n)/n.
+        aggl_R = (self._aggl_point_base_field() if aggl_mode == "point" else self._aggl_R_field()) if aggl_on else None
+        aggl_a = (self._demog.aggl_beta if aggl_mode == "point" else self._demog.aggl_alpha) if aggl_on else 1.15
+        aggl_h = self._demog.aggl_half if aggl_on else 100.0
+        # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
+        cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
+        fcap = self._forage_cap_field() if cap_on else None
+        # Stage 1b terrain move cost: perceived in IFD (move_cost_field) + drained at metabolism for movers. Off ⇒ None.
+        tmc_on = self._demog is not None and getattr(self._demog, "enable_terrain_move_cost", False)
+        mcf = self._move_cost_field() if tmc_on else None
+        # Stage 1c catchment site-appraisal: a static central-place suitability gradient perceived in IFD. Off ⇒ None.
+        site_on = self._demog is not None and getattr(self._demog, "enable_site_appraisal", False)
+        sfield = self._site_suitability_field() if site_on else None
+
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
             self._maintain_settlements()
@@ -767,6 +904,8 @@ class TerrainWorld(mesa.Model):
                 occ_wsum[old] = occ_wsum.get(old, 0.0) - wt
                 occ_wsum[target] = occ_wsum.get(target, 0.0) + wt
             agent.pos = target
+            if mcf is not None:
+                agent._moved_this_step = True                # Stage 1b: flag movers for the terrain move-cost drain
 
         for agent in agents:
             if fam_move and self._family_head(agent) is not None:
@@ -796,7 +935,10 @@ class TerrainWorld(mesa.Model):
                                              cell_owner=cell_owner,
                                              agent_band=(agent._group.band_id if def_on else None),
                                              owner_exclusion=def_excl, owner_tether=def_teth,
-                                             band_primary=band_primary)
+                                             band_primary=band_primary,
+                                             R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
+                                             aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf,
+                                             site_field=sfield)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
@@ -869,6 +1011,9 @@ class TerrainWorld(mesa.Model):
         # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
         store_on = demog is not None and demog.enable_storage
         store_frac = demog.storable_fraction if store_on else 0.0
+        # Resource-dependent storability (Testart): per-cell storable fraction from the local grain/fish/forage/game mix.
+        sfrac_field = (self._storable_frac_field() if (store_on and getattr(demog, "enable_resource_storability", False))
+                       else None)
         store_cap_mult = demog.store_capacity_reserves if store_on else 0.0
         store_temp_thr = demog.storage_temp_threshold_c if store_on else 0.0
         store_decay = demog.storage_decay if store_on else 0.0
@@ -933,6 +1078,15 @@ class TerrainWorld(mesa.Model):
                 # Layer 2 catchment tier-2 (2b: × yearly shock; B1: × per-site soil — farms degrade it, fisheries stay 1)
                 S += (self._settlement_catchment_yield((cx, cy)) * self._tier2_shock
                       * self._settlement_soil.get((cx, cy), 1.0))
+            if aggl_on and aggl_R is not None:
+                # AGGLOMERATION: REALIZED intensive output added to the cell pool, matching the movement-perceived
+                # per-capita → increasing returns are real, no over-subscription death.
+                no = len(occ)
+                if aggl_mode == "point":
+                    S += float(aggl_R[cy, cx]) * (no ** aggl_a - no)         # premium O(n)-baseline = A_cell·(n^β-n) → split n → A_cell·(n^(β-1)-1) each
+                else:
+                    na = no ** aggl_a
+                    S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))  # catchment R·L(n) (falsified)
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
@@ -961,6 +1115,15 @@ class TerrainWorld(mesa.Model):
             else:
                 shares = (_forage_excl(occ, S, kappa_cell, excl_mask) if excl_mask
                           else compute_harvest_shares(occ, S, kappa_cell, phi_eps))
+            if cap_on and fcap is not None:
+                # PER-PERSON FORAGE CAP: a forager harvests at most forage_kcal·work_hours (the biome return-rate);
+                # the surplus of a lightly-occupied cell is UNharvested (removes the S/n lone-agent over-reward).
+                cv = float(fcap[cy, cx])
+                if game_on:
+                    f_sh = [f if f <= cv else cv for f in f_sh]
+                    shares = [f + m for f, m in zip(f_sh, m_sh)]
+                else:
+                    shares = [s if s <= cv else cv for s in shares]
             msh = m_sh if game_on else [0.0] * len(occ)
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
@@ -991,7 +1154,8 @@ class TerrainWorld(mesa.Model):
                     # S.1 collective storage (delayed-return): in the overwintering zone the storable fraction of
                     # the otherwise-wasted overflow is ENFORCED into the band granary; the remainder stays giveable.
                     if in_owz and store_frac > 0.0:
-                        banked = store_frac * overflow
+                        sf = float(sfrac_field[cy, cx]) if sfrac_field is not None else store_frac
+                        banked = sf * overflow
                         cell_contrib += banked
                         overflow -= banked
                     if (provisioning or pat_prov) and overflow > 0.0:        # remaining overflow → giveable to dependents
@@ -1200,6 +1364,9 @@ class TerrainWorld(mesa.Model):
                 _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
+            if mcf is not None and getattr(a, "_moved_this_step", False):
+                a.wealth -= float(mcf[a.pos[1], a.pos[0]])     # Stage 1b: realized terrain move cost (drain movers)
+                a._moved_this_step = False
             a.age += 1
             if a._founder_store > 0.0:
                 # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the
@@ -1795,6 +1962,13 @@ class TerrainWorld(mesa.Model):
                 # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
                 cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
                 split_thr[bid] = base + (cap - base) * cohesion_frac
+                # Stage 1 SUPRA-BAND SCALING: net payoff ABOVE saturation (unclamped − 1) adds village headroom beyond
+                # the hard cap (Johnson: hierarchy+payoff overcome scalar stress). Since a_new≤1, net>1 REQUIRES the
+                # leader term ⇒ villages need hierarchy. Off ⇒ no headroom ⇒ hard cap, bit-exact.
+                if getattr(cfg, "enable_village_scaling", False) and cfg.village_gain > 0.0:
+                    net_raw = a_new + leader_term - repulsion - malnutrition
+                    if net_raw > 1.0:
+                        split_thr[bid] += cfg.village_gain * (cap - base) * (net_raw - 1.0)
             self._band_assabiyah = new_assab
             self._band_leader_term = new_leader
             self._band_repulsion = new_repulsion

@@ -78,6 +78,13 @@ def diffusion_select_target(
     owner_exclusion: float = 1.0,
     owner_tether: float = 1.0,
     band_primary: dict | None = None,
+    R_field=None,
+    aggl_alpha: float = 1.15,
+    aggl_half: float = 100.0,
+    aggl_mode: str = "point",
+    forage_cap=None,
+    move_cost_field=None,
+    site_field=None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -147,7 +154,13 @@ def diffusion_select_target(
             Wsum = occ_wsum.get((cx, cy), 0.0) if occ_wsum is not None else 0.0
             denom = (Wsum if is_cur else Wsum + w_self) + extra_occupants * w_self
             ypc = (S * w_self / denom) if denom > 0 else S
+        if forage_cap is not None:                             # per-person forage cap (solitude fix): a forager can
+            cv = float(forage_cap[cy, cx])                     # only WORK so much land — cap the perceived per-capita
+            if ypc > cv:                                       # (removes the lone-agent whole-cell over-reward)
+                ypc = cv
         move_cost = 0.0 if is_cur else sc.move_cost_flat
+        if move_cost_field is not None and not is_cur:         # Stage 1b: terrain-scaled move cost (perceived) — favours
+            move_cost += float(move_cost_field[cy, cx])        # staying + cheap-terrain steps (central-place foraging)
         # Emergent-bands grouping multipliers on the cell value (the crowd_response hook), traded against the
         # falling per-capita yield ⇒ an optimal band size emerges. E.1 safety (risk dilution, saturating) +
         # E.2 mating access (a penalty below the minimum viable band ⇒ being alone is actively bad).
@@ -171,6 +184,25 @@ def diffusion_select_target(
                 elif band_primary is None or band_primary.get(agent_band) == (cx, cy):
                     ypc *= owner_tether                          # tether members onto the band's PRIMARY reach
                 # else: a same-band SECONDARY owned cell → neutral (don't fragment the band across its plots)
+        # AGGLOMERATION ECONOMICS: increasing returns to co-location, added as a per-capita term. R_field=None ⇒ off.
+        #  POINT (Bettencourt-correct, Branch A): per-capita = A_cell · n^(β-1) — the cell's OWN intensive output scales
+        #    super-linearly (O=A·n^β), so per-capita RISES with n (β>1) and REINFORCES packing. aggl_alpha carries β here.
+        #  CATCHMENT (falsified): R·L(n)/n, L=n^α/(n^α+half^α) — a shared saturating pot ⇒ per-capita PEAKS then congests
+        #    (areal-dispersive; DEAD_ENDS). Kept for comparison.
+        if R_field is not None:
+            n_grp = (n_cell if is_cur else n_cell + 1) + extra_occupants
+            Rv = float(R_field[cy, cx])
+            if Rv > 0.0 and n_grp > 0:
+                if aggl_mode == "point":
+                    ypc += Rv * (n_grp ** (aggl_alpha - 1.0) - 1.0)         # co-location PREMIUM: 0 at n=1, rises with n
+                else:
+                    na = n_grp ** aggl_alpha
+                    ypc += Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
+        # Stage 1c CATCHMENT SITE-APPRAISAL: a static central-place suitability bonus (occupancy-INDEPENDENT) — the
+        # anticipated value of the SITE (rich, cheap-to-work catchment). A global gradient agents climb toward prime
+        # real-estate (assembly) + tightens onto catchment cores. site_field=None ⇒ off, bit-exact.
+        if site_field is not None:
+            ypc += float(site_field[cy, cx])
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 
