@@ -319,12 +319,17 @@ class ClimateField:
                     self._regime_state = 0                      # excursion ends
         self._regime_last_t = t
         self.t = t
+        self._season_cached = None      # PERF: invalidate the per-step GLOBAL (cell-independent) temporal caches;
+        self._regime_cached = None      # level(x,y) recomputes these ~n×candidates/step otherwise (profile hot spot)
 
     def season(self) -> float:
-        if self.a_seas <= 0.0:
-            return 1.0
-        return (1.0 - self.a_seas) + self.a_seas * 0.5 * (
-            1.0 + math.cos(2.0 * math.pi * self.t / self.period - self.phase))
+        c = getattr(self, "_season_cached", None)
+        if c is not None:
+            return c
+        c = 1.0 if self.a_seas <= 0.0 else ((1.0 - self.a_seas) + self.a_seas * 0.5 * (
+            1.0 + math.cos(2.0 * math.pi * self.t / self.period - self.phase)))
+        self._season_cached = c
+        return c
 
     def interannual(self) -> float:
         """C.2 ENSO-like layer: a quasi-periodic DEPRESSION (bad years only, ≤1), period 2–7 yr. Refinement:
@@ -353,11 +358,17 @@ class ClimateField:
         ~25-yr generation. NOT mean-reverting — it holds the level until the chain switches back. A CONTROLLED
         `regime_driver`, when set, supplies this multiplier DETERMINISTICALLY (overriding the telegraph) for the
         benchmark harness."""
+        c = getattr(self, "_regime_cached", None)
+        if c is not None:
+            return c
         if self.regime_driver is not None:
-            return self.regime_driver(self.t)
-        if self.regime_amp <= 0.0:
-            return 1.0
-        return 1.0 - self.regime_amp * self._regime_state
+            c = self.regime_driver(self.t)
+        elif self.regime_amp <= 0.0:
+            c = 1.0
+        else:
+            c = 1.0 - self.regime_amp * self._regime_state
+        self._regime_cached = c
+        return c
 
     def mult(self) -> float:
         # temporal [0,1] layers: seasonal × interannual × regime-shift
