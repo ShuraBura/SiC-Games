@@ -368,7 +368,7 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 | Name | Value | Status | Grounding / history |
 |------|-------|--------|---------------------|
-| enable_storage / storable_fraction / store_capacity_reserves | False / **0.5** / **3.0** | OPT-IN | collective band granary in the overwintering zone (Binford ET 15.25°C). §4.5.11 |
+| enable_storage / storable_fraction / store_capacity_reserves | False / **0.7** / **12.0** | OPT-IN, **LIT-CALIBRATED 2026-07-07** | collective band granary. storable_fraction 0.5→**0.7** (lit 0.5–0.8, seasonal storers live off stores); store_capacity_reserves 3→**12** (=~16 mo ≈ Halstead 1–2 yr granary; old 4 mo was < one annual cycle). storage_decay canonical 0.05→**0.02**/mo (~22%/yr, lit 10–30%). Storage survey (Testart 1982, Halstead & O'Shea 1989). §4.5.11 / MODEL_SPEC §4.8.21b |
 | storage_temp_threshold_c | **15.25** °C | LIT-ANCHORED (but INERT — temperature is a constant-14°C placeholder; realistic config sets 100 = storage-everywhere) | Binford 2001 ET storage threshold. §4.5.11 |
 | storage_seasonality_gated / storage_seasonality_threshold | **False / 0.25** | OPT-IN (SUPERSEDED by morph_aquatic, R-47) | R-46: gate the store on biome SEASONAL AMPLITUDE. Makes forest egalitarian but MIS-ORDERS desert (→complex). Retained ablatable; superseded by the aquatic morph gate. §4.5.10 |
 | morph_aquatic_gated / morph_aquatic_threshold / morph_npp_floor | **False / 0.15 / 500** (candidate CANONICAL, pending sign-off) | OPT-IN | R-47/R-48: storage stays a broad survival BUFFER; a band morphs COMPLEX only if BOTH (a) seasonal aquatic glut `mean(wateracc×seasonal_amp) ≥ threshold` (aseasonal watery forest [Mbuti] fails) AND (b) productive setting `mean(npp_gm2) ≥ npp_floor` (poor desert oasis [Kalahari, npp≈400] fails; Nile-floodplain [≳550] can pass — the true-desert vs river-desert distinguisher). → forest EGALITARIAN (aseasonal), desert EGALITARIAN+surviving (poor setting), montane/savanna COMPLEX (seasonal productive rivers). The correct forager-complexity signature (Testart/Ames/Kelly). Off ⇒ ungated morph, bit-exact. thr/floor PROVISIONAL (sweep-chosen from R-47 occupied-cell data). §4.5.10 |
@@ -537,6 +537,27 @@ The following D-items from ARCHITECTURE.md §15 are resolved by this document:
 | D3 | p_fission_Si: CLAUDE.md=0.28 (Stage 4.3), ROADMAP=0.065 (Stage 4.4) | **0.065 is current** (Stage 4.4 locked). 0.28 was the Stage 4.3 value at β=2 (pre-grid-rescale). Corrected here (§7 above). |
 | new | age_init_upper_frac: CLAUDE.md=0.25, production YAML=0.5 | **0.5 is current** (Stage 4.4 patch; production configs). CLAUDE.md was stale. Corrected here (§9 above). |
 | new | k_pool_cap: ROADMAP=20.0, production YAML=0.0 | **0.0 is production value** (Stage 5.1 configs). ROADMAP had Stage 4.3 design intent (20.0). Noted as open-flag in §6 above. |
+
+## §20 — Emergent village arc (agglomeration rework; R-54…R-57; MODEL_SPEC §4.8.21b; branch merged to main 2026-07-07)
+
+All default-OFF/opt-in; the canonical "everything on" preset is `emergent_village_demog()`. Use with `world_lottery_climate(..., scarce_arable=True)` for riverine villages.
+
+| Name | Value | Status | Grounding |
+|------|-------|--------|-----------|
+| enable_agglomeration / aggl_mode / aggl_beta | False / **"point"** / **1.15** | OPT-IN | point-superlinear: cell's own output ∝ n^β, per-capita premium `A_cell·(n^(β-1)−1)`. β = Bettencourt 2013 urban-scaling exponent. Catchment mode FALSIFIED (DE-11). |
+| aggl_tier2 | **5.0** | PROVISIONAL | intensification multiple A_cell = tier2·S_pot·cv_ref (dimensionless ~1–5) |
+| enable_forage_cap / forage_cap_hours | False / **100** | OPT-IN | per-person intake ≤ forage_kcal·hours (solitude fix; the nucleation lever, 5.8→31.7% packed). cv≈5×BURN optimum |
+| enable_village_scaling / village_gain | False / **5.0** | OPT-IN, UNANCHORED | net payoff above saturation adds tolerable-size headroom past band_split_size=45 → villages 55–77, hierarchy-gated (Johnson 1982) |
+| enable_leader_coherence / leader_coherence_gain | False / **2.0** | OPT-IN, UNANCHORED | hierarchy term (Boehm-gated: egalitarian 0 / complex 0.5 / stratified 1.0). Required to exceed band scale |
+| enable_size_repulsion / repulsion_gain / repulsion_midpoint / repulsion_width | False / **0.3** / **25** / **6** | OPT-IN | Johnson 1982 scalar stress (Alberti 2014 logistic); society relief 1.0/0.5/0.25 |
+| enable_terrain_move_cost / move_cost_kcal | False / **750** | OPT-IN, **VERIFIED-anchored** | =0.01·BURN ≈ a 10 km move (locomotion energetics 50–75 kcal/km; Pandolf/Minetti). Perceived + drained. Above ~1% over-penalizes |
+| enable_site_appraisal / site_gain / site_radius / site_lambda | False / **0.3** / **2** / **1.0** | OPT-IN | catchment central-place suitability (Kennett-Winterhalder IFD + Vita-Finzi radius 2). Emergent Carneiro on scarce land |
+| enable_resource_storability | False | OPT-IN (confirmed **second-order**, R-57) | storable_fraction ← per-cell grain 0.85/fish 0.80/forage 0.15/game 0.35 (Testart). Fill-rate modifier only |
+| scarce_arable (terrain) / RIVER_RIBBON_LAMBDA | False / **0.8** | OPT-IN | cultivability → thin river ribbons (cult·exp(−d2river/λ)); prime arable 20%→6% (Nile/Mesopotamia) |
+| enable_energetic_fertility | **True in preset** (audit 2026-07-07) | OPT-IN | births scale with maternal reserve → self-limiting population (not Malthusian). Validated: higher stable pops across maps |
+| enable_terrain_risk / risk_cap | **True in preset** / 3.0 | OPT-IN | biome mortality risk multiplier |
+| enable_productivity_mobility / mobility_npp_ref | **True in preset** / 900 | OPT-IN | biome-scaled ranging (Tallavaara forager-median NPP; poor biome → longer stride) |
+| enable_infanticide | False | **UNIMPLEMENTED STUB** | no logic; baseline infanticide is already in the Siler infant-mortality curve. Not built (redundant with energetic_fertility) |
 
 ---
 

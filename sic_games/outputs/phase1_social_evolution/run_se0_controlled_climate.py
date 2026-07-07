@@ -84,7 +84,11 @@ def emergent_village_demog():
         enable_village_scaling=True, village_gain=5.0,
         enable_site_appraisal=True, site_gain=0.3, site_radius=2, site_lambda=1.0,
         enable_terrain_move_cost=True, move_cost_kcal=750.0,          # 0.01·BURN ≈ a 10 km move (locomotion energetics)
-        enable_resource_storability=True))
+        enable_resource_storability=True,
+        # Realism modulators (audit 2026-07-07): energetic fertility = self-limiting population (births scale with
+        # maternal reserve → caps before the starvation floor, not Malthusian); terrain risk = biome mortality;
+        # productivity-mobility = biome-scaled ranging (Tallavaara npp_ref=900; poor biome → longer stride).
+        enable_energetic_fertility=True, enable_terrain_risk=True, enable_productivity_mobility=True))
 
 
 def band_positions_patch(fields, cap, n, band_size=25, sep=4):

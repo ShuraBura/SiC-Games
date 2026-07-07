@@ -176,7 +176,10 @@ class DemographyConfig(BaseModel):
     enable_density_disease: bool = False
     enable_terrain_pathogen: bool = False
     enable_nutrition_synergy: bool = False
-    enable_infanticide: bool = False
+    enable_infanticide: bool = False    # [UNIMPLEMENTED STUB — no logic reads this.] Baseline infanticide is ALREADY
+    # folded into the Siler infant-mortality curve (fit to observed HG infant deaths — "infanticide KEPT"). An explicit
+    # mechanism would only add CONDITIONAL infanticide (birth-spacing enforcement / sex-selective); the resource-stress
+    # channel overlaps enable_energetic_fertility, sex-selection is a separate future scoping. Documented stub, not built.
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
