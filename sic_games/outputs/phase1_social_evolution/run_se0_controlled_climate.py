@@ -70,6 +70,23 @@ def realistic_forager_demog() -> DemographyConfig:
         assabiyah_gain=0.05, assabiyah_decay=0.02)
 
 
+def emergent_village_demog():
+    """CANONICAL FULL EMERGENT-VILLAGE preset (agglomeration rework, branch gu-point-superlinear; RESULTS R-54…R-57).
+    realistic_forager_demog() + the emergent village stack turned on in one call: point-superlinear agglomeration
+    (Bettencourt β≈1.15) + forage cap (solitude fix) + hierarchy-gated village scaling (Johnson scalar stress + leader)
+    + terrain movement metabolism (~750 kcal/move) + catchment site-appraisal (Kennett-Winterhalder IFD-suitability →
+    emergent Carneiro on scarce_arable worlds). Storage already lit-calibrated in the base. Validated to compose across
+    worlds (run_fullstack_validation.py). Use with `world_lottery_climate(..., scarce_arable=True)` for riverine villages."""
+    return realistic_forager_demog().model_copy(update=dict(
+        enable_agriculture=True, enable_agglomeration=True, aggl_mode="point", aggl_beta=1.15, aggl_tier2=5.0,
+        comove_footprint=0, enable_forage_cap=True, forage_cap_hours=100.0,
+        enable_leader_coherence=True, leader_coherence_gain=2.0, enable_size_repulsion=True, repulsion_gain=0.3,
+        enable_village_scaling=True, village_gain=5.0,
+        enable_site_appraisal=True, site_gain=0.3, site_radius=2, site_lambda=1.0,
+        enable_terrain_move_cost=True, move_cost_kcal=750.0,          # 0.01·BURN ≈ a 10 km move (locomotion energetics)
+        enable_resource_storability=True))
+
+
 def band_positions_patch(fields, cap, n, band_size=25, sep=4):
     cells = sorted(((cap.level(x, y), x, y) for y in range(GRID_N) for x in range(GRID_N)
                     if fields.isWater[y, x] == 0 and cap.level(x, y) > 0), reverse=True)
