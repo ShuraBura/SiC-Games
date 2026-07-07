@@ -611,6 +611,18 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 
 **Decision:** stop the parameter chase — the mechanisms are armed. The unlock is a **scarcity calibration** (scoped follow-on): a resource-realistic world (scarce river-ribbon prime land ~few %, deeper seasonality, higher granary cap so *filling* it is an achievement only storable sites manage, sharper storability floor). That single change should wake circumscription + storage + Testart *together*, to be re-validated then.
 
+## R-57 — Scarcity calibration resolves R-56: emergent riverine villages; storability confirmed second-order (2026-07-07)
+
+**Resolves R-56** (the "land of plenty" dormancy). Two stages.
+
+**Stage 1 (`6bbd3eb`) — seasonality + hard-won storage.** The village harnesses ran **seasonless the whole arc** (bare `NPPCapacityField` has no `.season()`); wrapping the harvest in `ClimateField(a_seas)` activated it → store drawdown **20–26%** (was ~0% / saturated) — the lean season now genuinely draws granaries. Raising the granary cap (`store_capacity_reserves` 3→12; storage becomes hard-won) lifts packing 19→27%.
+
+**Stage 2 (`…`) — resource-structured (river-ribbon) world.** Sharpened `cultivability` into thin ribbons along river channels (`cult·exp(−d2river/λ)`, injected into the mutable `WorldFields`) → prime arable **20%→6%** (scarce + linear, Nile-valley structure), making storable (river-grain) vs perishable (hinterland-forage) sites spatially distinct.
+
+**WIN — emergent riverine villages.** On the scarce-ribbon world, **~50% of the population lives on the river ribbons** (only 23% of land) = **2× enrichment**, with 20–26% packing. Villages nucleate *on the rivers* via the circumscription + site-appraisal machinery (R-55) — the empirical cradle-of-civilization pattern, emergent, not hardcoded. This resolves the *circumscription* half of R-56.
+
+**Storability CONFIRMED SECOND-ORDER (thread closed).** Even with seasonality (drawdown 20–26%) + hard-won storage (cap 12) + scarce spatially-distinct sites + an **18× storable/perishable contrast** (forage 0.05 vs grain 0.90), villages do NOT concentrate on storable sites (near-river flat 49→51%). Robust reason: `storable_fraction` is a fill-*rate* modifier, but granaries fill from abundant overflow regardless, and a 25% winter drawdown doesn't empty them → no survival/relocation differential; the site-appraisal (S_pot-driven) already sets settlement location. Storability gates complexity only in a **marginal** economy (scarce surplus), which the point-superlinear + forage-cap economy is not. Kept wired (default-OFF) as a correct-but-minor refinement. **Open:** promote the river-ribbon resharpening from harness to a flaggable `terrain.py` scarce-arable mode; a marginal-economy regime if storability is ever wanted load-bearing; Stage 2-military (assabiyah/warfare) for supra-village scale.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
