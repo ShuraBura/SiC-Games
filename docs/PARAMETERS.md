@@ -196,7 +196,7 @@ Recorded here as reference for the calibration pass.
 | Mountain slope threshold (DEFAULT gate) | mtn_slope_thresh | **0.18 + (1−relief)·0.4** | (0,1) (relief-dependent) | LOCKED (default only) | terrain.py §9.5 biome ladder | Stage 7 (2026-06-10): joint-condition with elev. NB `slope` is the PER-WORLD max-normalized gradient (dimensionless), not a physical grade — doubly unanchored; another reason orogeny uses tree-line, not slope. |
 | Orogeny massif gain | OROGEN_MASSIF_GAIN | **1.6** | ≥0 | LOCKED | terrain.py; RESULTS §R-59 | 2026-07-08: additive low-freq uplift dome weight (pre-normalization) — real topographic prominence. orogenK=0 ⇒ off, bit-exact. |
 | Orogeny relief boost | OROGEN_RELIEF_BOOST_M | **2000.0 m** | ≥0 | LOCKED | terrain.py; RESULTS §R-59 | 2026-07-08: extra peak-to-trough added to reliefAmpM under orogeny → ~4 km range so lapse-cooling clears the tree-line. |
-| Alpine tree-line isotherm | TREELINE_WARMEST_MONTH_C | **6.4 °C** | — | LOCKED (lit-anchored) | terrain.py; `LITERATURE.md` (Körner 1998) | 2026-07-08: warmest-month/growing-season mean isotherm of the alpine tree-line (Körner 1998). Physical anchor replacing the unanchored high∧steep gate for the orogenic alpine biome. |
+| Alpine tree-line isotherm | TREELINE_WARMEST_MONTH_C | **10.0 °C** | — | LOCKED (lit-anchored) | terrain.py; `LITERATURE.md` (Köppen; Körner & Paulsen 2004) | 2026-07-08: Köppen 10 °C WARMEST-MONTH air isotherm (forest/alpine-tundra ET boundary), consistent with Körner 2004's 6.7 °C growing-season soil mean. Replaces the unanchored high∧steep gate for the orogenic alpine biome. **Corrected from a mis-slotted 6.4 (soil growing-season) value 2026-07-08.** |
 
 ### §12.2 — Mountain ceiling (structural finding)
 

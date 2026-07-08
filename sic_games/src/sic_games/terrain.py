@@ -27,8 +27,11 @@ CELL_EDGE_M    = 10000.0    # cell edge in metres (100 km²/cell)
 OROGEN_MASSIF_GAIN       = 1.6      # additive low-frequency uplift dome (pre-normalization) — raises a coherent massif
 OROGEN_RELIEF_BOOST_M    = 2000.0   # extra peak-to-trough (m) added to reliefAmpM so the range is genuinely tall (~4 km,
                                     # Alps/Rockies scale) → lapse-cooling drives the high core below the tree-line.
-TREELINE_WARMEST_MONTH_C = 6.4      # Körner 1998 alpine tree-line isotherm (growing-season / warmest-month mean °C):
-                                    # above it = barren alpine. Physical anchor replacing the unanchored high∧steep gate.
+TREELINE_WARMEST_MONTH_C = 10.0     # Köppen 10 °C WARMEST-MONTH air isotherm = the classic tree-line / alpine-tundra
+                                    # (ET) boundary: warmest month below 10 °C cannot support forest. Consistent with
+                                    # Körner & Paulsen 2004's 6.7 °C growing-season ROOT-ZONE (soil) mean — soil runs
+                                    # warmer than air over the season, so 6.7 °C soil growing-season ≈ 10 °C air warmest
+                                    # month. This slot is warmest-month AIR, so the correct anchor is 10 °C (not 6.7).
 W_FOREST       = 0.45       # forestness >= this → closed-canopy forest
 W_SAV          = 0.18       # forestness in [W_SAV, W_FOREST) → savanna/woodland
 

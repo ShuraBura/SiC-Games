@@ -1,0 +1,26 @@
+battery: 5 terrains x 5 climates x 5 seeds = 125 runs; founders=1500 steps=300
+[  1/125] flat        tropical    s0: OK  pop=1284 medBand=24 | el=0.2m eta=21.6m
+[  2/125] flat        tropical    s1: OK  pop=1483 medBand=25 | el=0.4m eta=22.6m
+[  3/125] flat        tropical    s2: OK  pop=1464 medBand=22 | el=0.6m eta=22.7m
+[  4/125] flat        tropical    s3: OK  pop=1387 medBand=24 | el=0.7m eta=22.4m
+[  5/125] flat        tropical    s4: OK  pop=1336 medBand=22 | el=0.9m eta=21.8m
+[  6/125] flat        subtropical s0: EXT pop=   0 medBand=0 | el=0.9m eta=18.3m
+[  7/125] flat        subtropical s1: OK  pop=   4 medBand=4 | el=1.0m eta=16.0m
+[  8/125] flat        subtropical s2: OK  pop=   2 medBand=2 | el=1.0m eta=14.3m
+[  9/125] flat        subtropical s3: OK  pop=   2 medBand=2 | el=1.0m eta=12.9m
+[ 10/125] flat        subtropical s4: EXT pop=   0 medBand=0 | el=1.0m eta=11.7m
+[ 11/125] flat        temperate   s0: OK  pop=1261 medBand=23 | el=1.2m eta=12.4m
+[ 12/125] flat        temperate   s1: OK  pop=1366 medBand=28 | el=1.4m eta=13.0m
+[ 13/125] flat        temperate   s2: OK  pop=1403 medBand=24 | el=1.6m eta=13.5m
+[ 14/125] flat        temperate   s3: OK  pop=1285 medBand=22 | el=1.8m eta=13.9m
+[ 15/125] flat        temperate   s4: OK  pop=1571 medBand=25 | el=1.9m eta=14.3m
+[ 16/125] flat        boreal      s0: OK  pop=1129 medBand=24 | el=2.2m eta=15.0m
+[ 17/125] flat        boreal      s1: OK  pop= 727 medBand=29 | el=2.4m eta=15.3m
+[ 18/125] flat        boreal      s2: OK  pop=1170 medBand=28 | el=2.7m eta=15.9m
+[ 19/125] flat        boreal      s3: OK  pop=1402 medBand=28 | el=3.0m eta=16.5m
+[ 20/125] flat        boreal      s4: OK  pop=  28 medBand=28 | el=3.0m eta=15.8m
+[ 21/125] flat        savanna     s0: OK  pop= 943 medBand=24 | el=3.2m eta=15.9m
+[ 22/125] flat        savanna     s1: OK  pop= 866 medBand=23 | el=3.4m eta=16.1m
+[ 23/125] flat        savanna     s2: OK  pop=1266 medBand=32 | el=3.7m eta=16.4m
+[ 24/125] flat        savanna     s3: OK  pop=1516 medBand=21 | el=4.0m eta=16.8m
+[ 25/125] flat        savanna     s4: OK  pop= 491 medBand=22 | el=4.1m eta=16.6m
