@@ -427,6 +427,14 @@ class DemographyConfig(BaseModel):
     band_cohesion: float = Field(0.0, ge=0.0)             # cohesion-drive strength (pull toward band centroid); 0 = off
     band_split_size: int = Field(45, ge=2)               # band fissions above this (upper "community" rung / HARD cap)
     band_merge_size: int = Field(10, ge=1)               # band fuses into the nearest band below this (hysteresis vs split)
+    # EMERGENT BAND SIZE (blueprint …_EmergentBandSize): the fission-threshold FLOOR is not the hardcoded
+    # band_base_tolerable=25 but the RISK-POOLING optimum g* = (CV/cv_safe)² — the group needed to pool the local
+    # foraging-return variance (per-biome CV from the Return-Rate Tables) down to a safe residual cv_safe. Higher-CV
+    # biomes (hunting/wetland) → bigger emergent bands; low-CV (forest gathering) → smaller. Predicts mean ~25 AND
+    # environment-dependence (Marlowe 25–50). Clamped [band_size_min, band_split_size]. Default OFF ⇒ hardcoded 25.
+    enable_emergent_band_size: bool = False
+    cv_safe: float = Field(0.14, gt=0.0)                 # residual per-capita CV the band pools variance down to (sets the scale; ~25 at CV≈0.7) [UNANCHORED — bracket]
+    band_size_min: int = Field(5, ge=1)                  # floor (nuclear-family cluster) for low-variance biomes
     # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
     # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
     # base)·assabiyah — so a rich, high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base.

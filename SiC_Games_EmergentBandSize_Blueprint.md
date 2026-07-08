@@ -52,4 +52,11 @@ Sits ALONGSIDE the perf re-architecture (SiC_Games_ReArchitecture_Blueprint.md) 
 emergent-sizes = the *science* correctness; SoA/numba = the *scale* to run the Turchin campaign. Independent; can proceed
 in parallel (emergent-sizes validated at a few thousand agents).
 
+## v1 IMPLEMENTED + VALIDATED (2026-07-08, branch `emergent-band-size`)
+`enable_emergent_band_size` (default OFF, bit-exact): the fission-threshold floor per band = `clamp((mean-cell-CV/cv_safe)², band_size_min, band_split_size)`, CV from `_return_cv_field()` (per-biome forage+game σ/μ). cv_safe=0.14, band_size_min=5.
+
+**Result — PARTIAL SUCCESS (environment-dependence YES; absolute ~25 NO).** In-sim (800 agents, 200 steps): emergent band size **tracks the biome return variance** — median **8** on low-variance flat/temperate (grass, CV~0.08) vs **26** on higher-variance flat/tropical. That environmental *variation* is the goal and a testable prediction the fixed-25 cannot make. BUT it **under-predicts the ~25 floor in low-variance environments** (grass→~8): pure risk-pooling says "low foraging variance → little to pool → small band," missing the OTHER overdetermining drivers of ~25 (mating/connubium minimum, kin, information). Also: the quadratic `(CV/cv_safe)²` is over-steep (bimodal 5/45 across biomes), and grass/mountain variances are 10%-DEFAULT placeholders (no lit spread) → artificially deflated CV.
+
+**Refinements needed for absolute ~25 (v2):** (1) add a GROUNDED social/mating floor (min viable exogamy/info unit) so low-variance environments still hold ~25 — band = max(risk-pooling optimum, social floor); (2) fill the per-biome return-variance data gaps (grass/mountain lack lit SD); (3) consider a gentler functional form + variance-tempering (storage buffers temporal variance, diet diversity lowers effective CV). The number is genuinely overdetermined (blueprint premise) — risk-pooling is ONE term, correctly delivering the environmental gradient; the floor is a second term. **v1 kept opt-in as the validated variation-driver.**
+
 *Blueprint 2026-07-08. Implementation tracked in RESULTS as it lands.*
