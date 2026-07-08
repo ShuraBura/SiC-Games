@@ -617,6 +617,10 @@ CLIMATE_PRESETS: dict[str, dict[str, tuple[float, float]]] = {
     "subtropical": dict(climate_latitude=(0.28, 0.38), climate_aridity=(0.40, 0.75)),  # the arid Hadley-descent belt
     "temperate":   dict(climate_latitude=(0.48, 0.62), climate_aridity=(0.10, 0.45)),
     "boreal":      dict(climate_latitude=(0.78, 0.92), climate_aridity=(0.15, 0.45)),
+    # SAVANNA (Köppen Aw, wet-dry tropical): warm (low latitude) + INTERMEDIATE aridity — the gap between too-wet
+    # tropical (→forest) and too-dry subtropical (→desert). The human-evolution biome (Hadza). Added 2026-07-08; NOT
+    # in CLIMATE_ORDER (explicit-only) so the seed→climate lottery is unchanged (existing runs bit-exact).
+    "savanna":     dict(climate_latitude=(0.14, 0.22), climate_aridity=(0.30, 0.50)),
 }
 TERRAIN_ORDER = ("flat", "hilly", "mountainous", "coastal")
 CLIMATE_ORDER = ("tropical", "subtropical", "temperate", "boreal")
