@@ -623,6 +623,20 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 
 **Storability CONFIRMED SECOND-ORDER (thread closed).** Even with seasonality (drawdown 20–26%) + hard-won storage (cap 12) + scarce spatially-distinct sites + an **18× storable/perishable contrast** (forage 0.05 vs grain 0.90), villages do NOT concentrate on storable sites (near-river flat 49→51%). Robust reason: `storable_fraction` is a fill-*rate* modifier, but granaries fill from abundant overflow regardless, and a 25% winter drawdown doesn't empty them → no survival/relocation differential; the site-appraisal (S_pot-driven) already sets settlement location. Storability gates complexity only in a **marginal** economy (scarce surplus), which the point-superlinear + forage-cap economy is not. Kept wired (default-OFF) as a correct-but-minor refinement. **Open:** promote the river-ribbon resharpening from harness to a flaggable `terrain.py` scarce-arable mode; a marginal-economy regime if storability is ever wanted load-bearing; Stage 2-military (assabiyah/warfare) for supra-village scale.
 
+## R-58 — The finite resource (GD-1) is FULLY lit-anchored and working; "decorative depletion" was an over-diagnosis (2026-07-08)
+
+**Context.** Investigating why the model shows a panmictic mating pool + one mega-cluster + no boom-bust (toward the Turchin campaign + emergent band/village sizes), I initially concluded the finite-resource depletion was "decorative / ~4–10× too weak" and proposed cranking `DEPLETE_FRAC`. Checking the literature anchoring (per supervisor) **reversed that conclusion.**
+
+**The GD-1 resource model is anchored per-biome, end-to-end** (LITERATURE.md §GD-1; MODEL_SPEC §4.3.11; PARAMETERS §19.7):
+- **Capacity** `K_persons` = **Tallavaara et al. 2018** NPP→density segmented regression (extracted from their SI, validated vs Dataset_4): 2–44 persons/cell, median ~21, on our world.
+- **Recovery** `R_BIOME_PER_YR` = **Cortés 2016** (r_max ≈ 0.3–0.4/yr medium ungulate; megafauna slower) + **Coe et al. 1976** (game stock/production ∝ NPP); aquatic fast-restock 0.80.
+- **Deplete→disperse mechanism** = the **central-place depletion-halo** papers (biorxiv 2024; PMC5645145/5373393) — Charnov marginal-value residential mobility.
+- The one provisional constant, **`DEPLETE_FRAC=0.5`**, even has a rationale: it puts the stock at **B=0.5 (logistic MSY) when occupancy = the observed Tallavaara density** — i.e. the ethnographic equilibrium sits at half-stock. Principled, not arbitrary.
+
+**Why it looked "decorative" (correct behaviour, not a bug).** Agents pack to ~37/cell — right at the rich-cell capacity (~44). At only 3–4K agents = **6–8% of the 52K world carrying capacity**, they cherry-pick the richest cells (IFD on a depleting resource) and, when forced over-capacity (stress test), **deplete a little then disperse to fresh land** (B settled ~0.79 because they *left* before hunting it out) — exactly the anchored marginal-value mobility. With abundant fresh land to escape to, no cell is fully hunted out and the population doesn't collapse.
+
+**Implication (corrects the roadmap).** The emergent size-limiting and the Malthusian boom-bust are **latent in the anchored model** and **activate near regional carrying capacity** (the full-scale ~52K regime, no escape from depletion). So: **do NOT recalibrate `deplete_frac`** (it would override Coe/Cortés/Tallavaara/MSY). The genuine gate to observing emergent sizes + the secular cycle is **reaching scale** — i.e. the SoA/numba performance re-architecture (SiC_Games_ReArchitecture_Blueprint.md), not a resource change. `deplete_frac`/`recovery_scale` were made tunable (34ccbf8) but kept at their anchored defaults (bit-exact); they remain an experimental knob only.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
