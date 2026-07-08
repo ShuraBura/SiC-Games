@@ -192,14 +192,17 @@ Recorded here as reference for the calibration pass.
 | Savanna threshold | W_SAV | **0.18** | (0,1) | LOCKED | terrain.py | Stage 7 (2026-06-10): forestness ∈ [W_SAV, W_FOREST) → savanna/woodland. |
 | Relief floor amplitude | RELIEF_FLOOR_M | **120.0 m** | >0 | LOCKED | terrain.py | Stage 7 (2026-06-10): peak-to-trough at relief=0 (gentle rolling). |
 | Relief ceiling amplitude | RELIEF_CEIL_M | **2500.0 m** | >RELIEF_FLOOR_M | LOCKED | terrain.py | Stage 7 (2026-06-10): peak-to-trough at relief=1 (mountainous). |
-| Mountain elevation threshold | mtn_elev_thresh | **0.72 + (1−relief)·0.5** | (0,1) (relief-dependent) | LOCKED | terrain.py §9.5 biome ladder | Stage 7 (2026-06-10): joint-condition with slope; do NOT lower to hit a coverage target. |
-| Mountain slope threshold | mtn_slope_thresh | **0.18 + (1−relief)·0.4** | (0,1) (relief-dependent) | LOCKED | terrain.py §9.5 biome ladder | Stage 7 (2026-06-10): joint-condition with elev. |
+| Mountain elevation threshold (DEFAULT gate) | mtn_elev_thresh | **0.72 + (1−relief)·0.5** | (0,1) (relief-dependent) | LOCKED (default only) | terrain.py §9.5 biome ladder | Stage 7 (2026-06-10): joint high∧steep gate. Unanchored design constant. Still the default; the `orogenK` alpine path bypasses it (tree-line classification). Do NOT lower to hit a coverage target — orogeny is the sanctioned mountain-dominant route. |
+| Mountain slope threshold (DEFAULT gate) | mtn_slope_thresh | **0.18 + (1−relief)·0.4** | (0,1) (relief-dependent) | LOCKED (default only) | terrain.py §9.5 biome ladder | Stage 7 (2026-06-10): joint-condition with elev. NB `slope` is the PER-WORLD max-normalized gradient (dimensionless), not a physical grade — doubly unanchored; another reason orogeny uses tree-line, not slope. |
+| Orogeny massif gain | OROGEN_MASSIF_GAIN | **1.6** | ≥0 | LOCKED | terrain.py; RESULTS §R-59 | 2026-07-08: additive low-freq uplift dome weight (pre-normalization) — real topographic prominence. orogenK=0 ⇒ off, bit-exact. |
+| Orogeny relief boost | OROGEN_RELIEF_BOOST_M | **2000.0 m** | ≥0 | LOCKED | terrain.py; RESULTS §R-59 | 2026-07-08: extra peak-to-trough added to reliefAmpM under orogeny → ~4 km range so lapse-cooling clears the tree-line. |
+| Alpine tree-line isotherm | TREELINE_WARMEST_MONTH_C | **6.4 °C** | — | LOCKED (lit-anchored) | terrain.py; `LITERATURE.md` (Körner 1998) | 2026-07-08: warmest-month/growing-season mean isotherm of the alpine tree-line (Körner 1998). Physical anchor replacing the unanchored high∧steep gate for the orogenic alpine biome. |
 
 ### §12.2 — Mountain ceiling (structural finding)
 
 | Name | Symbol | Value | Range | Status | Source | Lock history |
 |------|--------|-------|-------|--------|--------|-------------|
-| Mountain fraction ceiling | mtn_ceiling | **0.317** | — | OPEN (re-derivation item; see §H-TERRAIN-ASYMMETRY) | `HYPOTHESES.md §H-TERRAIN-ASYMMETRY` (canonical); `ARCHITECTURE.md §9.5.1` (mechanism). | Phase 1 Stage 1 (2026-06-13): 448-world coarse search. Structural property of the joint mtn condition — NOT a calibration failure. A8 criterion: mountain_fraction ≥ 0.9 × mtn_ceiling = 0.285. |
+| Mountain fraction ceiling (DEFAULT gate) | mtn_ceiling | **0.317** | — | RESOLVED — bounds the DEFAULT high∧steep gate only; SUPERSEDED for mountain-dominant worlds by orogeny (2026-07-08). See §H-TERRAIN-ASYMMETRY. | `HYPOTHESES.md §H-TERRAIN-ASYMMETRY` (canonical); `ARCHITECTURE.md §9.5.1` (mechanism). | Phase 1 Stage 1 (2026-06-13): 448-world coarse search. Structural property of the joint high∧steep gate. Still bounds the default gate. The `orogenK` alpine preset (real uplift massif + Körner tree-line, RESULTS §R-59) reaches alpine ≈ 0.59 (temperate) — the "redesigned generator" the finding deferred. |
 
 ### §12.3 — Water guard constants
 

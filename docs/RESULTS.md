@@ -639,4 +639,18 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 
 ---
 
+## R-59 — Mountain-dominant worlds ARE producible via orogeny; the 0.317 ceiling was real but the fix is geometry+tree-line, not lowering the gate (2026-07-08)
+
+**Context.** The pre-registered H-TERRAIN-ASYMMETRY finding (2026-06-13) held that mountain-dominant worlds are "not producible" (mtn_ceiling ≈ 0.317) and pre-registered "do NOT lower `mtn_elev_thresh`/`mtn_slope_thresh`." Revisiting it to give the model real mountain worlds.
+
+**Two findings on re-examination:**
+1. **The ceiling is *geometric*, deeper than a knob range.** "Mountain = high AND steep" is self-limiting because steepness IS elevation gradient — a large uniformly-high area (plateau/massif) is flat. Prototypes with boosted ridge weight and added uplift top out ≈ 0.34; real ranges are high-and-steep only on flanks/ridges. The pre-registration was *right*.
+2. **The gate was never anchored.** The classifier's `slope` is the **per-world max-normalized** gradient (dimensionless, relative to that world's single steepest cell), not a grade; `0.72/0.18` are unanchored Stage-7 design constants (contrast the Tallavaara/Siler trails). And at 10 km/cell, physical slope on a real 4 km range is only ~1° (sub-grid) — a slope criterion can't represent mountain steepness at this resolution at all.
+
+**Resolution (opt-in `orogenK`, the "redesigned generator" the finding deferred; default OFF ⇒ bit-exact).** Alpine is redefined as **above the tree-line** — barren because *cold-and-high*, an elevation/temperature property, **Körner 1998** warmest-month **6.4 °C** isotherm (a real lit anchor replacing the unanchored gate). The knob (a) adds an additive low-frequency **uplift massif** pre-normalization so a genuine range rises out of lowland, and (b) raises reliefAmpM ~+2 km so lapse-cooling drives the high core below the tree-line. On the `alpine` terrain preset: **maxElev ≈ 4074 m, prominence ≈ 2000 m** (real mountains, not a relabelled plateau), **alpine ≈ 0.59 (temperate)** with vegetated valleys sustaining an emergent-band population (~200, med band ~20). The **same range is only ~0.21 alpine in a tropical climate** (higher tree-line) — a physical behavior the old gate could not produce; boreal-alpine is near-uninhabitable (a cold 4 km massif), also plausibly correct.
+
+**Bookkeeping.** `mtnK` (an earlier crude threshold-drop attempt) was replaced by `orogenK`. Default (`orogenK=0`, absent from every existing preset) leaves elevation, relief, and the high∧steep classifier byte-identical ⇒ the 0.317 ceiling remains exactly true for all default worlds; only the explicit `alpine` preset exceeds it. Full suite 687 pass / 1 xfail. Docs synced: PARAMETERS §12.1/§12.2, ARCHITECTURE §9.5.1a, HYPOTHESES §H-TERRAIN-ASYMMETRY, LITERATURE (Körner 1998).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

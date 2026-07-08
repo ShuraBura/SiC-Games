@@ -69,7 +69,7 @@ reliefAmpM = 120 + (2500 − 120) * relief
 
 **Biome ladder (evaluation order is mandatory):**
 1. water (`elev < waterLevel`)
-2. mountain (`elev > 0.72+(1−relief)*0.5` AND `slope > 0.18+(1−relief)*0.4`)
+2. mountain — DEFAULT: `elev > 0.72+(1−relief)*0.5` AND `slope > 0.18+(1−relief)*0.4`. OROGENIC (`orogenK`>0, alpine preset): above the Körner tree-line `warmest_month < 6.4 °C` (elevation/lapse-driven; §9.5.1a, R-59).
 3. desert (`npp < 0.10`)
 4. wetland (`dist <= 2` AND `npp > 0.45` AND `slope < 0.12`)
 5. forest (`forestness >= W_FOREST`)
@@ -98,6 +98,15 @@ The generator's reachable world-space is *asymmetrically bounded* in biome domin
 **Do NOT** lower `mtn_elev_thresh` / `mtn_slope_thresh` — that redefines "mountain" and corrupts the terrain primitive.
 
 **Canonical homes:** mtn_ceiling = 0.317 is recorded in `PARAMETERS.md §12.2` (canonical parameter home) and `HYPOTHESES.md § H-TERRAIN-ASYMMETRY` (full pre-registration). This section provides mechanism context only; values are pointers.
+
+##### 9.5.1a Update (2026-07-08) — mountain-dominant worlds ARE now producible, via orogeny (RESULTS §R-59)
+
+The 0.317 ceiling and the "do NOT lower thresholds" rule above **still stand for the default gate** — but they turned out to be even *more* structural than first thought, and the resolution is NOT to lower the gate. Two findings on re-examination:
+
+1. **The ceiling is geometric, not knob-bound.** A large contiguous area cannot be simultaneously *high AND steep*: steepness IS elevation gradient, so a uniformly high region (a plateau/massif) has small gradients. Prototyping with boosted ridge weight and added uplift confirmed the high∧steep fraction tops out ≈ 0.34 regardless — real ranges are high-and-steep only on flanks/ridges.
+2. **The gate was never physically anchored.** `slope` is the *per-world max-normalized* gradient (dimensionless, relative to that world's single steepest cell), not a grade; `0.72/0.18` are unanchored Stage-7 design constants. And at 10 km/cell, physical slope on a real 4 km range is only ~1° — sub-grid. So a slope criterion cannot represent mountain steepness at this resolution at all.
+
+**Resolution (the "redesigned generator" this note deferred):** the alpine biome is defined by being **above the tree-line** — barren because *cold-and-high*, an **elevation/temperature** property (Körner 1998 warmest-month 6.4 °C isotherm), not steepness. The opt-in `orogenK` knob (alpine terrain preset) (a) adds an additive low-frequency **uplift massif** so a genuine range with ~2 km prominence and ~4 km peaks rises out of lowland, and (b) classifies alpine by the tree-line. Result: alpine ≈ **0.59** (temperate) on real mountains, with vegetated valleys; and the *same* range is less alpine in a warm climate (higher tree-line) — a physical behavior the old gate could not produce. Default (`orogenK=0`) is bit-exact, so the 0.317 ceiling remains exactly true for every non-alpine world. Canonical: `RESULTS.md §R-59`; do NOT lower the default thresholds — orogeny is the sanctioned route.
 
 #### 9.5.2 Phase 1 Stage 1 — ForageField + Terrain Diagnostics (2026-06-13)
 

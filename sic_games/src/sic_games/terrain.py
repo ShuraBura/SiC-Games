@@ -23,6 +23,12 @@ RELIEF_FLOOR_M = 120.0      # peak-to-trough at relief=0 (gentle rolling)
 RELIEF_CEIL_M  = 2500.0     # peak-to-trough at relief=1 (mountainous)
 SEA_LEVEL_M    = 0.0
 CELL_EDGE_M    = 10000.0    # cell edge in metres (100 km²/cell)
+# ── Orogeny (opt-in `orogenK` knob) — builds a REAL mountain range, not a relabelled plateau. Default off ⇒ bit-exact.
+OROGEN_MASSIF_GAIN       = 1.6      # additive low-frequency uplift dome (pre-normalization) — raises a coherent massif
+OROGEN_RELIEF_BOOST_M    = 2000.0   # extra peak-to-trough (m) added to reliefAmpM so the range is genuinely tall (~4 km,
+                                    # Alps/Rockies scale) → lapse-cooling drives the high core below the tree-line.
+TREELINE_WARMEST_MONTH_C = 6.4      # Körner 1998 alpine tree-line isotherm (growing-season / warmest-month mean °C):
+                                    # above it = barren alpine. Physical anchor replacing the unanchored high∧steep gate.
 W_FOREST       = 0.45       # forestness >= this → closed-canopy forest
 W_SAV          = 0.18       # forestness in [W_SAV, W_FOREST) → savanna/woodland
 
@@ -610,6 +616,11 @@ TERRAIN_PRESETS: dict[str, dict[str, tuple[float, float]]] = {
     "hilly":       dict(relief=(0.35, 0.55), rough=(0.55, 0.75), waterK=(0.25, 0.42)),
     "mountainous": dict(relief=(0.82, 0.96), rough=(0.72, 0.90), waterK=(0.25, 0.45)),
     "coastal":     dict(relief=(0.20, 0.45), rough=(0.45, 0.65), waterK=(0.45, 0.62)),
+    # ALPINE (Andes/Tibet/Rockies): OROGENY builds a genuine ~4 km range — additive uplift massif (real prominence
+    # ~1.8-2 km above lowland) + taller relief so lapse-cooling drives the high core below the Körner tree-line, where
+    # the barren alpine biome dominates (~35-45% of land); vegetated valleys ring it. A real mountain range, not a
+    # relabelled plateau. Added 2026-07-08; NOT in TERRAIN_ORDER (explicit-only) so the seed lottery is unchanged.
+    "alpine":      dict(relief=(0.82, 0.96), rough=(0.72, 0.90), waterK=(0.20, 0.40), orogenK=(0.85, 1.0)),
 }
 CLIMATE_PRESETS: dict[str, dict[str, tuple[float, float]]] = {
     # climate: (climate_latitude), (climate_aridity)
@@ -685,6 +696,8 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     waterK  = float(knobs['waterK'])
     forestK = float(knobs['forestK'])
     aridK   = float(knobs['aridK'])
+    orogenK = float(knobs.get('orogenK', 0.0))   # orogeny: additive uplift massif + taller relief + tree-line alpine
+                                                 # classification. 0.0 (default, absent) ⇒ historical terrain, bit-exact.
     seed_str = str(knobs.get('seedStr', knobs.get('seed', '0')))
 
     seed  = hash_seed(seed_str)
@@ -705,9 +718,16 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     r_fbm = _fbm(g2, nx * 1.3 + 10, ny * 1.3 + 10, 4, 2.0, 0.5)
     ridge = 1.0 - np.abs(2.0 * r_fbm - 1.0)
     e_raw = e_fbm * (1 - relief * 0.6) + ridge * (relief * 0.6)
+    if orogenK > 0.0:
+        # Orogeny: ADD a broad low-frequency uplift dome BEFORE normalization, so a coherent massif rises out of the
+        # lowland (real topographic prominence) while the fbm/ridge detail rides on top as flanks and valleys. _fbm is
+        # pure (no RNG advance) so this is invisible when orogenK==0 ⇒ every existing world stays bit-exact.
+        dome = _fbm(g1, nx * 0.5 + 7, ny * 0.5 + 7, 3, 2.0, 0.5)
+        dome = (dome - dome.min()) / (dome.max() - dome.min() + 1e-9)
+        e_raw = e_raw + orogenK * OROGEN_MASSIF_GAIN * dome
     moist_flat = _fbm(g2, nx * 0.8 + 5, ny * 0.8 + 5, 4, 2.0, 0.45)
 
-    reliefAmpM = RELIEF_FLOOR_M + (RELIEF_CEIL_M - RELIEF_FLOOR_M) * relief
+    reliefAmpM = RELIEF_FLOOR_M + (RELIEF_CEIL_M - RELIEF_FLOOR_M) * relief + orogenK * OROGEN_RELIEF_BOOST_M
 
     # Normalise elevation to [0,1]
     emin, emax = e_raw.min(), e_raw.max()
@@ -882,11 +902,22 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
                     np.clip(0.12 + exposure + thirst - shelter, 0.02, 1.0))
 
     # ── Biome classification (woody-cover ladder) ───────────────────────
+    # Historical mountain gate: high AND steep. NOTE `slope` here is the PER-WORLD max-normalized gradient (dimensionless,
+    # not a physical grade), and 0.72/0.18 are unanchored Stage-7 design constants — see H-TERRAIN-ASYMMETRY. This gate
+    # is self-limiting (~0.32 ceiling) because a large area cannot be both high and steep at 10 km/cell. Kept as the
+    # DEFAULT (bit-exact); orogeny switches to a physically-anchored tree-line definition below.
     mtn_elev_thresh  = 0.72 + (1 - relief) * 0.5
     mtn_slope_thresh = 0.18 + (1 - relief) * 0.4
 
     is_land    = (isWater == 0)
-    is_mtn     = is_land & (elev > mtn_elev_thresh) & (slope > mtn_slope_thresh)
+    if orogenK > 0.0 and mode == "climate":
+        # Orogenic ALPINE biome = above the Körner tree-line: warmest-month mean < ~6.4 °C ⇒ barren, cold-because-high.
+        # Elevation/lapse-driven (a real climatic contour the model already computes), so high plateaus correctly count
+        # and — riding on the orogenic massif above — this marks a GENUINE high range's cold core, not a relabelled flat.
+        warmest_month = temperature + temp_seas_amp
+        is_mtn = is_land & (warmest_month < TREELINE_WARMEST_MONTH_C)
+    else:
+        is_mtn = is_land & (elev > mtn_elev_thresh) & (slope > mtn_slope_thresh)
 
     if mode == "climate":
         # C4: biome EMERGES from Whittaker(T, P); MOUNTAIN/WETLAND are TERRAIN overrides on top; water stays water.

@@ -844,6 +844,13 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 
 ---
 
+### Körner, C. (1998). "A re-assessment of high elevation treeline positions and their explanation." *Oecologia* 115:445–459. (& Körner & Paulsen 2004, *J. Biogeography* 31:713 — global treeline isotherm.)
+
+**What was lifted — the alpine tree-line isotherm (orogenic mountain biome):** the high-elevation tree-line worldwide coincides with a **growing-season / warmest-month mean air temperature of ~6–7 °C** (Körner's synthesis; the later global dataset centres ~6.4 °C, remarkably latitude-invariant) — trees cannot maintain the tissue-formation temperatures above this, so land above it is **barren alpine**. **How used:** replaces the unanchored high∧steep mountain gate — the orogenic `alpine` biome is classified as **warmest-month mean < TREELINE_WARMEST_MONTH_C = 6.4 °C** (warmest-month ≈ annual-mean T + seasonal half-amplitude, both already computed with lapse-rate cooling). This makes the mountain biome an **elevation/temperature** property (cold-because-high, plateaus included), and correctly yields *less* alpine on the same range in warm climates (tropical tree-line is higher). **Status: REFERENCE (isotherm value from the well-established secondary/synthesis literature; PDF not filed). Anchor: warmest-month ≈ 6.4 °C.**
+**Citation tag:** [PARAMETER — alpine tree-line isotherm (orogenic mountain biome)] — **BUILT** (`terrain.py`, `orogenK`>0 classification); constants PARAMETERS §12.1, finding RESULTS §R-59.
+
+---
+
 ## Bettencourt, L.M.A. (2013). "The Origins of Scaling in Cities." *Science* 340(6139):1438–1441. DOI 10.1126/science.1235823. (SFI working paper 12-09-014 filed `literature/SiC_Games_AGG1_Bettencourt2013_UrbanScaling.pdf` — OA institutional preprint. **[VERIFIED]** against the PDF text via pypdf 2026-07-05.)
 
 **What was lifted — the agglomeration exponent for the returns-to-co-location `L(n)` (agglomeration-economics rework, blueprint …_AgglomerationEconomics):** urban socioeconomic outputs (GDP/GMP, wages, patents, crime) scale **SUPER-LINEARLY** with population, `Y = Y0·N^β`, **β ≈ 1.15** (paper's stated value; empirical Gross-Metropolitan-Product fit **β = 1.126 ± 0.023**, 95% CI, R²=0.96; theoretical **7/6 ≈ 1.167**). Material infrastructure scales **SUB-LINEARLY**, **β ≈ 0.85** (empirical **0.849 ± 0.038**, 95% CI, R²=0.65; theoretical **5/6 ≈ 0.833**); housing/jobs ≈ linear. **How used:** anchors the increasing-returns exponent in the agglomeration production function `Y(n)=R·L(n)`, `L(n)~n^α` for small n → **α ≈ 1.13–1.17 (≈1.15)**, NOT the P0 provisional guess α=1.5 (which over-nucleates). The catchment carrying-capacity then saturates `L(n)` (a subsistence village has a resource ceiling a modern city does not).

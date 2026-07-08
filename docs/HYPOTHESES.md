@@ -131,6 +131,8 @@ Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, ar
 
 **Resolution:** RESOLVED-CONFIRMED (structural finding, coarse grid search 2026-06-13).
 
+**Update 2026-07-08 — SUPERSEDED for mountain-dominant worlds by orogeny (RESULTS §R-59; ARCHITECTURE §9.5.1a).** The ceiling is confirmed *more* structural than stated — high∧steep is geometrically self-limiting (steepness = elevation gradient, so a uniformly high massif is flat; ridge-boost + uplift prototypes top out ≈ 0.34). And the gate was never anchored: `slope` is the per-world max-normalized gradient (not a grade), `0.72/0.18` are unanchored Stage-7 constants, and physical slope on a real 4 km range is ~1° at 10 km/cell (sub-grid). The gate was therefore NOT lowered. Instead the alpine biome is redefined by the **Körner (1998) tree-line** (warmest-month < 6.4 °C — cold-because-high, elevation/lapse-driven), riding on an opt-in **orogenic uplift massif** (`orogenK`) that builds a genuine ~4 km range (~2 km prominence) out of lowland. Alpine reaches ≈ 0.59 (temperate) on real mountains with vegetated valleys; the same range is less alpine in warm climates (higher tree-line). This is the "redesigned generator" clause (a) anticipated in the Consequence above. Default (`orogenK=0`) is bit-exact ⇒ the 0.317 ceiling remains exactly true for every default world; only the explicit `alpine` preset exceeds it.
+
 ---
 
 ---
