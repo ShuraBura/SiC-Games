@@ -1735,7 +1735,16 @@ class TerrainWorld(mesa.Model):
                     a._partner._wives.discard(a); a._partner = None
         affil = getattr(cfg, "enable_band_affiliation", False)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
-        for band in self.bands(cfg.bonded_mate_radius):
+        # PERF Tier 0: mate within the SOCIAL band_id (fission-capped ~25–45) → O(n), not the spatial bands() clump
+        # which balloons to O(clump²) under agglomeration. Off ⇒ spatial pool (bit-exact).
+        if affil and getattr(cfg, "mate_within_band_id", False):
+            pools: dict = {}
+            for a in self.agent_list:
+                pools.setdefault(a._group.band_id, []).append(a)
+            groups = pools.values()
+        else:
+            groups = self.bands(cfg.bonded_mate_radius)
+        for band in groups:
             females = [a for a in band if a.sex == "female" and a._partner is None and a.age >= cfg.menarche_months]
             males = [a for a in band if a.sex == "male" and a.age >= cfg.menarche_months]
             if not females or not males:

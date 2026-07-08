@@ -402,6 +402,11 @@ class DemographyConfig(BaseModel):
     # step); children DETACH at maturity → exogamous dispersal. Builds stable family-cored bands (Hill et al. 2011;
     # Marlowe monogamy). Uses bonded_mate_radius as the band extent. Default OFF = bit-exact back-compat.
     enable_pair_bonds: bool = False
+    # PERF (re-arch Tier 0): pool mates by SOCIAL band_id (fission-capped ~25–45) instead of the SPATIAL bands()
+    # clump. Fixes the O(clump²) mating blow-up under agglomeration (thousands co-located → one giant pool) → O(n),
+    # and is more realistic (mate choice is band-local, von Rueden scale). Default OFF ⇒ spatial pool, bit-exact.
+    # NB: changes the mating SKEW → re-validate status→RS (R-19/R-55). Requires enable_band_affiliation.
+    mate_within_band_id: bool = False
     divorce_rate: float = Field(0.0, ge=0.0, le=1.0)      # per-step bond dissolution prob (0 = lifelong unless widowed)
     family_maturity_months: int = Field(180, ge=0)        # child detaches from the family unit at this age (~15 yr)
     # F.3a MODEST POLYGYNY (von Rueden & Jaeggi 2016: polygyny is the MAIN status→RS amplifier; ~4-11% of forager
