@@ -56,7 +56,8 @@ class NPPCapacityField:
     linear-clamp `min(0.5, 0.3·npp/1360)·100` (per-km²×100). Default 'linear' keeps prior runs bit-exact."""
 
     def __init__(self, fields, burn: float, patch: tuple[int, int, int] | None = None, mode: str = "linear",
-                 aquatic: bool = False, enable_depletion: bool = False) -> None:
+                 aquatic: bool = False, enable_depletion: bool = False,
+                 deplete_frac: float | None = None, recovery_scale: float = 1.0) -> None:
         npp = np.asarray(fields.npp_gm2, dtype=float)
         self.height, self.width = npp.shape
         self.mode = mode
@@ -81,6 +82,8 @@ class NPPCapacityField:
         self.ceiling = float(ppl_per_cell[land & (E > 0.0)].sum())
         # ── GD-1 finite-stock state (opt-in) ──
         self.enable_depletion = enable_depletion
+        self._deplete_frac = DEPLETE_FRAC if deplete_frac is None else deplete_frac   # tunable depletion strength (default = bit-exact)
+        self._recovery_scale = recovery_scale                          # <1 = slower recovery (multi-year lag → cycles)
         if enable_depletion:
             self._base_E = E.copy()                                    # the ceiling flow K·burn (B=1)
             self._B = np.ones_like(E)                                  # stock fraction, starts full
@@ -103,7 +106,7 @@ class NPPCapacityField:
         for (x, y), n in occ_count.items():
             occ[y, x] = n
         pressure = occ / self._K_persons                              # foragers per unit capacity
-        self._B += self._r_step * season * ((1.0 - self._B) - DEPLETE_FRAC * pressure)
+        self._B += (self._r_step * self._recovery_scale) * season * ((1.0 - self._B) - self._deplete_frac * pressure)
         np.clip(self._B, B_FLOOR, 1.0, out=self._B)
         self._E = self._base_E * self._B                              # yield scales with the current stock
 
