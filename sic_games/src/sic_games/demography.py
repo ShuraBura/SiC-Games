@@ -434,7 +434,13 @@ class DemographyConfig(BaseModel):
     # environment-dependence (Marlowe 25–50). Clamped [band_size_min, band_split_size]. Default OFF ⇒ hardcoded 25.
     enable_emergent_band_size: bool = False
     cv_safe: float = Field(0.14, gt=0.0)                 # residual per-capita CV the band pools variance down to (sets the scale; ~25 at CV≈0.7) [UNANCHORED — bracket]
-    band_size_min: int = Field(5, ge=1)                  # floor (nuclear-family cluster) for low-variance biomes
+    # v2 SOCIAL FLOOR: band size = max(risk-pooling optimum, band_size_min). The ~25 is OVERDETERMINED — risk-pooling
+    # gives the environmental gradient (variance→size), but the FLOOR comes from the non-foraging drivers (min viable
+    # co-residential + mating + demographic-buffering unit). band_size_min anchored to Hill 2011 observed minimum
+    # co-residential group (~15; groups range ~15–50, mean ~25–30). cv_min corrects data-gap biomes (grass/mountain
+    # use 10%-default SD → unrealistically low CV; real foraging returns have CV ≳0.4, Kaplan/Hill).
+    band_size_min: int = Field(15, ge=1)                 # min viable co-residential/mating/demographic unit [LIT-anchored, Hill 2011]
+    cv_min: float = Field(0.4, ge=0.0)                   # floor on the per-biome return CV (corrects 10%-default data gaps; foraging is never CV≈0.1)
     # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
     # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
     # base)·assabiyah — so a rich, high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base.

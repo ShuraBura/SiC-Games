@@ -659,6 +659,9 @@ class TerrainWorld(mesa.Model):
                 tot_m = fm + gm
                 if tot_m > 0:
                     cv[biome == code] = math.sqrt(fs * fs + gs * gs) / tot_m   # combined return CV (independent forage+game)
+            cv_min = getattr(self._demog, "cv_min", 0.0)                       # v2: floor the CV (correct 10%-default data gaps)
+            if cv_min > 0.0:
+                np.maximum(cv, cv_min, out=cv)
             self._cv_cache = cv
         return self._cv_cache
 
