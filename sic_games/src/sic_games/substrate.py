@@ -85,6 +85,7 @@ def diffusion_select_target(
     forage_cap=None,
     move_cost_field=None,
     site_field=None,
+    band_opt_field=None,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -167,7 +168,8 @@ def diffusion_select_target(
         if s_max > 0.0 or g_mate > 0.0:
             g = n_cell if is_cur else n_cell + 1                 # post-move group size
             if s_max > 0.0:
-                ypc *= 1.0 + s_max * (1.0 - math.exp(-g / g_s))
+                gs_local = float(band_opt_field[cy, cx]) if band_opt_field is not None else g_s   # v3: CV-derived
+                ypc *= 1.0 + s_max * (1.0 - math.exp(-g / gs_local))                              # risk-pooling saturates at g*(CV)
             if g_mate > 0.0:
                 ypc *= m_floor + (1.0 - m_floor) * min(1.0, g / g_mate)
         if coh > 0.0:

@@ -275,6 +275,7 @@ class TerrainWorld(mesa.Model):
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
         self._cv_cache = None                                     # emergent-band-size: per-cell foraging-return CV (biome σ/μ) for risk-pooling optimum
+        self._band_opt_cache = None                               # emergent-band-size v3: per-cell risk-pooling optimum band g*(CV) — drives movement aggregation
         self._storable_frac_cache = None                          # resource-dependent per-cell storable fraction (Testart; absent ⇒ scalar)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
@@ -665,6 +666,20 @@ class TerrainWorld(mesa.Model):
             self._cv_cache = cv
         return self._cv_cache
 
+    def _band_optimum_field(self):
+        """Emergent-band-size v3: per-cell risk-pooling optimum band g* = clamp((CV/cv_safe)², band_size_min,
+        band_split_size). Used as the group_safety AGGREGATION saturation scale in movement (so agents cluster UP TO
+        g* — high-variance biomes grow bigger bands) AND as the fission-threshold floor. Cached. None if no CV field."""
+        if self._band_opt_cache is None:
+            cv = self._return_cv_field()
+            if cv is None:
+                return None
+            import numpy as np
+            cfg = self._demog
+            g = (cv / cfg.cv_safe) ** 2
+            self._band_opt_cache = np.clip(g, float(cfg.band_size_min), float(cfg.band_split_size))
+        return self._band_opt_cache
+
     def _storable_frac_field(self):
         """Resource-dependent per-cell storable fraction (Testart): weighted average of the local resource mix's
         storabilities = Σ(resource·s_r)/Σ(resource) over {grain=cultivability, fish=aquatic, forage, game}. Grain/
@@ -864,6 +879,10 @@ class TerrainWorld(mesa.Model):
         # Stage 1c catchment site-appraisal: a static central-place suitability gradient perceived in IFD. Off ⇒ None.
         site_on = self._demog is not None and getattr(self._demog, "enable_site_appraisal", False)
         sfield = self._site_suitability_field() if site_on else None
+        # emergent band size v3: the per-cell risk-pooling optimum g*(CV) drives the group_safety AGGREGATION scale
+        # (agents cluster up to g* → high-variance biomes grow bigger bands). Off ⇒ fixed group_safety_scale.
+        eb_on = self._demog is not None and getattr(self._demog, "enable_emergent_band_size", False)
+        band_opt = self._band_optimum_field() if eb_on else None
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
@@ -962,7 +981,7 @@ class TerrainWorld(mesa.Model):
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
                                              aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf,
-                                             site_field=sfield)
+                                             site_field=sfield, band_opt_field=band_opt)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
