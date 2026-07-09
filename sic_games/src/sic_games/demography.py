@@ -559,6 +559,14 @@ class DemographyConfig(BaseModel):
     enable_genome: bool = False
     genome_loci: int = Field(32, ge=1)                    # number of neutral loci (relatedness resolution ~1/L)
     genome_mutation: float = Field(0.0, ge=0.0, le=1.0)   # per-locus per-birth mutation prob (0 = pure drift / infinite-allele)
+    # ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo
+    # instead of the blind spatial aggregation_radius. A ~25-band is too small to self-mate under a real prohibition →
+    # marriage must reach across bands → the pool self-organizes to ~connubium scale. blueprint …_Connubium. Default OFF
+    # ⇒ only the historical parent-child avoidance applies (bit-exact).
+    enable_exogamy: bool = False
+    exogamy_degree: str = "lineage"                       # {"nuclear" (parents/sibs), "lineage" (+patriclan), "cousin" (+genome r>r*)}
+    exogamy_relatedness: float = Field(0.125, ge=0.0, le=1.0)  # r* first-cousin threshold for the "cousin" degree (needs enable_genome)
+    mate_search_min_eligible: int = Field(3, ge=1)        # m*: eligible-mate famine-safety margin (the connubium's cv_safe; Cut 2 search)
     # PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales
     # inversely with STATIC local geographic productivity (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
     # Low-NPP (savanna/desert) → longer stride → agents spread over sparse territory instead of piling on the few

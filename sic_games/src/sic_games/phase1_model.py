@@ -277,6 +277,7 @@ class TerrainWorld(mesa.Model):
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
         self._cv_cache = None                                     # emergent-band-size: per-cell foraging-return CV (biome σ/μ) for risk-pooling optimum
         self._band_opt_cache = None                               # emergent-band-size v3: per-cell risk-pooling optimum band g*(CV) — drives movement aggregation
+        self._connubium_sizes: list[int] = []                     # CONNUBIUM diag: distinct-adult size of each mating pool that produced ≥1 marriage (last pairing phase)
         self._storable_frac_cache = None                          # resource-dependent per-cell storable fraction (Testart; absent ⇒ scalar)
         self._seasonal_amp = None                              # §4.5.10 cached per-cell biome seasonal-amplitude field (storability-gated morph)
         self._band_assabiyah: dict[int, float] = {}            # F.3c-3 per-band solidarity (Ibn Khaldun; drives tolerable size)
@@ -482,6 +483,7 @@ class TerrainWorld(mesa.Model):
         # Demographic layer: pairing (F.3a) then births (opt-in)
         if self._demog is not None:
             if getattr(self._demog, "enable_pair_bonds", False):
+                self._connubium_sizes = []        # CONNUBIUM diag: reset; _pair_from_pool refills for this phase
                 if getattr(self._demog, "enable_marriage_aggregation", False):
                     self._do_gathering()          # seasonal cross-band gathering replaces daily within-band pairing
                 else:
@@ -1710,6 +1712,19 @@ class TerrainWorld(mesa.Model):
                                else sc.copy(update={"contest_exponent": kappa}))
         self._society = name
 
+    def connubium(self) -> dict:
+        """CONNUBIUM diagnostic: the realized mating-pool reach — distinct unpaired adults in each pool that produced a
+        marriage this pairing phase. Under real exogamy the pool must span many bands to hold enough non-kin mates, so
+        this size is the emergent mating-network scale (validate median → Wobst ~475). Empty until a pairing phase runs.
+        (Cut-1 proxy = the existing band/gathering pool size; Cut-2's search-to-eligibility gives the true catchment.)"""
+        import numpy as np
+        s = self._connubium_sizes
+        if not s:
+            return {}
+        a = np.array(s)
+        return dict(n_pools=len(s), median=float(np.median(a)), mean=float(a.mean()),
+                    p90=float(np.quantile(a, 0.9)), max=int(a.max()))
+
     def genetics(self, sample_pairs: int = 2000) -> dict:
         """Population-genetics read-out (requires enable_genome): expected heterozygosity H (drift/Nₑ signal — decays
         ~1/Nₑ per generation), mean pairwise relatedness (realized inbreeding level), and coverage. Empty if off."""
@@ -1825,12 +1840,29 @@ class TerrainWorld(mesa.Model):
         asc_on = getattr(cfg, "enable_ascribed_mate_choice", False)
         asc_a = getattr(cfg, "ascribed_mate_strength", 0.0)
         affil = band_sizes is not None
+        exog = getattr(cfg, "enable_exogamy", False)                 # CONNUBIUM: real kin/clan prohibition
+        exog_deg = getattr(cfg, "exogamy_degree", "lineage")
+        exog_clan = exog and exog_deg in ("lineage", "cousin")       # patriclan (same _lineage) exogamy
+        exog_cousin = exog and exog_deg == "cousin"                  # genetic cousin+ (needs genome)
+        r_star = getattr(cfg, "exogamy_relatedness", 0.125)
+        pool_n = len(females) + sum(1 for m in males if not m._wives)   # CONNUBIUM diag: distinct unpaired adults in reach
+        paired_here = 0
         self.random.shuffle(females)
         for f in females:
+            fm, ff = (f._mother, f._father) if exog else (None, None)
             avail = []
             for x in males:
                 if x._mother is f or x is f._father:                 # kin-avoidance (not son / father)
                     continue
+                if exog:
+                    # sibling / half-sib (shared mother or shared father), patriclan, and (optional) genetic cousin+
+                    if (fm is not None and x._mother is fm) or (ff is not None and x._father is ff):
+                        continue
+                    if exog_clan and x._lineage is not None and x._lineage == f._lineage:
+                        continue
+                    if exog_cousin and f._genome is not None and x._genome is not None \
+                            and x._genome.relatedness(f._genome) > r_star:
+                        continue
                 if not x._wives:
                     avail.append(x)
                 elif poly > 0.0 and len(x._wives) < max_wives and self.random.random() < poly:
@@ -1852,6 +1884,7 @@ class TerrainWorld(mesa.Model):
             else:
                 male = self.random.choice(avail)
             f._partner = male; male._wives.add(f)
+            paired_here += 1
             if affil:
                 fb, mb = f._group.band_id, male._group.band_id
                 if fb != mb:
@@ -1863,6 +1896,8 @@ class TerrainWorld(mesa.Model):
                         band_sizes[fb] -= 1; band_sizes[mb] += 1; f._group.band_id = mb
                     else:
                         band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
+        if paired_here:                                             # CONNUBIUM diag: record the reach of a pool that mated
+            self._connubium_sizes.append(pool_n)
 
     def _do_gathering(self) -> None:
         """Seasonal marriage-aggregation ('the gathering'): every `aggregation_period` steps, in the abundance
