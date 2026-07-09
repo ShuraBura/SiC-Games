@@ -215,9 +215,13 @@ class KcalEconomyConfig(BaseModel):
     Nominals tagged [NOMINAL] are pending literature grounding.
     Full ceiling re-derivation is CC-1 (DEFERRED_MECHANICS.md).
     """
-    # Reserve (body-fat store) — [PLACEHOLDER pending MR-1]
-    reserve_full_kcal: float = Field(100_000.0, gt=0.0)   # kcal; physiological estimate
-    reserve_floor_kcal: float = Field(20_000.0, ge=0.0)   # kcal; starvation floor (~40% BW loss)
+    # Reserve (body-fat store) — ANCHORED to starvation physiology (Cahill 1970, "Starvation in man"): a lean adult's
+    # total mobilizable fuel ≈ 130k kcal (scaled from the 70 kg / ~166k reference to a ~60 kg lean HG); death when
+    # fat < 3 kg AND protein > 50% depleted ⇒ residual ≈ 3 kg fat ≈ 28k → floor 20k (conservative). The model burns
+    # FLAT (no adaptive hypometabolism), so survival = (full−floor)/BURN = 110k/2500 ≈ 44 days total starvation — the
+    # lean-adult range (hunger-strike ~45–61 d). Was 100k/20k ⇒ 32 d (too fragile → busts sharper than reality).
+    reserve_full_kcal: float = Field(130_000.0, gt=0.0)   # kcal; lean-adult total mobilizable energy (Cahill 1970)
+    reserve_floor_kcal: float = Field(20_000.0, ge=0.0)   # kcal; starvation-death residual (~3 kg fat, Cahill 1970)
     # Burn — [NOMINAL adult HG expenditure]
     burn_kcal_per_day: float = Field(2_500.0, gt=0.0)     # kcal/day nominal adult expenditure
     days_per_month: int = Field(30, ge=1)                  # 1 step = 1 month (LOCKED ARCH §9.3)

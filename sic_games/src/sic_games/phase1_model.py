@@ -483,8 +483,10 @@ class TerrainWorld(mesa.Model):
         # Demographic layer: pairing (F.3a) then births (opt-in)
         if self._demog is not None:
             if getattr(self._demog, "enable_pair_bonds", False):
-                self._connubium_sizes = []        # CONNUBIUM diag: reset; _pair_from_pool refills for this phase
-                if getattr(self._demog, "enable_marriage_aggregation", False):
+                self._connubium_sizes = []        # CONNUBIUM diag: reset; the pairing method refills for this phase
+                if getattr(self._demog, "enable_adaptive_connubium", False):
+                    self._do_connubium()          # Cut 2: per-seeker expanding search to eligibility (emergent scale)
+                elif getattr(self._demog, "enable_marriage_aggregation", False):
                     self._do_gathering()          # seasonal cross-band gathering replaces daily within-band pairing
                 else:
                     self._do_pairing()
@@ -1854,15 +1856,8 @@ class TerrainWorld(mesa.Model):
             for x in males:
                 if x._mother is f or x is f._father:                 # kin-avoidance (not son / father)
                     continue
-                if exog:
-                    # sibling / half-sib (shared mother or shared father), patriclan, and (optional) genetic cousin+
-                    if (fm is not None and x._mother is fm) or (ff is not None and x._father is ff):
-                        continue
-                    if exog_clan and x._lineage is not None and x._lineage == f._lineage:
-                        continue
-                    if exog_cousin and f._genome is not None and x._genome is not None \
-                            and x._genome.relatedness(f._genome) > r_star:
-                        continue
+                if exog and self._exogamy_blocks(f, x, fm, ff, exog_clan, exog_cousin, r_star):
+                    continue                                         # sibling/half-sib, patriclan, or genetic cousin+
                 if not x._wives:
                     avail.append(x)
                 elif poly > 0.0 and len(x._wives) < max_wives and self.random.random() < poly:
@@ -1898,6 +1893,87 @@ class TerrainWorld(mesa.Model):
                         band_sizes[mb] -= 1; band_sizes[fb] += 1; male._group.band_id = fb
         if paired_here:                                             # CONNUBIUM diag: record the reach of a pool that mated
             self._connubium_sizes.append(pool_n)
+
+    def _exogamy_blocks(self, f, x, fm, ff, clan, cousin, r_star) -> bool:
+        """Single source of truth for the exogamy prohibition (Cut 1/2): True ⇒ male `x` is a forbidden mate for
+        female `f`. `fm`/`ff` = f's parents; `clan`/`cousin` = active-degree flags. Sibling/half-sib (shared parent),
+        patriclan (same `_lineage`), and — at cousin degree — genome relatedness > r*. (Parent-child is handled by the
+        caller's base check.) Used by both `_pair_from_pool` and the adaptive `_do_connubium`."""
+        if (fm is not None and x._mother is fm) or (ff is not None and x._father is ff):
+            return True                                              # sibling / half-sib
+        if clan and x._lineage is not None and x._lineage == f._lineage:
+            return True                                              # patriclan
+        if cousin and f._genome is not None and x._genome is not None and x._genome.relatedness(f._genome) > r_star:
+            return True                                              # genetic cousin+
+        return False
+
+    def _do_connubium(self) -> None:
+        """Cut 2 — ADAPTIVE connubium (replaces the fixed-radius gathering when `enable_adaptive_connubium`). Each
+        unpaired female expands a Chebyshev search ring-by-ring until she has ≥ m* eligible non-kin males in reach (or
+        the travel cap), then pairs prowess-weighted. The realized reach self-organizes to the connubium scale — a
+        kin-homogeneous region forces a wider search (bigger connubium); a diverse one a smaller. `connubium()` then
+        records the TOTAL population (all ages) within each realized reach = the mating-network size (Wobst ~500)."""
+        cfg = self._demog
+        if self.step_count % cfg.aggregation_period != 0:
+            return
+        hf = self._harvest_field
+        if hasattr(hf, "season") and hf.season() < cfg.aggregation_season_threshold:
+            return
+        if cfg.divorce_rate > 0.0:
+            for a in self.agent_list:
+                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
+                    a._partner._wives.discard(a); a._partner = None
+        affil = getattr(cfg, "enable_band_affiliation", False)
+        band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
+        exog = getattr(cfg, "enable_exogamy", False)
+        deg = getattr(cfg, "exogamy_degree", "lineage")
+        clan = exog and deg in ("lineage", "cousin"); cousin = exog and deg == "cousin"
+        r_star = getattr(cfg, "exogamy_relatedness", 0.125)
+        m_star = cfg.mate_search_min_eligible; max_r = cfg.mate_search_max_radius
+        mexp = cfg.mate_choice_strength; menarche = cfg.menarche_months
+        poly = getattr(cfg, "polygyny_rate", 0.0); max_wives = getattr(cfg, "max_wives", 1)
+        # spatial index: cell → agents (rebuilt this gathering)
+        cell: dict = {}
+        for a in self.agent_list:
+            cell.setdefault(a.pos, []).append(a)
+        W = getattr(hf, "width", N); H = getattr(hf, "height", N)
+        females = [a for a in self.agent_list if a.sex == "female" and a._partner is None and a.age >= menarche]
+        self.random.shuffle(females)
+        for f in females:
+            fx, fy = f.pos
+            fm, ff = f._mother, f._father
+            eligible: list = []; reach_pop = 0
+            for r in range(0, max_r + 1):                            # expand the search ring by ring
+                x0, x1 = max(0, fx - r), min(W - 1, fx + r)
+                y0, y1 = max(0, fy - r), min(H - 1, fy + r)
+                for cy in range(y0, y1 + 1):
+                    on_y = (cy == fy - r or cy == fy + r)
+                    for cx in range(x0, x1 + 1):
+                        if r > 0 and not on_y and cx != fx - r and cx != fx + r:
+                            continue                                 # only the new cells at Chebyshev distance r
+                        for a in cell.get((cx, cy), ()):             # count population in reach; collect eligible males
+                            reach_pop += 1
+                            if a.sex == "male" and a.age >= menarche and a is not f:
+                                if a._mother is f or a is f._father:
+                                    continue                          # parent-child (base kin)
+                                if exog and self._exogamy_blocks(f, a, fm, ff, clan, cousin, r_star):
+                                    continue
+                                if (not a._wives) or (poly > 0.0 and len(a._wives) < max_wives and self.random.random() < poly):
+                                    eligible.append(a)
+                if len(eligible) >= m_star:
+                    break
+            if not eligible:
+                continue
+            if mexp > 0.0:
+                w = [(getattr(x, "prowess", 1.0) + 1e-6) ** mexp for x in eligible]
+                male = self.random.choices(eligible, weights=w, k=1)[0]
+            else:
+                male = self.random.choice(eligible)
+            f._partner = male; male._wives.add(f)
+            if affil and f._group.band_id != male._group.band_id:    # virilocal: bride joins groom's band
+                band_sizes[f._group.band_id] -= 1; band_sizes[male._group.band_id] += 1
+                f._group.band_id = male._group.band_id
+            self._connubium_sizes.append(reach_pop)                  # total network pop within realized reach
 
     def _do_gathering(self) -> None:
         """Seasonal marriage-aggregation ('the gathering'): every `aggregation_period` steps, in the abundance
