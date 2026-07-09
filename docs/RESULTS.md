@@ -749,12 +749,16 @@ packed hardest, occ 99/cell) then COLLAPSED as the population relaxed and cells 
 rise-and-fall, not sustained. **Coupling: corr(pop, Gini)=+0.45, corr(stratified, Gini)=+0.31** (inequality rises with
 population pressure AND stratification — the immiseration signal Turchin needs); corr(pop, stratified)=+0.02 (near
 zero — OUT OF PHASE: stratification leads on the rising density, pop peaks later; stratification tracks PACKING not the
-pop level). **Why it doesn't sustain: packing doesn't sustain** — dense cells de-pack (occ 99→32) as agents disperse
-(hypothesis: proto-ag unlock → soil depletion → move → re-unlock elsewhere; to be verified). Carneiro circumscription
-returns here NOT to REACH packing (the measure fix did that) but to SUSTAIN it (prevent dispersal) — and per supervisor
-it must be EMERGENT (terrain-bounded rich land / non-depleting agriculture), not an imposed knob. NEXT: track the
-proto-ag deplete→move→shrink cycle; test sustainable-ag terrain criteria; possibly agent EXPERTISE (heritable skill →
-faster re-adaptation).
+pop level). **Why it doesn't sustain — VERIFIED (2026-07-09): IFD DISPERSAL, not soil.** The proto-ag/soil hypothesis (both
+supervisor's and Claude's) was FALSIFIED — `_settlement_sites`=0 the whole run (the swidden soil machinery is inactive
+under `emergent_village_demog`; villages come from agglomeration+band-morph). Real driver: the population SPREADS to
+fill the landscape (occ_cells 641→1067 as pop grows), so local density → the sub-packing regional average (~0.06/km²)
+and the stratified cores de-concentrate → de-morph (absolute N_stratified 1219→51, not just the fraction). GD-1
+depletion ACCELERATES but is not the cause (depletion-OFF A/B still collapses, peak 28%→4.9%). The early stratification
+is a TRANSIENT of the concentrated founder placement. **Same root as R-54 "assembly binds" and the original
+"continuous spread."** To SUSTAIN: hold local concentration AGAINST IFD dispersal — emergent circumscription
+(terrain-bounded rich land) or stronger agglomeration/defensibility — NOT soil-renewal. (Agent EXPERTISE / heritable
+skill is orthogonal: it makes re-adaptation cheaper ⇒ if anything eases dispersal, not concentration.)
 
 ---
 
