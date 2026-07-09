@@ -655,4 +655,48 @@ Disabling **only** co-movement (C, bonds retained for fertility) recovers **3→
 
 ---
 
+## R-60 — Substrate scale run A: soft overshoot (not boom-bust), villages emerge at ~56 (validated), and the morph's SURPLUS GATE is inert (mis-scaled) → stratification is packing-blocked, not surplus-blocked (2026-07-09)
+
+**Setup.** First scaled substrate run (`outputs/substrate_run/run_substrate_A.py`) after the pre-run audit + Cahill
+reserve anchoring. One **coastal-temperate** diverse world (forest 34/grass 55/desert 6/water 6, 722 river cells,
+relief 0.33 — deliberately NOT flat), `emergent_village_demog` + genome-on/exogamy-off, seasonal-but-no-regime climate
+(endogenous only). 4000 founders → 6000 steps (~500 yr). Logged the audit Gate-1 derived metrics every 25 steps.
+
+**Q1 — overshoot vs glide → SOFT OVERSHOOT then gentle secular decline (NOT boom-bust).** Pop 3914 → peak **~6970**
+(+78%, ~step 1500-2000) → slow relaxation to ~4850; mean reserve held **~0.36 throughout** (no mass starvation).
+This is the **energetic-fertility self-limiting** working as designed: at reserve 0.36 the fertility factor =
+(0.36·130k−20k)/(130k−20k) ≈ **0.24**, so births run at ~¼ max fecundability — the population caps softly before
+reserves reach the starvation floor. No Turchin cycles (that layer isn't built); the soft-landing design also
+suppresses Malthusian boom-bust. A slow decline over steps 2000-6000 (likely depletion of packed village cells).
+
+**Q2 — stratification → COMPLEXITY saturates ~90%, STRATIFICATION 0% — but the reason is NOT "no surplus".**
+Initial reading ("surplus never reaches 0.7") was WRONG. Diagnostic (400-step run-A config): `_band_surplus` median
+**6.3**, max 14.3 — **127/127 bands ≥ 0.7**. Surplus is abundant, not scarce. **The `surplus_frac` metric is
+mis-scaled** (`phase1_model.py:1220,1285`): per-cell granary cap ∝ TOTAL cell occupancy, but `surplus_frac =
+Σ(whole-cell granaries over the band's footprint) / (band members n)` — so a band sharing/spanning cells with other
+agents scores `Σ cell-occupancy / n` ≈ 6-14 instead of the intended 0-1. Consequence: **the morph's surplus gate is
+INERT (always true)** → the "surplus≥0.5 → complex" test fires for everyone (∴ the ~90% complex is trivial, not a
+finding), and "packed AND surplus≥0.7 → stratified" reduces to **packed alone**. Stratification is 0% because bands'
+per-band footprint density (members / occupied-footprint) stays **below Binford 0.091/km²** — they spread over too
+many cells to read as packed — NOT because surplus is lacking. **So the real stratification blocker is the PACKING
+gate + a broken surplus normalization, not a missing surplus engine.**
+
+**Emergent village size → VALIDATED.** ~34-44 villages sustained; **median 56, max 94-108 — squarely in the Bar-Yosef
+50-150 range.** `village_gain=5.0` produces ethnographically-correct village sizes, emergent (R-55 mechanism), not a
+tuned artifact. The `village_gain` check passes.
+
+**Structure / genetics.** Semi-discrete (villages = dense packed nodes 37-75/cell; landscape ~60% occupied — denser
+than the old continuous smear but not yet sparse-bands-in-empty-land, which needs true-capacity circumscription).
+Genome N_e healthy: H 0.999→0.985 over 500 yr (slow drift), mean relatedness →0.016 (large outbred network).
+
+**Actions (opened by this run):** (1) FIX the `surplus_frac` mis-scaling (branch; make it a real 0-1 band-share
+fraction) so the morph's surplus gate discriminates again — until then %complex/%stratified are not interpretable.
+(2) Relax the fertility self-limiting toward a lit-anchored sedentism/society-dependent model (Neolithic Demographic
+Transition — Bocquet-Appel 2011; Sellen & Mace 2007) so sedentary/complex groups grow faster (the real demographic
+engine) and can overshoot → bust / accumulate. (3) Re-examine whether per-band packing is the right stratification
+driver. THE RUN WAS VALUABLE precisely because it surfaced the inert surplus gate — a bug the small validation runs
+never exposed.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
