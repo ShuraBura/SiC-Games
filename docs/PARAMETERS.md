@@ -249,8 +249,8 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 
 | Name | Symbol | Value | Unit | Status | Source | Notes |
 |------|--------|-------|------|--------|--------|-------|
-| Kcal reserve (full) | reserve_full_kcal | **100,000** | kcal | OPEN [PLACEHOLDER MR-1] | KcalEconomyConfig; phase1_model.py | Physiology estimate: 70 kg adult ~12–15 kg adipose = 100k–115k kcal at normal body composition. NOT an HG-field number. MR-1 pending. |
-| Kcal reserve (floor) | reserve_floor_kcal | **20,000** | kcal | OPEN [PLACEHOLDER MR-1] | KcalEconomyConfig; base.py (reserve_floor) | Physiology estimate: ~40% body-weight loss at clinical starvation threshold. NOT an HG-field number. MR-1 pending. |
+| Kcal reserve (full) | reserve_full_kcal | **130,000** | kcal | ANCHORED (Cahill 1970) — was 100,000 [PLACEHOLDER] | KcalEconomyConfig; phase1_model.py | Cahill 1970 "Starvation in man": lean adult total mobilizable fuel ≈130k (70 kg/166k reference → ~60 kg lean). Flat-burn model ⇒ survival=(full−floor)/BURN=110k/2500≈44 d total starvation (lean-adult range; hunger-strike ~45–61 d). Corrected 2026-07-08 (100k gave 32 d = too fragile). |
+| Kcal reserve (floor) | reserve_floor_kcal | **20,000** | kcal | ANCHORED (Cahill 1970) | KcalEconomyConfig; base.py (reserve_floor) | Starvation-death residual ≈ 3 kg fat (Cahill: death when fat<3 kg & protein>50% depleted); 20k conservative (≈2.1 kg fat). |
 | Burn rate | burn_kcal_per_day | **2,500** | kcal/day | OPEN [NOMINAL] | KcalEconomyConfig | Nominal adult HG energy expenditure. Tunable. Grounding-refinement pending. |
 | Days per month | days_per_month | **30** | days/step | LOCKED | KcalEconomyConfig; ARCH §9.3 OWE-1 | 1 step = 1 month = 30 days (standing constraint). Burn per step = 75,000 kcal. |
 | Foraging hours per day | foraging_hours_per_day | **6** | hrs/day | OPEN [NOMINAL] | KcalEconomyConfig | Nominal time-allocation (Ache/Hadza active-foraging hours). Tunable. Grounding pending. |
@@ -296,8 +296,8 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | Menarche / menopause | **180 / 504** mo | LOCKED | 15/42 yr fertile window |
 | IBI lactational refractory | **30** mo | LOCKED | Aché |
 | SRB (male) | **0.512** | LOCKED | 105:100 |
-| reserve_full | **100 000** kcal | PROVISIONAL | ~1.3 mo adult fat. Pontzer 2012 anchor (♀109k/♂43k; sex-split deferred). §4.5.3 |
-| reserve_floor | **20 000** kcal | PROVISIONAL | starvation threshold |
+| reserve_full | **130 000** kcal | ANCHORED (Cahill 1970) | lean-adult total mobilizable fuel; ~44 d flat-burn survival. Was 100k. §4.5.3 |
+| reserve_floor | **20 000** kcal | ANCHORED (Cahill 1970) | starvation-death residual ≈3 kg fat |
 | burn (maintenance) | **75 000** kcal/mo | LOCKED | 2500 kcal/day × 30 |
 | forage_age_min | **180** mo | PROVISIONAL | foraging competence (15 yr); Kaplan 2000. η + cons + reserve scaling key. §4.5.1 |
 | eta_min | **0.0** | PROVISIONAL | newborn production (linear JV-1 approx; convex Kaplan deferred) |
@@ -503,7 +503,7 @@ Settlements as MULTI-BAND coalescence — "the gathering that stops dispersing".
 | Name | Value | Status | Meaning / grounding |
 |------|-------|--------|---------------------|
 | enable_aggregation_sedentism | **False** (default) | OPT-IN | master toggle; needs enable_marriage_aggregation + enable_band_affiliation. Off ⇒ no settlements, bit-exact. |
-| settle_min_pool | **40** persons | PROVISIONAL | min people within settle_radius to found/hold a settlement (multi-band; Natufian dozens+). |
+| settle_min_pool | **40** persons | ANCHORED-lower-bound (Bar-Yosef 1998) | minimum-viable-hamlet: Natufian settlements range small ~dozens → medium 100–150; 40 = small-settlement lower bound. `village_gain` (max size) should let villages LAND in 50–150 — check in run A. |
 | settle_persist_threshold | **0.3** (S_pot) | PROVISIONAL | site `aquatic_food`/S_pot ≥ this = a persistent-abundant (storable) settlement site. |
 | settle_radius | **2** cells | PROVISIONAL | Chebyshev radius for membership + formation (a day's logistical range). |
 | settle_release_steps | **12** steps | PROVISIONAL | hysteresis: steps a settlement survives below settle_min_pool before dissolving. |

@@ -298,7 +298,7 @@ class DemographyConfig(BaseModel):
     # (residence ≠ foraging; Binford collectors) + catchment-grain defensibility. Needs enable_marriage_aggregation
     # (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
     enable_aggregation_sedentism: bool = False
-    settle_min_pool: int = Field(40, ge=2)                     # min people aggregated within settle_radius to found/hold a settlement (multi-band; Natufian dozens+) [PROVISIONAL]
+    settle_min_pool: int = Field(40, ge=2)                     # min people to found/hold a settlement — minimum-viable-hamlet threshold (Bar-Yosef 1998: Natufian settlements range small ~dozens → medium 100–150; 40 = the small-settlement lower bound) [ANCHORED-lower-bound]
     settle_persist_threshold: float = Field(0.3, ge=0.0)      # site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL]
     settle_radius: int = Field(2, ge=1)                       # Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells)
     settlement_cohesion: float = Field(1.5, ge=0.0)          # (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation)
@@ -566,7 +566,12 @@ class DemographyConfig(BaseModel):
     enable_exogamy: bool = False
     exogamy_degree: str = "lineage"                       # {"nuclear" (parents/sibs), "lineage" (+patriclan), "cousin" (+genome r>r*)}
     exogamy_relatedness: float = Field(0.125, ge=0.0, le=1.0)  # r* first-cousin threshold for the "cousin" degree (needs enable_genome)
-    mate_search_min_eligible: int = Field(3, ge=1)        # m*: eligible-mate famine-safety margin (the connubium's cv_safe; Cut 2 search)
+    mate_search_min_eligible: int = Field(3, ge=1)        # m*: eligible-mate famine-safety margin (the connubium's cv_safe)
+    # Cut 2 — ADAPTIVE connubium: replace the fixed aggregation_radius with a per-seeker expanding-ring search that
+    # grows until ≥ m* eligible non-kin mates are in reach (or the travel cap). The realized reach self-organizes to the
+    # connubium scale (Wobst ~500) instead of being set by a radius. Needs enable_exogamy. Default OFF ⇒ bit-exact.
+    enable_adaptive_connubium: bool = False
+    mate_search_max_radius: int = Field(15, ge=1)         # travel cap on the marriage search (~150 km); isolated seekers past it stay unpaired
     # PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales
     # inversely with STATIC local geographic productivity (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
     # Low-NPP (savanna/desert) → longer stride → agents spread over sparse territory instead of piling on the few
