@@ -270,6 +270,12 @@ class DemographyConfig(BaseModel):
     # (montane salmon rivers) morph COMPLEX. SEPARATES survival-storage from complexity. Default OFF ⇒ bit-exact.
     morph_aquatic_gated: bool = False
     morph_aquatic_threshold: float = Field(0.15, ge=0.0, le=1.0)  # complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL]
+    # PACKING MEASURE (R-61 fix): the morph "packed" test vs Binford 0.091/km². Default = a band's members / its
+    # footprint area (a band's density over its own range ~0.017 = a NORMAL forager → never packs). Binford's 0.091 is
+    # a LANDSCAPE population density, so `enable_landscape_packing` uses (all agents on the band's cells / area) — is the
+    # LAND crowded, not is my band spread thin — so a genuinely dense village (rich/circumscribed terrain) can cross
+    # packing and stratify. Default OFF ⇒ old measure (bit-exact).
+    enable_landscape_packing: bool = False
     morph_npp_floor: float = Field(500.0, ge=0.0)  # AND a PRODUCTIVE setting: mean(npp_gm2) ≥ this — the true-desert(≈400) vs river-desert/Nile(≳550) distinguisher [PROVISIONAL, from R-47 occupied-cell data]
     # ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable
     # surplus for ~1 generation morphs egalitarian_forager → complex_forager → stratified_chiefdom (the cell's κ

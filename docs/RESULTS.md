@@ -699,4 +699,50 @@ never exposed.
 
 ---
 
+## R-61 — A2 (surplus-gate fix + NDT sedentism fertility): overshoot-and-bust with a COMPLEXITY CYCLE emerges; stratification is density-blocked (carrying-capacity < packing), not a bug (2026-07-09)
+
+**Setup.** Re-run of R-60's substrate run with two fixes (branch `dynamics-fix`): (1) the `surplus_frac` mis-scaling
+fixed → real 0-1, gate discriminates (30% bands ≥0.7); (2) **NDT sedentism fertility** ON (society-dependent
+lactational refractory: egalitarian 30 → complex 22 → stratified 14 mo; Howell/Sellen&Mace/Bocquet-Appel). Same
+coastal-temperate world, 4000 founders, 6000 steps. Full suite 698 pass (both fixes bit-exact on the tested paths).
+
+**Both fixes work.** (a) `%complex` is no longer a trivial ~100% artifact — it's a dynamic 40-94% tracking real
+packing+surplus. (b) Sedentism fertility turned R-60's soft glide into a genuine **overshoot-and-bust**: pop 3914 →
+**peak 9468** (@step 1600; vs R-60's 6970) → starvation bit (**62 deaths/step peak**) → correction to ~5400 (CV 0.16
+→ **0.23**).
+
+**NEW — a COMPLEXITY CYCLE.** Villages/complexity rose during the boom (85% complex, 53 villages) then **collapsed
+during the bust** (10%, 5 villages) as villages dissolved (morph de-morph tracking the demographic collapse). A
+proto-secular-cycle in **social complexity**, emergent from demography + the morph **with no elite/instability layer**
+— the first Turchin-flavored rise-and-fall the model has produced. Gini cred rose 0.278→0.317 during the boom.
+
+**Villages VALIDATED again:** median 53-61, max ~100 — Bar-Yosef 50-150 (`village_gain` holds across the re-run).
+
+**Stratification still 0% — CONFIRMED density-blocked, not surplus/fertility-blocked, and NOT a bug.** Diagnostic
+(6000 agents, 600 steps): **0/219 bands packed** — per-band density max **0.037**, median **0.017**, vs Binford
+0.091/km². 75/219 bands have surplus ≥0.7 (surplus fine); **0/219 satisfy BOTH.** Two layers: (i) the "packed" MEASURE
+is mis-specified — `band members / footprint` = a band's density over its ~14-cell range (~0.017 = a *normal forager*
+density), but Binford's threshold is a LANDSCAPE population density; (ii) even the REGIONAL density at the 9468 peak =
+**0.060/km², still < 0.091**. **Interpretation (Carneiro/Binford): this is CORRECT — a normal-richness forager world
+sits below packing → egalitarian, as most ethnographic foragers were.** Stratification needs carrying-capacity >
+packing, i.e. exceptionally rich land (dense storable aquatic / agriculture), ideally naturally circumscribed (Nile
+floodplain) so population concentrates. **Circumscription should EMERGE from realistic terrain, not be imposed** (per
+supervisor).
+
+**Actions (next, branch):** (1) fix the packing measure → LANDSCAPE population density (`total agents on the band's
+cells / area`), the correct Binford quantity — lets a genuinely dense village cross packing. (2) Run on `scarce_arable`
+river-ribbon worlds (emergent Nile circumscription) to test whether stratification fires where rich land is naturally
+bounded. NO imposed circumscription knob.
+
+**RESULT (`enable_landscape_packing`, opt-in default-OFF):** the measure fix ALONE fires stratification on the plain
+realistic coastal world — **STRAT 0.0% → 15.4%** (same pop ~8180), and it DISCRIMINATES (egalitarian ~9% / complex 76%
+/ **stratified 15%** = a real emergent complexity gradient, not everyone flipping). Circumscription is NOT needed:
+imposing `scarce_arable` (river-ribbon) actually LOWERED stratification to 3.1% (it cut total pop/villages 8180→4779).
+Confirms the Carneiro reading operationally — stratification emerges from realistic dense terrain once "packed" is the
+correct LANDSCAPE density; the old band-members/footprint measure was the sole blocker. The 0.091 Binford threshold is
+untouched (verified correct, R-59). NEXT: full A3 run to see whether stratification PERSISTS or cycles with the
+boom-bust; whether Gini/elite-concentration rises with it (proto-Turchin).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

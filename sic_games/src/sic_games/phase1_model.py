@@ -1280,10 +1280,14 @@ class TerrainWorld(mesa.Model):
                     band_members[bid] = band_members.get(bid, 0) + 1
                     band_cells.setdefault(bid, set()).add((cx, cy))
                     band_cell_n[(bid, (cx, cy))] = band_cell_n.get((bid, (cx, cy)), 0) + 1
+            land_pack = getattr(self._demog, "enable_landscape_packing", False)   # R-61: landscape vs band-member density
             self._band_surplus = {}
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
-                density = n / footprint_km2 if footprint_km2 > 0 else 0.0
+                # LANDSCAPE population density (all agents on the band's cells / area = the Binford quantity) when on;
+                # else the legacy band-members/footprint (a band's density over its own range).
+                head = sum(len(occ_lists[c]) for c in band_cells[bid]) if land_pack else n
+                density = head / footprint_km2 if footprint_km2 > 0 else 0.0
                 # R-60 fix: the band's SHARE of each (possibly shared) cell granary, not the whole-cell granary — the
                 # per-cell cap scales with TOTAL occupancy, so summing whole granaries / band-only members gave
                 # surplus_frac ≈ 6-14 (gate inert). Share = cell_store · (band members on cell / total occ) ⇒ 0..1.
