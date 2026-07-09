@@ -553,6 +553,12 @@ class DemographyConfig(BaseModel):
     aggregation_site_sep: float = Field(10.0, gt=0.0)     # min cell separation between aggregation sites (≈ one per region)
     aggregation_residence: str = Field("virilocal")       # {virilocal (bride→groom), uxorilocal (groom→bride), flexible (smaller→larger band)}
     aggregation_rank_homogamy: float = Field(0.0, ge=0.0)  # 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient
+    # ── Neutral-marker GENOME (population genetics: relatedness, inbreeding, effective pop size Nₑ, drift). A DIAGNOSTIC
+    # substrate, NOT the marriage rule — forager exogamy is cultural (lineage/clan; see connubium). Founders seeded with
+    # distinct alleles; children inherit each locus Mendelian ½/½. genome.py. Default OFF ⇒ no genome carried, bit-exact.
+    enable_genome: bool = False
+    genome_loci: int = Field(32, ge=1)                    # number of neutral loci (relatedness resolution ~1/L)
+    genome_mutation: float = Field(0.0, ge=0.0, le=1.0)   # per-locus per-birth mutation prob (0 = pure drift / infinite-allele)
     # PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales
     # inversely with STATIC local geographic productivity (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
     # Low-NPP (savanna/desert) → longer stride → agents spread over sparse territory instead of piling on the few

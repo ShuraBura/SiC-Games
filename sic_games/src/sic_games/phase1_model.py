@@ -61,6 +61,7 @@ from sic_games.demography import (
     mobility_radius, footprint_radius,
 )
 from sic_games.group import GroupVector, NO_BAND
+from sic_games.genome import Genome
 from sic_games.substrate import compute_harvest_shares, diffusion_select_target, base_status
 from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
@@ -345,6 +346,8 @@ class TerrainWorld(mesa.Model):
             if self._founder_buffer_steps > 0.0:         # carried mobile reserve for the founding transient
                 agent._founder_store = self._founder_buffer_steps * self._burn
             agent._lineage = fid                         # each founder seeds a unique lineage (patriline tracking)
+            if self._demog is not None and getattr(self._demog, "enable_genome", False):
+                agent._genome = Genome.founder(self.random, loci=self._demog.genome_loci)   # unique founder signature
             if self._demog is not None:
                 agent.age = self._sample_founder_age()   # staggered founders (stationary ∝ l(x))
             if getattr(agent, "use_cred_status", False) and self._demog.cred_seed_sigma > 0.0:
@@ -426,6 +429,7 @@ class TerrainWorld(mesa.Model):
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
+        agent._genome = None                      # neutral-marker genome (population genetics; founder-seeded / inherited when enabled)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
@@ -1680,6 +1684,9 @@ class TerrainWorld(mesa.Model):
                     lr = self._band_knob(a._group.band_id, "lineage_reversion") if loc else cfg.lineage_reversion
                     child.cred = (1.0 - lr) * base * noise + lr * 1.0
                 child.wealth = self._reserve_full * child.reserve_scale()   # C.2a body-sized neonatal reserve
+                if a._genome is not None:                                   # neutral genome: Mendelian ½/½ (uniparental if father unresolved)
+                    child._genome = Genome.inherit(a._genome, getattr(child._father, "_genome", None),
+                                                   self.random, mutation=cfg.genome_mutation)
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
@@ -1702,6 +1709,17 @@ class TerrainWorld(mesa.Model):
         self._substrate_cfg = (sc.model_copy(update={"contest_exponent": kappa}) if scp
                                else sc.copy(update={"contest_exponent": kappa}))
         self._society = name
+
+    def genetics(self, sample_pairs: int = 2000) -> dict:
+        """Population-genetics read-out (requires enable_genome): expected heterozygosity H (drift/Nₑ signal — decays
+        ~1/Nₑ per generation), mean pairwise relatedness (realized inbreeding level), and coverage. Empty if off."""
+        from sic_games.genome import expected_heterozygosity, mean_pairwise_relatedness
+        gs = [a._genome for a in self.agent_list if getattr(a, "_genome", None) is not None]
+        if not gs:
+            return {}
+        return dict(n_with_genome=len(gs),
+                    heterozygosity=expected_heterozygosity(gs),
+                    mean_relatedness=mean_pairwise_relatedness(gs, self.random, sample_pairs))
 
     def bands(self, radius: int | None = None) -> list[list]:
         """Public band identifier (F.2 diagnostics): the live population partitioned into spatially-connected

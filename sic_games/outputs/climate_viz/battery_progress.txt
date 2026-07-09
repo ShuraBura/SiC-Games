@@ -24,3 +24,104 @@ battery: 5 terrains x 5 climates x 5 seeds = 125 runs; founders=1500 steps=300
 [ 23/125] flat        savanna     s2: OK  pop=1266 medBand=32 | el=3.7m eta=16.4m
 [ 24/125] flat        savanna     s3: OK  pop=1516 medBand=21 | el=4.0m eta=16.8m
 [ 25/125] flat        savanna     s4: OK  pop= 491 medBand=22 | el=4.1m eta=16.6m
+[ 26/125] hilly       tropical    s0: OK  pop=1364 medBand=19 | el=4.4m eta=16.8m
+[ 27/125] hilly       tropical    s1: OK  pop=1409 medBand=23 | el=4.7m eta=17.0m
+[ 28/125] hilly       tropical    s2: OK  pop=1490 medBand=24 | el=5.0m eta=17.2m
+[ 29/125] hilly       tropical    s3: OK  pop=1501 medBand=22 | el=5.2m eta=17.2m
+[ 30/125] hilly       tropical    s4: OK  pop=1353 medBand=22 | el=5.4m eta=17.2m
+[ 31/125] hilly       subtropical s0: EXT pop=   0 medBand=0 | el=5.4m eta=16.5m
+[ 32/125] hilly       subtropical s1: OK  pop=   6 medBand=6 | el=5.5m eta=15.9m
+[ 33/125] hilly       subtropical s2: OK  pop=   1 medBand=1 | el=5.5m eta=15.3m
+[ 34/125] hilly       subtropical s3: EXT pop=   0 medBand=0 | el=5.5m eta=14.8m
+[ 35/125] hilly       subtropical s4: EXT pop=   0 medBand=0 | el=5.5m eta=14.2m
+[ 36/125] hilly       temperate   s0: OK  pop=1365 medBand=26 | el=5.8m eta=14.2m
+[ 37/125] hilly       temperate   s1: OK  pop=1553 medBand=24 | el=6.0m eta=14.2m
+[ 38/125] hilly       temperate   s2: OK  pop=1529 medBand=26 | el=6.2m eta=14.2m
+[ 39/125] hilly       temperate   s3: OK  pop=1261 medBand=18 | el=6.4m eta=14.2m
+[ 40/125] hilly       temperate   s4: OK  pop=1503 medBand=20 | el=6.7m eta=14.2m
+[ 41/125] hilly       boreal      s0: OK  pop= 313 medBand=21 | el=6.8m eta=13.9m
+[ 42/125] hilly       boreal      s1: OK  pop= 409 medBand=18 | el=6.9m eta=13.6m
+[ 43/125] hilly       boreal      s2: OK  pop= 316 medBand=17 | el=7.0m eta=13.4m
+[ 44/125] hilly       boreal      s3: OK  pop= 808 medBand=29 | el=7.2m eta=13.2m
+[ 45/125] hilly       boreal      s4: OK  pop=  36 medBand=18 | el=7.2m eta=12.9m
+[ 46/125] hilly       savanna     s0: OK  pop=1069 medBand=22 | el=7.4m eta=12.7m
+[ 47/125] hilly       savanna     s1: OK  pop=1187 medBand=20 | el=7.6m eta=12.6m
+[ 48/125] hilly       savanna     s2: OK  pop=1018 medBand=26 | el=7.8m eta=12.6m
+[ 49/125] hilly       savanna     s3: OK  pop=1314 medBand=22 | el=8.1m eta=12.5m
+[ 50/125] hilly       savanna     s4: OK  pop= 931 medBand=21 | el=8.2m eta=12.3m
+[ 51/125] mountainous tropical    s0: OK  pop=1347 medBand=20 | el=8.4m eta=12.2m
+[ 52/125] mountainous tropical    s1: OK  pop=1374 medBand=26 | el=8.6m eta=12.1m
+[ 53/125] mountainous tropical    s2: OK  pop=1413 medBand=23 | el=8.9m eta=12.1m
+[ 54/125] mountainous tropical    s3: OK  pop=1409 medBand=21 | el=9.2m eta=12.1m
+[ 55/125] mountainous tropical    s4: OK  pop=1494 medBand=26 | el=9.5m eta=12.0m
+[ 56/125] mountainous subtropical s0: EXT pop=   0 medBand=0 | el=9.5m eta=11.7m
+[ 57/125] mountainous subtropical s1: EXT pop=   0 medBand=0 | el=9.5m eta=11.3m
+[ 58/125] mountainous subtropical s2: EXT pop=   0 medBand=0 | el=9.5m eta=11.0m
+[ 59/125] mountainous subtropical s3: OK  pop=  28 medBand=28 | el=9.6m eta=10.7m
+[ 60/125] mountainous subtropical s4: EXT pop=   0 medBand=0 | el=9.6m eta=10.4m
+[ 61/125] mountainous temperate   s0: OK  pop= 670 medBand=19 | el=9.7m eta=10.2m
+[ 62/125] mountainous temperate   s1: OK  pop= 459 medBand=21 | el=9.9m eta=10.0m
+[ 63/125] mountainous temperate   s2: OK  pop= 566 medBand=17 | el=10.0m eta=9.9m
+[ 64/125] mountainous temperate   s3: OK  pop= 881 medBand=26 | el=10.2m eta=9.8m
+[ 65/125] mountainous temperate   s4: OK  pop= 672 medBand=22 | el=10.4m eta=9.6m
+[ 66/125] mountainous boreal      s0: OK  pop=   1 medBand=1 | el=10.4m eta=9.3m
+[ 67/125] mountainous boreal      s1: OK  pop= 113 medBand=16 | el=10.5m eta=9.1m
+[ 68/125] mountainous boreal      s2: OK  pop= 288 medBand=21 | el=10.6m eta=8.9m
+[ 69/125] mountainous boreal      s3: OK  pop= 559 medBand=26 | el=10.7m eta=8.7m
+[ 70/125] mountainous boreal      s4: EXT pop=   0 medBand=0 | el=10.7m eta=8.4m
+[ 71/125] mountainous savanna     s0: OK  pop=1305 medBand=27 | el=10.9m eta=8.3m
+[ 72/125] mountainous savanna     s1: OK  pop=1329 medBand=28 | el=11.2m eta=8.2m
+[ 73/125] mountainous savanna     s2: OK  pop=1210 medBand=27 | el=11.4m eta=8.1m
+[ 74/125] mountainous savanna     s3: OK  pop=1359 medBand=26 | el=11.6m eta=8.0m
+[ 75/125] mountainous savanna     s4: OK  pop=1230 medBand=25 | el=11.8m eta=7.9m
+[ 76/125] coastal     tropical    s0: OK  pop=1411 medBand=28 | el=12.1m eta=7.8m
+[ 77/125] coastal     tropical    s1: OK  pop=1453 medBand=24 | el=12.2m eta=7.6m
+[ 78/125] coastal     tropical    s2: OK  pop=1422 medBand=24 | el=12.4m eta=7.5m
+[ 79/125] coastal     tropical    s3: OK  pop=1301 medBand=20 | el=12.6m eta=7.3m
+[ 80/125] coastal     tropical    s4: OK  pop=1431 medBand=23 | el=12.8m eta=7.2m
+[ 81/125] coastal     subtropical s0: EXT pop=   0 medBand=0 | el=12.8m eta=6.9m
+[ 82/125] coastal     subtropical s1: OK  pop=  13 medBand=13 | el=12.8m eta=6.7m
+[ 83/125] coastal     subtropical s2: OK  pop=  22 medBand=22 | el=12.8m eta=6.5m
+[ 84/125] coastal     subtropical s3: OK  pop=  23 medBand=23 | el=12.9m eta=6.3m
+[ 85/125] coastal     subtropical s4: EXT pop=   0 medBand=0 | el=12.9m eta=6.1m
+[ 86/125] coastal     temperate   s0: OK  pop=1297 medBand=29 | el=13.1m eta=5.9m
+[ 87/125] coastal     temperate   s1: OK  pop=1315 medBand=25 | el=13.2m eta=5.8m
+[ 88/125] coastal     temperate   s2: OK  pop=1186 medBand=25 | el=13.4m eta=5.6m
+[ 89/125] coastal     temperate   s3: OK  pop=1267 medBand=20 | el=13.5m eta=5.5m
+[ 90/125] coastal     temperate   s4: OK  pop=1606 medBand=18 | el=13.7m eta=5.3m
+[ 91/125] coastal     boreal      s0: OK  pop= 676 medBand=26 | el=13.8m eta=5.2m
+[ 92/125] coastal     boreal      s1: OK  pop= 742 medBand=25 | el=14.0m eta=5.0m
+[ 93/125] coastal     boreal      s2: OK  pop= 881 medBand=20 | el=14.1m eta=4.9m
+[ 94/125] coastal     boreal      s3: OK  pop=1274 medBand=22 | el=14.3m eta=4.7m
+[ 95/125] coastal     boreal      s4: OK  pop=  30 medBand=30 | el=14.3m eta=4.5m
+[ 96/125] coastal     savanna     s0: OK  pop= 903 medBand=28 | el=14.5m eta=4.4m
+[ 97/125] coastal     savanna     s1: OK  pop=1222 medBand=26 | el=14.6m eta=4.2m
+[ 98/125] coastal     savanna     s2: OK  pop=1362 medBand=25 | el=14.8m eta=4.1m
+[ 99/125] coastal     savanna     s3: OK  pop=1458 medBand=27 | el=15.0m eta=3.9m
+[100/125] coastal     savanna     s4: OK  pop= 921 medBand=24 | el=15.1m eta=3.8m
+[101/125] alpine      tropical    s0: OK  pop=1294 medBand=31 | el=15.3m eta=3.6m
+[102/125] alpine      tropical    s1: OK  pop=1167 medBand=26 | el=15.5m eta=3.5m
+[103/125] alpine      tropical    s2: OK  pop=1086 medBand=23 | el=15.7m eta=3.3m
+[104/125] alpine      tropical    s3: OK  pop=1325 medBand=25 | el=15.8m eta=3.2m
+[105/125] alpine      tropical    s4: OK  pop=1376 medBand=22 | el=16.0m eta=3.0m
+[106/125] alpine      subtropical s0: EXT pop=   0 medBand=0 | el=16.0m eta=2.9m
+[107/125] alpine      subtropical s1: EXT pop=   0 medBand=0 | el=16.0m eta=2.7m
+[108/125] alpine      subtropical s2: OK  pop=  18 medBand=18 | el=16.0m eta=2.5m
+[109/125] alpine      subtropical s3: OK  pop=  30 medBand=15 | el=16.1m eta=2.4m
+[110/125] alpine      subtropical s4: EXT pop=   0 medBand=0 | el=16.1m eta=2.2m
+[111/125] alpine      temperate   s0: OK  pop= 470 medBand=30 | el=16.2m eta=2.0m
+[112/125] alpine      temperate   s1: OK  pop= 904 medBand=25 | el=16.3m eta=1.9m
+[113/125] alpine      temperate   s2: OK  pop=   4 medBand=4 | el=16.4m eta=1.7m
+[114/125] alpine      temperate   s3: OK  pop= 820 medBand=28 | el=16.5m eta=1.6m
+[115/125] alpine      temperate   s4: OK  pop= 871 medBand=28 | el=16.6m eta=1.4m
+[116/125] alpine      boreal      s0: EXT pop=   0 medBand=0 | el=16.7m eta=1.3m
+[117/125] alpine      boreal      s1: OK  pop= 109 medBand=54 | el=16.7m eta=1.1m
+[118/125] alpine      boreal      s2: OK  pop=   6 medBand=6 | el=16.7m eta=1.0m
+[119/125] alpine      boreal      s3: OK  pop= 232 medBand=19 | el=16.8m eta=0.8m
+[120/125] alpine      boreal      s4: EXT pop=   0 medBand=0 | el=16.8m eta=0.7m
+[121/125] alpine      savanna     s0: OK  pop= 768 medBand=28 | el=17.0m eta=0.6m
+[122/125] alpine      savanna     s1: OK  pop=1321 medBand=22 | el=17.1m eta=0.4m
+[123/125] alpine      savanna     s2: OK  pop=1190 medBand=21 | el=17.3m eta=0.3m
+[124/125] alpine      savanna     s3: OK  pop=1407 medBand=20 | el=17.4m eta=0.1m
+[125/125] alpine      savanna     s4: OK  pop= 537 medBand=22 | el=17.6m eta=0.0m
+DONE in 17.6 min -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\climate_viz\battery_results.json
