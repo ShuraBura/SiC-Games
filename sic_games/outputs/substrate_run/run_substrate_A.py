@@ -34,6 +34,7 @@ GENEVERY = int(os.environ.get("A_GENEVERY", "200"))   # genome diagnostics are O
 BAND_SPLIT = 45                                        # village = a band grown past the fission cap (R-55)
 TAG = os.environ.get("A_TAG", "")                      # output suffix (e.g. "_A2") so re-runs don't clobber
 SED_FERT = os.environ.get("A_SEDFERT", "0") == "1"     # NDT society-dependent fertility
+LAND_PACK = os.environ.get("A_LANDPACK", "0") == "1"   # R-61: landscape population density packing measure
 
 PROG = os.path.join(HERE, f"A_progress{TAG}.txt")
 OUT  = os.path.join(HERE, f"A_trajectory{TAG}.json")
@@ -113,7 +114,8 @@ def main():
     cap = ClimateField(base, a_seas=0.4, regime_driver=None)   # seasonal, NO regime forcing (endogenous only)
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
     demog = emergent_village_demog().model_copy(update=dict(enable_genome=True, genome_loci=48, enable_exogamy=False,
-                                                            enable_sedentism_fertility=SED_FERT))
+                                                            enable_sedentism_fertility=SED_FERT,
+                                                            enable_landscape_packing=LAND_PACK))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",

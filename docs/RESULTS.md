@@ -740,8 +740,21 @@ realistic coastal world — **STRAT 0.0% → 15.4%** (same pop ~8180), and it DI
 imposing `scarce_arable` (river-ribbon) actually LOWERED stratification to 3.1% (it cut total pop/villages 8180→4779).
 Confirms the Carneiro reading operationally — stratification emerges from realistic dense terrain once "packed" is the
 correct LANDSCAPE density; the old band-members/footprint measure was the sole blocker. The 0.091 Binford threshold is
-untouched (verified correct, R-59). NEXT: full A3 run to see whether stratification PERSISTS or cycles with the
-boom-bust; whether Gini/elite-concentration rises with it (proto-Turchin).
+untouched (verified correct, R-59).
+
+**A3 full run (6000 steps, sedentism + landscape-packing ON) — stratification EMERGES but is TRANSIENT; inequality
+couples to pressure (proto-Turchin), sustained stratification is the open problem.** Pop 3914 → peak 9673 (@s1525) →
+6061 end. **Stratification: peak 18.2%, mean 3.7%, end 1.2%** — it ROSE during the early boom (11% @s1000 when cells
+packed hardest, occ 99/cell) then COLLAPSED as the population relaxed and cells DE-PACKED (occ 99→32). A single
+rise-and-fall, not sustained. **Coupling: corr(pop, Gini)=+0.45, corr(stratified, Gini)=+0.31** (inequality rises with
+population pressure AND stratification — the immiseration signal Turchin needs); corr(pop, stratified)=+0.02 (near
+zero — OUT OF PHASE: stratification leads on the rising density, pop peaks later; stratification tracks PACKING not the
+pop level). **Why it doesn't sustain: packing doesn't sustain** — dense cells de-pack (occ 99→32) as agents disperse
+(hypothesis: proto-ag unlock → soil depletion → move → re-unlock elsewhere; to be verified). Carneiro circumscription
+returns here NOT to REACH packing (the measure fix did that) but to SUSTAIN it (prevent dispersal) — and per supervisor
+it must be EMERGENT (terrain-bounded rich land / non-depleting agriculture), not an imposed knob. NEXT: track the
+proto-ag deplete→move→shrink cycle; test sustainable-ag terrain criteria; possibly agent EXPERTISE (heritable skill →
+faster re-adaptation).
 
 ---
 
