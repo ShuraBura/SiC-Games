@@ -923,6 +923,51 @@ Central-place prey-depletion halos (biorxiv 2024.06.13.598783); "Measuring local
 - **Tushingham, S. & Bettinger, R. (2013).** "Why foragers choose acorns before salmon: storage, mobility, and risk in aboriginal California." *J. Anthropol. Archaeol.* 32:527–537. Stored acorns = the main plant-calorie source; Karuk salmon + acorn (both stored) > ½ the diet. [SEARCH-VERIFIED; paywalled — TO-GRAB]
 - **Traditional grain storage (ethnographic/FAO):** ~50–70% of household production is stored (consumed over the year + seed); post-harvest storage **losses ~10–30%/yr** traditional (up to 50–60% worst-case, pests/spoilage). California acorn granaries held ~a year's supply (refilled each fall); NW-Coast stored salmon covered the ~5–7-month winter as the diet's bulk.
 
-**CALIBRATION TARGETS (this survey):** (1) **stored fraction** of the seasonal surplus ≈ **0.5–0.8** (strongly-seasonal storers live mostly off stores); (2) **granary DURATION / capacity ≈ 1–2 years** of subsistence (Halstead normal-surplus: ~1 yr annual cycle + ~1 yr bad-year buffer; high-variance up to 2–3 yr); (3) **decay ≈ 10–30%/yr**; (4) qualitatively, the granary must run a strong ANNUAL FILL→DEPLETE CYCLE (fill at glut, draw down deeply through the lean to a reserve floor = the buffer), NOT stay full. Model mapping: reserve_full=100k ≈ 1.33 mo BURN ⇒ `store_capacity_reserves` for 1–2 yr = **~9–18** (default 3 = 4 mo is far too low); `storable_fraction` 0.5→~0.7; `storage_decay` 0.05/mo (~46%/yr) → **~0.02/mo (~22%/yr)**. See RESULTS (pending), MODEL_SPEC §4.8.21.
+**CALIBRATION TARGETS (this survey):** (1) **stored fraction** of the seasonal surplus ≈ **0.5–0.8** (strongly-seasonal storers live mostly off stores); (2) **granary DURATION / capacity ≈ 1–2 years** of subsistence (Halstead normal-surplus: ~1 yr annual cycle + ~1 yr bad-year buffer; high-variance up to 2–3 yr); (3) **decay ≈ 10–30%/yr**; (4) qualitatively, the granary must run a strong ANNUAL FILL→DEPLETE CYCLE (fill at glut, draw down deeply through the lean to a reserve floor = the buffer), NOT stay full. Model mapping: reserve_full=130k ≈ 1.73 mo BURN (Cahill-anchored 2026-07-08; was 100k) ⇒ `store_capacity_reserves` for 1–2 yr = **~7–14** (default 3 ≈ 5 mo is far too low); `storable_fraction` 0.5→~0.7; `storage_decay` 0.05/mo (~46%/yr) → **~0.02/mo (~22%/yr)**. See RESULTS (pending), MODEL_SPEC §4.8.21.
 
 **Status: FILED (all TO-GRAB, paywalled/book); targets SEARCH-VERIFIED. Grounds the storage recalibration.**
+
+---
+
+## Pre-run audit anchors (substrate scale run; 2026-07-08)
+
+Anchors verified/added while auditing the run-A-critical constants (register: `SiC_Games_PreRun_Audit.md`; numbers:
+`PARAMETERS.md`). Numbers repeated here so each has a lit home.
+
+### Cahill, G.F. (1970). "Starvation in man." *New England Journal of Medicine* 282:668–675. (& Cahill 2006, *Annu. Rev. Nutr.* 26:1.)
+**What was lifted — the starvation-bust threshold (`reserve_full_kcal` / `reserve_floor_kcal`):** a normal-composition
+adult's total mobilizable fuel ≈ **166,000 kcal** for a 70 kg reference man (fat ~141k + protein ~24k + glycogen
+~0.9k); survival is unusual once **fat < ~3 kg AND body protein depleted > 50%** (≈ 40% body-weight loss / BMI < 10–11),
+rarely beyond ~3 months of total starvation. **How used:** the agent reserve (body-energy store, kcal) — `reserve_full
+= 130,000` (scaled to a ~60 kg lean HG adult), `reserve_floor = 20,000` (the ~3 kg-fat death residual). The model burns
+FLAT (no adaptive hypometabolism), so survival = (full−floor)/BURN = 110k/2500 ≈ **44 days** total starvation — the
+lean-adult range (hunger-strike deaths ~45–61 d). Corrected 2026-07-08 from 100k (32 d = too fragile → exaggerated
+bust; the exact quantity the substrate run measures). **Status: SEARCH-VERIFIED (Cahill figures widely cited; PDF not
+filed). Anchor: full 130k / floor 20k / ~44 d runway.**
+**Citation tag:** [PARAMETER — starvation reserve full/floor] — BUILT (`KcalEconomyConfig`); PARAMETERS §13.
+
+### Bar-Yosef, O. (1998). "The Natufian culture in the Levant, threshold to the origins of agriculture." *Evolutionary Anthropology* 6:159–177.
+**What was lifted — minimum-viable-settlement size (`settle_min_pool`):** Natufian settlements span **small (~dozens)
+→ medium (100–150 people) → large**, the largest permanent hamlets up to several hundred. **How used:** `settle_min_pool
+= 40` = the small-settlement lower bound (min aggregation to found/hold a settlement). The village-size CEILING
+(`village_gain`, an unanchored tuning knob) should let villages LAND in **~50–150** — checked in run A, not pre-tuned.
+**Status: SEARCH-VERIFIED (PDF not filed). Anchor: 40 (min) … 100–150 (medium).**
+**Citation tag:** [PARAMETER — settle_min_pool] — BUILT; PARAMETERS §(settlement).
+
+### Cordain, L., Miller, J.B., Eaton, S.B., et al. (2000). "Plant-animal subsistence ratios and macronutrient energy estimations in worldwide hunter-gatherer diets." *Am. J. Clin. Nutr.* 71:682–692.
+**What was lifted — per-biome diet MEAT FRACTION (`MEAT_FRAC`, terrain.py; splits cell yield into forage vs meat):**
+Table 2 mean subsistence dependence by primary living environment (n = 63 societies); *hunted* fraction of the
+terrestrial diet = hunted/(plant+hunted) at class-interval midpoints, fished column dropped. **Values (re-derived
+exact 2026-07-08):** subtropical rainforest / Aché 50.5/91 = **0.55**; desert / !Kung 40.5/91 = **0.45**; tropical
+grassland / Hadza 30.5/81 = **0.38**; temperate grassland 60.5/91 = **0.66**. **Status: SEARCH-VERIFIED (Table 2
+arithmetic re-checked; PDF not filed). Anchor: Table 2 midpoints.**
+**Citation tag:** [PARAMETER — MEAT_FRAC per biome] — BUILT (`terrain.py`); MODEL_SPEC §4.5.5.
+
+### Run-A demographic anchors already filed (re-verified this audit — pointers, not new)
+- **Binford 2001** (Constructing Frames of Reference) — forager **packing threshold 9.098 persons/100 km² = 0.091/km²**
+  (`BINFORD_PACKING_PER_KM2`, the stratification-morph trigger). Web-re-verified CORRECT 2026-07-08. (Binford entries
+  already in this log.)
+- **Pelletier 1994** (Nutrition Reviews 52:409) — malnutrition→mortality is multiplicative/exponential; `mu_max = 2.5`
+  is a CONSERVATIVE capped max (severe malnutrition 5–8×; child data applied broadly). Plausible, provisional.
+- **Siler / Aché** mortality (a1..b3), **Tallavaara 2018** capacity, **Miami NPP (Lieth)**, **Köppen/Körner** tree-line
+  — all filed above; unchanged by this audit.

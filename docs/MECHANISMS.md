@@ -304,8 +304,8 @@ reserve_t+1 = min(reserve_t + intake_t, reserve_full)  − burn_per_step
 death:  reserve ≤ reserve_floor   (reserve_floor = 20,000 kcal [PLACEHOLDER MR-1])
 ```
 
-- `reserve_full = 100,000 kcal` [PLACEHOLDER MR-1] — physiological estimate; see PARAMETERS.md §13.2
-- `reserve_floor = 20,000 kcal` [PLACEHOLDER MR-1] — starvation floor estimate
+- `reserve_full = 130,000 kcal` [ANCHORED Cahill 1970 — was 100k PLACEHOLDER] — lean-adult total mobilizable fuel; ~44 d flat-burn starvation survival; see PARAMETERS.md §13.2, LITERATURE.md (Cahill 1970)
+- `reserve_floor = 20,000 kcal` [ANCHORED Cahill 1970] — starvation-death residual ≈ 3 kg fat
 - `reserve_floor` attribute on `BaseAgent`; default 0.0 (backward-compatible for Sugarscape runs)
 
 ### 9a.3 Sex-based stream selection (A2.2, C only)

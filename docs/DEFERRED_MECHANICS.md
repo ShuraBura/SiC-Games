@@ -90,9 +90,16 @@ pending. The `mode='linear'` provisional form is kept selectable (default) for b
 
 ---
 
-## MR-1 — Physiological reserve anchoring
+## MR-1 — Physiological reserve anchoring — **RESOLVED 2026-07-08 (Cahill 1970)**
 
-**What:** Ground the kcal reserve (body-fat store) and starvation floor in HG physiology literature. Replace the current physiology-estimate placeholders: `reserve_full ≈ 100,000 kcal` [PLACEHOLDER] and `reserve_floor ≈ 20,000 kcal` [PLACEHOLDER].
+**RESOLUTION (2026-07-08, pre-run audit, branch `prerun-anchoring`):** anchored to **Cahill 1970 "Starvation in man"** —
+`reserve_full = 130,000 kcal` (lean-adult total mobilizable fuel; 70 kg/166k reference → ~60 kg lean), `reserve_floor
+= 20,000 kcal` (death residual ≈ 3 kg fat; Cahill: death at fat<3 kg & protein>50% depleted). Flat-burn survival =
+110k/2500 ≈ 44 d total starvation (lean-adult range). See PARAMETERS.md §13, LITERATURE.md (Cahill 1970). The
+remaining refinement (HG-specific body composition / adaptive hypometabolism during starvation) is optional, not
+blocking. Original deferral note retained below for provenance.
+
+**What (original):** Ground the kcal reserve (body-fat store) and starvation floor in HG physiology literature. Replace the current physiology-estimate placeholders: `reserve_full ≈ 100,000 kcal` [PLACEHOLDER] and `reserve_floor ≈ 20,000 kcal` [PLACEHOLDER].
 
 **Why deferred:** The calibration is its own deliverable (survey + synthesis). The placeholders are self-consistent (reserve_full > burn_per_step × survival_window > reserve_floor) and sufficient for the correctness gate. Anchoring to real physiology requires a primary-source survey of HG body composition and starvation thresholds — not done in this blueprint.
 
