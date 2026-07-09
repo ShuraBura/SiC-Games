@@ -1,0 +1,6 @@
+substrate run A: sha=fcb1ba1 world=coastal-temperate founders=1500 steps=30 habitable_cells=1584 reserve_full=130000
+[    1/30] pop=  1481 bands=   2 band(med/max)=740.5/753 vill=2(med 740.5,max 753) cplx=0.0% strat=0.0% giniC=0.268 res=0.381 starvD=0 occ=883c/max6 | el=0.0m eta=0.1m
+[   10/30] pop=  1448 bands=  84 band(med/max)=17.0/25 vill=0(med 0,max 0) cplx=0.0% strat=0.0% giniC=0.267 res=0.377 starvD=5 occ=660c/max13 | el=0.0m eta=0.0m
+[   20/30] pop=  1393 bands=  82 band(med/max)=16.0/27 vill=0(med 0,max 0) cplx=0.0% strat=0.0% giniC=0.266 res=0.378 starvD=8 occ=649c/max10 | el=0.0m eta=0.0m
+[   30/30] pop=  1359 bands=  81 band(med/max)=15/31 vill=0(med 0,max 0) cplx=0.0% strat=0.0% giniC=0.265 res=0.379 starvD=2 occ=617c/max12 | el=0.0m eta=0.0m
+DONE step=30 in 0.0 min -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\A_trajectory.json
