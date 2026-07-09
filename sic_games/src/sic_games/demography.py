@@ -183,6 +183,13 @@ class DemographyConfig(BaseModel):
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
+    # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
+    # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
+    # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning
+    # → shorter amenorrhea; Sellen & Mace 2007), ~doubling the birth rate (Bocquet-Appel 2011). The mother's `ibi_
+    # refractory_months` becomes society-dependent (SEDENTISM_IBI_MONTHS). Multiplies with `enable_energetic_fertility`
+    # (nutritional-stress suppression stays on top). Default OFF ⇒ uniform IBI (bit-exact).
+    enable_sedentism_fertility: bool = False
     # Resource-Ecology Phase C.2b: mother-linked provisioning. A mother's harvest that overflows her
     # reserve cap (otherwise wasted) is redirected to her dependent children (age < forage_age_min).
     # Flow-based (adults at the cap have no reserve headroom to give); the variance lands on the
@@ -858,6 +865,23 @@ def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
     if packed and surplus_frac >= 0.7:
         return "stratified_chiefdom"
     return "complex_forager"
+
+
+# Neolithic Demographic Transition — society-dependent birth-spacing (lactational refractory months). Mobile foragers
+# space births ~44 mo (Howell !Kung; carrying cost + on-demand nursing) → sedentary/complex/agricultural shorten toward
+# ~24 mo (Sellen & Mace 2007 weaning×subsistence; Bocquet-Appel 2011 ~2× birth rate). Values are the REFRACTORY (the
+# ~7 mo to conceive at fecundability 0.12 adds on top → effective IBI ≈ refractory + 7). egalitarian keeps the base 30
+# (effective ~37, a forager). Only used when `enable_sedentism_fertility` (default OFF).
+SEDENTISM_IBI_MONTHS = {
+    "egalitarian_forager": 30,   # effective ~37 mo (mobile forager baseline; between !Kung 44 and farming 24)
+    "complex_forager":     22,   # effective ~29 mo (sedentary, storage, delayed-return)
+    "stratified_chiefdom": 14,   # effective ~21 mo (~1.8× the forager birth rate → the NDT signature)
+}
+
+
+def sedentism_ibi(society: str | None, base: int) -> int:
+    """Society-dependent lactational refractory (NDT). Unknown/None → the base (config) value."""
+    return SEDENTISM_IBI_MONTHS.get(society, base)
 
 
 def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig) -> bool:

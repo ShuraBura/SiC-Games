@@ -32,9 +32,11 @@ SEED     = int(os.environ.get("A_SEED", "0"))
 LOGEVERY = int(os.environ.get("A_LOGEVERY", "20"))
 GENEVERY = int(os.environ.get("A_GENEVERY", "200"))   # genome diagnostics are O(N·L) → sample less often
 BAND_SPLIT = 45                                        # village = a band grown past the fission cap (R-55)
+TAG = os.environ.get("A_TAG", "")                      # output suffix (e.g. "_A2") so re-runs don't clobber
+SED_FERT = os.environ.get("A_SEDFERT", "0") == "1"     # NDT society-dependent fertility
 
-PROG = os.path.join(HERE, "A_progress.txt")
-OUT  = os.path.join(HERE, "A_trajectory.json")
+PROG = os.path.join(HERE, f"A_progress{TAG}.txt")
+OUT  = os.path.join(HERE, f"A_trajectory{TAG}.json")
 
 
 def gini(xs):
@@ -84,6 +86,8 @@ def snapshot(w, step):
         pct_complex=round(100 * socs.get("complex_forager", 0) / pop, 1) if pop else 0,
         pct_stratified=round(100 * socs.get("stratified_chiefdom", 0) / pop, 1) if pop else 0,
         gini_cred=round(gini(cred), 3), gini_wealth=round(gini(wealth), 3),
+        surplus_med=round(statistics.median(list(w._band_surplus.values())), 3) if w._band_surplus else 0,
+        surplus_max=round(max(w._band_surplus.values()), 3) if w._band_surplus else 0,
         mean_reserve=round(statistics.mean(wealth) / w._reserve_full, 3) if pop else 0,
         occ_cells=len(occ), occ_max=max(occ.values()) if occ else 0,
     )
@@ -108,7 +112,8 @@ def main():
     cap_total = sum(base0.level(x, y) for (x, y) in land)
     cap = ClimateField(base, a_seas=0.4, regime_driver=None)   # seasonal, NO regime forcing (endogenous only)
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
-    demog = emergent_village_demog().model_copy(update=dict(enable_genome=True, genome_loci=48, enable_exogamy=False))
+    demog = emergent_village_demog().model_copy(update=dict(enable_genome=True, genome_loci=48, enable_exogamy=False,
+                                                            enable_sedentism_fertility=SED_FERT))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -133,7 +138,7 @@ def main():
             eta = el / step * (STEPS - step)
             log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bands={row['n_bands']:4d} "
                 f"band(med/max)={row['band_med']}/{row['band_max']} vill={row['n_villages']}(med {row['village_med']},max {row['village_max']}) "
-                f"cplx={row['pct_complex']}% strat={row['pct_stratified']}% giniC={row['gini_cred']} "
+                f"cplx={row['pct_complex']}% strat={row['pct_stratified']}% surp(med/mx)={row['surplus_med']}/{row['surplus_max']} giniC={row['gini_cred']} "
                 f"res={row['mean_reserve']} starvD={row['deaths_starv']} occ={row['occ_cells']}c/max{row['occ_max']} "
                 f"| el={el/60:.1f}m eta={eta/60:.1f}m")
     log(f"DONE step={step} in {(time.time()-t0)/60:.1f} min -> {OUT}")

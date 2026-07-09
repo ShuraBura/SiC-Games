@@ -1,0 +1,5 @@
+substrate run A: sha=25834dd world=coastal-temperate founders=1500 steps=40 habitable_cells=1584 reserve_full=130000
+[    1/40] pop=  1481 bands=   2 band(med/max)=740.5/753 vill=2(med 740.5,max 753) cplx=0.0% strat=0.0% surp(med/mx)=0.219/0.219 giniC=0.268 res=0.381 starvD=0 occ=883c/max6 | el=0.0m eta=0.1m
+[   20/40] pop=  1392 bands=  82 band(med/max)=17.0/26 vill=0(med 0,max 0) cplx=0.0% strat=0.0% surp(med/mx)=0.586/0.878 giniC=0.269 res=0.38 starvD=2 occ=619c/max13 | el=0.0m eta=0.0m
+[   40/40] pop=  1361 bands=  82 band(med/max)=16.0/29 vill=0(med 0,max 0) cplx=0.0% strat=0.0% surp(med/mx)=0.651/0.919 giniC=0.27 res=0.378 starvD=0 occ=579c/max15 | el=0.0m eta=0.0m
+DONE step=40 in 0.0 min -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\A_trajectory_smoke.json

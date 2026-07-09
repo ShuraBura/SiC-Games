@@ -56,7 +56,7 @@ from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
-    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, pathogen_mult, risk_mult, synergy_mult,
+    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, sedentism_ibi, pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
     mobility_radius, footprint_radius,
 )
@@ -1273,18 +1273,27 @@ class TerrainWorld(mesa.Model):
             # Same hysteresis (settle_T). Bands not seen this step decay toward egalitarian (dispersed/extinct).
             band_members: dict[int, int] = {}
             band_cells: dict[int, set] = {}
+            band_cell_n: dict[tuple, int] = {}              # (bid, cell) → THIS band's members on that cell
             for (cx, cy), occ in occ_lists.items():
                 for a in occ:
                     bid = a._group.band_id
                     band_members[bid] = band_members.get(bid, 0) + 1
                     band_cells.setdefault(bid, set()).add((cx, cy))
+                    band_cell_n[(bid, (cx, cy))] = band_cell_n.get((bid, (cx, cy)), 0) + 1
             self._band_surplus = {}
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
                 density = n / footprint_km2 if footprint_km2 > 0 else 0.0
-                store_sum = sum(self._cell_store.get(c, 0.0) for c in band_cells[bid])
+                # R-60 fix: the band's SHARE of each (possibly shared) cell granary, not the whole-cell granary — the
+                # per-cell cap scales with TOTAL occupancy, so summing whole granaries / band-only members gave
+                # surplus_frac ≈ 6-14 (gate inert). Share = cell_store · (band members on cell / total occ) ⇒ 0..1.
+                store_share = 0.0
+                for c in band_cells[bid]:
+                    tot = len(occ_lists[c])
+                    if tot > 0:
+                        store_share += self._cell_store.get(c, 0.0) * (band_cell_n[(bid, c)] / tot)
                 cap_band = store_cap_mult * self._reserve_full * n
-                surplus_frac = store_sum / cap_band if cap_band > 0.0 else 0.0
+                surplus_frac = store_share / cap_band if cap_band > 0.0 else 0.0
                 self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
                 target = society_from_character(density, surplus_frac)
                 if morph_aq_gated and target != "egalitarian_forager":
@@ -1613,11 +1622,17 @@ class TerrainWorld(mesa.Model):
                         if m._mother is not mother:
                             return True
             return False
+        sed_fert = getattr(cfg, "enable_sedentism_fertility", False)   # NDT: society-dependent birth-spacing
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
                 continue
-            if not is_fertile(a.age, a.months_since_birth, cfg):
+            if sed_fert:
+                soc = self._band_society.get(a._group.band_id) or self._cell_society.get(a.pos)
+                ibi_m = sedentism_ibi(soc, cfg.ibi_refractory_months)   # sedentary/complex → shorter IBI → higher fertility
+                if not (cfg.menarche_months <= a.age < cfg.menopause_months and a.months_since_birth >= ibi_m):
+                    continue
+            elif not is_fertile(a.age, a.months_since_birth, cfg):
                 continue
             if pair_bonds:
                 partner = a._partner                           # F.3a: needs a living, co-resident husband
