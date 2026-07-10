@@ -31,11 +31,14 @@ def status_of(agent: "BaseAgent") -> float:
 def base_status(agent: "BaseAgent", eps: float) -> float:
     """Multiplicative contest-weight base over ACTIVE status facets (Cobb–Douglas, equal within-domain
     exponents → the caller applies the exponent κ). Lineage (`status_of`) is always present; the achieved
-    PROWESS facet joins when `_use_prowess` (B+). Collapses to the scalar `(cred+ε)` / `(φ+ε)` (R-18) when
-    prowess is off — exact back-compat."""
+    PROWESS facet joins when `_use_prowess` (B+); the RELATIONAL STANDING facet (social capital, tenure-built,
+    lost on leaving — Wiessner hxaro) joins when `_use_standing` (P6). Collapses to the scalar `(cred+ε)` /
+    `(φ+ε)` (R-18) when both are off — exact back-compat."""
     b = status_of(agent) + eps
     if getattr(agent, "_use_prowess", False):
         b *= (getattr(agent, "prowess", 0.0) + eps)
+    if getattr(agent, "_use_standing", False):
+        b *= (getattr(agent, "_standing", 0.0) + eps)
     return b
 
 
@@ -86,6 +89,11 @@ def diffusion_select_target(
     move_cost_field=None,
     site_field=None,
     band_opt_field=None,
+    home_cells=None,
+    foreign_status_mult: float = 1.0,
+    store_field=None,
+    store_gain: float = 0.0,
+    store_horizon: float = 24.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -152,9 +160,13 @@ def diffusion_select_target(
             n_after = (n_cell if is_cur else n_cell + 1) + extra_occupants
             ypc = S / n_after if n_after > 0 else S
         else:
+            # P6 STANDING: leaving your community forfeits tenure-built social capital, so on a cell where your band is
+            # absent you would contest with a NEWCOMER's weight — a smaller share. This is the real cost of leaving
+            # (base_status also gates the granary draw and mate choice), not a bonus. mult=1 ⇒ bit-exact.
+            w_c = w_self if (is_cur or home_cells is None or (cx, cy) in home_cells) else w_self * foreign_status_mult
             Wsum = occ_wsum.get((cx, cy), 0.0) if occ_wsum is not None else 0.0
-            denom = (Wsum if is_cur else Wsum + w_self) + extra_occupants * w_self
-            ypc = (S * w_self / denom) if denom > 0 else S
+            denom = (Wsum if is_cur else Wsum + w_c) + extra_occupants * w_c
+            ypc = (S * w_c / denom) if denom > 0 else S
         if forage_cap is not None:                             # per-person forage cap (solitude fix): a forager can
             cv = float(forage_cap[cy, cx])                     # only WORK so much land — cap the perceived per-capita
             if ypc > cv:                                       # (removes the lone-agent whole-cell over-reward)
@@ -205,6 +217,15 @@ def diffusion_select_target(
         # real-estate (assembly) + tightens onto catchment cores. site_field=None ⇒ off, bit-exact.
         if site_field is not None:
             ypc += float(site_field[cy, cx])
+        # P1 STORE ANCHOR (Testart delayed-return): the granary is your BAND's COLLECTIVE store — an absolute,
+        # place-bound buffer you forfeit by leaving, and on which a stranger has NO CLAIM. So it is valued only on your
+        # own community's cells (`home_cells`); everywhere else it is worth 0, which is exactly what anchors a village.
+        # (Every occupied cell holds some store, so an ungated term would merely reward moving to a less-crowded one.)
+        # Amortised over `store_horizon` steps; per-capita share. store_gain=0 ⇒ bit-exact.
+        if store_gain > 0.0 and store_field is not None and (is_cur or home_cells is None or (cx, cy) in home_cells):
+            n_after = (n_cell if is_cur else n_cell + 1) + extra_occupants
+            if n_after > 0:
+                ypc += store_gain * (store_field.get((cx, cy), 0.0) / n_after) / store_horizon
         cells.append((cx, cy))
         utils.append(ypc - move_cost)
 

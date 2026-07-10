@@ -431,6 +431,10 @@ class TerrainWorld(mesa.Model):
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
         agent._genome = None                      # neutral-marker genome (population genetics; founder-seeded / inherited when enabled)
+        # P6 social capital: relational standing — accrues with tenure among co-resident band, lost on leaving (Wiessner hxaro)
+        agent._use_standing = self._demog is not None and getattr(self._demog, "enable_standing", False)
+        agent._standing = (self._demog.standing_floor if agent._use_standing else 0.0)
+        agent._standing_band = None               # band the standing was built in (change ⇒ outsider penalty)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
@@ -496,6 +500,7 @@ class TerrainWorld(mesa.Model):
         elif self._reproduction:
             self._do_births()
         self.occupied = {a.pos for a in self.agent_list}
+        self._update_standing()          # P6: tenure builds standing; leaving/isolation forfeits it (ready for next harvest)
 
     def _update_defensibility_claims(self) -> None:
         """Economic-defensibility (Dyson-Hudson & Smith 1978) claim maintenance. A cell is CLAIMABLE when its
@@ -789,6 +794,37 @@ class TerrainWorld(mesa.Model):
                 if self._settlement_sites[site] <= 0:
                     self._settlement_sites.pop(site, None)
 
+    def _update_standing(self) -> None:
+        """P6 social capital. Standing accrues with TENURE among co-resident band-mates (Wiessner 1977: ~1 yr of
+        reciprocal `hxaro` exchange before a partnership is 'firm'; the network is the bad-year insurance) and is
+        largely LOST on leaving the community — a band change, or isolation from one's band. Because `base_status`
+        weights the harvest contest, the granary draw AND mate choice, departure is a real FITNESS cost: the village
+        anchor. Dispersal therefore becomes SELECTIVE (low-standing juniors forfeit little and leave; established/
+        high-standing stay). Off ⇒ no-op (bit-exact)."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_standing", False):
+            return
+        r, pen, fl = cfg.standing_tenure_rate, cfg.standing_leave_penalty, cfg.standing_floor
+        bc: dict[tuple, int] = {}                       # (band_id, cell) → members present
+        for a in self.agent_list:
+            k = (a._group.band_id, a.pos)
+            bc[k] = bc.get(k, 0) + 1
+        for a in self.agent_list:
+            b = a._group.band_id
+            if a._standing_band != b:                   # joined / changed community → arrive an outsider
+                a._standing = max(fl, a._standing * pen)
+                a._standing_band = b
+                continue
+            x, y = a.pos
+            near = -1                                   # 3×3 co-band members, excluding self
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    near += bc.get((b, (x + dx, y + dy)), 0)
+            if near > 0:
+                a._standing += r * (1.0 - a._standing)  # embedded → hxaro ties deepen (saturating)
+            else:
+                a._standing = max(fl, a._standing * pen)   # isolated from the community → ties lapse
+
     def _update_settlement_soil(self) -> None:
         """Layer B1 soil depletion: a FARM settlement (cultivability > aquatic at its site) degrades a per-site SOIL
         stock under farming pressure (members/catchment carrying); tier-2 farm yield × soil (applied in the harvest).
@@ -891,6 +927,20 @@ class TerrainWorld(mesa.Model):
         # (agents cluster up to g* → high-variance biomes grow bigger bands). Off ⇒ fixed group_safety_scale.
         eb_on = self._demog is not None and getattr(self._demog, "enable_emergent_band_size", False)
         band_opt = self._band_optimum_field() if eb_on else None
+        # P6 STANDING: the cells where each band is present = "home" (co-residence). Moving off them means arriving as
+        # an outsider with a newcomer's contest weight → a smaller share. Only bites under a contest (kappa>0).
+        standing_on = self._demog is not None and getattr(self._demog, "enable_standing", False) and kappa > 0.0
+        # P1 store anchor: the band's COLLECTIVE granary the mover would abandon (Testart delayed-return).
+        store_on = self._demog is not None and getattr(self._demog, "enable_store_anchor", False)
+        st_field = self._cell_store if store_on else None
+        st_gain = self._demog.store_anchor_gain if store_on else 0.0
+        st_hor = self._demog.store_anchor_horizon if store_on else 24.0
+        # "home" = the cells where the agent's band is present. Needed by BOTH P6 (newcomer contest weight) and P1
+        # (no claim on a stranger's granary).
+        home_by_band: dict[int, set] = {}
+        if standing_on or store_on:
+            for a in self.agent_list:
+                home_by_band.setdefault(a._group.band_id, set()).add(a.pos)
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
         if settle_on:
@@ -981,6 +1031,13 @@ class TerrainWorld(mesa.Model):
                 local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
                 mr = mobility_radius(local_npp, self._demog)
             extra = followers_by_root.get(agent, 0) if anticipate else 0
+            hcells, fmult = None, 1.0
+            if standing_on or store_on:
+                hcells = home_by_band.get(agent._group.band_id)    # your community's cells
+            if standing_on:                                   # P6: price the standing you'd forfeit by leaving
+                st = agent._standing
+                st_after = max(self._demog.standing_floor, st * self._demog.standing_leave_penalty)
+                fmult = ((st_after + phi_eps) / (st + phi_eps)) ** kappa
             target = diffusion_select_target(agent, tf, occ_count, occ_wsum, sc, agent.random, temp, ct, agent_coh,
                                              move_radius=mr, water=water_mask, extra_occupants=extra,
                                              cell_owner=cell_owner,
@@ -989,7 +1046,9 @@ class TerrainWorld(mesa.Model):
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
                                              aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf,
-                                             site_field=sfield, band_opt_field=band_opt)
+                                             site_field=sfield, band_opt_field=band_opt,
+                                             home_cells=hcells, foreign_status_mult=fmult,
+                                             store_field=st_field, store_gain=st_gain, store_horizon=st_hor)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:

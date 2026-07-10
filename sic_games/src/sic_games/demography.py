@@ -190,6 +190,26 @@ class DemographyConfig(BaseModel):
     # refractory_months` becomes society-dependent (SEDENTISM_IBI_MONTHS). Multiplies with `enable_energetic_fertility`
     # (nutritional-stress suppression stays on top). Default OFF ⇒ uniform IBI (bit-exact).
     enable_sedentism_fertility: bool = False
+    # ── SOCIAL CAPITAL / STANDING — the village anchor with a REAL payoff (P6). Wiessner 1977 (!Kung *hxaro*): exchange
+    # partnerships need **≥1 yr of reciprocal gifting** before the bond is "firm", each person sits in a network of
+    # paths, and THAT NETWORK is what covers you in bad years. Status is also within-community (von Rueden) — a migrant
+    # arrives a low-status outsider. So standing is a RELATIONAL third status facet: it accrues with TENURE among your
+    # co-resident band and is largely LOST on leaving. Because `base_status` weights the harvest contest, the granary
+    # draw AND mate choice, leaving is a real FITNESS cost — this is the anchor that holds a village together, and it
+    # makes dispersal SELECTIVE (low-standing juniors leave; established/elite stay). Default OFF ⇒ facet absent, bit-exact.
+    enable_standing: bool = False
+    standing_tenure_rate: float = Field(0.083, gt=0.0, le=1.0)   # saturating accrual/step; 1/12 ⇒ ~63% after 1 yr (Wiessner "≥1 yr to firm")
+    standing_leave_penalty: float = Field(0.4, ge=0.0, le=1.0)   # fraction of standing RETAINED on leaving your community
+    standing_floor: float = Field(0.15, ge=0.0, le=1.0)          # newcomer baseline (never 0 — kin/lineage reputation travels)
+    # ── STORE ANCHOR (P1). The cell granary is a REAL payoff (allocate_store_draw already prevents starvation) and is
+    # CELL-BOUND — leaving abandons it — but the mover never sees it (`diffusion_select_target` weighs only forage S).
+    # Testart 1982: delayed-return STORAGE is what makes foragers sedentary; you don't walk away from a full granary
+    # for a 5% better patch. Unlike `standing` (a RELATIVE contest weight, which cancels on an empty cell), the store is
+    # an ABSOLUTE place-bound value ⇒ it is what actually anchors. Perceived as the per-capita stored buffer amortised
+    # over `store_anchor_horizon` steps. Default OFF (gain 0) ⇒ bit-exact.
+    enable_store_anchor: bool = False
+    store_anchor_gain: float = Field(1.0, ge=0.0)                # weight on the perceived per-capita granary buffer
+    store_anchor_horizon: float = Field(24.0, gt=0.0)            # steps over which the stock is amortised into a per-step value (~2 yr)
     # Resource-Ecology Phase C.2b: mother-linked provisioning. A mother's harvest that overflows her
     # reserve cap (otherwise wasted) is redirected to her dependent children (age < forage_age_min).
     # Flow-based (adults at the cap have no reserve headroom to give); the variance lands on the

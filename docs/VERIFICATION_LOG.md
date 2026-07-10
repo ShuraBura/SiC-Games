@@ -42,6 +42,10 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 | Genome | relatedness coefficients | 2026-07-09 | CLEAN — parent-child ≈0.5, sib ≈0.5, unrelated ≈0 (unit-tested) |
 | Exogamy/connubium | kin/clan rejection rule | 2026-07-09 | CLEAN — sibling/clan/cousin correctly rejected (unit-tested) |
 | `enable_infanticide` | wired? | 2026-07-09 | DEAD STUB — no logic reads it (harmless, off). Candidate for deletion |
+| Economic defensibility | does the tether anchor? | 2026-07-09 | **INERT + not a payoff** — its docstring: "a perception change only"; A/B shows only 3–14 cells ever claimed (`D_min=0.15` rarely passes) ⇒ no effect (occ_cells 889 vs 899) |
+| Movement payoff ledger | do any terms scale to VILLAGE size? | 2026-07-09 | **NO** — `group_safety` saturates at g_s=15, mating caps at 15, granary absent from decision, security never touches mortality, dwellings absent; only `Rv·(n^0.15−1)` (gated to S_pot). Measured utility peaks at **n=15** and falls monotonically (R-62) |
+| `enable_aggregation_sedentism` | wired? active? | 2026-07-09 | **OFF, and doubly gated** — settlements are founded inside `_do_gathering`, so it ALSO needs `enable_marriage_aggregation`. ⇒ `_settlement_sites=0` in every run ⇒ residence≠foraging catchment never ran (root cause, R-62) |
+| P6 standing / P1 store anchor | correctness | 2026-07-09 | Built, default-OFF. Standing cannot anchor alone (relative weight cancels when `Wsum=0`); first store cut was BUGGY (ungated + per-capita ⇒ rewarded dispersal) → fixed to community-gated |
 
 **OPEN code checks (the running to-do — build out next passes):**
 1. **Storage granary fill/cap** — the per-cell cap `store_cap_mult·reserve_full·occ` and the 84M-kcal stores; is the cap right, does it overfill?

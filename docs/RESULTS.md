@@ -762,4 +762,69 @@ skill is orthogonal: it makes re-adaptation cheaper ⇒ if anything eases disper
 
 ---
 
+## R-62 — Villages dissolve because RESIDENCE≠FORAGING is switched off, not for want of payoffs: the utility optimum is a BAND (n=15) by construction; restoring the catchment inverts the dynamics (concentration + 50% stratification) — and revises R-54's "assembly binds" (2026-07-09)
+
+**Question (supervisor).** Sustained concentration needs *mechanisms with a real payoff* — villages should buy personal
+security, a share in stored food, stable dwellings, societal life — not perception hacks. Which of these exist?
+
+**Measured payoff ledger (movement decision, `diffusion_select_target`).** COSTS are real and uncapped
+(`density_disease` ON, `dens_delta=3.0` ⇒ up to ×4 mortality; `size_repulsion` ON; depletion halo). PAYOFFS are capped,
+gated or invisible: `group_safety` saturates at `g_s=15`; mating caps at `g_mate=15`; the **granary is absent from the
+decision**; **security never affects mortality** (group size only multiplies yield); **dwellings/built capital don't
+exist**; the agglomeration premium `Rv·(n^{β−1}−1)` is the ONLY village-scale term and is gated to `S_pot` (rich cells).
+The `enable_economic_defensibility` tether is, by its own docstring, **"a perception change only"** — and inert anyway
+(A/B: only 3–14 cells ever claimed; occ_cells 889 vs 899 — no effect).
+
+**THE DECISIVE MEASUREMENT — utility vs group size on a real packed cell** (S=1.70 M, forage_cap=144.5 k, g_s=15):
+n=10 → 575 k; **n=15 → 743 k (PEAK)**; n=25 → 566 k; **n=58 (the actual village) → 316 k**; n=120 → 185 k.
+**The utility-maximising group is 15 — a BAND.** A villager at n=58 *doubles* their payoff by leaving for a 15-cell.
+Safety saturates (×9 by n≈60) while per-capita forage falls as `S/n`; the granary term is a per-capita constant (57 k).
+**Villages are strictly dominated.** Every anchor tried (tether ×6, standing, granary) was attempting to bridge a
+**427 k kcal** gap with **57 k** terms — hopeless by construction.
+
+**ROOT CAUSE (physics, not payoffs): `ypc = S/n` makes 58 people eat ONE 100 km² cell.** Real villages RESIDE at a
+point and FORAGE A CATCHMENT (Binford logistical collectors; Orians & Pearson central-place foraging). The model knows
+this — `"Layer 2 RESIDENCE PIN: … residence ≠ foraging; its food comes from the catchment tier-2, not the cell it
+stands on"`, `"a village « one 100 km² cell"` — but the machinery (`enable_aggregation_sedentism`, catchment radius 2 =
+25 cells, `settle_tier2_yield`) is **OFF** in `emergent_village_demog`, and additionally requires
+`enable_marriage_aggregation` (settlements are founded inside `_do_gathering`). Hence `_settlement_sites=0` in every
+run of this session (also explains R-61's falsified soil hypothesis).
+
+**REVISES R-54.** The agglomeration rework replaced the settlement machinery (which HAD the catchment) with a
+point-superlinear premium `A·n^{0.15}` on a single cell. That premium rises **×1.2** from n=15→58 while per-capita
+forage falls **×3.9**. R-54's "*economics sustains, assembly binds*" is better read as: **assembly binds because a
+village standing on one cell is a starvation trap.** The economics only ever held a PRE-SEEDED village that had not yet
+felt the dilution.
+
+**RESTORING THE CATCHMENT INVERTS EVERYTHING** (600 steps, coastal-temperate, landscape-packing + sedentism):
+| arm | pop | occ_cells | occ_max | sites | %stratified |
+|---|---|---|---|---|---|
+| baseline (one-cell forage) | 4077 | 538 | 72 | 0 | 19.4 |
+| gathering only | 8010 | 853 | 125 | 0 | 15.3 |
+| **+ catchment (residence≠forage)** | **12715** | **209** | 1930 | **21** | **50.5** |
+| + catchment + store + standing | 12224 | **165** | 2034 | 19 | **58.8** |
+Occupied cells COLLAPSE 853→209 (population concentrates into 21 settlements), capacity triples, **stratification
+50.5%**. Dispersal stops. **The payoff anchors then WORK on top** (occ_cells 209→165, strat 50.5→58.8%) — they were
+never wrong, merely swamped by the 1/n collapse.
+
+**NEW PROBLEM = THE ORIGINAL ONE.** `occ_max = 2034` — villages average ~600, up to ~2000, vs Bar-Yosef's ethnographic
+**50–150**. This is precisely the supervisor's very first observation ("*why do we have a few thousands piling up on
+adjacent cells?*"). Two failure modes: catchment OFF ⇒ one-cell starvation trap ⇒ continuous spread; catchment ON with
+`settle_tier2_yield=40.0` [PROVISIONAL — sweep] ⇒ mega-villages. The truth is between.
+
+**Built this session (branch `payoff-anchors`, both default-OFF, bit-exact):** **P6 STANDING** — relational social
+capital as a 3rd `base_status` facet, tenure-built (Wiessner 1977 hxaro: ≥1 yr of reciprocal exchange to become
+"firm"), forfeited on leaving; it gates harvest share, granary draw AND mate choice. It cannot anchor alone (a relative
+weight CANCELS on an empty cell: `ypc = S·w/(Wsum+w)` → `S` when `Wsum=0`) but it does produce the correct **SELECTIVE
+dispersal** (low-standing squeezed out; established stay). **P1 STORE ANCHOR** — the band's COLLECTIVE granary valued
+only on the community's own cells (a stranger has no claim); an absolute place-bound value that does not cancel
+(Testart delayed-return). First cut was buggy (ungated + per-capita ⇒ rewarded moving to a *less crowded* cell) — fixed.
+
+**NEXT:** calibrate the catchment economy (`settle_tier2_yield`, catchment radius) + costs (scalar stress,
+density-disease, depletion halo) so **village size EMERGES at 50–150** — payoff-vs-cost, exactly as band size emerged
+from risk-pooling-vs-competition. Then P2 (security-as-mortality, repairing the density_disease asymmetry) and P5
+(built capital / dwellings).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
