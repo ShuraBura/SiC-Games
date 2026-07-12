@@ -957,6 +957,16 @@ class TerrainWorld(mesa.Model):
                 home_by_band.setdefault(a._group.band_id, set()).add(a.pos)
 
         settle_on = self._demog is not None and getattr(self._demog, "enable_aggregation_sedentism", False)
+        # B (R-63): settlement scalar stress — per-site village population, so an over-crowded egalitarian village
+        # repels newcomers (Johnson 1982; dissipated by the site's society factor). Precompute the site populations.
+        settle_ss_on = settle_on and getattr(self._demog, "enable_settlement_scalar_stress", False)
+        settle_pop: dict = {}
+        if settle_ss_on:
+            srad = self._demog.settle_radius
+            for a in self.agent_list:
+                s = self._nearest_settlement(a.pos)
+                if s is not None:
+                    settle_pop[s] = settle_pop.get(s, 0) + 1
         if settle_on:
             self._maintain_settlements()
             if getattr(self._demog, "enable_soil_depletion", False):
@@ -1033,6 +1043,14 @@ class TerrainWorld(mesa.Model):
             # Layer 2 RESIDENCE PIN: a settled member steps onto the SINGLE settlement site cell (residence ≠ foraging);
             # its food comes from the catchment tier-2 (harvest step), not the cell it stands on. Mobile agents diffuse.
             site = self._nearest_settlement(agent.pos) if settle_on else None
+            if site is not None and settle_ss_on:
+                # Johnson scalar stress: an over-crowded settlement repels this agent (prob rises with village pop,
+                # dissipated by the site's society). Repelled ⇒ fall through to normal diffusion (leave/don't join).
+                soc = self._cell_society.get(site) or self._band_society.get(agent._group.band_id)
+                ss = size_repulsion(settle_pop.get(site, 0), self._demog.settlement_ss_gain,
+                                    self._demog.settlement_ss_midpoint, self._demog.settlement_ss_width, soc)
+                if ss > 0.0 and agent.random.random() < ss:
+                    site = None
             if site is not None:
                 target = self._toward(agent.pos, site)
                 if target != agent.pos and self._fields.isWater[target[1], target[0]] == 0:

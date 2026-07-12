@@ -23,21 +23,21 @@ CRAD = int(os.environ.get("CRAD", "1"))
 AGGL = os.environ.get("AGGL", "1") == "1"   # point-superlinear agglomeration premium on/off
 CEIL = os.environ.get("CEIL", "0") == "1"   # R-63 catchment carrying-capacity ceiling
 REP = float(os.environ.get("REP", "0.3"))   # scalar-stress repulsion_gain (Johnson/Alberti n^2 coordination cost)
+SS = os.environ.get("SS", "0") == "1"        # B: settlement scalar stress (caps egalitarian villages, dissipated by hierarchy)
+SSMID = float(os.environ.get("SSMID", "150"))
 STEPS = int(os.environ.get("P_STEPS", "800"))
 FOUNDERS = int(os.environ.get("P_FOUNDERS", "3000"))
 LOGEVERY = int(os.environ.get("P_LOGEVERY", "200"))
-TAG = f"ceil={int(CEIL)}/rep={REP}"
+TAG = f"ceil={int(CEIL)}/ss={int(SS)}@{SSMID:.0f}"
 
 
 def village_sizes(w, rad):
-    """Population within Chebyshev `rad` of each settlement site = the village."""
+    """Village = agents ON the settlement SITE cell (the residence pin converges them there). `rad` unused (kept for
+    signature); the old radius-2 area metric double-counted overlapping catchments."""
     if not w._settlement_sites:
         return []
-    sizes = []
-    for s in w._settlement_sites:
-        n = sum(1 for a in w.agent_list if w._torus_cheby(a.pos[0], a.pos[1], s[0], s[1]) <= rad)
-        sizes.append(n)
-    return sizes
+    occ = Counter(a.pos for a in w.agent_list)
+    return [occ.get(s, 0) for s in w._settlement_sites]
 
 
 def main():
@@ -50,6 +50,7 @@ def main():
         enable_landscape_packing=True, enable_sedentism_fertility=True,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True, enable_agglomeration=AGGL,
         enable_catchment_ceiling=CEIL, repulsion_gain=REP,
+        enable_settlement_scalar_stress=SS, settlement_ss_midpoint=SSMID,
         settle_tier2_yield=TIER2, settle_catchment_radius=CRAD))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=0,
                      carbon_cfg=CarbonConfig(kappa=1.5),

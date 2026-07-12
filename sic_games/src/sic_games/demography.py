@@ -352,6 +352,17 @@ class DemographyConfig(BaseModel):
     # scalar stress caps size; rich (aquatic/arable) catchments carry more → surplus → stratify. Default OFF ⇒ bit-exact.
     enable_catchment_ceiling: bool = False
     catchment_ceiling_mult: float = Field(1.0, gt=0.0)       # ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity
+    # SETTLEMENT SCALAR STRESS (Johnson 1982, dissipated by hierarchy) — the missing cost that caps VILLAGE size. The
+    # residence pin otherwise pulls every nearby agent into a settlement unconditionally ⇒ villages grow to the food
+    # ceiling with no cap (R-63). Here an over-crowded settlement REPELS agents (prob = size_repulsion(village_pop))
+    # — but the repulsion is scaled by the settlement's SOCIETY factor (egalitarian 1.0 → complex 0.5 → stratified
+    # 0.25): hierarchy absorbs scalar stress (Johnson's thesis), so an EGALITARIAN village fissions at ~midpoint while
+    # a STRATIFIED one grows past it. Combined with the catchment ceiling this closes the loop: cap at ~150 → surplus
+    # (ceiling > pop) → morph to stratified → scalar stress weakens → village grows toward the ceiling. Default OFF.
+    enable_settlement_scalar_stress: bool = False
+    settlement_ss_gain: float = Field(1.0, ge=0.0, le=1.0)   # max repel probability for an egalitarian over-crowded village
+    settlement_ss_midpoint: float = Field(150.0, gt=0.0)     # village pop at half-max repulsion (Bar-Yosef egalitarian upper bound)
+    settlement_ss_width: float = Field(50.0, gt=0.0)         # logistic width (Alberti 2014 shape)
     # LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews — NW
     # Coast stable millennia); the real dispersal driver is a correlated bad YEAR that STORAGE must buffer. Once per
     # aggregation_period a mean-preserving REGIONAL lognormal `s ~ LN(CV=shock_cv)` scales that year's tier-2 yield
