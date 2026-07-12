@@ -827,4 +827,42 @@ from risk-pooling-vs-competition. Then P2 (security-as-mortality, repairing the 
 
 ---
 
+## R-63 — Emergent village size = Bar-Yosef 50–150 ACHIEVED (median 88, 100% in band) with catchment ON + the UNBOUNDED point-superlinear agglomeration OFF; `n^1.15` is the mega-village bug (2026-07-09)
+
+**Context.** Following R-62 (restoring residence≠foraging inverts dispersal → concentration + stratification but
+`occ_max=2034` mega-villages). Question: calibrate village size to 50–150. First plan was to sweep `settle_tier2_yield`
+(catchment food, PROVISIONAL=40).
+
+**FALSIFIED that plan (measurement).** `settle_tier2_yield ∈ {1,2,5}` at catchment radius 1 gave **byte-identical**
+runs (pop 22406, villages med 3832) — the catchment FOOD term is negligible (`S_pot=max(aquatic,cultivability)≈0` on
+the forest cells where villages form; it only pays near water/arable). The mega-villages are fed by the **AGGLOMERATION
+premium** `S += aggl_R·(n^β − n)` (phase1_model.py:1191–1196; β=1.15, point mode) — **point-superlinear and UNBOUNDED**:
+per-capita output RISES with n forever (n^1.15 at n=3800 ≈ 15,700). The residence pin removed the `S/n` forage-dilution
+brake that previously balanced it ⇒ runaway.
+
+**A/B (catchment ON, agglomeration ON vs OFF, 800 steps, coastal-temperate):**
+| | villages med/p90/max | in 50–150 | strat | pop |
+|---|---|---|---|---|
+| aggl ON (n^1.15) | 3832 / 5607 / 5608 | 0% | 34% | 22406 (exploding) |
+| **aggl OFF** | **88 / 101 / 102** | **100%** | 4% | 881 (stable) |
+**Emergent village size lands EXACTLY at Bar-Yosef 50–150 (median 88, 100% in band) with no fitting** — it falls out of
+catchment carrying capacity minus scalar-stress cost, as band size fell out of risk-pooling minus competition. The
+unbounded `n^1.15` was the sole thing breaking it.
+
+**But neither endpoint is right — the tension is now clean.** aggl OFF → correct size but strat only 4% and population
+DECLINES (3000→881: the increasing-returns economy that made villages worthwhile + generated surplus is gone). aggl ON
+→ runaway. **The middle = increasing returns that SATURATE at the catchment's carrying capacity** — Bettencourt's own
+caveat that R-54 recorded but never applied (*"a subsistence village has a resource ceiling a modern city does not"*).
+The point-superlinear premium is missing that ceiling.
+
+**REVISES R-54 further:** the point-superlinear premium isn't merely "assembly-binds" — it is **UNBOUNDED**, so once
+assembly is solved (residence pin) it runs away. It needs a resource-ceiling saturation.
+
+**NEXT (proposed, awaiting sign-off):** cap `A·(n^β − n)` at the catchment carrying capacity (≈ catchment_cells ×
+Tallavaara/cell) so returns rise → saturate → scalar stress caps size. Predict: village size stays 50–150, but rich
+(aquatic/arable) catchments accumulate surplus → stratify, poor (forest) stay small egalitarian — the NW-Coast-vs-
+interior pattern — with population sustained.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
