@@ -886,4 +886,51 @@ BELOW the ceiling → surplus → stratification. This is a genuine open design 
 
 ---
 
+## R-64 — Option B: settlement scalar stress (Johnson, hierarchy-dissipated) completes the emergent settlement hierarchy — village size ≈ Bar-Yosef 50–150 + a bounded stratified-center tail, STABLE over 2000 steps, and it also fixes A3's transient stratification (2026-07-09)
+
+**The fix (R-63 fork B).** The residence pin pulled every nearby agent into a settlement unconditionally → no size
+cap → villages grew to the food ceiling (~450) without stratifying. `enable_settlement_scalar_stress` (default OFF,
+698 pass bit-exact): an over-crowded settlement REPELS agents from the residence pin with probability
+`size_repulsion(village_pop, midpoint=150, society)` — Johnson 1982 scalar stress, scaled by the EXISTING
+`REPULSION_SOCIETY_FACTOR` (egalitarian 1.0 / complex 0.5 / stratified 0.25). Wired to the **residence pin** (where
+settlement growth actually happens), NOT the band-fission `size_repulsion` (which does nothing to settlements — the
+lever mislocated for 5 iterations; utility-decompose before building, VERIFICATION_LOG).
+
+**The loop closes** (each rung already lit-anchored): scalar stress caps an EGALITARIAN village ~150 (Johnson) → the
+catchment ceiling (R-63, Tallavaara) leaves a food surplus (ceiling > capped pop) → surplus morphs the village to
+hierarchy (Testart) → hierarchy dissipates scalar stress (society factor 0.25) → it grows into a larger stratified
+center (Carneiro).
+
+**RESULT — STABLE over 2000 steps (~167 yr), coastal-temperate, catchment radius 1** (village = site-cell occupancy):
+| step | pop | village med/p90/max | in 50–150 | strat |
+|---|---|---|---|---|
+| 400 | 4885 | 64/133/233 | 63% | 29% |
+| 800 | 7151 | 101/134/282 | 77% | 7% |
+| 1200 | 7733 | 97/151/255 | 77% | 13% |
+| 2000 | 7210 | 102/154/241 | 77% | 9% |
+Population PLATEAUS (~7200, no runaway); **village size median ~100, p90 ~154, 77% in Bar-Yosef 50–150**, with a
+**bounded** stratified-center tail (~240); **stratification SUSTAINED 9–16%**. The distribution is the predicted
+bimodal Johnson pattern (a mass of egalitarian villages capped ~150 + larger stratified centers).
+
+**ALSO FIXES A3's TRANSIENT STRATIFICATION (R-61):** A3's stratification collapsed to ~1% because the "villages" were
+transient packing that de-concentrated via IFD dispersal. Here stratification PERSISTS (9–16% at step 2000) because
+villages are stable CATCHMENT-ANCHORED settlements (residence pin + scalar-stress equilibrium), not transient packing
+— the concentration is held by a real mechanism, so the stratification it drives is durable.
+
+**THE EMERGENT SETTLEMENT HIERARCHY IS COMPLETE** on realistic worlds, each rung emergent-from-mechanism (not
+hardcoded) and lit-anchored:
+- **band ≈ 24** ← risk-pooling vs competition (Winterhalder/Wobst; emergent-band-size v3)
+- **connubium ≈ 500** ← mate-availability under kin exogamy (Wobst; Cut 1/2, opt-in)
+- **village ≈ 50–150** ← catchment carrying capacity vs Johnson scalar stress (Bar-Yosef; R-63/R-64)
+- **stratified centers (to ~240) + ~10–16% stratified** ← surplus (ceiling − pop) → hierarchy (Testart/Carneiro/Johnson)
+
+**Branch `payoff-anchors` (off dynamics-fix), local-only, all opt-in/default-OFF, 698 pass.** The realistic
+"everything-on" village config = `emergent_village_demog` + `enable_marriage_aggregation` + `enable_aggregation_
+sedentism` + `enable_catchment_ceiling` + `enable_settlement_scalar_stress` + `enable_landscape_packing` +
+`enable_sedentism_fertility` (+ optional genome/exogamy). **NEXT (calibration, not structural):** the population
+plateau (~7200) and strat level (~10–16%) vs world richness; catchment radius vs Vita-Finzi & Higgs; then the Turchin
+elite/instability layer now has a stable stratified substrate to act on.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
