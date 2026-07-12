@@ -344,6 +344,14 @@ class DemographyConfig(BaseModel):
     # source drops in later — one field, many sources). This sustains the packed pool that reside-on-cluster starved.
     settle_catchment_radius: int = Field(2, ge=0)            # cells the settlement forages tier-2 from (a day's logistical range) [PROVISIONAL]
     settle_tier2_yield: float = Field(40.0, ge=0.0)          # intensive tier-2 yield per unit S_pot per catchment cell, unlocked by settlement (gated) [PROVISIONAL — sweep]
+    # CATCHMENT CARRYING-CAPACITY CEILING (R-63): a settled village's TOTAL food (base forage + resource tier-2 +
+    # agglomeration social-returns) is capped at what its catchment land can sustainably yield — a village cannot
+    # out-produce its territory, whether by intensifying OR by specializing. This is the resource ceiling R-54 recorded
+    # (Bettencourt: "a subsistence village has a resource ceiling a modern city does not") but never applied — the fix
+    # for the UNBOUNDED point-superlinear premium (R-63). Increasing returns then RISE → SATURATE at the ceiling →
+    # scalar stress caps size; rich (aquatic/arable) catchments carry more → surplus → stratify. Default OFF ⇒ bit-exact.
+    enable_catchment_ceiling: bool = False
+    catchment_ceiling_mult: float = Field(1.0, gt=0.0)       # ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity
     # LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews — NW
     # Coast stable millennia); the real dispersal driver is a correlated bad YEAR that STORAGE must buffer. Once per
     # aggregation_period a mean-preserving REGIONAL lognormal `s ~ LN(CV=shock_cv)` scales that year's tier-2 yield

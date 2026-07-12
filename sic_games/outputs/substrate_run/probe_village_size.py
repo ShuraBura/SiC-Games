@@ -21,10 +21,12 @@ from sic_games.climate import ClimateField
 TIER2 = float(os.environ.get("TIER2", "1.0"))
 CRAD = int(os.environ.get("CRAD", "1"))
 AGGL = os.environ.get("AGGL", "1") == "1"   # point-superlinear agglomeration premium on/off
+CEIL = os.environ.get("CEIL", "0") == "1"   # R-63 catchment carrying-capacity ceiling
+REP = float(os.environ.get("REP", "0.3"))   # scalar-stress repulsion_gain (Johnson/Alberti n^2 coordination cost)
 STEPS = int(os.environ.get("P_STEPS", "800"))
 FOUNDERS = int(os.environ.get("P_FOUNDERS", "3000"))
 LOGEVERY = int(os.environ.get("P_LOGEVERY", "200"))
-TAG = f"tier2={TIER2}/rad={CRAD}/aggl={int(AGGL)}"
+TAG = f"ceil={int(CEIL)}/rep={REP}"
 
 
 def village_sizes(w, rad):
@@ -47,6 +49,7 @@ def main():
     d = emergent_village_demog().model_copy(update=dict(
         enable_landscape_packing=True, enable_sedentism_fertility=True,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True, enable_agglomeration=AGGL,
+        enable_catchment_ceiling=CEIL, repulsion_gain=REP,
         settle_tier2_yield=TIER2, settle_catchment_radius=CRAD))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=0,
                      carbon_cfg=CarbonConfig(kappa=1.5),

@@ -863,6 +863,27 @@ Tallavaara/cell) so returns rise → saturate → scalar stress caps size. Predi
 (aquatic/arable) catchments accumulate surplus → stratify, poor (forest) stay small egalitarian — the NW-Coast-vs-
 interior pattern — with population sustained.
 
+**CATCHMENT CEILING BUILT + TESTED (`enable_catchment_ceiling`, default-OFF, bit-exact).** Total settled-cell food
+capped at `catchment_ceiling_mult · Σ(sustainable cell yield over catchment)` — a village can't out-produce its land
+(the resource ceiling R-54 flagged). **Result: STOPS the runaway** (pop 22406→3391 stable; villages med 3832→~450;
+occ_max 3514→~390). ✓ **But two things remain, and they REFRAME the problem:**
+1. **Villages sit AT the ceiling (~450, 3× Bar-Yosef), and stratification COLLAPSED to ~2%** — because a village at its
+   food ceiling has per-capita = subsistence, i.e. NO surplus (surplus needs population BELOW the food max; Testart/
+   Hayden). The ceiling that stops runaway also removes the surplus that drives stratification.
+2. **Scalar stress does NOT cap settlement size** — `repulsion_gain` 0.3→1.0→2.0 left villages ~417–511 (the movement
+   pins agents onto the settlement SITE via the residence pin; `size_repulsion` acts on BAND fission, a different
+   quantity). So the assumed "cost that bites at 50–150" isn't wired to settlement occupancy.
+
+**HONEST STATE (5 relocations of the lever this thread — consolidating):** the CLEANEST emergent village size (median
+88, 100% in 50–150) is the **agglomeration-OFF** result (R-63 table) — the catchment alone sizes villages correctly;
+the point-superlinear premium is the inflator, and even bounded by the ceiling it pulls villages up to the catchment
+capacity (~450). So the real fork is: **(A)** drop the agglomeration social-returns for villages (option 2) — villages
+= ~88, and surplus/stratification comes from the resource **tier-2** on rich (aquatic/arable) catchments only (forest
+villages small egalitarian — the realistic NW-Coast-vs-interior split); **(B)** keep agglomeration but the ceiling must
+be sized to the ETHNOGRAPHIC foraging radius (~5 km ≈ radius 0–1, Vita-Finzi & Higgs), not a 900 km² radius-1
+catchment, so the ceiling itself is ~50–150; **AND** wire a real cost (or the tier-2 surplus gap) so villages sit
+BELOW the ceiling → surplus → stratification. This is a genuine open design choice, not a knob-tune.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

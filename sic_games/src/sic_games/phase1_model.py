@@ -771,6 +771,20 @@ class TerrainWorld(mesa.Model):
                 tot += sp[(sy + dy) % N, (sx + dx) % N]
         return self._demog.settle_tier2_yield * tot
 
+    def _settlement_carrying_capacity(self, site: tuple[int, int]) -> float:
+        """R-63 resource ceiling: the sustainable food a settlement's CATCHMENT can yield = Σ of the harvest field's
+        cell yield over the catchment. A village's total food (forage + tier-2 + agglomeration) is capped at this — it
+        cannot out-produce its land. Cached per step (the field is set_step'd)."""
+        tf = self._harvest_field
+        rad = self._demog.settle_catchment_radius
+        sx, sy = site
+        tot = 0.0
+        W = getattr(tf, "width", N); H = getattr(tf, "height", N)
+        for dy in range(-rad, rad + 1):
+            for dx in range(-rad, rad + 1):
+                tot += tf.level((sx + dx) % W, (sy + dy) % H)
+        return self._demog.catchment_ceiling_mult * tot
+
     def _maintain_settlements(self) -> None:
         """Aggregation-sedentism lifecycle: an active settlement PERSISTS while ≥ settle_min_pool people are within
         settle_radius of its site (membership is emergent proximity — robust to band fission/fusion); otherwise its
@@ -1164,6 +1178,7 @@ class TerrainWorld(mesa.Model):
         # children are provisioned, not self-extracting) → it doesn't dilute the mother's cell; its subsistence
         # comes from the (now larger) provision pool + the band-pooled meat. Adults keep foraging normally.
         excl_on = fam_move and getattr(self._demog, "comove_provision_exclude", False)
+        ceiling_on = settle_on and getattr(self._demog, "enable_catchment_ceiling", False)   # R-63 resource ceiling
 
         def _forage_excl(occ_c, total, kap, mask):
             """Split `total` (κ=kap) among NON-excluded occupants only; excluded get 0. Redistributes the
@@ -1197,6 +1212,8 @@ class TerrainWorld(mesa.Model):
                 else:
                     na = no ** aggl_a
                     S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))  # catchment R·L(n) (falsified)
+            if ceiling_on and settle_on and (cx, cy) in self._settlement_sites:
+                S = min(S, self._settlement_carrying_capacity((cx, cy)))         # R-63: a village can't out-produce its catchment
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
