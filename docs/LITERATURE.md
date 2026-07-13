@@ -971,3 +971,36 @@ arithmetic re-checked; PDF not filed). Anchor: Table 2 midpoints.**
   is a CONSERVATIVE capped max (severe malnutrition 5–8×; child data applied broadly). Plausible, provisional.
 - **Siler / Aché** mortality (a1..b3), **Tallavaara 2018** capacity, **Miami NPP (Lieth)**, **Köppen/Körner** tree-line
   — all filed above; unchanged by this audit.
+
+---
+
+## Emergent settlement-hierarchy anchors (village/connubium/fertility mechanisms; 2026-07-08…09)
+
+Anchors for the R-58…R-64 settlement-hierarchy mechanisms (PARAMETERS §21; VERIFICATION_LOG for dates). Johnson 1982
+(scalar stress), Vita-Finzi & Higgs (site catchment), Testart 1982 (storage), Wobst (connubium 500), Binford packing,
+Tallavaara capacity are all filed ABOVE — these are the ones new this session.
+
+### Wiessner, P. (1977). "Hxaro: A regional system of reciprocity for reducing risk among the !Kung San." PhD diss., Univ. Michigan. (& Wiessner 1982, in *Politics and History in Band Societies*.)
+**What was lifted — SOCIAL CAPITAL / STANDING (P6, `enable_standing`):** `hxaro` gift-exchange partnerships require
+**≥ 1 year of reciprocal gifting before the bond is "firm"**; each person sits in a network of paths, and **that
+network is the bad-year insurance** (risk pooled across the region). Status is relational and slow-built. **How used:**
+standing = a tenure-built relational facet of `base_status` (accrues ~63%/yr, `standing_tenure_rate=0.083`) that is
+largely LOST on leaving one's community (`standing_leave_penalty`) — so departure forfeits food share, granary draw,
+and mating access. Drives SELECTIVE dispersal (low-standing leave, established stay). **Status: SEARCH-VERIFIED (PDF
+not filed). Anchor: ~1 yr to "firm".**
+
+### Bocquet-Appel, J.-P. (2011). "When the world's population took off: the springboard of the Neolithic Demographic Transition." *Science* 333:560–561.
+**What was lifted — the NEOLITHIC DEMOGRAPHIC TRANSITION (`enable_sedentism_fertility`):** the shift to sedentism/
+farming **roughly DOUBLED the birth rate** (the best-documented prehistoric demographic transition), via shorter birth
+spacing. **How used:** society-dependent lactational refractory (`SEDENTISM_IBI_MONTHS`: egalitarian 30 → complex 22 →
+stratified 14 mo ⇒ ~1.8× birth rate at the stratified end). **Status: SEARCH-VERIFIED (abstract; PDF not filed).
+Anchor: ~2× birth-rate rise.**
+
+### Sellen, D.W. & Mace, R. (1999/2007). "Fertility and mode of subsistence: a phylogenetic analysis." *Current Anthropology* 40:483 (& related weaning-age work).
+**What was lifted — the MECHANISM of the NDT fertility rise:** cross-cultural, higher dependence on agriculture
+associates with **shorter birth intervals / earlier weaning** (storable weaning foods → shorter lactational
+amenorrhea) — the proximate driver behind Bocquet-Appel's transition. **How used:** the direction + magnitude of the
+`SEDENTISM_IBI_MONTHS` ladder (mobile foragers ~44 mo / !Kung Howell → farming ~24 mo). **Status: SEARCH-VERIFIED (PDF
+not filed).**
+
+### Cahill / Bar-Yosef / Cordain / Köppen-Körner — filed under "Pre-run audit anchors" (above).

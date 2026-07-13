@@ -23,6 +23,11 @@ not exact) · **PROVISIONAL** (design/uncalibrated) · **BUG→FIXED** · **OPEN
 | Siler a1..b3 (Aché forest) | a1 0.157, b1 0.721, a2 0.013, a3 4.80e-5, b3 0.103 | Gurven & Kaplan 2007 — **Table 2** (Aché forest) | pdfplumber extract + PDF spot-check (per LITERATURE.md) | 2026-06-18 (prior) | CONFIRMED |
 | Miami NPP(T,P) coeffs | eqs (12-1)/(12-2) | Lieth 1975 *Modeling the Primary Productivity of the World* — **p. 9, eqs 12-1 & 12-2** | PDF filed + spot-check | 2026-07-03 (prior) | CONFIRMED |
 | Tallavaara NPP→density | segmented regression | Tallavaara et al. 2018 *PNAS* — regression + SI (Dataset_4) | fitted + validated (R-36) | 2026-07-02 (prior) | CONFIRMED |
+| Johnson scalar stress + society dissipation | `size_repulsion` shape + REPULSION_SOCIETY_FACTOR | Johnson 1982 (PDF filed) — org structure ABSORBS scalar stress; hierarchy relieves size penalty | PDF read | 2026-07-09 | CONFIRMED (shape; midpoint bracketed) |
+| `settlement_ss_midpoint` (village fission) | 150 | Bar-Yosef 1998 — egalitarian-village upper bound (medium settlement) | secondary | 2026-07-09 | ANCHORED |
+| Standing / hxaro (`standing_tenure_rate`) | 0.083 (~1 yr to firm) | Wiessner 1977 *Hxaro* diss. — ≥1 yr reciprocal exchange to "firm" | WebSearch (PDF not filed) | 2026-07-09 | ANCHORED |
+| Sedentism IBI / NDT | 30/22/14 mo (~2× birth rate) | Bocquet-Appel 2011 *Science* 333:560; Sellen & Mace 2007 (weaning×subsistence); Howell !Kung 44 mo | WebSearch (PDFs not filed) | 2026-07-09 | ANCHORED |
+| Vita-Finzi & Higgs site-catchment | ~5 km forager reach | Vita-Finzi & Higgs 1970 (filed above) | prior | 2026-07-09 | CONFIRMED (radius calibration OPEN) |
 
 **OPEN (not yet primary-verified; used in run A/A2/A3):** `fecundability=0.12` [FREE], `ibi_refractory=30` [FREE],
 `SEDENTISM_IBI` 30/22/14 (anchored to Howell/Sellen-Mace/Bocquet-Appel — **exact page/table OPEN**), return-rate

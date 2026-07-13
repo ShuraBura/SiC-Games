@@ -564,5 +564,77 @@ All default-OFF/opt-in; the canonical "everything on" preset is `emergent_villag
 
 ---
 
+---
+
+## §21 — Emergent settlement hierarchy (2026-07-08…09; RESULTS R-58…R-64; branches `emergent-band-size` → `dynamics-fix` → `payoff-anchors`, local-only, ALL opt-in default-OFF/bit-exact)
+
+The complete emergent chain (each rung a prediction from a mechanism, lit-anchored): band ≈24 (risk-pooling) →
+connubium ≈500 (mate-availability) → village 50–150 (catchment vs Johnson scalar stress) → stratified centers (surplus
+→ hierarchy). Verification dates + exact source locations: `VERIFICATION_LOG.md`.
+
+### §21.1 — Emergent band size v3 (`enable_emergent_band_size`; R-…; SiC_Games_EmergentBandSize_Blueprint.md)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_emergent_band_size | False | opt-in | risk-pooling optimum g\*(CV)=clamp((CV/cv_safe)²,min,split) drives BOTH fission ceiling AND movement aggregation |
+| cv_safe | **0.14** | DESIGN | the connubium's `cv_safe` analog — safety margin on return CV; sweeps the tail |
+| band_size_min | **15** | ANCHORED | Hill 2011 min observed co-residential group (social floor) |
+| cv_min | **0.4** | DESIGN | CV floor (grass/mountain 10%-default SD data gap) |
+
+### §21.2 — Neutral-marker genome (`enable_genome`; genome.py; population genetics diagnostic)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_genome | False | opt-in | haploid infinite-allele; relatedness=shared-allele frac (parent-child≈0.5 verified) |
+| genome_loci | **32** | DESIGN | relatedness resolution ~1/L |
+| genome_mutation | **0.0** | DESIGN | 0 = pure drift / infinite-allele |
+
+### §21.3 — Connubium / exogamy (`enable_exogamy`; SiC_Games_Connubium_Blueprint.md; Cut 1/2)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_exogamy | False | opt-in | reject sibling/half-sib (shared `_mother`/`_father`), patriclan (`_lineage`), or genome cousin |
+| exogamy_degree | "lineage" | DESIGN | {nuclear \| lineage \| cousin} — the taboo-stringency lever |
+| exogamy_relatedness | **0.125** | DESIGN | r\* first-cousin threshold (cousin degree; needs genome) |
+| mate_search_min_eligible (m\*) | **3** | DESIGN | famine-safety margin; N\* ≈ m\*/(½·b·ℓ·τ·c·(1−k)) ≈ 300–600 bracket (Wobst 475) |
+| enable_adaptive_connubium | False | opt-in | per-seeker expanding ring search to m\* eligible (replaces fixed aggregation_radius) |
+| mate_search_max_radius | **15** | DESIGN | ~150 km marriage-travel cap |
+
+### §21.4 — Sedentism fertility / Neolithic Demographic Transition (`enable_sedentism_fertility`)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_sedentism_fertility | False | opt-in | society-dependent lactational refractory (multiplies with energetic_fertility) |
+| SEDENTISM_IBI_MONTHS egalitarian | **30** | ANCHORED | ~effective 37 mo (mobile forager; between !Kung 44 & farming 24) |
+| SEDENTISM_IBI_MONTHS complex | **22** | ANCHORED | Sellen & Mace 2007 (weaning×subsistence) |
+| SEDENTISM_IBI_MONTHS stratified | **14** | ANCHORED | ~1.8× birth rate = NDT signature (Bocquet-Appel 2011) |
+
+### §21.5 — Landscape packing (`enable_landscape_packing`; R-61 fix)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_landscape_packing | False | opt-in | morph "packed" test = LANDSCAPE density (agents on band's cells / area) vs Binford 0.091, not band-members/footprint. Fires stratification 0%→15% on the plain realistic world |
+
+### §21.6 — Village payoff anchors (`payoff-anchors` branch)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_standing (P6) | False | opt-in | relational social capital, 3rd `base_status` facet; tenure-built, lost on leaving (Wiessner 1977 hxaro). Gives selective dispersal; can't anchor alone (relative weight cancels on empty cell) |
+| standing_tenure_rate | **0.083** | ANCHORED | 1/12 ⇒ ~63% after 1 yr (Wiessner "≥1 yr to firm") |
+| standing_leave_penalty | **0.4** | DESIGN | fraction of standing RETAINED on leaving |
+| standing_floor | **0.15** | DESIGN | newcomer baseline (kin/lineage reputation travels) |
+| enable_store_anchor (P1) | False | opt-in | band's COLLECTIVE granary, valued only on own cells (stranger has no claim); Testart delayed-return |
+| store_anchor_gain | **1.0** | DESIGN | weight on perceived per-capita stored buffer |
+| store_anchor_horizon | **24.0** | DESIGN | steps to amortise the stock (~2 yr) |
+
+### §21.7 — Village economy: catchment ceiling + settlement scalar stress (R-63/R-64 — the emergent village-size mechanism)
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| enable_catchment_ceiling | False | opt-in | settled-cell food capped at Σ(sustainable yield over catchment) — a village can't out-produce its land (Bettencourt subsistence ceiling; R-54). Stops the unbounded `n^1.15` runaway |
+| catchment_ceiling_mult | **1.0** | DESIGN | 1.0 = the land's own capacity |
+| enable_settlement_scalar_stress | False | opt-in | over-crowded settlement repels residence-pin agents, prob=`size_repulsion(village_pop, midpoint, society)` (Johnson 1982, dissipated by REPULSION_SOCIETY_FACTOR). **The village-size cap** |
+| settlement_ss_gain | **1.0** | DESIGN | max repel prob for an egalitarian over-crowded village |
+| settlement_ss_midpoint | **150.0** | ANCHORED | Bar-Yosef egalitarian-village upper bound; village fissions ~here unless stratified |
+| settlement_ss_width | **50.0** | DESIGN | Alberti 2014 logistic width |
+
+**R-64 result (2000 steps, all-on):** village median ~100, p90 ~154, **77% in Bar-Yosef 50–150**, bounded stratified
+tail ~240, stratification sustained 9–16%, population plateaus ~7200 — STABLE, no runaway. See RESULTS R-64.
+
+---
+
 *PARAMETERS.md extracted 2026-06-08. Supersedes interim locked-param tables in `sic_games/CLAUDE.md`
 and `docs/ROADMAP.md`. Maintained by Code; updated any time a parameter is locked, swept, or retired.*

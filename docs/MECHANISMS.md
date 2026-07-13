@@ -582,4 +582,39 @@ band; Wiessner hxaro).
 
 ---
 
+## 17. Emergent settlement hierarchy (2026-07-08…09; R-58…R-64; all opt-in default-OFF/bit-exact; params PARAMETERS §21)
+
+The settlement hierarchy is EMERGENT — each rung a prediction of a mechanism (not a hardcoded size), lit-anchored:
+
+- **17.1 Emergent band size v3** (`enable_emergent_band_size`) — risk-pooling optimum `g*(CV)=clamp((CV/cv_safe)²,
+  band_size_min, split)` drives BOTH the fission ceiling AND the movement group-safety aggregation, so bands GROW with
+  return variance. Predicts mean ~25 + environmental variation. `_band_optimum_field()`.
+- **17.2 Neutral genome** (`enable_genome`, `genome.py`) — haploid infinite-allele markers; founder-seeded, Mendelian
+  ½/½ inherit at birth. relatedness = shared-allele fraction (parent-child ≈0.5). Diagnostic: `world.genetics()`
+  (heterozygosity/Nₑ, mean relatedness). NOT the marriage rule.
+- **17.3 Connubium / exogamy** (`enable_exogamy`, `enable_adaptive_connubium`) — real kin/clan prohibition in
+  `_pair_from_pool`/`_do_connubium`: reject shared-parent siblings, same-`_lineage` patriclan, or genome cousins. The
+  ~500 mating network emerges from mate-availability under the taboo (Wobst); `world.connubium()`.
+- **17.4 Sedentism fertility / NDT** (`enable_sedentism_fertility`) — society-dependent lactational refractory
+  (`SEDENTISM_IBI_MONTHS` 30/22/14) → ~2× birth rate with sedentism (Bocquet-Appel/Sellen-Mace). Multiplies with
+  `energetic_fertility` (nutritional-stress suppression stays on top).
+- **17.5 Landscape packing** (`enable_landscape_packing`) — the morph "packed" test uses LANDSCAPE population density
+  (agents on the band's cells / area) vs Binford 0.091, not band-members/footprint (which never reaches it). Fires
+  stratification on realistic worlds (R-61).
+- **17.6 Village payoff anchors** — `enable_standing` (P6: relational social capital, a 3rd `base_status` facet,
+  tenure-built/lost-on-leaving, Wiessner hxaro; `_update_standing()`); `enable_store_anchor` (P1: the band's collective
+  granary valued only on its own cells, Testart delayed-return).
+- **17.7 Village economy = the emergent village-size mechanism (R-63/R-64):**
+  - `enable_catchment_ceiling` — settled-cell food capped at Σ(sustainable yield over the catchment): a village can't
+    out-produce its land (the Bettencourt subsistence ceiling R-54 flagged). Stops the unbounded `n^1.15` agglomeration
+    runaway. `_settlement_carrying_capacity()`.
+  - `enable_settlement_scalar_stress` — an over-crowded settlement REPELS residence-pin agents with prob
+    `size_repulsion(village_pop, midpoint=150, society)` (Johnson 1982, dissipated by `REPULSION_SOCIETY_FACTOR`).
+    Egalitarian villages fission ~150; stratified (hierarchy absorbs the stress) grow into a larger-center tail.
+  - **The closed loop:** scalar stress caps egalitarian village ~150 → ceiling leaves surplus → surplus morphs to
+    hierarchy → hierarchy weakens the stress → grows toward the ceiling. R-64: village median ~100, 77% in Bar-Yosef
+    50–150, stratification sustained 9–16%, stable over 2000 steps.
+
+---
+
 *End of MECHANISMS.md — split from MODEL_SPEC v0.2 on 2026-06-06. The world/resource substrate (§9), architecture principle, decision-log, seams, and known-gaps ledger are in `ARCHITECTURE.md`.*
