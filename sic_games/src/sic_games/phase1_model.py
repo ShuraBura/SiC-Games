@@ -45,6 +45,7 @@ deterministic founder-cluster layout instead of random land sampling.
 from __future__ import annotations
 
 import math
+import random
 from collections import Counter
 
 import mesa
@@ -67,6 +68,21 @@ from sic_games.terrain import N, WorldFields, generate_world
 from sic_games.terrain_field import TerrainField
 
 _CELL_KM2 = 100.0   # CC-1: each cell = 100 km² (local density = cell occupancy / _CELL_KM2)
+
+# Campaign genealogy CSV schema (enriched, append-only pure observer). x,y = event cell; rs facets = parity
+# (female lifetime births) / n_fathered (male); society = the band's morph at the event.
+GENEA_HEADER = ["step", "event", "uid", "mother_uid", "father_uid", "lineage", "band_id", "cred", "prowess",
+                "wealth", "sex", "age", "parity", "n_fathered", "x", "y", "society"]
+
+
+def _gini(xs) -> float:
+    """Gini coefficient of a non-negative sequence (0 = even, →1 = concentrated). <2 items or zero-sum ⇒ 0."""
+    import numpy as np
+    a = np.sort(np.asarray([v for v in xs if v is not None], dtype=float))
+    n = a.size
+    if n < 2 or a.sum() <= 0:
+        return 0.0
+    return float((2.0 * np.sum(np.arange(1, n + 1) * a)) / (n * a.sum()) - (n + 1.0) / n)
 
 
 def allocate_store_draw(weights: list[float], deficits: list[float], store: float) -> list[float]:
@@ -265,6 +281,8 @@ class TerrainWorld(mesa.Model):
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
+        self._claim_events_this_step: int = 0                  # instability diagnostic: defensibility contest events this step
+        self._diag_rng = random.Random(1_234_567)              # dedicated RNG for read-outs ⇒ diagnostics never perturb self.random
         self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
         self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
@@ -455,6 +473,7 @@ class TerrainWorld(mesa.Model):
         self.prov_young_maternal = 0.0   # diagnostic: kcal provisioned to <3-yr children by mother (Marlowe calib)
         self.prov_young_paternal = 0.0   # diagnostic: "" by father (male share = paternal/(maternal+paternal))
         self.mate_pairs_this_step: list[tuple[float, float]] = []   # (mother status, father status) — assortment
+        self._claim_events_this_step = 0             # instability diagnostic: reset the defensibility-contest flow
 
         if self._rivalrous:
             self._step_rivalrous()
@@ -538,6 +557,7 @@ class TerrainWorld(mesa.Model):
                 strength += 1; who = holder
             elif holder is not None:            # a challenger erodes the accrued claim, then takes it over
                 strength -= 1
+                self._claim_events_this_step += 1   # instability: an active contest over a defensible cell
                 if strength <= 0:
                     strength, who = 1, holder
             else:                               # nobody qualifies → decay
@@ -1572,29 +1592,52 @@ class TerrainWorld(mesa.Model):
             self._band_starv_this_step[bid] = self._band_starv_this_step.get(bid, 0) + 1
 
     def _log_genea(self, event: str, a) -> None:
-        """Stage 2 genealogy logger (pure observer): append one (step, event, uid, mother, father, lineage,
-        band_id, cred) record. `event` ∈ {'birth','death'}. Missing parents → uid −1. No RNG, no read-back."""
+        """Genealogy logger (pure observer): append one GENEA_HEADER-schema record per birth/death — parentage,
+        lineage/band, status (cred + prowess), wealth, sex/age, COMPLETED reproductive success (parity / n_fathered),
+        cell, and band society. `event` ∈ {'birth','death'}. Missing parents → uid −1. No RNG, no read-back — so
+        DEATH rows carry each agent's completed life-history (the RS/dynasty substrate for offline analysis)."""
         if self._genealogy_log is None:
             return
+        g = getattr(a, "_group", None)
+        bid = getattr(g, "band_id", None) if g is not None else None
         self._genealogy_log.append((
             self.step_count, event, a.unique_id,
             getattr(getattr(a, "_mother", None), "unique_id", -1),
             getattr(getattr(a, "_father", None), "unique_id", -1),
-            getattr(a, "_lineage", None),
-            getattr(getattr(a, "_group", None), "band_id", None),
-            round(getattr(a, "cred", 0.0), 4),
+            getattr(a, "_lineage", None), bid,
+            round(getattr(a, "cred", 0.0), 4), round(getattr(a, "prowess", 1.0), 4),
+            round(getattr(a, "wealth", 0.0), 1), getattr(a, "sex", ""), int(getattr(a, "age", 0)),
+            int(getattr(a, "parity", 0)), int(getattr(a, "_n_fathered", 0)),
+            a.pos[0], a.pos[1], self._band_society.get(bid, "") if bid is not None else "",
         ))
 
     def dump_genealogy(self, path: str) -> int:
-        """Write the genealogy buffer to a CSV (offline analysis substrate). Returns the record count."""
+        """Write the whole genealogy buffer to a CSV, OVERWRITING (offline analysis substrate; short runs/tests).
+        For long campaigns use flush_genealogy() to append+clear and keep memory bounded. Returns record count."""
         if not self._genealogy_log:
             return 0
         import csv
         with open(path, "w", newline="", encoding="utf-8") as f:
             wr = csv.writer(f)
-            wr.writerow(["step", "event", "uid", "mother_uid", "father_uid", "lineage", "band_id", "cred"])
+            wr.writerow(GENEA_HEADER)
             wr.writerows(self._genealogy_log)
         return len(self._genealogy_log)
+
+    def flush_genealogy(self, path: str) -> int:
+        """APPEND the buffered genealogy rows to `path` and CLEAR the buffer — bounded memory for long campaigns
+        (call every N steps). Writes the header once, when the file is first created. Returns rows flushed."""
+        if not self._genealogy_log:
+            return 0
+        import csv, os
+        new = not os.path.exists(path)
+        with open(path, "a", newline="", encoding="utf-8") as f:
+            wr = csv.writer(f)
+            if new:
+                wr.writerow(GENEA_HEADER)
+            wr.writerows(self._genealogy_log)
+        n = len(self._genealogy_log)
+        self._genealogy_log.clear()
+        return n
 
     def _step_agent(self, agent: BaseAgent) -> None:
         tf = self.terrain_field
@@ -1849,7 +1892,7 @@ class TerrainWorld(mesa.Model):
             return {}
         return dict(n_with_genome=len(gs),
                     heterozygosity=expected_heterozygosity(gs),
-                    mean_relatedness=mean_pairwise_relatedness(gs, self.random, sample_pairs))
+                    mean_relatedness=mean_pairwise_relatedness(gs, self._diag_rng, sample_pairs))
 
     def bands(self, radius: int | None = None) -> list[list]:
         """Public band identifier (F.2 diagnostics): the live population partitioned into spatially-connected
@@ -1895,6 +1938,80 @@ class TerrainWorld(mesa.Model):
         for a in self.agent_list:
             members.setdefault(a._group.band_id, []).append(a)
         return {bid: max(ms, key=lambda a: a.cred * getattr(a, "prowess", 1.0)) for bid, ms in members.items()}
+
+    def dynasties(self, top: int = 15, sample_pairs: int = 400) -> dict:
+        """Lineage/dynasty read-out (campaign — Turchin elite layer). Groups the live population by patriline
+        `_lineage`. Aggregate: n_lineages; top_share (largest lineage ÷ pop); size_gini (dynastic concentration);
+        eff_lineages (inverse-Simpson Hill number — the effective count of co-existing lineages, falls as dynasties
+        consolidate). Per top-`top` lineage: size, mean cred/prowess/wealth, mean COMPLETED reproductive success
+        (female parity / male n_fathered), and — with genome on — within-lineage mean relatedness (the genetic
+        signature of a dynasty). Pure observer (uses the diagnostic RNG ⇒ never perturbs the model stream)."""
+        import numpy as np
+        al = self.agent_list
+        if not al:
+            return {}
+        groups: dict = {}
+        for a in al:
+            groups.setdefault(getattr(a, "_lineage", None), []).append(a)
+        pop = len(al)
+        sizes = sorted((len(v) for v in groups.values()), reverse=True)
+        p = np.asarray(sizes, dtype=float) / pop
+        eff = float(1.0 / np.sum(p * p))
+        from sic_games.genome import mean_pairwise_relatedness
+        rows = []
+        for lin, ms in sorted(groups.items(), key=lambda kv: len(kv[1]), reverse=True)[:top]:
+            gs = [a._genome for a in ms if getattr(a, "_genome", None) is not None]
+            rows.append(dict(
+                lineage=lin, n=len(ms),
+                cred=round(float(np.mean([getattr(a, "cred", 1.0) for a in ms])), 3),
+                prowess=round(float(np.mean([getattr(a, "prowess", 1.0) for a in ms])), 3),
+                wealth=round(float(np.mean([getattr(a, "wealth", 0.0) for a in ms])), 1),
+                rs=round(float(np.mean([getattr(a, "parity", 0) if a.sex == "female"
+                                        else getattr(a, "_n_fathered", 0) for a in ms])), 2),
+                relatedness=(round(mean_pairwise_relatedness(gs, self._diag_rng, sample_pairs), 3)
+                             if len(gs) >= 2 else None)))
+        return dict(n_lineages=len(groups), top_share=round(sizes[0] / pop, 3),
+                    size_gini=round(_gini(sizes), 3), eff_lineages=round(eff, 1), top=rows)
+
+    def settlements(self) -> dict:
+        """Per-settlement panel (campaign — urban hierarchy + lifespans). For each maintained settlement site with
+        live occupants: count, society (dominant band's morph), catchment yield, mean cred, dominant lineage.
+        Aggregate rank-size: primate_ratio (largest ÷ 2nd), zipf_slope (OLS of ln size vs ln rank; ≈ −1 = Zipf),
+        median/max. Pure observer."""
+        import numpy as np
+        sites = set(self._settlement_sites)
+        if not sites:
+            return {}
+        occ_by_site: dict = {}
+        for a in self.agent_list:
+            if a.pos in sites:
+                occ_by_site.setdefault(a.pos, []).append(a)
+        panel = []
+        for s, ms in occ_by_site.items():
+            bids = Counter(a._group.band_id for a in ms)
+            lins = Counter(getattr(a, "_lineage", None) for a in ms)
+            panel.append(dict(pos=s, n=len(ms),
+                              society=self._band_society.get(bids.most_common(1)[0][0], "egalitarian_forager"),
+                              catchment=round(self._settlement_catchment_yield(s), 1),
+                              cred=round(float(np.mean([getattr(a, "cred", 1.0) for a in ms])), 3),
+                              dom_lineage=lins.most_common(1)[0][0]))
+        if not panel:
+            return {}
+        sizes = sorted((q["n"] for q in panel), reverse=True)
+        primate = round(sizes[0] / sizes[1], 2) if len(sizes) > 1 else None
+        zipf = (float(np.polyfit(np.log(np.arange(1, len(sizes) + 1)), np.log(np.asarray(sizes, float)), 1)[0])
+                if len(sizes) >= 3 else None)
+        return dict(n=len(panel), median=int(np.median(sizes)), max=sizes[0], primate_ratio=primate,
+                    zipf_slope=round(zipf, 2) if zipf is not None else None,
+                    panel=sorted(panel, key=lambda q: q["n"], reverse=True))
+
+    def instability(self) -> dict:
+        """Sociopolitical-instability read-out (campaign). Economic-defensibility (Dyson-Hudson & Smith 1978)
+        contest activity: claim_events = challenger-erosion events over defensible cells THIS step (the instability
+        FLOW); n_owned = cells currently under a standing ownership claim; n_claims = active (incl. contested)
+        claims. A proxy for Turchin's instability variable, grounded in the defensibility mechanism. Pure observer."""
+        return dict(claim_events=self._claim_events_this_step,
+                    n_owned=len(self._cell_owner), n_claims=len(self._cell_claim))
 
     def _family_head(self, a) -> "BaseAgent | None":
         """F.3b nuclear-family movement: the agent's MOVEMENT ANCHOR, or None if it moves independently. A dependent

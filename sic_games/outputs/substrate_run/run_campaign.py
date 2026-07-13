@@ -1,0 +1,207 @@
+"""SiC Games — deep-time CAMPAIGN harness (endogenous secular dynamics + full Turchin-layer instrumentation).
+
+Grows one diverse temperate world for a long horizon on the VALIDATED R-64 settlement substrate (band→village→
+stratified centres), with climate seasonal but NO regime forcing, so anything cyclic is ENDOGENOUS. Unlike
+run_substrate_A (population/stratification/genetics only), this captures the full diagnostic surface so a single
+long run answers the elite/dynasty, settlement-hierarchy, mating-network, and instability questions in one pass:
+
+  TRAJECTORY (per C_LOGEVERY steps, JSON checkpoint):
+    demography     pop, births, starv-deaths, mean-reserve, juvenile fraction, mean age
+    structure      band/village size dist, %complex/%stratified, gini(cred)/gini(wealth), surplus, assabiyah
+    ELITE/DYNASTY  n_lineages, top_share, size_gini, eff_lineages (inverse-Simpson), dominant-dynasty RS +
+                   within-dynasty relatedness (genetic signature); male reproductive-skew gini (overproduction)
+    SETTLEMENT     n settlements, median/max size, primate_ratio, zipf_slope (rank-size / urban hierarchy)
+    MATING         connubium reach (median/p90 → Wobst ~475)
+    INSTABILITY    defensibility claim_events (contest flow), cells owned  [Dyson-Hudson & Smith 1978]
+    LEADERSHIP     band-leader identity turnover between snapshots
+    GENETICS       heterozygosity + mean relatedness (N_e signal; computed offline from H-decay)   [C_GENEVERY]
+
+  GENEALOGY (streamed to CSV, bounded memory): every birth/death as a GENEA_HEADER row (parentage, lineage/band,
+    status, wealth, sex/age, COMPLETED RS, cell, society) — the substrate for offline dynasty/RS/relatedness
+    reconstruction. Flushed + buffer-cleared every C_FLUSHEVERY steps.
+
+Run:  py -3 -u sic_games/outputs/substrate_run/run_campaign.py            (from repo root)
+Env:  C_FOUNDERS 3000 | C_STEPS 15000 | C_SEED 0 | C_LOGEVERY 25 | C_GENEVERY 200 | C_FLUSHEVERY 500
+      C_TERR coastal | C_CLIM temperate | C_TAG "" | C_GENOME 1
+"""
+import sys, os, time, json, statistics, subprocess
+from collections import Counter
+
+HERE = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(HERE, "..", "phase1_social_evolution"))
+sys.path.insert(0, os.path.join(HERE, "..", "biome_society_20260702"))
+from run_biome_society import BURN, X0, Y0, PATCH, GRP
+from run_se0_controlled_climate import emergent_village_demog
+from sic_games.config import KcalEconomyConfig, SubstrateConfig, CarbonConfig
+from sic_games.phase1_model import TerrainWorld
+from sic_games.terrain import generate_world, world_lottery_climate
+from sic_games.capacity import NPPCapacityField
+from sic_games.climate import ClimateField
+
+FOUNDERS  = int(os.environ.get("C_FOUNDERS", "3000"))
+STEPS     = int(os.environ.get("C_STEPS", "15000"))
+SEED      = int(os.environ.get("C_SEED", "0"))
+LOGEVERY  = int(os.environ.get("C_LOGEVERY", "25"))
+GENEVERY  = int(os.environ.get("C_GENEVERY", "200"))     # genome H/relatedness — O(N·L); sample less often
+FLUSHEVERY = int(os.environ.get("C_FLUSHEVERY", "500"))  # genealogy CSV flush cadence (bounded memory)
+TERR      = os.environ.get("C_TERR", "coastal")
+CLIM      = os.environ.get("C_CLIM", "temperate")
+TAG       = os.environ.get("C_TAG", "")
+GENOME    = os.environ.get("C_GENOME", "1") == "1"
+DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibility (Dyson-Hudson & Smith) → instability
+                                                          #   signal. NOT in the R-64 validation; toggle off to match it.
+BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
+
+PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
+OUT   = os.path.join(HERE, f"campaign_trajectory{TAG}.json")
+GENEA = os.path.join(HERE, f"campaign_genealogy{TAG}.csv")
+
+
+def gini(xs):
+    xs = sorted(v for v in xs if v is not None)
+    n = len(xs)
+    if n < 2:
+        return 0.0
+    s = sum(xs)
+    if s <= 0:
+        return 0.0
+    cum = sum((i + 1) * v for i, v in enumerate(xs))
+    return (2.0 * cum) / (n * s) - (n + 1.0) / n
+
+
+def society_of(a, w):
+    s = w._band_society.get(a._group.band_id)
+    if s is None:
+        s = w._cell_society.get(a.pos)
+    return s or "egalitarian_forager"
+
+
+def log(msg):
+    with open(PROG, "a", encoding="utf-8") as fh:
+        fh.write(msg + "\n"); fh.flush()
+    print(msg, flush=True)
+
+
+def snapshot(w, step, menarche, prev_leaders, last_con):
+    al = w.agent_list
+    pop = len(al)
+    sizes = Counter(a._group.band_id for a in al)
+    szv = list(sizes.values())
+    villages = [n for n in szv if n > BAND_SPLIT]
+    socs = Counter(society_of(a, w) for a in al)
+    cred = [getattr(a, "cred", 1.0) for a in al]
+    wealth = [a.wealth for a in al]
+    ages = [a.age for a in al]
+    # --- elite / dynasty layer -------------------------------------------------
+    dyn = w.dynasties(top=5)
+    top0 = dyn.get("top", [{}])[0] if dyn.get("top") else {}
+    male_rs = [getattr(a, "_n_fathered", 0) for a in al if a.sex == "male" and a.age >= menarche]
+    # --- settlement hierarchy --------------------------------------------------
+    st = w.settlements()
+    # --- mating network + instability + leadership -----------------------------
+    con = last_con                                    # most-recent non-empty gathering reach (seasonal → sampled every step)
+    ins = w.instability()
+    cur_leaders = {bid: ld.unique_id for bid, ld in w.band_leaders().items()}
+    common = set(cur_leaders) & set(prev_leaders)
+    leader_turnover = round(sum(1 for b in common if cur_leaders[b] != prev_leaders[b]) / len(common), 3) if common else 0.0
+    assab = list(w._band_assabiyah.values())
+    row = dict(
+        step=step, pop=pop, births=w.births_this_step, deaths_starv=w.deaths_starv_this_step,
+        mean_reserve=round(statistics.mean(wealth) / w._reserve_full, 3) if pop else 0,
+        juv_frac=round(sum(1 for x in ages if x < 180) / pop, 3) if pop else 0,   # <15 yr (dependency proxy)
+        mean_age_yr=round(statistics.mean(ages) / 12.0, 1) if pop else 0,
+        n_bands=len(sizes), band_med=statistics.median(szv) if szv else 0, band_max=max(szv) if szv else 0,
+        n_villages=len(villages), village_med=round(statistics.median(villages), 1) if villages else 0,
+        village_max=max(villages) if villages else 0,
+        pct_complex=round(100 * socs.get("complex_forager", 0) / pop, 1) if pop else 0,
+        pct_stratified=round(100 * socs.get("stratified_chiefdom", 0) / pop, 1) if pop else 0,
+        gini_cred=round(gini(cred), 3), gini_wealth=round(gini(wealth), 3),
+        surplus_med=round(statistics.median(list(w._band_surplus.values())), 3) if w._band_surplus else 0,
+        surplus_max=round(max(w._band_surplus.values()), 3) if w._band_surplus else 0,
+        assab_med=round(statistics.median(assab), 3) if assab else 0,
+        # elite / dynasty
+        n_lineages=dyn.get("n_lineages", 0), lin_top_share=dyn.get("top_share", 0),
+        lin_size_gini=dyn.get("size_gini", 0), eff_lineages=dyn.get("eff_lineages", 0),
+        dom_dyn_rs=top0.get("rs"), dom_dyn_related=top0.get("relatedness"),
+        male_rs_gini=round(gini(male_rs), 3),
+        # settlement hierarchy
+        n_settle=st.get("n", 0), settle_med=st.get("median", 0), settle_max=st.get("max", 0),
+        primate_ratio=st.get("primate_ratio"), zipf_slope=st.get("zipf_slope"),
+        # mating + instability + leadership
+        connubium_med=con.get("median"), connubium_p90=con.get("p90"),
+        claim_events=ins.get("claim_events", 0), cells_owned=ins.get("n_owned", 0),
+        leader_turnover=leader_turnover,
+    )
+    if step % GENEVERY == 0 and GENOME:
+        g = w.genetics(sample_pairs=1500)
+        row["heterozygosity"] = round(g.get("heterozygosity", 0.0), 4)
+        row["mean_relatedness"] = round(g.get("mean_relatedness", 0.0), 4)
+    return row, cur_leaders
+
+
+def main():
+    open(PROG, "w").close()
+    if os.path.exists(GENEA):
+        os.remove(GENEA)                                 # fresh genealogy stream per run
+    try:
+        sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"],
+                                      cwd=os.path.join(HERE, "..", "..", "..")).decode().strip()
+    except Exception:
+        sha = "?"
+    k = world_lottery_climate(SEED, terrain=TERR, climate=CLIM)
+    f = generate_world(k, mode="climate")
+    base = NPPCapacityField(f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
+    base0 = NPPCapacityField(f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
+    land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
+    cap = ClimateField(base, a_seas=0.4, regime_driver=None)      # seasonal, NO regime forcing (endogenous only)
+    pos = [land[i % len(land)] for i in range(FOUNDERS)]
+    demog = emergent_village_demog().model_copy(update=dict(
+        enable_landscape_packing=True, enable_sedentism_fertility=True,
+        enable_marriage_aggregation=True, enable_aggregation_sedentism=True,
+        enable_catchment_ceiling=True, enable_settlement_scalar_stress=True, settle_catchment_radius=1,
+        enable_economic_defensibility=DEFEND,
+        enable_exogamy=False, enable_genome=GENOME, genome_loci=48, enable_genealogy_log=True))
+    w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
+                     carbon_cfg=CarbonConfig(kappa=1.5),
+                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                   contest_exponent=1.5, move_cost_flat=0.0, **GRP),
+                     harvest_field=cap, placement_positions=pos, demography_cfg=demog)
+    menarche = demog.menarche_months
+    meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
+                habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
+                genome=GENOME, genea_csv=os.path.basename(GENEA))
+    log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
+        f"habitable={len(land)} genome={GENOME} genealogy=ON flush/{FLUSHEVERY}")
+    traj = []
+    prev_leaders: dict = {}
+    last_con: dict = {}
+    genea_rows = 0
+    t0 = time.time()
+    for step in range(1, STEPS + 1):
+        w.step()
+        if not w.agent_list:
+            log(f"[{step}] EXTINCT"); break
+        c = w.connubium()
+        if c:
+            last_con = c                                 # seasonal gathering fires every aggregation_period steps
+        if step % FLUSHEVERY == 0:
+            genea_rows += w.flush_genealogy(GENEA)       # append + clear buffer (bounded memory)
+        if step % LOGEVERY == 0 or step == 1:
+            row, prev_leaders = snapshot(w, step, menarche, prev_leaders, last_con)
+            traj.append(row)
+            with open(OUT, "w", encoding="utf-8") as fh:
+                json.dump(dict(meta=meta, traj=traj), fh)     # crash-safe trajectory checkpoint
+            el = time.time() - t0
+            eta = el / step * (STEPS - step)
+            log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} vil={row['n_villages']}"
+                f"(med{row['village_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
+                f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} mRSg={row['male_rs_gini']} "
+                f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
+                f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']} "
+                f"| {el/60:.1f}m eta{eta/60:.0f}m")
+    genea_rows += w.flush_genealogy(GENEA)               # final flush
+    log(f"DONE step={step} in {(time.time()-t0)/60:.1f} min -> {OUT} ; genealogy rows={genea_rows} -> {GENEA}")
+
+
+if __name__ == "__main__":
+    main()
