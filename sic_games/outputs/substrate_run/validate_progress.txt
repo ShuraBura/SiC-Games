@@ -1,0 +1,18 @@
+validate stratification prediction: 7 worlds × 2 seeds, 800 steps. Prediction: %strat rises with richness; stratified sites richer than egalitarian.
+  coastal  tropical  s0: npp=2312.0 aq=0.623 pop=5562 strat=9.9% village_med=69.0 strat_spot=0.802 egal_spot=0.802 | el=3.1m
+  coastal  tropical  s1: npp=2268.0 aq=0.698 pop=7283 strat=6.7% village_med=75.0 strat_spot=0.81 egal_spot=0.716 | el=6.9m
+  coastal  temperate s0: npp=1040.0 aq=0.747 pop=7151 strat=7.4% village_med=101 strat_spot=1.0 egal_spot=0.918 | el=10.4m
+  coastal  temperate s1: npp=1204.0 aq=0.623 pop=9005 strat=23.8% village_med=93 strat_spot=0.925 egal_spot=0.866 | el=14.3m
+  flat     tropical  s0: npp=2397.0 aq=0.499 pop=2579 strat=0.8% village_med=63 strat_spot=None egal_spot=0.68 | el=16.4m
+  flat     tropical  s1: npp=2384.0 aq=0.642 pop=2176 strat=2.1% village_med=61.0 strat_spot=None egal_spot=0.677 | el=18.4m
+  flat     temperate s0: npp=1198.0 aq=0.698 pop=8828 strat=7.1% village_med=106.5 strat_spot=0.891 egal_spot=0.841 | el=23.9m
+  flat     temperate s1: npp=1443.0 aq=0.416 pop=5778 strat=22.7% village_med=91.0 strat_spot=0.844 egal_spot=0.673 | el=27.0m
+  hilly    temperate s0: npp=1090.0 aq=0.344 pop=3699 strat=0.8% village_med=90.5 strat_spot=None egal_spot=0.646 | el=28.8m
+  hilly    temperate s1: npp=1188.0 aq=0.36 pop=6198 strat=23.1% village_med=98.0 strat_spot=0.974 egal_spot=0.723 | el=32.0m
+  flat     boreal    s0: npp=871.0 aq=0.232 pop=2840 strat=0.0% village_med=0 strat_spot=None egal_spot=None | el=33.1m
+  flat     boreal    s1: npp=802.0 aq=0.117 pop=1401 strat=0.0% village_med=0 strat_spot=None egal_spot=None | el=33.8m
+  hilly    boreal    s0: npp=670.0 aq=0.233 pop=1019 strat=73.8% village_med=72 strat_spot=1.0 egal_spot=None | el=34.4m
+  hilly    boreal    s1: npp=641.0 aq=0.166 pop=434 strat=0.0% village_med=0 strat_spot=None egal_spot=None | el=34.8m
+CROSS-WORLD: corr(mean_npp, %strat)=-0.28  corr(aquatic_frac, %strat)=-0.15  (prediction: POSITIVE)
+WITHIN-WORLD: stratified-site S_pot vs egalitarian: 0.892 vs 0.791 (6/7 worlds strat>egal; prediction: strat RICHER)
+DONE 34.8m -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\validate_results.json
