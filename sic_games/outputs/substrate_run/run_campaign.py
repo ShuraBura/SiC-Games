@@ -50,6 +50,8 @@ TAG       = os.environ.get("C_TAG", "")
 GENOME    = os.environ.get("C_GENOME", "1") == "1"
 DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibility (Dyson-Hudson & Smith) → instability
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
+CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
+MSTAR     = int(os.environ.get("C_MSTAR", "50"))         # Cut-2 mate-search pool m* (probe: m*=50 → median reach 496 ≈ Wobst)
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
@@ -155,12 +157,15 @@ def main():
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
     cap = ClimateField(base, a_seas=0.4, regime_driver=None)      # seasonal, NO regime forcing (endogenous only)
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
+    cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
         enable_landscape_packing=True, enable_sedentism_fertility=True,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True,
         enable_catchment_ceiling=True, enable_settlement_scalar_stress=True, settle_catchment_radius=1,
         enable_economic_defensibility=DEFEND,
-        enable_exogamy=False, enable_genome=GENOME, genome_loci=48, enable_genealogy_log=True))
+        enable_adaptive_connubium=cut2, mate_search_min_eligible=(MSTAR if cut2 else 3),
+        enable_exogamy=cut2, exogamy_degree="lineage",
+        enable_genome=GENOME, genome_loci=48, enable_genealogy_log=True))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -169,9 +174,11 @@ def main():
     menarche = demog.menarche_months
     meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
-                genome=GENOME, genea_csv=os.path.basename(GENEA))
+                genome=GENOME, genea_csv=os.path.basename(GENEA), connubium=CONNUBIUM,
+                m_star=(MSTAR if cut2 else 3), defend=DEFEND)
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
-        f"habitable={len(land)} genome={GENOME} genealogy=ON flush/{FLUSHEVERY}")
+        f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
+        f"defend={DEFEND} genome={GENOME} genealogy=ON flush/{FLUSHEVERY}")
     traj = []
     prev_leaders: dict = {}
     last_con: dict = {}
