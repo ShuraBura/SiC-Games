@@ -1070,6 +1070,18 @@ is the main amplifier"). OPEN FORK (supervisor to steer): (a) build the skew-pre
 (b) treat the overshoot-bust as a FEATURE — the Turchin-cycle seed — and chase it. Cut-2 remains default-OFF, NOT yet the
 substrate. Branch `connubium-cut2`. `m*` anchor retired from 50→(pending); mechanism refinement required before adoption.
 
+**[CYCLING TEST RESOLVED — Finding 4 is NEGATIVE, 2026-07-14]:** extended m*=25 to 45,000 steps (≈3,750 yr) × 2 seeds
+(genealogy off; `C_GENEA=0`). Both seeds are CONCORDANT and show a SINGLE founder-overshoot transient (peak 9.8k–11.8k
+@ ~year 170), then a flat noisy low plateau (~1,900–2,170, well below Cut-1's ~6,400 capacity) for the remaining ~43k
+steps — **no repeating boom-busts, NOT secular cycling.** The 15k-step "recovery" tail was just the plateau settling.
+Dynasties slowly RE-CONCENTRATE on the plateau (top-share drifts 0.02→0.3–0.4) but never fixate (eff ~3–5) and never
+cycle. **Conclusion: the Cut-2 overshoot-bust is a one-time transient, not the Turchin engine — the substrate (Cut-1 OR
+Cut-2) does NOT self-cycle. Secular cycles require the explicit elite/instability layer; no connubium tuning produces
+them.** The connubium arc is CLOSED: its scientific yield = (i) R-66's winner-take-all fixation was a mating-structure
+artifact; (ii) a realistic wide/exogamous connubium breaks it but flattens skew → destabilizes; (iii) the lit anchor was
+475→corrected to MVP ~150; (iv) no self-cycling. Next levers are ELSEWHERE: the explicit Turchin elite layer (for
+cycles) and the agriculture/claimable-cells expansion (for the agrarian stratification path).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
