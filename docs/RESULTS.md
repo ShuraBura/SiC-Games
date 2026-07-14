@@ -1015,4 +1015,61 @@ search may be needed to reach the ethnographic mating-network scale.
 
 ---
 
+## R-67 — The connubium is load-bearing for BOTH dynasty and demography: Cut-2 (adaptive exogamous mating) robustly BREAKS the winner-take-all fixation but flattens reproductive skew → Malthusian boom-bust at every reach; the lit anchor was wrong (475 → MVP ~150) but that is a correctness fix, NOT the bust fix (2026-07-13)
+
+**Why.** R-66's OFF arm fixated to a single patriline (top-share 0.89) under the fixed-radius Cut-1 gathering. Hypothesis:
+that fixation is a small-connubium DRIFT artifact; a Wobst-scale mating network should break it. Built + calibrated the
+adaptive connubium (Cut-2: each unpaired seeker expands a ring search to `m*` eligible non-kin males, patriclan exogamy),
+gave it its own settlement founding (`_found_settlements_by_occupancy`; the gathering path is bypassed), and ran the
+2×2 (Cut-1/Cut-2 × OFF/ON) plus an m* sweep. `run_campaign.py C_CONNUBIUM=cut2 C_MSTAR`.
+
+**Lit re-check (supervisor: "is 475 relevant, or band-of-25 specific?") — the anchor was WRONG.** Wobst 1974's Minimum
+Equilibrium Size = "persons in the intervening distance between two marriage partners" = a spatial mate-search REACH; his
+runs gave **MES 79–332** (the cited **175–475 is an EXTRAPOLATION** to 1–2 hex tiers), and it DEPENDS on density/
+arrangement (shrinks as residential units aggregate). The spatial-independent demographic floor is White 2017's **MVP
+~150** (40–150 by marriage rule; our monogamy+exogamy config → ~140–150). The 500 is Birdsell's separate, contested
+"dialectal tribe." So the connubium target is the **~150 floor with reach EMERGENT**, not a fixed 475. Our probe
+calibration (m*=50 → reach ~475) had anchored to the contested max-dispersal number. LITERATURE.md corrected.
+
+**The 2×2 + m* sweep (coastal-temperate, 15k steps, seed 0):**
+
+| arm | peak pop | end pop | top-share | eff-dyn | childless | RS-gini | stratification |
+|---|---|---|---|---|---|---|---|
+| Cut-1 OFF (R-66) | 7,914 | **6,403 glide** | **0.89** | 1.3 | 37% | 0.66 | 7% |
+| Cut-1 ON (R-66) | — | 7,206 glide | 0.45 | 3.3 | 37% | — | 14% |
+| Cut-2 OFF m*=50 (reach ~475) | 10,379 | 1,812 BUST | 0.31 | 5.0 | 28% | 0.61 | →0 |
+| Cut-2 ON m*=50 | 10,869 | 1,661 BUST | 0.25 | 5.6 | 28% | 0.61 | →0 |
+| Cut-2 OFF m*=25 (reach ~285) | 11,210 | 2,565 ↑recovering | 0.21 | 5.4 | 26% | 0.59 | →0 (10 vil back) |
+| Cut-2 OFF m*=15 (reach ~167) | **13,932** | 1,840 BUST | 0.215 | **8.7** | **23%** | **0.575** | →0 |
+
+**Finding 1 — Cut-2 robustly BREAKS the drift-fixation (the hypothesis holds).** Every Cut-2 arm collapses the
+winner-take-all: top-share 0.89 → 0.21–0.31, eff-lineages 1.3 → 5–9, and the birth-lineage drift is far slower
+(eff 239→79→30→8 vs Cut-1's 78→10→3.6→1.7). The exogamous outward search mixes patrilines regardless of reach. **R-66's
+single-dynasty outcome WAS a mating-structure artifact** — confirmed.
+
+**Finding 2 — but Cut-2 boom-busts at EVERY reach; the driver is reproductive-skew flattening, NOT reach width (my "wide
+net → scatter" hypothesis is REFUTED).** All three m* overshoot to 10–14k then crash to ~1,800; a reach of 167 (≈ Cut-1's
+own 146–181, which glided) busts as hard as 475. Mechanism: Cut-2 cuts childlessness 37% → 23–28% (fraction reproducing
+63% → ~75%), removing the reproductive-skew BRAKE that gave Cut-1 its smooth glide → Malthusian overshoot → starvation
+bust → de-sedentization (villages → 0) → low mobile-forager attractor. COUNTERINTUITIVELY, NARROWER search flattens skew
+MORE (m*=15: childless 23%, RS-gini 0.575, peak 13,932) — a wide prowess-weighted search is more mate-SELECTIVE (top
+males chosen across more rings) than a narrow grab, and Cut-1's site-POOLING concentrates most of all (all a site's
+females choose from one pool → one male monopolizes). So re-anchoring to MVP (m*=15) made the overshoot WORSE. **The lit
+correction is real but is a correctness fix, not the bust fix.**
+
+**Finding 3 — defensibility washes out under Cut-2** (OFF ≈ ON: both ~1,700, eff ~5, strat ~0): the R-66 defensibility
+pivot needs aggregation to bite, and the bust destroyed aggregation.
+
+**Finding 4 — a cycling hint:** m*=25 is RECOVERING at the end (pop 1,676 → 2,565, villages 0 → 10) — the skew-flatten →
+overshoot-bust is the demographic instability the Cut-1 substrate refused to show; it may be the seed of Turchin cycles.
+
+**Verdict + fork.** The connubium is load-bearing for BOTH the dynastic outcome (fixation) AND population stability (via
+skew). Cut-2's two effects must be DECOUPLED: keep the fixation-break, restore the brake — i.e. **preserve status-based
+reproductive skew WITHIN the exogamous network** (stronger polygyny / global-status mate weighting; von Rueden "polygyny
+is the main amplifier"). OPEN FORK (supervisor to steer): (a) build the skew-preservation fix and damp the bust, vs
+(b) treat the overshoot-bust as a FEATURE — the Turchin-cycle seed — and chase it. Cut-2 remains default-OFF, NOT yet the
+substrate. Branch `connubium-cut2`. `m*` anchor retired from 50→(pending); mechanism refinement required before adoption.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

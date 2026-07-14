@@ -1,0 +1,9 @@
+connubium calibration: m* sweep [3, 10, 25, 50, 80], coastal-temperate, 2500 founders x 700 steps, reach over last 150. Target = Wobst 475.
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  m*=  3: reach med=78 p90=147 mean=83 (n=1022) | pop=4407 settle=5 band_med=28 unpaired=0.036 | 1.0m  [Wobst 475]
+  m*= 10: reach med=137 p90=219 mean=146 (n=945) | pop=4133 settle=5 band_med=26 unpaired=0.023 | 1.0m  [Wobst 475]
+  m*= 25: reach med=285 p90=409 mean=293 (n=959) | pop=4142 settle=5 band_med=25.0 unpaired=0.031 | 1.0m  [Wobst 475]
+  m*= 50: reach med=496 p90=670 mean=502 (n=724) | pop=3414 settle=4 band_med=26 unpaired=0.037 | 0.9m  [Wobst 475]
+  m*= 80: reach med=824 p90=997 mean=815 (n=869) | pop=3777 settle=5 band_med=29 unpaired=0.043 | 0.9m  [Wobst 475]
+DONE -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\connubium_results.json
