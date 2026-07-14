@@ -2204,6 +2204,37 @@ class TerrainWorld(mesa.Model):
                 band_sizes[f._group.band_id] -= 1; band_sizes[male._group.band_id] += 1
                 f._group.band_id = male._group.band_id
             self._connubium_sizes.append(reach_pop)                  # total network pop within realized reach
+        if getattr(cfg, "enable_aggregation_sedentism", False):     # Cut-2 founds settlements itself (gathering is bypassed)
+            self._found_settlements_by_occupancy()
+
+    def _found_settlements_by_occupancy(self) -> None:
+        """Settlement founding for the adaptive-connubium path (Cut 2), DECOUPLED from the gathering's mating pools:
+        scan persistent-abundant (storable) candidate sites and found/refresh one wherever ≥ settle_min_pool agents
+        cluster within settle_radius. Occupancy-driven (Binford collectors settle where people persistently aggregate
+        on storable resources), independent of the mating calendar — the gathering path founds the same way but keyed
+        to the pools it just built. Reuses the identical gates (settle_persist_threshold / settle_min_pool /
+        settle_radius / settle_release_steps) and the top-S_pot min-separated candidate set, so the two paths agree.
+        No RNG → the daily _maintain_settlements handles hold/release exactly as for the gathering path."""
+        cfg = self._demog
+        aqf = self._s_pot_field()
+        if aqf is None:
+            return
+        hf = self._harvest_field
+        W = getattr(hf, "width", N); H = getattr(hf, "height", N)
+        sep = cfg.aggregation_site_sep
+        thr = cfg.settle_persist_threshold
+        cands = sorted(((aqf[y, x], x, y) for y in range(H) for x in range(W) if aqf[y, x] >= thr), reverse=True)
+        sites: list = []
+        for (_, x, y) in cands:
+            if all(max(abs(x - sx), abs(y - sy)) >= sep for (sx, sy) in sites):
+                sites.append((x, y))
+            if len(sites) >= 40:
+                break
+        rad = cfg.settle_radius
+        for (sx, sy) in sites:
+            near = sum(1 for a in self.agent_list if self._torus_cheby(a.pos[0], a.pos[1], sx, sy) <= rad)
+            if near >= cfg.settle_min_pool:
+                self._settlement_sites[(sx, sy)] = cfg.settle_release_steps
 
     def _do_gathering(self) -> None:
         """Seasonal marriage-aggregation ('the gathering'): every `aggregation_period` steps, in the abundance
