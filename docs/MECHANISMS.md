@@ -615,6 +615,35 @@ The settlement hierarchy is EMERGENT — each rung a prediction of a mechanism (
     hierarchy → hierarchy weakens the stress → grows toward the ceiling. R-64: village median ~100, 77% in Bar-Yosef
     50–150, stratification sustained 9–16%, stable over 2000 steps.
 
+## Campaign diagnostics & the genealogy record (pure observers)
+
+Read-outs for deep-time campaigns (`run_campaign.py`). All are **pure observers**: they never mutate model state and
+route any RNG through a dedicated `self._diag_rng`, so enabling/interleaving them does **not** perturb the run
+(`test_campaign_readouts_are_observer_only`). Definitions of the trajectory columns:
+
+- **`dynasties(top, sample_pairs)`** — live population grouped by patriline `_lineage`. `n_lineages`; `top_share`
+  (largest lineage ÷ pop); `size_gini` (dynastic concentration); **`eff_lineages`** = inverse-Simpson / Hill-q2 number
+  (the *effective* count of co-existing lineages — falls as dynasties consolidate under drift + patriliny). Per top
+  lineage: size, mean cred/prowess/wealth, mean **completed reproductive success** (female `parity` / male
+  `_n_fathered`), and **within-lineage mean relatedness** (the genetic *signature* of a dynasty — needs `enable_genome`).
+- **`settlements()`** — per maintained settlement site with live occupants: count, society (dominant band's morph),
+  catchment yield, mean cred, dominant lineage. Aggregate rank-size: `primate_ratio` (largest ÷ 2nd), `zipf_slope`
+  (OLS ln size vs ln rank; ≈ −1 = Zipf) — the urban-hierarchy read-out.
+- **`instability()`** — economic-defensibility (**Dyson-Hudson & Smith 1978**) contest activity: `claim_events`
+  (challenger-erosion events over defensible cells this step — the instability *flow*), `n_owned`, `n_claims`. Proxy for
+  Turchin's instability variable. **Only active with `enable_economic_defensibility=True`** AND agents concentrated
+  enough that cells pass `D_min` (inert in dispersed configs — VERIFICATION_LOG 2026-07-13). ~2× stratification effect
+  at small scale; parity at 3000 founders early — resolved by the OFF/ON campaign arms.
+- **`connubium()`** — realized mating-pool reach per gathering (seasonal; validate median → Wobst ~475).
+  **`genetics()`** — expected heterozygosity H (N_e signal, computed offline from H-decay) + mean relatedness.
+  **`bands()`** / **`band_leaders()`** — spatial band partition / per-band top cred·prowess member (leader turnover).
+
+**Genealogy record** (`enable_genealogy_log`; `flush_genealogy()` appends+clears for bounded memory). One row per
+birth/death, `GENEA_HEADER` (17 cols): `step, event, uid, mother_uid, father_uid, lineage, band_id, cred, prowess,
+wealth, sex, age, parity, n_fathered, x, y, society`. Because it is a pure observer (write-after-step, no read-back),
+**death rows carry each agent's COMPLETED life-history** — the substrate for offline dynasty / reproductive-success /
+relatedness reconstruction. `_diag_rng` and the enriched schema added 2026-07-13.
+
 ---
 
 *End of MECHANISMS.md — split from MODEL_SPEC v0.2 on 2026-06-06. The world/resource substrate (§9), architecture principle, decision-log, seams, and known-gaps ledger are in `ARCHITECTURE.md`.*

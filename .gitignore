@@ -35,3 +35,6 @@ literature/*.djvu
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# campaign genealogy dumps: 100MB+ per run, regenerable from run_campaign.py
+sic_games/outputs/**/*genealogy*.csv

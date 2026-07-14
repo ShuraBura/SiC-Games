@@ -965,4 +965,54 @@ Value of validate-first: a confident prediction was corrected BEFORE spending a 
 
 ---
 
+## R-66 — The deep-time CAMPAIGN (15,000 steps ≈ 1,250 yr, fully instrumented): the substrate CONSOLIDATES, it does not cycle; economic defensibility is the pivot between single-dynasty fixation and multi-dynasty pluralism (2026-07-13)
+
+**Setup.** Two parallel arms on coastal-temperate, 3,000 founders × 15,000 steps, endogenous (seasonal climate, NO
+regime forcing), full R-64 settlement stack + genome + genealogy. **OFF** = the validated substrate; **ON** = OFF +
+economic-defensibility (Dyson-Hudson & Smith; the instability channel). `run_campaign.py`; ~114 min/arm; genealogy
+1.05M / 1.11M birth-death rows streamed (bounded memory). Analysis `analyze_campaign.py`.
+
+**Headline: neither arm produces secular cycles.** Both overshoot mildly then relax to equilibrium — 0 stratification
+swings (>10%) in the capacity phase. The validated substrate does **not** self-organize into Turchin secular cycles; it
+CONSOLIDATES. Genuine aggregate cycling would need an explicit elite/instability coupling (option 3). *But* the ON arm
+shows dynasty-level TURNOVER (below) — elite competition without a single winner — the seed a cycling layer would build on.
+
+**The pivotal finding — economic defensibility flips the dynastic outcome:**
+
+| | OFF (validated) | ON (+defensibility) |
+|---|---|---|
+| Population endpoint | overshoot 7,914→6,008, settle ~6,400 (mild bust) | glide 7,847→6,589→7,206 (**no bust**) |
+| Sustained stratification (cap-phase) | **7.0 %** | **14.4 % (≈2×)** |
+| Dynastic outcome | **1 patriline @ 88.6 %** (winner-take-all) | **~3 dynasties, top 45 %** (pluralistic) |
+| eff_lineages (patriline) 2913 → | **1.3** | **3.3** |
+| top_share trajectory | monotone 0→0.89 (fixation) | oscillates 0.61→0.42→0.42→0.50 (**turnover**) |
+| Instability (contest events/step) | 0 | **42** |
+| gini_cred (final) | 0.265 | 0.309 |
+| Individual reproductive skew | 37 % childless, RS-gini 0.66, max 81 | 37 % childless, RS-gini 0.66, max 68 |
+| Neutral genome H 0.999 → | 0.884 | 0.868 |
+
+**Reading.** (1) **Defensibility sustains pluralism + hierarchy.** Without a conflict channel, drift under strict
+patriliny drives WINNER-TAKE-ALL: one "house" fixes to 88.6 % and stratification decays to ~7 %. Defended resource
+patches PARTITION the landscape → ~3 competing dynasties coexist (top 45 %), stratification holds ~2× higher, inequality
+and population are both higher and more stable. Defensibility is the difference between "one house rules" and "competing
+houses." (2) **Stratification is a founder TRANSIENT in both** — peaks ~50 % at step ~300 (concentrated placement),
+then decays to the capacity equilibrium (7 % / 14 %); confirms the A3 transient over deep time. (3) **Individual
+reproductive skew is universal and severe** (37 % childless, RS-gini 0.66, one man 68–81 children) and INDEPENDENT of
+defensibility — elite overproduction is individual (mate-choice/polygyny); its DYNASTIC consequence is what the regime
+sets. (4) **Patrilineal-name fixation ≠ genetic fixation** — the `_lineage` patriline fixes to 1 (OFF) while the neutral
+autosomal genome stays diverse (H 0.88): non-patrilineal maternal alleles keep flowing even as one surname dominates. A
+correct, subtle pop-gen result, visible only because the genome layer was on.
+
+**Method note.** Every dynasty-level quantity here (fixation curves, RS distribution, name-vs-gene divergence,
+pluralism-vs-fixation) was INVISIBLE before the campaign diagnostics + genealogy layer (this session). Validate-then-
+instrument-then-run paid off: the smoke's "2× stratification" was real (it is the capacity-phase equilibrium, 14.4 vs
+7.0), not an artifact — it was masked at step 250 because both arms were still in the founder transient.
+
+**Open forks.** (a) Elite/instability layer (option 3) to test whether the ON arm's dynasty turnover can be amplified
+into true secular cycles. (b) Defensibility params are PROVISIONAL (`D_min` 0.15, dwell 6, min 3) — the 2× effect
+motivates anchoring them. (c) connubium reach plateaus ~146–181, below Wobst ~475 — the adaptive-connubium (Cut 2)
+search may be needed to reach the ethnographic mating-network scale.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

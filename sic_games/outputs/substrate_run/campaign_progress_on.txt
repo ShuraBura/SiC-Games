@@ -1,0 +1,603 @@
+campaign: sha=13005c1 world=coastal-temperate founders=3000 steps=15000 habitable=1584 genome=True genealogy=ON flush/500
+[    1/15000] pop=  2913 bd=   2 vil=2(med1456.5) strat=0.0% giniC=0.276 dyn:eff=2913.0 top=0.0 mRSg=0.0 set=0(mx0,primNone) con=None inst=0 ldT=0.0 | 0.0m eta25m
+[   25/15000] pop=  2912 bd= 165 vil=0(med0) strat=0.0% giniC=0.272 dyn:eff=2296.8 top=0.001 mRSg=0.774 set=10(mx93,prim1.07) con=54.0 inst=16 ldT=0.0 | 0.1m eta35m
+[   50/15000] pop=  2898 bd= 160 vil=0(med0) strat=0.0% giniC=0.268 dyn:eff=1945.9 top=0.002 mRSg=0.736 set=17(mx100,prim1.2) con=36.5 inst=29 ldT=0.49 | 0.1m eta35m
+[   75/15000] pop=  2940 bd= 158 vil=0(med0) strat=32.3% giniC=0.269 dyn:eff=1598.9 top=0.003 mRSg=0.713 set=24(mx116,prim1.1) con=34.0 inst=27 ldT=0.43 | 0.2m eta35m
+[  100/15000] pop=  2995 bd= 148 vil=1(med51) strat=39.9% giniC=0.276 dyn:eff=1241.9 top=0.004 mRSg=0.699 set=26(mx179,prim1.54) con=28.0 inst=29 ldT=0.39 | 0.2m eta36m
+[  125/15000] pop=  3121 bd= 140 vil=2(med55.0) strat=42.3% giniC=0.282 dyn:eff=1007.8 top=0.004 mRSg=0.696 set=28(mx166,prim1.09) con=28.0 inst=31 ldT=0.406 | 0.3m eta37m
+[  150/15000] pop=  3227 bd= 136 vil=3(med49) strat=37.6% giniC=0.292 dyn:eff=845.5 top=0.004 mRSg=0.695 set=31(mx182,prim1.13) con=26.5 inst=27 ldT=0.404 | 0.4m eta38m
+[  175/15000] pop=  3344 bd= 132 vil=9(med49) strat=37.6% giniC=0.293 dyn:eff=731.5 top=0.006 mRSg=0.697 set=33(mx199,prim1.2) con=31.0 inst=27 ldT=0.359 | 0.5m eta39m
+[  200/15000] pop=  3432 bd= 128 vil=11(med51) strat=37.5% giniC=0.296 dyn:eff=655.5 top=0.006 mRSg=0.716 set=34(mx208,prim1.36) con=47.5 inst=27 ldT=0.417 | 0.5m eta40m
+[  225/15000] pop=  3527 bd= 127 vil=12(med56.0) strat=38.3% giniC=0.294 dyn:eff=571.1 top=0.007 mRSg=0.715 set=36(mx214,prim1.3) con=25.0 inst=23 ldT=0.508 | 0.6m eta41m
+[  250/15000] pop=  3533 bd= 124 vil=13(med52) strat=43.4% giniC=0.293 dyn:eff=503.3 top=0.008 mRSg=0.73 set=39(mx185,prim1.15) con=28.0 inst=26 ldT=0.508 | 0.7m eta43m
+[  275/15000] pop=  3511 bd= 118 vil=18(med50.5) strat=44.3% giniC=0.292 dyn:eff=445.8 top=0.009 mRSg=0.747 set=39(mx183,prim1.13) con=32.0 inst=21 ldT=0.492 | 0.8m eta44m
+[  300/15000] pop=  3644 bd= 115 vil=18(med54.0) strat=50.3% giniC=0.296 dyn:eff=397.5 top=0.009 mRSg=0.74 set=41(mx196,prim1.05) con=72.0 inst=25 ldT=0.496 | 0.9m eta44m
+[  325/15000] pop=  3826 bd= 113 vil=24(med54.5) strat=47.0% giniC=0.301 dyn:eff=350.6 top=0.009 mRSg=0.744 set=41(mx200,prim1.01) con=30.0 inst=30 ldT=0.496 | 1.0m eta45m
+[  350/15000] pop=  3828 bd= 111 vil=24(med57.0) strat=48.7% giniC=0.314 dyn:eff=302.2 top=0.011 mRSg=0.75 set=41(mx241,prim1.25) con=86.0 inst=28 ldT=0.545 | 1.1m eta46m
+[  375/15000] pop=  4071 bd= 116 vil=30(med56.5) strat=42.3% giniC=0.321 dyn:eff=267.7 top=0.013 mRSg=0.746 set=41(mx217,prim1.06) con=77.5 inst=32 ldT=0.519 | 1.2m eta47m
+[  400/15000] pop=  4245 bd= 118 vil=32(med58.0) strat=41.1% giniC=0.318 dyn:eff=247.0 top=0.014 mRSg=0.762 set=41(mx255,prim1.31) con=55.5 inst=18 ldT=0.425 | 1.3m eta48m
+[  425/15000] pop=  4361 bd= 123 vil=32(med59.0) strat=38.3% giniC=0.317 dyn:eff=222.8 top=0.015 mRSg=0.759 set=41(mx276,prim1.25) con=55.0 inst=27 ldT=0.44 | 1.4m eta48m
+[  450/15000] pop=  4574 bd= 126 vil=33(med62) strat=42.2% giniC=0.318 dyn:eff=200.5 top=0.018 mRSg=0.766 set=42(mx254,prim1.02) con=57.0 inst=32 ldT=0.479 | 1.5m eta49m
+[  475/15000] pop=  4590 bd= 133 vil=32(med59.0) strat=30.8% giniC=0.319 dyn:eff=177.0 top=0.021 mRSg=0.776 set=42(mx301,prim1.2) con=98.0 inst=31 ldT=0.48 | 1.6m eta50m
+[  500/15000] pop=  4733 bd= 145 vil=31(med65) strat=31.9% giniC=0.321 dyn:eff=164.5 top=0.022 mRSg=0.779 set=41(mx273,prim1.28) con=67.0 inst=33 ldT=0.484 | 1.8m eta51m
+[  525/15000] pop=  4761 bd= 148 vil=28(med61.5) strat=32.1% giniC=0.326 dyn:eff=150.0 top=0.024 mRSg=0.78 set=41(mx261,prim1.34) con=85.0 inst=32 ldT=0.526 | 1.9m eta52m
+[  550/15000] pop=  5014 bd= 160 vil=26(med59.5) strat=29.9% giniC=0.325 dyn:eff=142.1 top=0.024 mRSg=0.788 set=42(mx307,prim1.35) con=87.5 inst=37 ldT=0.5 | 2.0m eta53m
+[  575/15000] pop=  5278 bd= 166 vil=28(med60.5) strat=31.0% giniC=0.326 dyn:eff=132.9 top=0.023 mRSg=0.785 set=43(mx259,prim1.2) con=114.0 inst=42 ldT=0.503 | 2.1m eta54m
+[  600/15000] pop=  5444 bd= 162 vil=35(med58) strat=29.6% giniC=0.326 dyn:eff=117.9 top=0.025 mRSg=0.768 set=48(mx306,prim1.2) con=98.0 inst=32 ldT=0.49 | 2.3m eta55m
+[  625/15000] pop=  5648 bd= 162 vil=42(med58.0) strat=35.8% giniC=0.326 dyn:eff=106.8 top=0.027 mRSg=0.763 set=49(mx238,prim1.0) con=153.0 inst=38 ldT=0.516 | 2.4m eta56m
+[  650/15000] pop=  5582 bd= 163 vil=39(med59) strat=30.3% giniC=0.325 dyn:eff=97.5 top=0.03 mRSg=0.758 set=50(mx244,prim1.02) con=77.0 inst=30 ldT=0.468 | 2.6m eta58m
+[  675/15000] pop=  5964 bd= 174 vil=36(med62.5) strat=28.8% giniC=0.328 dyn:eff=92.7 top=0.032 mRSg=0.756 set=51(mx334,prim1.34) con=116.0 inst=40 ldT=0.522 | 2.8m eta59m
+[  700/15000] pop=  6222 bd= 180 vil=39(med63) strat=23.5% giniC=0.33 dyn:eff=87.3 top=0.034 mRSg=0.751 set=51(mx343,prim1.34) con=118.5 inst=44 ldT=0.476 | 2.9m eta60m
+[  725/15000] pop=  6258 bd= 177 vil=44(med61.5) strat=25.5% giniC=0.334 dyn:eff=79.2 top=0.037 mRSg=0.752 set=52(mx294,prim1.04) con=111.0 inst=34 ldT=0.521 | 3.1m eta62m
+[  750/15000] pop=  6191 bd= 184 vil=42(med58.5) strat=22.9% giniC=0.338 dyn:eff=73.1 top=0.042 mRSg=0.75 set=54(mx271,prim1.15) con=119.5 inst=37 ldT=0.5 | 3.3m eta63m
+[  775/15000] pop=  6408 bd= 184 vil=49(med58) strat=15.2% giniC=0.337 dyn:eff=69.1 top=0.044 mRSg=0.757 set=54(mx293,prim1.03) con=126.0 inst=32 ldT=0.492 | 3.5m eta64m
+[  800/15000] pop=  6746 bd= 205 vil=55(med56) strat=12.8% giniC=0.338 dyn:eff=65.4 top=0.046 mRSg=0.755 set=54(mx283,prim1.06) con=149.5 inst=49 ldT=0.52 | 3.7m eta66m
+[  825/15000] pop=  6921 bd= 208 vil=55(med57) strat=19.9% giniC=0.338 dyn:eff=60.7 top=0.05 mRSg=0.752 set=54(mx295,prim1.05) con=140.0 inst=57 ldT=0.39 | 3.9m eta67m
+[  850/15000] pop=  7102 bd= 217 vil=48(med63.5) strat=19.1% giniC=0.341 dyn:eff=56.7 top=0.054 mRSg=0.755 set=54(mx343,prim1.36) con=157.0 inst=42 ldT=0.438 | 4.1m eta69m
+[  875/15000] pop=  7056 bd= 231 vil=40(med59.0) strat=18.6% giniC=0.342 dyn:eff=53.4 top=0.057 mRSg=0.751 set=54(mx291,prim1.25) con=137.0 inst=46 ldT=0.42 | 4.3m eta70m
+[  900/15000] pop=  7450 bd= 234 vil=45(med62) strat=15.1% giniC=0.344 dyn:eff=51.3 top=0.058 mRSg=0.753 set=54(mx286,prim1.07) con=148.0 inst=57 ldT=0.491 | 4.6m eta71m
+[  925/15000] pop=  7649 bd= 233 vil=49(med60) strat=17.8% giniC=0.342 dyn:eff=48.5 top=0.061 mRSg=0.755 set=54(mx402,prim1.31) con=159.0 inst=52 ldT=0.489 | 4.8m eta73m
+[  950/15000] pop=  7536 bd= 237 vil=47(med57) strat=17.9% giniC=0.346 dyn:eff=45.0 top=0.068 mRSg=0.746 set=54(mx309,prim1.34) con=146.0 inst=60 ldT=0.513 | 5.0m eta74m
+[  975/15000] pop=  7502 bd= 232 vil=50(med57.0) strat=14.5% giniC=0.345 dyn:eff=41.2 top=0.076 mRSg=0.747 set=54(mx353,prim1.46) con=141.0 inst=47 ldT=0.48 | 5.2m eta75m
+[ 1000/15000] pop=  7535 bd= 232 vil=51(med58) strat=17.0% giniC=0.35 dyn:eff=39.1 top=0.082 mRSg=0.747 set=54(mx329,prim1.35) con=137.5 inst=45 ldT=0.401 | 5.4m eta76m
+[ 1025/15000] pop=  7429 bd= 228 vil=56(med58.5) strat=13.1% giniC=0.352 dyn:eff=35.6 top=0.093 mRSg=0.747 set=54(mx267,prim1.01) con=169.0 inst=44 ldT=0.471 | 5.7m eta78m
+[ 1050/15000] pop=  7550 bd= 226 vil=58(med61.0) strat=10.9% giniC=0.357 dyn:eff=33.4 top=0.101 mRSg=0.749 set=54(mx339,prim1.19) con=179.5 inst=48 ldT=0.468 | 5.9m eta79m
+[ 1075/15000] pop=  7814 bd= 226 vil=59(med62) strat=5.8% giniC=0.354 dyn:eff=31.7 top=0.106 mRSg=0.742 set=54(mx343,prim1.36) con=164.0 inst=55 ldT=0.5 | 6.1m eta80m
+[ 1100/15000] pop=  7662 bd= 225 vil=60(med60.5) strat=6.2% giniC=0.358 dyn:eff=29.0 top=0.117 mRSg=0.74 set=54(mx304,prim1.27) con=138.5 inst=48 ldT=0.469 | 6.4m eta81m
+[ 1125/15000] pop=  7443 bd= 223 vil=57(med61) strat=8.0% giniC=0.363 dyn:eff=26.7 top=0.129 mRSg=0.745 set=54(mx275,prim1.17) con=145.0 inst=55 ldT=0.505 | 6.6m eta82m
+[ 1150/15000] pop=  7344 bd= 223 vil=56(med59.5) strat=12.5% giniC=0.371 dyn:eff=24.8 top=0.138 mRSg=0.75 set=54(mx223,prim1.06) con=139.0 inst=59 ldT=0.488 | 6.8m eta82m
+[ 1175/15000] pop=  7535 bd= 223 vil=54(med65.5) strat=10.5% giniC=0.372 dyn:eff=23.1 top=0.146 mRSg=0.751 set=54(mx279,prim1.37) con=121.0 inst=48 ldT=0.429 | 7.1m eta83m
+[ 1200/15000] pop=  7720 bd= 230 vil=55(med62) strat=14.6% giniC=0.379 dyn:eff=21.4 top=0.157 mRSg=0.751 set=54(mx287,prim1.17) con=142.0 inst=58 ldT=0.509 | 7.3m eta84m
+[ 1225/15000] pop=  7815 bd= 234 vil=53(med62) strat=14.9% giniC=0.376 dyn:eff=20.2 top=0.164 mRSg=0.752 set=54(mx297,prim1.05) con=162.0 inst=48 ldT=0.475 | 7.5m eta85m
+[ 1250/15000] pop=  7795 bd= 236 vil=55(med62) strat=15.4% giniC=0.378 dyn:eff=19.3 top=0.17 mRSg=0.748 set=54(mx265,prim1.1) con=150.0 inst=53 ldT=0.489 | 7.8m eta86m
+[ 1275/15000] pop=  7653 bd= 229 vil=56(med61.0) strat=15.2% giniC=0.382 dyn:eff=18.4 top=0.177 mRSg=0.747 set=54(mx280,prim1.21) con=118.0 inst=55 ldT=0.476 | 8.0m eta86m
+[ 1300/15000] pop=  7847 bd= 236 vil=58(med59.0) strat=11.7% giniC=0.382 dyn:eff=17.6 top=0.184 mRSg=0.744 set=54(mx334,prim1.13) con=159.0 inst=51 ldT=0.464 | 8.3m eta87m
+[ 1325/15000] pop=  7632 bd= 231 vil=51(med61) strat=15.3% giniC=0.386 dyn:eff=16.8 top=0.191 mRSg=0.743 set=54(mx313,prim1.19) con=131.0 inst=52 ldT=0.523 | 8.5m eta88m
+[ 1350/15000] pop=  7826 bd= 242 vil=57(med60) strat=8.5% giniC=0.384 dyn:eff=15.8 top=0.201 mRSg=0.747 set=54(mx326,prim1.39) con=144.0 inst=51 ldT=0.456 | 8.7m eta88m
+[ 1375/15000] pop=  7630 bd= 247 vil=54(med58.5) strat=12.9% giniC=0.382 dyn:eff=14.5 top=0.216 mRSg=0.75 set=54(mx290,prim1.1) con=143.0 inst=54 ldT=0.522 | 9.0m eta89m
+[ 1400/15000] pop=  7426 bd= 249 vil=52(med55.0) strat=12.8% giniC=0.383 dyn:eff=13.4 top=0.229 mRSg=0.75 set=54(mx316,prim1.3) con=151.0 inst=56 ldT=0.532 | 9.2m eta89m
+[ 1425/15000] pop=  7695 bd= 257 vil=53(med58) strat=10.5% giniC=0.386 dyn:eff=12.5 top=0.241 mRSg=0.751 set=54(mx291,prim1.06) con=123.5 inst=55 ldT=0.492 | 9.4m eta90m
+[ 1450/15000] pop=  7688 bd= 255 vil=48(med59.0) strat=11.2% giniC=0.392 dyn:eff=11.8 top=0.251 mRSg=0.75 set=54(mx325,prim1.24) con=136.0 inst=49 ldT=0.488 | 9.7m eta90m
+[ 1475/15000] pop=  7462 bd= 255 vil=44(med58.0) strat=14.4% giniC=0.384 dyn:eff=10.9 top=0.264 mRSg=0.75 set=54(mx336,prim1.37) con=134.5 inst=57 ldT=0.49 | 9.9m eta91m
+[ 1500/15000] pop=  7298 bd= 254 vil=41(med57) strat=15.7% giniC=0.393 dyn:eff=10.5 top=0.27 mRSg=0.756 set=54(mx255,prim1.12) con=145.0 inst=52 ldT=0.51 | 10.1m eta91m
+[ 1525/15000] pop=  7191 bd= 243 vil=39(med59) strat=14.8% giniC=0.394 dyn:eff=10.4 top=0.27 mRSg=0.763 set=54(mx347,prim1.48) con=171.0 inst=40 ldT=0.51 | 10.3m eta91m
+[ 1550/15000] pop=  7301 bd= 239 vil=44(med56.0) strat=17.9% giniC=0.392 dyn:eff=10.1 top=0.275 mRSg=0.765 set=54(mx377,prim1.27) con=136.0 inst=50 ldT=0.45 | 10.6m eta92m
+[ 1575/15000] pop=  7557 bd= 237 vil=48(med56.0) strat=18.0% giniC=0.395 dyn:eff=9.6 top=0.284 mRSg=0.757 set=54(mx322,prim1.42) con=160.0 inst=47 ldT=0.432 | 10.8m eta92m
+[ 1600/15000] pop=  7465 bd= 233 vil=49(med57) strat=18.2% giniC=0.393 dyn:eff=9.0 top=0.295 mRSg=0.756 set=54(mx372,prim1.6) con=155.0 inst=46 ldT=0.52 | 11.1m eta93m
+[ 1625/15000] pop=  7349 bd= 224 vil=49(med56) strat=11.0% giniC=0.395 dyn:eff=8.5 top=0.306 mRSg=0.759 set=54(mx340,prim1.42) con=142.5 inst=41 ldT=0.518 | 11.3m eta93m
+[ 1650/15000] pop=  7205 bd= 218 vil=45(med58) strat=12.3% giniC=0.397 dyn:eff=8.3 top=0.311 mRSg=0.75 set=54(mx351,prim1.42) con=131.0 inst=46 ldT=0.474 | 11.6m eta94m
+[ 1675/15000] pop=  7305 bd= 221 vil=42(med60.5) strat=9.0% giniC=0.404 dyn:eff=8.0 top=0.317 mRSg=0.753 set=54(mx272,prim1.18) con=123.0 inst=49 ldT=0.456 | 11.9m eta94m
+[ 1700/15000] pop=  7235 bd= 220 vil=45(med59) strat=13.3% giniC=0.407 dyn:eff=8.0 top=0.316 mRSg=0.755 set=54(mx300,prim1.35) con=138.5 inst=50 ldT=0.493 | 12.1m eta95m
+[ 1725/15000] pop=  7219 bd= 221 vil=50(med56.5) strat=16.7% giniC=0.402 dyn:eff=7.6 top=0.325 mRSg=0.761 set=54(mx285,prim1.45) con=133.0 inst=45 ldT=0.526 | 12.4m eta95m
+[ 1750/15000] pop=  7382 bd= 217 vil=55(med58) strat=17.1% giniC=0.407 dyn:eff=7.6 top=0.324 mRSg=0.759 set=54(mx288,prim1.33) con=135.0 inst=52 ldT=0.458 | 12.7m eta96m
+[ 1775/15000] pop=  7404 bd= 212 vil=57(med56) strat=14.9% giniC=0.402 dyn:eff=7.5 top=0.327 mRSg=0.76 set=54(mx402,prim1.97) con=133.5 inst=52 ldT=0.534 | 12.9m eta96m
+[ 1800/15000] pop=  7352 bd= 208 vil=59(med58) strat=14.9% giniC=0.409 dyn:eff=7.4 top=0.33 mRSg=0.768 set=54(mx329,prim1.33) con=138.0 inst=49 ldT=0.573 | 13.2m eta97m
+[ 1825/15000] pop=  7168 bd= 210 vil=55(med59) strat=14.4% giniC=0.406 dyn:eff=7.0 top=0.34 mRSg=0.763 set=54(mx243,prim1.06) con=151.0 inst=41 ldT=0.522 | 13.5m eta97m
+[ 1850/15000] pop=  7492 bd= 216 vil=56(med60.0) strat=15.0% giniC=0.404 dyn:eff=6.8 top=0.345 mRSg=0.766 set=54(mx312,prim1.26) con=127.0 inst=42 ldT=0.51 | 13.7m eta97m
+[ 1875/15000] pop=  7351 bd= 216 vil=57(med61) strat=9.8% giniC=0.394 dyn:eff=6.3 top=0.36 mRSg=0.759 set=54(mx358,prim1.62) con=124.0 inst=51 ldT=0.529 | 14.0m eta98m
+[ 1900/15000] pop=  7269 bd= 225 vil=51(med60) strat=16.4% giniC=0.399 dyn:eff=6.1 top=0.37 mRSg=0.756 set=54(mx294,prim1.25) con=117.5 inst=42 ldT=0.51 | 14.2m eta98m
+[ 1925/15000] pop=  7314 bd= 224 vil=49(med61) strat=10.0% giniC=0.404 dyn:eff=5.8 top=0.38 mRSg=0.756 set=54(mx285,prim1.13) con=144.0 inst=46 ldT=0.479 | 14.5m eta98m
+[ 1950/15000] pop=  7296 bd= 228 vil=50(med57.5) strat=13.1% giniC=0.4 dyn:eff=5.7 top=0.385 mRSg=0.755 set=54(mx262,prim1.07) con=158.5 inst=44 ldT=0.493 | 14.8m eta99m
+[ 1975/15000] pop=  6932 bd= 223 vil=43(med60) strat=14.5% giniC=0.397 dyn:eff=5.6 top=0.386 mRSg=0.752 set=54(mx250,prim1.01) con=113.0 inst=37 ldT=0.491 | 15.0m eta99m
+[ 2000/15000] pop=  7098 bd= 217 vil=47(med61) strat=13.2% giniC=0.383 dyn:eff=5.4 top=0.392 mRSg=0.753 set=54(mx351,prim1.43) con=114.5 inst=39 ldT=0.447 | 15.3m eta99m
+[ 2025/15000] pop=  6990 bd= 217 vil=42(med59.0) strat=15.6% giniC=0.39 dyn:eff=5.3 top=0.396 mRSg=0.758 set=54(mx229,prim1.07) con=141.0 inst=40 ldT=0.553 | 15.5m eta99m
+[ 2050/15000] pop=  7430 bd= 217 vil=50(med60.0) strat=13.3% giniC=0.389 dyn:eff=5.2 top=0.402 mRSg=0.752 set=54(mx356,prim1.55) con=117.5 inst=47 ldT=0.536 | 15.8m eta100m
+[ 2075/15000] pop=  7340 bd= 212 vil=56(med58.0) strat=13.8% giniC=0.391 dyn:eff=5.1 top=0.407 mRSg=0.753 set=54(mx248,prim1.06) con=156.0 inst=50 ldT=0.466 | 16.0m eta100m
+[ 2100/15000] pop=  7335 bd= 211 vil=54(med60.0) strat=14.6% giniC=0.381 dyn:eff=4.8 top=0.421 mRSg=0.746 set=54(mx361,prim1.52) con=137.0 inst=43 ldT=0.579 | 16.3m eta100m
+[ 2125/15000] pop=  7064 bd= 221 vil=47(med54) strat=17.4% giniC=0.378 dyn:eff=4.7 top=0.428 mRSg=0.74 set=54(mx254,prim1.11) con=106.5 inst=43 ldT=0.493 | 16.6m eta100m
+[ 2150/15000] pop=  7267 bd= 215 vil=52(med60.5) strat=15.2% giniC=0.377 dyn:eff=4.5 top=0.435 mRSg=0.744 set=54(mx328,prim1.32) con=161.0 inst=40 ldT=0.462 | 16.9m eta101m
+[ 2175/15000] pop=  7297 bd= 208 vil=60(med57.5) strat=13.7% giniC=0.376 dyn:eff=4.5 top=0.438 mRSg=0.745 set=54(mx329,prim1.24) con=156.0 inst=43 ldT=0.44 | 17.2m eta101m
+[ 2200/15000] pop=  6983 bd= 206 vil=51(med58) strat=16.3% giniC=0.364 dyn:eff=4.3 top=0.447 mRSg=0.746 set=54(mx298,prim1.3) con=137.0 inst=46 ldT=0.523 | 17.4m eta101m
+[ 2225/15000] pop=  6993 bd= 207 vil=46(med58.5) strat=11.1% giniC=0.368 dyn:eff=4.3 top=0.451 mRSg=0.749 set=54(mx226,prim1.06) con=115.0 inst=37 ldT=0.431 | 17.7m eta102m
+[ 2250/15000] pop=  7178 bd= 215 vil=53(med56) strat=10.6% giniC=0.362 dyn:eff=4.2 top=0.453 mRSg=0.743 set=54(mx376,prim1.68) con=164.5 inst=39 ldT=0.495 | 18.0m eta102m
+[ 2275/15000] pop=  7090 bd= 218 vil=45(med57) strat=10.9% giniC=0.364 dyn:eff=4.2 top=0.452 mRSg=0.749 set=54(mx309,prim1.4) con=181.0 inst=45 ldT=0.532 | 18.3m eta102m
+[ 2300/15000] pop=  6822 bd= 209 vil=47(med58) strat=18.8% giniC=0.359 dyn:eff=4.1 top=0.459 mRSg=0.739 set=54(mx274,prim1.12) con=171.5 inst=43 ldT=0.471 | 18.5m eta102m
+[ 2325/15000] pop=  6852 bd= 207 vil=51(med59) strat=18.1% giniC=0.356 dyn:eff=4.0 top=0.464 mRSg=0.739 set=54(mx334,prim1.4) con=168.0 inst=39 ldT=0.505 | 18.8m eta102m
+[ 2350/15000] pop=  6952 bd= 205 vil=51(med61) strat=19.4% giniC=0.356 dyn:eff=4.0 top=0.469 mRSg=0.742 set=54(mx276,prim1.09) con=154.0 inst=41 ldT=0.547 | 19.0m eta102m
+[ 2375/15000] pop=  7235 bd= 210 vil=57(med60) strat=17.0% giniC=0.353 dyn:eff=3.9 top=0.473 mRSg=0.743 set=54(mx321,prim1.17) con=148.0 inst=46 ldT=0.505 | 19.3m eta102m
+[ 2400/15000] pop=  7042 bd= 207 vil=50(med61.5) strat=16.8% giniC=0.353 dyn:eff=3.9 top=0.477 mRSg=0.742 set=54(mx273,prim1.36) con=138.0 inst=45 ldT=0.475 | 19.5m eta103m
+[ 2425/15000] pop=  6913 bd= 203 vil=50(med60.5) strat=15.8% giniC=0.354 dyn:eff=3.8 top=0.479 mRSg=0.742 set=54(mx248,prim1.06) con=120.0 inst=42 ldT=0.523 | 19.8m eta103m
+[ 2450/15000] pop=  7112 bd= 210 vil=46(med63.5) strat=20.9% giniC=0.348 dyn:eff=3.7 top=0.489 mRSg=0.742 set=54(mx347,prim1.62) con=153.0 inst=48 ldT=0.516 | 20.0m eta103m
+[ 2475/15000] pop=  6981 bd= 212 vil=40(med60.0) strat=20.4% giniC=0.348 dyn:eff=3.6 top=0.496 mRSg=0.74 set=54(mx286,prim1.22) con=137.5 inst=36 ldT=0.558 | 20.3m eta103m
+[ 2500/15000] pop=  7045 bd= 208 vil=42(med62.0) strat=19.5% giniC=0.348 dyn:eff=3.6 top=0.497 mRSg=0.735 set=54(mx347,prim1.45) con=97.0 inst=45 ldT=0.488 | 20.6m eta103m
+[ 2525/15000] pop=  6772 bd= 206 vil=45(med59) strat=22.3% giniC=0.345 dyn:eff=3.6 top=0.496 mRSg=0.737 set=54(mx263,prim1.23) con=172.0 inst=39 ldT=0.577 | 20.8m eta103m
+[ 2550/15000] pop=  6988 bd= 202 vil=51(med58) strat=13.1% giniC=0.343 dyn:eff=3.5 top=0.5 mRSg=0.744 set=54(mx315,prim1.45) con=148.0 inst=39 ldT=0.49 | 21.0m eta103m
+[ 2575/15000] pop=  7005 bd= 203 vil=53(med57) strat=10.2% giniC=0.341 dyn:eff=3.5 top=0.5 mRSg=0.743 set=54(mx337,prim1.58) con=155.0 inst=40 ldT=0.469 | 21.3m eta103m
+[ 2600/15000] pop=  6811 bd= 209 vil=46(med59.5) strat=12.2% giniC=0.337 dyn:eff=3.5 top=0.502 mRSg=0.738 set=54(mx251,prim1.3) con=151.0 inst=41 ldT=0.462 | 21.5m eta103m
+[ 2625/15000] pop=  6890 bd= 207 vil=48(med58.0) strat=9.0% giniC=0.333 dyn:eff=3.5 top=0.499 mRSg=0.745 set=54(mx237,prim1.02) con=148.5 inst=45 ldT=0.503 | 21.7m eta102m
+[ 2650/15000] pop=  6853 bd= 203 vil=49(med57) strat=6.7% giniC=0.336 dyn:eff=3.4 top=0.505 mRSg=0.753 set=54(mx309,prim1.42) con=157.5 inst=44 ldT=0.487 | 21.9m eta102m
+[ 2675/15000] pop=  6834 bd= 196 vil=50(med58.0) strat=11.2% giniC=0.337 dyn:eff=3.4 top=0.505 mRSg=0.755 set=54(mx240,prim1.13) con=131.0 inst=35 ldT=0.492 | 22.1m eta102m
+[ 2700/15000] pop=  7064 bd= 204 vil=49(med60) strat=15.2% giniC=0.33 dyn:eff=3.4 top=0.507 mRSg=0.755 set=54(mx286,prim1.18) con=145.5 inst=43 ldT=0.513 | 22.3m eta102m
+[ 2725/15000] pop=  7017 bd= 204 vil=51(med58) strat=16.3% giniC=0.329 dyn:eff=3.4 top=0.512 mRSg=0.754 set=54(mx311,prim1.17) con=151.0 inst=45 ldT=0.377 | 22.5m eta101m
+[ 2750/15000] pop=  7187 bd= 203 vil=54(med61.0) strat=15.7% giniC=0.326 dyn:eff=3.3 top=0.514 mRSg=0.748 set=54(mx364,prim1.52) con=143.0 inst=39 ldT=0.527 | 22.7m eta101m
+[ 2775/15000] pop=  7020 bd= 197 vil=52(med60.5) strat=17.3% giniC=0.33 dyn:eff=3.3 top=0.52 mRSg=0.744 set=54(mx249,prim1.14) con=145.0 inst=36 ldT=0.485 | 22.9m eta101m
+[ 2800/15000] pop=  6904 bd= 201 vil=49(med62) strat=18.9% giniC=0.322 dyn:eff=3.4 top=0.512 mRSg=0.741 set=54(mx365,prim1.31) con=121.0 inst=40 ldT=0.429 | 23.1m eta101m
+[ 2825/15000] pop=  6870 bd= 199 vil=52(med58.5) strat=15.3% giniC=0.315 dyn:eff=3.3 top=0.521 mRSg=0.732 set=54(mx303,prim1.17) con=108.0 inst=37 ldT=0.479 | 23.3m eta101m
+[ 2850/15000] pop=  6756 bd= 195 vil=49(med60) strat=19.7% giniC=0.316 dyn:eff=3.3 top=0.521 mRSg=0.732 set=54(mx320,prim1.27) con=114.0 inst=36 ldT=0.476 | 23.5m eta100m
+[ 2875/15000] pop=  6882 bd= 206 vil=47(med59) strat=12.0% giniC=0.316 dyn:eff=3.2 top=0.525 mRSg=0.735 set=54(mx212,prim1.01) con=94.0 inst=40 ldT=0.441 | 23.7m eta100m
+[ 2900/15000] pop=  6964 bd= 203 vil=47(med62) strat=12.3% giniC=0.315 dyn:eff=3.3 top=0.524 mRSg=0.733 set=54(mx294,prim1.52) con=89.0 inst=42 ldT=0.464 | 23.9m eta100m
+[ 2925/15000] pop=  6933 bd= 207 vil=49(med58) strat=17.8% giniC=0.314 dyn:eff=3.2 top=0.532 mRSg=0.737 set=54(mx321,prim1.54) con=138.0 inst=41 ldT=0.45 | 24.1m eta100m
+[ 2950/15000] pop=  6882 bd= 213 vil=46(med58.5) strat=18.8% giniC=0.313 dyn:eff=3.2 top=0.535 mRSg=0.741 set=54(mx250,prim1.15) con=107.0 inst=37 ldT=0.493 | 24.4m eta99m
+[ 2975/15000] pop=  7076 bd= 216 vil=49(med59) strat=11.4% giniC=0.315 dyn:eff=3.1 top=0.54 mRSg=0.746 set=54(mx273,prim1.02) con=109.0 inst=44 ldT=0.515 | 24.6m eta99m
+[ 3000/15000] pop=  6893 bd= 202 vil=49(med58) strat=13.9% giniC=0.316 dyn:eff=3.1 top=0.536 mRSg=0.748 set=54(mx296,prim1.13) con=131.0 inst=42 ldT=0.579 | 24.8m eta99m
+[ 3025/15000] pop=  7245 bd= 218 vil=51(med56) strat=14.1% giniC=0.315 dyn:eff=3.1 top=0.543 mRSg=0.749 set=54(mx336,prim1.81) con=134.0 inst=51 ldT=0.538 | 25.0m eta99m
+[ 3050/15000] pop=  6863 bd= 220 vil=43(med54) strat=21.4% giniC=0.315 dyn:eff=3.1 top=0.542 mRSg=0.744 set=54(mx238,prim1.25) con=144.0 inst=49 ldT=0.48 | 25.2m eta99m
+[ 3075/15000] pop=  7160 bd= 222 vil=49(med55) strat=16.2% giniC=0.312 dyn:eff=3.1 top=0.547 mRSg=0.744 set=54(mx349,prim1.49) con=119.0 inst=39 ldT=0.484 | 25.4m eta99m
+[ 3100/15000] pop=  7084 bd= 212 vil=50(med56.0) strat=16.0% giniC=0.31 dyn:eff=3.1 top=0.547 mRSg=0.741 set=54(mx317,prim1.33) con=122.0 inst=42 ldT=0.498 | 25.7m eta98m
+[ 3125/15000] pop=  7016 bd= 212 vil=50(med56.5) strat=9.5% giniC=0.302 dyn:eff=3.0 top=0.558 mRSg=0.735 set=54(mx279,prim1.09) con=118.0 inst=45 ldT=0.555 | 25.9m eta98m
+[ 3150/15000] pop=  6889 bd= 203 vil=50(med57.5) strat=11.1% giniC=0.302 dyn:eff=2.9 top=0.564 mRSg=0.737 set=54(mx243,prim1.12) con=125.0 inst=46 ldT=0.51 | 26.1m eta98m
+[ 3175/15000] pop=  7038 bd= 204 vil=51(med56) strat=7.0% giniC=0.298 dyn:eff=2.9 top=0.568 mRSg=0.737 set=54(mx342,prim1.49) con=110.0 inst=40 ldT=0.558 | 26.3m eta98m
+[ 3200/15000] pop=  6897 bd= 201 vil=46(med58.0) strat=7.6% giniC=0.297 dyn:eff=2.8 top=0.571 mRSg=0.73 set=54(mx289,prim1.1) con=128.0 inst=40 ldT=0.516 | 26.5m eta98m
+[ 3225/15000] pop=  6742 bd= 205 vil=40(med58.5) strat=16.4% giniC=0.3 dyn:eff=2.9 top=0.568 mRSg=0.732 set=54(mx227,prim1.06) con=110.0 inst=42 ldT=0.526 | 26.7m eta98m
+[ 3250/15000] pop=  7071 bd= 211 vil=47(med58) strat=13.9% giniC=0.299 dyn:eff=2.8 top=0.572 mRSg=0.732 set=54(mx372,prim1.84) con=115.0 inst=45 ldT=0.458 | 26.9m eta97m
+[ 3275/15000] pop=  7117 bd= 212 vil=46(med57.5) strat=15.7% giniC=0.298 dyn:eff=2.7 top=0.582 mRSg=0.733 set=54(mx342,prim1.32) con=113.0 inst=40 ldT=0.5 | 27.1m eta97m
+[ 3300/15000] pop=  7153 bd= 212 vil=47(med59) strat=15.8% giniC=0.303 dyn:eff=2.7 top=0.586 mRSg=0.739 set=54(mx255,prim1.05) con=126.0 inst=42 ldT=0.543 | 27.3m eta97m
+[ 3325/15000] pop=  7332 bd= 221 vil=49(med55) strat=14.9% giniC=0.301 dyn:eff=2.7 top=0.585 mRSg=0.73 set=54(mx387,prim1.99) con=143.0 inst=43 ldT=0.478 | 27.6m eta97m
+[ 3350/15000] pop=  7372 bd= 227 vil=49(med56) strat=16.1% giniC=0.297 dyn:eff=2.7 top=0.588 mRSg=0.729 set=54(mx303,prim1.22) con=126.0 inst=53 ldT=0.44 | 27.8m eta97m
+[ 3375/15000] pop=  6894 bd= 223 vil=40(med55.5) strat=16.0% giniC=0.298 dyn:eff=2.7 top=0.591 mRSg=0.732 set=54(mx275,prim1.04) con=123.0 inst=40 ldT=0.442 | 28.1m eta97m
+[ 3400/15000] pop=  6778 bd= 219 vil=39(med53) strat=23.5% giniC=0.3 dyn:eff=2.7 top=0.582 mRSg=0.73 set=54(mx261,prim1.07) con=139.5 inst=44 ldT=0.469 | 28.2m eta96m
+[ 3425/15000] pop=  7012 bd= 216 vil=41(med58) strat=20.9% giniC=0.3 dyn:eff=2.7 top=0.589 mRSg=0.737 set=54(mx301,prim1.24) con=142.0 inst=39 ldT=0.5 | 28.5m eta96m
+[ 3450/15000] pop=  6931 bd= 211 vil=38(med59.0) strat=12.9% giniC=0.305 dyn:eff=2.7 top=0.589 mRSg=0.726 set=54(mx272,prim1.17) con=123.0 inst=43 ldT=0.471 | 28.7m eta96m
+[ 3475/15000] pop=  6765 bd= 216 vil=36(med60.5) strat=20.3% giniC=0.302 dyn:eff=2.7 top=0.595 mRSg=0.726 set=54(mx268,prim1.23) con=128.0 inst=42 ldT=0.532 | 28.9m eta96m
+[ 3500/15000] pop=  7140 bd= 215 vil=41(med59) strat=14.6% giniC=0.304 dyn:eff=2.7 top=0.592 mRSg=0.734 set=54(mx332,prim1.33) con=119.0 inst=42 ldT=0.526 | 29.1m eta96m
+[ 3525/15000] pop=  7303 bd= 220 vil=46(med57.5) strat=10.4% giniC=0.306 dyn:eff=2.7 top=0.591 mRSg=0.73 set=54(mx308,prim1.24) con=126.0 inst=49 ldT=0.515 | 29.3m eta95m
+[ 3550/15000] pop=  7166 bd= 222 vil=39(med58) strat=17.3% giniC=0.311 dyn:eff=2.7 top=0.591 mRSg=0.734 set=54(mx246,prim1.04) con=133.5 inst=48 ldT=0.512 | 29.5m eta95m
+[ 3575/15000] pop=  7052 bd= 225 vil=36(med58.0) strat=18.5% giniC=0.316 dyn:eff=2.6 top=0.595 mRSg=0.73 set=54(mx281,prim1.23) con=133.0 inst=45 ldT=0.509 | 29.8m eta95m
+[ 3600/15000] pop=  6987 bd= 213 vil=39(med56) strat=15.0% giniC=0.315 dyn:eff=2.6 top=0.6 mRSg=0.729 set=54(mx236,prim1.19) con=141.0 inst=52 ldT=0.55 | 30.0m eta95m
+[ 3625/15000] pop=  7036 bd= 217 vil=39(med59) strat=18.1% giniC=0.314 dyn:eff=2.6 top=0.603 mRSg=0.727 set=54(mx302,prim1.5) con=142.0 inst=44 ldT=0.478 | 30.2m eta95m
+[ 3650/15000] pop=  6901 bd= 217 vil=42(med58.5) strat=17.6% giniC=0.318 dyn:eff=2.6 top=0.604 mRSg=0.73 set=54(mx255,prim1.08) con=150.0 inst=42 ldT=0.472 | 30.4m eta94m
+[ 3675/15000] pop=  7064 bd= 221 vil=42(med58.0) strat=20.0% giniC=0.312 dyn:eff=2.6 top=0.603 mRSg=0.725 set=54(mx424,prim1.8) con=126.0 inst=39 ldT=0.519 | 30.6m eta94m
+[ 3700/15000] pop=  6831 bd= 226 vil=40(med56.0) strat=16.3% giniC=0.316 dyn:eff=2.5 top=0.609 mRSg=0.734 set=54(mx288,prim1.35) con=142.0 inst=37 ldT=0.5 | 30.8m eta94m
+[ 3725/15000] pop=  6755 bd= 228 vil=33(med61) strat=15.2% giniC=0.324 dyn:eff=2.5 top=0.616 mRSg=0.732 set=54(mx266,prim1.25) con=118.0 inst=42 ldT=0.528 | 31.0m eta94m
+[ 3750/15000] pop=  6876 bd= 225 vil=43(med55) strat=8.9% giniC=0.326 dyn:eff=2.4 top=0.622 mRSg=0.732 set=54(mx228,prim1.08) con=128.0 inst=44 ldT=0.536 | 31.2m eta93m
+[ 3775/15000] pop=  6765 bd= 220 vil=41(med55) strat=11.6% giniC=0.321 dyn:eff=2.4 top=0.627 mRSg=0.729 set=54(mx304,prim1.45) con=125.0 inst=36 ldT=0.49 | 31.4m eta93m
+[ 3800/15000] pop=  6951 bd= 224 vil=45(med58) strat=12.9% giniC=0.316 dyn:eff=2.4 top=0.631 mRSg=0.732 set=54(mx341,prim1.24) con=132.5 inst=44 ldT=0.432 | 31.6m eta93m
+[ 3825/15000] pop=  6984 bd= 223 vil=45(med58) strat=15.9% giniC=0.311 dyn:eff=2.4 top=0.629 mRSg=0.727 set=54(mx312,prim1.24) con=127.0 inst=53 ldT=0.435 | 31.8m eta93m
+[ 3850/15000] pop=  6876 bd= 210 vil=46(med58.5) strat=21.3% giniC=0.313 dyn:eff=2.4 top=0.63 mRSg=0.723 set=54(mx297,prim1.22) con=97.0 inst=40 ldT=0.44 | 32.0m eta93m
+[ 3875/15000] pop=  6685 bd= 208 vil=40(med59.0) strat=20.5% giniC=0.311 dyn:eff=2.3 top=0.636 mRSg=0.734 set=54(mx245,prim1.17) con=104.0 inst=46 ldT=0.483 | 32.2m eta92m
+[ 3900/15000] pop=  6886 bd= 202 vil=47(med63) strat=22.1% giniC=0.307 dyn:eff=2.3 top=0.636 mRSg=0.734 set=54(mx337,prim1.49) con=104.0 inst=39 ldT=0.431 | 32.4m eta92m
+[ 3925/15000] pop=  7234 bd= 219 vil=47(med55) strat=18.7% giniC=0.301 dyn:eff=2.3 top=0.639 mRSg=0.736 set=54(mx369,prim1.41) con=118.0 inst=50 ldT=0.477 | 32.6m eta92m
+[ 3950/15000] pop=  6973 bd= 210 vil=46(med57.0) strat=17.3% giniC=0.302 dyn:eff=2.3 top=0.643 mRSg=0.737 set=54(mx282,prim1.02) con=118.5 inst=40 ldT=0.5 | 32.8m eta92m
+[ 3975/15000] pop=  7149 bd= 217 vil=49(med57) strat=19.8% giniC=0.302 dyn:eff=2.3 top=0.646 mRSg=0.737 set=54(mx383,prim1.41) con=112.0 inst=44 ldT=0.524 | 33.0m eta92m
+[ 4000/15000] pop=  7087 bd= 218 vil=49(med58) strat=12.2% giniC=0.303 dyn:eff=2.2 top=0.651 mRSg=0.737 set=54(mx240,prim1.06) con=126.0 inst=52 ldT=0.483 | 33.2m eta91m
+[ 4025/15000] pop=  7366 bd= 219 vil=56(med58.0) strat=8.3% giniC=0.299 dyn:eff=2.2 top=0.654 mRSg=0.737 set=54(mx291,prim1.21) con=131.0 inst=44 ldT=0.457 | 33.5m eta91m
+[ 4050/15000] pop=  7251 bd= 219 vil=52(med59.0) strat=7.2% giniC=0.303 dyn:eff=2.2 top=0.653 mRSg=0.741 set=54(mx308,prim1.15) con=133.0 inst=43 ldT=0.521 | 33.7m eta91m
+[ 4075/15000] pop=  7200 bd= 216 vil=52(med58.0) strat=7.1% giniC=0.301 dyn:eff=2.2 top=0.654 mRSg=0.737 set=54(mx315,prim1.13) con=151.0 inst=40 ldT=0.505 | 33.9m eta91m
+[ 4100/15000] pop=  7045 bd= 213 vil=49(med58) strat=6.8% giniC=0.299 dyn:eff=2.2 top=0.661 mRSg=0.732 set=54(mx293,prim1.08) con=141.0 inst=46 ldT=0.5 | 34.1m eta91m
+[ 4125/15000] pop=  7160 bd= 216 vil=46(med59.0) strat=6.3% giniC=0.298 dyn:eff=2.2 top=0.665 mRSg=0.734 set=54(mx343,prim1.36) con=128.0 inst=42 ldT=0.488 | 34.3m eta90m
+[ 4150/15000] pop=  6937 bd= 216 vil=50(med53.0) strat=12.0% giniC=0.297 dyn:eff=2.2 top=0.666 mRSg=0.743 set=54(mx303,prim1.26) con=131.0 inst=45 ldT=0.466 | 34.5m eta90m
+[ 4175/15000] pop=  7082 bd= 219 vil=46(med56.5) strat=15.2% giniC=0.293 dyn:eff=2.1 top=0.668 mRSg=0.738 set=54(mx324,prim1.25) con=149.0 inst=46 ldT=0.502 | 34.7m eta90m
+[ 4200/15000] pop=  7117 bd= 220 vil=46(med56.0) strat=14.1% giniC=0.296 dyn:eff=2.1 top=0.668 mRSg=0.734 set=54(mx287,prim1.32) con=128.0 inst=48 ldT=0.495 | 34.9m eta90m
+[ 4225/15000] pop=  6796 bd= 212 vil=43(med54) strat=24.0% giniC=0.298 dyn:eff=2.2 top=0.661 mRSg=0.736 set=54(mx282,prim1.2) con=133.0 inst=47 ldT=0.486 | 35.1m eta90m
+[ 4250/15000] pop=  7091 bd= 209 vil=47(med56) strat=15.0% giniC=0.295 dyn:eff=2.2 top=0.657 mRSg=0.734 set=54(mx388,prim1.76) con=136.0 inst=43 ldT=0.507 | 35.3m eta89m
+[ 4275/15000] pop=  6733 bd= 203 vil=48(med55.0) strat=24.5% giniC=0.299 dyn:eff=2.3 top=0.649 mRSg=0.724 set=54(mx349,prim1.5) con=130.0 inst=36 ldT=0.503 | 35.5m eta89m
+[ 4300/15000] pop=  6656 bd= 198 vil=42(med57.0) strat=17.0% giniC=0.302 dyn:eff=2.3 top=0.649 mRSg=0.726 set=54(mx262,prim1.32) con=146.5 inst=38 ldT=0.466 | 35.7m eta89m
+[ 4325/15000] pop=  6980 bd= 191 vil=49(med59) strat=17.5% giniC=0.299 dyn:eff=2.3 top=0.639 mRSg=0.727 set=54(mx327,prim1.42) con=132.0 inst=40 ldT=0.455 | 35.9m eta89m
+[ 4350/15000] pop=  7216 bd= 198 vil=57(med57) strat=10.0% giniC=0.293 dyn:eff=2.3 top=0.635 mRSg=0.732 set=54(mx366,prim1.44) con=120.0 inst=40 ldT=0.5 | 36.1m eta89m
+[ 4375/15000] pop=  7157 bd= 205 vil=53(med62) strat=6.5% giniC=0.292 dyn:eff=2.4 top=0.628 mRSg=0.734 set=54(mx275,prim1.1) con=103.0 inst=46 ldT=0.489 | 36.4m eta88m
+[ 4400/15000] pop=  7351 bd= 214 vil=55(med58) strat=10.8% giniC=0.289 dyn:eff=2.4 top=0.62 mRSg=0.739 set=54(mx350,prim1.27) con=156.0 inst=53 ldT=0.485 | 36.6m eta88m
+[ 4425/15000] pop=  7351 bd= 214 vil=51(med60) strat=5.0% giniC=0.294 dyn:eff=2.4 top=0.619 mRSg=0.746 set=54(mx318,prim1.2) con=135.5 inst=44 ldT=0.527 | 36.8m eta88m
+[ 4450/15000] pop=  7197 bd= 218 vil=49(med61) strat=7.5% giniC=0.292 dyn:eff=2.5 top=0.618 mRSg=0.748 set=54(mx325,prim1.27) con=139.0 inst=45 ldT=0.531 | 37.0m eta88m
+[ 4475/15000] pop=  6943 bd= 214 vil=47(med56) strat=14.2% giniC=0.292 dyn:eff=2.5 top=0.612 mRSg=0.738 set=54(mx248,prim1.04) con=115.0 inst=42 ldT=0.522 | 37.2m eta88m
+[ 4500/15000] pop=  6901 bd= 210 vil=45(med58) strat=17.5% giniC=0.289 dyn:eff=2.5 top=0.611 mRSg=0.744 set=54(mx242,prim1.16) con=127.0 inst=41 ldT=0.564 | 37.4m eta87m
+[ 4525/15000] pop=  6775 bd= 207 vil=46(med57.0) strat=21.3% giniC=0.29 dyn:eff=2.5 top=0.604 mRSg=0.747 set=54(mx285,prim1.16) con=130.5 inst=38 ldT=0.502 | 37.6m eta87m
+[ 4550/15000] pop=  7016 bd= 210 vil=48(med58.0) strat=21.9% giniC=0.293 dyn:eff=2.6 top=0.599 mRSg=0.745 set=54(mx300,prim1.29) con=134.0 inst=37 ldT=0.417 | 37.8m eta87m
+[ 4575/15000] pop=  7182 bd= 209 vil=54(med58.0) strat=16.7% giniC=0.293 dyn:eff=2.6 top=0.594 mRSg=0.741 set=54(mx387,prim1.37) con=143.5 inst=49 ldT=0.534 | 38.0m eta87m
+[ 4600/15000] pop=  7060 bd= 209 vil=49(med58) strat=20.3% giniC=0.294 dyn:eff=2.6 top=0.59 mRSg=0.735 set=54(mx235,prim1.1) con=129.0 inst=40 ldT=0.54 | 38.2m eta86m
+[ 4625/15000] pop=  6982 bd= 213 vil=48(med55.5) strat=14.5% giniC=0.288 dyn:eff=2.7 top=0.581 mRSg=0.728 set=54(mx307,prim1.42) con=136.0 inst=44 ldT=0.517 | 38.5m eta86m
+[ 4650/15000] pop=  6612 bd= 204 vil=42(med57.5) strat=13.8% giniC=0.289 dyn:eff=2.7 top=0.578 mRSg=0.736 set=54(mx229,prim1.05) con=122.0 inst=36 ldT=0.48 | 38.7m eta86m
+[ 4675/15000] pop=  6971 bd= 210 vil=40(med58.5) strat=18.6% giniC=0.287 dyn:eff=2.7 top=0.577 mRSg=0.734 set=54(mx310,prim1.42) con=129.0 inst=40 ldT=0.47 | 38.9m eta86m
+[ 4700/15000] pop=  7056 bd= 212 vil=44(med56.5) strat=14.0% giniC=0.286 dyn:eff=2.8 top=0.571 mRSg=0.735 set=54(mx327,prim1.3) con=135.0 inst=50 ldT=0.554 | 39.1m eta86m
+[ 4725/15000] pop=  6948 bd= 212 vil=38(med61.0) strat=11.4% giniC=0.286 dyn:eff=2.8 top=0.568 mRSg=0.734 set=54(mx253,prim1.11) con=126.0 inst=45 ldT=0.485 | 39.3m eta85m
+[ 4750/15000] pop=  7017 bd= 208 vil=51(med56) strat=13.9% giniC=0.284 dyn:eff=2.8 top=0.566 mRSg=0.738 set=54(mx313,prim1.15) con=134.5 inst=36 ldT=0.514 | 39.5m eta85m
+[ 4775/15000] pop=  6884 bd= 211 vil=47(med55) strat=12.6% giniC=0.281 dyn:eff=2.8 top=0.567 mRSg=0.745 set=54(mx264,prim1.02) con=147.0 inst=42 ldT=0.498 | 39.7m eta85m
+[ 4800/15000] pop=  6983 bd= 208 vil=49(med57) strat=19.2% giniC=0.283 dyn:eff=2.8 top=0.565 mRSg=0.746 set=54(mx282,prim1.17) con=130.0 inst=41 ldT=0.485 | 39.9m eta85m
+[ 4825/15000] pop=  6928 bd= 206 vil=52(med56.5) strat=16.8% giniC=0.284 dyn:eff=2.9 top=0.557 mRSg=0.748 set=54(mx245,prim1.12) con=132.0 inst=44 ldT=0.483 | 40.1m eta85m
+[ 4850/15000] pop=  6934 bd= 206 vil=54(med54.5) strat=21.1% giniC=0.284 dyn:eff=2.9 top=0.556 mRSg=0.736 set=54(mx374,prim1.48) con=129.0 inst=48 ldT=0.485 | 40.3m eta84m
+[ 4875/15000] pop=  7015 bd= 204 vil=53(med55) strat=19.7% giniC=0.289 dyn:eff=2.9 top=0.554 mRSg=0.74 set=54(mx292,prim1.04) con=118.0 inst=43 ldT=0.538 | 40.5m eta84m
+[ 4900/15000] pop=  7155 bd= 206 vil=51(med55) strat=14.1% giniC=0.284 dyn:eff=2.9 top=0.553 mRSg=0.737 set=54(mx362,prim1.41) con=105.0 inst=39 ldT=0.477 | 40.7m eta84m
+[ 4925/15000] pop=  7202 bd= 213 vil=54(med56.5) strat=16.9% giniC=0.284 dyn:eff=2.9 top=0.554 mRSg=0.736 set=54(mx368,prim1.43) con=108.0 inst=43 ldT=0.52 | 40.9m eta84m
+[ 4950/15000] pop=  7154 bd= 214 vil=51(med56) strat=11.2% giniC=0.288 dyn:eff=2.9 top=0.554 mRSg=0.746 set=54(mx318,prim1.0) con=153.0 inst=47 ldT=0.527 | 41.1m eta83m
+[ 4975/15000] pop=  7043 bd= 216 vil=47(med57) strat=12.9% giniC=0.288 dyn:eff=3.0 top=0.545 mRSg=0.748 set=54(mx235,prim1.03) con=159.5 inst=49 ldT=0.538 | 41.3m eta83m
+[ 5000/15000] pop=  6963 bd= 216 vil=42(med58.0) strat=10.9% giniC=0.292 dyn:eff=3.0 top=0.543 mRSg=0.746 set=54(mx251,prim1.05) con=128.0 inst=38 ldT=0.519 | 41.5m eta83m
+[ 5025/15000] pop=  6874 bd= 214 vil=39(med61) strat=13.6% giniC=0.29 dyn:eff=3.0 top=0.542 mRSg=0.737 set=54(mx283,prim1.28) con=111.0 inst=45 ldT=0.488 | 41.7m eta83m
+[ 5050/15000] pop=  6716 bd= 217 vil=35(med57) strat=16.3% giniC=0.294 dyn:eff=3.0 top=0.544 mRSg=0.738 set=54(mx237,prim1.15) con=154.5 inst=36 ldT=0.512 | 41.9m eta83m
+[ 5075/15000] pop=  6917 bd= 219 vil=45(med54) strat=22.8% giniC=0.293 dyn:eff=3.0 top=0.542 mRSg=0.738 set=54(mx340,prim1.83) con=171.0 inst=51 ldT=0.514 | 42.1m eta82m
+[ 5100/15000] pop=  6861 bd= 213 vil=42(med58.0) strat=19.2% giniC=0.301 dyn:eff=3.0 top=0.545 mRSg=0.744 set=54(mx250,prim1.06) con=161.5 inst=41 ldT=0.535 | 42.3m eta82m
+[ 5125/15000] pop=  7059 bd= 212 vil=47(med57) strat=16.7% giniC=0.299 dyn:eff=2.9 top=0.555 mRSg=0.746 set=54(mx332,prim1.46) con=145.0 inst=44 ldT=0.483 | 42.5m eta82m
+[ 5150/15000] pop=  7110 bd= 222 vil=50(med54.0) strat=16.8% giniC=0.3 dyn:eff=2.8 top=0.56 mRSg=0.748 set=54(mx321,prim1.34) con=140.0 inst=38 ldT=0.451 | 42.7m eta82m
+[ 5175/15000] pop=  7168 bd= 224 vil=46(med57.5) strat=16.9% giniC=0.301 dyn:eff=2.8 top=0.564 mRSg=0.747 set=54(mx353,prim1.39) con=62.0 inst=39 ldT=0.498 | 42.9m eta82m
+[ 5200/15000] pop=  7148 bd= 222 vil=49(med55) strat=8.9% giniC=0.301 dyn:eff=2.8 top=0.562 mRSg=0.741 set=54(mx330,prim1.29) con=148.0 inst=49 ldT=0.438 | 43.1m eta81m
+[ 5225/15000] pop=  6953 bd= 219 vil=41(med59) strat=13.3% giniC=0.304 dyn:eff=2.8 top=0.569 mRSg=0.741 set=54(mx220,prim1.2) con=130.0 inst=48 ldT=0.479 | 43.4m eta81m
+[ 5250/15000] pop=  7015 bd= 216 vil=40(med62.0) strat=12.8% giniC=0.299 dyn:eff=2.8 top=0.573 mRSg=0.744 set=54(mx327,prim1.45) con=123.0 inst=39 ldT=0.498 | 43.6m eta81m
+[ 5275/15000] pop=  6971 bd= 221 vil=45(med57) strat=15.0% giniC=0.3 dyn:eff=2.7 top=0.581 mRSg=0.749 set=54(mx303,prim1.37) con=138.5 inst=45 ldT=0.486 | 43.8m eta81m
+[ 5300/15000] pop=  7179 bd= 223 vil=45(med58) strat=10.9% giniC=0.299 dyn:eff=2.7 top=0.581 mRSg=0.745 set=54(mx342,prim1.4) con=130.5 inst=45 ldT=0.554 | 44.0m eta81m
+[ 5325/15000] pop=  6849 bd= 224 vil=42(med56.0) strat=17.2% giniC=0.302 dyn:eff=2.6 top=0.591 mRSg=0.742 set=54(mx293,prim1.36) con=149.0 inst=42 ldT=0.491 | 44.2m eta80m
+[ 5350/15000] pop=  7004 bd= 218 vil=49(med56) strat=15.5% giniC=0.304 dyn:eff=2.6 top=0.593 mRSg=0.741 set=54(mx271,prim1.14) con=144.5 inst=38 ldT=0.438 | 44.5m eta80m
+[ 5375/15000] pop=  7191 bd= 217 vil=52(med57.5) strat=9.5% giniC=0.303 dyn:eff=2.6 top=0.597 mRSg=0.739 set=54(mx264,prim1.05) con=126.0 inst=42 ldT=0.451 | 44.7m eta80m
+[ 5400/15000] pop=  7094 bd= 217 vil=47(med60) strat=14.9% giniC=0.302 dyn:eff=2.5 top=0.604 mRSg=0.737 set=54(mx257,prim1.06) con=122.0 inst=47 ldT=0.457 | 44.9m eta80m
+[ 5425/15000] pop=  6965 bd= 209 vil=45(med63) strat=12.5% giniC=0.3 dyn:eff=2.5 top=0.61 mRSg=0.731 set=54(mx265,prim1.08) con=137.5 inst=48 ldT=0.435 | 45.2m eta80m
+[ 5450/15000] pop=  7002 bd= 202 vil=44(med60.5) strat=17.6% giniC=0.299 dyn:eff=2.5 top=0.613 mRSg=0.731 set=54(mx275,prim1.01) con=132.0 inst=43 ldT=0.449 | 45.4m eta80m
+[ 5475/15000] pop=  7096 bd= 204 vil=50(med61.0) strat=17.0% giniC=0.293 dyn:eff=2.4 top=0.617 mRSg=0.732 set=54(mx297,prim1.08) con=137.0 inst=48 ldT=0.528 | 45.6m eta79m
+[ 5500/15000] pop=  7145 bd= 210 vil=49(med62) strat=17.7% giniC=0.292 dyn:eff=2.4 top=0.619 mRSg=0.73 set=54(mx313,prim1.05) con=149.0 inst=46 ldT=0.541 | 45.8m eta79m
+[ 5525/15000] pop=  7062 bd= 221 vil=46(med57.0) strat=10.1% giniC=0.292 dyn:eff=2.4 top=0.622 mRSg=0.728 set=54(mx293,prim1.04) con=137.0 inst=40 ldT=0.398 | 46.0m eta79m
+[ 5550/15000] pop=  7130 bd= 215 vil=48(med59.0) strat=10.9% giniC=0.29 dyn:eff=2.4 top=0.623 mRSg=0.722 set=54(mx289,prim1.02) con=125.0 inst=42 ldT=0.464 | 46.2m eta79m
+[ 5575/15000] pop=  7104 bd= 212 vil=46(med57.5) strat=12.4% giniC=0.289 dyn:eff=2.4 top=0.626 mRSg=0.724 set=54(mx303,prim1.2) con=121.0 inst=31 ldT=0.493 | 46.5m eta79m
+[ 5600/15000] pop=  7190 bd= 214 vil=50(med59.0) strat=7.9% giniC=0.291 dyn:eff=2.4 top=0.624 mRSg=0.726 set=54(mx236,prim1.15) con=122.0 inst=48 ldT=0.459 | 46.7m eta78m
+[ 5625/15000] pop=  7107 bd= 211 vil=48(med58.5) strat=5.1% giniC=0.29 dyn:eff=2.4 top=0.626 mRSg=0.726 set=54(mx242,prim1.03) con=124.0 inst=37 ldT=0.512 | 46.9m eta78m
+[ 5650/15000] pop=  7111 bd= 208 vil=49(med57) strat=8.9% giniC=0.288 dyn:eff=2.4 top=0.625 mRSg=0.722 set=54(mx272,prim1.13) con=116.0 inst=40 ldT=0.46 | 47.1m eta78m
+[ 5675/15000] pop=  7092 bd= 207 vil=45(med61) strat=15.0% giniC=0.283 dyn:eff=2.4 top=0.624 mRSg=0.721 set=54(mx310,prim1.23) con=102.0 inst=39 ldT=0.552 | 47.3m eta78m
+[ 5700/15000] pop=  6941 bd= 206 vil=46(med54.0) strat=15.0% giniC=0.287 dyn:eff=2.4 top=0.63 mRSg=0.734 set=54(mx270,prim1.03) con=111.0 inst=35 ldT=0.51 | 47.5m eta77m
+[ 5725/15000] pop=  7066 bd= 205 vil=47(med55) strat=14.1% giniC=0.29 dyn:eff=2.3 top=0.633 mRSg=0.73 set=54(mx323,prim1.33) con=108.0 inst=38 ldT=0.599 | 47.7m eta77m
+[ 5750/15000] pop=  7067 bd= 208 vil=49(med56) strat=17.7% giniC=0.286 dyn:eff=2.4 top=0.629 mRSg=0.724 set=54(mx306,prim1.25) con=81.0 inst=43 ldT=0.515 | 47.9m eta77m
+[ 5775/15000] pop=  6711 bd= 204 vil=40(med59.5) strat=18.4% giniC=0.291 dyn:eff=2.4 top=0.626 mRSg=0.725 set=54(mx298,prim1.23) con=125.0 inst=33 ldT=0.534 | 48.1m eta77m
+[ 5800/15000] pop=  6938 bd= 198 vil=51(med58) strat=18.8% giniC=0.287 dyn:eff=2.4 top=0.628 mRSg=0.727 set=54(mx369,prim1.33) con=122.0 inst=37 ldT=0.472 | 48.3m eta77m
+[ 5825/15000] pop=  7049 bd= 199 vil=58(med57.5) strat=17.9% giniC=0.29 dyn:eff=2.4 top=0.627 mRSg=0.722 set=54(mx324,prim1.22) con=89.0 inst=45 ldT=0.482 | 48.5m eta76m
+[ 5850/15000] pop=  6967 bd= 197 vil=58(med58.0) strat=15.5% giniC=0.295 dyn:eff=2.4 top=0.629 mRSg=0.718 set=54(mx208,prim1.01) con=97.0 inst=44 ldT=0.505 | 48.7m eta76m
+[ 5875/15000] pop=  7015 bd= 195 vil=58(med57.0) strat=10.1% giniC=0.297 dyn:eff=2.4 top=0.627 mRSg=0.72 set=54(mx294,prim1.32) con=134.5 inst=43 ldT=0.478 | 48.9m eta76m
+[ 5900/15000] pop=  6976 bd= 202 vil=56(med57.0) strat=11.9% giniC=0.297 dyn:eff=2.3 top=0.632 mRSg=0.728 set=54(mx314,prim1.35) con=123.5 inst=37 ldT=0.542 | 49.1m eta76m
+[ 5925/15000] pop=  6860 bd= 208 vil=49(med59) strat=13.8% giniC=0.297 dyn:eff=2.3 top=0.638 mRSg=0.738 set=54(mx241,prim1.01) con=93.0 inst=47 ldT=0.495 | 49.3m eta76m
+[ 5950/15000] pop=  7202 bd= 217 vil=47(med59) strat=12.0% giniC=0.297 dyn:eff=2.3 top=0.635 mRSg=0.739 set=54(mx355,prim1.46) con=95.0 inst=49 ldT=0.48 | 49.6m eta75m
+[ 5975/15000] pop=  6943 bd= 209 vil=50(med57.0) strat=20.0% giniC=0.298 dyn:eff=2.3 top=0.636 mRSg=0.746 set=54(mx293,prim1.3) con=126.5 inst=36 ldT=0.529 | 49.8m eta75m
+[ 6000/15000] pop=  6929 bd= 202 vil=50(med59.5) strat=21.4% giniC=0.294 dyn:eff=2.4 top=0.628 mRSg=0.747 set=54(mx343,prim1.33) con=132.0 inst=49 ldT=0.482 | 50.0m eta75m
+[ 6025/15000] pop=  6919 bd= 204 vil=46(med58.5) strat=20.5% giniC=0.299 dyn:eff=2.4 top=0.628 mRSg=0.742 set=54(mx323,prim1.07) con=118.0 inst=41 ldT=0.531 | 50.2m eta75m
+[ 6050/15000] pop=  7258 bd= 207 vil=52(med55.5) strat=12.6% giniC=0.299 dyn:eff=2.4 top=0.624 mRSg=0.735 set=54(mx365,prim1.1) con=92.0 inst=44 ldT=0.561 | 50.4m eta75m
+[ 6075/15000] pop=  6984 bd= 205 vil=44(med58.5) strat=17.4% giniC=0.298 dyn:eff=2.4 top=0.625 mRSg=0.736 set=54(mx279,prim1.09) con=91.0 inst=36 ldT=0.526 | 50.6m eta74m
+[ 6100/15000] pop=  7134 bd= 206 vil=49(med59) strat=12.0% giniC=0.295 dyn:eff=2.4 top=0.62 mRSg=0.741 set=54(mx311,prim1.18) con=109.5 inst=43 ldT=0.525 | 50.8m eta74m
+[ 6125/15000] pop=  7083 bd= 201 vil=50(med59.5) strat=12.9% giniC=0.294 dyn:eff=2.5 top=0.614 mRSg=0.736 set=54(mx283,prim1.08) con=112.0 inst=38 ldT=0.492 | 51.0m eta74m
+[ 6150/15000] pop=  6960 bd= 205 vil=50(med58.0) strat=15.6% giniC=0.291 dyn:eff=2.5 top=0.61 mRSg=0.733 set=54(mx257,prim1.06) con=102.5 inst=41 ldT=0.503 | 51.2m eta74m
+[ 6175/15000] pop=  6903 bd= 203 vil=52(med56.0) strat=11.1% giniC=0.291 dyn:eff=2.5 top=0.608 mRSg=0.739 set=54(mx246,prim1.17) con=98.0 inst=47 ldT=0.487 | 51.4m eta73m
+[ 6200/15000] pop=  7152 bd= 200 vil=60(med57.0) strat=11.1% giniC=0.289 dyn:eff=2.5 top=0.603 mRSg=0.739 set=54(mx298,prim1.15) con=104.5 inst=40 ldT=0.405 | 51.6m eta73m
+[ 6225/15000] pop=  6991 bd= 205 vil=55(med57) strat=13.7% giniC=0.289 dyn:eff=2.5 top=0.603 mRSg=0.739 set=54(mx300,prim1.19) con=124.0 inst=40 ldT=0.588 | 51.8m eta73m
+[ 6250/15000] pop=  6954 bd= 197 vil=50(med58.5) strat=12.7% giniC=0.294 dyn:eff=2.6 top=0.598 mRSg=0.746 set=54(mx264,prim1.11) con=109.0 inst=34 ldT=0.518 | 52.0m eta73m
+[ 6275/15000] pop=  7170 bd= 202 vil=52(med58.5) strat=11.1% giniC=0.289 dyn:eff=2.6 top=0.595 mRSg=0.74 set=54(mx308,prim1.33) con=103.0 inst=45 ldT=0.521 | 52.2m eta73m
+[ 6300/15000] pop=  7088 bd= 212 vil=46(med57.0) strat=12.6% giniC=0.289 dyn:eff=2.6 top=0.593 mRSg=0.733 set=54(mx293,prim1.24) con=117.5 inst=52 ldT=0.538 | 52.5m eta72m
+[ 6325/15000] pop=  7345 bd= 211 vil=52(med58.5) strat=9.7% giniC=0.295 dyn:eff=2.6 top=0.593 mRSg=0.734 set=54(mx333,prim1.24) con=122.5 inst=48 ldT=0.481 | 52.7m eta72m
+[ 6350/15000] pop=  7106 bd= 214 vil=40(med58.5) strat=12.3% giniC=0.294 dyn:eff=2.6 top=0.593 mRSg=0.731 set=54(mx354,prim1.26) con=110.0 inst=39 ldT=0.493 | 52.9m eta72m
+[ 6375/15000] pop=  7087 bd= 215 vil=46(med56.5) strat=10.4% giniC=0.293 dyn:eff=2.6 top=0.59 mRSg=0.735 set=54(mx335,prim1.41) con=102.0 inst=40 ldT=0.51 | 53.1m eta72m
+[ 6400/15000] pop=  7219 bd= 219 vil=51(med55) strat=9.8% giniC=0.297 dyn:eff=2.6 top=0.588 mRSg=0.739 set=54(mx321,prim1.43) con=96.0 inst=40 ldT=0.423 | 53.3m eta72m
+[ 6425/15000] pop=  7453 bd= 222 vil=54(med57.0) strat=8.1% giniC=0.294 dyn:eff=2.6 top=0.591 mRSg=0.74 set=54(mx407,prim1.57) con=92.0 inst=49 ldT=0.458 | 53.5m eta71m
+[ 6450/15000] pop=  6963 bd= 221 vil=40(med57.5) strat=7.9% giniC=0.294 dyn:eff=2.6 top=0.59 mRSg=0.74 set=54(mx288,prim1.01) con=99.0 inst=40 ldT=0.524 | 53.7m eta71m
+[ 6475/15000] pop=  7031 bd= 218 vil=42(med61.0) strat=15.1% giniC=0.292 dyn:eff=2.6 top=0.59 mRSg=0.735 set=54(mx389,prim1.66) con=100.0 inst=48 ldT=0.54 | 53.9m eta71m
+[ 6500/15000] pop=  6776 bd= 212 vil=37(med58) strat=17.6% giniC=0.299 dyn:eff=2.6 top=0.586 mRSg=0.736 set=54(mx262,prim1.07) con=95.0 inst=35 ldT=0.5 | 54.1m eta71m
+[ 6525/15000] pop=  6977 bd= 216 vil=42(med58.5) strat=8.8% giniC=0.297 dyn:eff=2.6 top=0.586 mRSg=0.729 set=54(mx365,prim1.67) con=117.0 inst=41 ldT=0.444 | 54.3m eta71m
+[ 6550/15000] pop=  6907 bd= 215 vil=40(med57.0) strat=11.4% giniC=0.288 dyn:eff=2.6 top=0.585 mRSg=0.725 set=54(mx263,prim1.17) con=123.0 inst=42 ldT=0.493 | 54.5m eta70m
+[ 6575/15000] pop=  6992 bd= 208 vil=47(med56) strat=15.3% giniC=0.287 dyn:eff=2.6 top=0.586 mRSg=0.719 set=54(mx333,prim1.56) con=109.0 inst=44 ldT=0.466 | 54.7m eta70m
+[ 6600/15000] pop=  7024 bd= 207 vil=44(med61.0) strat=9.9% giniC=0.29 dyn:eff=2.6 top=0.588 mRSg=0.724 set=54(mx260,prim1.26) con=106.0 inst=50 ldT=0.553 | 54.9m eta70m
+[ 6625/15000] pop=  6899 bd= 204 vil=49(med58) strat=22.3% giniC=0.29 dyn:eff=2.6 top=0.591 mRSg=0.724 set=54(mx361,prim1.67) con=113.0 inst=43 ldT=0.446 | 55.1m eta70m
+[ 6650/15000] pop=  6977 bd= 210 vil=52(med58.0) strat=22.3% giniC=0.292 dyn:eff=2.6 top=0.588 mRSg=0.729 set=54(mx354,prim1.27) con=126.5 inst=44 ldT=0.44 | 55.4m eta70m
+[ 6675/15000] pop=  7002 bd= 217 vil=53(med59) strat=19.4% giniC=0.292 dyn:eff=2.6 top=0.586 mRSg=0.737 set=54(mx276,prim1.01) con=128.0 inst=37 ldT=0.468 | 55.6m eta69m
+[ 6700/15000] pop=  7186 bd= 221 vil=53(med59) strat=13.7% giniC=0.29 dyn:eff=2.6 top=0.583 mRSg=0.743 set=54(mx324,prim1.29) con=140.5 inst=39 ldT=0.46 | 55.8m eta69m
+[ 6725/15000] pop=  7055 bd= 210 vil=51(med60) strat=8.0% giniC=0.29 dyn:eff=2.6 top=0.587 mRSg=0.739 set=54(mx275,prim1.64) con=107.0 inst=44 ldT=0.498 | 56.0m eta69m
+[ 6750/15000] pop=  7195 bd= 213 vil=50(med63.0) strat=13.2% giniC=0.287 dyn:eff=2.6 top=0.585 mRSg=0.747 set=54(mx263,prim1.1) con=109.0 inst=43 ldT=0.461 | 56.2m eta69m
+[ 6775/15000] pop=  7027 bd= 222 vil=45(med57) strat=5.1% giniC=0.29 dyn:eff=2.6 top=0.581 mRSg=0.742 set=54(mx218,prim1.11) con=108.0 inst=40 ldT=0.507 | 56.4m eta68m
+[ 6800/15000] pop=  7323 bd= 226 vil=51(med56) strat=7.0% giniC=0.287 dyn:eff=2.6 top=0.581 mRSg=0.742 set=54(mx323,prim1.39) con=111.0 inst=52 ldT=0.517 | 56.6m eta68m
+[ 6825/15000] pop=  7218 bd= 231 vil=51(med54) strat=10.4% giniC=0.29 dyn:eff=2.6 top=0.582 mRSg=0.737 set=54(mx253,prim1.03) con=110.0 inst=48 ldT=0.519 | 56.9m eta68m
+[ 6850/15000] pop=  7126 bd= 228 vil=47(med56) strat=9.2% giniC=0.288 dyn:eff=2.6 top=0.579 mRSg=0.733 set=54(mx282,prim1.28) con=112.5 inst=47 ldT=0.507 | 57.1m eta68m
+[ 6875/15000] pop=  7300 bd= 230 vil=46(med58.5) strat=8.6% giniC=0.288 dyn:eff=2.6 top=0.581 mRSg=0.727 set=54(mx291,prim1.11) con=108.0 inst=47 ldT=0.55 | 57.3m eta68m
+[ 6900/15000] pop=  7123 bd= 225 vil=39(med59) strat=12.6% giniC=0.288 dyn:eff=2.6 top=0.583 mRSg=0.734 set=54(mx270,prim1.24) con=114.0 inst=44 ldT=0.528 | 57.5m eta68m
+[ 6925/15000] pop=  7174 bd= 228 vil=44(med57.5) strat=9.8% giniC=0.285 dyn:eff=2.6 top=0.578 mRSg=0.73 set=54(mx357,prim1.38) con=102.0 inst=41 ldT=0.502 | 57.7m eta67m
+[ 6950/15000] pop=  7140 bd= 225 vil=41(med56) strat=16.2% giniC=0.288 dyn:eff=2.6 top=0.575 mRSg=0.726 set=54(mx349,prim1.44) con=119.5 inst=38 ldT=0.532 | 57.9m eta67m
+[ 6975/15000] pop=  7268 bd= 215 vil=51(med55) strat=11.3% giniC=0.284 dyn:eff=2.6 top=0.572 mRSg=0.731 set=54(mx418,prim1.61) con=96.0 inst=38 ldT=0.516 | 58.1m eta67m
+[ 7000/15000] pop=  7109 bd= 212 vil=50(med56.5) strat=13.9% giniC=0.287 dyn:eff=2.6 top=0.568 mRSg=0.732 set=54(mx329,prim1.57) con=95.0 inst=47 ldT=0.471 | 58.3m eta67m
+[ 7025/15000] pop=  6760 bd= 202 vil=48(med58.0) strat=12.7% giniC=0.291 dyn:eff=2.7 top=0.567 mRSg=0.728 set=54(mx255,prim1.12) con=123.0 inst=42 ldT=0.48 | 58.5m eta66m
+[ 7050/15000] pop=  7080 bd= 204 vil=53(med59) strat=8.5% giniC=0.287 dyn:eff=2.7 top=0.564 mRSg=0.733 set=54(mx387,prim1.58) con=125.0 inst=34 ldT=0.5 | 58.7m eta66m
+[ 7075/15000] pop=  6871 bd= 203 vil=53(med54) strat=14.6% giniC=0.289 dyn:eff=2.7 top=0.555 mRSg=0.732 set=54(mx290,prim1.08) con=120.0 inst=41 ldT=0.492 | 58.9m eta66m
+[ 7100/15000] pop=  7305 bd= 211 vil=54(med57.5) strat=7.4% giniC=0.289 dyn:eff=2.7 top=0.555 mRSg=0.735 set=54(mx293,prim1.19) con=135.0 inst=45 ldT=0.579 | 59.1m eta66m
+[ 7125/15000] pop=  6775 bd= 208 vil=47(med57) strat=9.8% giniC=0.29 dyn:eff=2.8 top=0.549 mRSg=0.736 set=54(mx268,prim1.14) con=141.0 inst=36 ldT=0.561 | 59.3m eta66m
+[ 7150/15000] pop=  6668 bd= 209 vil=49(med54) strat=15.6% giniC=0.295 dyn:eff=2.8 top=0.55 mRSg=0.735 set=54(mx222,prim1.16) con=152.0 inst=39 ldT=0.523 | 59.5m eta65m
+[ 7175/15000] pop=  6810 bd= 207 vil=50(med58.0) strat=16.3% giniC=0.294 dyn:eff=2.8 top=0.543 mRSg=0.739 set=54(mx352,prim1.43) con=161.0 inst=39 ldT=0.532 | 59.7m eta65m
+[ 7200/15000] pop=  7131 bd= 204 vil=56(med55.5) strat=12.7% giniC=0.297 dyn:eff=2.8 top=0.538 mRSg=0.739 set=54(mx316,prim1.29) con=139.0 inst=38 ldT=0.5 | 59.9m eta65m
+[ 7225/15000] pop=  7385 bd= 205 vil=52(med61.5) strat=9.9% giniC=0.3 dyn:eff=2.8 top=0.538 mRSg=0.745 set=54(mx354,prim1.47) con=136.0 inst=42 ldT=0.46 | 60.2m eta65m
+[ 7250/15000] pop=  6815 bd= 206 vil=47(med56) strat=14.0% giniC=0.301 dyn:eff=2.8 top=0.535 mRSg=0.737 set=54(mx264,prim1.09) con=130.0 inst=39 ldT=0.518 | 60.4m eta65m
+[ 7275/15000] pop=  6943 bd= 213 vil=50(med55.5) strat=10.3% giniC=0.295 dyn:eff=2.8 top=0.537 mRSg=0.741 set=54(mx352,prim1.61) con=129.0 inst=40 ldT=0.513 | 60.6m eta64m
+[ 7300/15000] pop=  7013 bd= 216 vil=48(med57.0) strat=12.5% giniC=0.291 dyn:eff=2.8 top=0.541 mRSg=0.738 set=54(mx298,prim1.24) con=149.5 inst=47 ldT=0.462 | 60.8m eta64m
+[ 7325/15000] pop=  7088 bd= 218 vil=49(med60) strat=18.5% giniC=0.289 dyn:eff=2.8 top=0.543 mRSg=0.733 set=54(mx323,prim1.4) con=91.0 inst=44 ldT=0.437 | 61.0m eta64m
+[ 7350/15000] pop=  6890 bd= 204 vil=52(med59.0) strat=14.2% giniC=0.286 dyn:eff=2.8 top=0.539 mRSg=0.737 set=54(mx297,prim1.28) con=103.0 inst=35 ldT=0.475 | 61.2m eta64m
+[ 7375/15000] pop=  6905 bd= 201 vil=55(med61) strat=17.0% giniC=0.283 dyn:eff=2.8 top=0.541 mRSg=0.74 set=54(mx346,prim1.46) con=116.0 inst=40 ldT=0.464 | 61.4m eta64m
+[ 7400/15000] pop=  6800 bd= 204 vil=53(med57) strat=14.7% giniC=0.291 dyn:eff=2.8 top=0.539 mRSg=0.744 set=54(mx270,prim1.11) con=120.0 inst=34 ldT=0.405 | 61.6m eta63m
+[ 7425/15000] pop=  7214 bd= 204 vil=56(med59.5) strat=9.6% giniC=0.293 dyn:eff=2.8 top=0.538 mRSg=0.745 set=54(mx349,prim1.26) con=122.0 inst=42 ldT=0.497 | 61.8m eta63m
+[ 7450/15000] pop=  7024 bd= 210 vil=53(med57) strat=19.8% giniC=0.293 dyn:eff=2.8 top=0.531 mRSg=0.738 set=54(mx267,prim1.27) con=98.0 inst=48 ldT=0.51 | 62.1m eta63m
+[ 7475/15000] pop=  6868 bd= 208 vil=50(med54.0) strat=19.8% giniC=0.294 dyn:eff=2.8 top=0.529 mRSg=0.741 set=54(mx229,prim1.04) con=104.0 inst=37 ldT=0.505 | 62.3m eta63m
+[ 7500/15000] pop=  7057 bd= 212 vil=48(med57.5) strat=23.7% giniC=0.292 dyn:eff=2.9 top=0.525 mRSg=0.737 set=54(mx343,prim1.63) con=105.5 inst=45 ldT=0.472 | 62.5m eta62m
+[ 7525/15000] pop=  7364 bd= 207 vil=53(med59) strat=10.1% giniC=0.289 dyn:eff=2.9 top=0.524 mRSg=0.734 set=54(mx359,prim1.3) con=90.0 inst=42 ldT=0.488 | 62.7m eta62m
+[ 7550/15000] pop=  7069 bd= 204 vil=49(med55) strat=15.9% giniC=0.291 dyn:eff=2.9 top=0.52 mRSg=0.731 set=54(mx291,prim1.08) con=96.0 inst=46 ldT=0.482 | 62.9m eta62m
+[ 7575/15000] pop=  7120 bd= 209 vil=48(med56.0) strat=22.6% giniC=0.292 dyn:eff=2.9 top=0.518 mRSg=0.736 set=54(mx344,prim1.49) con=108.0 inst=39 ldT=0.475 | 63.1m eta62m
+[ 7600/15000] pop=  6952 bd= 210 vil=42(med56.5) strat=13.8% giniC=0.296 dyn:eff=2.9 top=0.521 mRSg=0.734 set=54(mx225,prim1.14) con=140.5 inst=35 ldT=0.468 | 63.3m eta62m
+[ 7625/15000] pop=  7108 bd= 210 vil=46(med56.5) strat=8.8% giniC=0.296 dyn:eff=2.9 top=0.523 mRSg=0.733 set=54(mx341,prim1.4) con=130.5 inst=48 ldT=0.485 | 63.5m eta61m
+[ 7650/15000] pop=  6803 bd= 215 vil=39(med55) strat=20.0% giniC=0.296 dyn:eff=2.9 top=0.526 mRSg=0.736 set=54(mx335,prim1.6) con=101.0 inst=41 ldT=0.481 | 63.7m eta61m
+[ 7675/15000] pop=  6755 bd= 219 vil=40(med55.5) strat=14.0% giniC=0.297 dyn:eff=2.8 top=0.532 mRSg=0.74 set=53(mx256,prim1.28) con=82.0 inst=43 ldT=0.481 | 63.9m eta61m
+[ 7700/15000] pop=  7143 bd= 212 vil=46(med58.0) strat=11.6% giniC=0.295 dyn:eff=2.8 top=0.538 mRSg=0.742 set=54(mx333,prim1.14) con=119.5 inst=37 ldT=0.491 | 64.1m eta61m
+[ 7725/15000] pop=  6896 bd= 202 vil=45(med60) strat=15.2% giniC=0.296 dyn:eff=2.8 top=0.535 mRSg=0.729 set=54(mx259,prim1.09) con=110.5 inst=36 ldT=0.55 | 64.3m eta61m
+[ 7750/15000] pop=  7023 bd= 197 vil=52(med62.0) strat=13.9% giniC=0.295 dyn:eff=2.8 top=0.531 mRSg=0.73 set=54(mx286,prim1.03) con=87.0 inst=42 ldT=0.553 | 64.5m eta60m
+[ 7775/15000] pop=  7038 bd= 206 vil=49(med61) strat=12.0% giniC=0.297 dyn:eff=2.9 top=0.526 mRSg=0.734 set=54(mx296,prim1.2) con=110.5 inst=46 ldT=0.539 | 64.8m eta60m
+[ 7800/15000] pop=  7114 bd= 202 vil=55(med59) strat=9.3% giniC=0.293 dyn:eff=2.9 top=0.515 mRSg=0.726 set=54(mx338,prim1.48) con=110.0 inst=43 ldT=0.515 | 65.0m eta60m
+[ 7825/15000] pop=  7139 bd= 202 vil=53(med60) strat=9.7% giniC=0.294 dyn:eff=2.9 top=0.514 mRSg=0.734 set=54(mx294,prim1.3) con=96.0 inst=34 ldT=0.5 | 65.2m eta60m
+[ 7850/15000] pop=  6935 bd= 213 vil=49(med57) strat=16.3% giniC=0.293 dyn:eff=3.0 top=0.511 mRSg=0.741 set=54(mx256,prim1.33) con=86.0 inst=48 ldT=0.459 | 65.4m eta60m
+[ 7875/15000] pop=  7102 bd= 221 vil=47(med59) strat=16.9% giniC=0.295 dyn:eff=3.0 top=0.51 mRSg=0.748 set=54(mx325,prim1.5) con=97.0 inst=48 ldT=0.495 | 65.6m eta59m
+[ 7900/15000] pop=  7143 bd= 215 vil=49(med60) strat=14.1% giniC=0.295 dyn:eff=3.0 top=0.501 mRSg=0.749 set=54(mx313,prim1.32) con=89.5 inst=46 ldT=0.59 | 65.8m eta59m
+[ 7925/15000] pop=  7048 bd= 216 vil=45(med60) strat=13.6% giniC=0.303 dyn:eff=3.0 top=0.506 mRSg=0.753 set=54(mx274,prim1.18) con=135.0 inst=40 ldT=0.507 | 66.1m eta59m
+[ 7950/15000] pop=  7062 bd= 229 vil=41(med59) strat=9.7% giniC=0.298 dyn:eff=3.0 top=0.503 mRSg=0.747 set=54(mx354,prim1.34) con=118.0 inst=39 ldT=0.626 | 66.3m eta59m
+[ 7975/15000] pop=  7217 bd= 225 vil=42(med61.0) strat=8.1% giniC=0.298 dyn:eff=3.0 top=0.502 mRSg=0.745 set=54(mx284,prim1.11) con=113.0 inst=51 ldT=0.42 | 66.5m eta59m
+[ 8000/15000] pop=  7250 bd= 231 vil=45(med58) strat=8.2% giniC=0.299 dyn:eff=3.1 top=0.494 mRSg=0.748 set=54(mx354,prim1.6) con=143.5 inst=42 ldT=0.471 | 66.8m eta58m
+[ 8025/15000] pop=  7202 bd= 222 vil=46(med60.0) strat=10.3% giniC=0.307 dyn:eff=3.1 top=0.499 mRSg=0.739 set=54(mx258,prim1.2) con=122.0 inst=43 ldT=0.465 | 67.0m eta58m
+[ 8050/15000] pop=  6871 bd= 213 vil=42(med59.0) strat=11.5% giniC=0.305 dyn:eff=3.1 top=0.494 mRSg=0.734 set=54(mx262,prim1.25) con=106.0 inst=42 ldT=0.399 | 67.2m eta58m
+[ 8075/15000] pop=  7018 bd= 209 vil=45(med60) strat=15.7% giniC=0.302 dyn:eff=3.1 top=0.493 mRSg=0.733 set=54(mx356,prim1.5) con=126.0 inst=38 ldT=0.485 | 67.4m eta58m
+[ 8100/15000] pop=  6832 bd= 206 vil=49(med57) strat=20.0% giniC=0.307 dyn:eff=3.1 top=0.491 mRSg=0.742 set=54(mx255,prim1.12) con=118.0 inst=39 ldT=0.542 | 67.6m eta58m
+[ 8125/15000] pop=  7196 bd= 208 vil=57(med56) strat=12.5% giniC=0.307 dyn:eff=3.2 top=0.484 mRSg=0.736 set=54(mx378,prim1.63) con=123.0 inst=43 ldT=0.48 | 67.8m eta57m
+[ 8150/15000] pop=  6938 bd= 203 vil=49(med60) strat=13.0% giniC=0.308 dyn:eff=3.2 top=0.484 mRSg=0.74 set=54(mx244,prim1.15) con=132.0 inst=50 ldT=0.43 | 68.0m eta57m
+[ 8175/15000] pop=  7257 bd= 207 vil=52(med62.5) strat=13.3% giniC=0.305 dyn:eff=3.3 top=0.479 mRSg=0.736 set=54(mx297,prim1.49) con=102.0 inst=47 ldT=0.505 | 68.2m eta57m
+[ 8200/15000] pop=  7348 bd= 209 vil=51(med63) strat=11.7% giniC=0.312 dyn:eff=3.3 top=0.473 mRSg=0.734 set=54(mx303,prim1.35) con=128.0 inst=40 ldT=0.502 | 68.4m eta57m
+[ 8225/15000] pop=  7290 bd= 208 vil=50(med62.0) strat=5.8% giniC=0.315 dyn:eff=3.4 top=0.468 mRSg=0.729 set=54(mx360,prim1.51) con=120.0 inst=39 ldT=0.468 | 68.6m eta57m
+[ 8250/15000] pop=  7035 bd= 207 vil=49(med63) strat=6.5% giniC=0.32 dyn:eff=3.3 top=0.471 mRSg=0.731 set=54(mx217,prim1.12) con=139.0 inst=43 ldT=0.515 | 68.8m eta56m
+[ 8275/15000] pop=  7199 bd= 209 vil=57(med57) strat=3.5% giniC=0.316 dyn:eff=3.3 top=0.474 mRSg=0.723 set=54(mx310,prim1.4) con=124.0 inst=42 ldT=0.488 | 69.1m eta56m
+[ 8300/15000] pop=  6836 bd= 202 vil=48(med60.0) strat=7.8% giniC=0.31 dyn:eff=3.3 top=0.472 mRSg=0.716 set=54(mx259,prim1.27) con=125.0 inst=48 ldT=0.495 | 69.3m eta56m
+[ 8325/15000] pop=  6887 bd= 202 vil=51(med58) strat=12.3% giniC=0.312 dyn:eff=3.3 top=0.474 mRSg=0.719 set=54(mx223,prim1.03) con=117.5 inst=43 ldT=0.474 | 69.5m eta56m
+[ 8350/15000] pop=  6814 bd= 206 vil=48(med58.5) strat=12.2% giniC=0.31 dyn:eff=3.4 top=0.473 mRSg=0.729 set=54(mx231,prim1.31) con=98.0 inst=47 ldT=0.546 | 69.7m eta56m
+[ 8375/15000] pop=  7187 bd= 216 vil=49(med62) strat=14.0% giniC=0.308 dyn:eff=3.4 top=0.473 mRSg=0.733 set=54(mx349,prim1.43) con=99.0 inst=44 ldT=0.539 | 69.9m eta55m
+[ 8400/15000] pop=  7371 bd= 225 vil=54(med59.0) strat=11.7% giniC=0.308 dyn:eff=3.4 top=0.467 mRSg=0.743 set=54(mx400,prim1.67) con=132.0 inst=42 ldT=0.473 | 70.1m eta55m
+[ 8425/15000] pop=  7031 bd= 216 vil=47(med60) strat=17.5% giniC=0.309 dyn:eff=3.4 top=0.47 mRSg=0.735 set=54(mx285,prim1.19) con=115.0 inst=44 ldT=0.533 | 70.3m eta55m
+[ 8450/15000] pop=  7275 bd= 211 vil=53(med60) strat=14.1% giniC=0.306 dyn:eff=3.4 top=0.471 mRSg=0.739 set=54(mx385,prim1.46) con=124.5 inst=40 ldT=0.498 | 70.5m eta55m
+[ 8475/15000] pop=  7243 bd= 221 vil=45(med61) strat=16.1% giniC=0.303 dyn:eff=3.4 top=0.475 mRSg=0.738 set=54(mx319,prim1.15) con=134.0 inst=37 ldT=0.486 | 70.7m eta54m
+[ 8500/15000] pop=  7026 bd= 228 vil=41(med58) strat=16.3% giniC=0.306 dyn:eff=3.4 top=0.467 mRSg=0.738 set=54(mx327,prim1.34) con=127.0 inst=36 ldT=0.498 | 70.9m eta54m
+[ 8525/15000] pop=  7087 bd= 227 vil=41(med56) strat=11.5% giniC=0.311 dyn:eff=3.4 top=0.471 mRSg=0.741 set=54(mx288,prim1.27) con=130.0 inst=46 ldT=0.455 | 71.2m eta54m
+[ 8550/15000] pop=  7301 bd= 227 vil=46(med58.0) strat=9.5% giniC=0.31 dyn:eff=3.4 top=0.472 mRSg=0.737 set=54(mx304,prim1.29) con=119.0 inst=48 ldT=0.535 | 71.4m eta54m
+[ 8575/15000] pop=  7060 bd= 221 vil=40(med58.0) strat=9.9% giniC=0.307 dyn:eff=3.3 top=0.478 mRSg=0.733 set=54(mx270,prim1.04) con=106.0 inst=38 ldT=0.528 | 71.6m eta54m
+[ 8600/15000] pop=  6967 bd= 216 vil=44(med55.5) strat=12.7% giniC=0.306 dyn:eff=3.4 top=0.47 mRSg=0.725 set=54(mx278,prim1.34) con=120.5 inst=39 ldT=0.495 | 71.8m eta53m
+[ 8625/15000] pop=  7083 bd= 225 vil=40(med60.5) strat=13.7% giniC=0.304 dyn:eff=3.4 top=0.472 mRSg=0.73 set=54(mx360,prim1.78) con=155.0 inst=40 ldT=0.54 | 72.0m eta53m
+[ 8650/15000] pop=  6634 bd= 218 vil=33(med61) strat=17.2% giniC=0.302 dyn:eff=3.5 top=0.464 mRSg=0.734 set=54(mx259,prim1.04) con=148.0 inst=40 ldT=0.542 | 72.2m eta53m
+[ 8675/15000] pop=  6998 bd= 228 vil=39(med57) strat=15.2% giniC=0.3 dyn:eff=3.4 top=0.466 mRSg=0.737 set=54(mx359,prim1.42) con=138.0 inst=42 ldT=0.472 | 72.4m eta53m
+[ 8700/15000] pop=  7064 bd= 222 vil=48(med55.0) strat=18.7% giniC=0.3 dyn:eff=3.4 top=0.47 mRSg=0.737 set=54(mx345,prim1.23) con=140.0 inst=43 ldT=0.511 | 72.6m eta53m
+[ 8725/15000] pop=  6859 bd= 214 vil=38(med62.0) strat=18.7% giniC=0.301 dyn:eff=3.4 top=0.473 mRSg=0.74 set=54(mx291,prim1.09) con=140.5 inst=47 ldT=0.509 | 72.8m eta52m
+[ 8750/15000] pop=  7166 bd= 215 vil=49(med55) strat=17.4% giniC=0.302 dyn:eff=3.4 top=0.471 mRSg=0.742 set=54(mx306,prim1.42) con=132.0 inst=49 ldT=0.514 | 73.0m eta52m
+[ 8775/15000] pop=  7294 bd= 219 vil=51(med57) strat=24.0% giniC=0.301 dyn:eff=3.4 top=0.475 mRSg=0.745 set=54(mx361,prim1.35) con=130.0 inst=41 ldT=0.478 | 73.2m eta52m
+[ 8800/15000] pop=  7069 bd= 223 vil=46(med55.5) strat=13.6% giniC=0.299 dyn:eff=3.3 top=0.479 mRSg=0.739 set=54(mx235,prim1.15) con=153.5 inst=44 ldT=0.52 | 73.5m eta52m
+[ 8825/15000] pop=  7335 bd= 227 vil=48(med58.5) strat=14.9% giniC=0.294 dyn:eff=3.3 top=0.482 mRSg=0.74 set=54(mx361,prim1.69) con=100.0 inst=46 ldT=0.45 | 73.7m eta52m
+[ 8850/15000] pop=  6989 bd= 236 vil=41(med55) strat=15.4% giniC=0.297 dyn:eff=3.3 top=0.487 mRSg=0.74 set=54(mx289,prim1.28) con=146.5 inst=39 ldT=0.507 | 73.9m eta51m
+[ 8875/15000] pop=  6947 bd= 229 vil=38(med59.0) strat=11.3% giniC=0.295 dyn:eff=3.2 top=0.493 mRSg=0.737 set=54(mx291,prim1.46) con=140.0 inst=42 ldT=0.484 | 74.1m eta51m
+[ 8900/15000] pop=  6626 bd= 226 vil=32(med55.0) strat=17.9% giniC=0.298 dyn:eff=3.2 top=0.494 mRSg=0.742 set=54(mx273,prim1.24) con=98.0 inst=45 ldT=0.512 | 74.3m eta51m
+[ 8925/15000] pop=  7072 bd= 224 vil=46(med56.0) strat=13.1% giniC=0.301 dyn:eff=3.2 top=0.493 mRSg=0.749 set=54(mx374,prim1.46) con=100.0 inst=43 ldT=0.416 | 74.5m eta51m
+[ 8950/15000] pop=  6850 bd= 217 vil=46(med54.5) strat=10.9% giniC=0.302 dyn:eff=3.2 top=0.491 mRSg=0.756 set=54(mx244,prim1.11) con=124.0 inst=45 ldT=0.491 | 74.7m eta51m
+[ 8975/15000] pop=  6882 bd= 209 vil=44(med56.0) strat=10.6% giniC=0.3 dyn:eff=3.2 top=0.49 mRSg=0.739 set=54(mx346,prim1.52) con=139.0 inst=40 ldT=0.502 | 74.9m eta50m
+[ 9000/15000] pop=  7165 bd= 207 vil=51(med58) strat=9.9% giniC=0.299 dyn:eff=3.2 top=0.488 mRSg=0.735 set=54(mx360,prim1.18) con=134.5 inst=44 ldT=0.495 | 75.1m eta50m
+[ 9025/15000] pop=  6986 bd= 208 vil=50(med54.0) strat=14.8% giniC=0.302 dyn:eff=3.2 top=0.491 mRSg=0.728 set=54(mx283,prim1.0) con=101.0 inst=50 ldT=0.455 | 75.4m eta50m
+[ 9050/15000] pop=  6945 bd= 210 vil=51(med55) strat=13.6% giniC=0.298 dyn:eff=3.2 top=0.489 mRSg=0.732 set=54(mx313,prim1.02) con=116.0 inst=49 ldT=0.46 | 75.6m eta50m
+[ 9075/15000] pop=  7036 bd= 202 vil=60(med54.5) strat=14.8% giniC=0.298 dyn:eff=3.2 top=0.488 mRSg=0.729 set=54(mx297,prim1.27) con=137.0 inst=42 ldT=0.505 | 75.8m eta49m
+[ 9100/15000] pop=  7106 bd= 195 vil=60(med56.0) strat=15.0% giniC=0.297 dyn:eff=3.3 top=0.482 mRSg=0.74 set=54(mx378,prim1.65) con=146.0 inst=42 ldT=0.521 | 76.0m eta49m
+[ 9125/15000] pop=  7159 bd= 196 vil=59(med58) strat=15.0% giniC=0.295 dyn:eff=3.3 top=0.481 mRSg=0.743 set=54(mx336,prim1.37) con=116.0 inst=40 ldT=0.538 | 76.2m eta49m
+[ 9150/15000] pop=  6893 bd= 206 vil=52(med53.5) strat=13.2% giniC=0.301 dyn:eff=3.3 top=0.477 mRSg=0.738 set=54(mx242,prim1.06) con=116.0 inst=41 ldT=0.571 | 76.4m eta49m
+[ 9175/15000] pop=  7071 bd= 208 vil=57(med55) strat=8.8% giniC=0.3 dyn:eff=3.4 top=0.471 mRSg=0.742 set=54(mx343,prim1.45) con=141.0 inst=36 ldT=0.577 | 76.6m eta49m
+[ 9200/15000] pop=  6972 bd= 208 vil=56(med55.0) strat=10.9% giniC=0.298 dyn:eff=3.4 top=0.461 mRSg=0.742 set=54(mx292,prim1.19) con=146.0 inst=51 ldT=0.495 | 76.8m eta48m
+[ 9225/15000] pop=  6821 bd= 209 vil=47(med60) strat=11.8% giniC=0.3 dyn:eff=3.4 top=0.471 mRSg=0.737 set=54(mx274,prim1.05) con=111.0 inst=41 ldT=0.527 | 77.0m eta48m
+[ 9250/15000] pop=  6853 bd= 214 vil=45(med59) strat=17.5% giniC=0.297 dyn:eff=3.3 top=0.473 mRSg=0.737 set=54(mx305,prim1.32) con=138.0 inst=47 ldT=0.512 | 77.2m eta48m
+[ 9275/15000] pop=  7016 bd= 209 vil=46(med60.0) strat=19.6% giniC=0.294 dyn:eff=3.3 top=0.475 mRSg=0.729 set=54(mx313,prim1.37) con=141.0 inst=44 ldT=0.555 | 77.4m eta48m
+[ 9300/15000] pop=  7132 bd= 215 vil=47(med60) strat=16.3% giniC=0.294 dyn:eff=3.3 top=0.473 mRSg=0.731 set=54(mx286,prim1.04) con=139.5 inst=39 ldT=0.478 | 77.6m eta48m
+[ 9325/15000] pop=  7047 bd= 215 vil=47(med59) strat=15.0% giniC=0.296 dyn:eff=3.3 top=0.471 mRSg=0.732 set=54(mx235,prim1.02) con=130.0 inst=46 ldT=0.559 | 77.9m eta47m
+[ 9350/15000] pop=  7435 bd= 216 vil=50(med58.0) strat=7.4% giniC=0.296 dyn:eff=3.3 top=0.471 mRSg=0.736 set=54(mx406,prim1.85) con=114.0 inst=44 ldT=0.483 | 78.1m eta47m
+[ 9375/15000] pop=  7234 bd= 208 vil=50(med56.0) strat=9.6% giniC=0.293 dyn:eff=3.3 top=0.468 mRSg=0.733 set=54(mx295,prim1.38) con=115.0 inst=35 ldT=0.507 | 78.3m eta47m
+[ 9400/15000] pop=  6838 bd= 205 vil=44(med57.0) strat=12.9% giniC=0.297 dyn:eff=3.3 top=0.462 mRSg=0.717 set=54(mx327,prim1.49) con=88.0 inst=40 ldT=0.526 | 78.5m eta47m
+[ 9425/15000] pop=  6833 bd= 207 vil=46(med55.0) strat=10.3% giniC=0.291 dyn:eff=3.4 top=0.455 mRSg=0.72 set=54(mx312,prim1.32) con=77.0 inst=42 ldT=0.462 | 78.7m eta47m
+[ 9450/15000] pop=  6814 bd= 202 vil=51(med57) strat=16.1% giniC=0.29 dyn:eff=3.4 top=0.448 mRSg=0.728 set=54(mx267,prim1.31) con=89.0 inst=38 ldT=0.535 | 78.9m eta46m
+[ 9475/15000] pop=  7138 bd= 213 vil=51(med55) strat=14.1% giniC=0.29 dyn:eff=3.4 top=0.444 mRSg=0.736 set=54(mx308,prim1.48) con=100.0 inst=48 ldT=0.497 | 79.1m eta46m
+[ 9500/15000] pop=  7161 bd= 219 vil=50(med57.0) strat=8.0% giniC=0.286 dyn:eff=3.4 top=0.438 mRSg=0.73 set=54(mx342,prim1.44) con=125.5 inst=47 ldT=0.456 | 79.3m eta46m
+[ 9525/15000] pop=  7168 bd= 222 vil=42(med62.5) strat=16.4% giniC=0.287 dyn:eff=3.4 top=0.439 mRSg=0.733 set=54(mx326,prim1.29) con=91.0 inst=48 ldT=0.548 | 79.5m eta46m
+[ 9550/15000] pop=  7032 bd= 223 vil=44(med60.0) strat=14.7% giniC=0.288 dyn:eff=3.4 top=0.436 mRSg=0.734 set=54(mx255,prim1.04) con=110.0 inst=38 ldT=0.546 | 79.7m eta46m
+[ 9575/15000] pop=  7136 bd= 226 vil=41(med65) strat=14.5% giniC=0.282 dyn:eff=3.4 top=0.435 mRSg=0.727 set=54(mx325,prim1.29) con=95.0 inst=48 ldT=0.498 | 80.0m eta45m
+[ 9600/15000] pop=  7141 bd= 228 vil=41(med63) strat=14.7% giniC=0.282 dyn:eff=3.4 top=0.432 mRSg=0.729 set=54(mx317,prim1.15) con=100.0 inst=40 ldT=0.55 | 80.2m eta45m
+[ 9625/15000] pop=  7121 bd= 230 vil=41(med60) strat=13.3% giniC=0.284 dyn:eff=3.4 top=0.427 mRSg=0.734 set=54(mx313,prim1.17) con=129.0 inst=45 ldT=0.479 | 80.4m eta45m
+[ 9650/15000] pop=  7482 bd= 233 vil=45(med61) strat=14.1% giniC=0.284 dyn:eff=3.5 top=0.421 mRSg=0.735 set=54(mx413,prim1.96) con=128.5 inst=45 ldT=0.471 | 80.6m eta45m
+[ 9675/15000] pop=  7341 bd= 224 vil=44(med61.0) strat=13.8% giniC=0.29 dyn:eff=3.5 top=0.417 mRSg=0.734 set=54(mx276,prim1.03) con=122.0 inst=42 ldT=0.495 | 80.8m eta44m
+[ 9700/15000] pop=  6907 bd= 225 vil=40(med57.5) strat=14.7% giniC=0.289 dyn:eff=3.5 top=0.414 mRSg=0.725 set=54(mx272,prim1.11) con=98.0 inst=45 ldT=0.5 | 81.1m eta44m
+[ 9725/15000] pop=  6911 bd= 216 vil=43(med58) strat=16.4% giniC=0.288 dyn:eff=3.5 top=0.405 mRSg=0.717 set=54(mx321,prim1.6) con=90.0 inst=48 ldT=0.464 | 81.3m eta44m
+[ 9750/15000] pop=  6927 bd= 211 vil=46(med59.0) strat=14.0% giniC=0.284 dyn:eff=3.5 top=0.399 mRSg=0.719 set=54(mx358,prim1.67) con=98.0 inst=42 ldT=0.486 | 81.5m eta44m
+[ 9775/15000] pop=  6782 bd= 209 vil=46(med56.5) strat=18.3% giniC=0.289 dyn:eff=3.6 top=0.394 mRSg=0.725 set=54(mx270,prim1.14) con=83.0 inst=40 ldT=0.502 | 81.7m eta44m
+[ 9800/15000] pop=  6855 bd= 204 vil=45(med56) strat=12.7% giniC=0.295 dyn:eff=3.6 top=0.39 mRSg=0.733 set=54(mx285,prim1.12) con=80.0 inst=37 ldT=0.468 | 81.9m eta43m
+[ 9825/15000] pop=  7038 bd= 211 vil=46(med56.0) strat=12.5% giniC=0.291 dyn:eff=3.6 top=0.392 mRSg=0.735 set=54(mx327,prim1.18) con=119.5 inst=39 ldT=0.51 | 82.1m eta43m
+[ 9850/15000] pop=  7129 bd= 213 vil=49(med55) strat=17.0% giniC=0.285 dyn:eff=3.5 top=0.394 mRSg=0.736 set=54(mx276,prim1.16) con=94.0 inst=47 ldT=0.502 | 82.3m eta43m
+[ 9875/15000] pop=  6850 bd= 213 vil=42(med54.5) strat=20.5% giniC=0.286 dyn:eff=3.5 top=0.389 mRSg=0.735 set=54(mx328,prim1.4) con=111.5 inst=42 ldT=0.462 | 82.5m eta43m
+[ 9900/15000] pop=  6838 bd= 206 vil=46(med57.0) strat=21.1% giniC=0.288 dyn:eff=3.5 top=0.384 mRSg=0.737 set=54(mx241,prim1.12) con=88.0 inst=41 ldT=0.53 | 82.7m eta43m
+[ 9925/15000] pop=  7165 bd= 210 vil=47(med58) strat=24.8% giniC=0.288 dyn:eff=3.5 top=0.382 mRSg=0.738 set=54(mx366,prim1.6) con=138.5 inst=43 ldT=0.505 | 82.9m eta42m
+[ 9950/15000] pop=  7116 bd= 217 vil=44(med58.0) strat=21.7% giniC=0.292 dyn:eff=3.5 top=0.38 mRSg=0.735 set=54(mx239,prim1.0) con=112.0 inst=42 ldT=0.51 | 83.1m eta42m
+[ 9975/15000] pop=  7164 bd= 220 vil=43(med60) strat=14.0% giniC=0.294 dyn:eff=3.5 top=0.377 mRSg=0.736 set=54(mx359,prim1.5) con=143.0 inst=44 ldT=0.526 | 83.4m eta42m
+[10000/15000] pop=  7396 bd= 233 vil=44(med54.5) strat=16.7% giniC=0.289 dyn:eff=3.5 top=0.379 mRSg=0.734 set=54(mx434,prim1.83) con=141.0 inst=47 ldT=0.481 | 83.6m eta42m
+[10025/15000] pop=  7117 bd= 233 vil=40(med55.0) strat=14.4% giniC=0.295 dyn:eff=3.5 top=0.38 mRSg=0.733 set=54(mx220,prim1.07) con=143.0 inst=45 ldT=0.507 | 83.8m eta42m
+[10050/15000] pop=  7072 bd= 230 vil=40(med54.0) strat=18.1% giniC=0.294 dyn:eff=3.5 top=0.376 mRSg=0.73 set=54(mx328,prim1.34) con=114.0 inst=46 ldT=0.495 | 84.0m eta41m
+[10075/15000] pop=  6931 bd= 227 vil=45(med52) strat=18.1% giniC=0.294 dyn:eff=3.6 top=0.37 mRSg=0.726 set=54(mx306,prim1.18) con=108.0 inst=39 ldT=0.495 | 84.2m eta41m
+[10100/15000] pop=  6730 bd= 216 vil=44(med55.0) strat=18.0% giniC=0.297 dyn:eff=3.6 top=0.373 mRSg=0.726 set=54(mx273,prim1.15) con=132.0 inst=46 ldT=0.481 | 84.5m eta41m
+[10125/15000] pop=  6722 bd= 208 vil=41(med54) strat=10.2% giniC=0.304 dyn:eff=3.6 top=0.366 mRSg=0.731 set=54(mx206,prim1.01) con=95.0 inst=45 ldT=0.505 | 84.7m eta41m
+[10150/15000] pop=  6951 bd= 205 vil=46(med52.5) strat=15.9% giniC=0.299 dyn:eff=3.6 top=0.366 mRSg=0.725 set=54(mx305,prim1.5) con=101.0 inst=35 ldT=0.513 | 84.9m eta41m
+[10175/15000] pop=  6843 bd= 208 vil=42(med55.5) strat=15.9% giniC=0.297 dyn:eff=3.6 top=0.377 mRSg=0.722 set=54(mx305,prim1.41) con=105.5 inst=42 ldT=0.478 | 85.1m eta40m
+[10200/15000] pop=  6913 bd= 205 vil=46(med57.0) strat=19.3% giniC=0.301 dyn:eff=3.6 top=0.38 mRSg=0.727 set=54(mx339,prim1.55) con=86.0 inst=47 ldT=0.482 | 85.3m eta40m
+[10225/15000] pop=  6874 bd= 202 vil=45(med61) strat=19.5% giniC=0.304 dyn:eff=3.6 top=0.379 mRSg=0.725 set=54(mx305,prim1.37) con=120.0 inst=39 ldT=0.47 | 85.5m eta40m
+[10250/15000] pop=  7080 bd= 208 vil=48(med57.5) strat=18.3% giniC=0.301 dyn:eff=3.6 top=0.379 mRSg=0.727 set=54(mx355,prim1.66) con=122.5 inst=47 ldT=0.5 | 85.7m eta40m
+[10275/15000] pop=  7100 bd= 221 vil=42(med56.5) strat=18.3% giniC=0.302 dyn:eff=3.6 top=0.383 mRSg=0.725 set=54(mx290,prim1.36) con=101.0 inst=44 ldT=0.5 | 85.9m eta40m
+[10300/15000] pop=  7078 bd= 221 vil=49(med53) strat=18.8% giniC=0.299 dyn:eff=3.6 top=0.387 mRSg=0.723 set=54(mx358,prim1.32) con=131.5 inst=38 ldT=0.481 | 86.1m eta39m
+[10325/15000] pop=  7151 bd= 212 vil=52(med54.0) strat=17.2% giniC=0.299 dyn:eff=3.6 top=0.382 mRSg=0.72 set=54(mx300,prim1.01) con=98.0 inst=35 ldT=0.481 | 86.3m eta39m
+[10350/15000] pop=  6998 bd= 201 vil=52(med54.5) strat=11.9% giniC=0.302 dyn:eff=3.7 top=0.378 mRSg=0.726 set=54(mx296,prim1.05) con=129.0 inst=40 ldT=0.533 | 86.5m eta39m
+[10375/15000] pop=  6726 bd= 197 vil=50(med53.5) strat=7.3% giniC=0.3 dyn:eff=3.7 top=0.388 mRSg=0.721 set=54(mx230,prim1.0) con=137.5 inst=42 ldT=0.495 | 86.7m eta39m
+[10400/15000] pop=  6869 bd= 202 vil=46(med55.5) strat=10.9% giniC=0.298 dyn:eff=3.7 top=0.39 mRSg=0.721 set=54(mx359,prim1.75) con=105.0 inst=46 ldT=0.456 | 86.9m eta38m
+[10425/15000] pop=  6921 bd= 201 vil=49(med59) strat=11.1% giniC=0.294 dyn:eff=3.7 top=0.399 mRSg=0.729 set=54(mx320,prim1.52) con=149.0 inst=44 ldT=0.545 | 87.2m eta38m
+[10450/15000] pop=  6886 bd= 200 vil=49(med59) strat=13.2% giniC=0.293 dyn:eff=3.7 top=0.398 mRSg=0.736 set=54(mx295,prim1.27) con=106.0 inst=43 ldT=0.528 | 87.4m eta38m
+[10475/15000] pop=  7190 bd= 203 vil=55(med61) strat=15.6% giniC=0.29 dyn:eff=3.7 top=0.403 mRSg=0.734 set=54(mx380,prim1.58) con=100.0 inst=53 ldT=0.513 | 87.6m eta38m
+[10500/15000] pop=  6951 bd= 204 vil=57(med58) strat=22.9% giniC=0.299 dyn:eff=3.7 top=0.406 mRSg=0.735 set=54(mx276,prim1.35) con=106.0 inst=45 ldT=0.487 | 87.8m eta38m
+[10525/15000] pop=  7001 bd= 207 vil=53(med59) strat=19.5% giniC=0.3 dyn:eff=3.7 top=0.409 mRSg=0.74 set=54(mx308,prim1.47) con=104.0 inst=38 ldT=0.457 | 88.0m eta37m
+[10550/15000] pop=  7286 bd= 211 vil=54(med64.0) strat=13.4% giniC=0.294 dyn:eff=3.7 top=0.413 mRSg=0.741 set=54(mx404,prim1.35) con=99.0 inst=43 ldT=0.451 | 88.2m eta37m
+[10575/15000] pop=  6908 bd= 209 vil=53(med60) strat=18.9% giniC=0.294 dyn:eff=3.7 top=0.406 mRSg=0.742 set=54(mx262,prim1.01) con=115.0 inst=38 ldT=0.539 | 88.4m eta37m
+[10600/15000] pop=  7131 bd= 206 vil=53(med61) strat=13.7% giniC=0.292 dyn:eff=3.7 top=0.412 mRSg=0.739 set=54(mx332,prim1.34) con=90.0 inst=42 ldT=0.48 | 88.6m eta37m
+[10625/15000] pop=  7208 bd= 210 vil=48(med64.5) strat=8.4% giniC=0.291 dyn:eff=3.7 top=0.418 mRSg=0.737 set=54(mx319,prim1.37) con=90.0 inst=39 ldT=0.457 | 88.8m eta37m
+[10650/15000] pop=  7036 bd= 210 vil=48(med61.5) strat=11.3% giniC=0.288 dyn:eff=3.6 top=0.424 mRSg=0.741 set=54(mx312,prim1.42) con=107.0 inst=45 ldT=0.475 | 89.0m eta36m
+[10675/15000] pop=  7110 bd= 210 vil=51(med59) strat=12.4% giniC=0.288 dyn:eff=3.6 top=0.423 mRSg=0.742 set=54(mx353,prim1.5) con=98.0 inst=43 ldT=0.532 | 89.2m eta36m
+[10700/15000] pop=  6960 bd= 210 vil=46(med59.0) strat=7.7% giniC=0.291 dyn:eff=3.7 top=0.419 mRSg=0.739 set=54(mx248,prim1.28) con=104.0 inst=38 ldT=0.544 | 89.4m eta36m
+[10725/15000] pop=  6900 bd= 201 vil=54(med58.0) strat=8.6% giniC=0.294 dyn:eff=3.7 top=0.416 mRSg=0.734 set=54(mx288,prim1.1) con=105.0 inst=44 ldT=0.605 | 89.6m eta36m
+[10750/15000] pop=  6757 bd= 210 vil=43(med56) strat=15.8% giniC=0.292 dyn:eff=3.7 top=0.421 mRSg=0.734 set=54(mx256,prim1.21) con=124.0 inst=35 ldT=0.456 | 89.9m eta36m
+[10775/15000] pop=  6998 bd= 209 vil=45(med60) strat=20.3% giniC=0.289 dyn:eff=3.7 top=0.421 mRSg=0.74 set=54(mx307,prim1.01) con=119.0 inst=38 ldT=0.488 | 90.1m eta35m
+[10800/15000] pop=  7036 bd= 216 vil=44(med58.0) strat=12.6% giniC=0.292 dyn:eff=3.7 top=0.414 mRSg=0.743 set=54(mx279,prim1.4) con=149.5 inst=36 ldT=0.485 | 90.3m eta35m
+[10825/15000] pop=  7067 bd= 222 vil=42(med56.0) strat=14.8% giniC=0.288 dyn:eff=3.7 top=0.416 mRSg=0.746 set=54(mx312,prim1.54) con=139.0 inst=46 ldT=0.531 | 90.5m eta35m
+[10850/15000] pop=  7045 bd= 225 vil=43(med53) strat=18.8% giniC=0.288 dyn:eff=3.7 top=0.414 mRSg=0.744 set=54(mx278,prim1.13) con=146.5 inst=37 ldT=0.455 | 90.7m eta35m
+[10875/15000] pop=  6986 bd= 221 vil=41(med54) strat=17.3% giniC=0.289 dyn:eff=3.8 top=0.409 mRSg=0.747 set=54(mx257,prim1.21) con=123.0 inst=46 ldT=0.463 | 90.9m eta34m
+[10900/15000] pop=  7004 bd= 226 vil=43(med55) strat=17.1% giniC=0.285 dyn:eff=3.8 top=0.409 mRSg=0.739 set=54(mx369,prim1.67) con=134.5 inst=46 ldT=0.509 | 91.1m eta34m
+[10925/15000] pop=  7026 bd= 226 vil=43(med56) strat=16.0% giniC=0.286 dyn:eff=3.8 top=0.41 mRSg=0.741 set=54(mx317,prim1.45) con=123.0 inst=45 ldT=0.486 | 91.3m eta34m
+[10950/15000] pop=  7091 bd= 225 vil=46(med56.0) strat=7.4% giniC=0.283 dyn:eff=3.8 top=0.408 mRSg=0.733 set=54(mx377,prim1.56) con=107.0 inst=42 ldT=0.507 | 91.5m eta34m
+[10975/15000] pop=  6929 bd= 218 vil=47(med54) strat=11.7% giniC=0.287 dyn:eff=3.8 top=0.408 mRSg=0.737 set=54(mx287,prim1.25) con=138.0 inst=46 ldT=0.519 | 91.7m eta34m
+[11000/15000] pop=  7000 bd= 213 vil=51(med55) strat=8.6% giniC=0.291 dyn:eff=3.8 top=0.404 mRSg=0.738 set=54(mx235,prim1.04) con=136.0 inst=42 ldT=0.491 | 91.9m eta33m
+[11025/15000] pop=  7130 bd= 217 vil=49(med56) strat=8.2% giniC=0.29 dyn:eff=3.8 top=0.404 mRSg=0.734 set=54(mx317,prim1.4) con=133.0 inst=38 ldT=0.469 | 92.2m eta33m
+[11050/15000] pop=  6781 bd= 206 vil=46(med57.0) strat=13.0% giniC=0.292 dyn:eff=3.8 top=0.405 mRSg=0.73 set=54(mx245,prim1.1) con=114.0 inst=29 ldT=0.573 | 92.4m eta33m
+[11075/15000] pop=  7148 bd= 205 vil=54(med57.5) strat=14.0% giniC=0.291 dyn:eff=3.8 top=0.401 mRSg=0.733 set=54(mx403,prim1.8) con=114.0 inst=42 ldT=0.5 | 92.6m eta33m
+[11100/15000] pop=  6831 bd= 204 vil=48(med58.5) strat=13.2% giniC=0.285 dyn:eff=3.8 top=0.399 mRSg=0.73 set=54(mx274,prim1.07) con=104.0 inst=40 ldT=0.531 | 92.8m eta33m
+[11125/15000] pop=  6920 bd= 199 vil=49(med59) strat=16.2% giniC=0.285 dyn:eff=3.8 top=0.395 mRSg=0.74 set=54(mx298,prim1.13) con=116.0 inst=48 ldT=0.439 | 93.0m eta32m
+[11150/15000] pop=  7325 bd= 207 vil=56(med58.0) strat=19.6% giniC=0.287 dyn:eff=3.8 top=0.394 mRSg=0.745 set=54(mx252,prim1.03) con=125.0 inst=45 ldT=0.485 | 93.2m eta32m
+[11175/15000] pop=  7134 bd= 211 vil=56(med55.5) strat=13.6% giniC=0.288 dyn:eff=3.8 top=0.393 mRSg=0.735 set=54(mx313,prim1.05) con=138.0 inst=46 ldT=0.535 | 93.4m eta32m
+[11200/15000] pop=  7065 bd= 204 vil=52(med59.0) strat=17.9% giniC=0.292 dyn:eff=3.8 top=0.385 mRSg=0.736 set=54(mx300,prim1.21) con=149.0 inst=42 ldT=0.478 | 93.6m eta32m
+[11225/15000] pop=  6895 bd= 210 vil=43(med56) strat=19.8% giniC=0.29 dyn:eff=3.8 top=0.387 mRSg=0.735 set=54(mx268,prim1.1) con=126.0 inst=44 ldT=0.584 | 93.8m eta32m
+[11250/15000] pop=  7130 bd= 214 vil=48(med56.5) strat=15.3% giniC=0.294 dyn:eff=3.8 top=0.39 mRSg=0.738 set=54(mx255,prim1.15) con=97.0 inst=32 ldT=0.534 | 94.1m eta31m
+[11275/15000] pop=  6878 bd= 221 vil=39(med58) strat=16.4% giniC=0.295 dyn:eff=3.8 top=0.386 mRSg=0.737 set=54(mx284,prim1.26) con=142.0 inst=42 ldT=0.554 | 94.3m eta31m
+[11300/15000] pop=  6967 bd= 217 vil=40(med62.0) strat=10.5% giniC=0.297 dyn:eff=3.8 top=0.387 mRSg=0.738 set=54(mx300,prim1.36) con=135.0 inst=40 ldT=0.528 | 94.5m eta31m
+[11325/15000] pop=  6908 bd= 219 vil=41(med61) strat=16.6% giniC=0.296 dyn:eff=3.8 top=0.388 mRSg=0.741 set=54(mx286,prim1.26) con=134.0 inst=48 ldT=0.472 | 94.7m eta31m
+[11350/15000] pop=  6660 bd= 214 vil=38(med58.5) strat=14.5% giniC=0.299 dyn:eff=3.8 top=0.384 mRSg=0.748 set=54(mx277,prim1.23) con=146.0 inst=40 ldT=0.532 | 94.9m eta31m
+[11375/15000] pop=  6780 bd= 215 vil=40(med59.5) strat=14.0% giniC=0.303 dyn:eff=3.8 top=0.38 mRSg=0.751 set=54(mx264,prim1.18) con=141.0 inst=46 ldT=0.502 | 95.1m eta30m
+[11400/15000] pop=  6993 bd= 211 vil=42(med62.0) strat=15.8% giniC=0.299 dyn:eff=3.8 top=0.38 mRSg=0.748 set=54(mx383,prim1.92) con=128.0 inst=41 ldT=0.449 | 95.3m eta30m
+[11425/15000] pop=  6924 bd= 202 vil=44(med62.5) strat=19.0% giniC=0.301 dyn:eff=3.9 top=0.377 mRSg=0.748 set=54(mx284,prim1.64) con=116.0 inst=44 ldT=0.53 | 95.5m eta30m
+[11450/15000] pop=  7071 bd= 204 vil=49(med62) strat=13.8% giniC=0.299 dyn:eff=3.9 top=0.377 mRSg=0.748 set=54(mx355,prim1.36) con=128.0 inst=45 ldT=0.51 | 95.7m eta30m
+[11475/15000] pop=  6766 bd= 212 vil=44(med58.5) strat=17.1% giniC=0.302 dyn:eff=3.9 top=0.375 mRSg=0.75 set=54(mx284,prim1.15) con=160.0 inst=41 ldT=0.536 | 95.9m eta29m
+[11500/15000] pop=  6926 bd= 219 vil=47(med58) strat=14.9% giniC=0.302 dyn:eff=3.9 top=0.378 mRSg=0.747 set=54(mx314,prim1.37) con=139.5 inst=40 ldT=0.493 | 96.1m eta29m
+[11525/15000] pop=  6865 bd= 211 vil=46(med59.5) strat=15.9% giniC=0.301 dyn:eff=3.9 top=0.373 mRSg=0.75 set=54(mx314,prim1.35) con=166.0 inst=39 ldT=0.474 | 96.3m eta29m
+[11550/15000] pop=  6962 bd= 223 vil=37(med62) strat=14.7% giniC=0.303 dyn:eff=3.9 top=0.373 mRSg=0.747 set=54(mx310,prim1.15) con=156.0 inst=40 ldT=0.474 | 96.5m eta29m
+[11575/15000] pop=  6952 bd= 225 vil=44(med54.5) strat=14.8% giniC=0.296 dyn:eff=3.9 top=0.377 mRSg=0.741 set=54(mx264,prim1.04) con=145.0 inst=41 ldT=0.419 | 96.7m eta29m
+[11600/15000] pop=  6677 bd= 217 vil=41(med55) strat=13.7% giniC=0.306 dyn:eff=4.0 top=0.371 mRSg=0.749 set=54(mx239,prim1.45) con=145.0 inst=40 ldT=0.462 | 96.9m eta28m
+[11625/15000] pop=  6796 bd= 216 vil=39(med59) strat=12.1% giniC=0.302 dyn:eff=4.0 top=0.37 mRSg=0.745 set=54(mx312,prim1.3) con=159.0 inst=43 ldT=0.554 | 97.1m eta28m
+[11650/15000] pop=  6808 bd= 217 vil=36(med58.5) strat=14.7% giniC=0.3 dyn:eff=4.1 top=0.364 mRSg=0.74 set=54(mx256,prim1.09) con=150.5 inst=43 ldT=0.466 | 97.3m eta28m
+[11675/15000] pop=  7072 bd= 239 vil=35(med52) strat=18.5% giniC=0.298 dyn:eff=4.1 top=0.363 mRSg=0.747 set=54(mx372,prim1.68) con=162.5 inst=42 ldT=0.46 | 97.6m eta28m
+[11700/15000] pop=  7022 bd= 239 vil=32(med59.0) strat=15.3% giniC=0.301 dyn:eff=4.1 top=0.364 mRSg=0.746 set=54(mx276,prim1.12) con=140.0 inst=43 ldT=0.513 | 97.8m eta28m
+[11725/15000] pop=  7220 bd= 244 vil=34(med58.5) strat=18.7% giniC=0.3 dyn:eff=4.1 top=0.363 mRSg=0.747 set=54(mx381,prim1.56) con=128.0 inst=39 ldT=0.494 | 98.0m eta27m
+[11750/15000] pop=  7120 bd= 237 vil=38(med53.0) strat=22.8% giniC=0.302 dyn:eff=4.0 top=0.367 mRSg=0.75 set=54(mx284,prim1.25) con=128.5 inst=48 ldT=0.506 | 98.2m eta27m
+[11775/15000] pop=  7148 bd= 231 vil=38(med59.0) strat=19.0% giniC=0.295 dyn:eff=4.1 top=0.366 mRSg=0.746 set=54(mx385,prim1.79) con=138.5 inst=43 ldT=0.485 | 98.4m eta27m
+[11800/15000] pop=  7001 bd= 227 vil=34(med59.5) strat=18.0% giniC=0.296 dyn:eff=4.1 top=0.363 mRSg=0.738 set=54(mx325,prim1.49) con=137.0 inst=44 ldT=0.529 | 98.6m eta27m
+[11825/15000] pop=  7047 bd= 229 vil=38(med54.0) strat=12.5% giniC=0.298 dyn:eff=4.1 top=0.37 mRSg=0.735 set=54(mx354,prim1.36) con=150.0 inst=40 ldT=0.509 | 98.8m eta27m
+[11850/15000] pop=  6848 bd= 218 vil=41(med56) strat=7.3% giniC=0.295 dyn:eff=4.1 top=0.369 mRSg=0.731 set=54(mx321,prim1.3) con=150.5 inst=54 ldT=0.514 | 99.0m eta26m
+[11875/15000] pop=  6821 bd= 214 vil=44(med56.0) strat=6.0% giniC=0.3 dyn:eff=4.1 top=0.367 mRSg=0.732 set=54(mx284,prim1.15) con=147.5 inst=40 ldT=0.521 | 99.2m eta26m
+[11900/15000] pop=  6978 bd= 209 vil=52(med55.0) strat=11.7% giniC=0.288 dyn:eff=4.1 top=0.367 mRSg=0.721 set=54(mx323,prim1.13) con=119.0 inst=40 ldT=0.485 | 99.4m eta26m
+[11925/15000] pop=  6930 bd= 205 vil=48(med60.5) strat=13.7% giniC=0.288 dyn:eff=4.2 top=0.367 mRSg=0.728 set=54(mx293,prim1.16) con=117.0 inst=37 ldT=0.472 | 99.6m eta26m
+[11950/15000] pop=  7108 bd= 208 vil=53(med61) strat=9.4% giniC=0.288 dyn:eff=4.2 top=0.364 mRSg=0.742 set=54(mx289,prim1.11) con=134.0 inst=44 ldT=0.497 | 99.8m eta25m
+[11975/15000] pop=  7182 bd= 209 vil=52(med61.0) strat=10.0% giniC=0.283 dyn:eff=4.2 top=0.365 mRSg=0.74 set=54(mx313,prim1.26) con=135.0 inst=47 ldT=0.525 | 100.0m eta25m
+[12000/15000] pop=  7048 bd= 209 vil=48(med61.0) strat=15.2% giniC=0.281 dyn:eff=4.2 top=0.362 mRSg=0.747 set=54(mx281,prim1.4) con=137.5 inst=47 ldT=0.533 | 100.2m eta25m
+[12025/15000] pop=  6950 bd= 206 vil=54(med58.0) strat=15.4% giniC=0.285 dyn:eff=4.2 top=0.364 mRSg=0.743 set=54(mx261,prim1.18) con=142.0 inst=47 ldT=0.513 | 100.4m eta25m
+[12050/15000] pop=  6937 bd= 201 vil=53(med56) strat=15.1% giniC=0.286 dyn:eff=4.2 top=0.368 mRSg=0.739 set=54(mx238,prim1.03) con=115.0 inst=47 ldT=0.525 | 100.6m eta25m
+[12075/15000] pop=  7205 bd= 207 vil=54(med57.0) strat=16.8% giniC=0.285 dyn:eff=4.2 top=0.367 mRSg=0.743 set=54(mx394,prim1.6) con=120.0 inst=34 ldT=0.497 | 100.8m eta24m
+[12100/15000] pop=  7348 bd= 204 vil=53(med62) strat=16.3% giniC=0.288 dyn:eff=4.2 top=0.364 mRSg=0.734 set=54(mx412,prim1.7) con=134.0 inst=38 ldT=0.51 | 101.0m eta24m
+[12125/15000] pop=  7159 bd= 198 vil=55(med61) strat=11.7% giniC=0.288 dyn:eff=4.1 top=0.372 mRSg=0.738 set=54(mx360,prim1.61) con=124.0 inst=43 ldT=0.546 | 101.2m eta24m
+[12150/15000] pop=  7008 bd= 200 vil=49(med58) strat=13.5% giniC=0.286 dyn:eff=4.1 top=0.374 mRSg=0.734 set=54(mx281,prim1.41) con=116.0 inst=34 ldT=0.526 | 101.5m eta24m
+[12175/15000] pop=  6952 bd= 205 vil=50(med57.0) strat=8.9% giniC=0.288 dyn:eff=4.1 top=0.369 mRSg=0.735 set=54(mx297,prim1.12) con=113.0 inst=36 ldT=0.5 | 101.7m eta24m
+[12200/15000] pop=  7066 bd= 202 vil=51(med60) strat=11.7% giniC=0.286 dyn:eff=4.1 top=0.372 mRSg=0.734 set=54(mx290,prim1.22) con=107.0 inst=40 ldT=0.525 | 101.9m eta23m
+[12225/15000] pop=  6762 bd= 199 vil=48(med60.0) strat=15.2% giniC=0.286 dyn:eff=4.1 top=0.374 mRSg=0.722 set=54(mx260,prim1.12) con=119.5 inst=43 ldT=0.508 | 102.1m eta23m
+[12250/15000] pop=  7094 bd= 215 vil=47(med58) strat=15.9% giniC=0.281 dyn:eff=4.1 top=0.38 mRSg=0.724 set=54(mx348,prim1.47) con=90.0 inst=41 ldT=0.459 | 102.3m eta23m
+[12275/15000] pop=  7369 bd= 221 vil=51(med61) strat=8.6% giniC=0.28 dyn:eff=4.0 top=0.385 mRSg=0.722 set=54(mx314,prim1.19) con=99.0 inst=44 ldT=0.498 | 102.5m eta23m
+[12300/15000] pop=  7105 bd= 232 vil=40(med61.0) strat=15.9% giniC=0.283 dyn:eff=4.0 top=0.386 mRSg=0.724 set=54(mx283,prim1.23) con=109.0 inst=51 ldT=0.54 | 102.7m eta23m
+[12325/15000] pop=  7260 bd= 238 vil=38(med62.0) strat=15.1% giniC=0.287 dyn:eff=4.0 top=0.386 mRSg=0.722 set=54(mx332,prim1.52) con=127.0 inst=46 ldT=0.549 | 102.9m eta22m
+[12350/15000] pop=  7242 bd= 239 vil=38(med60.5) strat=10.0% giniC=0.289 dyn:eff=4.0 top=0.389 mRSg=0.721 set=54(mx309,prim1.19) con=125.0 inst=44 ldT=0.554 | 103.1m eta22m
+[12375/15000] pop=  7220 bd= 228 vil=37(med60) strat=12.1% giniC=0.285 dyn:eff=4.0 top=0.388 mRSg=0.721 set=54(mx302,prim1.25) con=114.0 inst=45 ldT=0.52 | 103.3m eta22m
+[12400/15000] pop=  7124 bd= 220 vil=38(med60.5) strat=13.4% giniC=0.283 dyn:eff=4.0 top=0.398 mRSg=0.719 set=54(mx292,prim1.17) con=112.0 inst=49 ldT=0.467 | 103.5m eta22m
+[12425/15000] pop=  7100 bd= 220 vil=40(med58.0) strat=16.6% giniC=0.282 dyn:eff=3.9 top=0.405 mRSg=0.727 set=54(mx283,prim1.23) con=122.0 inst=39 ldT=0.467 | 103.7m eta21m
+[12450/15000] pop=  7148 bd= 220 vil=44(med57.5) strat=11.6% giniC=0.278 dyn:eff=3.9 top=0.405 mRSg=0.73 set=54(mx377,prim1.68) con=122.0 inst=33 ldT=0.466 | 103.9m eta21m
+[12475/15000] pop=  7072 bd= 221 vil=43(med58) strat=11.4% giniC=0.278 dyn:eff=3.9 top=0.409 mRSg=0.726 set=54(mx318,prim1.42) con=109.0 inst=42 ldT=0.464 | 104.2m eta21m
+[12500/15000] pop=  6752 bd= 215 vil=38(med58.0) strat=14.8% giniC=0.279 dyn:eff=3.8 top=0.417 mRSg=0.724 set=54(mx248,prim1.18) con=118.0 inst=33 ldT=0.465 | 104.4m eta21m
+[12525/15000] pop=  6741 bd= 207 vil=45(med58) strat=16.5% giniC=0.279 dyn:eff=3.8 top=0.42 mRSg=0.724 set=54(mx257,prim1.33) con=95.0 inst=38 ldT=0.458 | 104.6m eta21m
+[12550/15000] pop=  7110 bd= 207 vil=51(med58) strat=16.9% giniC=0.278 dyn:eff=3.7 top=0.423 mRSg=0.721 set=54(mx335,prim1.44) con=125.0 inst=42 ldT=0.522 | 104.8m eta20m
+[12575/15000] pop=  6928 bd= 199 vil=52(med57.0) strat=15.4% giniC=0.282 dyn:eff=3.8 top=0.422 mRSg=0.727 set=54(mx267,prim1.3) con=104.0 inst=41 ldT=0.557 | 105.0m eta20m
+[12600/15000] pop=  7195 bd= 198 vil=58(med59.0) strat=15.5% giniC=0.28 dyn:eff=3.7 top=0.425 mRSg=0.73 set=54(mx330,prim1.24) con=113.0 inst=43 ldT=0.495 | 105.3m eta20m
+[12625/15000] pop=  6983 bd= 197 vil=53(med58) strat=16.5% giniC=0.284 dyn:eff=3.7 top=0.428 mRSg=0.731 set=54(mx297,prim1.17) con=108.0 inst=41 ldT=0.479 | 105.5m eta20m
+[12650/15000] pop=  7276 bd= 203 vil=56(med58.0) strat=16.8% giniC=0.281 dyn:eff=3.7 top=0.43 mRSg=0.733 set=54(mx383,prim1.92) con=114.0 inst=47 ldT=0.536 | 105.7m eta20m
+[12675/15000] pop=  7158 bd= 208 vil=52(med57.5) strat=16.3% giniC=0.279 dyn:eff=3.7 top=0.434 mRSg=0.734 set=54(mx325,prim1.25) con=109.0 inst=45 ldT=0.505 | 105.9m eta19m
+[12700/15000] pop=  7034 bd= 207 vil=45(med59) strat=12.5% giniC=0.283 dyn:eff=3.6 top=0.44 mRSg=0.739 set=54(mx328,prim1.35) con=119.0 inst=33 ldT=0.52 | 106.1m eta19m
+[12725/15000] pop=  7064 bd= 213 vil=49(med55) strat=9.0% giniC=0.285 dyn:eff=3.6 top=0.447 mRSg=0.734 set=54(mx286,prim1.43) con=163.0 inst=37 ldT=0.443 | 106.3m eta19m
+[12750/15000] pop=  6858 bd= 214 vil=45(med55) strat=13.7% giniC=0.287 dyn:eff=3.6 top=0.449 mRSg=0.727 set=54(mx193,prim1.03) con=121.0 inst=45 ldT=0.461 | 106.5m eta19m
+[12775/15000] pop=  7116 bd= 215 vil=50(med57.0) strat=11.9% giniC=0.287 dyn:eff=3.6 top=0.447 mRSg=0.727 set=53(mx364,prim1.39) con=113.0 inst=43 ldT=0.483 | 106.7m eta19m
+[12800/15000] pop=  6737 bd= 217 vil=41(med55) strat=9.3% giniC=0.286 dyn:eff=3.5 top=0.456 mRSg=0.727 set=54(mx250,prim1.09) con=121.0 inst=48 ldT=0.461 | 106.9m eta18m
+[12825/15000] pop=  6860 bd= 212 vil=44(med58.0) strat=16.9% giniC=0.293 dyn:eff=3.5 top=0.454 mRSg=0.725 set=54(mx234,prim1.07) con=108.0 inst=43 ldT=0.536 | 107.1m eta18m
+[12850/15000] pop=  7075 bd= 220 vil=48(med60.0) strat=13.8% giniC=0.295 dyn:eff=3.5 top=0.455 mRSg=0.733 set=54(mx323,prim1.5) con=144.5 inst=42 ldT=0.543 | 107.3m eta18m
+[12875/15000] pop=  6805 bd= 221 vil=39(med60) strat=16.6% giniC=0.298 dyn:eff=3.5 top=0.455 mRSg=0.728 set=54(mx307,prim1.5) con=91.5 inst=39 ldT=0.538 | 107.5m eta18m
+[12900/15000] pop=  6867 bd= 216 vil=42(med59.0) strat=23.8% giniC=0.3 dyn:eff=3.5 top=0.456 mRSg=0.735 set=54(mx252,prim1.18) con=108.0 inst=39 ldT=0.519 | 107.7m eta18m
+[12925/15000] pop=  7255 bd= 222 vil=46(med60.0) strat=16.8% giniC=0.301 dyn:eff=3.5 top=0.458 mRSg=0.738 set=54(mx380,prim1.83) con=100.0 inst=44 ldT=0.467 | 107.9m eta17m
+[12950/15000] pop=  7285 bd= 227 vil=41(med59) strat=17.9% giniC=0.302 dyn:eff=3.5 top=0.46 mRSg=0.746 set=54(mx299,prim1.18) con=120.0 inst=46 ldT=0.505 | 108.1m eta17m
+[12975/15000] pop=  7108 bd= 223 vil=40(med62.0) strat=17.2% giniC=0.298 dyn:eff=3.4 top=0.464 mRSg=0.746 set=53(mx340,prim1.26) con=129.0 inst=43 ldT=0.479 | 108.3m eta17m
+[13000/15000] pop=  7079 bd= 227 vil=38(med57.5) strat=18.3% giniC=0.305 dyn:eff=3.4 top=0.469 mRSg=0.745 set=54(mx290,prim1.3) con=135.0 inst=44 ldT=0.514 | 108.5m eta17m
+[13025/15000] pop=  6836 bd= 221 vil=32(med58.0) strat=16.4% giniC=0.303 dyn:eff=3.4 top=0.469 mRSg=0.739 set=54(mx218,prim1.06) con=160.0 inst=41 ldT=0.542 | 108.7m eta16m
+[13050/15000] pop=  6906 bd= 216 vil=39(med58) strat=13.1% giniC=0.297 dyn:eff=3.4 top=0.471 mRSg=0.738 set=54(mx280,prim1.08) con=159.0 inst=36 ldT=0.543 | 108.9m eta16m
+[13075/15000] pop=  7172 bd= 223 vil=39(med59) strat=12.8% giniC=0.293 dyn:eff=3.3 top=0.476 mRSg=0.732 set=54(mx383,prim1.41) con=123.0 inst=46 ldT=0.512 | 109.2m eta16m
+[13100/15000] pop=  7115 bd= 219 vil=46(med57.0) strat=10.7% giniC=0.291 dyn:eff=3.3 top=0.479 mRSg=0.734 set=54(mx323,prim1.39) con=120.0 inst=43 ldT=0.509 | 109.4m eta16m
+[13125/15000] pop=  6827 bd= 211 vil=42(med58.0) strat=14.2% giniC=0.289 dyn:eff=3.3 top=0.485 mRSg=0.726 set=54(mx280,prim1.13) con=132.0 inst=40 ldT=0.449 | 109.6m eta16m
+[13150/15000] pop=  6884 bd= 203 vil=47(med60) strat=15.9% giniC=0.292 dyn:eff=3.2 top=0.492 mRSg=0.726 set=54(mx238,prim1.11) con=126.0 inst=42 ldT=0.483 | 109.8m eta15m
+[13175/15000] pop=  6722 bd= 204 vil=46(med59.5) strat=18.5% giniC=0.29 dyn:eff=3.2 top=0.494 mRSg=0.73 set=54(mx276,prim1.3) con=119.0 inst=43 ldT=0.518 | 110.0m eta15m
+[13200/15000] pop=  7075 bd= 206 vil=56(med59.0) strat=19.8% giniC=0.288 dyn:eff=3.2 top=0.491 mRSg=0.731 set=54(mx332,prim1.48) con=123.0 inst=40 ldT=0.503 | 110.2m eta15m
+[13225/15000] pop=  6869 bd= 199 vil=50(med60.0) strat=21.4% giniC=0.295 dyn:eff=3.3 top=0.487 mRSg=0.732 set=54(mx297,prim1.5) con=133.0 inst=50 ldT=0.51 | 110.4m eta15m
+[13250/15000] pop=  7195 bd= 211 vil=50(med60.0) strat=12.9% giniC=0.297 dyn:eff=3.2 top=0.494 mRSg=0.734 set=54(mx398,prim1.91) con=121.0 inst=39 ldT=0.534 | 110.6m eta15m
+[13275/15000] pop=  7123 bd= 220 vil=53(med52) strat=16.9% giniC=0.297 dyn:eff=3.2 top=0.499 mRSg=0.726 set=54(mx332,prim1.52) con=150.5 inst=44 ldT=0.517 | 110.8m eta14m
+[13300/15000] pop=  7125 bd= 223 vil=45(med54) strat=13.2% giniC=0.301 dyn:eff=3.2 top=0.496 mRSg=0.736 set=54(mx218,prim1.02) con=168.0 inst=49 ldT=0.507 | 111.0m eta14m
+[13325/15000] pop=  7100 bd= 227 vil=44(med54.5) strat=14.9% giniC=0.298 dyn:eff=3.2 top=0.498 mRSg=0.735 set=54(mx323,prim1.29) con=140.0 inst=43 ldT=0.45 | 111.2m eta14m
+[13350/15000] pop=  6589 bd= 220 vil=38(med56.0) strat=24.5% giniC=0.301 dyn:eff=3.1 top=0.501 mRSg=0.744 set=54(mx236,prim1.03) con=118.0 inst=36 ldT=0.54 | 111.4m eta14m
+[13375/15000] pop=  6839 bd= 215 vil=45(med57) strat=22.5% giniC=0.297 dyn:eff=3.2 top=0.499 mRSg=0.738 set=54(mx362,prim1.48) con=152.0 inst=45 ldT=0.472 | 111.6m eta14m
+[13400/15000] pop=  7101 bd= 224 vil=44(med57.5) strat=16.5% giniC=0.295 dyn:eff=3.2 top=0.496 mRSg=0.739 set=53(mx302,prim1.14) con=166.0 inst=45 ldT=0.476 | 111.8m eta13m
+[13425/15000] pop=  6965 bd= 218 vil=45(med58) strat=19.3% giniC=0.298 dyn:eff=3.1 top=0.507 mRSg=0.729 set=54(mx286,prim1.32) con=146.0 inst=40 ldT=0.549 | 112.0m eta13m
+[13450/15000] pop=  7010 bd= 219 vil=47(med60) strat=13.8% giniC=0.309 dyn:eff=3.1 top=0.512 mRSg=0.731 set=54(mx225,prim1.0) con=147.0 inst=38 ldT=0.545 | 112.2m eta13m
+[13475/15000] pop=  6943 bd= 215 vil=45(med64) strat=16.5% giniC=0.304 dyn:eff=3.0 top=0.513 mRSg=0.723 set=54(mx289,prim1.15) con=109.0 inst=42 ldT=0.561 | 112.4m eta13m
+[13500/15000] pop=  7010 bd= 209 vil=48(med66.0) strat=17.2% giniC=0.31 dyn:eff=3.0 top=0.514 mRSg=0.724 set=54(mx312,prim1.33) con=147.0 inst=38 ldT=0.558 | 112.6m eta13m
+[13525/15000] pop=  7227 bd= 222 vil=48(med64.5) strat=13.4% giniC=0.307 dyn:eff=3.1 top=0.511 mRSg=0.732 set=54(mx378,prim1.32) con=134.0 inst=42 ldT=0.578 | 112.8m eta12m
+[13550/15000] pop=  7253 bd= 230 vil=44(med58.5) strat=15.1% giniC=0.307 dyn:eff=3.1 top=0.51 mRSg=0.739 set=54(mx282,prim1.05) con=157.0 inst=50 ldT=0.495 | 113.1m eta12m
+[13575/15000] pop=  7377 bd= 240 vil=45(med60) strat=17.9% giniC=0.306 dyn:eff=3.1 top=0.506 mRSg=0.745 set=54(mx326,prim1.18) con=152.0 inst=46 ldT=0.518 | 113.3m eta12m
+[13600/15000] pop=  7230 bd= 236 vil=43(med57) strat=19.4% giniC=0.309 dyn:eff=3.1 top=0.505 mRSg=0.748 set=54(mx347,prim1.64) con=146.0 inst=50 ldT=0.48 | 113.5m eta12m
+[13625/15000] pop=  7209 bd= 237 vil=45(med56) strat=12.5% giniC=0.313 dyn:eff=3.1 top=0.509 mRSg=0.751 set=54(mx321,prim1.32) con=142.0 inst=52 ldT=0.549 | 113.7m eta11m
+[13650/15000] pop=  6985 bd= 229 vil=41(med57) strat=9.8% giniC=0.309 dyn:eff=3.1 top=0.509 mRSg=0.749 set=54(mx266,prim1.16) con=137.0 inst=45 ldT=0.507 | 113.9m eta11m
+[13675/15000] pop=  7089 bd= 228 vil=45(med55) strat=10.1% giniC=0.31 dyn:eff=3.1 top=0.51 mRSg=0.745 set=54(mx196,prim1.02) con=162.5 inst=44 ldT=0.507 | 114.1m eta11m
+[13700/15000] pop=  6917 bd= 229 vil=43(med53) strat=9.8% giniC=0.308 dyn:eff=3.0 top=0.512 mRSg=0.737 set=54(mx330,prim1.55) con=154.0 inst=38 ldT=0.486 | 114.3m eta11m
+[13725/15000] pop=  6974 bd= 227 vil=42(med57.0) strat=11.0% giniC=0.304 dyn:eff=3.0 top=0.517 mRSg=0.742 set=54(mx317,prim1.38) con=133.0 inst=42 ldT=0.534 | 114.5m eta11m
+[13750/15000] pop=  7086 bd= 220 vil=50(med58.5) strat=10.5% giniC=0.302 dyn:eff=3.0 top=0.522 mRSg=0.735 set=54(mx266,prim1.17) con=137.0 inst=44 ldT=0.491 | 114.7m eta10m
+[13775/15000] pop=  7001 bd= 209 vil=54(med55.5) strat=14.6% giniC=0.3 dyn:eff=3.0 top=0.522 mRSg=0.73 set=54(mx315,prim1.36) con=157.5 inst=41 ldT=0.478 | 114.9m eta10m
+[13800/15000] pop=  7096 bd= 207 vil=52(med59.0) strat=15.3% giniC=0.3 dyn:eff=2.9 top=0.525 mRSg=0.731 set=54(mx262,prim1.07) con=127.0 inst=44 ldT=0.47 | 115.0m eta10m
+[13825/15000] pop=  7034 bd= 203 vil=53(med58) strat=21.6% giniC=0.301 dyn:eff=2.9 top=0.526 mRSg=0.73 set=54(mx225,prim1.01) con=91.5 inst=37 ldT=0.469 | 115.2m eta10m
+[13850/15000] pop=  7372 bd= 211 vil=55(med60) strat=11.9% giniC=0.298 dyn:eff=3.0 top=0.522 mRSg=0.737 set=54(mx312,prim1.13) con=139.0 inst=45 ldT=0.52 | 115.4m eta10m
+[13875/15000] pop=  7071 bd= 213 vil=49(med61) strat=10.7% giniC=0.292 dyn:eff=2.9 top=0.524 mRSg=0.738 set=54(mx320,prim1.43) con=92.5 inst=46 ldT=0.552 | 115.6m eta9m
+[13900/15000] pop=  7150 bd= 216 vil=47(med61) strat=15.4% giniC=0.291 dyn:eff=2.9 top=0.524 mRSg=0.737 set=54(mx327,prim1.28) con=119.0 inst=50 ldT=0.52 | 115.7m eta9m
+[13925/15000] pop=  7025 bd= 218 vil=46(med58.5) strat=14.3% giniC=0.291 dyn:eff=2.9 top=0.525 mRSg=0.734 set=54(mx287,prim1.11) con=133.0 inst=38 ldT=0.529 | 115.9m eta9m
+[13950/15000] pop=  7065 bd= 223 vil=46(med61.5) strat=12.9% giniC=0.289 dyn:eff=3.0 top=0.516 mRSg=0.735 set=54(mx333,prim1.21) con=114.0 inst=43 ldT=0.465 | 116.1m eta9m
+[13975/15000] pop=  6786 bd= 218 vil=40(med57.0) strat=16.7% giniC=0.286 dyn:eff=3.0 top=0.514 mRSg=0.731 set=54(mx233,prim1.11) con=148.5 inst=46 ldT=0.529 | 116.3m eta9m
+[14000/15000] pop=  7059 bd= 221 vil=44(med57.0) strat=15.9% giniC=0.286 dyn:eff=3.1 top=0.506 mRSg=0.732 set=54(mx267,prim1.02) con=125.0 inst=41 ldT=0.551 | 116.4m eta8m
+[14025/15000] pop=  6839 bd= 223 vil=40(med55.0) strat=15.2% giniC=0.29 dyn:eff=3.0 top=0.51 mRSg=0.731 set=54(mx230,prim1.05) con=133.5 inst=43 ldT=0.516 | 116.6m eta8m
+[14050/15000] pop=  6788 bd= 217 vil=40(med59.0) strat=18.0% giniC=0.288 dyn:eff=3.1 top=0.503 mRSg=0.728 set=54(mx301,prim1.54) con=109.0 inst=35 ldT=0.538 | 116.8m eta8m
+[14075/15000] pop=  7020 bd= 221 vil=43(med58) strat=9.6% giniC=0.285 dyn:eff=3.1 top=0.503 mRSg=0.727 set=54(mx283,prim1.21) con=130.0 inst=39 ldT=0.514 | 116.9m eta8m
+[14100/15000] pop=  6994 bd= 213 vil=44(med61.0) strat=12.3% giniC=0.285 dyn:eff=3.1 top=0.501 mRSg=0.73 set=54(mx257,prim1.07) con=134.0 inst=39 ldT=0.514 | 117.1m eta7m
+[14125/15000] pop=  6786 bd= 211 vil=45(med55) strat=18.6% giniC=0.291 dyn:eff=3.1 top=0.498 mRSg=0.736 set=54(mx315,prim1.65) con=120.0 inst=37 ldT=0.527 | 117.3m eta7m
+[14150/15000] pop=  6899 bd= 208 vil=45(med61) strat=17.3% giniC=0.293 dyn:eff=3.1 top=0.5 mRSg=0.73 set=54(mx283,prim1.18) con=143.5 inst=33 ldT=0.534 | 117.4m eta7m
+[14175/15000] pop=  6893 bd= 208 vil=43(med60) strat=17.2% giniC=0.288 dyn:eff=3.1 top=0.496 mRSg=0.73 set=54(mx362,prim1.45) con=156.5 inst=42 ldT=0.453 | 117.6m eta7m
+[14200/15000] pop=  6812 bd= 201 vil=50(med58.0) strat=18.1% giniC=0.291 dyn:eff=3.2 top=0.49 mRSg=0.735 set=54(mx269,prim1.03) con=136.0 inst=38 ldT=0.465 | 117.8m eta7m
+[14225/15000] pop=  6638 bd= 198 vil=45(med58) strat=15.5% giniC=0.296 dyn:eff=3.2 top=0.489 mRSg=0.734 set=54(mx340,prim1.35) con=151.0 inst=34 ldT=0.449 | 117.9m eta6m
+[14250/15000] pop=  6599 bd= 192 vil=51(med55) strat=11.6% giniC=0.304 dyn:eff=3.2 top=0.481 mRSg=0.746 set=54(mx237,prim1.03) con=145.0 inst=33 ldT=0.545 | 118.1m eta6m
+[14275/15000] pop=  6777 bd= 188 vil=49(med61) strat=14.5% giniC=0.302 dyn:eff=3.2 top=0.48 mRSg=0.749 set=54(mx297,prim1.19) con=117.5 inst=32 ldT=0.429 | 118.2m eta6m
+[14300/15000] pop=  6973 bd= 193 vil=51(med62) strat=10.4% giniC=0.301 dyn:eff=3.3 top=0.478 mRSg=0.752 set=54(mx264,prim1.29) con=105.0 inst=44 ldT=0.473 | 118.4m eta6m
+[14325/15000] pop=  7214 bd= 195 vil=54(med61.5) strat=7.7% giniC=0.302 dyn:eff=3.3 top=0.477 mRSg=0.752 set=54(mx275,prim1.27) con=140.0 inst=43 ldT=0.503 | 118.6m eta6m
+[14350/15000] pop=  6704 bd= 192 vil=51(med57) strat=10.7% giniC=0.304 dyn:eff=3.3 top=0.472 mRSg=0.746 set=54(mx298,prim1.32) con=136.0 inst=42 ldT=0.464 | 118.7m eta5m
+[14375/15000] pop=  6715 bd= 190 vil=53(med57) strat=17.3% giniC=0.302 dyn:eff=3.3 top=0.467 mRSg=0.75 set=54(mx310,prim1.58) con=133.0 inst=37 ldT=0.519 | 118.9m eta5m
+[14400/15000] pop=  6943 bd= 189 vil=59(med55) strat=17.6% giniC=0.302 dyn:eff=3.3 top=0.466 mRSg=0.752 set=54(mx367,prim1.95) con=118.0 inst=36 ldT=0.428 | 119.1m eta5m
+[14425/15000] pop=  6914 bd= 193 vil=56(med56.0) strat=21.6% giniC=0.301 dyn:eff=3.3 top=0.465 mRSg=0.752 set=54(mx289,prim1.26) con=125.0 inst=42 ldT=0.457 | 119.2m eta5m
+[14450/15000] pop=  6948 bd= 192 vil=56(med58.5) strat=15.7% giniC=0.293 dyn:eff=3.4 top=0.458 mRSg=0.755 set=54(mx310,prim1.27) con=121.0 inst=50 ldT=0.511 | 119.4m eta5m
+[14475/15000] pop=  6985 bd= 192 vil=57(med57) strat=16.5% giniC=0.3 dyn:eff=3.4 top=0.456 mRSg=0.756 set=54(mx247,prim1.02) con=146.5 inst=43 ldT=0.513 | 119.6m eta4m
+[14500/15000] pop=  6927 bd= 196 vil=52(med59.5) strat=13.5% giniC=0.304 dyn:eff=3.4 top=0.455 mRSg=0.757 set=54(mx326,prim1.54) con=110.0 inst=41 ldT=0.495 | 119.7m eta4m
+[14525/15000] pop=  6828 bd= 194 vil=55(med57) strat=17.4% giniC=0.309 dyn:eff=3.4 top=0.45 mRSg=0.761 set=54(mx336,prim1.53) con=157.5 inst=38 ldT=0.492 | 119.9m eta4m
+[14550/15000] pop=  6804 bd= 196 vil=52(med58.0) strat=14.4% giniC=0.311 dyn:eff=3.4 top=0.444 mRSg=0.756 set=54(mx233,prim1.22) con=110.0 inst=38 ldT=0.439 | 120.0m eta4m
+[14575/15000] pop=  6701 bd= 198 vil=44(med59.0) strat=11.5% giniC=0.314 dyn:eff=3.4 top=0.442 mRSg=0.758 set=54(mx225,prim1.18) con=94.0 inst=41 ldT=0.461 | 120.2m eta4m
+[14600/15000] pop=  6750 bd= 201 vil=46(med58.5) strat=13.9% giniC=0.309 dyn:eff=3.4 top=0.445 mRSg=0.749 set=54(mx281,prim1.24) con=146.5 inst=41 ldT=0.447 | 120.4m eta3m
+[14625/15000] pop=  6747 bd= 195 vil=48(med59.5) strat=20.4% giniC=0.309 dyn:eff=3.4 top=0.445 mRSg=0.742 set=54(mx308,prim1.42) con=82.0 inst=44 ldT=0.492 | 120.5m eta3m
+[14650/15000] pop=  6907 bd= 200 vil=47(med59) strat=19.7% giniC=0.311 dyn:eff=3.4 top=0.448 mRSg=0.748 set=54(mx266,prim1.07) con=86.0 inst=38 ldT=0.518 | 120.7m eta3m
+[14675/15000] pop=  7229 bd= 219 vil=51(med57) strat=16.1% giniC=0.308 dyn:eff=3.4 top=0.447 mRSg=0.751 set=54(mx341,prim1.49) con=103.0 inst=40 ldT=0.444 | 120.8m eta3m
+[14700/15000] pop=  7051 bd= 214 vil=49(med57) strat=16.0% giniC=0.307 dyn:eff=3.4 top=0.444 mRSg=0.75 set=54(mx254,prim1.24) con=95.0 inst=45 ldT=0.515 | 121.0m eta2m
+[14725/15000] pop=  7252 bd= 217 vil=48(med58.0) strat=15.6% giniC=0.307 dyn:eff=3.4 top=0.44 mRSg=0.751 set=54(mx366,prim1.51) con=106.0 inst=46 ldT=0.551 | 121.2m eta2m
+[14750/15000] pop=  6932 bd= 209 vil=48(med58.5) strat=15.4% giniC=0.311 dyn:eff=3.4 top=0.442 mRSg=0.75 set=54(mx284,prim1.37) con=165.0 inst=36 ldT=0.498 | 121.4m eta2m
+[14775/15000] pop=  7120 bd= 206 vil=54(med58.0) strat=15.7% giniC=0.307 dyn:eff=3.3 top=0.451 mRSg=0.745 set=54(mx316,prim1.22) con=148.0 inst=45 ldT=0.443 | 121.5m eta2m
+[14800/15000] pop=  7128 bd= 213 vil=51(med60) strat=17.3% giniC=0.307 dyn:eff=3.3 top=0.453 mRSg=0.747 set=54(mx341,prim1.59) con=115.0 inst=43 ldT=0.515 | 121.7m eta2m
+[14825/15000] pop=  7243 bd= 217 vil=52(med60.5) strat=9.9% giniC=0.312 dyn:eff=3.3 top=0.456 mRSg=0.749 set=54(mx310,prim1.33) con=167.0 inst=48 ldT=0.478 | 121.9m eta1m
+[14850/15000] pop=  7304 bd= 217 vil=51(med59) strat=10.7% giniC=0.308 dyn:eff=3.2 top=0.463 mRSg=0.744 set=54(mx375,prim1.47) con=123.0 inst=43 ldT=0.466 | 122.0m eta1m
+[14875/15000] pop=  7050 bd= 220 vil=45(med57) strat=7.4% giniC=0.31 dyn:eff=3.2 top=0.465 mRSg=0.741 set=54(mx303,prim1.27) con=137.0 inst=44 ldT=0.474 | 122.2m eta1m
+[14900/15000] pop=  6939 bd= 222 vil=44(med57.5) strat=14.5% giniC=0.31 dyn:eff=3.3 top=0.458 mRSg=0.743 set=54(mx315,prim1.57) con=171.5 inst=43 ldT=0.471 | 122.4m eta1m
+[14925/15000] pop=  6899 bd= 224 vil=49(med58) strat=17.6% giniC=0.311 dyn:eff=3.3 top=0.457 mRSg=0.743 set=54(mx258,prim1.14) con=170.5 inst=45 ldT=0.577 | 122.5m eta1m
+[14950/15000] pop=  6917 bd= 216 vil=45(med61) strat=15.4% giniC=0.309 dyn:eff=3.3 top=0.456 mRSg=0.738 set=54(mx336,prim1.39) con=143.0 inst=42 ldT=0.519 | 122.7m eta0m
+[14975/15000] pop=  6925 bd= 218 vil=47(med56) strat=22.5% giniC=0.312 dyn:eff=3.3 top=0.452 mRSg=0.74 set=54(mx265,prim1.08) con=158.0 inst=35 ldT=0.519 | 122.9m eta0m
+[15000/15000] pop=  7206 bd= 225 vil=52(med55.5) strat=13.3% giniC=0.309 dyn:eff=3.3 top=0.453 mRSg=0.735 set=54(mx341,prim1.21) con=132.0 inst=39 ldT=0.445 | 123.0m eta0m
+DONE step=15000 in 123.0 min -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\campaign_trajectory_on.json ; genealogy rows=1106416 -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\campaign_genealogy_on.csv
