@@ -49,6 +49,8 @@ CLIM      = os.environ.get("C_CLIM", "temperate")
 TAG       = os.environ.get("C_TAG", "")
 GENOME    = os.environ.get("C_GENOME", "1") == "1"
 GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream (off for long cycling runs → save disk/time)
+BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
+BUD_THR   = int(os.environ.get("C_BUD_THR", "150"))      # fission threshold (Bandy ~150 open → ~277 circumscribed)
 DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibility (Dyson-Hudson & Smith) → instability
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
@@ -166,6 +168,7 @@ def main():
         enable_economic_defensibility=DEFEND,
         enable_adaptive_connubium=cut2, mate_search_min_eligible=(MSTAR if cut2 else 3),
         enable_exogamy=cut2, exogamy_degree="lineage",
+        enable_village_budding=BUD, village_fission_threshold=BUD_THR,
         enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
@@ -179,7 +182,8 @@ def main():
                 m_star=(MSTAR if cut2 else 3), defend=DEFEND)
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
         f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
-        f"defend={DEFEND} genome={GENOME} genealogy={'ON' if GENEALOG else 'OFF'} flush/{FLUSHEVERY}")
+        f"defend={DEFEND} budding={BUD}{'(thr'+str(BUD_THR)+')' if BUD else ''} "
+        f"genome={GENOME} genealogy={'ON' if GENEALOG else 'OFF'} flush/{FLUSHEVERY}")
     traj = []
     prev_leaders: dict = {}
     last_con: dict = {}
