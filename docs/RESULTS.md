@@ -1084,4 +1084,42 @@ cycles) and the agriculture/claimable-cells expansion (for the agrarian stratifi
 
 ---
 
+## R-68 — The founder boom-bust is a STARTUP ARTIFACT specific to Cut-2; the validated Cut-1 substrate is a GENUINE attractor (recovers from a 50% kill); agents are never immobile (2026-07-14)
+
+**Why.** Supervisor: "founder dynamics differing from post-crash is a problem — are they still mobile? do bands move?"
+Reboot test (`probe_reboot.py`): grow to the plateau, measure per-step MOBILITY, then kill 50% of the population and
+watch whether the sedentary regime re-forms (re-boom) or the flat plateau is the true attractor.
+
+**Mobility — agents are NOT frozen.** Fraction of agents changing cell per step: **0.73 (founder growth), 0.60 (Cut-2
+plateau), 0.29–0.31 (Cut-1, lower only because they are settled in villages).** Movement is never energy-gated
+([phase1_model.py:1093/1051](sic_games/src/sic_games/phase1_model.py:1093)); it is *self-limiting* (a cell attracts only
+if it beats your per-capita), so at low density there is no aggregation gradient — bands drift locally but don't
+converge. The flat plateau is NOT immobility.
+
+**Cut-2 (m*=25) — founder boom is a startup artifact.** Kill 1,641 → 820 ⇒ NO re-boom; pop re-glides to the same flat
+~1,700, villages stay 0. The one-time boom to 11k required the PRISTINE landscape (untouched stock briefly supporting a
+villaged overshoot past the sedentism tipping density); once worked, the sustainable *mobile* K is ~1,700 and the
+population sits there regardless of headroom. → Cut-2's boom-bust is substantially an INITIALIZATION artifact; its true
+attractor is the mobile low-K. Explains R-67's single boom.
+
+**Cut-1 (VALIDATED substrate) CONTROL — genuine robust attractor.** Kill 7,124 → 3,562 ⇒ RAPID full recovery to ~7,250
+within ~250 steps, **villages persist 42–62 throughout**. The sedentary high-K returns to equilibrium after a 50%
+perturbation — the signature of a genuine attractor, not a privileged start. → **R-58…R-66 are NOT founder-artifacts;
+the validated substrate is sound.**
+
+**Root of the Cut-1/Cut-2 divergence = VILLAGE PERSISTENCE (refines R-67).** Cut-1's seasonal gathering actively
+RE-CONVERGES bands onto sites each year → villages persist → high sedentary fertility → robust attractor + fast
+recovery. Cut-2's per-seeker ring-search SCATTERS (virilocal brides travel to distant grooms) → villages can't hold →
+collapse to the mobile floor after the founder transient. So Cut-2's destabilization is fundamentally the
+**virilocal-scatter breaking village persistence**, NOT the connubium reach (reach 167 busts like 475; R-67). Any Cut-3
+must keep marriage relocation LOCAL so villages persist.
+
+**BUG exposed (latent, validated path):** the long Cut-1 run crashed at ~step 16,500 —
+`_pair_from_pool` ([phase1_model.py:2108](sic_games/src/sic_games/phase1_model.py:2108)) weight overflow ("Total of
+weights must be finite"): `(prowess+1e-6)**mate_choice_strength` → inf when prowess drifts large over a long run. The 15k
+campaigns just missed it. Needs a fix that preserves bit-exactness for normal (non-overflowing) cases. Did NOT affect the
+reboot conclusion (obtained by step 16,000).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
