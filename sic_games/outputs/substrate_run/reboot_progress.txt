@@ -1,0 +1,25 @@
+reboot probe: seed=0 kill 50% @ step 10000, run to 18000. Q: does removing pop re-boom (generic) or re-glide flat (startup artifact)?
+  [    1] pop=  2910 vil=  2 mobility=0.000 occ=1267  | 0.0m
+  [ 1000] pop=  7106 vil= 53 mobility=0.708 occ=691  | 2.3m
+  [ 2000] pop= 11620 vil=107 mobility=0.744 occ=878  | 8.0m
+  [ 3000] pop=  9253 vil= 73 mobility=0.735 occ=911  | 14.8m
+  [ 4000] pop=  6526 vil= 51 mobility=0.722 occ=746  | 19.7m
+  [ 5000] pop=  4664 vil= 33 mobility=0.708 occ=703  | 22.9m
+  [ 6000] pop=  3155 vil= 14 mobility=0.663 occ=524  | 25.1m
+  [ 7000] pop=  1989 vil=  0 mobility=0.614 occ=341  | 26.4m
+  [ 8000] pop=  1570 vil=  0 mobility=0.571 occ=245  | 27.3m
+  [ 9000] pop=  1735 vil=  0 mobility=0.611 occ=324  | 28.1m
+  [10000] KILLED 50%: 1641 -> ~820 (headroom created; landscape already worked)
+  [10000] pop=  1641 vil=  0 mobility=0.589 occ=285 POST-KILL | 28.9m
+  [10250] pop=  1334 vil=  3 mobility=0.500 occ=164 POST-KILL | 29.0m
+  [10500] pop=  1683 vil=  1 mobility=0.561 occ=277 POST-KILL | 29.2m
+  [10750] pop=  1714 vil=  3 mobility=0.607 occ=297 POST-KILL | 29.4m
+  [11000] pop=  1633 vil=  0 mobility=0.587 occ=302 POST-KILL | 29.6m
+  [12000] pop=  1532 vil=  0 mobility=0.581 occ=274 POST-KILL | 30.3m
+  [13000] pop=  1722 vil=  1 mobility=0.583 occ=284 POST-KILL | 31.1m
+  [14000] pop=  1785 vil=  1 mobility=0.594 occ=288 POST-KILL | 31.8m
+  [15000] pop=  1626 vil=  0 mobility=0.584 occ=255 POST-KILL | 32.6m
+  [16000] pop=  1809 vil=  2 mobility=0.604 occ=327 POST-KILL | 33.4m
+  [17000] pop=  1683 vil=  0 mobility=0.598 occ=300 POST-KILL | 34.1m
+  [18000] pop=  1623 vil=  1 mobility=0.589 occ=260 POST-KILL | 34.9m
+DONE 34.9m -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\reboot_traj.json
