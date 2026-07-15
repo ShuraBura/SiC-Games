@@ -559,6 +559,17 @@ class DemographyConfig(BaseModel):
     # (enable_leader_coherence) — villages need leadership (Johnson/Testart). Default OFF ⇒ hard cap, bit-exact.
     enable_village_scaling: bool = False
     village_gain: float = Field(0.0, ge=0.0)                   # headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep)
+    # VILLAGE BUDDING (Bandy 2004; Chagnon 1975) — the ethnographic settlement-SPREAD/recovery mode. A village (band_id)
+    # grown past a scalar-stress FISSION THRESHOLD sheds its RIVAL-LEADER (2nd-largest lineage) faction, which RELOCATES
+    # to a nearby available STORABLE site and founds a DAUGHTER village. So the settlement system propagates by BUDDING
+    # (not by aggregating scattered individuals — the mode aggregation-only lacked, R-68) and re-spreads after a crash.
+    # Fission CEASES once a village STRATIFIES (integrative institutions suppress it — Bandy → the Carneiro fork). If no
+    # open site is in reach (CIRCUMSCRIPTION → high relocation cost), budding fails and the village stays large (existing
+    # morph → hierarchy handles it). Requires enable_band_affiliation. Default OFF ⇒ no-op (bit-exact).
+    enable_village_budding: bool = False
+    village_fission_threshold: int = Field(150, ge=10)        # village size that triggers fission — Bandy open-landscape ~150 → ~277 circumscribed; Alberti N≈127–158; Yanomamö ~200 [PROVISIONAL, from Bandy 2004]
+    village_bud_min_faction: float = Field(0.25, ge=0.0, le=1.0)  # the rival (2nd) lineage bloc must be ≥ this fraction of the village to carry a fission (else too leader-dominated to split)
+    village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an available daughter site; beyond it ⇒ circumscribed (no bud → hierarchy). ~a day's relocation range
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
     # metabolism (moving repeatedly depletes reserve → selection for sedentism) AND PERCEIVED in the IFD utility

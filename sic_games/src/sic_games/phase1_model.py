@@ -515,6 +515,8 @@ class TerrainWorld(mesa.Model):
                     self._do_pairing()
             if getattr(self._demog, "enable_band_affiliation", False):
                 self._maintain_bands()
+                if getattr(self._demog, "enable_village_budding", False):
+                    self._maintain_village_budding()   # Bandy 2004: large village sheds a rival-led daughter (relocates)
             self._do_births_ibi()
         elif self._reproduction:
             self._do_births()
@@ -2457,6 +2459,60 @@ class TerrainWorld(mesa.Model):
             for a in ms:
                 if side(a):
                     a._group.band_id = new_id
+
+    def _maintain_village_budding(self) -> None:
+        """Bandy 2004 / Chagnon 1975 VILLAGE FISSIONING — the ethnographic settlement-SPREAD/recovery mode. A VILLAGE
+        (the multi-band cluster within settle_radius of a settlement site) grown past `village_fission_threshold`
+        sheds its RIVAL faction — the SECOND-largest lineage bloc (Chagnon: fission along the lineage/leadership
+        cleavage) — which RELOCATES to a nearby available STORABLE site and founds a DAUGHTER village (new band_id).
+        So settlements PROPAGATE by budding, not only by aggregating scattered individuals (the mode aggregation-only
+        lacked — R-68), and re-spread across the landscape after a crash. Fission is SUPPRESSED once the village
+        STRATIFIES (integrative institutions — Bandy → the Carneiro fork; the existing morph grows those villages
+        instead). If no open site is within `village_bud_search_radius` (CIRCUMSCRIPTION), budding fails and the village
+        stays large. Operates on the SETTLEMENT (not band_id), so the band~25 fission scale is untouched. No RNG
+        (deterministic cleavage + siting). Default OFF ⇒ never called (bit-exact)."""
+        cfg = self._demog
+        aqf = self._s_pot_field()
+        if aqf is None or not self._settlement_sites:
+            return
+        thr = cfg.village_fission_threshold; minf = cfg.village_bud_min_faction
+        R = cfg.village_bud_search_radius; persist = cfg.settle_persist_threshold; sep = cfg.settle_radius
+        hf = self._harvest_field; W = getattr(hf, "width", N); H = getattr(hf, "height", N)
+        cell_agents: dict = {}
+        for a in self.agent_list:
+            cell_agents.setdefault(a.pos, []).append(a)
+        occ = {c: len(v) for c, v in cell_agents.items()}
+        for (sx, sy) in list(self._settlement_sites):
+            village = [a for dx in range(-sep, sep + 1) for dy in range(-sep, sep + 1)
+                       for a in cell_agents.get((sx + dx, sy + dy), ())]
+            if len(village) <= thr:
+                continue
+            bids = Counter(a._group.band_id for a in village)
+            if "stratified" in str(self._band_society.get(bids.most_common(1)[0][0], "")):
+                continue                                            # integrated village → fission suppressed (Bandy)
+            lin_ct = Counter(getattr(a, "_lineage", None) for a in village)
+            top = [l for l, _ in lin_ct.most_common(2) if l is not None]
+            if len(top) < 2:
+                continue                                            # single-lineage village → no cleavage line
+            faction = [a for a in village if getattr(a, "_lineage", None) == top[1]]
+            if len(faction) < minf * len(village):
+                continue                                            # rival bloc too small to carry a fission
+            # daughter site = the richest AVAILABLE storable cell within reach, in a separate catchment
+            best, best_v = None, persist
+            for yy in range(max(0, sy - R), min(H, sy + R + 1)):
+                for xx in range(max(0, sx - R), min(W, sx + R + 1)):
+                    v = float(aqf[yy, xx])
+                    if v < best_v or max(abs(xx - sx), abs(yy - sy)) < sep + 1:
+                        continue                                    # too poor, or inside the parent's own catchment
+                    if (xx, yy) in self._settlement_sites or occ.get((xx, yy), 0) >= cfg.settle_min_pool:
+                        continue                                    # already an occupied settlement → not available
+                    best, best_v = (xx, yy), v
+            if best is None:
+                continue                                            # CIRCUMSCRIBED — no open site → no bud (village stays)
+            new_id = self._next_band_id; self._next_band_id += 1     # BUD: rival faction migrates + founds the daughter
+            for a in faction:
+                a._group.band_id = new_id; a.pos = best
+            self._settlement_sites[best] = cfg.settle_release_steps
 
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell
