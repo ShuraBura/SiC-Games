@@ -1120,6 +1120,16 @@ weights must be finite"): `(prowess+1e-6)**mate_choice_strength` → inf when pr
 campaigns just missed it. Needs a fix that preserves bit-exactness for normal (non-overflowing) cases. Did NOT affect the
 reboot conclusion (obtained by step 16,000).
 
+**Hard-kill addendum (2026-07-14):** Cut-1 at 75% kill (6,834 → 1,703) recovers to ~8,000 within ~1,000 steps, villages
+40→24 (robust). BUT the *random* kill only THINS villages below the size threshold momentarily — survivors stay
+concentrated in the old village cells and regrow bands back over threshold, so villages "re-thicken from thinned," they do
+NOT nucleate from a DISPERSED village-less state. Aggregation-only village formation is weak precisely at
+dispersed-nucleation (the Cut-2 crash state). Ethnography consult (Bandy 2004; Chagnon 1975; Yanomamö fission ~200;
+Alberti N≈127–158) → the correct recovery/settlement-spread mechanism is village FISSION/BUDDING driven by leadership
+competition (a village past a scalar-stress threshold sheds a rival-led segment onto a nearby storable site), NOT
+individual scalar-stress repulsion. That is the recovery fix to build (independent of agriculture), and it doubles as the
+"re-settle" step the agro depletion oscillator needs.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
