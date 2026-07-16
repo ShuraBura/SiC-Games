@@ -393,6 +393,16 @@ class DemographyConfig(BaseModel):
     soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
     soil_deplete_frac: float = Field(0.6, ge=0.0)           # per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL]
     soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
+    # ALLUVIAL RENEWAL — soil renewal is TERRAIN-dependent, not uniform. The annual FLOOD re-deposits nutrient silt, so
+    # FLOODPLAIN farmland is renewed WHILE FARMED (the Nile floodplain was cropped ~5,000 yr essentially without fallow —
+    # the flood WAS the fertilizer), whereas RAIN-FED dryland exhausts → the swidden deplete→fallow→re-settle cycle.
+    # Keyed on `wateracc`, the SAME alluvial signal cultivability_field already uses (CULT_WATER_BASE far-from-water =
+    # rain-fed/no alluvium … CULT_WATER_GAIN at the water = alluvial floodplain/irrigable = prime; Nile/Mesopotamia/Indus).
+    # ⇒ TWO agrarian regimes emerge: rain-fed SWIDDEN (deplete→abandon→re-settle = cycles) vs HYDRAULIC floodplain
+    # (renewed → stable, dense, stratifying without cycling). Requires enable_soil_depletion. Default OFF ⇒ every farm
+    # depletes (bit-exact).
+    enable_alluvial_renewal: bool = False
+    alluvial_renew_per_yr: float = Field(3.0, ge=0.0)       # flood soil-restoration rate at wateracc=1 — restores ~97% of the deficit within a year ⇒ equilibrium soil ≈ 1 − deplete/renew ≈ 0.8 at full farming pressure = sustainable WITHOUT fallow (the Nile) [PROVISIONAL]
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so

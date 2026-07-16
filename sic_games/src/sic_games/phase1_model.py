@@ -908,13 +908,24 @@ class TerrainWorld(mesa.Model):
         rad = cfg.settle_radius
         r = cfg.soil_regrow_per_yr / 12.0
         carry = cfg.soil_carry_per_cell * (2 * cfg.settle_catchment_radius + 1) ** 2
+        occ: dict = {}                                         # PERF: cell → occupancy, then sum each site's
+        for a in self.agent_list:                              # neighbourhood — O(agents + n_sites·rad²), not
+            occ[a.pos] = occ.get(a.pos, 0) + 1                 # O(agents·n_sites). Bit-exact (same counts).
         counts: dict[tuple[int, int], int] = {}
-        for a in self.agent_list:
-            ax, ay = a.pos
-            for s in self._settlement_sites:
-                if self._torus_cheby(ax, ay, s[0], s[1]) <= rad:
-                    counts[s] = counts.get(s, 0) + 1
+        for (sx, sy) in self._settlement_sites:
+            n = 0
+            for dx in range(-rad, rad + 1):
+                for dy in range(-rad, rad + 1):
+                    n += occ.get(((sx + dx) % N, (sy + dy) % N), 0)
+            counts[(sx, sy)] = n
         dep = cfg.soil_deplete_frac / 12.0                     # per-step exhaustion at pressure 1
+        # ALLUVIAL RENEWAL — renewal is TERRAIN-dependent, not uniform: a FLOODPLAIN farm is re-fertilised in place by
+        # the annual flood silt (the Nile was cropped ~5,000 yr without fallow) while RAIN-FED dryland exhausts.
+        # `wateracc` is the alluvial signal (the same one cultivability_field uses). OFF ⇒ allu_r=0 ⇒ every farm
+        # depletes (bit-exact). ⇒ two regimes: rain-fed SWIDDEN (cycles) vs HYDRAULIC floodplain (stable).
+        allu_on = getattr(cfg, "enable_alluvial_renewal", False)
+        allu_r = (cfg.alluvial_renew_per_yr / 12.0) if allu_on else 0.0
+        wacc = getattr(self._fields, "wateracc", None) if allu_on else None
         active_farm = set()
         for s in self._settlement_sites:
             if aq is not None and aq[s[1], s[0]] >= cult[s[1], s[0]]:
@@ -923,8 +934,11 @@ class TerrainWorld(mesa.Model):
             pressure = counts.get(s, 0) / carry if carry > 0 else 0.0
             # SWIDDEN: continuous cropping EXHAUSTS the soil (no regrowth while farmed) → progressive decline to the
             # floor → yield crashes → bust/relocate. (Landesque capital, B2, is what damps this to a sustainable
-            # equilibrium — the intensification path.) Regrowth happens only on FALLOW (below).
+            # equilibrium — the intensification path.) Regrowth happens only on FALLOW (below) — UNLESS the site is
+            # ALLUVIAL, where the flood renews it IN PLACE (the hydraulic regime: dense, stable, fallow-free).
             soil = self._settlement_soil.get(s, 1.0) - dep * pressure
+            if wacc is not None:
+                soil += allu_r * float(wacc[s[1], s[0]]) * (1.0 - soil)   # flood silt restores toward 1 ∝ alluviality
             self._settlement_soil[s] = min(1.0, max(0.05, soil))
         for s in list(self._settlement_soil):                  # FALLOW: abandoned (or non-farm) sites heal slowly
             if s not in active_farm:
