@@ -530,17 +530,29 @@ class TerrainWorld(mesa.Model):
         the diffuse interior ≈ 0 so it never qualifies). A band that LEAD-occupies a claimable cell with ≥
         defensibility_claim_min members builds a claim (+1/step); at ≥ defensibility_claim_dwell it OWNS the cell.
         The incumbent owner keeps priority while present; a challenger erodes the claim (−1); ownership LAPSES
-        (hysteresis) when the claim decays to 0. Resource-agnostic: reads aquatic_food now, cultivability later."""
+        (hysteresis) when the claim decays to 0. Aquatic is claimable by construction; with `enable_improved_land`
+        CULTIVABLE land is ALSO claimable where WORKED (inside an active settlement's catchment) — the agrarian path."""
         D = getattr(self._fields, "aquatic_food", None)
         if D is None:
             return
         dmin = self._demog.defensibility_min
         dwell = self._demog.defensibility_claim_dwell
         claim_min = self._demog.defensibility_claim_min
+        # IMPROVED-LAND (agriculture): cultivable cells become claimable where actively WORKED — a settlement's catchment.
+        # "You own what you've cleared" (Testart), not any fertile wilderness cell. worked=None ⇒ aquatic-only (bit-exact).
+        cult = getattr(self._fields, "cultivability", None) if getattr(self._demog, "enable_improved_land", False) else None
+        worked = None
+        if cult is not None and self._settlement_sites:
+            rad = self._demog.settle_radius
+            worked = set()
+            for (sx, sy) in self._settlement_sites:
+                for dx in range(-rad, rad + 1):
+                    for dy in range(-rad, rad + 1):
+                        worked.add(((sx + dx) % N, (sy + dy) % N))
         cell_bands: dict[tuple[int, int], dict[int, int]] = {}
         for a in self.agent_list:
             x, y = a.pos
-            if D[y, x] >= dmin:
+            if D[y, x] >= dmin or (worked is not None and (x, y) in worked and cult[y, x] >= dmin):
                 d = cell_bands.setdefault((x, y), {})
                 b = a._group.band_id
                 d[b] = d.get(b, 0) + 1

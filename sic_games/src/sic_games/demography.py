@@ -321,6 +321,12 @@ class DemographyConfig(BaseModel):
     defensibility_claim_min: int = Field(3, ge=1)              # min owner members present to build/hold a claim (a family; below → the claim decays)
     defensibility_exclusion: float = Field(0.2, ge=0.0, le=1.0)  # OUTSIDER's perceived per-capita on an OWNED cell × this (shadow of defence → routed away) [PROVISIONAL]
     defensibility_tether: float = Field(6.0, ge=1.0)           # OWNER member's perceived per-capita on ITS band's owned cell × this (delayed-return tether → concentrate) [PROVISIONAL]
+    # IMPROVED-LAND (agriculture): cultivable land becomes DEFENSIBLE/claimable where it is actively WORKED — inside an
+    # active settlement's catchment — NOT merely fertile. "You own what you've cleared and planted" (Testart delayed-
+    # return; Bandy landscape capital). Opens the AGRARIAN territoriality → stratification path (Fertile Crescent/Nile)
+    # alongside the aquatic (NW-Coast) one, without letting the ~62% cultivable wilderness all be claimable at once.
+    # Requires enable_economic_defensibility. Default OFF ⇒ aquatic-only claimable (bit-exact).
+    enable_improved_land: bool = False
     # ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson): settlements as MULTI-BAND
     # coalescence — "the gathering that stops dispersing". Q1 lit: villages form by COALESCENCE of several bands at a
     # rich node (not one band packing); Q2: the landscape is ~6× below Binford packing, so the density must come from
