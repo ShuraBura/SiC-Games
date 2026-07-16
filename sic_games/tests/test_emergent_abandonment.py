@@ -32,8 +32,8 @@ def _farm_site(w, high_water: bool):
     return best
 
 
-def _farm_for(w, site, steps):
-    carry = int(w._demog.soil_carry_per_cell * (2 * w._demog.settle_catchment_radius + 1) ** 2)
+def _farm_for(w, site, steps, pressure=1.0):
+    carry = int(w._demog.soil_carry_per_cell * (2 * w._demog.settle_catchment_radius + 1) ** 2 * pressure)
     for _ in range(carry):
         a = w._make_agent(sex="male", lh_cfg=None); a.pos = site
         w.agent_list.append(a)
@@ -72,6 +72,17 @@ def test_memory_is_slow_one_bad_year_does_not_move_it():
     site = _farm_site(w, high_water=False)
     h = _farm_for(w, site, 1)
     assert h < 0.02, f"a single bad step should barely move a generational memory; got {h:.4f}"
+
+
+def test_hardship_is_proportional_to_real_over_exploitation():
+    """REASSURANCE: the trigger is not arbitrary/elapsed-time — hardship tracks ACTUAL over-working of the land. A
+    lightly-worked village keeps its soil (and its hold on its people) far longer than a heavily-worked one."""
+    heavy = _world(enable_soil_depletion=True, enable_emergent_abandonment=True)
+    h_heavy = _farm_for(heavy, _farm_site(heavy, high_water=False), 144, pressure=1.0)   # 12 yr, full pressure
+    light = _world(enable_soil_depletion=True, enable_emergent_abandonment=True)
+    h_light = _farm_for(light, _farm_site(light, high_water=False), 144, pressure=0.1)   # 12 yr, a tenth the pressure
+    assert h_light < 0.5 * h_heavy, f"hardship must scale with real over-exploitation: light={h_light:.3f} heavy={h_heavy:.3f}"
+    assert h_heavy > 0.3, f"a fully-worked village SHOULD accumulate hardship; got {h_heavy:.3f}"
 
 
 def test_memory_off_stays_empty():

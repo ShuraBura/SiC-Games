@@ -239,3 +239,5 @@ campaign: sha=3959f3d world=flat-tropical founders=2500 steps=6000 habitable=160
 [ 5925/6000] pop= 14848 bd= 452 vil=102(med59.0) strat=0.6% giniC=0.271 dyn:eff=22.1 top=0.103 mRSg=0.767 set=26(mx75,prim1.27) con=117.0 inst=88 ldT=0.565 | 57.3m eta1m
 [ 5950/6000] pop= 14751 bd= 452 vil=99(med57) strat=1.0% giniC=0.272 dyn:eff=21.7 top=0.106 mRSg=0.766 set=25(mx50,prim1.35) con=133.0 inst=89 ldT=0.514 | 57.6m eta0m
 [ 5975/6000] pop= 14759 bd= 446 vil=98(med59.0) strat=0.5% giniC=0.271 dyn:eff=21.6 top=0.104 mRSg=0.769 set=25(mx61,prim1.2) con=213.0 inst=89 ldT=0.553 | 57.8m eta0m
+[ 6000/6000] pop= 14731 bd= 429 vil=113(med58) strat=0.3% giniC=0.269 dyn:eff=21.4 top=0.103 mRSg=0.767 set=25(mx78,prim1.37) con=207.5 inst=93 ldT=0.589 | 58.0m eta0m
+DONE step=6000 in 58.0 min -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\campaign_trajectory_swidden2.json ; genealogy rows=0 -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\campaign_genealogy_swidden2.csv
