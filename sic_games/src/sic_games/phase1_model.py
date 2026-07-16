@@ -2490,14 +2490,17 @@ class TerrainWorld(mesa.Model):
         So settlements PROPAGATE by budding, not only by aggregating scattered individuals (the mode aggregation-only
         lacked — R-68), and re-spread across the landscape after a crash. Fission is SUPPRESSED once the village
         STRATIFIES (integrative institutions — Bandy → the Carneiro fork; the existing morph grows those villages
-        instead). If no open site is within `village_bud_search_radius` (CIRCUMSCRIPTION), budding fails and the village
-        stays large. Operates on the SETTLEMENT (not band_id), so the band~25 fission scale is untouched. No RNG
+        instead). CIRCUMSCRIPTION (Bandy p.330): the fission threshold RISES with the relocation distance to the nearest
+        OPEN site — base ~170 (open landscape) → ~277 (circumscribed) — so budding self-limits as the landscape fills,
+        and where no open site is in reach the village grows + stratifies. Operates on the SETTLEMENT (not band_id),
+        so the band~25 fission scale is untouched. No RNG
         (deterministic cleavage + siting). Default OFF ⇒ never called (bit-exact)."""
         cfg = self._demog
         aqf = self._s_pot_field()
         if aqf is None or not self._settlement_sites:
             return
-        thr = cfg.village_fission_threshold; minf = cfg.village_bud_min_faction
+        thr_base = cfg.village_fission_threshold; circ_gain = cfg.village_circumscription_gain
+        minf = cfg.village_bud_min_faction
         R = cfg.village_bud_search_radius; persist = cfg.settle_persist_threshold; sep = cfg.settle_radius
         hf = self._harvest_field; W = getattr(hf, "width", N); H = getattr(hf, "height", N)
         cell_agents: dict = {}
@@ -2507,7 +2510,7 @@ class TerrainWorld(mesa.Model):
         for (sx, sy) in list(self._settlement_sites):
             village = [a for dx in range(-sep, sep + 1) for dy in range(-sep, sep + 1)
                        for a in cell_agents.get((sx + dx, sy + dy), ())]
-            if len(village) <= thr:
+            if len(village) <= thr_base:            # below even the open-landscape threshold → can't fission
                 continue
             bids = Counter(a._group.band_id for a in village)
             if "stratified" in str(self._band_society.get(bids.most_common(1)[0][0], "")):
@@ -2519,18 +2522,21 @@ class TerrainWorld(mesa.Model):
             faction = [a for a in village if getattr(a, "_lineage", None) == top[1]]
             if len(faction) < minf * len(village):
                 continue                                            # rival bloc too small to carry a fission
-            # daughter site = the richest AVAILABLE storable cell within reach, in a separate catchment
-            best, best_v = None, persist
+            # NEAREST open storable daughter site (its distance = the relocation cost that drives circumscription)
+            best, bestd = None, R + 1
             for yy in range(max(0, sy - R), min(H, sy + R + 1)):
                 for xx in range(max(0, sx - R), min(W, sx + R + 1)):
-                    v = float(aqf[yy, xx])
-                    if v < best_v or max(abs(xx - sx), abs(yy - sy)) < sep + 1:
-                        continue                                    # too poor, or inside the parent's own catchment
+                    d = max(abs(xx - sx), abs(yy - sy))
+                    if d < sep + 1 or d >= bestd or float(aqf[yy, xx]) < persist:
+                        continue                                    # own catchment, farther than best, or not storable
                     if (xx, yy) in self._settlement_sites or occ.get((xx, yy), 0) >= cfg.settle_min_pool:
-                        continue                                    # already an occupied settlement → not available
-                    best, best_v = (xx, yy), v
+                        continue                                    # already an occupied settlement → not open
+                    best, bestd = (xx, yy), d
             if best is None:
-                continue                                            # CIRCUMSCRIBED — no open site → no bud (village stays)
+                continue         # CIRCUMSCRIBED (no open site in reach) → no bud → village grows + stratifies (Bandy → morph)
+            # Bandy fission COST: the threshold RISES with relocation distance — base (open) → ~+60% when circumscribed
+            if len(village) <= thr_base * (1.0 + circ_gain * bestd / R):
+                continue                                            # not large enough to justify relocation at this cost
             new_id = self._next_band_id; self._next_band_id += 1     # BUD: rival faction migrates + founds the daughter
             for a in faction:
                 a._group.band_id = new_id; a.pos = best

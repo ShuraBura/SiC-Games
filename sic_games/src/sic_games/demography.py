@@ -567,9 +567,10 @@ class DemographyConfig(BaseModel):
     # open site is in reach (CIRCUMSCRIPTION → high relocation cost), budding fails and the village stays large (existing
     # morph → hierarchy handles it). Requires enable_band_affiliation. Default OFF ⇒ no-op (bit-exact).
     enable_village_budding: bool = False
-    village_fission_threshold: int = Field(150, ge=10)        # village size that triggers fission — Bandy open-landscape ~150 → ~277 circumscribed; Alberti N≈127–158; Yanomamö ~200 [PROVISIONAL, from Bandy 2004]
+    village_fission_threshold: int = Field(170, ge=10)        # BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index 157–186); =Alberti N≈127–158 / Yanomamö ~200 range [ANCHORED, Bandy 2004 p.330]
     village_bud_min_faction: float = Field(0.25, ge=0.0, le=1.0)  # the rival (2nd) lineage bloc must be ≥ this fraction of the village to carry a fission (else too leader-dominated to split)
-    village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an available daughter site; beyond it ⇒ circumscribed (no bud → hierarchy). ~a day's relocation range
+    village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range
+    village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
     # metabolism (moving repeatedly depletes reserve → selection for sedentism) AND PERCEIVED in the IFD utility

@@ -43,12 +43,15 @@ def _site_with_neighbor(w):
 def test_village_budding_defaults_off():
     c = DemographyConfig()
     assert c.enable_village_budding is False
-    assert c.village_fission_threshold == 150
+    assert c.village_fission_threshold == 170
     assert c.village_bud_min_faction == 0.25
+    assert c.village_circumscription_gain == 0.6
 
 
 def test_budding_sheds_rival_lineage_to_new_site():
-    w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20)
+    # circ_gain=0 isolates the fires-behaviour from the circumscription threshold-rise (tested separately)
+    w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20,
+               village_circumscription_gain=0.0)
     site = _site_with_neighbor(w)
     assert site is not None, "coastal world should have a storable site with a storable neighbor in reach"
     maj = _place(w, site, 20, 1, 0)          # majority lineage-1 (band_id 0)
@@ -62,6 +65,21 @@ def test_budding_sheds_rival_lineage_to_new_site():
     assert all(a.pos != site for a in riv), "rival faction relocates off the parent site"
     assert all(a._group.band_id == 0 and a.pos == site for a in maj), "majority stays put"
     assert len(w._settlement_sites) > n0, "a daughter settlement is founded"
+
+
+def test_circumscription_raises_threshold_and_blocks_small_bud():
+    """Bandy circumscription: a steep relocation cost lifts the effective fission threshold above the village size →
+    no bud (the village would grow + stratify instead). Same village that fissions at circ_gain=0."""
+    w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20,
+               village_circumscription_gain=5.0)            # eff_thr = 20·(1+5·d/8) ≫ 30 at any reachable d ≥ 3
+    site = _site_with_neighbor(w)
+    _place(w, site, 20, 1, 0); riv = _place(w, site, 10, 2, 0)
+    w._settlement_sites[site] = w._demog.settle_release_steps
+    w._next_band_id = 7
+    n0 = len(w._settlement_sites)
+    w._maintain_village_budding()
+    assert all(a._group.band_id == 0 for a in riv), "circumscription cost should block this small fission"
+    assert len(w._settlement_sites) == n0
 
 
 def test_single_lineage_village_does_not_bud():
