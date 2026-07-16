@@ -1204,4 +1204,57 @@ candidate for the depletion-driven secular cycles the connubium (R-67) could not
 
 ---
 
+## R-71 — Emergent abandonment closes the swidden loop: collapse → SUSTAINABLE rotation (1.71×), but still NO cycles; and swidden churn is ANTI-hierarchical → completes the two-regime picture (2026-07-15)
+
+**Setup.** Rain-fed flat-tropical (aquatic 0.6%), full agrarian stack (Cut-1 + defensibility + budding + improved-land +
+soil depletion + alluvial renewal), 6000 steps, seed 0. Paired arms differing ONLY in `enable_emergent_abandonment` ⇒
+bit-identical until the pin first releases. `run_campaign C_SOIL=1 C_ABANDON=0|1`.
+
+**The ratchet (abandonment OFF) — the loop does not close.** pop 2,428 → peak **20,244 @1,600** → **monotonic slide to
+8,563**, zero swings; villages 154→27; stratification 16%→0.7%. Diagnostic: `n_settle` sat **frozen at 12–16 while the
+population halved** — settlements NEVER abandon. Depletion crashes the yield but nothing converts that into leaving, so
+people farm floor-soil forever, the land never fallows, and the landscape ratchets down. **Real forest-fallow swidden
+survives its 1:10 crop:fallow ratio ONLY because people move on** — the same (correct, lit-anchored) parameters produce
+a death spiral without that step.
+
+**Emergent abandonment (ON) — collapse becomes a sustainable rotation.**
+
+| | abandonment ON | ratchet (OFF) |
+|---|---|---|
+| peak | 19,896 @2,500 | 20,244 @1,600 |
+| endpoint | **equilibrium ≈14,421** (13,838–15,132, ±4.5%) | **8,563** (monotone, no recovery) |
+| settlements | **25–26, churning** | 12–16, frozen |
+| largest village | ~50 | large |
+
+**⇒ 1.71× the ratchet endpoint.** The mechanism reads exactly as designed: many small villages, constantly abandoning
+exhausted ground and re-founding on healed land, at a density the landscape can rotate (Boserup forest-fallow carrying
+capacity). **The collapse is cured.**
+
+**But NO CYCLES (±4.5% = noise).** Rotating swidden is *stable* — the ethnographically correct answer (it persisted for
+millennia). **Third independent negative for secular cycles**: the connubium (R-67), the bare substrate (R-68), and now
+soil depletion all find EQUILIBRIA. **Secular cycles are NOT in the subsistence base** — they need exogenous shocks
+(`enable_tier2_shock`, deliberately OFF to isolate endogeneity; its own docstring notes shock deficit → dissolve →
+dispersal) or the explicit Turchin elite layer.
+
+**Unexpected second finding — swidden churn is ANTI-HIERARCHICAL, completing R-70's two regimes.** Stratification
+collapsed to **0.4%** here, versus **11–16%** in the SAME world with improved-land but WITHOUT soil depletion (R-70):
+constant relocation prevents surplus accumulation, so no hierarchy forms. With alluvial renewal keeping floodplain soil
+≈1 (no hardship ⇒ never abandons), the model now yields BOTH regimes from terrain alone:
+- **rain-fed swidden** → mobile, rotating, sustainable, **EGALITARIAN**
+- **alluvial floodplain** → renewed, sedentary, **STRATIFIED** (the hydraulic state)
+Which is the ethnography: shifting cultivators ARE egalitarian; Fertile-Crescent/Nile hierarchy required SEDENTARY
+(flood-renewed/irrigated) agriculture.
+
+**Design note (supervisor's framing, and the shortcut in it).** Abandonment did NOT need a new "leave" drive — the IFD
+drive already wants better per-capita; it was merely OVERRIDDEN by the residence pin. So the pin was made
+condition-dependent on the site's own remembered fortunes (a per-SITE generational hardship EMA, 12 yr — the place
+persists while members churn; slow ⇒ intrinsic hysteresis, only CHRONIC decline registers = "the elders notice"), and
+the existing drive decides. **This dissolves the information problem: agents never need to know whether elsewhere is
+better** — release the pin and the local comparison settles it. Anchor: swidden villages relocate every ~5–30 yr
+(Conklin; Yanomamö ~5–10) = WITHIN one generation. Lit re-check also CONFIRMED the existing params (Boserup
+forest-fallow: crop 1–2 yr / fallow 20–25 yr ⇒ `soil_deplete_frac` 0.6/yr ≈1.6 crop-yr is RIGHT; the 10:1 ratio IS the
+system); `soil_regrow_per_yr` 0.06→0.045 (~22 yr) to sit in the band. Branch `agriculture`; all default-OFF; 723 pass.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

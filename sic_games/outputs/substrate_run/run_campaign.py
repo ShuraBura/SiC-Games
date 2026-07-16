@@ -174,6 +174,7 @@ def main():
         enable_village_budding=BUD, village_fission_threshold=BUD_THR,
         enable_improved_land=IMPROVED,
         enable_soil_depletion=SOIL, enable_alluvial_renewal=SOIL,
+        enable_emergent_abandonment=(SOIL and os.environ.get("C_ABANDON", "0") == "1"),
         enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),

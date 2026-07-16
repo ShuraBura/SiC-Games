@@ -1,0 +1,24 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+reboot probe: seed=0 kill 75% @ step 6000, run to 15000. Q: does removing pop re-boom (generic) or re-glide flat (startup artifact)?
+  [    1] pop=  2910 vil=  2 mobility=0.000 occ=1267  | 0.0m
+  [ 1000] pop=  7772 vil= 57 mobility=0.315 occ=297  | 4.8m
+  [ 2000] pop=  7158 vil= 36 mobility=0.313 occ=287  | 14.0m
+  [ 3000] pop=  6933 vil= 50 mobility=0.296 occ=177  | 21.7m
+  [ 4000] pop=  6693 vil= 39 mobility=0.292 occ=181  | 28.7m
+  [ 5000] pop=  6774 vil= 41 mobility=0.296 occ=194  | 36.4m
+  [6000] KILLED 75%: 6812 -> ~1703 (headroom created; landscape already worked)
+  [ 6000] pop=  6812 vil= 47 mobility=0.291 occ=169 POST-KILL | 45.1m
+  [ 6250] pop=  4817 vil= 48 mobility=0.070 occ=118 POST-KILL | 45.9m
+  [ 6500] pop=  7862 vil= 53 mobility=0.221 occ=206 POST-KILL | 47.6m
+  [ 6750] pop=  8266 vil= 30 mobility=0.297 occ=232 POST-KILL | 49.7m
+  [ 7000] pop=  7950 vil= 31 mobility=0.297 occ=221 POST-KILL | 51.9m
+  [ 8000] pop=  7937 vil= 29 mobility=0.304 occ=216 POST-KILL | 61.7m
+  [ 9000] pop=  8007 vil= 29 mobility=0.295 occ=214 POST-KILL | 70.4m
+  [10000] pop=  8065 vil= 22 mobility=0.302 occ=225 POST-KILL | 80.0m
+  [11000] pop=  7930 vil= 21 mobility=0.302 occ=218 POST-KILL | 89.8m
+  [12000] pop=  7971 vil= 30 mobility=0.298 occ=225 POST-KILL | 98.8m
+  [13000] pop=  8035 vil= 28 mobility=0.297 occ=212 POST-KILL | 107.5m
+  [14000] pop=  7851 vil= 19 mobility=0.297 occ=216 POST-KILL | 116.3m
+  [15000] pop=  8104 vil= 27 mobility=0.304 occ=197 POST-KILL | 125.1m
+DONE 125.1m -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\reboot_traj_c1hard.json

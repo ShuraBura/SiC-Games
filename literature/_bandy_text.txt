@@ -1,0 +1,1097 @@
+MATTHEW S. BANDY
+Fissioning,ScalarStress,andSocialEvolution
+inEarlyVillageSocieties
+ABSTRACT Theories of social evolution have predicted that early permanent population concentrations will frequently be unstable,
+with ﬁssioning the predominant mechanism for resolving intravillage conﬂict. It has further been suggested that village ﬁssioning will
+ceasewiththeemergenceofhigher-levelintegrativeinstitutions.Theseprocesseshaveremainedarchaeologicallyundocumented.Inthis
+articleIattempttoidentifythevillageﬁssioningprocessintheFormativePeriodofBolivia’sTiticacaBasin.Iconcludethatvillageﬁssioning
+took place in the Early Formative, and that it ceased with the emergence of a regional religious tradition in the Middle Formative. These
+results conﬁrm the utility and applicability of the evolutionary model. [Keywords: village ﬁssioning, social evolution, scalar stress, Lake
+Titicaca, Bolivia]
+V
+ILLAGEFISSIONINGASAPROCESSoccupiesacuri-
+ouspositioninneoevolutionarytheory.Ontheone
+handitisinvokedwithsomefrequencyandisastapleofin-
+troductorytreatmentsofsocialevolution.Virtuallyallthe-
+oreticaltransitsfromhunter-gatherertovillageorurbanso-
+cialformspassthroughanearlystageof“learningtolivein
+villages,”asJoyceMarcusandKentFlannery(1996:71)put
+it.Oftenlikenedtotheethnographicallydocumentedbig-
+mensocietiesofMelanesiaandNewGuinea(Oliver1955;
+Sahlins1963;Strathern1971),theseearlyvillagesocieties
+are thought to be characterized by weakly developed in-
+stitutions of authority, more persuasive than coercive in
+nature.Inconditionsofrelativelylowpopulationdensity
+and relatively egalitarian social organization, conﬂict can
+beresolvedbysplittingthelocalgroup.Thiseaseofﬁssion-
+ingisalsothoughttoactasacheckontheaspirationsof
+ambitiousleaders.Thesocialdynamicsofearlyvillageso-
+cieties are therefore thought to have been fundamentally
+structuredbyﬁssionorbythepossibilityofﬁssion.Thus,
+“amajorchallengefacingthe[early]villages ... wastoﬁnd
+ways to integrate larger communities without ﬁssioning”
+(MarcusandFlannery1996:73).
+On the other hand, village ﬁssioning has remained
+virtuallyundocumentedarchaeologically.Socialgroupﬁs-
+sioninghasbeenobservedinnonhumanprimatesocieties
+(Struhsaker1988;Yamigawa1985)andinmodernandeth-
+nohistorichumancommunities(Blitz1999;Chagnon1979;
+Lewis1961;Olsen1987;Turner1957).However,despiteits
+fundamental importance for the social and demographic
+evolutionofearlyagriculturalvillagesocieties,speciﬁcﬁs-
+American Anthropologist,Vol.106,Issue2,pp.322–333,ISSN0002-7294,onlineISSN1548-1433. C⃝ 2004bytheAmericanAnthropologicalAssociation.
+Allrightsreserved.Sendrequestsforpermissiontoreprintto:RightsandPermissions,UniversityofCaliforniaPress,JournalsDivision,2000Ce nterStreet,
+Suite 303, Berkeley, CA 94704-1223.
+sioning events have never been observed in an archaeo-
+logicalcontext.Thefewpublishedattemptstoidentifythe
+processarchaeologically(e.g.,Parsonsetal.1982:367)have
+failed. There are, of course, good reasons for this failure.
+Early phases of archaeological sequences are likely to be
+problematicandpoorlypreserved.Also,anynumberoffac-
+tors, such as dispersed residential patterns or high levels
+of residential mobility, can confuse the settlement record
+enoughtomaketherecognitionofspeciﬁcﬁssioningevents
+impossible.Inthisarticle,Idescribeacaseinwhichnatu-
+ralprocessesandprehistoricsettlementpracticeshavecom-
+binedtopermittheidentiﬁcationofseveralspeciﬁcvillage
+ﬁssioning events. On this basis I estimate the population
+thresholdatwhichFormativevillagesﬁssionedand,justas
+importantly,arguethatﬁssioningceasedaround800B.C.E.
+withtheemergenceofaregionalreligioustradition.
+IRRITATION,SCALARSTRESS,ANDSOCIALEVOLUTION
+Anthropologicalinterpretationsofthecausesofvillageﬁs-
+sioningvarywidely.Someaccountshaveemphasizedpopu-
+lationpressureonlimitedresourceswithinavillage’scatch-
+mentarea(cf.Bradﬁeld’s1971versionofthe1906Oraibi
+split).Ingeneral,though,itseemsthatﬁssioningfrequently
+takesplaceatverylowpopulationdensities,farbelowthe
+pointatwhichlocalsubsistenceresourceswouldbeginto
+bestrained(Turner1957:46).
+Village ﬁssioning is a result of the fact that as hu-
+man social groups grow, through natural increase or im-
+migration,theyexperienceincreasinglevelsofintragroup
+conﬂict. This received perhaps its ﬁrst anthropological
+Bandy • Village Fissioning and Scalar Stress 323
+treatment by Roy Rappaport (1968). In his discussion of
+the“pulsating”settlementcycleoftheTsembaga(1968:12),
+he noted that “the frequencies of some kinds of disputes
+aredependentonpopulationdensities”(1968:116).More
+speciﬁcally,“sourcesofirritation ... increaseatarategreater
+thanpopulationsize.Ifpopulationincreaseweretakento
+be linear, the increase of some kinds of dispute... might
+be taken to be roughly geometric” (1968:116). He sug-
+gests that the process may even be amenable to mathe-
+maticalformalization,asan“irritationcoefﬁcient”ofgroup
+size.
+This observation is conﬁrmed by many ethnographic
+accounts. For example, the Kwaio of Malaita after World
+WarIIaggregatedintoafewlargevillages,afterpreviously
+havinglivedindispersedhamlets.‘Elota,aKwaiobig-man,
+recalledlater:“Wehadproblemslivinginbigvillages.There
+were sexual affairs that caused trouble. And some people
+stole pigs. These were the things that provoked the kind
+of feuds we had always had. We who were leading had
+to try to keep the peace” (Keesing 1978:160). The Kwaio
+later returned to their traditional dispersed residential
+pattern.
+DouglasOlivermadeasimilarobservationinhisstudy
+ofthepoliticalprocessamongtheSiuaiofBougainville.His
+informants attributed hamlet ﬁssioning (local population
+clustersneverexceededninehouseholds[Oliver1955:236])
+tothefactthat“quarrelingfrequentlybreaksoutbetween
+women,andthatmenhavetomoveapartinordertokeep
+the women from ﬁghting” (Oliver 1955:238). However, a
+powerful and skillful leader could counter the increase of
+Rappaport’sIrritationCoefﬁcient.Thepresenceofahigh-
+rankingleader,abig-man,inahamlet“reducesthenumber
+of clashes and deviations... in the neighborhood, and he
+often steps in to resolve them when they occur” (Oliver
+1955:443).
+Thisassociationofsuccessfulleaderswithlargerthan
+usualpopulationconcentrationsisrepeatedintheethno-
+graphic record of many parts of the world. For example,
+VictorTurnerobservedthat,amongtheNdembuofwhatis
+todaynorthernZimbabwe,thepopulationofavillagede-
+pendedtoasigniﬁcantdegreeonthequalitiesofitshead-
+man: “If he is notorious as a sorcerer, or is unskillful as a
+judge,ormeanandselﬁsh,manypeoplewillleavehim.If
+hehasthereputationofbeingawiseandgenerousmanhe
+willbuildupalargevillage”(Turner1957:52).Turnermakes
+theadditionalobservationthatleadersnotonlyplayarole
+in aggregating population but also in instigating ﬁssion-
+ingevents.Inhisaccount,villageﬁssioningoftenreﬂects
+stresses related to competition between ambitious leaders
+inacommunity(Turner1957:169).
+Theinﬂuenceoftheseleaders,itshouldbenoted,isnot
+alwaysprimarilypolitical(sensustrictoMann1986)inna-
+ture.JaneAtkinson(1989)providesaprotracteddiscussion
+ofshamanismandleadershipamongtheWanaofinlandSu-
+lawesi.Inheraccount,popularorrenownedshamanscan
+serveasnucleiforlargepopulationconcentrationsinthis
+highlymobilesociety:
+Theimmediateneighborsofaprominentshamanstand
+tobeneﬁtmostfromhisskills.Theiradvantageisnotonly
+logisticbutalsopolitical.Establishedshamansusetheir
+reputationstoattractpeopletotheirsettlement,foronly
+thosewholivenearbyhaveprimaryclaimonashaman’s
+services. ... A powerful shaman can serve as an entice-
+mentandajustiﬁcationforresidencechoice.[Atkinson
+1989:271]
+The various services provided by Wana ritual special-
+ists,allofwhichareapparentlysigniﬁcantconsiderationsin
+residentialchoice,includefarmingmagic,legalknowledge
+andcounsel,andshamanicprowessthatisconcernedwith
+healthandhealing.Successfulshamans,saysAtkinson,can
+combat the centrifugal tendencies of Wana communities
+by encouraging the dependence of others on their skills
+(1989:269).
+Amongarchaeologists,themostfrequentlycitedtreat-
+mentoftheseissuesisashortessaybyGregoryJohnson.
+Johnson termed this phenomenon “scalar stress” (1982).
+Thetermshouldbeunderstoodtobebasicallyequivalentto
+Rappaport’sIrritationCoefﬁcient,thoughcouchedinterms
+ofinformationtheoryratherthansocialconﬂict.
+1Thesense
+oftheargumentisthesame.Intheabsenceofhigher-level
+integrative institutions capable of mitigating scale-related
+stresses, expanding social groups will at some point un-
+dergoaﬁssioningprocess,generatingtwoormoredaughter
+groupsofmoremanageablesize.Ifthecostofﬁssioningis
+low,asinthecaseofalightlypopulatedandrelativelyun-
+bounded landscape, ﬁssioning may be expected to occur
+frequentlyandataverylowpopulationthreshold.
+2
+Johnsongoesbeyondtheethnographersalreadymen-
+tioned, however, in positing an evolutionary signiﬁcance
+forscalarstress.Conﬂictandcrisispotentialescalateasthe
+earlyvillagepopulationgrows.Assumingcontinuedpopu-
+lationgrowth,thisprocesscanberesolvedinonlyoneof
+twoways:(1)Thevillageﬁssionsor(2)institutionsandprac-
+ticesemerge—areproducedandsubsequentlyreproduced—
+thatmanageinternalconﬂictinsuchawaythatﬁssioning
+isnotnecessary.Thatistosay,mechanismsofsocialinte-
+grationdevelopthatdonotdependdirectlyonkinship,and
+thatareeffectiveinmitigatingscale-relatedsocialconﬂict.
+In either case we may say that a signiﬁcant evolutionary
+processhastakenplace.Inthelattercase,however,thepos-
+sibilityiscreatedofincreasingpopulationdensity,greater
+socialgroupsizes,andspiralingsocialinequality.
+Itisforthisreasonthatscalarstressandvillageﬁssion-
+ingareofteninvokedinthecontextoftheclassic“origins
+ofsocialinequality”discourse.Theincreasedauthorityof
+leadersnecessaryforthemaintenanceoftheintactvillage
+isconsideredtobeanecessarypreconditionforthedevel-
+opment of hereditary rank and ascribed status. However,
+Iwouldliketomaintainaneutralpositionwithregardto
+thekindsofinstitutionsthatemergedasaresponsetoscalar
+stressandthatpermittedtheestablishmentoflarge,perma-
+nentvillages.Insomecases,includingapparentlymuchof
+Mesoamerica (cf. Lesure and Blake 2002), hereditary rank
+and pronounced social inequality seem to have followed
+324 American Anthropologist • Vol. 106, No. 2• June 2004
+fastontheheelsofsubstantialpermanentvillages. 3 How-
+ever, in other cases such as the Pueblo I period of the
+Colorado Plateau (Adler and Wilshusen 1990; Wilshusen
+1991)andtheLevantinePrepotteryNeolithic(Kuijt1996,
+2000;KuijtandGoring-Morris2002),themodesofsocial
+integration that emerged in early villages appear to have
+beenofanentirelydifferentcharacter.Itismycontention
+that the Titicaca Basin case should be classiﬁed with the
+secondgroup.
+Anumberoffactorsaffectthelikelihoodofﬁssioningin
+anygivenvillageexperiencingscalarstress.Ingeneral,we
+maysupposethatthelikelihoodofﬁssioningwillvarywith
+thecostofﬁssioning.Factorsthatwouldappeartofavorﬁs-
+sioningincluderesourcedepletion
+4 andahighlevelofin-
+ternalconﬂict.Peacefulrelationswithneighboringgroups
+would also seem to increase the probability of ﬁssioning,
+as aggregation for the purposes of self-defense is in such
+circumstancesunnecessary.Anexampleisthedramaticde-
+creaseincommunitysizethatfollowedtheestablishment
+ofthePaxBrittanicaandtheconsequentreductioninlocal
+levelsofviolenceinmanyregionsoftheglobe(e.g.,Turner
+1957:220).
+Factorsdiscouragingﬁssioningincludewarfare(ahigh
+level of external conﬂict), high levels of investment in
+landscape(nonportable)capital,andsocialcircumscription
+(Carneiro1988).Thislastisparticularlyimportant,because
+itisalsorelatedtoregionalpopulationgrowth.Asregional
+populationgrows,andthelandscapeﬁllsin,thecostsofﬁs-
+sioningandrelocationrise,sincetheappropriationofnew
+land will necessarily involve conﬂict with groups already
+claimingtheterritoryinquestion,oritwillinvolvereloca-
+tiontoprogressivelymoredistantandmarginalareas.
+All other things being equal, then, a regional system
+ofvillageswithasteadilyincreasingpopulationcanbeex-
+pected to demonstrate an initially high rate of ﬁssioning
+followedbyacessationofﬁssioningandtheappearanceof
+thematerialized(DeMarraisetal.1996)manifestationsof
+higher-levelintegrativepractices.Thisstraightforwardevo-
+lutionaryhypothesisiswhatIintendtotestinthepresent
+analysis.Intheargumenttofollow,Iemployarchaeological
+settlementdatatodiscusstheprocessofvillageﬁssioning
+intheEarlyFormativeperiod(Table1)ofBolivia’ssouth-
+ernTiticacaBasin,anditscessationinthefollowingMiddle
+Formativeperiod.Beforeproceedingtothedata,however,
+itwillﬁrstbenecessarytoconsiderhowIproposetoiden-
+TABLE1. Titicaca Basin Chronology.
+CalendarYears ProjectAreaPhase TiticacaBasinPeriod
+1500–1000B.C.E. EarlyChiripa EarlyFormative1
+1000–800B.C.E. MiddleChiripa EarlyFormative2
+800–250B.C.E LateChiripa MiddleFormative
+250B.C.E.–C.E.300 TiwanakuI LateFormative1
+C.E.300–500 TiwanakuIII LateFormative2
+C.E.500–1100 TiwanakuIV–V MiddleHorizon
+C.E.1100–1450 EarlyPacajes AltiplanoPeriod
+C.E.1450–1540 Pacajes-Inka LateHorizon
+tify speciﬁc village ﬁssioning events in the archaeological
+record.
+IDENTIFYINGVILLAGEFISSIONING
+ARCHAEOLOGICALLY
+Three lines of evidence are necessary in order to identify
+a speciﬁc village ﬁssioning event archaeologically: (1) the
+abandonment or reduction in size of a previously inhab-
+itedvillage,(2)thesimultaneousfoundingofoneormore
+smaller(daughter)villages,and(3)evidencethattheinhab-
+itantsofthedaughtervillageswereresidentsoftheoriginal
+villagebeforeitwasabandonedorreducedinsize.
+Points1and2shouldbeconsideredtogether,sincethe
+difﬁcultyinthiscaseistheestablishmentofsimultaneityof
+theabandonment/diminishmentoftheoriginalvillageand
+thefoundingofthedaughtervillages.Ifweareworkingwith
+asettlementdataset,asIintendtodo,andthesitesinques-
+tionhavenotbeenexcavated,thennopreciseradiometric
+dates will be available for the abandonment or founding
+ofthesitesinquestion.Rather,wewillhaveatourdisposal
+onlypopulationestimatesforeachphaseofeachsite’soccu-
+pation.Withthesekindsofdata,then,wecanpostulatetwo
+typesofsituations.Intheﬁrst,avillageﬁssionedinthemid-
+dleofanarchaeologicalphase,typicallydeﬁnedintermsof
+aregionalceramicsequence.Inthiscase,theoriginaland
+daughtercommunitieswouldappeartobecontemporary,
+sinceallofthesiteswouldhaveoccupationsintheearlier
+phase. The reduction in size of the original site would be
+evidentinthedataasaveryslowornegativerateofgrowth
+during the later phase. However, there would be no way
+todeterminewhichoftheothersitesoccupiedduringthe
+earlierphasewerethedaughtercommunitiesrelatedtothis
+speciﬁcevent.Aﬁssioningeventmaybedemonstrable,but
+noassociationcanreliablybemadebetweenoriginaland
+daughtervillages.
+Ifweareworkingwithphase-basedarchaeologicalset-
+tlementdata,therefore,itwouldseemtobeimpossibleto
+identifyﬁssioningeventstakingplaceinthemiddleofthe
+phases of the chronological sequence. Another scenario,
+however,ispossible.Ifaﬁssioningeventtakesplacevery
+neartoanarchaeologicalphaseboundary,wewoulddetect
+an abandonment or reduction in size of the original vil-
+lage(itssizeinthelaterphaseisappreciablysmallerthan
+in the earlier phase) and the appearance of one or more
+smallersitesoccupiedinthelaterphasethatwerenotoc-
+cupiedintheearlierphase.Suchaneventshouldbereadily
+identiﬁable.
+Point 3 presents real difﬁculties. There are two ways
+inwhichitcanbeestablishedthattheinhabitantsofthe
+daughter villages were inhabitants of the original village
+beforeitsabandonment/diminishment.Thebestwaytoac-
+complishthis,ofcourse,wouldbetousedirectevidence.
+Direct evidence for identity of this kind would consist of
+thematerialremainsofsomeactivityorpracticeuniqueto
+theoriginalvillagepriortoﬁssioning,whichafterwardwas
+sharedexclusivelybytheoriginalvillageanditsdaughter
+Bandy • Village Fissioning and Scalar Stress 325
+communities.Distinctiveceramicstylisticattributescould
+satisfythisrequirement,ascouldidiosyncraticarchitectural
+practicesoridentifyingclothing.Theremaybearchaeolog-
+icalcasesinwhichdirectevidencesuchasthisexistsand
+is obtainable. However, I am aware of no such instance.
+In most settlement archaeology datasets, only limited ex-
+cavationdataareavailabletoaidininterpretation.Inmy
+case,noneoftheﬁssioningcandidateshavebeentestedby
+excavation.Further,preservationconditionsaresuchthat
+the only durable, datable material present on the surface
+of these sites is pottery. Under these conditions no direct
+establishmentofidentityispossible.
+Ifdirectevidenceisunobtainabletoestablishidentity
+between the inhabitants of the original and daughter vil-
+lages,wearereducedtoemployingcircumstantialevidence.
+The strongest circumstantial evidence available relates to
+ratesofpopulationgrowth.Inthecontextofaregionalar-
+chaeologicalstudy,itshouldbepossibletoestablishabasal
+rateofpopulationgrowthforanygivenphase.Ifavillage
+ﬁssionsatanarchaeologicalphaseboundary,asdiscussed
+above,thenthepopulationgrowthrateoftheoriginaland
+daughtervillagescombinedshouldberoughlyequaltothe
+baselineregionalrateforthephaseinquestion.Ofcourse,
+wecannotthinkofastudyareaasaclosedsystem,anditis
+alwayspossiblethatsomespeciﬁccombinationofpopula-
+tionenteringandleavingthestudyregioncouldprecisely
+mimicthepredictedeffectsofanin-situvillageﬁssioning
+event.ItisforthisreasonthatIhaveclassiﬁedthepopu-
+lation growth rate criterion as circumstantial rather than
+direct evidence. Using such evidence, it is impossible to
+FIGURE1. Map of the southern Titicaca Basin, showing the project area.
+unambiguouslyidentifyavillageﬁssioningeventtogether
+withthespeciﬁcoriginalanddaughtervillagesinvolved.
+I have argued that a village ﬁssioning event near an
+archaeological phase boundary will be identiﬁable in the
+followingcircumstances:(1)avillageoccupiedintheear-
+lier of the two phases experiences a reduction in size or
+abandonment during the second phase; (2) one or more
+newvillages are founded, probably nearby, in the second
+phase;and(3)thepopulationofallofthesevillages,taken
+together,canbeshowntohavegrownduringthesecond
+phaseatapproximatelythesamerateasthebasepopula-
+tiongrowthrateforthatphaseinthestudyareaasawhole.
+If these three conditions are met, village ﬁssioning is the
+mostparsimoniousexplanation,thoughnottheonlyone
+possible.
+THETITICACABASINFORMATIVE
+The southern Titicaca Basin presents a regional sequence
+of social evolution culminating in the formation of the
+Tiwanaku state between C.E. 300 and 550. This sequence
+parallelsotherstateformationsequencesintheAndes,in
+Mesoamerica,theNearEast,China,andelsewhere.Seden-
+taryagriculturalvillagelifebeganinthesouthernTiticaca
+Basin at around 1500 B.C.E. A long sequence of demo-
+graphicexpansionandsociopoliticalevolutiontookplace
+throughout the long Formative Period prior to Tiwanaku
+stateformation.In1998–99,Iundertookanarchaeological
+surveyofBolivia’sTaracoPeninsula(seeFigure1)withthe
+goalofinvestigatingFormativePeriodsocialprocessesfrom
+aregionalsettlementperspective(Bandy2001).
+326 American Anthropologist • Vol. 106, No. 2• June 2004
+Settlement Data
+Thesurveyemployedafull-coveragepedestriantechnique
+(FishandKowalewski1990)overanareaof98squarekilo-
+meters,with30-meterspacingbetweenﬁeldwalkers.Preser-
+vationconditionsintheareaaresuchthatnoremainsofdo-
+mesticarchitecturearevisibleonthesurface.Archaeological
+sitesthereforeappearasartifactscattersofvariabledensity,
+mostlyinmodernagriculturalﬁelds.Continualagricultural
+useoftheareaoverthepastthreemillennia,combinedwith
+regularreworkingofdeeperdepositsbyprehistoricandcon-
+temporaryadobeproduction,guaranteesthatagoodsam-
+pleofsherdsfromalloccupationphasesispresentonthe
+surface.
+Adensitythresholdof0.1sherds/squaremeteroveran
+areaof100squaremeterswasemployedastheminimum
+deﬁnition of a site.
+5 Smaller scatters, or scatters of lower
+density, were not recorded. This was necessary, since the
+entire Taraco Peninsula is essentially a single lowdensity
+sherd scatter. So deﬁned, all multicomponent sites larger
+thanﬁvehectaresweresystematicallysurfacecollectedus-
+inga50-metergrid,aswereallsigniﬁcantEarlyandMid-
+dle Formative period sites. Occupations for each phase
+were deﬁned using the surface distribution of chronolog-
+ically sensitive ceramic types. Ceramics are the only reli-
+ablechronologicalindicatorinthezone,andseparateoc-
+cupations were deﬁned for each phase. For the Early and
+MiddleFormativephases,Iemployedamodiﬁedversionof
+LeeSteadman’s(1999;Bandy2001:46–56)Chiripachronol-
+ogy.IusedanewerchronologydevelopedbyJohnJanusek
+(2003)andCarlosL ´emuz(2001)fortheLateFormativeand
+Tiwanakuphases(Bandy2001:163–174,207–210).Forthe
+post-Tiwanaku phases, I used Juan Albarrac´ın-Jordan and
+James Mathews’s Pacajes chronology (Albarrac´ın-Jordan
+1992, 1996; Albarrac´ın-Jordan and Mathews 1990; Math-
+ews1992).
+This intensive methodology, combining systematic
+ﬁeldwalkingwithalarge-scalesurfacecollectioneffort,per-
+mittedtheidentiﬁcationofseparateoccupationareasand
+the calculation of a population index value (derived ulti-
+matelyfromtheareaoftheartifactscatter)foreachtempo-
+ralcomponentofallrecordedsites.Thepopulationindex
+isafunctionoftheareaofdistributionofphase-diagnostic
+ceramics, and not of sherd density. The relation between
+siteareaandpopulationisassumedtoremainconstantover
+time.Iamawarethatthisrelationcanvary(e.g.,Milnerand
+Oliver1999:90–93;Winter1976),sometimessigniﬁcantly,
+butintheabsenceofexcavateddomesticarchitecturethis
+variationcannotbeevaluated.Foradetaileddiscussionof
+theprocedureemployed,Ireferthereadertomydisserta-
+tion (Bandy 2001: ch. 4). In all, the project recorded 476
+siteswith831distinctoccupations.Ofthese,83sitesand
+168occupationsdatetotheFormativePeriod.
+Fissioning Events
+Figure2showswireframesurfacemapsofpopulationden-
+sityforthethreephasesoftheEarly(1500–800B.C.E.)and
+Middle(800–250B.C.E.)Formativeperiod:theEarly,Mid-
+dle,andLateChiripaphases(seeTable1).Thez-axisrepre-
+sentssummedpopulationindexvaluesforallsitesfalling
+within 0.25-square-kilometer areas for the phase in ques-
+tion. A system of small, well-deﬁned villages was present
+onthepeninsulafromtheEarlyChiripaphase,evidentas
+spikesonthediagram.Thissystemwasingeneralverysta-
+bleovertime.Infact,mostoftheEarlyChiripavillagescon-
+tinuedtobeoccupiedthroughtothecollapseofTiwanaku
+around C.E. 1100. Some villages, however, especially the
+largerones,werenotasstableastherest.
+Figure 3 represents change in population density for
+theMiddleandLateChiripaphases.Thesediagramswere
+produced by subtracting the population density of each
+grid square for the earlier phase from the value for the
+samesquareforthelaterphase.Thus,thesemapsshowthe
+growth or decline of population within each grid square
+during the phase in question. An inspection of Figure 3
+shows that most of the Taraco Peninsula villages experi-
+enced regular growth during both the Middle and Late
+Chiripaphases.However,somelocalizedinstancesofpop-
+ulation decline are apparent as negative spikes, and new
+sites were founded in each of the two phases. In particu-
+lar, three localities experienced population decline in the
+MiddleChiripaphase,andoneexperiencedadeclineinthe
+LateChiripaphase.Iarguethattheseanomaliesrepresent
+villageﬁssioningeventsatphaseboundaries.Iwillbrieﬂy
+discusseacheventindividually.
+Candidate 1 Around 1000 B.C.E. (the end of the Early
+Chiripa phase), the site of Chiaramaya, the largest Early
+Chiripasiteinthestudyarea,experiencedadramaticpop-
+ulationdecline(seeFigure4forsitenamesandlocations),
+fromanEarlyChiripapopulationindexvalueof186toa
+MiddleChiripavalueof127.
+6 Atthesametime,anumber
+ofnewsiteswerefoundedtotheEastofChiaramaya.This
+fact suggests that there was some population inﬂux into
+theareaduringthisphase.Combined,Chiaramayaandthe
+newsitestotheEast(AltoPukara,ChiripaPata,Quiswaran)
+grewat an annual rate of 0.47 percent during the 200-
+yearMiddleChiripaphase—identicaltotheoverallphase
+growthratebutsomewhathigherthantherateofvillages
+thatseemtohavegrownin-situ.IfweconsiderChiaramaya
+togetherwithonlyChiripaPataandAltoPukara,thecom-
+binedgrowthratewas0.38percent,almostidenticaltothe
+phaseaverage.Thissuggeststhepossibilitythatthepopula-
+tionofQuiswaranenteredthestudyareafromsomeexter-
+nalpointoforigin,andthatChiripaPataandAltoPukara
+were the daughter communities of the Chiaramaya split.
+Therefore,intermsofmycriteriaoutlinedearlier,wecan
+say that Chiaramaya deﬁnitely ﬁssioned but that the cir-
+cumstantialevidencelinkingittotheotherthreevillages
+foundedtotheEastisweak.Oneormoreofthesevillages
+maybedaughtervillagesofChiaramaya,butitisimpossible
+todemonstratethisunequivocally.
+Candidate 2 At the same time that Chiaramaya ex-
+perienced a population decline (ca. 1000 B.C.E.), Cerro
+Bandy • Village Fissioning and Scalar Stress 327
+FIGURE2. Population density for three archaeological phases: (a) Early Chiripa, (b) Middle Chiripa, (c) Late Chiripa.
+Choncaya, the second-largest Early Chiripa village, was
+abandoned.ThesmallersiteofSunajPatawasabandoned
+atthesametime,andaseriesofnewsites(KalaUyuni,Son-
+aji, Kumi Kipa) were founded. Combined, these ﬁve sites
+grewatanannualrateof0.35percentduringtheMiddle
+Chiripaphase,identicaltothegrowthrateofChiripaand
+JankoKala.ItappearsthatCerroChoncayaﬁssionedinto
+two groups, one of which founded Kala Uyuni, and the
+other of which combined with the former population of
+Sunaj Pata to found the newvillages of Sonaji and Kumi
+Kipa.
+Thiscaseisthereforesomewhatstrongerthanthatof
+Chiaramaya.ThefactthatCerroChoncayawasabandoned
+andthreenewsiteswerefoundednearbylendsrealweight
+to the suggestion that the village ﬁssioned. The fact that
+thecombinedpopulationofthesefoursitesgrewatarate
+in the Middle Chiripa phase identical to that of villages
+experiencingregulargrowthinthisphaseiscompellingev-
+idencethatKalaUyuni,Sonaji,andKumiKipawereinfact
+daughtercommunitiesofaﬁssioningCerroChoncaya.The
+caseiscomplicated,however,bytheinvolvementofSunaj
+PataandbytheroughlysimultaneousﬁssioningofChiara-
+maya,whichinterfereswiththeﬁrmidentiﬁcationofspe-
+ciﬁcdaughtercommunities.Again,thecaseforﬁssioningis
+strong,buttheidentiﬁcationofspeciﬁcdaughtercommu-
+nitiesismorecomplicated.
+Candidate 3 Sometwohundredyearslater,around800
+B.C.E.,thesiteofSonaji,foundedaftertheearlierﬁssion-
+ingofCerroChoncaya(Candidate2,above),wasabruptly
+abandoned.SonajihadbeenthelargestvillageoftheMid-
+dle Chiripa phase. At the same time, the sites of Cerro
+Choncaya and Sunaj Pata, abandoned at the end of the
+EarlyChiripaphase,werereoccupied.Theoverallpopula-
+tiongrowthratefortheLateChiripaphasewas0.10percent
+annually. Combined, Sonaji, Cerro Choncaya, and Sunaj
+Patagrewatanannualrateof0.11percent,almostidenti-
+caltotheoverallrateforthephase.
+328 American Anthropologist • Vol. 106, No. 2• June 2004
+FIGURE3. Population density change for two phases: (a) Middle Chiripa, (b) Late Chiripa.
+This, then, is the strongest case of the three. At the
+Middle/LateChiripaphaseboundaryoccupationatSonaji
+ceased and two new villages were founded nearby. More-
+over,thecombinedgrowthrateofthesethreesitesisthe
+sameasthebaseratefortheLateChiripaphase.Thisevent
+satisﬁesthethreeconditionsIoutlinedabove.Itisasun-
+equivocalacaseofvillageﬁssioningasispossibletoestab-
+lishintheabsenceofdirectevidenceofidentityandprecise
+dating of the abandonment and founding of each of the
+sites.
+Summary Thesedatasuggestasetofthreeconcretepop-
+ulationmovements.Ireconstructthemasfollows:
+1. Around1000B.C.E.,thevillageofChiaramayasplit
+intothreegroups.Theﬁrstofthesegroupsmoved
+to the East, leapfrogging over the adjacent site
+of Chiripa to found Chiripa Pata. Another group
+continued eastward and founded Alto Pukara. A
+smallpercentageoftheEarlyChiripapopulationof
+Chiaramayaremainedinthevillage,whichcontin-
+uedtobeoccupiedonamuchreducedscale.This
+eventishighlyconjectural.Thoughﬁssioningiswell
+attested by the reduction in size of Chiaramaya,
+the identiﬁcation of the speciﬁc daughter villages
+isproblematic.
+2. At about the same time (1000 B.C.E.), the village
+ofCerroChoncayasplitintothreegroups.Theﬁrst
+ofthesemovedtotheEastandfoundedthesiteof
+Kala Uyuni. The other groups moved a short dis-
+tancetotheNorthandWest,combining withthe
+priorpopulationofSunajPatatofoundSonajiand
+its small outlier Kumi Kipa. This event is clearer
+thantheﬁrst,thoughidentiﬁcationofdaughtervil-
+lagesisstillcomplicatedduetotheinvolvementof
+SunajPataandtheroughlysimultaneousﬁssioning
+ofChiaramaya.
+3. Around 800 B.C.E., the village of Sonaji ﬁssioned
+into two groups. One moved to reoccupy the for-
+mersiteofCerroChoncaya,andtheotherreoccu-
+piedthesiteofSunajPata.RecallthatSonajiwasini-
+tiallyformedbyafusionofpopulationsfromthese
+same two villages after the 1000 B.C.E. ﬁssioning
+of Cerro Choncaya (above). It is possible that the
+distinct identities of the two groups were main-
+tained even during their two-century period of
+coresidenceatSonaji,andthatthisdistinctionper-
+sistedasasocialcleavageplanealongwhichthevil-
+lagesplitatthebeginningoftheLateChiripaphase.
+Thiseventisthebestdeﬁnedofthethreeandsatis-
+ﬁesallthreeofthecriteriaIdiscussedearlier.
+Figure 4 graphically represents these reconstructed
+village ﬁssioning events. In the case of the two earlier
+events,thereisnowaytobecertainwhichdonorvillages
+Bandy • Village Fissioning and Scalar Stress 329
+FIGURE4. Reconstructed village ﬁssioning events: (a) c. 1000 B.C.E., (b) c. 800 B.C.E.
+contributedtoeachrecipientvillage,sincethetwoﬁssion-
+ingeventstookplaceatapproximatelythesametime.The
+relationships represented in Figure 4a are therefore hypo-
+thetical, though plausible. In the case of the third event,
+therelationshipbetweendonorandrecipientvillagesisun-
+ambiguous.Otherepisodesofvillageﬁssioningalmostcer-
+tainly took place during the Taraco Peninsula Formative.
+The ones I have mentioned are visible only because they
+took place very near to archaeological phase boundaries,
+andarethereforevisibleassiteabandonmentintheearlier
+phase,andfoundinginthelater.
+Severalfactsmeritcomment.First,Ishouldstressthat
+theidentiﬁcationofvillageﬁssioningeventsinthisanaly-
+sis has been possible only because the archaeological sur-
+veywasundertakenwiththeexpresspurposeofmonitor-
+ing population growth, decline, and movement through
+the Formative period phases. Without very ﬁne-grained,
+phase-speciﬁc identiﬁcation of occupation areas for every
+siterecorded,thissortofanalysisisnotpossible.Second,
+these kinds of events are only visible if care is taken to
+observe demographic processes at a regional scale. Site-
+centeredanalysiswillnotrevealpatternssuchastheones
+reported here.
+7 Finally, the remarkable stability of the
+TaracoPeninsulavillagesystemmakestheﬁssioningevents
+standoutinsharpcontrast.Inthecontextofamoreﬂuid
+village system, with frequent relocation of communities,
+ﬁssioning events might not be distinguishable against a
+background of general residential mobility and would be
+detectableonlyintheiraggregateeffects.
+8
+Asigniﬁcantresultofthisanalysisisthefactthatthe
+villages that ﬁssioned were, in all three cases, the largest
+villages of each phase. Chiaramaya and Cerro Choncaya
+werethetwolargestvillagesoftheEarlyChiripaphase,and
+SonajiwasthelargestvillageoftheMiddleChiripaphase.
+330 American Anthropologist • Vol. 106, No. 2• June 2004
+Thisisexactlyaspredictedbythesocialevolutionarysce-
+narioIoutlinedatthebeginningofthisarticle.Theseearly
+villages lacked integrative institutions capable of mitigat-
+ing the scale-related stresses that emerged and intensiﬁed
+astheygrew.
+Inthisconnection,itisinterestingtonoteanincrease
+over time of the village ﬁssioning threshold. Chiaramaya
+and Cerro Choncaya, the two Early Chiripa villages that
+ﬁssionedaround1000B.C.E.,hadpopulationindexvalues
+of 186 (3.5 hectares) and 157 (3.0 hectares), respectively.
+ThevillageﬁssioningthresholdintheEarlyChiripaphase
+wasthereforeontheorderof170.Sonaji,however,hada
+populationindexvalueof277(5.0hectares)priortoﬁssion-
+ing.Thus,thevillageﬁssioningthresholdhadincreasedby
+morethan50percentintheMiddleChiripaphase.Thisin-
+creasemaybeattributableinparttosocialcircumscription.
+Thatis,theTaracoPeninsulawasessentiallyfullyoccupied
+bytheLateChiripaphase;therewerenounoccupiedareas
+thatwouldhavebeeneasytocolonize.Thecostofﬁssion-
+ing,therefore,rose,resultinginanincreaseintheﬁssioning
+thresholdofvillages.
+THEYAYA-MAMARELIGIOUSTRADITION
+ItwaspreciselyatthistimethattheTaracoPeninsulavil-
+lagesbegantoexperimentwithpublicceremonialism.The
+ﬁrst known example of the sunken court form of public
+orceremonialarchitectureappearsatChiripaaround1000
+B.C.E., near the beginning of the Middle Chiripa phase
+(DeanandKojan1999;Hastorf1999;Hastorfetal.2001).
+9
+Thisconstruction,theChoquehuancastructure,wasasim-
+pletrapezoidalplaza,excavatedbelowthegroundsurface,
+lined with unmodiﬁed cobbles, and plastered. Its dimen-
+sionsareapproximately14 ×14meters.Atthissametime,
+decoratedservingceramicsalsomaketheirﬁrstappearance
+(Hastorfetal.2001;Steadman1999).Isuggestthatthesein-
+novationshadtheeffectofmitigatingscalarstresstosome
+degreeandsucceededinincreasingtheMiddleChiripavil-
+lage ﬁssioning threshold. These precocious developments
+reﬂectearlyexperimentationwithhigher-levelintegrative
+institutionsintheMiddleChiripaphase.
+The building of the Choquehuanca structure inaugu-
+ratedalongtraditionofsunkencourtconstructionatthe
+siteofChiripa.Atleastthreemoresunkencourtswerecon-
+structed during the Middle Formative, and another dur-
+ing the Late Formative. The Middle Formative examples
+include: (1) the Llusco structure (800–600 B.C.E.; Hastorf
+etal.2001;PazSoria1999);(2)theLowerHouseLevelcom-
+plex(roughly600–400B.C.E.;Bandy1999;Browman1978;
+Ch´avez1988;Hastorfetal.2001;Kidder1956);and(3)the
+well-knownUpperHouseLevelcomplex(400–250B.C.E.;
+Bandy1999;Bennett1936;Browman1978;Ch ´avez1988;
+Hastorfetal.2001;Kidder1956;PortugalOrt ´ız1992).
+10 No
+doubtsimilarsequencesexistattheotherEarlyandMiddle
+Formativevillagesinthestudyarea,butChiripaistheonly
+sitetohavebeenintensivelyinvestigated.
+ThebeginningoftheLateChiripaphase,at800B.C.E.,
+markstheemergenceofanintegratedandformalizedsetof
+materialculturerelatedtoceremonialactivityinthesouth-
+ernTiticacaBasin.Thiscomplex,whichhasbeencalledthe
+“Yaya-MamaReligiousTradition”(Ch ´avez1988),includes
+asdiagnosticfeatures:(1)thesunkentemplearchitectural
+form;(2)decoratedservingbowls;(3)ceramictrumpets;(4)
+pedestal-basedburningbowls,akindofincenseburner;and
+(5)adistinctivestyleofstonesculpture.Thiscomplexgrew
+out of the early experimentation documented at Chiripa.
+Signiﬁcantly, the emergence of the Yaya-Mama Religious
+Traditioncoincidedwiththecessationofvillageﬁssioning
+inthestudyarea.
+MichaelAdlerandRichardWilshusen(1990),inare-
+viewof public architecture in a variety of ethnographi-
+cally documented “tribal” societies, distinguish between
+low-andhigh-levelintegrativefacilities.Thesecanbedis-
+tinguishedbythebreadthofthesocialgroupsthatemploy
+theconstructionsforpublicorritualactivity.Low-levelde-
+scribes those facilities “that serve to integrate only a por-
+tionofacommunity”(1990:135).High-levelfacilities,by
+contrast,“canintegrategroupsfromasinglecommunityor
+fromanumberofseparatecommunities”(1990:135).Use-
+fully,thesetwocategoriesoffacilitiescan,intheirsample,
+be fairly reliably separated on the basis of their size. The
+averageﬂoorareaofhigh-levelfacilitiesintheirsamplewas
+183squaremeters(standarddeviationof64squaremeters),
+while that of low-level facilities was only 95 square me-
+ters(standarddeviationof83squaremeters).Theearliest
+knownsunkencourt,theChoquehuancastructurealluded
+to above, is approximately 14×14 meters (Hastorf et al.
+2001:37), or some 196 square meters. It falls well within
+thesizerangeofhigh-levelintegrativestructures,andmore
+thanonestandarddeviationabovethemeanareaoflow-
+levelfacilities.Ofcourse,thisareaincludesonlythesunken
+areaitself,notthepatioandstructuresthatmostlikelysur-
+roundedit.Thatis,itisaveryminimalestimateoffacility
+size.
+Adler and Wilshusen were also able to detect a rela-
+tion between community size and the presence of high-
+levelfacilities.High-levelintegrativefacilities,suchasthe
+sunkencourtsthataretheobjectofthepresentdiscussion,
+onlyappearinAdler’scrossculturalsamplewhencommu-
+nitysizeexceedsabouttwohundredandﬁftypersons(Adler
+1989:ﬁgure5;AdlerandWilshusen1990:ﬁgure1).Thisﬁg-
+urecoincidesalmostexactlywiththeﬁssioningthresholdI
+estimated for the Middle Chiripa phase (277 persons),
+the time when the ﬁrst sunken courts were constructed.
+Evengiventhedifﬁcultyofarchaeologicalpopulationesti-
+matesandofcross-culturalanalysisofthetypeAdlerand
+Wilshusenemploy,Iconsiderthiscoincidencetobeimpor-
+tantandtoconstituteanadditionallineofevidencesup-
+porting the proposed relation between village size, scalar
+stress,ﬁssion,andthedevelopmentofintegrativeinstitu-
+tionsandpractices.
+The last documented village ﬁssioning event on the
+TaracoPeninsulatookplacearound800B.C.E.
+11 Fromthat
+Bandy • Village Fissioning and Scalar Stress 331
+TABLE2. Site area (Ha) and population index by site and phase.
+SiteNumber Sitename EarlyChiripa MiddleChiripa LateChiripa
+1 Chiripa 2.50/115 4.25/231 7.75/445
+2 CerroChoncaya 3.00/157 — 4.25/231
+3 Chiaramaya 3.50/186 2.50/127 4.25/231
+4 ChiripaPata — 3.25/171 5.00/277
+130 Yanapata 1.00/43 3.00/157 7.50/429
+225 AchachiCoaKkollu 0.50/17 0.50/17 1.50/70
+232 KalaUyuni — 2.50/127 5.25/291
+268 SunajPata 1.25/56 — 5.00/277
+271 Sonaji — 5.00/277 —
+272 KumiKipa — 1.00/43 —
+303 Quiswaran — 1.75/84 2.25/113
+394 JankoKala 2.25/113 4.50/246 7.50/429
+430 AltoPukara — 2.00/98 3.25/171
+time forward, no ﬁssioning events took place for almost
+2,000years,untilthecollapseoftheTiwanakustate.Shortly
+after800B.C.E.,then,theTaracoPeninsulavillagesceased
+ﬁssioningandbeganaperiodofuninterruptedgrowthto
+sizesthatwouldhavebeenunimaginableintheEarlyFor-
+mativephases.BytheendoftheLateChiripaphase,anum-
+berofvillageshadpopulationindexvaluesinexcessof400
+(greaterthansevenhectaresinarea).Thefactthatthispe-
+riodofsteadygrowthwithoutﬁssioningbeganimmediately
+followingthecrystallizationofaregionalreligioustradition
+isyetanotherlineofevidenceindicatingthatpubliccere-
+monialismandceremonialarchitectureinparticularhavea
+socialintegrativeeffect.
+CONCLUSION
+The simple social evolutionary model with which I be-
+ganthisarticleaccuratelydescribesthecourseoftheEarly
+andMiddleFormativesequencefromthesouthernTiticaca
+Basin.IntheEarlyChiripaphase,whenthelandscapewas
+relativelyunoccupied,thelargestvillagesregularlyﬁssioned
+oncrossingacertainpopulationthreshold.IntheMiddle
+Chiripaphase,therelocationcostsofﬁssioninghadrisen
+due to heightened social circumscription. In this phase,
+thereappearstobeadecreaseintherateofﬁssioning,an
+increase in the ﬁssioning threshold, and experimentation
+withincipientformsofpublicceremonialism,presumably
+having as one goal the mitigation of scale-related social
+stressandtheresolutionofinternalconﬂicts.
+12 Itisappro-
+priateheretospeakof“goals”:Theethnographicrecordis
+very clear on the point that inhabitants of villages expe-
+riencingscalarstressareverymuchawareofthefactand
+activelyseektoalleviateitoratleasttomitigateitseffects—
+to “keep the peace,” as Roger Keesing’s informant put it
+(1978:160).
+AtthebeginningoftheLateChiripaphase,theseearly
+experimentalpracticeswereformalizedandcodiﬁed,result-
+ingintheconstellationofmaterialremainswerecognizeas
+theYaya-MamaReligiousTradition.Atthesametime,vil-
+lageﬁssioningceasedaltogether.Asetofsocialinstitutions
+andpracticeshadbecomeestablishedthathadtheeffectof
+obviatingtheneedforﬁssioning.Thatis,theseinstitutions
+andpracticessuccessfullysolvedtheproblempresentedby
+scalarstress,permittingsteadyanduninterruptedgrowthof
+thevillagesinquestion.Theprecisecharacterofthoseprac-
+tices and institutions, however, will remain obscure until
+moredetailedresearchisundertaken.
+I wish to emphasize once again that I do not intend
+to directly address the question of “the origins of social
+inequality.” One would be hard-pressed to argue that the
+autonomousvillagesoftheLateChiripaphaserepresented
+anykindof“chiefdom.”Indeed,large,stablevillageshave
+appearedinmanypartsoftheworldintheabsenceofany
+heritablerankingorclassstratiﬁcation.Therearemultiple
+waysinwhichscalarstresscanbealleviated,andavarietyof
+institutionsandpracticescapableofintegratingsubstantial,
+permanent villages. Hereditary rank is only one of these,
+andprobablynotthemostcommon.
+The evolutionary model presented and tested in this
+article is applicable to a wide range of archaeological se-
+quences.Thecessationofvillageﬁssioningandtheemer-
+genceofhigh-levelintegrativeinstitutionsandsubstantial,
+permanentvillagesisoneofthemajorwatershedsinTiti-
+cacaBasinprehistory,andnodoubtinotherevolutionary
+sequences. I do not contend, however, that the model is
+applicabletoeverycase.Itiscertainthatthedepletionor
+scarcityofcriticalresources,deﬁnedeitherintermsofsub-
+sistence or of cultural signiﬁcance, can necessitate group
+ﬁssioning at a very lowthreshold value. A good exam-
+ple is the importance of hunting to Ndembu masculin-
+ity (Turner 1957:42). In this case, game scarcity leads to
+ﬁssioning at population densities far belowthe levels at
+which either subsistence or scalar stress could begin to
+be experienced. Conversely, it is certain that higher-level
+integrative institutions and even spontaneous popula-
+tion aggregation may emerge in populations character-
+ized by dispersed settlement, or otherwise insulated from
+scalar stress (as with Robin Beck’s “persuasive aggrega-
+tion”[2003:644]).Thereprobablyaresomeundocumented
+cases in which a strong egalitarian ethos, or some com-
+parablevalueorientation,preventedtheemergenceofsta-
+blehigher-levelinstitutionsevenindenselyconcentrated
+332 American Anthropologist • Vol. 106, No. 2• June 2004
+populations experiencing severe scalar stress. The signiﬁ-
+cance of the model I have presented is not as a universal
+mechanism for the evolution of regional religious tradi-
+tions.ItisratheranexampleofwhatJulianStewardcalled
+“phenomena of limited occurrence” (1955:8). Its applica-
+bility is limited to particular social, cultural, and ecolog-
+ical contexts. The Titicaca Basin Formative is one of the
+contextsinwhichthismodelhasconsiderableexplanatory
+power.
+MATTHEW S.B ANDYTheCotsenInstituteofArchaeologyat
+UCLA, University of California, Los Angeles, Los Angeles,
+CA90095-1361
+NOTES
+Acknowledgments. This research was supported by the National
+Science Foundation (BCS-9813395), the Wenner Gren Founda-
+tionforAnthropologicalResearch,andaFulbright-Haysfellowship
+fromtheUnitedStatesDepartmentofEducation.Iwouldliketo
+thankChristineHastorf,AmandaCohen,RobinBeck,ErikaSim-
+borth,LeeSteadman,WilliamWhitehead,KirkFrye,JohnJanusek,
+CarlosL´emuz,CharlesStanish,RichardWilshusen,ThomasWake,
+Pilar Lima, Felipe Choque, Facundo Llusco, Eduardo Pareja, An-
+drewRoddick,andMichaelWilkes,allofwhomeitherassistedin
+theﬁeldworkphaseoftheprojectorinformulatingtheideaspre-
+sentedinthisarticle.Inaddition,severalanonymous AAreviewers
+madeextensiveandextremelyhelpfulcomments.Finally,Mayumi
+Shimose wasveryhelpful intheediting andﬁnalpreparation of
+themanuscript.
+1. MarkCohen(1985)hasintroducedintotheliteratureyetan-
+otherrelatedterm, social crowding.
+2. VictorTurner’srecordedvillagesizessuggestalowerthreshold
+fortheNdembu,atorbelow50persons(1957:37–38).Napoleon
+Chagnon suggests that the maximum Yanamam¨o village size is
+probablyintherangeof250persons(1975:103).
+3. Althoughsomescholars,suchasJoyceMarcusandKentFlan-
+nery(1996),seetheprocesstakingplacemoregradually.
+4. Theterm resource depletionismuchbroaderthansimplesubsis-
+tenceresourcedepletion.VictorTurnerprovidesanexample.Hunt-
+ingamongtheNdembuisavaluedmaleactivity,andessentialto
+themalelifecycle.Gamedepletioncanleadtovillageﬁssioning
+despitethefactthatthevillagelocalitywasstillmorethancapable
+ofsustainingthepopulationagriculturally(1957:42).
+5. Thesmallestpossiblesite,therefore,wouldconsistoftensherds
+within an area of 100 square meters. In fact, however, only two
+occupationswererecordedthatwereequaltothisminimumdef-
+inition. The vast majority of occupations (96 percent) were 0.09
+hectares (30 square meters) or larger, and therefore contained a
+minimumof90sherds.
+6. SeeTable2forthesizesandpopulationindexvaluesforeach
+sitediscussedinthetext.
+7. For example, Marcus Winter (1976) may have inadvertently
+identiﬁed a ﬁssioning event at around 1100 B.C.E. in his recon-
+structionofthepopulationhistoryofthesmallvillageofTierras
+LargasinOaxaca.
+8. AsseemstobethecaseintheFormativePeriodBasinofMexico
+(Parsonsetal.1982:367).
+9. SunkencourtsweretoremainaﬁxtureofTiticacaBasinpublic
+lifeformorethan2000years,persistinguntilthecollapseofthe
+Tiwanakustate.
+10. IthasnotbeendemonstratedthattheLowerHouseLevelstruc-
+turessurroundedasunkencourt.Iconsideritverylikely,however,
+ashaveearlierinvestigators.
+11. Thisiseventnumber3,discussedabove:the800B.C.E.ﬁssion-
+ingofSonaji.
+12. GregoryJohnsonexplicitlyrecognizestheintegrativepotential
+ofceremonialactivity(1982:405–406).
+REFERENCESCITED
+Adler,MichaelA.
+1989 RitualFacilitiesandSocialIntegrationinNon-RankedSo-
+cieties. InTheArchitectureofSocialIntegrationinPrehistoric
+Pueblos.OccasionalPapersoftheCrowCanyonArchaeologi-
+calCenter,1.WilliamD.LipeandMichelleHegmon,eds.Pp.
+35–52.Cortez,CO:CrowCanyonArchaeologicalCenter.
+Adler,Michael,andRichardWilshusen
+1990 Large-ScaleIntegrativeFacilitiesinTribalSocieties:Cross-
+CulturalandSouthwesternU.S.Examples.WorldArchaeology
+22(2):133–146.
+Albarrac´ın-Jordan,Juan
+1992 PrehispanicandEarlyColonialSettlementPatternsinthe
+Lower Tiwanaku Valley, Bolivia. Ph.D. dissertation, Depart-
+mentofAnthropology,SouthernMethodistUniversity.
+1996 Tiwanaku:Arqueolog´ıaRegionalyDin ´amicaSegmentaria.
+LaPaz:EditoresPlural.
+Albarrac´ın-Jordan,Juan,andJamesE.Mathews
+1990 AsentamientosPrehisp´anicosdelValledeTiwanaku,vol.
+1.LaPaz:ProduccionesCIMA.
+Atkinson,Jane
+1989 TheArtandPoliticsofWanaShamanship.Berkeley:Uni-
+versityofCaliforniaPress.
+Bandy,MatthewS.
+1999 TheMont´ıculoExcavations. InEarlySettlementatChiripa
+Bolivia.ContributionsoftheUniversityofCaliforniaArchae-
+ologicalResearchFacility,57.ChristineHastorf,ed.Pp.43–50.
+Berkeley:ArchaeologicalResearchFacility.
+2001 Population and History in the Ancient Titicaca Basin.
+Ph.D. dissertation, Department of Anthropology, University
+of California Berkeley. Electronic document, http://andean.
+kulture.org/bandy/bandy-dissertation.pdf,March18,2004.
+Beck,RobinA.
+2003 ConsolidationandHierarchy:ChiefdomVariabilityinthe
+MississippianSoutheast.AmericanAntiquity68(4):641–661.
+Bennett,Wendell
+1936 Excavations in Bolivia. Anthropological Papers of the
+American Museum of Natural History, 35. NewYork: Ameri-
+canMuseumofNaturalHistory.
+Blitz,JohnH.
+1999 Mississippian Chiefdoms and the Fission-Fusion Process.
+AmericanAntiquity64:577–592.
+Bradﬁeld,RichardM.
+1971 TheChangingPatternofHopiAgriculture.OccasionalPa-
+pers,30.London:RoyalAnthropologicalInstitute.
+Browman,David
+1978 TheTempleofChiripa(LakeTiticaca,Bolivia). InElHom-
+breyLaCulturaAndina,3CongresoPeruano.RamiroMatos
+Mendieta,ed.Pp.807–813.Lima:EditoraLasontay.
+Carneiro,Robert
+1988 The Circumscription Theory: Challenge and Response.
+AmericanBehavioralScientist31(4):497–511.
+Chagnon,NapoleonA.
+1975 Genealogy, Solidarity, and Relatedness: Limits to
+Local Group Size and Patterns of Fissioning in an Expand-
+ing Population. Yearbook of Physical Anthropology 19:95–
+110.
+1979 Mate Competition, Favoring Close Kin, and Village Fis-
+sioning among the Yanomam¨o Indians. In Evolutionary Bi-
+ology and Human Social Behavior: An Anthropological Per-
+spective.NapoleonA.ChagnonandW.Irons,eds.Pp.86–131.
+NorthScituate,MA:DuxburyPress.
+Ch´avez,KarenL.Mohr
+1988 TheSigniﬁcanceofChiripainLakeTiticacaBasinDevel-
+opments.Expedition30(3):17–26.
+Cohen,MarkN.
+1985 PrehistoricHunter-Gatherers:TheMeaningofSocialCom-
+plexity. InPrehistoricHunter-Gatherers:EmergenceofCultural
+Complexity. Theron Douglas Price and James A. Brown, eds.
+Pp.99–119.NewYork:AcademicPress.
+Bandy • Village Fissioning and Scalar Stress 333
+Dean,Emily,andDavidKojan
+1999 Santiago. InEarlySettlementatChiripaBolivia.Contribu-
+tionsoftheUniversityofCaliforniaArchaeologicalResearch
+Facility,57.ChristineHastorf,ed.Pp.37–42.Berkeley:Archae-
+ologicalResearchFacility.
+DeMarrais,Elizabeth,LuisJaimeCastillo,andTimothyEarle
+1996 Ideology, Materialization, and Power Strategies. Current
+Anthropology37:15–86.
+Fish,SuzanneK.,andStephenKowalewski
+1990 Introduction. In The Archaeology of Regions: A Case
+for Full-Coverage Survey. Suzanne K. Fish and Stephen
+Kowalewski, eds. Pp. 1–5. Washington, DC: Smithsonian In-
+stitutionPress.
+Hastorf,ChristineA.,ed.
+1999 EarlySettlementatChiripa,Bolivia.Contributionsofthe
+University of California Archaeological Research Facility, 57.
+Berkeley:ArchaeologicalResearchFacility.
+Hastorf, Christine A., MatthewS. Bandy, William T. Whitehead,
+andLeeH.Steadman
+2001 El Per´ıodo Formativo en Chiripa, Bolivia. Textos
+Antrop´ogicos13(1–2):17–92.
+Janusek,JohnJ.
+2003 Vessels,Time,andSociety:TowardaCeramicChronology
+intheTiwanakuHeartland. InTiwanakuandItsHinterland2:
+Urban and Rural Archaeology. Alan L. Kolata, ed. Pp. 30–94.
+Washington,DC:SmithsonianInstitutionPress.
+Johnson,Gregory
+1982 OrganizationalStructureandScalarStress. InTheoryand
+Explanation in Archaeology. Colin Renfrew, Michael Row-
+lands, and Barbara A. Segraves, eds. Pp. 389–421. NewYork:
+AcademicPress.
+Keesing,RogerM.
+1978 ‘Elota’sStory:TheLifeandTimesofaSolomonIslandsBig
+Man.St.Lucia:UniversityofQueenslandPress.
+Kidder,Alfred
+1956 Digging in the Lake Titicaca Basin. University Museum
+Bulletin20(3):16–29.
+Kuijt,Ian
+1996 Negotiating Equality through Ritual: A Consideration of
+Late Natuﬁan and PrePottery Neolithic A Period Burial Prac-
+tices.JournalofAnthropologicalAnthropology14(4):313–336.
+2000 People and Space in Early Agricultural Villages: Explor-
+ingDailyLives,CommunitySize,andArchitectureintheLate
+Pre-PotteryNeolithic.JournalofAnthropologicalArchaeology
+19(1):75–102.
+Kuijt,Ian,andNigelGoring-Morris
+2002 Foraging, Farming, and Social Complexity in the Pre-
+PotteryNeolithicoftheSouthernLevant:AReviewandSyn-
+thesis.JournalofWorldPrehistory16(4):361–440.
+L´emuzAguirre,Carlos
+2001 PatronesdeAsentamientoArqueol ´ogicoenlaPen ´ınsulade
+Santiago de Huatta, Bolivia. Licenciatura thesis, Department
+of Anthropology, Universidad Mayor de San Andr´es, La Paz,
+Bolivia.
+Lesure,RichardG.,andMichaelBlake
+2002 InterpretiveChallengesintheStudyofEarlyComplexity:
+Economy,RitualandArchitectureatPasodelaAmada,Mexico.
+JournalofAnthropologicalArchaeology21:1–24.
+Lewis,IoanM.
+1961 Force and Fission in Northern Somali Lineage Structure.
+AmericanAnthropologist63(1):94–112.
+Mann,Michael
+1986 TheSourcesofSocialPower:AHistoryofPowerfromthe
+Beginning to A.D. 1760. Cambridge: Cambridge University
+Press.
+Marcus,Joyce,andKentV.Flannery
+1996 ZapotecCivilization:HowUrbanSocietyEvolvedinMex-
+ico’sOaxacaValley.London:ThamesandHudson.
+Mathews,James
+1992 Prehispanic Settlement and Agriculture in the Middle
+Tiwanaku Valley, Bolivia. Ph.D. dissertation, Department of
+Anthropology,UniversityofChicago.
+Milner,George,andJamesOliver
+1999 LatePrehistoricSettlementsandWetlandsintheCentral
+MississippiValley. InSettlementPatternStudiesintheAmeri-
+cas:FiftyYearssinceVir ´u.B.BillmanandG.Feinman,eds.Pp.
+79–95.Washington,DC:SmithsonianInstitutionPress.
+Oliver,DouglasL.
+1955 Solomon Island Society: Kinship and Leadership among
+theSiuaiofBougainville.Cambridge,MA:HarvardUniversity
+Press.
+Olsen,Carolyn
+1987 The Demography of Colony Fission from 1878–1970
+amongtheHutteritesofNorthAmerica.AmericanAnthropol-
+ogist89(4):823–837.
+Parsons,JamesR.,ElizabethBrumﬁel,M.H.Parsons,andDavidJ.
+Wilson
+1982 PrehispanicSettlementPatternsintheSouthernValleyof
+Mexico:TheChalco-XochimilcoRegion.MemoirsoftheMu-
+seumofAnthropology,14AnnArbor:UniversityofMichigan.
+PazSoria,Jos ´eLuis
+1999 Excavations in the Llusco Area.In Early Settlement at
+ChiripaBolivia.ContributionsoftheUniversityofCalifornia
+ArchaeologicalResearchFacility,57.ChristineHastorf,ed.Pp.
+31–36.Berkeley:ArchaeologicalResearchFacility.
+PortugalOrt´ız,Max
+1992 AspectosdelaCulturaChiripa.TextosAntropol ´ogicos3:9–
+26.
+Rappaport,RoyA.
+1968 Pigs for the Ancestors: Ritual in the Ecology of a New
+GuineaPeople.NewHaven,CT:YaleUniversityPress.
+Sahlins,Marshall
+1963 Poor Man, Rich Man, Big-Man, Chief: Political Types in
+MelanesiaandPolynesia.ComparativeStudiesinSocietyand
+History5(3):285–303.
+Steadman,Lee
+1999 TheCeramics. InEarlySettlementatChiripaBolivia.Con-
+tributions of the University of California Archaeological Re-
+searchFacility,57.ChristineHastorf,ed.Pp.61–72.Berkeley:
+ArchaeologicalResearchFacility.
+Steward,Julian
+1955 TheoryofCultureChange.Urbana:UniversityofIllinois
+Press.
+Strathern,Andrew
+1971 TheRopeofMoka:BigMenandCeremonialExchangein
+MountHagen,NewGuinea.Cambridge:CambridgeUniversity
+Press.
+Struhsaker,ThomasT.
+1988 Group Fission in Redtail Monkeys (Cercopithecus asca-
+nius) in the Kibale Forest, Uganda.In A Primate Radiation:
+EvolutionaryBiologyoftheAfricanGuenons.AnnieGautier-
+Hion, Jonathan Kingdon, Francois Bourliere, and Jean-Pierre
+Gautier,eds.Pp.364–388.Cambridge:CambridgeUniversity
+Press.
+Turner,VictorW.
+1957 Schism and Continuity in an African Society: A Study
+of Ndembu Village Life. Manchester: Manchester University
+Press.
+Wilshusen,RichardH.
+1991 EarlyVillagesintheAmericanSouthwest:Cross-Cultural
+and Archaeological Perspectives. Ph.D. dissertation, Depart-
+mentofAnthropology,UniversityofColorado,Boulder.
+Winter,Marcus
+1976 DifferentialPatternsofCommunityGrowthinOaxaca. In
+TheEarlyMesoamericanVillage.KentV.Flannery,ed.Pp.227–
+234.NewYork:AcademicPress.
+Yamigawa,Muichi
+1985 SociosexualFactorsofTroopFissioninWildJapaneseMon-
+keys (Macaca fuscata yakui ) on Yakushima Island, Japan. Pri-
+mates26(2):105–120.

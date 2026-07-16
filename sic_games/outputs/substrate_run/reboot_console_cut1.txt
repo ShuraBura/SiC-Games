@@ -1,0 +1,60 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+reboot probe: seed=0 kill 50% @ step 10000, run to 18000. Q: does removing pop re-boom (generic) or re-glide flat (startup artifact)?
+  [    1] pop=  2910 vil=  2 mobility=0.000 occ=1267  | 0.0m
+  [ 1000] pop=  7772 vil= 57 mobility=0.315 occ=297  | 5.1m
+  [ 2000] pop=  7158 vil= 36 mobility=0.313 occ=287  | 13.5m
+  [ 3000] pop=  6933 vil= 50 mobility=0.296 occ=177  | 20.7m
+  [ 4000] pop=  6693 vil= 39 mobility=0.292 occ=181  | 29.4m
+  [ 5000] pop=  6774 vil= 41 mobility=0.296 occ=194  | 36.3m
+  [ 6000] pop=  6812 vil= 47 mobility=0.291 occ=169  | 44.3m
+  [ 7000] pop=  7063 vil= 41 mobility=0.299 occ=203  | 52.6m
+  [ 8000] pop=  6713 vil= 47 mobility=0.288 occ=189  | 59.9m
+  [ 9000] pop=  7093 vil= 50 mobility=0.294 occ=187  | 67.8m
+  [10000] KILLED 50%: 7124 -> ~3562 (headroom created; landscape already worked)
+  [10000] pop=  7124 vil= 47 mobility=0.294 occ=197 POST-KILL | 75.7m
+  [10250] pop=  7250 vil= 62 mobility=0.199 occ=176 POST-KILL | 77.4m
+  [10500] pop=  7006 vil= 46 mobility=0.293 occ=172 POST-KILL | 79.6m
+  [10750] pop=  7112 vil= 42 mobility=0.300 occ=193 POST-KILL | 81.9m
+  [11000] pop=  7225 vil= 55 mobility=0.298 occ=192 POST-KILL | 84.1m
+  [12000] pop=  7196 vil= 52 mobility=0.302 occ=192 POST-KILL | 92.4m
+  [13000] pop=  7474 vil= 60 mobility=0.296 occ=190 POST-KILL | 100.3m
+  [14000] pop=  7253 vil= 52 mobility=0.297 occ=197 POST-KILL | 108.1m
+  [15000] pop=  7397 vil= 55 mobility=0.292 occ=210 POST-KILL | 116.0m
+  [16000] pop=  7478 vil= 51 mobility=0.301 occ=202 POST-KILL | 123.9m
+C:\Users\syatom\Projects\SiC Games\sic_games\src\sic_games\phase1_model.py:2101: RuntimeWarning: overflow encountered in scalar power
+  w = [((getattr(x, "prowess", 1.0) + 1e-6) * (getattr(x, "cred", 1.0) + 1e-6) ** g) ** m_f for x in avail]
+Traceback (most recent call last):
+  File "C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\probe_reboot.py", line 109, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\syatom\Projects\SiC Games\sic_games\outputs\substrate_run\probe_reboot.py", line 78, in main
+    w.step()
+    ~~~~~~^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\model.py", line 204, in _wrapped_step
+    self._advance_time(self.time + 1)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\model.py", line 229, in _advance_time
+    event.execute()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\time\events.py", line 130, in execute
+    fn(*self.function_args, **self.function_kwargs)
+    ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\time\events.py", line 292, in _execute_and_reschedule
+    fn()
+    ~~^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\model.py", line 240, in _do_step
+    self._user_step()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\syatom\Projects\SiC Games\sic_games\src\sic_games\phase1_model.py", line 513, in step
+    self._do_gathering()          # seasonal cross-band gathering replaces daily within-band pairing
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\syatom\Projects\SiC Games\sic_games\src\sic_games\phase1_model.py", line 2290, in _do_gathering
+    self._pair_from_pool(females, males, cfg.aggregation_residence, cfg.aggregation_rank_homogamy, band_sizes)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\Projects\SiC Games\sic_games\src\sic_games\phase1_model.py", line 2108, in _pair_from_pool
+    male = self.random.choices(avail, weights=w, k=1)[0]
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\random.py", line 491, in choices
+    raise ValueError('Total of weights must be finite')
+ValueError: Total of weights must be finite
