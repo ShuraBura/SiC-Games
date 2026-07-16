@@ -1172,4 +1172,36 @@ consider SoA/numba for 50–100K if ever needed (the remaining time is now hones
 
 ---
 
+## R-70 — Improved-land defensibility opens the AGRARIAN stratification path (Fertile-Crescent/Nile), distinct from the aquatic NW-Coast one, in rain-fed worlds (2026-07-15)
+
+**Why.** Defensibility was aquatic/fisherman-only (claimable ⟺ aquatic_food ≥ D_min); farmland could never be defended.
+Built `enable_improved_land` (default-OFF): cultivable land is ALSO claimable where WORKED (inside a settlement's
+catchment) — "you own what you've cleared" (Testart delayed-return; Bandy landscape capital). 4 tests, 714 pass,
+bit-exact. In riverine worlds (coastal/flat-temperate) the effect is MODEST (cells_owned 41→46) — settlements already
+sit on aquatic-defensible cells, so aquatic SUBSUMES it (realistic: the river valley is the defended resource). The
+DISTINCT agrarian path needs a rain-fed world.
+
+**Rain-fed test (supervisor: run it on the right world).** World survey → flat-tropical is rain-fed: **aquatic 0.6%,
+cultivable 38%** (highest-NPP world in the model; R-65 found it stays EGALITARIAN — rich forest isn't
+storable/defensible). Ran improved OFF vs ON (Cut-1 + defensibility + budding, 1200 steps):
+
+| flat-tropical | cells_owned | instability | stratification |
+|---|---|---|---|
+| improved OFF (aquatic-only) | **0** | 0 | 3.1–4.6% (egalitarian — = R-65) |
+| improved ON (farmland defensible) | **5–10** | active (1–10) | **16.2% → 11.5%** (stratified) |
+
+**Result.** Without improved-land the richest world stays egalitarian (nothing defensible → no territoriality → no
+hierarchy). WITH it, **worked farmland becomes the defended resource → agrarian territoriality → stratification jumps to
+11–16%**. So improved-land is exactly the mechanism that lets rich CULTIVABLE land drive complexity — the
+Fertile-Crescent/Nile agrarian route — and it is DISTINCT from the aquatic (NW-Coast) route only where no river subsumes
+it (rain-fed). **Both resource routes to Testart delayed-return complexity (dense-predictable AQUATIC + WORKED AGRARIAN
+land) are now emergent + lit-anchored.** Improved-land also lifted the flat-tropical population (10k→16k) — defended
+farmland tethers/concentrates, raising the realized capacity. Branch `agriculture`.
+
+**NEXT (the payoff):** village-coupled SOIL DEPLETION — farm → deplete → abandon → **budding re-settles** on fresh land
+→ fallow recovers — now has every piece (defensible farmland R-70 + a working re-settle mechanism R-69). This is the
+candidate for the depletion-driven secular cycles the connubium (R-67) could not produce.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
