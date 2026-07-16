@@ -52,6 +52,8 @@ GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream 
 BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
 BUD_THR   = int(os.environ.get("C_BUD_THR", "150"))      # fission threshold (Bandy ~150 open → ~277 circumscribed)
 IMPROVED  = os.environ.get("C_IMPROVED", "0") == "1"     # agriculture: cultivable land claimable where WORKED (needs C_DEFEND=1)
+SOIL      = os.environ.get("C_SOIL", "0") == "1"         # Layer-B1 soil depletion + terrain-dependent (alluvial) renewal
+                                                          #   → rain-fed SWIDDEN oscillator vs HYDRAULIC floodplain
 DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibility (Dyson-Hudson & Smith) → instability
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
@@ -171,6 +173,7 @@ def main():
         enable_exogamy=cut2, exogamy_degree="lineage",
         enable_village_budding=BUD, village_fission_threshold=BUD_THR,
         enable_improved_land=IMPROVED,
+        enable_soil_depletion=SOIL, enable_alluvial_renewal=SOIL,
         enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
