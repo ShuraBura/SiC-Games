@@ -390,7 +390,7 @@ class DemographyConfig(BaseModel):
     # village leaves). FISHERIES are exempt (aquatic-dominant sites never deplete → R-53 stable villages preserved).
     # This gives boom → soil-degrade → yield-fall → bust (relocation = Layer B3). Default OFF ⇒ soil≡1 ⇒ bit-exact.
     enable_soil_depletion: bool = False
-    soil_regrow_per_yr: float = Field(0.06, ge=0.0)         # slow fallow soil recovery (~1/0.06 ≈ 17 yr; Conklin/Boserup swidden) [PROVISIONAL]
+    soil_regrow_per_yr: float = Field(0.045, ge=0.0)        # slow fallow soil recovery (~1/0.045 ≈ 22 yr) — Boserup FOREST-FALLOW: a parcel is cropped 1–2 yr then fallowed 20–25 yr (Conklin) [ANCHORED, forest-fallow band]
     soil_deplete_frac: float = Field(0.6, ge=0.0)           # per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL]
     soil_carry_per_cell: float = Field(8.0, ge=0.1)         # persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL]
     # ALLUVIAL RENEWAL — soil renewal is TERRAIN-dependent, not uniform. The annual FLOOD re-deposits nutrient silt, so
@@ -403,6 +403,22 @@ class DemographyConfig(BaseModel):
     # depletes (bit-exact).
     enable_alluvial_renewal: bool = False
     alluvial_renew_per_yr: float = Field(3.0, ge=0.0)       # flood soil-restoration rate at wateracc=1 — restores ~97% of the deficit within a year ⇒ equilibrium soil ≈ 1 − deplete/renew ≈ 0.8 at full farming pressure = sustainable WITHOUT fallow (the Nile) [PROVISIONAL]
+    # EMERGENT ABANDONMENT — a settlement's HOLD on its people is not permanent; it erodes when the village's REMEMBERED
+    # FORTUNES have been bad for a long time. There is NO "if soil < X then dissolve" rule and NO global knowledge: the
+    # agents' ordinary IFD drive already wants to move somewhere better — it is merely OVERRIDDEN by the residence pin.
+    # So we make the PIN condition-dependent on the site's own history (which is the only information the elders
+    # actually have) and let the existing drive decide: released ⇒ the agent stays anyway if nowhere nearby is better,
+    # or drifts out if it is → the pool falls below settle_min_pool → the settlement dissolves by the EXISTING rule →
+    # the field fallows → budding re-settles fresh land. Abandonment thus EMERGES.
+    #   memory: per-SITE EMA of hardship (1 − realized field productivity) — attached to the PLACE (members churn, the
+    #   place persists). A slow EMA ⇒ one bad year does not move it (natural hysteresis); only CHRONIC decline does.
+    #   Fisheries/alluvial sites keep soil ≈1 ⇒ hardship ≈0 ⇒ they never abandon (the permanent hydraulic village).
+    # ANCHOR: swidden villages relocate every ~5–30 yr (Conklin's "integral pioneers… move on to new village sites
+    # often"; Yanomamö ~5–10 yr) = WITHIN one generation, not several. Requires enable_soil_depletion.
+    # Default OFF ⇒ the pin never releases (bit-exact).
+    enable_emergent_abandonment: bool = False
+    settlement_memory_yr: float = Field(12.0, gt=0.0)       # the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range]
+    abandon_hardship_gain: float = Field(1.0, ge=0.0)       # how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema)
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so

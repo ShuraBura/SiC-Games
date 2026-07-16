@@ -289,6 +289,7 @@ class TerrainWorld(mesa.Model):
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
         self._settlement_soil: dict[tuple[int, int], float] = {}  # Layer B1: per-FARM-site soil stock ∈[0.05,1] (absent ⇒ 1, no depletion)
+        self._settlement_hardship: dict[tuple[int, int], float] = {}  # emergent abandonment: per-SITE EMA of remembered hardship (the village's memory)
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
@@ -947,6 +948,18 @@ class TerrainWorld(mesa.Model):
                     self._settlement_soil.pop(s, None)
                 else:
                     self._settlement_soil[s] = soil
+        # EMERGENT ABANDONMENT — the village's REMEMBERED FORTUNES: a slow per-SITE EMA of hardship (1 − realized field
+        # productivity), attached to the PLACE (members churn; the place persists). Slow ⇒ one bad year cannot move it;
+        # only CHRONIC decline does — which is what the elders would actually notice. Read by the residence pin.
+        # Fisheries/alluvial keep soil ≈1 ⇒ hardship ≈0 ⇒ they never abandon (the permanent hydraulic village).
+        if getattr(cfg, "enable_emergent_abandonment", False):
+            am = 1.0 / max(1.0, cfg.settlement_memory_yr * 12.0)     # memory window (yr → steps) ⇒ EMA weight
+            for s in self._settlement_sites:
+                h = 1.0 - self._settlement_soil.get(s, 1.0)
+                self._settlement_hardship[s] = (1.0 - am) * self._settlement_hardship.get(s, 0.0) + am * h
+            for s in list(self._settlement_hardship):                # forget sites that have dissolved
+                if s not in self._settlement_sites:
+                    self._settlement_hardship.pop(s, None)
 
     def _step_rivalrous(self) -> None:
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
@@ -1030,6 +1043,8 @@ class TerrainWorld(mesa.Model):
         # B (R-63): settlement scalar stress — per-site village population, so an over-crowded egalitarian village
         # repels newcomers (Johnson 1982; dissipated by the site's society factor). Precompute the site populations.
         settle_ss_on = settle_on and getattr(self._demog, "enable_settlement_scalar_stress", False)
+        abandon_on = settle_on and getattr(self._demog, "enable_emergent_abandonment", False)
+        abandon_gain = self._demog.abandon_hardship_gain if abandon_on else 0.0
         settle_pop: dict = {}
         if settle_ss_on:
             srad = self._demog.settle_radius
@@ -1113,6 +1128,14 @@ class TerrainWorld(mesa.Model):
             # Layer 2 RESIDENCE PIN: a settled member steps onto the SINGLE settlement site cell (residence ≠ foraging);
             # its food comes from the catchment tier-2 (harvest step), not the cell it stands on. Mobile agents diffuse.
             site = self._nearest_settlement(agent.pos) if settle_on else None
+            if site is not None and abandon_on:
+                # EMERGENT ABANDONMENT: chronic REMEMBERED hardship erodes the village's hold. Released ⇒ this agent's
+                # ordinary IFD drive decides — it stays anyway if nowhere nearby is better, or drifts out if it is; the
+                # pool then drains below settle_min_pool and the settlement dissolves by the EXISTING rule → fallow →
+                # budding re-settles. No global knowledge is used: only the site's own remembered fortunes.
+                att = 1.0 - abandon_gain * self._settlement_hardship.get(site, 0.0)
+                if att < 1.0 and agent.random.random() > att:
+                    site = None
             if site is not None and settle_ss_on:
                 # Johnson scalar stress: an over-crowded settlement repels this agent (prob rises with village pop,
                 # dissipated by the site's society). Repelled ⇒ fall through to normal diffusion (leave/don't join).
