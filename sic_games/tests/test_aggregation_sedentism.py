@@ -16,9 +16,10 @@ from sic_games.demography import DemographyConfig
 def _fake(sites, agent_positions, min_pool=40, rad=2, release=12):
     cfg = DemographyConfig(enable_aggregation_sedentism=True, settle_min_pool=min_pool,
                            settle_radius=rad, settle_release_steps=release)
-    f = SimpleNamespace(_settlement_sites=dict(sites), _demog=cfg,
+    f = SimpleNamespace(_settlement_sites=dict(sites), _demog=cfg, _nearest_map=None,
                         agent_list=[SimpleNamespace(pos=p) for p in agent_positions])
     f._torus_cheby = lambda ax, ay, bx, by: TerrainWorld._torus_cheby(f, ax, ay, bx, by)
+    f._build_nearest_map = lambda: TerrainWorld._build_nearest_map(f)   # PERF: nearest-settlement now via a cached map
     return f
 
 

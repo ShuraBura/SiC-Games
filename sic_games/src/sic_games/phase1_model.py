@@ -284,6 +284,7 @@ class TerrainWorld(mesa.Model):
         self._claim_events_this_step: int = 0                  # instability diagnostic: defensibility contest events this step
         self._diag_rng = random.Random(1_234_567)              # dedicated RNG for read-outs ⇒ diagnostics never perturb self.random
         self._settlement_sites: dict[tuple[int, int], int] = {}   # aggregation-sedentism: active settlement site → hysteresis timer
+        self._nearest_map: dict | None = None                     # PERF: cached cell→nearest-settlement map (per step); None = stale
         self._tier2_shock: float = 1.0                            # Layer 2b: current-year REGIONAL tier-2 yield shock multiplier (1.0 = no shock)
         self._shock_x: float = 0.0                                # Layer 2b: AR(1) latent (log-space, mean 0) driving the shock regime
         self._spot_cache = None                                   # agriculture: cached S_pot field = max(aquatic_food, cultivability?)
@@ -578,16 +579,33 @@ class TerrainWorld(mesa.Model):
         return max(min(dx, N - dx), min(dy, N - dy))
 
     def _nearest_settlement(self, pos: tuple[int, int]) -> tuple[int, int] | None:
-        """The active settlement whose site is within settle_radius of `pos` (nearest); None if outside all."""
-        if not self._settlement_sites:
-            return None
+        """The active settlement within settle_radius of `pos` (nearest, tie-broken by settlement INSERTION order);
+        None if outside all. PERF: reads a per-step cell→nearest-settlement map (built once in O(n_sites·rad²))
+        instead of scanning EVERY settlement for EVERY agent — the old O(agents·n_sites) that dominated runtime once
+        budding creates hundreds of settlements. Bit-exact: the map's tie-break = first-inserted site at the minimum
+        (torus-Chebyshev) distance, identical to the old scan."""
+        if getattr(self, "_nearest_map", None) is None:
+            self._nearest_map = self._build_nearest_map()
+        return self._nearest_map.get(pos)
+
+    def _build_nearest_map(self) -> dict:
+        """cell → nearest active settlement (within settle_radius). Each site stamps its (2·rad+1)² neighbourhood,
+        earlier sites winning distance ties (insertion order) — so a lookup reproduces the old nearest-scan exactly."""
         rad = self._demog.settle_radius
-        best, bestd = None, rad + 1
-        for site in self._settlement_sites:
-            d = self._torus_cheby(pos[0], pos[1], site[0], site[1])
-            if d <= rad and d < bestd:
-                bestd, best = d, site
-        return best
+        best: dict = {}                                          # cell → (site, dist)
+        for site in self._settlement_sites:                     # insertion order preserves the tie-break
+            sx, sy = site
+            for dx in range(-rad, rad + 1):
+                for dy in range(-rad, rad + 1):
+                    d = dx if dx >= 0 else -dx
+                    ady = dy if dy >= 0 else -dy
+                    if ady > d:
+                        d = ady
+                    cell = ((sx + dx) % N, (sy + dy) % N)
+                    cur = best.get(cell)
+                    if cur is None or d < cur[1]:               # strictly closer wins; ties keep the earlier site
+                        best[cell] = (site, d)
+        return {c: v[0] for c, v in best.items()}
 
     def _toward(self, pos: tuple[int, int], site: tuple[int, int]) -> tuple[int, int]:
         """One cardinal step from `pos` toward `site` on the torus (larger axis first); stays if blocked by water.
@@ -816,19 +834,22 @@ class TerrainWorld(mesa.Model):
             return
         rad = self._demog.settle_radius
         min_pool = self._demog.settle_min_pool
-        counts = {site: 0 for site in self._settlement_sites}
-        for a in self.agent_list:
-            ax, ay = a.pos
-            for site in counts:
-                if self._torus_cheby(ax, ay, site[0], site[1]) <= rad:
-                    counts[site] += 1
-        for site, n in counts.items():
+        occ: dict = {}                                    # PERF: cell → occupancy; sum each site's neighbourhood
+        for a in self.agent_list:                         # instead of O(agents·n_sites) torus-distance checks
+            occ[a.pos] = occ.get(a.pos, 0) + 1
+        for site in list(self._settlement_sites):
+            sx, sy = site
+            n = 0
+            for dx in range(-rad, rad + 1):
+                for dy in range(-rad, rad + 1):
+                    n += occ.get(((sx + dx) % N, (sy + dy) % N), 0)
             if n >= min_pool:
                 self._settlement_sites[site] = self._demog.settle_release_steps    # refresh
             else:
                 self._settlement_sites[site] -= 1
                 if self._settlement_sites[site] <= 0:
                     self._settlement_sites.pop(site, None)
+        self._nearest_map = None                          # settlements may have dissolved → invalidate the cache
 
     def _update_standing(self) -> None:
         """P6 social capital. Standing accrues with TENURE among co-resident band-mates (Wiessner 1977: ~1 yr of
@@ -904,6 +925,7 @@ class TerrainWorld(mesa.Model):
     def _step_rivalrous(self) -> None:
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
         Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
+        self._nearest_map = None                      # PERF: rebuild the cell→nearest-settlement map fresh this step
         sc = self._substrate_cfg
         kappa = sc.contest_exponent
         phi_eps = sc.phi_epsilon
