@@ -1132,4 +1132,44 @@ individual scalar-stress repulsion. That is the recovery fix to build (independe
 
 ---
 
+## R-69 — Village BUDDING (Bandy 2004): leadership-cleavage fission → daughter village is the settlement-SPREAD/recovery mechanism; revealed the baseline capacity was a spread-BOTTLENECK artifact; circumscription self-limits it + forks to hierarchy; +3.2× perf fix (2026-07-15)
+
+**Why.** R-68: aggregation-only village formation can't NUCLEATE villages from a dispersed state — the recovery weak
+spot. Ethnography consult (Bandy 2004 filed; Chagnon 1975; Yanomamö fission ~200; Alberti N≈127–158) → the correct
+settlement-spread/recovery mechanism is village FISSION/BUDDING driven by internal leadership competition, NOT
+aggregation. Built `_maintain_village_budding` (default-OFF, `enable_village_budding`): a VILLAGE (multi-band cluster
+within settle_radius of a settlement) past a scalar-stress threshold sheds its RIVAL faction (2nd-largest lineage bloc,
+Chagnon cleavage), which RELOCATES to a nearby open storable site and founds a DAUGHTER village. Operates on the
+settlement so the band~25 scale is untouched. 6 tests; default-off bit-exact.
+
+**Finding 1 — budding works + revealed a BASELINE ARTIFACT.** Paired run (Cut-1 + budding vs the R-66 Cut-1 baseline,
+bit-identical until the first bud): budding **propagates settlements 49 → 532** and caps village size (~150–256), while
+the baseline was STUCK at ~49 settlements forever (the aggregation-only spread bottleneck). So **the baseline's ~6,400
+"carrying capacity" was an ARTIFACT** — remove the spread bottleneck and pop climbs to ~29,000 (0.18 people/km², a
+realistic mid-forager/proto-ag density; the baseline's 0.04/km² was too LOW). Budding CORRECTED an under-population
+artifact. But with ~62% of land buddable (cultivability), it spread unchecked → 29k / 530 settlements → impractically
+slow.
+
+**Finding 2 — (b) CIRCUMSCRIPTION self-limits it + forks to hierarchy (Bandy p.330, anchored).** "As the landscape fills
+in, the costs of fissioning and relocation rise… an initially high rate of fissioning followed by a cessation of
+fissioning and the appearance of higher-level integrative practices." Threshold: **~170 (Early Chiripa, open) → ~277
+(Middle, circumscribed) = +60%.** Wired: `eff_thr = base·(1 + circ_gain·d_nearest_open/R)`, `base`=170,
+`circ_gain`=0.6 (170→272 ≈ 277); budding targets the NEAREST open site (relocation cost); where none is in reach the
+village grows + STRATIFIES (Carneiro fork, via the existing morph). **Result:** pop SELF-LIMITS to ~6,800 (was 29k),
+~53 settlements (was 530), stratification 7–17% — budding while land is open, stratification once circumscribed. The
+ethnographically-complete Bandy mechanism.
+
+**Finding 3 — PERF (the "run 20–30K" ask).** Profiling the full step (4k agents) showed **56% of runtime in `_torus_cheby`
+(63.5M calls)** — two O(agents·n_settlements) loops (`_nearest_settlement` scans every settlement per agent;
+`_maintain_settlements` same) that exploded with hundreds of settlements. Fixed bit-exact with cell-neighbourhood
+lookups (a per-step cell→nearest-settlement map, O(n_sites·rad²); occupancy-sum counting): **106.5s → 33.4s at 4k
+(3.2×)**, scaling with settlement COUNT correctly (so the budding regime benefits most). Suite bit-exact.
+
+**Status.** Branch `village-budding` (off connubium-cut2). Village budding + circumscription + perf all committed,
+default-OFF. Anchored to Bandy 2004 (filed). NEXT: validate the (b) equilibrium at scale (is ~53 settlements / stratified
+fraction stable + realistic?); tie budding's daughter-founding into the agro depletion oscillator's re-settle step;
+consider SoA/numba for 50–100K if ever needed (the remaining time is now honest per-agent movement/status work).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
