@@ -510,8 +510,9 @@ class TerrainWorld(mesa.Model):
                 a.remove()
         self.agent_list = [a for a in self.agent_list if a.alive]
 
-        # Demographic layer: pairing (F.3a) then births (opt-in)
+        # Demographic layer: bond attrition (R-76) → pairing (F.3a) → births (opt-in)
         if self._demog is not None:
+            self._do_polygyny_attrition()
             if getattr(self._demog, "enable_pair_bonds", False):
                 self._connubium_sizes = []        # CONNUBIUM diag: reset; the pairing method refills for this phase
                 if getattr(self._demog, "enable_adaptive_connubium", False):
@@ -713,6 +714,62 @@ class TerrainWorld(mesa.Model):
             norm = acc / mx if mx > 0 else acc
             self._site_cache = self._demog.site_gain * self._burn * norm
         return self._site_cache
+
+    def _order_females_for_pairing(self, females) -> None:
+        """R-77 wife-quality ordering, in place. Off ⇒ a plain shuffle (bit-exact; the RNG-order contract
+        "shuffle → polygyny-gate → choose" is preserved because this consumes exactly one draw per female,
+        as `shuffle` effectively does).
+
+        von Rueden & Jaeggi (33 societies): in MONOGAMOUS societies status→RS runs through **wife quality
+        (r=0.15)**, defined as "wife's age or interbirth interval". So the most fertile women pair FIRST and,
+        choosing prowess-weighted, take the highest-status men — the status↔wife-youth assortment EMERGES
+        from mutual choice instead of being imposed.
+
+        Ordering is Efraimidis–Spirakis weighted sampling without replacement (key = u^(1/w), sort desc),
+        which is a Plackett–Luce draw: a strict youth sort would be deterministic and unrealistic.
+        """
+        cfg = self._demog
+        wq = getattr(cfg, "wife_quality_strength", 0.0) if cfg is not None else 0.0
+        if wq <= 0.0:
+            self.random.shuffle(females)
+            return
+        span = max(1.0, float(cfg.menopause_months - cfg.menarche_months))
+
+        def _key(f):
+            rem = max(0.0, float(cfg.menopause_months - f.age)) / span   # remaining fertile fraction ∈ [0,1]
+            w = max(1e-9, rem) ** wq
+            u = self.random.random()
+            return u ** (1.0 / w)                                        # higher w ⇒ higher key ⇒ pairs sooner
+
+        females.sort(key=_key, reverse=True)
+
+    def _do_polygyny_attrition(self) -> None:
+        """R-76 — the polygyny stock's missing OUTFLOW. Marlowe (*The Hadza*): "When a man does have 2 wives,
+        the women usually live in different camps, and **polygynous marriages are less enduring**."
+
+        Without this, polygyny only fills: `polygyny_rate` gates whether a married male is CONSIDERED, he then
+        wins prowess-weighted, and the bond never ends — so the rate cannot set the level (a 150× rate change
+        moved realized polygyny only 9.2%→25.3%, and Marlowe's ~4% of men was unreachable). With an outflow,
+        inflow-vs-attrition equilibrates and the rate becomes a real control.
+
+        Fires EVERY step, deliberately — `divorce_rate` sits inside the seasonal gate on the gathering path and
+        so means per-gathering there (R-75, task_9804e99a); this must not inherit that bug. Only wives of a
+        husband holding >1 wife are exposed: dissolving a monogamous bond is `divorce_rate`'s job, not this.
+        Off (0.0) ⇒ bit-exact. Iterates a snapshot: the pass mutates `_wives`/`_partner`.
+        """
+        cfg = self._demog
+        rate = getattr(cfg, "polygyny_attrition", 0.0)
+        if rate <= 0.0:
+            return
+        for a in list(self.agent_list):
+            if a.sex != "female":
+                continue
+            h = a._partner
+            if h is None or len(h._wives) <= 1:          # monogamous or unpaired → not this mechanism
+                continue
+            if a.random.random() < rate:
+                h._wives.discard(a)
+                a._partner = None                        # she re-enters the pairing pool (serial monogamy)
 
     def _orphan_status(self, a):
         """(mother_dead, father_dead, divorced) for agent `a`. Parent links are set at IBI birth; a dead
@@ -2332,7 +2389,7 @@ class TerrainWorld(mesa.Model):
         r_star = getattr(cfg, "exogamy_relatedness", 0.125)
         pool_n = len(females) + sum(1 for m in males if not m._wives)   # CONNUBIUM diag: distinct unpaired adults in reach
         paired_here = 0
-        self.random.shuffle(females)
+        self._order_females_for_pairing(females)   # R-77: wife-quality order (off ⇒ shuffle, bit-exact)
         for f in females:
             fm, ff = (f._mother, f._father) if exog else (None, None)
             avail = []
@@ -2421,7 +2478,7 @@ class TerrainWorld(mesa.Model):
             cell.setdefault(a.pos, []).append(a)
         W = getattr(hf, "width", N); H = getattr(hf, "height", N)
         females = [a for a in self.agent_list if a.sex == "female" and a._partner is None and a.age >= menarche]
-        self.random.shuffle(females)
+        self._order_females_for_pairing(females)   # R-77: wife-quality order (off ⇒ shuffle, bit-exact)
         for f in females:
             fx, fy = f.pos
             fm, ff = f._mother, f._father

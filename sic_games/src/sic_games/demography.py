@@ -560,6 +560,34 @@ class DemographyConfig(BaseModel):
     # roots (wives are mother-anchored cores in his band; the birth gate is band-level). 0 = strict monogamy.
     polygyny_rate: float = Field(0.0, ge=0.0, le=1.0)
     max_wives: int = Field(1, ge=1)                       # cap on wives per male (1 = monogamy even if rate>0)
+    # POLYGYNY ATTRITION (R-76) — the stock's missing OUTFLOW. `polygyny_rate` gates only whether a married
+    # male is CONSIDERED; once considered he wins prowess-weighted, and a polygynous bond never ends. So
+    # polygyny is a stock that only fills, and the rate cannot set the level: measured, a **150× rate change
+    # (0.002→0.3) moves realized polygyny just 9.2%→25.3%**, and Marlowe's ~4% is unreachable (0% at rate=0,
+    # then straight to 9.2% at 0.002). With an outflow, inflow-vs-attrition reaches an equilibrium the rate
+    # actually controls.
+    # ANCHOR — Marlowe, *The Hadza* (monograph): "When a man does have 2 wives, the women usually live in
+    # different camps, and **polygynous marriages are less enduring**." Level target from the same page:
+    # "there are usually only about **4% of men with 2 wives**" (note the denominator: of MEN, not of married
+    # men). Per-step dissolution probability for a wife whose husband holds >1 wife; fires EVERY step (unlike
+    # `divorce_rate`, which is trapped inside the seasonal gate on the gathering path — R-75, task_9804e99a).
+    # 0 = no attrition ⇒ bit-exact pre-R-76 behaviour.
+    polygyny_attrition: float = Field(0.0, ge=0.0, le=1.0)
+    # WIFE QUALITY (R-77) — the missing status→RS channel for a MONOGAMY-DOMINANT system.
+    # von Rueden & Jaeggi, "Men's status and reproductive success in 33 nonindustrial societies" (PNAS;
+    # phylogenetic multilevel meta-analysis, 288 associations / 46 studies / 33 societies): overall status→RS
+    # **r = 0.19**, but decomposed by marriage system — status associates with **wife quality ONLY in
+    # MONOGAMOUS societies (r = 0.15)** and with offspring mortality only in polygynous ones (r = −0.08).
+    # Their operational definition: wife quality = "**wife's age or interbirth interval**, wife's productivity".
+    # WHY IT MATTERS HERE (R-76): the model's ONLY status→RS channel was wives-COUNT, so it had to run 6× the
+    # ethnographic polygyny rate (25% of men vs Marlowe's 4%) to reach von Rueden's r. At a Marlowe-calibrated
+    # ~4% polygyny, status→RS collapsed to ≈+0.02. A monogamy-dominant forager system is supposed to route
+    # status→RS through wife QUALITY, not wife count — and the model had no such route.
+    # MECHANISM: females pair in order of remaining fertility^strength (weighted sampling without
+    # replacement), so the most fertile pair FIRST and — choosing prowess-weighted — take the highest-status
+    # men. The status↔wife-youth assortment EMERGES from mutual choice rather than being imposed as a
+    # correlation. 0 = random pairing order (bit-exact).
+    wife_quality_strength: float = Field(0.0, ge=0.0)
     # F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership that
     # families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle per-band society
     # attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS the larger/richer band

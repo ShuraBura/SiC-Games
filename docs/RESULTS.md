@@ -1536,4 +1536,66 @@ substrate.** 758 pass.
 
 ---
 
+## R-76/R-77 — R-19/R-20's status→RS was an ARTIFACT of 6× too much polygyny. Polygyny had no outflow, so its knob never worked; the missing wife-quality channel closes only a third of the gap (2026-07-17)
+
+**Origin:** the R-75 dashboard flagged polygyny at 56% of married men against a forager anchor. Branch
+`polygyny-stock`. Marlowe, *The Hadza*; von Rueden & Jaeggi, "Men's status and reproductive success in 33
+nonindustrial societies" (PNAS).
+
+**R-76 — the knob never worked, because polygyny had no exit.** `polygyny_rate` gates only whether a married
+male is CONSIDERED; he then wins prowess-weighted, and a polygynous bond never ends. Polygyny was a **stock
+that only fills**:
+
+| `polygyny_rate` | realized polygyny (% of MEN) |
+|---|---|
+| 0.002 | 9.2% |
+| 0.30 (canonical) | 25.3% |
+| **Marlowe (Hadza)** | **~4%** |
+
+**A 150× rate change moved the level 2.8×**, and Marlowe's 4% was unreachable (0% at rate=0, then straight to
+9.2% at 0.002). **ANCHOR — Marlowe:** *"there are usually only about **4% of men with 2 wives**"* (denominator:
+of MEN) and the missing outflow, from the same page: *"When a man does have 2 wives, the women usually live in
+different camps, and **polygynous marriages are less enduring**."* Adding `polygyny_attrition` (per-step, fires
+EVERY step — it must not inherit `divorce_rate`'s seasonal-gate bug, R-75) gives an inflow/attrition
+equilibrium the rate controls: **0.0005→0.02 now spans 0.9%→11.5%**, and Marlowe's ~4–5% lands at
+`rate≈0.005, attrition=0.02`. Attrition's floor is monogamy — it erodes the polygyny, never the marriage.
+
+**R-77 — and that exposes the artifact.** With polygyny calibrated to Marlowe:
+
+| configuration | polygyny (% men) | status→RS |
+|---|---|---|
+| old canonical | **25.3%** (6× Marlowe) | **+0.170** |
+| Marlowe-calibrated, no wife quality | 5.3% | **+0.019** |
+| **Marlowe-calibrated + wife quality** | 4–5% | **+0.070** |
+| von Rueden target | — | **0.19** |
+
+**R-19/R-20's status→RS ≈0.13–0.17 was bought with 6× the ethnographic polygyny rate.** The model reaches von
+Rueden's r only above ~10% polygyny. Cause is structural: **polygyny was the model's ONLY status→RS channel**,
+so it had to be cranked past the ethnography to hit the target — the same shape as R-64's "band ≈ 24" (came out
+at 24 because 25 went in) and R-18's "sweet spot" (which vanished on re-measurement).
+
+**The missing channel, named by the anchor.** von Rueden & Jaeggi (288 associations, 46 studies, 33 societies):
+overall status→RS **r=0.19**; status associates with **wife quality ONLY in MONOGAMOUS societies (r=0.15)** and
+with offspring mortality only in polygynous ones (r=−0.08); *"reproductive strategies that enhance fertility
+more than offspring well-being"*; and **no significant difference by subsistence type** (foraging included — the
+egalitarianism hypothesis is rejected). Their definition: wife quality = *"wife's age or interbirth interval,
+wife's productivity"*. The model had **no** such route — females chose prowess-weighted, but a high-prowess man
+was as likely to pair with a 40-year-old as a 16-year-old. `wife_quality_strength` supplies it: females pair in
+order of remaining fertility^strength (Efraimidis–Spirakis weighted sampling — Plackett–Luce, not a
+deterministic youth sort), so the most fertile pair FIRST and, choosing prowess-weighted, take the
+highest-status men. The assortment **emerges from mutual choice** rather than being imposed as a correlation.
+
+**RESULT — it works, and it is NOT enough.** Wife-youth assortment rises ~0 → **+0.06–0.08** (vs von Rueden's
+**0.15**) and status→RS **+0.02 → +0.07** (vs **0.19**) — **about a third of the gap**. It **saturates
+immediately** (strength 1→8 changes nothing): the ordering only decides who pairs *first*, and the band-limited
+male pool caps how much better than average the first chooser can do. **Do not over-claim it.**
+
+**Verdict.** Both mechanisms default-OFF/bit-exact; 767 pass. The honest position: **at a forager-realistic
+polygyny rate the model does NOT reproduce von Rueden's r — it reaches ~0.07, not 0.19.** **NEXT:** von Rueden's
+remaining channels — **mating success** ("age at marriage or probability of marriage") and **fertility**
+(status→shorter IBI) — hold the other half of the gap. Until they exist, R-19/R-20's status→RS should be read
+as *polygyny-inflated and not validated at a realistic marriage system*.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
