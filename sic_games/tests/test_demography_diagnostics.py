@@ -209,10 +209,14 @@ def test_village_demography_is_sane_and_lit_anchored():
             v = m[key]
             assert v == v and 0.0 <= v <= 1.0, (site, key, v)     # finite + a proper fraction
 
-    # R-74/R-16: the model is fertility-pinned (e₀~28) while the Aché were GROWING (e₀ 36.5, NRR>1), so it
-    # MUST orphan more than their 2% exposure. Below the Aché rate would mean the pinning had gone away.
-    assert whole["frac_motherless"] > 0.02, "model orphan exposure fell to/below the Ache — check R-16 pinning"
-    assert whole["frac_motherless"] < 0.40
+    # Orphan exposure. `enable_orphan_mortality` is CANONICAL from 2026-07-17 (R-74), so this figure is
+    # POST-selection — motherless infants die and leave the risk set — exactly as Hill & Hurtado's observed
+    # 2.0% is. Measured: 1.5% on the plain forager preset (from 4.4% with the channel off — it reproduces
+    # their depletion against an anchor it was not fitted to), but ~4.0-4.2% on THIS village stack, i.e.
+    # still ~2× the Aché. Two forces pull opposite ways and the band must not hide either: R-16's
+    # fertility-pinning (e₀~28 vs the Aché's growing 36.5) pushes exposure UP; the orphan channel culls it
+    # DOWN. Drift outside this range means one of them moved — go look.
+    assert 0.005 < whole["frac_motherless"] < 0.20, whole["frac_motherless"]
 
 
 @pytest.mark.slow

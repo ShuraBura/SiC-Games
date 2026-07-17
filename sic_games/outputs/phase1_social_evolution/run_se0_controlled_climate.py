@@ -49,6 +49,22 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
         enable_prowess_facet=True, prowess_decay=0.05, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
+        # CANONICAL 2026-07-17: orphan-conditioned child mortality (Hill & Hurtado 1996 Tab. 13.1; R-74).
+        # Losing a parent — not birth-spacing infanticide — is the dominant Aché child-killing channel
+        # (Tab. 5.1: homicide/neglect 39.7% of 0–3 deaths, of which parental infanticide is only 5.3%; the
+        # bulk is killing orphans + burying children with dead adults). Mother dead ×5.09, father dead
+        # ×3.05, parents divorced ×2.97; EVERY other kin category null (p .156–.990).
+        # Compositional — normalised by the population's OWN E[mult], so WHO dies is orphan-graded while
+        # HOW MANY stays fertility-pinned (R-16): measured eq_pop **−1.1%** on this preset.
+        # VALIDATES against an anchor it was not fitted to: motherless EXPOSURE 4.4% → **1.5%** vs the Aché's
+        # observed **2.0%** (their 2% is likewise post-selection — motherless infants die and leave the risk
+        # set). Requires enable_paternity + enable_cred_status (both above) — `_father` is assigned inside
+        # the use_cred_status gate, so without it the father channel silently no-ops.
+        # NB `divorce_rate` stays 0.0 here ⇒ the ×2.97 divorce channel never fires. Deliberate: that knob
+        # means per-step in _do_pairing but per-GATHERING under marriage-aggregation (~12× rarer than
+        # documented) — R-75, task_9804e99a. Wire it once the semantics are fixed and re-anchored to the
+        # Aché 0.14 divorced exposure.
+        enable_orphan_mortality=True,
         # CANONICAL 2026-07-02: newborn→adult life-history (Kaplan 2000) — graded juvenile yield/burn/reserve +
         # provisioning of the childhood deficit. (Was OFF — newborns foraged at full adult rate.)
         enable_life_history=True, enable_provisioning=True,
