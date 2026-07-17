@@ -510,8 +510,9 @@ class TerrainWorld(mesa.Model):
                 a.remove()
         self.agent_list = [a for a in self.agent_list if a.alive]
 
-        # Demographic layer: bond attrition (R-76) → pairing (F.3a) → births (opt-in)
+        # Demographic layer: divorce (R-78) → polygyny attrition (R-76) → pairing (F.3a) → births (opt-in)
         if self._demog is not None:
+            self._do_divorce()
             self._do_polygyny_attrition()
             if getattr(self._demog, "enable_pair_bonds", False):
                 self._connubium_sizes = []        # CONNUBIUM diag: reset; the pairing method refills for this phase
@@ -743,6 +744,28 @@ class TerrainWorld(mesa.Model):
 
         females.sort(key=_key, reverse=True)
 
+    def _do_divorce(self) -> None:
+        """Baseline bond dissolution (serial monogamy): each step, a paired female dissolves her bond with
+        probability `divorce_rate` and re-enters the pairing pool.
+
+        R-78 — fires EVERY step, on ALL pairing paths. It PREVIOUSLY lived inside the three pairing methods,
+        and in `_do_gathering`/`_do_connubium` it sat AFTER the annual seasonal gate (`step % aggregation_period
+        != 0: return`), so under `enable_marriage_aggregation` — the canonical village stack — it fired only on
+        gathering steps: ~`aggregation_period`× (=12×) rarer than the "per-step" the config documents, and
+        rarer still on seasonal worlds where the abundance-window gate trims it further (R-75, task_9804e99a).
+        Measured consequence: `frac_parents_divorced` 0.014 vs the Aché 0.14. Now it is one home with one meaning.
+        Polygynous bonds face THIS plus `polygyny_attrition` (Marlowe: polygynous marriages "less enduring").
+        0 = lifelong unless widowed ⇒ bit-exact (no draw fires). Iterates a snapshot: mutates `_wives`/`_partner`.
+        """
+        cfg = self._demog
+        rate = getattr(cfg, "divorce_rate", 0.0)
+        if rate <= 0.0:
+            return
+        for a in list(self.agent_list):
+            if a.sex == "female" and a._partner is not None and self.random.random() < rate:
+                a._partner._wives.discard(a)
+                a._partner = None
+
     def _do_polygyny_attrition(self) -> None:
         """R-76 — the polygyny stock's missing OUTFLOW. Marlowe (*The Hadza*): "When a man does have 2 wives,
         the women usually live in different camps, and **polygynous marriages are less enduring**."
@@ -752,9 +775,8 @@ class TerrainWorld(mesa.Model):
         moved realized polygyny only 9.2%→25.3%, and Marlowe's ~4% of men was unreachable). With an outflow,
         inflow-vs-attrition equilibrates and the rate becomes a real control.
 
-        Fires EVERY step, deliberately — `divorce_rate` sits inside the seasonal gate on the gathering path and
-        so means per-gathering there (R-75, task_9804e99a); this must not inherit that bug. Only wives of a
-        husband holding >1 wife are exposed: dissolving a monogamous bond is `divorce_rate`'s job, not this.
+        Fires EVERY step, like `_do_divorce` (R-78). Only wives of a husband holding >1 wife are exposed:
+        dissolving a monogamous bond is `divorce_rate`'s job, not this.
         Off (0.0) ⇒ bit-exact. Iterates a snapshot: the pass mutates `_wives`/`_partner`.
         """
         cfg = self._demog
@@ -2347,10 +2369,6 @@ class TerrainWorld(mesa.Model):
         take additional wives (≤ max_wives), prowess-weighted → high-status males accumulate wives (von Rueden).
         (Superseded by `_do_gathering` when `enable_marriage_aggregation`.)"""
         cfg = self._demog
-        if cfg.divorce_rate > 0.0:
-            for a in self.agent_list:
-                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
-                    a._partner._wives.discard(a); a._partner = None
         affil = getattr(cfg, "enable_band_affiliation", False)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         # PERF Tier 0: mate within the SOCIAL band_id (fission-capped ~25–45) → O(n), not the spatial bands() clump
@@ -2459,10 +2477,6 @@ class TerrainWorld(mesa.Model):
         hf = self._harvest_field
         if hasattr(hf, "season") and hf.season() < cfg.aggregation_season_threshold:
             return
-        if cfg.divorce_rate > 0.0:
-            for a in self.agent_list:
-                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
-                    a._partner._wives.discard(a); a._partner = None
         affil = getattr(cfg, "enable_band_affiliation", False)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         exog = getattr(cfg, "enable_exogamy", False)
@@ -2557,10 +2571,6 @@ class TerrainWorld(mesa.Model):
         hf = self._harvest_field
         if hasattr(hf, "season") and hf.season() < cfg.aggregation_season_threshold:
             return                                                  # not the abundance window (static fields: no season → always fire)
-        if cfg.divorce_rate > 0.0:
-            for a in self.agent_list:
-                if a.sex == "female" and a._partner is not None and self.random.random() < cfg.divorce_rate:
-                    a._partner._wives.discard(a); a._partner = None
         affil = getattr(cfg, "enable_band_affiliation", False)
         band_sizes = Counter(a._group.band_id for a in self.agent_list) if affil else None
         members: dict = {}

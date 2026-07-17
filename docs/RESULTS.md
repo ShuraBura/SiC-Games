@@ -1598,4 +1598,38 @@ as *polygyny-inflated and not validated at a realistic marriage system*.
 
 ---
 
+## R-78 — `divorce_rate` meant two things; fixed to per-step everywhere, calibrated to the Aché 0.14, and turned on — which completes R-74's dead divorce arm (2026-07-17)
+
+**Origin:** the R-75 dashboard (`frac_parents_divorced` 0.014 vs the Aché 0.14). Branch `divorce-semantics`.
+MODEL_SPEC; PARAMETERS.
+
+**The bug.** `divorce_rate` is documented "per-step bond dissolution prob". It WAS per-step in `_do_pairing`
+(runs every step) but sat AFTER the seasonal gate in `_do_gathering`/`_do_connubium`
+(`step % aggregation_period != 0: return`, period=12), so under `enable_marriage_aggregation` — the canonical
+village stack — it fired only on gathering steps: **~12× rarer than documented**, and rarer still on seasonal
+worlds where the `season ≥ 0.8` window trims it further. The same knob meant two different things.
+
+**Fix.** The draw moved to a single `_do_divorce`, called once per step in the main loop, independent of
+pairing path. The three in-pairing copies were removed. Bit-exact for every current config (default and
+canonical were both 0.0; no test set it >0). Verified on the gathering path: `divorce_rate=0.004` now gives
+0.111 exposure, up from 0.014 — the ~8× the seasonal gate had been eating.
+
+**Calibration.** Hill & Hurtado Table 13.1 gives ~0.14 of child (0–9) risk-intervals as parents-divorced
+PREVALENCE (both parents living) — a stock, so the flow `divorce_rate` is calibrated, not read off. Swept
+against `report_demography.py`: **`divorce_rate=0.005` reproduces `frac_parents_divorced` ≈ 0.14 on BOTH pairing
+paths** (base/per-step 0.140, village/seasonal 0.149 — re-pairing latency barely shifts the stock). Adopted
+CANONICAL.
+
+**It completes R-74.** The orphan channel (canonical) carries a **×2.97 divorced-child multiplier** — the same
+order as losing a father (×3.05) — but at `divorce_rate=0` it never fired. Turning divorce on (paired, village
+stack, 4 seeds): divorced exposure 0.000→0.149, **orphan-flagged deaths 80→126**, motherless 0.045→0.058, eq_pop
+848→924 (fertility-pinned, holds). A third of R-74's mechanism was dead until now.
+
+**Verdict.** Semantics fixed, Aché-anchored, canonical-on; completes R-74; 6 new tests; 767 pass. It is the
+prerequisite the von-Rueden-`r` work needed: status→RS will now be measured on a marriage system where divorce
+sits at its real level, not 12× too low. *(Side note: the R-75 dashboard paid off a second time — it found this
+bug, and now the same dashboard confirms the fix.)*
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

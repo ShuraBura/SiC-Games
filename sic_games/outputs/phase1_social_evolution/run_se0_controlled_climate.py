@@ -60,11 +60,15 @@ def realistic_forager_demog() -> DemographyConfig:
         # observed **2.0%** (their 2% is likewise post-selection — motherless infants die and leave the risk
         # set). Requires enable_paternity + enable_cred_status (both above) — `_father` is assigned inside
         # the use_cred_status gate, so without it the father channel silently no-ops.
-        # NB `divorce_rate` stays 0.0 here ⇒ the ×2.97 divorce channel never fires. Deliberate: that knob
-        # means per-step in _do_pairing but per-GATHERING under marriage-aggregation (~12× rarer than
-        # documented) — R-75, task_9804e99a. Wire it once the semantics are fixed and re-anchored to the
-        # Aché 0.14 divorced exposure.
         enable_orphan_mortality=True,
+        # CANONICAL 2026-07-17: divorce, now that its SEMANTICS are fixed (R-78 — the draw moved to
+        # `_do_divorce`, per-step on ALL pairing paths; it previously sat inside the seasonal gate on the
+        # gathering/connubium paths ⇒ ~12× rarer than "per-step", R-75). CALIBRATED to the Aché: Hill &
+        # Hurtado Tab. 13.1 gives ~0.14 of child (0-9) risk-intervals as parents-divorced prevalence, and
+        # divorce_rate=0.005 reproduces `frac_parents_divorced` ≈ 0.14 on BOTH pairing paths (base 0.140 /
+        # village 0.149; re-pairing latency barely shifts the stock). Feeds R-74's ×2.97 divorced-child
+        # multiplier — so it also completes the orphan channel above (its divorce arm was dead at rate 0).
+        divorce_rate=0.005,
         # CANONICAL 2026-07-02: newborn→adult life-history (Kaplan 2000) — graded juvenile yield/burn/reserve +
         # provisioning of the childhood deficit. (Was OFF — newborns foraged at full adult rate.)
         enable_life_history=True, enable_provisioning=True,

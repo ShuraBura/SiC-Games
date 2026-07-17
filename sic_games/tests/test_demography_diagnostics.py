@@ -181,9 +181,9 @@ def test_village_demography_is_sane_and_lit_anchored():
     Bands are deliberately WIDE: this is a drift alarm, not a calibration. A breach means the demography
     moved — go look, don't just widen the band."""
     w = _village_world()
-    for _ in range(400):
-        w.step()
-        assert w.agent_list, "population went extinct"
+    for _ in range(500):                       # 500, not 400: villages reliably cross n≥50 on both seeds by
+        w.step()                               # ~500 steps (at 400, seed 0 was marginal — divorce, R-78, adds
+        assert w.agent_list, "population went extinct"  # pair-churn that slightly slows early village growth)
 
     whole = w.demography()
     vil = w.demography(by="village")

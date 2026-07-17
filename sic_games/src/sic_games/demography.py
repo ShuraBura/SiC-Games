@@ -550,7 +550,13 @@ class DemographyConfig(BaseModel):
     # and is more realistic (mate choice is band-local, von Rueden scale). Default OFF ⇒ spatial pool, bit-exact.
     # NB: changes the mating SKEW → re-validate status→RS (R-19/R-55). Requires enable_band_affiliation.
     mate_within_band_id: bool = False
-    divorce_rate: float = Field(0.0, ge=0.0, le=1.0)      # per-step bond dissolution prob (0 = lifelong unless widowed)
+    # PER-STEP bond dissolution probability, applied in `_do_divorce` every step on all pairing paths (R-78 —
+    # it previously sat inside the seasonal gate on the gathering/connubium paths ⇒ ~12× rarer than "per-step"
+    # there; R-75). 0 = lifelong unless widowed. Anchor: Hill & Hurtado Tab. 13.1 gives ~0.14 of child (0-9)
+    # risk-intervals as PARENTS-DIVORCED PREVALENCE (both parents living) — a stock, so `divorce_rate` (a flow)
+    # is CALIBRATED to reproduce that `frac_parents_divorced` via `report_demography.py`, not read off directly.
+    # Feeds the R-74 orphan channel's ×2.97 divorced-child multiplier.
+    divorce_rate: float = Field(0.0, ge=0.0, le=1.0)
     family_maturity_months: int = Field(180, ge=0)        # child detaches from the family unit at this age (~15 yr)
     # F.3a MODEST POLYGYNY (von Rueden & Jaeggi 2016: polygyny is the MAIN status→RS amplifier; ~4-11% of forager
     # marriages). polygyny_rate>0: when a female pairs she may also consider ALREADY-MARRIED males (each with prob
