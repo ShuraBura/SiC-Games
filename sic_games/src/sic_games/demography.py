@@ -253,8 +253,14 @@ class DemographyConfig(BaseModel):
     game_meat_frac: float = Field(0.0, ge=0.0, le=1.0)
     # G.3 stochastic meat returns (the Carbon-stage core variance; MODEL_SPEC §4.5.5 / Carbon scoping). The
     # cell meat pool is a mean-preserving lognormal draw with this CV (band-level correlated: ONE draw per cell,
-    # all occupants share it). 0 = deterministic (back-compat). Per-biome anchors (terrain.GAME_KCAL_STD/mean):
-    # forest 0.73, savanna 2.24, desert 0.29. The ordinary bad-streak variance, NOT a shock.
+    # all occupants share it). 0 = deterministic (back-compat). The ordinary bad-streak variance, NOT a shock.
+    #
+    # ANCHOR = `terrain.MEAT_CV` — measured DAY-TO-DAY meat CV (forest/Aché 1.97, desert/Martu 2.92, savanna/
+    # Hadza-big-game 5.29), or `terrain.HUNT_CV` = 2.11 for a generic forager. **NOT `GAME_KCAL_STD/mean`**
+    # (forest 0.73, savanna 2.24, desert 0.29), which is what this said until R-72: those are SPATIAL cross-cell
+    # spreads (a spread across 7 species' *means* for forest, 3 hunt types for desert) and this draw is TEMPORAL
+    # — fresh every step, per cell. The old anchor understated forest 2.7× and desert 10×. Runs predating R-72
+    # (R-18/19/20, society benchmark, paternal calib) hardcode 0.73 = the mis-anchored forest value.
     game_meat_cv: float = Field(0.0, ge=0.0)
     # ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982,
     # Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp ≤ storage_temp_threshold_c ≈ Binford's

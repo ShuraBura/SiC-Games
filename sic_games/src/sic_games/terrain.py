@@ -144,6 +144,24 @@ def biome_return_cv(meat_frac: float, hunt_cv: float = HUNT_CV, gather_cv: float
     return math.sqrt((1.0 - m) ** 2 * gather_cv ** 2 + m ** 2 * hunt_cv ** 2)
 
 
+# Per-biome day-to-day MEAT-acquisition CV — THE anchor for `DemographyConfig.game_meat_cv` (G.3's per-step
+# mean-preserving lognormal meat draw, MODEL_SPEC §4.5.6). Same quantity as HUNT_CV, resolved to the specific
+# calibration people where cchunts has one.
+#
+# **This replaces the old anchor `GAME_KCAL_STD/mean` (forest 0.73, savanna 2.24, desert 0.29), which was a
+# SPATIAL spread fed to a TEMPORAL per-step draw** — it understated forest 2.7× and desert 10×. G.3 draws fresh
+# every step per cell, so it needs day-to-day variance, not a spread across species' means. See R-72.
+MEAT_CV = {
+    BIOME_FOREST:  1.97,   # Aché — cchunts `Hill_Kintigh`, n=14,071 observed trips; 51.6% of days return nothing
+    BIOME_DESERT:  2.92,   # Martu — cchunts `Bird_Bird_Codding`, n=612 observed trips; 49.2% fail
+    BIOME_SAVANNA: 5.29,   # Hadza — Hawkes 1991 p.244: 1 large animal per 29 hunter-days ⇒ √((1−p)/p). Big-game
+                           # specialists ("small game ≈1% of animal tissue"), so their meat variance IS big-game
+                           # variance. The documented EXTREME, not a generic — Hawkes: the Hadza "differ sharply
+                           # from other low-latitude hunter-gatherers". Use HUNT_CV for a generic forager.
+    # GRASS / MOUNTAIN / WETLAND: no cchunts calibration people ⇒ absent. Use HUNT_CV (the CV is biome-invariant,
+    # §4.2), never GAME_KCAL_STD/mean.
+}
+
 # Per-biome day-to-day return CV, derived (never hand-set) from MEAT_FRAC via `biome_return_cv`.
 # Yields CV 0.70 (wetland, pure gathering) → 1.41 (grass, 66% meat) = a **2.0× spread**, against
 # Marlowe/Kelly's observed band range 25–50 (also 2×). That spread is a PREDICTION: `cv_safe` is

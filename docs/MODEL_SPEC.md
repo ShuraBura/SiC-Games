@@ -775,9 +775,11 @@ gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by e
 **DEFERRED (documented, not built):** (a) **meat not η-discounted** — currently η(age) multiplies the *summed*
 intake, so a child's received meat share is production-discounted; the lit-faithful refinement (band sharing
 feeds dependents regardless of their own production → meat share *not* η-scaled) would let meat-sharing buffer
-the dependent class, a separate increment. (b) **G.3 stochastic meat returns** (per-biome CV `GAME_KCAL_STD`;
-**band-level correlated** draw) — NOT a "shock": this is the **ordinary foraging variance** (forest CV 0.73,
-savanna 2.24) whose *bad streaks* push the band below cap-for-all, the regime where Cred-weighted sharing
+the dependent class, a separate increment. (b) **G.3 stochastic meat returns** (per-biome CV `terrain.MEAT_CV`;
+**band-level correlated** draw) — NOT a "shock": this is the **ordinary foraging variance** (forest/Aché **1.97**,
+desert/Martu **2.92** — measured; *these read `GAME_KCAL_STD/mean` = 0.73/2.24/0.29 until R-72, which was a
+SPATIAL spread fed to a TEMPORAL draw*) whose *bad streaks* push the band below cap-for-all, the regime where
+Cred-weighted sharing
 decides who crosses the starvation floor. **It is the CORE mechanism of the Carbon stage** (a deterministic
 meat economy is cap-pinned → Cred-inert), scoped INTO the first Carbon build (see the Carbon-substrate scoping
 blueprint). (c) **Cred dynamics in the rivalrous path** — the meat/contest weight reads `φ` (uniform 0.5), not
@@ -798,9 +800,17 @@ opt-in (default flags off → the 452-baseline unchanged; suite now 461).
   `w_self`, and the `occ_wsum` movement weights.
 - **G.3 stochastic meat (`DemographyConfig.game_meat_cv`):** the cell meat pool is a **mean-preserving
   lognormal draw**, ONE per cell (band-level correlated; all occupants share it), `μ=ln(M)−σ²/2`,
-  `σ=√ln(1+CV²)`. Per-biome CV anchors `terrain.GAME_KCAL_STD` (forest 0.73, savanna 2.24). This is the
-  *ordinary bad-streak variance* that pushes a band below cap-for-all so the share rule decides who crosses
-  the floor — **the core mechanism** (a deterministic meat economy is cap-pinned → Cred-inert).
+  `σ=√ln(1+CV²)`. **Per-biome CV anchor: `terrain.MEAT_CV`** — the measured DAY-TO-DAY meat CV (forest/Aché
+  **1.97**, n=14,071 observed trips, 51.6% of days return nothing; desert/Martu **2.92**; Hadza big game 5.29),
+  or `terrain.HUNT_CV`=2.11 generically. This is the *ordinary bad-streak variance* that pushes a band below
+  cap-for-all so the share rule decides who crosses the floor — **the core mechanism** (a deterministic meat
+  economy is cap-pinned → Cred-inert).
+  **[R-72 CORRECTION, 2026-07-16]** This anchored to `GAME_KCAL_STD` (forest 0.73, savanna 2.24, desert 0.29)
+  from the Carbon build until R-72. Those are **SPATIAL** cross-cell spreads — forest's is the spread across 7
+  species' *means*, desert's across 3 hunt types — while this draw is **TEMPORAL** (fresh per step, per cell).
+  The old anchor understated forest **2.7×** and desert **10×**. Savanna's 2.24 was the lone temporal number
+  (Hawkes small-game income/day) but describes small game, ≈1% of Hadza animal tissue by mass. All runs
+  predating R-72 (R-18/19/20, society benchmark, paternal calibration) hardcode 0.73 = the mis-anchored forest.
 - **D3(i) heritable Cred (`enable_cred_status`, `cred_seed_sigma`, `cred_inherit_sigma`):** founders seeded
   `cred ~ lognormal(median 1)`; at IBI birth `child.cred = mother.cred·exp(N(0,σ))` (noisy lineage copy).
   Decay/earning OFF in Tier-1 (persistent heritable status). Movement temperature held at σ_base

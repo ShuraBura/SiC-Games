@@ -33,7 +33,16 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 FOUNDERS, STEPS = 400, 700
 SEEDS = list(range(20))                      # 20 seeds for SE/t
 KAPPAS = [0.0, 1.0, 2.0]
-CVS = [0.0, 0.73, 2.24]                       # control / forest / savanna meat variance
+# R-72 RE-ANCHOR. Was [0.0, 0.73, 2.24] labelled "control / forest / savanna". Those anchors came from
+# GAME_KCAL_STD/mean — SPATIAL cross-cell spreads — while G.3 is a TEMPORAL per-step draw. Measured day-to-day
+# meat CV (cchunts, observed trips): forest/Aché 1.97 (n=14,071), desert/Martu 2.92 (n=612); Hadza big game 5.29
+# (Hawkes 1991). Old points kept so the R-18 comparison is direct, not inferred.
+CVS = [0.0,      # control (deterministic) — reproduces R-18's control
+       0.73,     # R-18's "forest" — MIS-ANCHORED (spread across 7 species' means); kept for comparison
+       1.97,     # TRUE forest — Aché measured
+       2.24,     # R-18's "savanna" — Hawkes SMALL-game income (small game ≈1% of tissue); kept for comparison
+       2.92,     # TRUE desert — Martu measured
+       5.29]     # TRUE savanna — Hadza big game (the documented extreme)
 MEAT_FRAC, SEED_SIGMA, INHERIT_SIGMA, DELTA = 0.55, 0.5, 0.1, 3.0
 
 

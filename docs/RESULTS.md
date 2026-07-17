@@ -241,7 +241,7 @@ A **+6.2 yr** change in the *natural* baseline moved the *regulated* e₀ by **0
 
 **But a prediction was FALSIFIED — meat variance (G.3) is NOT the switch.** The pre-registered control was: at **CV=0** (deterministic meat) the gradient must vanish (the red-team's cap-pinning wash-out). **It did not** — CV=0, κ=2: Δmean_cred t=3.5***, death-deficit t=7.2. The advantage is **fully present without any temporal meat variance.**
 
-**Why — the operative heterogeneity is SPATIAL competition near carrying capacity, not temporal "bad streaks."** Near K (δ=3) cells are crowded/poor, so per-capita shares are **sub-cap deterministically** — the cap-pinning argument (everyone fed to cap → surplus wasted) is false near K. Two Cred channels are active at CV=0: (a) the **meat harvest split** (high-Cred get more of a contested cell's meat), and (b) the **cell-occupancy movement contest** (`occ_wsum`/`w_self` are also `(cred+ε)^κ`-weighted → high-Cred secure better cells). Both are variance-independent. **G.3 only MODULATES**: the effect **peaks at moderate CV** (forest 0.73: Δmean_cred +0.093, deficit +0.118) and is **lower at the extremes** — CV=0 (spatial only) *and* CV=2.24 (savanna: meat is mostly near-zero with rare over-cap jackpots → the band lives on egalitarian forage, so Cred-weight has little meat to bite on). Forest-like variance is the sweet spot.
+**Why — the operative heterogeneity is SPATIAL competition near carrying capacity, not temporal "bad streaks."** Near K (δ=3) cells are crowded/poor, so per-capita shares are **sub-cap deterministically** — the cap-pinning argument (everyone fed to cap → surplus wasted) is false near K. Two Cred channels are active at CV=0: (a) the **meat harvest split** (high-Cred get more of a contested cell's meat), and (b) the **cell-occupancy movement contest** (`occ_wsum`/`w_self` are also `(cred+ε)^κ`-weighted → high-Cred secure better cells). Both are variance-independent. **G.3 only MODULATES**: ~~the effect **peaks at moderate CV** (forest 0.73: Δmean_cred +0.093, deficit +0.118) and is **lower at the extremes** — CV=0 (spatial only) *and* CV=2.24 (savanna: meat is mostly near-zero with rare over-cap jackpots → the band lives on egalitarian forage, so Cred-weight has little meat to bite on). Forest-like variance is the sweet spot.~~ **[SUPERSEDED by R-73, 2026-07-16 — no sweet spot; and "forest = 0.73" was mis-anchored.]** The re-anchored sweep (CV∈{0, 0.73, 1.97, 2.24, 2.92, 5.29}, N=20) finds the effect **FLAT** from 0.73 to 5.29 (κ=2 death-deficit +0.111…+0.132, all overlapping) — there is no peak, and 2.24 is not "lower". *That G.3 only modulates stands; that it has an optimum does not.* Separately, 0.73 was never forest's temporal CV (it is a spread across 7 species' means); forest's measured day-to-day CV is **1.97** (Aché, n=14,071) — which yields a statistically indistinguishable result, so this mis-anchoring did not affect R-18's conclusions.
 
 **Consequence / caveats:** (1) This **revises** the "ordinary temporal meat variance / bad streaks" framing (scoping bp central finding, §4.5.5): the channel is spatial competition near K; G.3 is a modulator, not a prerequisite. (2) **κ Cred-weights two things at once** — the meat harvest split AND the movement contest. The validated result is the *combined* Cred-competition advantage; a clean **harvest-only vs movement-only ablation** is the next step to apportion them. (3) Decay/β OFF, Gini(cred) stable (~0.23–0.27, no runaway in 700 steps). δ=3 provisional. **This is the first recorded Carbon result on the substrate; Tier-2 (earned Cred + leadership) is the next stage.**
 
@@ -1333,6 +1333,56 @@ demonstrated, replacing a hardcoded constant with a measured one — but it does
 environment-dependence. **NEXT:** anchor `repulsion_gain` (Johnson/Alberti n² coordination cost) so the cost side
 bites hard enough for the gradient to survive the competing drives; then re-run the battery. Default-OFF;
 `band-size-cv` branch; 736 pass.
+
+---
+
+## R-73 — `game_meat_cv` was anchored to a SPATIAL spread (forest 2.7× low, desert 10× low) since the Carbon build — but re-anchoring changes nothing, because the Cred effect is CV-INSENSITIVE. R-18's "sweet spot" falsified; its primary finding strengthened (2026-07-16)
+
+**Origin:** `run_3b_carbon_statval.py` re-anchor sweep, branch `band-size-cv`. MODEL_SPEC §4.5.6; Resource table §4.
+
+**The defect (found by the supervisor asking "didn't we already do this? did you check the model spec?").** G.3's
+stochastic meat draw (`phase1_model.py:1340`) is **temporal** — a fresh mean-preserving lognormal per cell, per
+step. Its documented anchor was `terrain.GAME_KCAL_STD/mean`: **spatial** cross-cell spreads (forest 0.73 = the
+spread across 7 species' *means*; desert 0.29 = across 3 hunt types). Against the measured day-to-day CVs
+(cchunts, R-72): **forest 0.73 vs 1.97 → 2.7× low; desert 0.29 vs 2.92 → 10× low.** Savanna's 2.24 was the lone
+temporal number but describes *small* game (≈1% of Hadza animal tissue by mass; big game is 5.29). So one
+number was doing double duty as spatial AND temporal variance — and `game_meat_cv=0.73` is hardcoded into
+R-18/19/20, the society benchmark and the paternal calibration.
+
+**RESULT — the blast radius is ZERO.** Re-anchored sweep, κ∈{0,1,2} × CV∈{0, 0.73, 1.97, 2.24, 2.92, 5.29},
+N=20 seeds, paired drift-control. At κ=2:
+
+| meat CV | Δmean_cred | cred-death-deficit | eq_pop |
+|---|---|---|---|
+| 0.00 (control) | +0.035 (t=1.8) | +0.099 (t=8.9) | 553 |
+| 0.73 (old "forest") | +0.082 (t=6.2) | +0.132 (t=9.7) | 556 |
+| **1.97 (TRUE forest, Aché)** | **+0.077 (t=5.7)** | **+0.120 (t=9.6)** | 567 |
+| 2.24 (old "savanna") | +0.093 (t=6.2) | +0.125 (t=8.8) | 576 |
+| 2.92 (TRUE desert, Martu) | +0.073 (t=4.4) | +0.111 (t=9.0) | 575 |
+| 5.29 (Hadza big game) | +0.062 (t=3.3) | +0.118 (t=9.9) | 566 |
+
+1. **The Cred effect is CV-INSENSITIVE.** From 0.73 to 5.29 it is flat (deficit +0.111…+0.132; Δmean_cred
+   +0.062…+0.093, all within ~1.5 SE), and significant throughout. **At forest's true 1.97 the result is
+   statistically indistinguishable from the 0.73 it was actually run at ⇒ R-19, R-20, the society benchmark and
+   the paternal calibration need NO re-run.** The mis-anchoring was real but consequence-free.
+2. **R-18's PRIMARY finding is reproduced and strengthened.** The CV=0 control still does not vanish (κ=2:
+   deficit +0.099, t=8.9). The operative channel is **spatial competition near K**, not temporal meat variance —
+   and no re-anchoring can touch a CV=0 control. *This is also WHY (1) holds: an effect that survives at CV=0 was
+   never going to care what CV is.*
+3. **R-18's SECONDARY claim is FALSIFIED** (corrected in place at R-18): "the effect **peaks at moderate
+   forest-CV (0.73)** and is lower at CV=2.24 (savanna meat too bursty to leverage) — forest-like variance is the
+   sweet spot." **There is no sweet spot.** 2.24 (+0.125) is not below 0.73 (+0.132); the effect persists at 5.29.
+   *That G.3 only modulates stands; that it has an optimum does not.*
+
+**CAVEAT — this is NOT a reproduction of R-18.** The model has changed materially since 2026-06-21 (prowess-credit
+fix, `prowess_decay=0.05`, et al.), so the 0.73 arm here (+0.082/+0.132) differs modestly from R-18's reported
+(+0.093/+0.118). **The across-CV comparison within this run is clean** (one model, one seed set, paired); the
+comparison to R-18's absolute numbers is not.
+
+**Fix shipped:** `terrain.MEAT_CV` (forest 1.97 / desert 2.92 / savanna-big-game 5.29, measured) is now the single
+home and the documented anchor for `game_meat_cv`; `GAME_KCAL_STD` is explicitly marked spatial-only in
+demography.py + MODEL_SPEC §4.5.6. Harness CVs left at 0.73 with the mis-anchoring documented, since (1) shows
+re-running them would be compute spent to reproduce the same numbers.
 
 ---
 
