@@ -77,14 +77,14 @@ GAME_KCAL_TARGETS = {
     BIOME_FOREST:  5541.0,   # 7-species pursuit-weighted mean (Hill 1987; 1,462,745/264). Resource table §3.2 [NATIVE, handling-only, PROVISIONAL]
     BIOME_SAVANNA:  518.0,   # all-seasons base encounter (static cell; 745 dry-season = seasonality hook). Resource table §3.2 [CONVERTED, PROVISIONAL]
     BIOME_GRASS:   3001.0,   # Hurtado & Hill 1987 direct lift. Resource table §3.2 [NATIVE, PROVISIONAL]
-    BIOME_DESERT:   730.0,   # 1201→730: bout-frequency-weighted mean of search-incl. overall hunt-type rates (Bird 2009; 570,262/781). Resource table §3.2 [supervisor-approved 2026-06-15, PROVISIONAL]
+    BIOME_DESERT:   995.0,   # bout-weighted mean of the 4 main Bird 2009 hunt-type Return Rate/Bout (sand monitor 641/perentie 697/bustard 1761/hill kangaroo 1203; 1,065,060/1,070). Resource table §3.2 [R-79 correction 2026-07-17; supersedes the 730 extraction error that swapped kangaroo in for bustard]
 }
 # Per-biome literature spread (std). Biomes absent here use DEFAULT_STD_FRAC (10% of mean).
 # Derivations: Resource table §3.2; MECHANISMS §9a.6.
 GAME_KCAL_STD = {
     BIOME_FOREST:  4043.0,   # weighted std of the 7 Hill 1987 species rates (CV 0.73). Resource table §3.2 [NATIVE]
     BIOME_SAVANNA: 1158.0,   # Hawkes 1991: small-game income 0.162±0.362 animals/day → CV 2.24 × mean 518 [LIT-DERIVED, supervisor-review — hunting is high-variance; 10% understates]
-    BIOME_DESERT:   210.0,   # weighted std of the 3 Bird 2009 hunt-type rates {641,765,1300} (CV 0.29). Resource table §3.2
+    BIOME_DESERT:   490.0,   # bout-weighted std of the 4 Bird 2009 hunt-type rates {641,697,1761,1203} (CV 0.49). Resource table §3.2 [R-79 correction]
     # GRASS absent → DEFAULT_STD_FRAC fallback (10% of mean; Hurtado & Hill 1987 variance source not in repo)
 }
 

@@ -1632,4 +1632,35 @@ bug, and now the same dashboard confirms the fix.)*
 
 ---
 
+## R-79 — Desert game return was an extraction error: the doc swapped hill kangaroo in for bustard, dropping the Martu's 2nd-most-frequent hunt. Corrected 730 → 995 (+36%) (2026-07-17)
+
+**Origin:** verifying the flagged Bird 2009 sample-size swap (task_52ad3af5) by re-reading Table 1 from the page
+image. Resource_Return_Rate_Table §3.2; PARAMETERS §game.
+
+**The error.** `GAME_KCAL_TARGETS[DESERT] = 730` (supervisor-approved 2026-06-15) was derived from Bird 2009
+(Martu) Table 1's Return-Rate/Bout column as "sand monitor 641 (n=612), perentie 765 (n=78), bustard ~1,300
+(n=91)". Against the actual table: **perentie is 697 (not 765)**, and the third species — labelled "bustard
+~1,300 (n=91)" — is in fact **hill kangaroo** (1,203, n=91); the real **bustard is 1,761, n=289**, and it was
+"excluded" under the mislabel "kangaroo (n=289)". So the derivation silently **dropped the Martu's 2nd-most-
+frequent hunt (bustard, n=289)** and computed 570,262/781 = 730 from {sand monitor, perentie, kangaroo}. It was
+right for a species set nobody intended.
+
+**The fix (supervisor-chosen basis B — all four main hunts).** Bout-weighted mean of {sand monitor 641 (612),
+perentie 697 (78), bustard 1,761 (289), hill kangaroo 1,203 (91)} = 1,065,060/1,070 = **995** (std 490, CV 0.49);
+feral cat (n=25) excluded as opportunistic. **730 → 995, +36%.**
+
+**Blast radius — contained by the R-72/R-73 separation.** `GAME_KCAL_STD` is the SPATIAL cell-value spread
+(§1.5); it does NOT feed the temporal band-size CV (`RETURN_CV`, from Cordain meat_frac — R-72) or the G.3 meat
+draw (`terrain.MEAT_CV`, from cchunts — R-73). So the correction moves only the desert **game cell-value
+distribution**, not any status/band/meat mechanism. `RETURN_CV[DESERT]` = 1.025, unchanged. No test asserted the
+old value; desert-world runs shift (richer desert game), the coastal-temperate validation substrate does not. 773
+pass.
+
+**Method note.** This is the 4th value this session that was wrong because it was hard-read off a table image
+(after the Hawkes/Berbesque/cchunts CV extractions): the Bird 2009 table has no text layer, and the original
+lift transposed two rows. Re-rendering the page and re-reading it caught it — the same tool (`pymupdf` render)
+that the R-72 CV work leaned on.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

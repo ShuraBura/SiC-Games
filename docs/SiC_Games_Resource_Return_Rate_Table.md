@@ -99,7 +99,18 @@ Mine the std from the literature where the source reports a spread (SD / range /
 
 **Grassland — mean 3,001, std 300.1 [10%-DEFAULT, NATIVE].** Hurtado & Hill 1987 Table II: men 20–60 (n=414 person-days), wild-game hunting (domestic-origin excluded) = **3,001 cal/hr** (direct). No per-bout rate-SD published → 10% fallback. Corroborated lower by Gurven & Hill 2009 (~2,700) and Hiwi 1990 (2,593) — different samples; 3,001 stands as the anchor.
 
-**Desert — mean 730, std 210 [LIT].** SET 2026-06-15 (supervisor-approved; was the 1,201 midpoint). Bird 2009 (Am. Antiquity 74(1)), read via image render: **search-inclusive overall hunt-type rates** are the correct basis (§1.3). Bout-frequency-weighted mean of {sand monitor 641 (n=612), perentie 765 (n=78), bustard ~1,300 (n=91)} = 570,262/781 = **730** (median 765). **Std** = weighted std of those rates = **210** (CV 0.29). *Note:* the Bird 2009 **post-encounter** rates (Table 2/Fig 5, thousands; bustard tail >100,000) are a *different denominator* — not the basis. Hill kangaroo (n=289) excluded (overall rate not cleanly stated); feral cat opportunistic.
+**Desert — mean 995, std 490 [LIT].** R-79 CORRECTION (2026-07-17, supervisor-approved; supersedes the
+2026-06-15 value 730). Bird 2009 (Am. Antiquity 74(1)) **Table 1, Return Rate/Bout (kcal/hr)** = the
+search-inclusive overall basis (§1.3), read via image render. Bout-frequency-weighted mean of the four main
+hunt types {sand monitor 641 (n=612), perentie 697 (n=78), bustard 1,761 (n=289), hill kangaroo 1,203 (n=91)}
+= 1,065,060 / 1,070 = **995**. **Std** = bout-weighted std of those four rates = **490** (CV 0.49). Feral cat
+(n=25) excluded as opportunistic. *Note:* the Bird 2009 **post-encounter** rates (Table 2/Fig 5, thousands;
+bustard tail >100,000) are a *different denominator* — not the basis.
+**Why the prior 730 was wrong (R-79):** it was an EXTRACTION ERROR against Table 1. It used perentie 765
+(the table says **697**) and a third species labelled "bustard ~1,300 (n=91)" that was in fact **hill kangaroo**
+(1,203, n=91), while "excluding kangaroo (n=289)" that was in fact **bustard**. So it silently dropped the
+Martu's 2nd-most-frequent hunt (bustard, n=289) and swapped kangaroo in under bustard's name — computing
+570,262/781 = 730 from {sand monitor, perentie, kangaroo}. The corrected all-four-hunts mean is **995 (+36%)**.
 
 **Wetland / Mountain — UNANCHORED → 0.** No journal kcal/hr source; absent from `GAME_KCAL_TARGETS` (the loop zeroes any biome not in the dict). A gap, not a measured zero.
 
