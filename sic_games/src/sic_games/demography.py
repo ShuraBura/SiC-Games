@@ -62,9 +62,17 @@ class SilerParams:
         """l(x) = exp(−H(x))."""
         return math.exp(-self.cumulative_hazard(age_years))
 
-    def monthly_death_prob(self, age_months: float, a2_mult: float = 1.0) -> float:
-        """P(die during this month) at `age_months`. Annual hazard → monthly-interval prob."""
-        h = self.hazard(age_months / MONTHS_PER_YEAR, a2_mult)
+    def monthly_death_prob(self, age_months: float, a2_mult: float = 1.0,
+                           hazard_mult: float = 1.0) -> float:
+        """P(die during this month) at `age_months`. Annual hazard → monthly-interval prob.
+
+        `hazard_mult` scales the WHOLE age-specific hazard (unlike `a2_mult`, which scales only the
+        Makeham term). Used by the kin/orphan channel: Hill & Hurtado's Table 13.1 controls for age and
+        age², so its parameters are proportional effects on the total age-specific rate, not on a1.
+        Threaded through `hazard()` ONLY — `cumulative_hazard()`/`survivorship()` stay unmodulated, as
+        founder sampling, the ×12 guard and the life-table test depend on the unmodulated forms.
+        """
+        h = self.hazard(age_months / MONTHS_PER_YEAR, a2_mult) * hazard_mult
         return 1.0 - math.exp(-h / MONTHS_PER_YEAR)
 
 
@@ -176,6 +184,46 @@ class DemographyConfig(BaseModel):
     enable_density_disease: bool = False
     enable_terrain_pathogen: bool = False
     enable_nutrition_synergy: bool = False
+    # ── KIN/ORPHAN CHILD MORTALITY (Hill & Hurtado 1996 Table 13.1; MODEL_SPEC §4.6.4; R-74) ──────────
+    # SUPERSEDES `enable_infanticide` (below). Losing a parent — not birth-spacing — is the dominant
+    # killing channel among the forest Aché, and it is a HAZARD MULTIPLIER, not a separate event.
+    #
+    # Table 13.1 ("Kin Effects on Child Mortality Rates during the Forest Period: Age 0–9"), a hazard model
+    # controlling age, age², sex, mother's age, mother's age². Log-parameters → rate ratios:
+    #   mother alive  −1.6277 (p<.001) ⇒ mother DEAD  ×exp(1.6277) = 5.09   ["about fivefold"]
+    #   father alive  −1.1146 (p<.001) ⇒ father DEAD  ×exp(1.1146) = 3.05   ["about threefold"]
+    #   parents divorced +1.0892 (p<.001) ⇒           ×exp(1.0892) = 2.97   ["threefold increase"]
+    # Every OTHER kin category is null: adult brothers/sisters, grandmothers, grandfathers, aunts, uncles,
+    # total kin helpers (p .156–.990) — "parents, but NOT other kin, have a strong and unique influence."
+    # Mechanism: "A good deal of this effect is due to child homicide" + orphans "treated worse" — Table 5.1's
+    # homicide/neglect is 39.7% of 0–3 deaths (child homicide 24, sacrificed-with-adult 11, left-behind 5,
+    # parental infanticide only 7 of 131 = 5.3%). Effects are age-PROPORTIONAL (no significant age interaction).
+    enable_orphan_mortality: bool = False
+    orphan_mult_mother_dead: float = Field(5.09, ge=1.0)   # exp(1.6277) [LIT — Hill & Hurtado Tab. 13.1]
+    orphan_mult_father_dead: float = Field(3.05, ge=1.0)   # exp(1.1146) [LIT]
+    orphan_mult_divorced: float = Field(2.97, ge=1.0)      # exp(1.0892) [LIT]; both parents alive but unbonded
+    orphan_max_age_years: float = Field(9.0, gt=0.0)       # Table 13.1's window is ages 0–9
+    # DOUBLE-COUNT GUARD. The Siler a1 was fit to OBSERVED Aché mortality, which already contains these deaths
+    # at their observed frequency (`ACHE_FOREST_NATURAL` says so: "infanticide KEPT"). Applying the multipliers
+    # on top would kill the same children twice. Dividing by E[mult] under Table 13.1's OWN mean values
+    # (mother alive 0.98, father alive 0.95, divorced 0.14 | both alive) recovers the counterfactual
+    # both-parents-alive-and-married baseline:
+    #   E[mult] = (0.98 + 0.02·5.09) · (0.95 + 0.05·3.05) · [P(¬both alive) + P(both alive)·(0.86 + 0.14·2.97)]
+    #           = 1.0818 · 1.1025 · (0.069 + 0.931·1.2758) = 1.499
+    # ⇒ at Aché-typical orphan rates the population-mean hazard is UNCHANGED (e₀ invariant — the validation
+    # test) and the mechanism only REDISTRIBUTES mortality onto orphans. If the model's orphan rate diverges
+    # from the Aché (e.g. high adult mortality), infant mortality moves — that is the mechanism working, not
+    # a calibration error.
+    orphan_normalize: bool = True
+    orphan_e_mult: float = Field(1.499, gt=0.0)            # DERIVED from Tab. 13.1 means (arithmetic above)
+    # "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our
+    # sample" — an unweaned infant cannot survive its mother's loss. Small n; kept flaggable.
+    orphan_infant_mother_lethal: bool = True
+    # SUPERSEDED by enable_orphan_mortality (R-74) — never implemented; no logic reads it. Scoped in the Siler
+    # blueprint §4.1 as birth-spacing/sex-biased infanticide, but Table 5.1 shows parental infanticide is only
+    # 5.3% of Aché infant deaths, and infancy is nearly sex-SYMMETRIC (38% of male vs 41% of female infant
+    # deaths are homicide/neglect) — the sex bias is at ages 4–14 (28% F vs 6% M) and comes from grave
+    # accompaniment (80% of children buried with a deceased adult are female), not from infanticide.
     enable_infanticide: bool = False    # [UNIMPLEMENTED STUB — no logic reads this.] Baseline infanticide is ALREADY
     # folded into the Siler infant-mortality curve (fit to observed HG infant deaths — "infanticide KEPT"). An explicit
     # mechanism would only add CONDITIONAL infanticide (birth-spacing enforcement / sex-selective); the resource-stress

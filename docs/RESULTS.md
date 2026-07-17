@@ -1401,4 +1401,76 @@ re-running them would be compute spent to reproduce the same numbers.
 
 ---
 
+## R-74 — Infanticide is the WRONG mechanism: Aché child killing is orphan-conditioned, and it's a hazard multiplier. Built + anchored — and it exposes a demographic validation FAILURE: the model makes 3.4× too many orphans (2026-07-17)
+
+**Origin:** Hill & Hurtado 1996 (*Aché Life History*) Tables 5.1 + 13.1, extracted by image render (the tables have
+no usable text layer). MODEL_SPEC §4.6.4; PARAMETERS. Branch `orphan-mortality`.
+
+**The scoping was wrong, and the data says so.** `enable_infanticide` was scoped (Siler blueprint §4.1) as
+birth-spacing/sex-biased infanticide, never built. Table 5.1 ("Causes of Death during the Forest Period", ages
+0–3, n=131) says otherwise:
+
+| category | n | % |
+|---|---|---|
+| all illness | 36 | 27.5 |
+| congenital/degenerative | 19 | 14.5 |
+| accident | 3 | 2.3 |
+| **homicide/neglect** | **52** | **39.7** |
+| warfare | 21 | 16.0 |
+
+- **Parental infanticide is only 7/131 = 5.3%** (father 3 + mother 4). The 39.7% is dominated by **child
+  homicide (24)**, **sacrificed-with-adult (11)** and **left-behind (5)** — killing orphans and burying children
+  with dead adults, NOT birth spacing. (Arithmetic reproduces the book's prose exactly: homicide/neglect is
+  26/63 female = 41.3% and 26/68 male = 38.2% ↔ its "41% / 38%".)
+- **The blueprint's "optional sex-biased variant" is misplaced for infancy** — infancy is near-symmetric
+  (38% M / 41% F). The bias is at 4–14 (28% F vs 6% M) and comes from grave accompaniment (80% of children
+  buried with a deceased adult are female).
+- **39.7% is a FLOOR:** Hill & Hurtado warn "some of the children reported to have died of defects at birth were
+  actually killed and are coded incorrectly."
+
+**The mechanism is a hazard MULTIPLIER, fully anchored** (Table 13.1, "Kin Effects on Child Mortality Rates
+during the Forest Period: Age 0–9"; controls age, age², sex, mother's age, mother's age²):
+
+| variable | parameter | rate ratio | prose |
+|---|---|---|---|
+| mother alive | −1.6277 (p<.001) | mother dead **×5.09** | "about fivefold" |
+| father alive | −1.1146 (p<.001) | father dead **×3.05** | "about threefold" |
+| parents divorced | +1.0892 (p<.001) | **×2.97** | "threefold increase" |
+| *all other kin* | ~0 | — | brothers/sisters/grandparents/aunts/uncles ALL n.s. (p .156–.990) |
+
+"Parents, but **not** other kin, have a strong and unique influence." Effects are age-proportional (no
+significant age interaction). Plus: mother's death in year 1 ⇒ **100% mortality**.
+
+**Built:** `enable_orphan_mortality` (default-OFF, bit-exact) + a `hazard_mult` on `monthly_death_prob` that
+scales the TOTAL age-specific hazard (Table 13.1 controls age, so its effect is not a1-specific), threaded
+through `hazard()` only — `cumulative_hazard`/`survivorship` stay unmodulated per blueprint hazard I-2. Reads
+the existing `_mother`/`_father`/`_partner` links. 11 tests.
+
+**THE FINDING — a demographic validation failure.** Table 13.1's *mean values* are an independent target this
+project never had: **mother alive 0.98, father alive 0.95** (i.e. 2% of Aché child-risk-intervals are motherless,
+5% fatherless). Measured (4 seeds × 700 steps, forest-Aché substrate, paternity + divorce on):
+
+| arm | eq_pop | motherless | fatherless |
+|---|---|---|---|
+| OFF | 501 | **8.4%** | **11.9%** |
+| ON | **267 (−47%)** | 6.7% | 11.3% |
+| **Aché (Tab. 13.1)** | — | **2.0%** | **5.0%** |
+
+**The model makes 2–4× too many orphans.** Its E[mult]≈2.0 vs the Aché normaliser 1.499 ⇒ a net ~34% hazard
+rise ⇒ eq_pop halves. The Aché 2% is *post-selection* (motherless infants die, culling the risk set), so the fair
+comparison is the ON arm: **6.7% vs 2.0% = 3.4× too high**. Either adult mortality is too high near the child-
+rearing ages, the maternal age structure is off, or `dens_delta=3` overshoots. **This is a real defect the
+mechanism merely revealed — and it is worth more than the mechanism.**
+
+**Also found:** `_father` is assigned inside the `use_cred_status` gate (`phase1_model.py:1938`), so the entire
+paternity link — and hence any father-conditioned mechanism — **silently no-ops unless `enable_cred_status` is
+on**. First probe (paternity off) showed fatherless = 0.0% and eq_pop *rising* 25%.
+
+**Verdict.** Mechanism built, anchored, default-OFF. **Do NOT enable until the orphan-rate discrepancy is
+resolved** — with a fixed Aché normaliser the flag cannot be switched on without moving eq_pop by tens of
+percent. **NEXT: diagnose why child-orphanhood runs 3.4× the Aché rate** (that is a substrate-calibration bug,
+independent of this flag).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -57,7 +57,8 @@ from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
-    DemographyConfig, density_mult, energetic_fertility_factor, is_fertile, sedentism_ibi, pathogen_mult, risk_mult, synergy_mult,
+    DemographyConfig, MONTHS_PER_YEAR, density_mult, energetic_fertility_factor, is_fertile, sedentism_ibi,
+    pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
     mobility_radius, footprint_radius,
 )
@@ -469,6 +470,7 @@ class TerrainWorld(mesa.Model):
         self.births_this_step = 0
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0
+        self.deaths_orphan_this_step = 0              # R-74 diag: deaths carrying an elevated kin/orphan hazard
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
         self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
@@ -708,6 +710,55 @@ class TerrainWorld(mesa.Model):
             norm = acc / mx if mx > 0 else acc
             self._site_cache = self._demog.site_gain * self._burn * norm
         return self._site_cache
+
+    def _orphan_status(self, a):
+        """(mother_dead, father_dead, divorced) for agent `a`. Parent links are set at IBI birth; a dead
+        parent's object survives the prune with `alive=False`, so the reference stays readable.
+        `divorced` follows Table 13.1's footnote — it is defined ONLY when both parents are living, and
+        means the mother is no longer bonded to this child's father (she re-paired, or the bond dissolved:
+        the Aché `pianjambyre`, "neglected by its provider after a parent initiates sexual relations with
+        a new partner"). Unknown parentage (founders) ⇒ no effect, never an assumed orphan."""
+        m = getattr(a, "_mother", None)
+        f = getattr(a, "_father", None)
+        m_dead = m is not None and not m.alive
+        f_dead = f is not None and not f.alive
+        divorced = False
+        if m is not None and f is not None and not m_dead and not f_dead:
+            divorced = getattr(m, "_partner", None) is not f
+        return m_dead, f_dead, divorced
+
+    def _orphan_lethal(self, a) -> bool:
+        """Hill & Hurtado: "mother's death in the first year of a child's life leads to mortality in 100%
+        of the cases in our sample" — an unweaned infant cannot survive losing its mother."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_orphan_mortality", False):
+            return False
+        if not getattr(cfg, "orphan_infant_mother_lethal", False) or a.age >= MONTHS_PER_YEAR:
+            return False
+        m = getattr(a, "_mother", None)
+        return m is not None and not m.alive
+
+    def _orphan_mult(self, a) -> float:
+        """R-74 kin/orphan multiplier on the TOTAL age-specific hazard (Hill & Hurtado Table 13.1).
+        Normalised by E[mult] at the Aché mean values so the population-mean hazard is preserved and the
+        mechanism REDISTRIBUTES mortality onto orphans rather than adding a second helping of it on top of
+        the a1 that already contains these deaths ("infanticide KEPT"). Off ⇒ 1.0 (bit-exact)."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_orphan_mortality", False):
+            return 1.0
+        if a.age > cfg.orphan_max_age_years * MONTHS_PER_YEAR:
+            return 1.0                                    # Table 13.1's window is ages 0–9
+        m_dead, f_dead, divorced = self._orphan_status(a)
+        mult = 1.0
+        if m_dead:
+            mult *= cfg.orphan_mult_mother_dead
+        if f_dead:
+            mult *= cfg.orphan_mult_father_dead
+        if divorced:
+            mult *= cfg.orphan_mult_divorced
+        if cfg.orphan_normalize:
+            mult /= cfg.orphan_e_mult
+        return mult
 
     def _return_cv_field(self):
         """Emergent-band-size v3: per-cell **DAY-TO-DAY** return CV — the variance a band pools away by sharing.
@@ -1632,11 +1683,18 @@ class TerrainWorld(mesa.Model):
                     self._note_band_starv(a)                          # M2: attribute this starvation death to its band
                     self.starv_cred_this_step.append(a.cred)
                     self.starv_status_this_step.append(a.cred * getattr(a, "prowess", 1.0))
+                elif self._orphan_lethal(a):              # R-74: mother lost in year 1 ⇒ 100% (Hill & Hurtado)
+                    a.alive = False
+                    self.deaths_senesc_this_step += 1
+                    self.deaths_orphan_this_step += 1
                 else:
                     a2m = self._a2_mult(a, occ_count)     # Step-2 a2 modulators (1.0 if all flags off)
-                    if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m):
+                    om = self._orphan_mult(a)             # R-74: kin/orphan hazard multiplier (1.0 if off)
+                    if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m, om):
                         a.alive = False                   # Siler baseline+senescence
                         self.deaths_senesc_this_step += 1
+                        if om > 1.0:
+                            self.deaths_orphan_this_step += 1   # diag: died while carrying an elevated kin hazard
                     elif a.age >= a.max_age:              # hard lifespan cap (Siler-tail backstop; was DEAD CODE
                         a.alive = False                   # under demog — the elif below is only reached when
                         self.deaths_senesc_this_step += 1  # demog is None, so ancient agents slipped through to 1111)
