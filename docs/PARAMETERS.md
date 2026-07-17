@@ -391,7 +391,7 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | enable_leader_coherence / leader_coherence_gain | **False / 0** | OPT-IN | Stage 1a: 2nd cohesion source from a band's top-status member, Boehm-gated (`LEADER_SOCIETY_WEIGHT` egalitarian 0 / complex 0.5 / stratified 1.0). Gain UNANCHORED (bracket). Built + unit-valid; behavioural benchmark DEFERRED to the dynastic stage (R-30). §4.8.13 |
 | _(dependency, R-34)_ | — | — | `enable_leader_coherence`, `enable_size_repulsion`, `enable_malnutrition_fission` are **no-ops unless `enable_dynamic_bands=True`** (they live in that block). `enable_resource_directed_fusion` + `enable_genealogy_log` are independent. |
 | enable_ascribed_mate_choice / ascribed_mate_strength | **True / 2.5** (CANONICAL 2026-07-02) | **CANONICAL** | cred (ascribed) enters mate-choice, society-gated (`MATE_ASCRIBED_WEIGHT` egalitarian 0.25 / complex 0.6 / stratified 1.0). Mate weight = `(prowess·cred^(a·sw))^mate_choice_strength`. **a=2.5 pinned** → composite status→RS ≈0.13 (von Rueden; sweep, Gini stable/no runaway). Stratified ~0.19 endpoint pending settlement-arc validation. Flag OFF ⇒ prowess-only, bit-exact. *Headline-result reframe (R-19/R-21/R-26 → gated von-Rueden) HELD pending settlement-arc validation.* |
-| enable_size_repulsion / repulsion_gain / repulsion_midpoint / repulsion_width | **False / 0 / 25 / 6** | OPT-IN | Stage 1b: Johnson scalar-stress DISPERSIVE term (logistic in band size, Alberti shape), society-relieved (`REPULSION_SOCIETY_FACTOR` egal 1.0 / complex 0.5 / stratified 0.25). midpoint=Wobst-band, width=Alberti re-anchored to band scale; gain UNANCHORED. Trims tail (R-29; the "44→31 cap" corrected in R-31 — dormant threshold). §4.8.13 |
+| enable_size_repulsion / repulsion_gain / repulsion_midpoint / repulsion_width | **False / 0 / 25 / 6** | OPT-IN | Stage 1b: Johnson scalar-stress DISPERSIVE term (logistic in band size), society-relieved (`REPULSION_SOCIETY_FACTOR` egal 1.0 / complex 0.5 / stratified 0.25). Trims tail (R-29; the "44→31 cap" corrected in R-31 — dormant threshold). §4.8.13. **ANCHOR (R-72): Alberti 2014 fits `logit = −18.636 + 0.147·n` ⇒ gain = 1.0 (his logistic IS a probability), width = 1/b1 = 6.80, midpoint = −b0/b1 = 126.9. But 126.9 is a COMMUNITY = the VILLAGE rung, not the ~25 band — so the band-scale slope is an extrapolation. Village stack validated at gain 0.3 / width 6.0; gain=1.0 tested and did NOT rescue the band gradient (+0.335→+0.374, still n.s.) ⇒ left as-is.** |
 | enable_malnutrition_fission / malnutrition_fission_gain / malnutrition_starv_rate / malnutrition_ema_alpha | **False / 0 / 0.05 / 0.3** | OPT-IN | M2: severe-scarcity fission of LARGE bands (dispersal substitutes for starvation death). Signal = per-band REALIZED starvation-rate EMA (`_band_starv_ema`), NOT `_condition` (survivor-biased, R-32). Size-gate from base floor; gain/rate UNANCHORED. Validated substitution test (R-33). §4.8.14 |
 | enable_resource_directed_fusion / fusion_search_radius | **False / 25** | OPT-IN | F: a band < merge_size joins the RICHEST (`_band_surplus`) neighbour within radius (else nearest) — starving remnants merge into well-provisioned bands (Wiessner hxaro). Off ⇒ nearest, bit-exact. §4.8.14 |
 | enable_genealogy_log | **False** (default) | OPT-IN | Stage 2: pure-observer append-only log of births/deaths (uid, mother, father, lineage, band_id, step, cred) → `dump_genealogy(path)`. Bit-exact when off/on (write-after-step). §4.8.15 |
@@ -588,10 +588,16 @@ scalar-stress logistic** (`repulsion_midpoint`) — the term that actually sets 
 | ~~band_size_min~~ | *deleted* | — | v2's 15 social floor: an artifact of the over-steep quadratic pinning every biome to the clamp. Removed in v3 (R-72) |
 | ~~cv_min~~ | *deleted* | — | v2's 0.4 data-gap band-aid; **provably inert** (0.08 and 0.40 both floored to 15). Removed in v3 (R-72) |
 
-**Known limitation (R-72):** the environmental gradient is real in direction but **weak and not significant**
-(paired corr(g\*, ON−OFF delta) = +0.335, n=18). `repulsion_gain=0.3` is UNANCHORED and too small for the CV's
-effect on the cost term to survive against assabiyah (~0.83). Anchoring it (Johnson 1982 / Alberti 2014 n²
-coordination cost) is the next step before this flag can be defaulted ON.
+**STATUS (R-72) — the environment-dependence FAILS; keep default-OFF.** Seeded biome battery (4 seeds/world,
+n=20, paired ON-vs-OFF): **corr(g\*, ON−OFF delta) = +0.165, t=0.71, NOT significant** — the gradient vanishes
+once per-world seed noise is averaged out (the 1-seed +0.335 was noise; the OFF confound reference likewise falls
++0.382 → −0.001). Anchoring `repulsion_gain` 0.3→1.0 did not help (+0.374, n.s.), and the fission threshold does
+bind (9/27 bands at/above their g\* base) — all three explanations refuted. **Structural cause:** hunting CV is
+biome-invariant, so the gradient rides solely on Cordain meat fraction (0.34–0.66) ⇒ CV 0.85–1.41 ⇒ g\* 23–38, a
+**1.66×** range that productivity/assabiyah/terrain swamp. **What R-72 does buy:** the temporal-CV fix, the
+unclamped linear law, un-pinning both hardcoded 25s, and a mean that is emergent-from-measured-data at Hill's
+25–30 (ON ≈ +2 above OFF). **What it does not:** Marlowe's 25–50 variation. Only a high-meat biome (arctic/tundra,
+m≈0.9 ⇒ g\*≈49) would give the predicted 2× room to show.
 
 ### §21.2 — Neutral-marker genome (`enable_genome`; genome.py; population genetics diagnostic)
 | Name | Value | Status | Grounding |

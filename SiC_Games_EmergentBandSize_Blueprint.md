@@ -96,10 +96,35 @@ battery (20 worlds, productivity controlled) gives corr(g\*, ON−OFF delta) = *
 and forest inverted. Cause: `repulsion_gain=0.3` (UNANCHORED) is too small for the CV's effect on the cost term
 to survive against assabiyah (~0.83).
 
-**The blueprint's success criterion is still NOT met.** "Band size varies with environment (25–50, Marlowe/Kelly)"
-remains unachieved — the *mean* is now a prediction, the *variation* is not. **NEXT:** anchor `repulsion_gain` to
-Johnson 1982 / Alberti 2014's n² coordination cost (this document already says scalar stress "should be grounded
-in Johnson's n² pairwise cost rather than a pinned midpoint" — the remaining un-done instruction), then re-run
-the battery. Do not default the flag ON before then.
+## v3 FINAL VERDICT (2026-07-16) — the environment-dependence FAILS; the blueprint's premise does not survive
+
+`repulsion_gain` was anchored as this document's last instruction demanded. **Alberti 2014** fits
+`logit P(critical scalar stress | n) = −18.636 + 0.147·n` ⇒ **gain = 1.0** (his logistic IS a probability; the
+0.3 in use is an arbitrary attenuation) and **width = 1/b1 = 6.80**. *Caveat:* his midpoint −b0/b1 = **126.9** is
+a **community** — the VILLAGE rung — not the ~25 band, so the band-scale slope extrapolates below his data.
+
+**It did not help, and three explanations died in a row (RESULTS R-72):**
+
+| test | paired corr(g\*, ON−OFF delta) |
+|---|---|
+| 1 seed/world, n=18 | +0.335 (n.s.) |
+| **anchored gain=1.0** | +0.374 (n.s.) — *"cost too weak" refuted* |
+| **4 seeds/world, n=20** | **+0.165 (n.s.) — the gradient VANISHES** |
+
+Seeding also collapses the OFF confound reference (+0.382 → **−0.001**), so the 1-seed signal was noise on both
+arms. "The fission threshold never binds" was refuted too (9/27 bands sit at/above their g\* base).
+
+**The premise fails for a structural reason.** This document assumed return-CV varies enough across environments
+to set band size. It does not: hunting CV is **biome-INVARIANT** (measured — 10 societies; forest alone spans
+1.53–4.64), so the whole gradient must ride on Cordain's meat fraction, which spans only 0.34–0.66 ⇒ CV 0.85–1.41
+⇒ **a 1.66× g\* range**. Band size is also driven by productivity, assabiyah, terrain and mating, which swamp a
+1.6× signal. **Risk-pooling predicts a 2× gradient; inside the full model it is undetectable.**
+
+**Kept as default-OFF and NOT recommended for adoption:** it replaces a hardcoded 25 with a *measured* mean
+(genuine progress: R-72's temporal CV, linear law, and the un-pinning of both 25s all stand) but buys no
+environment-dependence to pay for its complexity. **The one live route:** our six biomes have no high-meat
+environment. An arctic/tundra diet (Cordain m≈0.9) gives CV 1.80 ⇒ g\*≈49 — the top of Marlowe's range. Widening
+the biome set is the only way the predicted 2× has room to appear; without it, this blueprint's goal is
+unreachable by construction.
 
 *Blueprint 2026-07-08. Implementation tracked in RESULTS as it lands.*

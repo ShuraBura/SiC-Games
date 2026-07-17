@@ -574,10 +574,25 @@ class DemographyConfig(BaseModel):
     # cap). The midpoint is the band-scale scalar-stress onset (≈ the Wobst-minimal band); the width is Alberti's
     # logistic shape re-anchored to band scale (village-scale N≈127 → band scale — a bracket, not a fit, cf. the
     # regime °C→CC% re-anchoring). Requires enable_dynamic_bands. Default OFF ⇒ repulsion≡0, bit-exact.
+    # Johnson 1982 scalar stress as a dispersive term. **The anchor is Alberti 2014** (PLoS ONE 9(3):e91510),
+    # who fits P(critical scalar stress | community size n) by logistic regression on archaeological +
+    # ethnographic cases: `logit = b0 + b1·n` with **b0 = −18.636** (SE 3.127) and **b1 = 0.147** (SE 0.025),
+    # both p<0.001; 98% correctly classified, Somers' D 0.99. Equivalently midpoint = −b0/b1 = **126.9**
+    # (95% CI 121.9–131.9) and width = 1/b1 = **6.80**. Cross-check: p=0.99 at n=158.2 ⇒ logit 4.62 ✓.
+    #
+    # ⇒ ANCHORED VALUES: `repulsion_gain = 1.0` (Alberti's logistic IS a probability ∈ [0,1] — any gain<1
+    # arbitrarily attenuates it) and `repulsion_width = 6.80`.
+    # **CAVEAT (R-72):** Alberti's 126.9 is a COMMUNITY — i.e. the VILLAGE rung (Bar-Yosef 50–150, which
+    # `enable_settlement_scalar_stress` uses; R-63/R-64) — NOT the ~25 band. Applying his slope at band scale
+    # extrapolates below his data.
+    # **The validated village stack (`emergent_village_demog`, R-54…R-64) runs gain=0.3 + width=6.0** — i.e.
+    # a 0.3 attenuation and a rounded width. Left as-is: those results are validated at those values, and
+    # testing gain=1.0 did NOT rescue the band gradient (+0.335 → +0.374 paired, still n.s.), so re-running
+    # the village stack would buy documentation tidiness at the cost of re-validating R-54…R-64.
     enable_size_repulsion: bool = False
-    repulsion_gain: float = Field(0.0, ge=0.0)           # max repulsion (subtracted from cohesion_frac); UNANCHORED
-    repulsion_midpoint: float = Field(25.0, gt=0.0)      # band size at half-max repulsion (≈ Wobst-minimal band)
-    repulsion_width: float = Field(6.0, gt=0.0)          # logistic steepness in band-size units (Alberti shape ~6.7)
+    repulsion_gain: float = Field(0.0, ge=0.0)           # max repulsion (subtracted from cohesion_frac). ANCHORED value = 1.0 (Alberti P); village stack uses 0.3
+    repulsion_midpoint: float = Field(25.0, gt=0.0)      # band size at half-max repulsion (≈ Wobst-minimal band). Alberti's own midpoint is 126.9 = the VILLAGE rung; under enable_emergent_band_size this is replaced per-band by g*(CV)
+    repulsion_width: float = Field(6.0, gt=0.0)          # logistic steepness in band-size units. ANCHORED value = 6.80 (= 1/b1, Alberti 2014); village stack validated at 6.0
     # Resource-response redesign (blueprint …_ResourceResponse_Scoping):
     # M2 — MALNUTRITION FISSION: a band losing members to REALIZED starvation adds a DISPERSIVE term that lowers
     # tolerable_size toward band_base_tolerable → a large band breaks up (fission), the child band diffuses apart

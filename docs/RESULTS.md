@@ -1316,23 +1316,38 @@ that sets size. Deletes `band_size_min`, `cv_min`, and both 25s from the ON path
 - **Mean lands on the ethnography.** At calibrated `cv_safe=0.037`: med band 29 / mean 29.4 = Hill 2011's 25–30.
   `cv_safe` is fitted ONLY to the mean; the **CV spread 0.70→1.41 = 2.0× is a free prediction vs Marlowe's 2×**.
 
-**RESULT — what is NOT (do not over-claim):**
-- **The environmental gradient is WEAK.** Biome battery, 20 worlds, paired ON-vs-OFF (same world+seed ⇒
-  productivity controlled), 2 degenerate worlds (pop<100) excluded: **corr(g\*, ON−OFF delta) = +0.335, n=18,
-  NOT significant**. Direction is right — g\*>25 worlds gain bands (+3.62) vs g\*<25 (+0.40), mountain correctly
-  shrinks (−0.33) — but **grass and forest invert** (grass, highest CV, gains only +2.20 vs forest's +4.50).
-- **Raw across-world corr is confounded:** ON +0.445 vs **OFF +0.382** — biome CV correlates with productivity, so
-  even the hardcoded arm "predicts" band size. Only the paired analysis is informative.
-- **Why weak:** the response is damped (3.5× g\* → 1.45× band). At g\*=38 a grass band of 22 sits far left of the
-  scalar-stress midpoint ⇒ repulsion ≈0.019, vs ≈0.097 for mountain. The CV *is* differentiating the cost term,
-  but `repulsion_gain=0.3` (UNANCHORED) makes that difference tiny against assabiyah (~0.83). **The risk-pooling
-  term now reaches the right channel; that channel is a minor contributor to band size as parameterised.**
+**RESULT — what is NOT: the environment-dependence FAILS. A clean, well-powered negative.**
+The blueprint's actual success criterion ("band size varies with environment, Marlowe 25–50") is **NOT met**, and
+three successive explanations for the weakness were each falsified by measurement:
 
-**Verdict.** The mechanism is now correct-by-construction (right statistic, right law, right wiring) and causally
-demonstrated, replacing a hardcoded constant with a measured one — but it does **not** yet deliver Marlowe's
-environment-dependence. **NEXT:** anchor `repulsion_gain` (Johnson/Alberti n² coordination cost) so the cost side
-bites hard enough for the gradient to survive the competing drives; then re-run the battery. Default-OFF;
-`band-size-cv` branch; 736 pass.
+| test | paired corr(g\*, ON−OFF delta) | verdict |
+|---|---|---|
+| Biome battery, **1 seed**/world, n=18 | +0.335 (t=1.42) | n.s. |
+| Same at **anchored `repulsion_gain=1.0`** | +0.374 (t=1.61) | n.s. — *"cost side too weak" REFUTED* |
+| Biome battery, **4 seeds**/world, n=20 | **+0.165 (t=0.71)** | **n.s. — "underpowered" REFUTED; the gradient VANISHES** |
+
+- *"The cost term is swamped by assabiyah."* **Refuted:** anchoring `repulsion_gain` 0.3→1.0 (Alberti's logistic
+  IS a probability; see PARAMETERS §21.1) moved it +0.335→+0.374. Still n.s.
+- *"The fission threshold never binds."* **Refuted:** 9/27 bands sit at or above their g\* base, 6/27 at the hard
+  cap, 1/27 at the merge floor. It binds.
+- *"The battery is underpowered."* **Refuted, decisively:** seeding 4×/world *lowers* the paired r to **+0.165**.
+  The 1-seed +0.374 was noise — and so was the "productivity confound": the OFF reference falls from +0.382 to
+  **−0.001** once seeds are averaged. Low-g\* worlds gained MORE than high (+2.42 vs +1.79); ON spread 1.66× vs
+  OFF 1.60×.
+
+**Why it fails — structural, not a bug.** The per-biome CV range is only **1.66×** (0.85→1.41), because Cordain's
+meat fraction spans just 0.34–0.66 ⇒ g\* 23→38. Band size is *also* set by productivity, assabiyah, terrain and
+mating, which swamp a 1.6× signal. **Risk-pooling predicts a 2× gradient; inside a full model with competing
+drivers it is undetectable.** (Marlowe's real 25–50 likely spans a wider meat range than our six biomes: an
+arctic/tundra diet at m≈0.9 would give CV 1.80 ⇒ g\*≈49 — the top of his range. Our worlds have no such biome.)
+
+**Verdict — what R-72 DID buy.** (1) The category error is fixed and the CV is now a measured temporal statistic.
+(2) The law is unclamped and the saturation is gone (g\* 100% interior, was 0–59%). (3) The mechanism is **causal**
+(cv_safe sweep: med band 33→22 as g\* 43→17). (4) The mean is emergent-from-measured-data and lands on Hill 2011's
+25–30, with ON consistently ~+2 above OFF. **What it did NOT buy: the environmental gradient.** Keep default-OFF —
+it replaces a hardcoded 25 with a measured mean but adds no environment-dependence to justify the complexity.
+**NEXT (if resumed): widen the biome CV range — a tundra/arctic biome (m≈0.9) is the missing high end and the only
+way the predicted 2× has room to show.** `band-size-cv`; 736 pass.
 
 ---
 
