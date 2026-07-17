@@ -2064,6 +2064,89 @@ class TerrainWorld(mesa.Model):
                     heterozygosity=expected_heterozygosity(gs),
                     mean_relatedness=mean_pairwise_relatedness(gs, self._diag_rng, sample_pairs))
 
+    # ── Demographic diagnostics (R-75) ───────────────────────────────────────────────────────────
+    # A standing read-out of every demographic marker, groupable by village/band, so drift is caught
+    # rather than discovered. Motivation: R-74 spent a session chasing a "3.4× orphan excess" that turned
+    # out to be R-16's fertility-pinning — visible immediately had the orphan-exposure markers been on a
+    # dashboard next to e₀. Pure measurement: reads live state, mutates nothing, costs one pass.
+
+    #: Age-class boundaries in YEARS. child<15 = pre-menarche (`menarche_months`=180); elder≥60 follows the
+    #: Aché cause-of-death tables (Table 5.1's classes are 0–3 / 4–14 / 15–59 / 60+).
+    _AGE_CHILD_YR, _AGE_ELDER_YR = 15.0, 60.0
+
+    def _demog_markers(self, pop: list) -> dict:
+        """Markers for one group of live agents. `nan` where a denominator is empty — never a fake 0."""
+        import statistics as _st
+        n = len(pop)
+        if n == 0:
+            return {"n": 0}
+        males = [a for a in pop if a.sex == "male"]
+        females = [a for a in pop if a.sex == "female"]
+        ages = [a.age / MONTHS_PER_YEAR for a in pop]
+        child = [a for a in pop if a.age < self._AGE_CHILD_YR * MONTHS_PER_YEAR]
+        elder = [a for a in pop if a.age >= self._AGE_ELDER_YR * MONTHS_PER_YEAR]
+        adult = [a for a in pop if self._AGE_CHILD_YR * MONTHS_PER_YEAR <= a.age
+                 < self._AGE_ELDER_YR * MONTHS_PER_YEAR]
+        adult_f = [a for a in females if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR]
+        paired_f = [a for a in adult_f if getattr(a, "_partner", None) is not None]
+        wives = [len(getattr(a, "_wives", ())) for a in males
+                 if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR]
+        married_m = [w for w in wives if w > 0]
+        # Orphan EXPOSURE among the 0–9 risk set — the Hill & Hurtado Table 13.1 covariates. Agents of
+        # unknown parentage (founders) are excluded: they are not in the risk set, and counting them as
+        # non-orphans would dilute the marker toward 0 early in a run.
+        risk = [a for a in pop if a.age <= 9 * MONTHS_PER_YEAR
+                and not (getattr(a, "_mother", None) is None and getattr(a, "_father", None) is None)]
+        md = fd = dv = 0
+        for a in risk:
+            m_dead, f_dead, divorced = self._orphan_status(a)
+            md += m_dead; fd += f_dead; dv += divorced
+        nr = len(risk)
+        nan = float("nan")
+        return {
+            "n": n,
+            "n_male": len(males), "n_female": len(females),
+            "sex_ratio_m_f": (len(males) / len(females)) if females else nan,
+            "mean_age_yr": _st.mean(ages), "median_age_yr": _st.median(ages),
+            "frac_child": len(child) / n, "frac_adult": len(adult) / n, "frac_elder": len(elder) / n,
+            "dependency_ratio": (len(child) + len(elder)) / len(adult) if adult else nan,
+            "frac_paired_adult_f": (len(paired_f) / len(adult_f)) if adult_f else nan,
+            "mean_wives_married_m": (_st.mean(married_m) if married_m else nan),
+            "frac_polygynous_m": (sum(1 for w in married_m if w > 1) / len(married_m)) if married_m else nan,
+            # Table 13.1 covariates — compare against mother alive 0.98 / father alive 0.95 / divorced 0.14
+            "n_risk_0_9": nr,
+            "frac_motherless": (md / nr) if nr else nan,
+            "frac_fatherless": (fd / nr) if nr else nan,
+            "frac_parents_divorced": (dv / nr) if nr else nan,
+        }
+
+    def demography(self, by: str | None = None) -> dict:
+        """Demographic snapshot of the live population.
+
+        `by=None`     → one marker dict for the whole population.
+        `by="band"`   → {band_id: markers} (the F.3c affiliation — the social unit).
+        `by="village"`→ {site: markers} for agents inside an active settlement's catchment, plus the
+                        residual under key `None` (the mobile hinterland — NOT a village; kept visible
+                        because a village-only view hides half the population, R-69's "shock hits the
+                        hinterland while the storing village rides through").
+
+        Population STOCK only. Flow rates (CBR/CDR, deaths by cause) are per-step counters — read
+        `deaths_starv_this_step` / `deaths_senesc_this_step` / `deaths_orphan_this_step` /
+        `births_this_step`, or the per-band tallies in `_band_starv_this_step`.
+        """
+        if by is None:
+            return self._demog_markers(self.agent_list)
+        groups: dict = {}
+        if by == "band":
+            for a in self.agent_list:
+                groups.setdefault(a._group.band_id, []).append(a)
+        elif by == "village":
+            for a in self.agent_list:
+                groups.setdefault(self._nearest_settlement(a.pos), []).append(a)
+        else:
+            raise ValueError(f"demography(by=): expected None | 'band' | 'village', got {by!r}")
+        return {k: self._demog_markers(v) for k, v in groups.items()}
+
     def bands(self, radius: int | None = None) -> list[list]:
         """Public band identifier (F.2 diagnostics): the live population partitioned into spatially-connected
         BANDS — cells linked when Chebyshev-adjacent within `radius` (default = the configured bonded_mate_radius,

@@ -1491,4 +1491,49 @@ confidence diluted ⇒ investment withdrawn). That plugs straight into the exist
 
 ---
 
+## R-75 — A standing demographic dashboard, per village. Found three calibration flags on its first run — including a `divorce_rate` that means two different things (2026-07-17)
+
+**Origin:** `TerrainWorld.demography(by=None|'band'|'village')` + `tests/test_demography_diagnostics.py` +
+`outputs/phase1_biome_mortality/report_demography.py`. Branch `orphan-mortality`.
+
+**Why.** R-74 burned a session chasing a "3.4× orphan excess" that turned out to be R-16's fertility-pinning
+working correctly — **four hypotheses died** before the answer arrived (cost side too weak; threshold never binds;
+study underpowered; density-disease). All of it would have been visible at a glance with the orphan-exposure
+markers sitting next to e₀ on a per-village read-out. The model had exactly ONE diagnostic method (`bands()`).
+So: measure every marker continuously, per settlement, and let drift announce itself.
+
+**Built.** `demography()` returns population/sex/age-class/dependency/pairing/polygyny/orphan-exposure markers;
+`by='band'` or `by='village'` partitions the live population (verified exactly — no agent lost or double-counted),
+with the mobile hinterland kept visible under key `None` (R-69: the shock hits the hinterland while the storing
+village rides through, so a village-only view hides half the story). `nan` where a denominator is empty — never a
+fake 0. Agents of unknown parentage (founders) are excluded from the 0–9 orphan risk set, or the marker would
+dilute toward 0 early in a run and hide exactly the drift it exists to catch. 9 tests (7 unit on synthetic
+populations + 2 integration driving a real village world, ~8 s).
+
+**RESULT — three flags on the first run** (400 steps, coastal-temperate, full village stack, n=1014, 11
+settlements / 6 large, hinterland 264):
+
+| marker | model | anchor | |
+|---|---|---|---|
+| sex ratio M:F | 1.18 | ~1.05 (SRB 0.512) | ok |
+| **frac polygynous ♂** | **0.564** | Hadza ~4% (Marlowe); Aché monogamy-dominant | **14× high** |
+| **dependency ratio** | **1.65** | forager ~0.8 | **2× high** — but this population is GROWING (500→1014 in 33 yr); a growing population *is* young (median age 11.6, frac<15 0.58). Re-check at K before calling it a defect. |
+| **frac parents divorced** | **0.014** | Aché 0.14 (Tab. 13.1) | **10× LOW → a real bug (below)** |
+| frac motherless | 0.045 | Aché 0.02; model must EXCEED (R-74/R-16) | ok |
+
+**THE BUG — `divorce_rate` means two different things.** Documented as "per-step bond dissolution prob", it is
+per-step in `_do_pairing` (called every step) but sits INSIDE the seasonal gate in `_do_gathering`/`_do_connubium`
+(`if step_count % aggregation_period != 0: return`), so under `enable_marriage_aggregation` — i.e. the canonical
+village stack (R-64) — it fires only on gathering steps: **~12× rarer than configured**. A per-step 0.004 should
+dissolve ~35% of bonds over a 9-yr child window; measured exposure is 1.4%. This is not cosmetic: Table 13.1 gives
+divorce a **×2.97** child-mortality multiplier — the same order as losing a father (×3.05) — and R-74's orphan
+channel reads this state, so an under-firing divorce knob silently mutes a third of that mechanism. Flagged, not
+fixed (it would move validated results): `task_9804e99a`.
+
+**Verdict.** Pure measurement, mutates nothing, one pass. The dashboard paid for itself on run one. **Use
+`report_demography.py` before believing any demographic claim, and after any change that could move the
+substrate.** 758 pass.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
