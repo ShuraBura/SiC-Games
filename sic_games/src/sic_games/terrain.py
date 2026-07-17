@@ -94,11 +94,61 @@ GAME_KCAL_STD = {
 # Source: Cordain et al. 2000, AJCN 71:682–692, Table 2 (mean subsistence dependence by primary living
 # environment, n=63). Used by DemographyConfig.game_meat_frac to split the cell yield (forage + meat).
 MEAT_FRAC = {
-    BIOME_FOREST:  0.55,   # Subtropical rain forest (Aché): hunted 50.5 / (plant 40.5 + hunted 50.5)
-    BIOME_DESERT:  0.45,   # Desert grasses & shrubs (!Kung): 40.5 / (50.5 + 40.5)
-    BIOME_SAVANNA: 0.38,   # Tropical grassland (Hadza): 30.5 / (50.5 + 30.5)
-    BIOME_GRASS:   0.66,   # Temperate grasslands (steppe/plains): 60.5 / (30.5 + 60.5)
+    BIOME_FOREST:   0.55,  # Subtropical rain forest (Aché): hunted 50.5 / (plant 40.5 + hunted 50.5)
+    BIOME_DESERT:   0.45,  # Desert grasses & shrubs (!Kung): 40.5 / (50.5 + 40.5)
+    BIOME_SAVANNA:  0.38,  # Tropical grassland (Hadza): 30.5 / (50.5 + 30.5)
+    BIOME_GRASS:    0.66,  # Temperate grasslands (steppe/plains): 60.5 / (30.5 + 60.5)
+    BIOME_MOUNTAIN: 0.34,  # Temperate forest, mostly mountainous: 20.5 / (40.5 + 20.5) = 0.336
+    # WETLAND: no Cordain environment maps to it ⇒ deliberately ABSENT, not 0.0. Resource table §3.2 on the
+    # wetland/mountain game gap: "A gap, not a measured zero." A 0.0 here would assert that wetland foragers
+    # eat no meat. Consumers must handle absence explicitly (RETURN_CV → the gathering floor; see below).
 }
+
+# ── Day-to-day (TEMPORAL) return CV by food stream — the risk-pooling driver ────────────────
+# CRITICAL DISTINCTION. `FORAGE_KCAL_STD` / `GAME_KCAL_STD` above are **SPATIAL** (cross-cell)
+# spreads: they parameterise the terrain-coupled lognormal *cell-value* draw (Resource table §1.5,
+# σ²=ln(1+(std/mean)²)), and §1.6's sourcing rule ("mine the std wherever the source reports a
+# spread") is correct for that. They are NOT day-to-day variance — forest's is a spread across 7
+# species' means, desert's across 3 hunt types, wetland's a skew across ~286 habitat samples.
+# Risk-pooling asks a different question: how much variance does a band POOL AWAY by sharing?
+# That is one forager's DAY-TO-DAY acquisition variance. Hence this separate, temporal layer.
+# Full derivation + extraction arithmetic: Resource_Return_Rate_Table.md §4.
+#
+# HUNT_CV — median daily-harvest CV of 10 cross-cultural societies (~15,600 trips) from `cchunts`
+# (McElreath/Koster, GPLv3; the data behind Koster et al. 2020, Sci. Adv. 6:eaax9070), restricted to
+# directly-observed, single-day, individually-attributed, adult-male trips. `observed==1` matters:
+# most cchunts datasets are verbally *reported*, and recall bias under-reports empty-handed days.
+# **BIOME-INVARIANT — a measured negative result.** Forest alone spans 1.53–4.64; the Martu desert
+# (2.92) sits inside that range; two Baka samples (same people, same biome) give 1.91 vs 3.94.
+# Hunting variance tracks prey choice and technology, not environment, so a per-biome hunting CV is
+# NOT supportable. Aché n=14,071 → 1.97 (51.6% of hunting days return nothing); Martu n=612 → 2.92.
+# (Hawkes 1991's Hadza big game — 1 animal per 29 hunter-days → CV 5.29 — is the big-game-specialist
+# outlier; Hawkes says the Hadza "differ sharply from other low-latitude hunter-gatherers".)
+HUNT_CV = 2.11
+# GATHER_CV — Berbesque & Marlowe 2009 Table 4: Hadza female tuber 257.7 ± 182.1 kcal/hr over N=56
+# foraging bouts → 0.71 [LIT, direct bout-level SD]. Corroborated by Bird 2009 Table 1: every Martu
+# plant food has success rate **1.00** (you always find plants), kcal/bout CV 0.20–0.98.
+# All gathering variance is HOW MUCH; all hunting variance is WHETHER AT ALL.
+GATHER_CV = 0.70
+
+
+def biome_return_cv(meat_frac: float, hunt_cv: float = HUNT_CV, gather_cv: float = GATHER_CV) -> float:
+    """Day-to-day CV of one forager's total daily acquisition, for a diet `meat_frac` hunted by energy.
+
+    Gather and hunt are independent streams, so variances add: with μ_g=(1−m)·μ and μ_h=m·μ the
+    overall mean cancels and CV = √((1−m)²·cv_g² + m²·cv_h²). Because the stream CVs carry no biome
+    signal (see HUNT_CV), the ENTIRE per-biome gradient comes from the diet mix — i.e. from Cordain
+    2000's MEAT_FRAC. Meat-dependent foragers ride a high-variance stream and must pool more.
+    """
+    m = min(1.0, max(0.0, float(meat_frac)))
+    return math.sqrt((1.0 - m) ** 2 * gather_cv ** 2 + m ** 2 * hunt_cv ** 2)
+
+
+# Per-biome day-to-day return CV, derived (never hand-set) from MEAT_FRAC via `biome_return_cv`.
+# Yields CV 0.70 (wetland, pure gathering) → 1.41 (grass, 66% meat) = a **2.0× spread**, against
+# Marlowe/Kelly's observed band range 25–50 (also 2×). That spread is a PREDICTION: `cv_safe` is
+# fitted only to place the mean at Hill 2011's ~25–30, never the width.
+RETURN_CV = {b: biome_return_cv(m) for b, m in MEAT_FRAC.items()}
 
 # Fallback spread when a biome's std is NOT literature-anchored: std = DEFAULT_STD_FRAC × mean.
 # Supervisor rule (2026-06-15): "if [literature std] not available use 10% of the value as std."

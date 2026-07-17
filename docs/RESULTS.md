@@ -919,7 +919,14 @@ villages are stable CATCHMENT-ANCHORED settlements (residence pin + scalar-stres
 
 **THE EMERGENT SETTLEMENT HIERARCHY IS COMPLETE** on realistic worlds, each rung emergent-from-mechanism (not
 hardcoded) and lit-anchored:
-- **band ≈ 24** ← risk-pooling vs competition (Winterhalder/Wobst; emergent-band-size v3)
+- **band ≈ 24** ← ~~risk-pooling vs competition (Winterhalder/Wobst; emergent-band-size v3)~~
+  **[CORRECTED 2026-07-16, R-72 — this attribution was FALSE.]** The config for this run (listed below) does
+  **not** include `enable_emergent_band_size`; the flag was default-OFF and contributed nothing. The ~24 came
+  from `repulsion_midpoint = 25` — the hardcoded midpoint of the Johnson scalar-stress logistic, which is the
+  term that actually sets band size. **The number came out at 24 because it was put in at 25.** So the band was
+  the ONE rung in this list that was hardcoded, under a banner claiming none were. The other three rungs are
+  unaffected. R-72 rebuilds the mechanism and un-pins the midpoint; band size is emergent-from-mechanism only
+  from R-72 onward, and even there the environmental gradient is weak (see R-72's limitations).
 - **connubium ≈ 500** ← mate-availability under kin exogamy (Wobst; Cut 1/2, opt-in)
 - **village ≈ 50–150** ← catchment carrying capacity vs Johnson scalar stress (Bar-Yosef; R-63/R-64)
 - **stratified centers (to ~240) + ~10–16% stratified** ← surplus (ceiling − pop) → hierarchy (Testart/Carneiro/Johnson)
@@ -1254,6 +1261,78 @@ better** — release the pin and the local comparison settles it. Anchor: swidde
 (Conklin; Yanomamö ~5–10) = WITHIN one generation. Lit re-check also CONFIRMED the existing params (Boserup
 forest-fallow: crop 1–2 yr / fallow 20–25 yr ⇒ `soil_deplete_frac` 0.6/yr ≈1.6 crop-yr is RIGHT; the 10:1 ratio IS the
 system); `soil_regrow_per_yr` 0.06→0.045 (~22 yr) to sit in the band. Branch `agriculture`; all default-OFF; 723 pass.
+
+---
+
+## R-72 — Emergent band size never worked: a SPATIAL variance fed to a TEMPORAL law, and both hardcoded 25s still alive. Rebuilt on measured cross-cultural data — mechanism now causal, but the environmental gradient stays weak (2026-07-16)
+
+**Origin:** branch `band-size-cv`. MODEL_SPEC §4.8; Resource_Return_Rate_Table §4; PARAMETERS §21.1.
+
+**Context.** `enable_emergent_band_size` was never validated — PARAMETERS §21.1 headed the section with a literal
+`R-…` placeholder and no test referenced the flag. Auditing it before enabling it (the biome-comparison work needs
+Marlowe's 25–50 environment-dependence) showed it could not work, for three stacked reasons.
+
+**1. A category error in the REUSE (not the extraction).** `FORAGE_KCAL_STD`/`GAME_KCAL_STD` are **spatial**
+cross-cell spreads feeding the lognormal cell-value draw (Resource table §1.5); §1.6's sourcing rule is correct
+*for that*. `_return_cv_field()` fed them to a risk-pooling law that needs **temporal** day-to-day variance.
+Sharing cannot smooth a spread across habitat patches. Which side of the `[15,45]` clamp a biome landed on was
+decided purely by which *kind* of statistic its source reported — forest 0.73 = spread across 7 species' means;
+desert 0.29 = across 3 hunt types; wetland 2.35 = a skew across ~286 habitat samples; savanna 2.24 = the lone
+genuine temporal one (§3.2 already flagged it "for supervisor review"); grass/mountain = 10%-DEFAULT, no data.
+**A measurement artifact wearing an environmental signal's clothes** — and backwards: it made forest, the
+meat-heaviest biome, the lowest-variance/smallest-band one.
+
+**2. Both hardcoded 25s were alive.** The blueprint said remove `band_base_tolerable` AND `repulsion_midpoint`;
+v1/v2 removed neither. `repulsion_midpoint=25` is ON in `emergent_village_demog()` (`repulsion_gain=0.3`) and is
+the term that actually sets band size. **R-64's "band ≈ 24" came out at 24 because it was put in at 25** —
+RESULTS:922's "band ≈ 24 ← risk-pooling … (not hardcoded)" was FALSE and is corrected there.
+
+**3. g\* was a permission ceiling, not a force.** Measured: hilly/temperate → g\* constant 15 across all 32 bands
+(provably inert); coastal/tropical → 59% interior via biome-mixing but **corr(g\*, band size) = −0.22**. A ceiling
+cannot pull a band together, so better CV data alone would have changed nothing.
+
+**THE REBUILD.** (a) A **new temporal CV layer** (`terrain.HUNT_CV`/`GATHER_CV`/`RETURN_CV`), separate from the
+spatial stds, which stay untouched. (b) **Linear** `g*=CV/cv_safe`, no clamps — the square is a stopping rule with
+no cost side (unbounded ⇒ clamps ⇒ saturation); linear falls out of benefit-vs-cost (pooled variance σ²/n vs
+crowding ∝ n ⇒ n\* ∝ CV). (c) **`repulsion_midpoint` per-band = g\*(CV)** — the CV finally reaches the cost term
+that sets size. Deletes `band_size_min`, `cv_min`, and both 25s from the ON path.
+
+**THE ANCHORS — measured, not assumed** (Resource table §4; data archived at `literature/cchunts/`):
+- **`HUNT_CV = 2.11`** — median of 10 societies / ~15,600 trips from `cchunts` (McElreath/Koster; Koster et al.
+  2020 Sci. Adv.), directly-observed single-day individually-attributed adult-male trips. Aché n=14,071 → **1.97**
+  (51.6% of hunting days return nothing); Martu n=612 → 2.92.
+- **`GATHER_CV = 0.70`** — Berbesque & Marlowe 2009 Tab. 4, Hadza tuber 257.7±182.1 over N=56 bouts. Bird 2009
+  Tab. 1: every Martu plant food has **success rate 1.00**. *All gathering variance is HOW MUCH; all hunting
+  variance is WHETHER AT ALL.*
+- **NEGATIVE — hunting CV is BIOME-INVARIANT.** Forest alone spans 1.53–4.64; Martu desert (2.92) sits inside it;
+  two Baka samples (same people, same biome) give 1.91 vs 3.94. It tracks prey choice/technology, not environment.
+  **This falsifies deriving prey size per biome** and forces the gradient onto the diet mix (Cordain MEAT_FRAC) —
+  which is the only reason the design works at all.
+
+**RESULT — what IS demonstrated:**
+- **Saturation gone.** g\* 100% interior on both probe worlds (was 0% and 59%).
+- **CAUSAL** (the clean test — same world, same seed, sweep `cv_safe`): med band **33→29→24→22** as g\* falls
+  **43→33→24→17**. The CV now moves realized band size; v1/v2 could not.
+- **Mean lands on the ethnography.** At calibrated `cv_safe=0.037`: med band 29 / mean 29.4 = Hill 2011's 25–30.
+  `cv_safe` is fitted ONLY to the mean; the **CV spread 0.70→1.41 = 2.0× is a free prediction vs Marlowe's 2×**.
+
+**RESULT — what is NOT (do not over-claim):**
+- **The environmental gradient is WEAK.** Biome battery, 20 worlds, paired ON-vs-OFF (same world+seed ⇒
+  productivity controlled), 2 degenerate worlds (pop<100) excluded: **corr(g\*, ON−OFF delta) = +0.335, n=18,
+  NOT significant**. Direction is right — g\*>25 worlds gain bands (+3.62) vs g\*<25 (+0.40), mountain correctly
+  shrinks (−0.33) — but **grass and forest invert** (grass, highest CV, gains only +2.20 vs forest's +4.50).
+- **Raw across-world corr is confounded:** ON +0.445 vs **OFF +0.382** — biome CV correlates with productivity, so
+  even the hardcoded arm "predicts" band size. Only the paired analysis is informative.
+- **Why weak:** the response is damped (3.5× g\* → 1.45× band). At g\*=38 a grass band of 22 sits far left of the
+  scalar-stress midpoint ⇒ repulsion ≈0.019, vs ≈0.097 for mountain. The CV *is* differentiating the cost term,
+  but `repulsion_gain=0.3` (UNANCHORED) makes that difference tiny against assabiyah (~0.83). **The risk-pooling
+  term now reaches the right channel; that channel is a minor contributor to band size as parameterised.**
+
+**Verdict.** The mechanism is now correct-by-construction (right statistic, right law, right wiring) and causally
+demonstrated, replacing a hardcoded constant with a measured one — but it does **not** yet deliver Marlowe's
+environment-dependence. **NEXT:** anchor `repulsion_gain` (Johnson/Alberti n² coordination cost) so the cost side
+bites hard enough for the gradient to survive the competing drives; then re-run the battery. Default-OFF;
+`band-size-cv` branch; 736 pass.
 
 ---
 

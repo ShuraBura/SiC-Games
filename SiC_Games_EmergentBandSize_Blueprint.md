@@ -64,4 +64,42 @@ Added: (1) **social floor** `band_size_min = 15` (Hill 2011 min observed co-resi
 
 **Result (800 agents, 3 climates):** median band **19–22** (was v1's 8–26 bimodal; the low-variance under-prediction 8→19 is fixed), within the empirical 15–50 range, near the ~25 mean, and EMERGENT (floor + variance) not pinned. Structure: the **median tracks the lit-anchored floor** (~15, most cells modest-variance), while size **rises with local return variance in the tail** (big bands 45–82 in high-variance patches) — `cv_safe` moves the tail, `band_size_min` the floor. Deliberately NOT cranking the floor to 20 to force exactly 25 (that re-hardcodes). Median sits slightly below 25 because the flat test worlds are low-variance; richer/more-variable environments push it up. Default OFF, bit-exact. **Verdict: band size is now emergent (grounded floor + variance-driven variation), a real replacement for the hardcoded 25.**
 
+## v3 DONE (2026-07-16, branch `band-size-cv`; RESULTS **R-72**) — v2's verdict RETRACTED
+
+**v2's "band size is now emergent" verdict was WRONG.** Auditing before enabling the flag showed the mechanism
+could not work. v1's own result section had already named two of the three causes ("the quadratic is over-steep
+(bimodal 5/45)"; "grass/mountain variances are 10%-DEFAULT placeholders") and listed the fixes as v2 to-dos —
+**v2 did neither**, adding the `band_size_min` floor and the `cv_min` band-aid, which patch the *symptom*. v3 is
+that deferred work, plus a third cause nobody had spotted:
+
+1. **Category error in the REUSE.** `FORAGE/GAME_KCAL_STD` are **SPATIAL** cross-cell spreads (they feed the
+   lognormal cell-value draw, Resource table §1.5); the risk-pooling law needs **TEMPORAL** day-to-day variance.
+   Sharing cannot smooth a spread across habitat patches. The §2/§3 extraction is fine — the reuse was not.
+   Which side of the clamp a biome hit was set by which *kind* of statistic its source happened to report.
+2. **The blueprint's own instruction was never carried out.** This document says remove `band_base_tolerable`
+   **and `repulsion_midpoint`** (the two hardcoded 25s). v1/v2 removed neither. `repulsion_midpoint=25` is the
+   term that ACTUALLY sets band size — so **R-64's "band ≈ 24" came out at 24 because it was put in at 25.**
+3. **g\* was a ceiling, not a force** — measured corr(g\*, band size) = **−0.22**. A permission to be big cannot
+   pull a band together, so fixing the data alone would have changed nothing.
+
+**v3:** new temporal CV layer (`terrain.HUNT_CV=2.11` / `GATHER_CV=0.70` / `RETURN_CV`, all measured — see
+Resource table §4); **linear** `g*=CV/cv_safe`, no clamps (the square is a stopping rule with no cost side, hence
+unbounded, hence the clamps, hence saturation; linear falls out of benefit-vs-cost ⇒ n\* ∝ CV); and
+**`repulsion_midpoint` per-band = g\*(CV)** so the CV drives the cost side. Deletes `band_size_min`, `cv_min`,
+both 25s. **Falsified en route:** hunting CV is biome-INVARIANT (10 societies, forest alone spans 1.53–4.64), so
+the entire gradient must come from the diet mix (Cordain MEAT_FRAC) — a per-biome hunting CV is not supportable.
+
+**Result — HONEST.** Saturation gone (100% interior, was 0–59%); **causal** (same world+seed, sweeping cv_safe:
+med band 33→22 as g\* 43→17 — v1/v2 could not do this); mean lands on Hill 2011's 25–30 (med 29) with the 2.0×
+CV spread a *free* prediction against Marlowe's 2×. **BUT the environmental gradient is weak**: paired biome
+battery (20 worlds, productivity controlled) gives corr(g\*, ON−OFF delta) = **+0.335, n=18, n.s.**, with grass
+and forest inverted. Cause: `repulsion_gain=0.3` (UNANCHORED) is too small for the CV's effect on the cost term
+to survive against assabiyah (~0.83).
+
+**The blueprint's success criterion is still NOT met.** "Band size varies with environment (25–50, Marlowe/Kelly)"
+remains unachieved — the *mean* is now a prediction, the *variation* is not. **NEXT:** anchor `repulsion_gain` to
+Johnson 1982 / Alberti 2014's n² coordination cost (this document already says scalar stress "should be grounded
+in Johnson's n² pairwise cost rather than a pinned midpoint" — the remaining un-done instruction), then re-run
+the battery. Do not default the flag ON before then.
+
 *Blueprint 2026-07-08. Implementation tracked in RESULTS as it lands.*

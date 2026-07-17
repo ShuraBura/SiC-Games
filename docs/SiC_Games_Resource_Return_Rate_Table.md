@@ -127,7 +127,112 @@ Intertidal shellfishing is **forage**, not game — anchored as `SHORE_BONUS_KCA
 
 ---
 
-## §4 Combined source list
+## §4 Day-to-day (TEMPORAL) return CV — `terrain.HUNT_CV` / `GATHER_CV` / `RETURN_CV`
+
+**Role:** the variance a band **pools away by sharing**. Feeds the emergent-band-size risk-pooling optimum
+`g* = CV/cv_safe` (PARAMETERS §21.1; RESULTS R-72). Added 2026-07-16.
+
+### §4.1 Why this is a SEPARATE quantity from §2/§3's std (the v1/v2 bug)
+`FORAGE_KCAL_STD` / `GAME_KCAL_STD` are **SPATIAL** — cross-cell spreads parameterising the terrain-coupled
+lognormal *cell-value* draw (§1.5). §1.6's sourcing rule ("mine the std where the source reports a spread")
+is **correct for that purpose**, and those values stand unchanged.
+
+Risk-pooling asks a different question: *how much of one forager's DAY-TO-DAY luck does the group average
+away?* Sharing cannot smooth a spread across habitat patches; it smooths the variance between a hunter's
+good day and his empty day. Emergent-band-size v1/v2 fed the spatial field to a temporal law — a category
+error in the **reuse**, not in the §2/§3 extraction. It produced incoherent CVs, because each biome's std
+measures a different thing:
+
+| biome | §2/§3 std is a spread across… | CV | kind |
+|---|---|---|---|
+| Forest | 7 species' post-encounter **means** (§3.3) | 0.73 | spatial/between-category |
+| Desert | 3 hunt types' **rates** | 0.29 | spatial/between-category |
+| Wetland | ~286 habitat samples (mean-vs-median skew) | 2.35 | spatial |
+| Savanna | Hawkes small-game **income/day** | 2.24 | **temporal** (the lone exception; §3.2 already flagged it "for supervisor review") |
+| Grass, Mountain | *(no data → 10%-DEFAULT)* | 0.08–0.10 | none |
+
+Which side of the old `[15,45]` clamp a biome landed on was decided entirely by which *kind* of statistic its
+source happened to report. That is a measurement artifact, not an environmental signal.
+
+### §4.2 `HUNT_CV = 2.11` [LIT, measured — cross-cultural]
+**Source:** `cchunts` (McElreath & Koster, GPLv3; archived at `literature/cchunts/`) — the per-trip data behind
+**Koster et al. 2020**, *Sci. Adv.* 6:eaax9070, "The life history of human foraging". Per-trip harvests in kg
+**including zero-return trips**. Extraction: `sic_games/outputs/climate_viz/extract_cchunts_cv.py`.
+
+**Filter (each clause load-bearing):** `observed==1` — most cchunts datasets are *verbally reported*, and recall
+bias under-reports empty-handed days, deflating the failure rate; `day_trip==1` — the statistic is per *day*;
+`pooled==0` — individual attribution, not a group total; `sex=='M'`; adults (`age_dist_1 ≥ 18` where exact).
+
+**Result — 10 societies, ~15,600 trips. Median daily-harvest CV = 2.11** (mean 2.61, range 1.53–4.64):
+
+| people | biome | n | fail% | kg/day | CV |
+|---|---|---|---|---|---|
+| Piro (Peru) | trop forest | 93 | 34.4% | 8.31 | 1.53 |
+| Punan (Indonesia) | trop rain forest | 123 | 66.7% | 20.32 | 1.81 |
+| Baka (Cameroon) | trop rain forest | 144 | 31.9% | 4.06 | 1.91 |
+| **Aché (Paraguay)** | **forest** | **14,071** | **51.6%** | **3.26** | **1.97** |
+| Tsimane (Bolivia) | trop forest | 107 | 39.3% | 8.74 | 2.05 |
+| Punan (Indonesia) | trop rain forest | 95 | 68.4% | 17.57 | 2.17 |
+| **Martu (Australia)** | **desert** | **612** | **49.2%** | **2.31** | **2.92** |
+| Tsimane (Bolivia) | trop forest | 105 | 23.8% | 11.44 | 3.12 |
+| Baka (Cameroon) | trop rain forest | 51 | 27.5% | 17.34 | 3.94 |
+| Wola (PNG) | montane forest | 218 | 78.0% | 0.05 | 4.64 |
+
+**BIOME-INVARIANT — a measured negative result.** Forest alone spans 1.53–4.64; the Martu desert (2.92) sits
+inside that range; two Baka samples (same people, same biome) give 1.91 vs 3.94. Hunting variance tracks prey
+choice and technology, not environment ⇒ **a per-biome hunting CV is not supportable**, and the per-biome
+gradient must come from the diet mix (§4.4) instead.
+
+*Corroboration, independent of cchunts.* Daily CV from a Bernoulli failure structure is `√((1−p)/p)`:
+Bird 2009 Table 1 (Martu) — hill kangaroo 79% fail → 1.94; bustard 56% fail → 1.13; and Hawkes 1991 p.244
+(Hadza) — small game 14 animals/75 hunter-days → 2.09. All three bracket 2.11.
+
+*The Hadza big-game outlier.* Hawkes 1991 p.244: "the Hadza took **one large animal every 29 hunter-days**"
+→ p=0.034 → CV **5.29**. NOT used as the generic anchor: Hawkes states the Hadza take big game "to the virtual
+exclusion of small-bodied prey" and that this "differs sharply from that of other low-latitude hunter-gatherers."
+It is the documented extreme, consistent with the cchunts max (4.64), not the central case.
+
+### §4.3 `GATHER_CV = 0.70` [LIT, direct bout-level SD]
+**Berbesque & Marlowe 2009, Table 4** (read via image render — the table has no text layer): Hadza **female
+tuber 257.7 ± 182.1 kcal/hr, N=56 foraging bouts** → 182.1/257.7 = **0.707**. `N` is bouts, so the SD is
+bout-to-bout — the temporal statistic. Same table, other plant foods: baobab 0.85 (♀) / 0.95 (♂), berry 1.09.
+
+*Corroboration.* Bird 2009 Table 1: **every** Martu plant food has **success rate = 1.00** (bulb, desert raisin,
+grub, bush tomato, root, grass seed, nectar, tree seed), kcal/bout CV 0.20–0.98. **All gathering variance is
+HOW MUCH; all hunting variance is WHETHER AT ALL** — which is why sharing targets meat (Kaplan & Hill 1985;
+Hill 1987 p.13: "daily variance in calories acquired is much higher for hunting than it is for gathering").
+
+### §4.4 `RETURN_CV` — per-biome, derived from the diet mix
+Gather and hunt are independent streams ⇒ variances add. With `μ_g=(1−m)·μ`, `μ_h=m·μ` the mean cancels:
+
+> **CV(m) = √( (1−m)²·GATHER_CV² + m²·HUNT_CV² )**,  `m` = `MEAT_FRAC` (Cordain 2000 Table 2, §4.5.5)
+
+Because the stream CVs carry no biome signal (§4.2), **the entire per-biome gradient comes from the diet mix**:
+meat-dependent foragers ride the high-variance stream and must pool more. Derived in code
+(`terrain.biome_return_cv`), never hand-set.
+
+| biome | Cordain environment | `m` | CV | `g*` at cv_safe=0.037 |
+|---|---|---|---|---|
+| Wetland | *(no Cordain analog → **absent**)* | — | **0.70** (GATHER_CV fallback) | 18.9 |
+| Mountain | Temperate forest, mostly mountainous | 0.34 | 0.853 | 23.1 |
+| Savanna | Tropical grassland (Hadza) | 0.38 | 0.912 | 24.6 |
+| Desert | Desert grasses & shrubs (!Kung) | 0.45 | 1.025 | 27.7 |
+| Forest | Subtropical rain forest (Aché) | 0.55 | 1.202 | 32.5 |
+| Grass | Temperate grasslands (steppe/plains) | 0.66 | 1.413 | 38.2 |
+
+**MOUNTAIN 0.34** is new: Cordain Table 2's "Temperate forest, mostly mountainous" = 20.5/(40.5+20.5) = 0.336,
+an anchor the original lift missed. **WETLAND is deliberately ABSENT from `MEAT_FRAC`, not 0.0** — per §3.2's
+own warning about the wetland/mountain game gap ("*A gap, not a measured zero*"), a 0.0 would assert that
+wetland foragers eat no meat. `_return_cv_field` falls back to `GATHER_CV` for unanchored biomes: a conservative
+choice (no manufactured pooling incentive), flagged as a fallback rather than a measurement.
+
+**Calibration + prediction.** Mean CV 1.017; `cv_safe` = 1.017/27.5 = **0.037**, fitted ONLY to place the mean
+band at Hill 2011's ~25–30. The **spread is then a free prediction: 0.70→1.41 = 2.0×, against Marlowe/Kelly's
+observed band range 25–50 (also 2×)**, with every biome inside Hill 2011's observed 15–50.
+
+---
+
+## §5 Combined source list
 
 | Source | Layer / role | Tag |
 |---|---|---|

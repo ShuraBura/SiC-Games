@@ -572,13 +572,26 @@ The complete emergent chain (each rung a prediction from a mechanism, lit-anchor
 connubium ≈500 (mate-availability) → village 50–150 (catchment vs Johnson scalar stress) → stratified centers (surplus
 → hierarchy). Verification dates + exact source locations: `VERIFICATION_LOG.md`.
 
-### §21.1 — Emergent band size v3 (`enable_emergent_band_size`; R-…; SiC_Games_EmergentBandSize_Blueprint.md)
+### §21.1 — Emergent band size v3 (`enable_emergent_band_size`; **R-72**; SiC_Games_EmergentBandSize_Blueprint.md)
+Band size = argmax{risk-pooling − competition}. `g* = CV/cv_safe` (**linear, unclamped**) where CV is the local
+**day-to-day** return CV (`terrain.RETURN_CV` — a TEMPORAL field; extraction + arithmetic in
+Resource_Return_Rate_Table **§4**). g\* both floors the fission threshold and, per band, **centres the
+scalar-stress logistic** (`repulsion_midpoint`) — the term that actually sets band size.
+
 | Name | Value | Status | Grounding |
 |---|---|---|---|
-| enable_emergent_band_size | False | opt-in | risk-pooling optimum g\*(CV)=clamp((CV/cv_safe)²,min,split) drives BOTH fission ceiling AND movement aggregation |
-| cv_safe | **0.14** | DESIGN | the connubium's `cv_safe` analog — safety margin on return CV; sweeps the tail |
-| band_size_min | **15** | ANCHORED | Hill 2011 min observed co-residential group (social floor) |
-| cv_min | **0.4** | DESIGN | CV floor (grass/mountain 10%-default SD data gap) |
+| enable_emergent_band_size | False | opt-in | default-OFF ⇒ bit-exact (falls back to `band_base_tolerable`=25 and `repulsion_midpoint`=25) |
+| cv_safe | **0.037** | CALIBRATED | the ONE fitted scale (composite of risk-aversion × crowding cost, neither independently anchored). Fitted ONLY to place the MEAN band at Hill 2011's ~25–30: mean RETURN_CV 1.017 / 27.5. The **spread is NOT fitted** — it is predicted at 2.0× vs Marlowe/Kelly's observed 25–50 (also 2×) |
+| terrain.HUNT_CV | **2.11** | LIT (measured) | median daily-harvest CV, 10 societies / ~15,600 observed trips (`cchunts`; Koster et al. 2020 Sci. Adv.). **Biome-invariant** — forest spans 1.53–4.64, Martu desert 2.92 sits inside it. Resource table §4.2 |
+| terrain.GATHER_CV | **0.70** | LIT (direct SD) | Berbesque & Marlowe 2009 Tab. 4, Hadza tuber 257.7±182.1, N=56 bouts. Bird 2009 Tab. 1: all plant foods success rate 1.00. Resource table §4.3 |
+| terrain.MEAT_FRAC[MOUNTAIN] | **0.34** | LIT | Cordain 2000 Tab. 2 "Temperate forest, mostly mountainous" 20.5/(40.5+20.5) — anchor the original lift missed |
+| ~~band_size_min~~ | *deleted* | — | v2's 15 social floor: an artifact of the over-steep quadratic pinning every biome to the clamp. Removed in v3 (R-72) |
+| ~~cv_min~~ | *deleted* | — | v2's 0.4 data-gap band-aid; **provably inert** (0.08 and 0.40 both floored to 15). Removed in v3 (R-72) |
+
+**Known limitation (R-72):** the environmental gradient is real in direction but **weak and not significant**
+(paired corr(g\*, ON−OFF delta) = +0.335, n=18). `repulsion_gain=0.3` is UNANCHORED and too small for the CV's
+effect on the cost term to survive against assabiyah (~0.83). Anchoring it (Johnson 1982 / Alberti 2014 n²
+coordination cost) is the next step before this flag can be defaulted ON.
 
 ### §21.2 — Neutral-marker genome (`enable_genome`; genome.py; population genetics diagnostic)
 | Name | Value | Status | Grounding |

@@ -511,20 +511,30 @@ class DemographyConfig(BaseModel):
     band_cohesion: float = Field(0.0, ge=0.0)             # cohesion-drive strength (pull toward band centroid); 0 = off
     band_split_size: int = Field(45, ge=2)               # band fissions above this (upper "community" rung / HARD cap)
     band_merge_size: int = Field(10, ge=1)               # band fuses into the nearest band below this (hysteresis vs split)
-    # EMERGENT BAND SIZE (blueprint …_EmergentBandSize): the fission-threshold FLOOR is not the hardcoded
-    # band_base_tolerable=25 but the RISK-POOLING optimum g* = (CV/cv_safe)² — the group needed to pool the local
-    # foraging-return variance (per-biome CV from the Return-Rate Tables) down to a safe residual cv_safe. Higher-CV
-    # biomes (hunting/wetland) → bigger emergent bands; low-CV (forest gathering) → smaller. Predicts mean ~25 AND
-    # environment-dependence (Marlowe 25–50). Clamped [band_size_min, band_split_size]. Default OFF ⇒ hardcoded 25.
+    # EMERGENT BAND SIZE v3 (blueprint …_EmergentBandSize; R-72). Band size = the argmax of
+    # {risk-pooling − competition}, per the blueprint's original spec. Two coupled changes vs v1/v2:
+    #
+    # (1) LINEAR law, no clamps: g* = CV/cv_safe, where CV is the local DAY-TO-DAY return CV
+    #     (terrain.RETURN_CV — a temporal field, NOT the spatial FORAGE/GAME_KCAL_STD; see terrain.py).
+    #     v1/v2 used g*=(CV/cv_safe)², which is a *stopping rule with no cost side* ("pool until residual
+    #     CV hits a threshold") — unbounded in CV, hence the clamps, hence saturation at 15/45 with nothing
+    #     in between. The linear form falls out of benefit-vs-cost: pooled variance falls as σ²/n while
+    #     crowding cost rises with n, so the optimum is n* ∝ CV. It needs no clamps, and a 2× CV spread
+    #     gives a 2× band spread — which is what the ethnography shows (Marlowe/Kelly 25–50).
+    # (2) The CV drives the COST side. v1/v2 only lowered the fission *ceiling*, i.e. a permission to be
+    #     big — measured corr(g*, band size) = −0.22, no gradient, because a ceiling cannot pull a band
+    #     together. `repulsion_midpoint` (Johnson scalar stress) is the term that actually sets band size,
+    #     and it was still hardcoded at 25 — which is why R-64's "band ≈ 24" came out at 24. It is now
+    #     per-band = g*(CV), so a high-variance band tolerates crowding longer before scalar stress bites.
+    #
+    # This deletes band_size_min, cv_min, and the two hardcoded 25s from the ON path (band_base_tolerable
+    # and repulsion_midpoint survive only as the default-OFF values ⇒ bit-exact back-compat).
     enable_emergent_band_size: bool = False
-    cv_safe: float = Field(0.14, gt=0.0)                 # residual per-capita CV the band pools variance down to (sets the scale; ~25 at CV≈0.7) [UNANCHORED — bracket]
-    # v2 SOCIAL FLOOR: band size = max(risk-pooling optimum, band_size_min). The ~25 is OVERDETERMINED — risk-pooling
-    # gives the environmental gradient (variance→size), but the FLOOR comes from the non-foraging drivers (min viable
-    # co-residential + mating + demographic-buffering unit). band_size_min anchored to Hill 2011 observed minimum
-    # co-residential group (~15; groups range ~15–50, mean ~25–30). cv_min corrects data-gap biomes (grass/mountain
-    # use 10%-default SD → unrealistically low CV; real foraging returns have CV ≳0.4, Kaplan/Hill).
-    band_size_min: int = Field(15, ge=1)                 # min viable co-residential/mating/demographic unit [LIT-anchored, Hill 2011]
-    cv_min: float = Field(0.4, ge=0.0)                   # floor on the per-biome return CV (corrects 10%-default data gaps; foraging is never CV≈0.1)
+    # cv_safe: the ONE fitted scale. Composite of risk-aversion and per-capita crowding cost, neither
+    # independently anchored, so it is calibrated — but ONLY to place the MEAN band at Hill 2011's ~25–30
+    # (mean RETURN_CV 1.017 / 27.5 = 0.037), never the spread. Predicted g*: wetland 19, mountain 23,
+    # savanna 25, desert 28, forest 33, grass 38 (mean 27.5, spread 2.0× = Marlowe's 25–50). [CALIBRATED]
+    cv_safe: float = Field(0.037, gt=0.0)
     # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
     # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
     # base)·assabiyah — so a rich, high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base.

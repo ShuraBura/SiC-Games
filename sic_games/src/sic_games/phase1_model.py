@@ -710,40 +710,37 @@ class TerrainWorld(mesa.Model):
         return self._site_cache
 
     def _return_cv_field(self):
-        """Emergent-band-size: per-cell foraging-return CV = σ/μ of the total (forage+game) return, from the per-biome
-        Return-Rate Tables (FORAGE/GAME_KCAL TARGETS+STD). Drives the risk-pooling optimum band g*=(CV/cv_safe)². Cached."""
+        """Emergent-band-size v3: per-cell **DAY-TO-DAY** return CV — the variance a band pools away by sharing.
+
+        Sourced from `terrain.RETURN_CV` (derived from Cordain 2000 MEAT_FRAC via the two measured stream CVs;
+        see terrain.py). Deliberately NOT from FORAGE/GAME_KCAL_STD: those are **spatial** (cross-cell) spreads
+        feeding the lognormal cell-value draw — reusing them here was a category error (v1/v2), since a spread
+        across 7 species' means says nothing about one forager's day-to-day luck. Cached."""
         if self._cv_cache is None:
-            from sic_games.terrain import (FORAGE_KCAL_TARGETS, FORAGE_KCAL_STD, GAME_KCAL_TARGETS, GAME_KCAL_STD,
-                                           DEFAULT_STD_FRAC)
+            from sic_games.terrain import RETURN_CV, GATHER_CV
             biome = getattr(self._fields, "biome", None)
             if biome is None:
                 return None
             import numpy as np
-            cv = np.full(biome.shape, 0.5, dtype=float)
+            # Biomes absent from RETURN_CV have no diet anchor ⇒ fall back to pure gathering (the low-variance
+            # floor), never to a made-up middle: an unanchored biome should not manufacture a pooling incentive.
+            cv = np.full(biome.shape, float(GATHER_CV), dtype=float)
             for code in np.unique(biome):
-                fm = FORAGE_KCAL_TARGETS.get(int(code), 0.0); fs = FORAGE_KCAL_STD.get(int(code), DEFAULT_STD_FRAC * fm)
-                gm = GAME_KCAL_TARGETS.get(int(code), 0.0); gs = GAME_KCAL_STD.get(int(code), DEFAULT_STD_FRAC * gm)
-                tot_m = fm + gm
-                if tot_m > 0:
-                    cv[biome == code] = math.sqrt(fs * fs + gs * gs) / tot_m   # combined return CV (independent forage+game)
-            cv_min = getattr(self._demog, "cv_min", 0.0)                       # v2: floor the CV (correct 10%-default data gaps)
-            if cv_min > 0.0:
-                np.maximum(cv, cv_min, out=cv)
+                c = RETURN_CV.get(int(code))
+                if c is not None:
+                    cv[biome == code] = float(c)
             self._cv_cache = cv
         return self._cv_cache
 
     def _band_optimum_field(self):
-        """Emergent-band-size v3: per-cell risk-pooling optimum band g* = clamp((CV/cv_safe)², band_size_min,
-        band_split_size). Used as the group_safety AGGREGATION saturation scale in movement (so agents cluster UP TO
-        g* — high-variance biomes grow bigger bands) AND as the fission-threshold floor. Cached. None if no CV field."""
+        """Emergent-band-size v3: per-cell risk-pooling optimum g* = CV/cv_safe (LINEAR, unclamped — see
+        DemographyConfig). Used as the group_safety AGGREGATION scale in movement (agents cluster up to g*)
+        and, per band, as the scalar-stress midpoint + fission-threshold base. Cached. None if no CV field."""
         if self._band_opt_cache is None:
             cv = self._return_cv_field()
             if cv is None:
                 return None
-            import numpy as np
-            cfg = self._demog
-            g = (cv / cfg.cv_safe) ** 2
-            self._band_opt_cache = np.clip(g, float(cfg.band_size_min), float(cfg.band_split_size))
+            self._band_opt_cache = cv / self._demog.cv_safe
         return self._band_opt_cache
 
     def _storable_frac_field(self):
@@ -2458,9 +2455,22 @@ class TerrainWorld(mesa.Model):
                     leader_term = leader_gain * weight * leader_strength
                 new_leader[bid] = leader_term
 
+                # EMERGENT BAND SIZE v3: the risk-pooling optimum for THIS band's local return variance.
+                # g* = mean-cell-CV / cv_safe (linear, unclamped). It is the band's tolerable-size SCALE:
+                # it centres the scalar-stress logistic (below) and floors the fission threshold.
+                g_star = None
+                if cvf is not None and ms:
+                    mean_cv = sum(float(cvf[a.pos[1], a.pos[0]]) for a in ms) / len(ms)
+                    g_star = mean_cv / cfg.cv_safe
+
                 repulsion = 0.0
                 if repulsion_on and rep_gain > 0.0:
-                    repulsion = size_repulsion(len(ms), rep_gain, rep_mid, rep_width, society)
+                    # THE fix: Johnson scalar stress is centred on g*, not a hardcoded 25. A band living on
+                    # high-variance returns has more to gain from pooling, so it tolerates crowding to a larger
+                    # size before the coordination cost bites — which is how the CV finally reaches the term
+                    # that actually SETS band size (v1/v2 only raised a ceiling; corr(g*,size) was −0.22).
+                    repulsion = size_repulsion(len(ms), rep_gain, g_star if g_star is not None else rep_mid,
+                                               rep_width, society)
                 new_repulsion[bid] = repulsion
 
                 # M2: update the band's per-capita starvation-rate EMA (this step's starvation deaths / pre-death
@@ -2480,12 +2490,10 @@ class TerrainWorld(mesa.Model):
                 # tolerable below base_tolerable (the Wobst floor) — so malnutrition fissions ONLY bands > base
                 # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
                 cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
-                base_b = base
-                if cvf is not None and ms:                          # emergent floor = risk-pooling optimum from band CV
-                    mean_cv = sum(float(cvf[a.pos[1], a.pos[0]]) for a in ms) / len(ms)
-                    g_star = (mean_cv / cfg.cv_safe) ** 2
-                    base_b = min(max(g_star, float(cfg.band_size_min)), float(cap))
-                split_thr[bid] = base_b + (cap - base_b) * cohesion_frac
+                base_b = g_star if g_star is not None else base      # emergent base = the risk-pooling optimum
+                # `max(0, ...)`: guards the degenerate case g* > cap (a mis-set cv_safe) from inverting the
+                # headroom's sign. It is NOT a clamp on g* — with the anchored RETURN_CV, g* spans 19–38 < cap.
+                split_thr[bid] = base_b + max(0.0, cap - base_b) * cohesion_frac
                 # Stage 1 SUPRA-BAND SCALING: net payoff ABOVE saturation (unclamped − 1) adds village headroom beyond
                 # the hard cap (Johnson: hierarchy+payoff overcome scalar stress). Since a_new≤1, net>1 REQUIRES the
                 # leader term ⇒ villages need hierarchy. Off ⇒ no headroom ⇒ hard cap, bit-exact.
