@@ -296,6 +296,8 @@ class TerrainWorld(mesa.Model):
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
+        self._orphan_e_cache = None                               # R-74: endogenous E[mult] divisor (per-step cache)
+        self._orphan_e_step = -1
         self._cv_cache = None                                     # emergent-band-size: per-cell foraging-return CV (biome σ/μ) for risk-pooling optimum
         self._band_opt_cache = None                               # emergent-band-size v3: per-cell risk-pooling optimum band g*(CV) — drives movement aggregation
         self._connubium_sizes: list[int] = []                     # CONNUBIUM diag: distinct-adult size of each mating pool that produced ≥1 marriage (last pairing phase)
@@ -471,6 +473,7 @@ class TerrainWorld(mesa.Model):
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0
         self.deaths_orphan_this_step = 0              # R-74 diag: deaths carrying an elevated kin/orphan hazard
+        self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
         self.starv_status_this_step: list[float] = []  # diagnostic: combined status (cred·prowess) at starvation
@@ -757,8 +760,47 @@ class TerrainWorld(mesa.Model):
         if divorced:
             mult *= cfg.orphan_mult_divorced
         if cfg.orphan_normalize:
-            mult /= cfg.orphan_e_mult
+            mult /= self._orphan_e_mult_live()
         return mult
+
+    def _orphan_e_mult_live(self) -> float:
+        """E[mult] over THIS population's own children — the double-count divisor, computed ENDOGENOUSLY
+        once per step and cached.
+
+        Why not the fixed Aché constant (Table 13.1's 0.98/0.95/0.14 ⇒ 1.499)? Because this model is
+        **fertility-pinned** (R-16): held at r=0 its equilibrium e₀ is ~28, not the Aché's 36.5 — the Aché
+        had TFR≈8 AND e₀≈36.5, i.e. NRR>1, a GROWING population. A stationary population must therefore
+        orphan MORE children (measured: ~10% motherless vs the Aché's ~2% exposure, and the analytic
+        confirms it — a2_mult≈3 ⇒ 10.7%). Dividing by a constant fitted to a growing population's orphan
+        rate would hand every intact child an unearned discount (or, here, a net penalty) and move eq_pop
+        by tens of percent — measured −47% before this fix.
+        Normalising by the population's OWN mean makes the channel exactly **compositional**: WHO dies is
+        orphan-graded, HOW MANY stays fertility-pinned. That is the same split R-16/R-18 established for
+        the Cred hierarchy, and it is the honest one here — the Siler a1 already contains these deaths
+        ("infanticide KEPT"), so the mechanism must redistribute them, not add more."""
+        if self._orphan_e_cache is not None and self._orphan_e_step == self.step_count:
+            return self._orphan_e_cache
+        cfg = self._demog
+        tot = n = 0.0
+        maxm = cfg.orphan_max_age_years * MONTHS_PER_YEAR
+        for a in self.agent_list:
+            if a.age > maxm:
+                continue
+            if getattr(a, "_mother", None) is None and getattr(a, "_father", None) is None:
+                continue                                   # founders / unknown parentage: not in the risk set
+            m_dead, f_dead, divorced = self._orphan_status(a)
+            m = 1.0
+            if m_dead:
+                m *= cfg.orphan_mult_mother_dead
+            if f_dead:
+                m *= cfg.orphan_mult_father_dead
+            if divorced:
+                m *= cfg.orphan_mult_divorced
+            tot += m; n += 1.0
+        e = (tot / n) if n > 0 else 1.0
+        self._orphan_e_cache = e
+        self._orphan_e_step = self.step_count
+        return e
 
     def _return_cv_field(self):
         """Emergent-band-size v3: per-cell **DAY-TO-DAY** return CV — the variance a band pools away by sharing.

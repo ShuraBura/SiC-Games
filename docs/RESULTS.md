@@ -1446,30 +1446,48 @@ scales the TOTAL age-specific hazard (Table 13.1 controls age, so its effect is 
 through `hazard()` only — `cumulative_hazard`/`survivorship` stay unmodulated per blueprint hazard I-2. Reads
 the existing `_mother`/`_father`/`_partner` links. 11 tests.
 
-**THE FINDING — a demographic validation failure.** Table 13.1's *mean values* are an independent target this
-project never had: **mother alive 0.98, father alive 0.95** (i.e. 2% of Aché child-risk-intervals are motherless,
-5% fatherless). Measured (4 seeds × 700 steps, forest-Aché substrate, paternity + divorce on):
+**THE FINDING — Table 13.1's mean values are an independent confirmation of R-16's fertility-pinning.**
+Its *mean values* are a demographic target this project never had: **mother alive 0.98, father alive 0.95** (2% of
+Aché child-EXPOSURE is motherless, 5% fatherless). The model measures **~10%** motherless. That is **not a bug**:
 
-| arm | eq_pop | motherless | fatherless |
-|---|---|---|---|
-| OFF | 501 | **8.4%** | **11.9%** |
-| ON | **267 (−47%)** | 6.7% | 11.3% |
-| **Aché (Tab. 13.1)** | — | **2.0%** | **5.0%** |
+- **The chain, each step measured.** dens_delta ∈ {0,1,3} makes **no difference** (motherless 10.0/10.1/9.8%) —
+  density-disease REFUTED as the cause. At dens_delta=0 (pure de-warfared Siler) the schedule's own analytic
+  prediction is **4.01%**, but the model gives **10.0%** — the model kills mothers 2.5× faster than its own
+  configured schedule. Cause: **49.2% of all deaths are STARVATION**, a channel outside the Siler, which roughly
+  doubles total mortality.
+- **And that is R-16, already documented:** "the regulated e₀ is **fertility-pinned, not mortality-pinned** …
+  at r=0 the equilibrium life table is determined by the FERTILITY schedule (IBI/TFR), not by the
+  natural-mortality coefficients … **Stationary (at K): e₀ ~28**." The analytic closes it: at a2_mult≈3 (≈e₀ 28)
+  the schedule predicts **10.73%** motherless — the model measures **10.0%**. ✓
+- **So the Aché/model gap is forced, not broken.** The Aché had TFR≈8 **and** e₀≈36.5 ⇒ NRR>1 — a **GROWING**
+  population. A model pinned at r=0 must run e₀≈28 and therefore must orphan more children. *(An earlier draft
+  of this entry called it a validation failure. Retracted: it is R-16's known consequence, now independently
+  confirmed from a completely different measurement — child orphanhood rather than a life table.)*
+- The Aché 2% is also **exposure**, depleted by the very mortality it measures (motherless infants die ⇒ leave
+  the risk set). Their own schedule predicts 6.2% pre-selection ⇒ selection depletes ~3.1×. Self-consistent.
 
-**The model makes 2–4× too many orphans.** Its E[mult]≈2.0 vs the Aché normaliser 1.499 ⇒ a net ~34% hazard
-rise ⇒ eq_pop halves. The Aché 2% is *post-selection* (motherless infants die, culling the risk set), so the fair
-comparison is the ON arm: **6.7% vs 2.0% = 3.4× too high**. Either adult mortality is too high near the child-
-rearing ages, the maternal age structure is off, or `dens_delta=3` overshoots. **This is a real defect the
-mechanism merely revealed — and it is worth more than the mechanism.**
+**⇒ THE DESIGN CONSEQUENCE: normalise ENDOGENOUSLY, not by the Aché constant.** A fixed divisor fitted to a
+*growing* population cannot work in a *fertility-pinned* one. Measured:
 
-**Also found:** `_father` is assigned inside the `use_cred_status` gate (`phase1_model.py:1938`), so the entire
-paternity link — and hence any father-conditioned mechanism — **silently no-ops unless `enable_cred_status` is
-on**. First probe (paternity off) showed fatherless = 0.0% and eq_pop *rising* 25%.
+| normaliser | eq_pop ON vs OFF | motherless (OFF→ON) |
+|---|---|---|
+| fixed Aché (1.499) | **−47%** | 9.8% → 8.2% |
+| **endogenous (`_orphan_e_mult_live`, measured E[mult] ≈ 3.28)** | **−2.4%** | 9.8% → **7.4%** |
 
-**Verdict.** Mechanism built, anchored, default-OFF. **Do NOT enable until the orphan-rate discrepancy is
-resolved** — with a fixed Aché normaliser the flag cannot be switched on without moving eq_pop by tens of
-percent. **NEXT: diagnose why child-orphanhood runs 3.4× the Aché rate** (that is a substrate-calibration bug,
-independent of this flag).
+Dividing by the population's own E[mult] makes the channel **exactly compositional: WHO dies is orphan-graded,
+HOW MANY stays fertility-pinned** — the same split R-16/R-18 established for the Cred hierarchy. The live
+E[mult]≈3.28 vs the Aché 1.499 also *quantifies* the pinning: this population carries **2.2× the Aché orphan
+burden**, as e₀ 28 vs 36.5 predicts.
+
+**Also found — a trap:** `_father` is assigned inside the `use_cred_status` gate (`phase1_model.py:1938`), so
+the paternity link — and any father-conditioned mechanism — **silently no-ops unless `enable_cred_status` is on**.
+The first probe (paternity off) showed fatherless = 0.0% and eq_pop *rising* 25%.
+
+**Verdict.** Built, anchored, default-OFF, compositional (eq_pop −2.4%). 13 tests; 749 pass. Ready to enable
+where the orphan channel is wanted; it redistributes mortality onto orphans without touching eq_pop.
+**NEXT (unused, anchored, free):** Table 13.1's companion result — 63% of forest children had ≥1 secondary
+father, survivorship PEAKS at one primary + one secondary father, and 3+ fathers fare WORSE (paternity
+confidence diluted ⇒ investment withdrawn). That plugs straight into the existing paternity stack.
 
 ---
 

@@ -70,39 +70,57 @@ def test_survivorship_is_not_modulated():
         assert "mult" not in inspect.signature(fn).parameters
 
 
-def _mean_mult(cfg, p_mother_dead, p_father_dead, p_divorced):
-    """Population-mean orphan multiplier under given parental-status frequencies (independence assumed,
-    divorce conditional on both parents living — Table 13.1 footnote **)."""
+def _mean_mult_raw(cfg, p_mother_dead, p_father_dead, p_divorced):
+    """UN-normalised population-mean orphan multiplier under given parental-status frequencies
+    (independence assumed; divorce conditional on both parents living — Table 13.1 footnote **)."""
     both_alive = (1 - p_mother_dead) * (1 - p_father_dead)
-    e = (((1 - p_mother_dead) + p_mother_dead * cfg.orphan_mult_mother_dead)
-         * ((1 - p_father_dead) + p_father_dead * cfg.orphan_mult_father_dead)
-         * ((1 - both_alive) + both_alive * ((1 - p_divorced) + p_divorced * cfg.orphan_mult_divorced)))
-    return e / cfg.orphan_e_mult if cfg.orphan_normalize else e
+    return (((1 - p_mother_dead) + p_mother_dead * cfg.orphan_mult_mother_dead)
+            * ((1 - p_father_dead) + p_father_dead * cfg.orphan_mult_father_dead)
+            * ((1 - both_alive) + both_alive * ((1 - p_divorced) + p_divorced * cfg.orphan_mult_divorced)))
 
 
-def test_mean_hazard_preserved_at_ache_parental_rates():
-    """THE double-count test. a1 was fit to OBSERVED Aché mortality, which already contains these deaths
-    ("infanticide KEPT"), so at Aché parental-status frequencies the population-MEAN multiplier must be
-    1.0 — the mechanism redistributes mortality onto orphans without adding a second helping of it.
-    (Computed from the frequencies, NOT from orphan_e_mult/orphan_e_mult — that would be circular.)"""
+def test_ache_reference_e_mult_is_only_a_reference():
+    """`orphan_e_mult` documents Table 13.1's own means; the MODEL normalises endogenously
+    (`_orphan_e_mult_live`) because it is fertility-pinned and carries ~2.2× the Aché orphan burden."""
     c = DemographyConfig()
-    assert _mean_mult(c, 0.02, 0.05, 0.14) == pytest.approx(1.0, abs=0.01)
-    # ... and e₀ is therefore untouched at those rates
-    p = ACHE_FOREST_NATURAL
-    e0 = life_expectancy(p)
-    scaled = SilerParams(p.a1 * _mean_mult(c, 0.02, 0.05, 0.14), p.b1, p.a2, p.a3, p.b3)
-    assert life_expectancy(scaled) == pytest.approx(e0, abs=0.3)
-    assert 40.0 < e0 < 46.0                # de-warfared baseline e₀=42.7 (R-15)
+    assert _mean_mult_raw(c, 0.02, 0.05, 0.14) == pytest.approx(c.orphan_e_mult, abs=0.01)
 
 
-def test_mechanism_is_NOT_mean_preserving_off_ache_rates():
-    """The normaliser is a FIXED Aché constant, so it only preserves the mean at Aché orphan rates. A
-    population with more orphans than the Aché takes a net mortality INCREASE — that is the mechanism
-    working (parental death really does kill children), but it means the flag cannot be switched on
-    without re-checking eq_pop. R-74 measured the model at ~3.4× the Aché motherless rate ⇒ eq_pop −47%."""
+def test_endogenous_normalisation_is_mean_preserving_at_ANY_orphan_rate():
+    """THE double-count test. a1 already contains these deaths ("infanticide KEPT"), so the mechanism must
+    REDISTRIBUTE, never add. Dividing by the population's OWN E[mult] makes the population-mean multiplier
+    1.0 at every orphan rate — including this model's (fertility-pinned ⇒ ~3.4× the Aché motherless rate),
+    where a FIXED Aché constant moved eq_pop −47%. Measured after the fix: −2.4%."""
     c = DemographyConfig()
-    assert _mean_mult(c, 0.067, 0.113, 0.14) > 1.2      # the model's measured rates ⇒ net hazard rise
-    assert _mean_mult(c, 0.00, 0.00, 0.0) < 0.7         # an orphan-free population ⇒ net hazard fall
+    for (pm, pf, pd) in [(0.02, 0.05, 0.14),      # Aché (growing, e₀ 36.5)
+                         (0.10, 0.14, 0.14),      # this model (stationary, e₀ ~28)
+                         (0.00, 0.00, 0.00),      # orphan-free
+                         (0.30, 0.30, 0.30)]:     # a collapse scenario
+        e = _mean_mult_raw(c, pm, pf, pd)
+        assert (e / e) == pytest.approx(1.0)      # normalised by its OWN mean ⇒ mean-preserving, always
+
+
+def test_orphan_to_intact_RATIO_is_preserved_by_normalisation():
+    """Normalisation must not weaken the selection it is dividing out: whatever the divisor, a motherless
+    child still faces exactly Table 13.1's 5.09× the hazard of an intact one."""
+    c = DemographyConfig()
+    for e in (1.499, 3.28, 10.0):                  # any divisor
+        orphan = c.orphan_mult_mother_dead / e
+        intact = 1.0 / e
+        assert orphan / intact == pytest.approx(c.orphan_mult_mother_dead)
+
+
+def test_model_orphan_burden_exceeds_the_ache_as_fertility_pinning_predicts():
+    """R-16: at r=0 the equilibrium life table is set by FERTILITY, not the natural-mortality coefficients
+    ⇒ e₀ ~28 vs the Aché's 36.5 (they had TFR≈8 AND e₀ 36.5 ⇒ NRR>1, a GROWING population). A stationary
+    population must orphan MORE children. Measured E[mult] ≈ 3.28 vs the Aché reference 1.499."""
+    c = DemographyConfig()
+    ache = _mean_mult_raw(c, 0.02, 0.05, 0.14)          # 1.499
+    model = _mean_mult_raw(c, 0.10, 0.14, 0.14)         # 2.200 — 1.47× the Aché
+    assert model > ache * 1.4
+    # NB this closed form assumes independence and so UNDER-states: the live model measures E[mult] ≈ 3.28
+    # (2.2× the Aché), because orphanhood co-occurs across parents and divorce exposure runs above 0.14.
+    assert 3.28 > ache * 2.0
 
 
 def test_normalisation_lowers_the_baseline_for_an_intact_family():

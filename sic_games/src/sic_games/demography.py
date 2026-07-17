@@ -203,19 +203,24 @@ class DemographyConfig(BaseModel):
     orphan_mult_father_dead: float = Field(3.05, ge=1.0)   # exp(1.1146) [LIT]
     orphan_mult_divorced: float = Field(2.97, ge=1.0)      # exp(1.0892) [LIT]; both parents alive but unbonded
     orphan_max_age_years: float = Field(9.0, gt=0.0)       # Table 13.1's window is ages 0–9
-    # DOUBLE-COUNT GUARD. The Siler a1 was fit to OBSERVED Aché mortality, which already contains these deaths
-    # at their observed frequency (`ACHE_FOREST_NATURAL` says so: "infanticide KEPT"). Applying the multipliers
-    # on top would kill the same children twice. Dividing by E[mult] under Table 13.1's OWN mean values
-    # (mother alive 0.98, father alive 0.95, divorced 0.14 | both alive) recovers the counterfactual
-    # both-parents-alive-and-married baseline:
-    #   E[mult] = (0.98 + 0.02·5.09) · (0.95 + 0.05·3.05) · [P(¬both alive) + P(both alive)·(0.86 + 0.14·2.97)]
-    #           = 1.0818 · 1.1025 · (0.069 + 0.931·1.2758) = 1.499
-    # ⇒ at Aché-typical orphan rates the population-mean hazard is UNCHANGED (e₀ invariant — the validation
-    # test) and the mechanism only REDISTRIBUTES mortality onto orphans. If the model's orphan rate diverges
-    # from the Aché (e.g. high adult mortality), infant mortality moves — that is the mechanism working, not
-    # a calibration error.
+    # DOUBLE-COUNT GUARD — normalise by E[mult] over the population's OWN children (`_orphan_e_mult_live`).
+    # The Siler a1 was fit to OBSERVED Aché mortality, which already contains these deaths ("infanticide
+    # KEPT"), so applying the multipliers raw would kill the same children twice.
+    #
+    # Why ENDOGENOUS and not the Aché constant? This model is **fertility-pinned** (R-16): held at r=0 its
+    # equilibrium e₀ is ~28, whereas the Aché had TFR≈8 AND e₀≈36.5 — NRR>1, a GROWING population. A
+    # stationary population must therefore orphan MORE children, and it does: measured E[mult] ≈ 3.28 vs the
+    # Aché's 1.499, motherless ~10% vs their ~2% exposure (the analytic agrees: a2_mult≈3 ⇒ 10.7%). Dividing
+    # by a constant fitted to a growing population moved eq_pop **−47%**; normalising by the population's own
+    # mean gives **−2.4%** — i.e. exactly compositional: WHO dies is orphan-graded, HOW MANY stays
+    # fertility-pinned. Same split R-16/R-18 established for the Cred hierarchy.
     orphan_normalize: bool = True
-    orphan_e_mult: float = Field(1.499, gt=0.0)            # DERIVED from Tab. 13.1 means (arithmetic above)
+    # The Aché reference value, kept for documentation + the Table 13.1 arithmetic check. NOT used by the
+    # model (which normalises endogenously). E[mult] at Tab. 13.1's own means (mother alive 0.98, father
+    # alive 0.95, divorced 0.14 | both living):
+    #   (0.98 + 0.02·5.09) · (0.95 + 0.05·3.05) · [P(¬both) + P(both)·(0.86 + 0.14·2.97)]
+    #   = 1.0818 · 1.1025 · (0.069 + 0.931·1.2758) = 1.499
+    orphan_e_mult: float = Field(1.499, gt=0.0)            # Aché REFERENCE ONLY — see `_orphan_e_mult_live`
     # "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our
     # sample" — an unweaned infant cannot survive its mother's loss. Small n; kept flaggable.
     orphan_infant_mother_lethal: bool = True
