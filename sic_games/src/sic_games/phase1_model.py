@@ -1422,9 +1422,11 @@ class TerrainWorld(mesa.Model):
         # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
         store_on = demog is not None and demog.enable_storage
         # R-82 Stage A: aggrandizer capture of the granary leftover into the durable `material` cell.
-        mat_on = store_on and getattr(demog, "enable_material_capture", False)
+        # R-82b: material now derives from GAME (hides), so it no longer depends on storage/the granary.
+        mat_on = demog is not None and getattr(demog, "enable_material_capture", False)
         mat_frac = demog.material_capture_frac if mat_on else 0.0
         mat_inv_min = getattr(demog, "material_invulnerability_min", 0.0) if mat_on else 0.0
+        mat_hide = getattr(demog, "material_hide_frac", 0.0) if mat_on else 0.0
         store_frac = demog.storable_fraction if store_on else 0.0
         # Resource-dependent storability (Testart): per-cell storable fraction from the local grain/fish/forage/game mix.
         sfrac_field = (self._storable_frac_field() if (store_on and getattr(demog, "enable_resource_storability", False))
@@ -1543,6 +1545,34 @@ class TerrainWorld(mesa.Model):
                 else:
                     shares = [s if s <= cv else cv for s in shares]
             msh = m_sh if game_on else [0.0] * len(occ)
+            # R-82b: MATERIAL comes from GAME (hides/bone/sinew), not the granary. Durable goods in a forager
+            # economy are the byproduct of HUNTING, produced ∝ meat taken; stored food is eaten or rots.
+            # PRODUCTION is everyone's (∝ own meat share ⇒ couples material to prowess, the achieved facet);
+            # CAPTURE is the aggrandizer's — Hayden's move is to claim a share of the GROUP's hides beyond his
+            # own take (debt/feast obligation). Gated: capture needs an abundant, un-drawn-down stock.
+            if mat_on and game_on and mat_hide > 0.0:
+                hides = [mat_hide * m for m in msh]
+                pool = sum(hides)
+                if pool > 0.0:
+                    B = 1.0
+                    Barr = getattr(tf, "_B", None)      # ClimateField.__getattr__ delegates to the base field
+                    if Barr is not None:
+                        try:
+                            B = float(Barr[cy, cx])
+                        except Exception:
+                            B = 1.0
+                    aw = [getattr(a, "aggrandizer", 0.0) for a in occ]
+                    asum = sum(aw)
+                    if mat_frac > 0.0 and asum > 0.0 and B >= mat_inv_min:
+                        take = mat_frac * pool          # the aggrandizers' claim on the group's durable output
+                        for a, wi in zip(occ, aw):
+                            if wi > 0.0:
+                                a.material += take * (wi / asum)
+                        for a, h in zip(occ, hides):    # the remainder stays with whoever produced it
+                            a.material += (1.0 - mat_frac) * h
+                    else:
+                        for a, h in zip(occ, hides):
+                            a.material += h
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
                 # female gatherers. Independent of the Cred-weighted consumption share below. The credit is split
@@ -1602,34 +1632,6 @@ class TerrainWorld(mesa.Model):
                         for (a, _), g in zip(needy, gives):
                             a.wealth += g
                             store -= g
-                # R-82 STAGE A — AGGRANDIZER CAPTURE of the granary LEFTOVER as DURABLE material.
-                # The S.2 draw above is deficit-capped, so surplus survives it ("any leftover … stays in the
-                # granary"). Hayden's aggrandizer is precisely who claims BEYOND need: that residue is taken
-                # status^κ-weighted into `material` — a stock that PERSISTS (unlike `wealth`, burned + capped
-                # each step), which is why it can stratify where the food share cannot (measured corr(cred,
-                # wealth) ≈ 0). Testart supplies the precondition (a granary can't be shared out like a carcass).
-                if mat_on and store > 0.0 and occ:
-                    # GATE (Hayden Fig. 6 top row): capture only where resources are ABUNDANT and INVULNERABLE
-                    # to overexploitation. B = GD-1 stock fraction (1.0 = at ceiling; low = being drawn down).
-                    # Where the stock is stressed, extraction endangers the group and Boehm leveling wins.
-                    B = 1.0
-                    Barr = getattr(tf, "_B", None)          # ClimateField.__getattr__ delegates to the base field
-                    if Barr is not None:
-                        try:
-                            B = float(Barr[cy, cx])
-                        except Exception:
-                            B = 1.0
-                    if B >= mat_inv_min:
-                        # WHO: the AGGRANDIZER type, not inherited cred (R-82 first cut keyed on cred^κ and got
-                        # corr(cred, material) = −0.018 — the wrong variable; Hayden's captor is an ambition type).
-                        mw = [getattr(a, "aggrandizer", 0.0) for a in occ]
-                        msum = sum(mw)
-                        if msum > 0.0:
-                            take = mat_frac * store
-                            for a, wi in zip(occ, mw):
-                                if wi > 0.0:
-                                    a.material += take * (wi / msum)
-                            store -= take
                 self._cell_store[key] = store
                 if morph_on and not band_society_on:
                     # S.4 settlement detector → society_from_character (the morph hook, finally called). A cell

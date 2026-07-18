@@ -868,7 +868,13 @@ class DemographyConfig(BaseModel):
     # (not `wealth`, which is burned and capped). High cred ⇒ bigger claim ⇒ material stratification that does
     # NOT wash out. Requires enable_storage (the granary) + the overwintering/seasonal zone.
     enable_material_capture: bool = False
-    material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the granary LEFTOVER claimed as durable goods
+    # SOURCE = GAME, not the granary (supervisor correction, R-82b). Durable goods in a forager economy are the
+    # BYPRODUCT OF HUNTING — hides, furs, bone, antler, sinew — produced in proportion to game taken. Stored
+    # food is EATEN or rots; turning granary grain into durable wealth conflated subsistence with capital.
+    # (Testart's storable-food route drives inequality by BUFFERING SUBSISTENCE, which is a different channel.)
+    # Bonus: hides ∝ meat couples material to the hunting economy, hence to `prowess` — the achieved facet.
+    material_hide_frac: float = Field(0.0, ge=0.0)              # durable yield per unit meat taken (sets UNITS only)
+    material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the cell's hide pool claimed by aggrandizers
     material_decay: float = Field(0.0, ge=0.0, le=1.0)          # per-step depreciation of the durable stock (0 = imperishable)
     # WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an
     # "ambitious, accumulative aggrandizer" — "the best and most highly motivated minds of an epoch" — i.e. a
@@ -901,8 +907,14 @@ class DemographyConfig(BaseModel):
     # capture is gated off while leveling still bites (egalitarian); under abundance capture outruns it
     # (stratified). That emergent competition IS Hayden's thesis, and it is what makes it falsifiable here.
     enable_leveling: bool = False
-    leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess
-    leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned
+    # ANCHOR [Boehm 1993, VERIFIED]: "Ousting or ostracizing the individual or removing him from a leadership
+    # role involved **38 of the 48 societies**" reporting deliberate control of over-assertive leaders — i.e.
+    # a DECISIVE sanction is applied in 38/48 = **0.79** of societies (a further 28 instances used softer
+    # social pressure; 11/48 report assassination, the top rung). So a conspicuous monopolizer should draw a
+    # sanction with probability ≈0.79, not rarely: leveling is the NORM, not the exception. `leveling_strength`
+    # is the per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
+    leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess [0.79 = Boehm 38/48]
+    leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned [DESIGN]
     # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
     # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
     # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).
