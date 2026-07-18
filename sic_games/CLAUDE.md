@@ -169,6 +169,23 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     regenerated `context/CANONICAL_FACTS.md` into the Claude.ai project knowledge.** The file
     is a cache; it must never be hand-edited to diverge from the homes.
 
+16. **Check the spec docs BEFORE re-reading literature PDFs (added 2026-07-17).**
+    Extracted lit values are already POOLED into the docs (charter "one fact, one home"): the exact
+    extraction/scaling math in `../docs/MODEL_SPEC.md`; per-biome forage/game means+stds with their
+    derivations in `../docs/SiC_Games_Resource_Return_Rate_Table.md`; constants in `../docs/PARAMETERS.md`;
+    sources + what each was used for in `../docs/LITERATURE.md`. **Grep those FIRST** — the number is almost
+    always already there with its arithmetic and citation; cite it, do not re-derive it or re-render the
+    table image. Open a `literature/` PDF **only** for (1) a genuinely NEW statistic that isn't pooled
+    (e.g. R-72's day-to-day/*temporal* return CV — the tables pool only *spatial* cross-cell variance), or
+    (2) verifying a SUSPECTED error in a pooled value (e.g. R-79's Bird 2009 desert-game row). Say which,
+    in the RESULTS/commit note, and pool the new value back into its home. When a source must be read,
+    render image-only tables with `pymupdf` (`pymupdf.open(p)[i].get_pixmap(dpi=200)`) and read the image —
+    `pypdf` text extraction silently transposes/drops table columns, which is how the R-79 error entered.
+    *(Phase-1 note: the tooling here is `py -3`, not `python`; before believing any demographic claim run
+    `outputs/phase1_biome_mortality/report_demography.py` — R-75. New Phase-1 mechanics land default-OFF /
+    bit-exact and are adopted by flipping the flag in `run_se0_controlled_climate.py`'s preset with a
+    `# CANONICAL <date>` note, not in the `DemographyConfig` default.)*
+
 ---
 
 ## Locked parameters — do not change without explicit instruction
