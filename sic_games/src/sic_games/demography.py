@@ -869,6 +869,13 @@ class DemographyConfig(BaseModel):
     # Marlowe critical-period target; calibrate so emergent male share of <3-yr provisioning ≈ 58%). 0 = pure B
     # (no paternal feeding). Requires enable_paternity (the father-links).
     paternal_provision_frac: float = Field(0.0, ge=0.0, le=1.0)
+    # [R-80, NOT BUILT] A status→fertility provisioning channel (husband's overflow → wife's reproductive
+    # reserve → shorter IBI) was prototyped and REVERTED: it is structurally inert. The transfer needs a husband
+    # with harvest OVERFLOW and a wife with reserve NEED simultaneously, but those are anti-correlated —
+    # overflow ⟺ well-fed (so the wife is also full, need≈0); scarcity ⟺ wife-need (but then the husband has
+    # 0 overflow). Measured at a crowded equilibrium: 0% of married men had any overflow, 100% of wives had full
+    # need ⇒ zero transfers. Root cause is R-16 fertility-pinning: no surplus at r=0, so von Rueden's DOMINANT
+    # channel (status→fertility, "enhances fertility more than offspring well-being") cannot operate here. See RESULTS R-80.
     # B++ : ASSORTATIVE mating. The father a mother draws is weighted by his prowess^m (the B+ skew) AND his
     # status-SIMILARITY to the mother — a Gaussian-in-log-status kernel exp(−α·(ln s_j − ln s_i)²), s = cred·
     # prowess, α = assortative_strength. So high-status mothers pair with high-status fathers, CONSOLIDATING

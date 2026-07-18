@@ -1663,4 +1663,53 @@ that the R-72 CV work leaned on.
 
 ---
 
+## R-80 — von Rueden's DOMINANT channel (status→fertility) is structurally unavailable to a fertility-pinned model. status→RS caps at ~0.07 at realistic polygyny; 0.19 is polygyny-inflated (2026-07-17)
+
+**Origin:** building von Rueden's remaining status→RS channels after R-77 showed the 0.19 was 6× polygyny.
+Branch `vonrueden-fertility`. von Rueden & Jaeggi, "Men's status and RS in 33 nonindustrial societies" (PNAS).
+
+**The goal.** R-77 built wife quality (r=0.15 in monogamous societies) and it closed only ~⅓ of the gap
+(status→RS +0.02→+0.07). von Rueden's other decomposed channels: **fertility** (total offspring born — the
+DOMINANT one; "status enhances fertility MORE than offspring well-being") and **mating success** (age at
+marriage). Built the fertility channel: a husband directs his harvest OVERFLOW to his wife's reproductive
+reserve → higher `energetic_fertility_factor` → shorter IBI → more births; status-graded emergently
+(high-prowess ⇒ bigger meat share ⇒ bigger overflow).
+
+**RESULT — it is STRUCTURALLY INERT. Built, measured, REVERTED.** The transfer fired ZERO times. Direct
+instrumentation at a crowded equilibrium:
+
+| | value |
+|---|---|
+| married men with any overflow (wealth > cap) | **0%** |
+| married women with reserve need (wealth < full) | **100%** (mean need = a full reserve) |
+
+**The two preconditions are anti-correlated by construction.** A husband has overflow only when food is
+plentiful — but then his co-resident wife is *also* full (need ≈ 0); under scarcity the wife has need but the
+husband has 0 overflow. Overflow and need never co-occur ⇒ no transfer ⇒ `corr(husband status, wife fertility)`
+≈ 0 across all fracs, and a frac=0.9 run is bit-identical to off. Sweeps (+0.03→+0.08) were noise; the higher
+values at n=900 (+0.10–0.14) were the **polygyny artifact** (crowding pushed polygyny to 12–16%, R-77), not the
+fertility channel.
+
+**Root cause — R-16 fertility-pinning.** At r=0 there is no surplus above subsistence, so a status→fertility
+channel (which needs surplus to convert into *more births*) cannot operate. **The model can only access
+fixed-pie channels** — mating monopoly (polygyny) and who-pairs-with-whom (wife quality) — **not pie-growing
+ones** (status→fertility). von Rueden's *dominant* real-world pathway is therefore foreclosed in this model.
+
+**SYNTHESIS — the von-Rueden-r arc, closed honestly.**
+- At forager-realistic polygyny (~4%, Marlowe), the model's status→RS is **~0.07** (wife quality ~⅓; fertility
+  channel dead; mating-success/age-at-marriage unbuilt but a fixed-pie channel unlikely to close a 0.12 gap).
+- The model reaches von Rueden's 0.19 only above ~10% polygyny (R-77) — **~3× the ethnographic rate**.
+- **CONCLUSION: von Rueden's 0.19 is a cross-cultural average, inflated by the polygynous societies in his
+  33-society sample. A monogamy-dominant forager system has LOWER status→RS (~0.07–0.10 here), because its two
+  strongest real-world channels are unavailable to the model — polygyny (calibrated down to the ethnographic 4%)
+  and fertility (foreclosed by fertility-pinning).** R-19/R-21's 0.19 was the polygyny lottery; it is not
+  reproducible through legitimate monogamous-society channels, and should be read as polygyny-inflated.
+
+**Code:** the fertility mechanism is REVERTED (provably inert — dead weight); a `[NOT BUILT]` note in
+`demography.py` records why, so it isn't re-attempted without first solving the overflow/need anti-correlation
+(would require intra-household inequality — husband eats first — which the model's co-resident sharing precludes).
+770 pass.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
