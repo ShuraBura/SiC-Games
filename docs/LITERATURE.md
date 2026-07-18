@@ -1197,3 +1197,65 @@ for a hereditary managerial class. Converges with Dyson-Hudson & Smith 1978 (alr
 
 **Note on offensive raiding (−0.01):** warfare does NOT predict hierarchy in this sample — relevant if a future
 stage reaches for a conflict-driven stratification route.
+
+---
+
+### D'Altroy, T.N. & Earle, T.K. (1985). "Staple Finance, Wealth Finance, and Storage in the Inka Political Economy [and Comments and Reply]." *Current Anthropology* 26(2):187–206. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — full text searched 2026-07-18** (`literature/408830614-Staple-Finance-Wealth-
+Finance-and-Storag-pdf.pdf`, 21 pp, text layer). Obtained specifically to test whether a **direct levy rate**
+exists that would supersede R-84b's outcome-based anchoring of `leader_share_frac`.
+
+**VERIFIED NEGATIVE on the levy rate — this was the best remaining candidate and it does not carry one.** The
+paper's contribution is *structural*, not rate-based: it dichotomises state finance into **staple finance** (the
+mobilisation of subsistence/utilitarian goods) and **wealth finance** (manufacture and procurement of valuables
+and primitive money), and shows the Inka state shifting between them. Obligation is expressed as **corvée labour
+(mit'a) assessed per household on a rotating basis**, *not* as a percentage of a household's product — so there
+is no "the chief takes X%" figure to lift. **`leader_share_frac`'s anchor therefore stands as R-84b left it**
+(BHM composite Gini). Record this so the source is not re-fetched for the same purpose.
+
+**What it DOES supply — a storage-decay anchor we currently mark [DESIGN]:** *"the loss rate for maize is about
+30% per year"*. Our stored-food/`material_decay` handling is unanchored (0.002/step ≈ 2.4%/yr). Note the 30%
+figure is for **stored grain**, so it anchors the granary/food-store sink, NOT durable prestige goods (hides,
+boat shares), which should decay far more slowly — the two must not share a constant. Also: ~**79%** of storage
+in the Upper Mantaro Valley is accounted for by state finance, and ~**50%** of that storage sits away from
+settlements — relevant if a later stage models storage as a *sited* facility rather than a per-agent stock.
+
+**Charter note (`MECHANISM_CHARTER.md`):** staple-vs-wealth finance is precisely a **Conversion (C)** distinction
+— staple finance moves subsistence (an X operator on food), wealth finance converts production into durable
+valuables (a C operator, production → material). That the ethnography draws the same line the type system does is
+a useful corroboration of the typing.
+
+### Borgerhoff Mulder et al. (2009) — Supporting Online Material `[VERIFIED]`
+**Status: FILED + [VERIFIED] — Table S4 read 2026-07-18** (`literature/borgerhoff-mulder.som.pdf`, 46 pp).
+Supplies the **per-wealth-type Ginis** that the main-text Table 2 aggregates away, which is what makes a
+FACET-BY-FACET comparison possible instead of only the α-weighted composite.
+
+**Table S4 — forager populations (Gini, SE, N):**
+| Population | Wealth type | Class | Gini | Model facet |
+|---|---|---|---|---|
+| Aché | Hunting returns | E | 0.237 | `prowess` |
+| Aché | Weight | E | 0.064 | — |
+| Hadza | Weight | E | 0.079 | — |
+| Hadza | Hunting & gathering returns | E | 0.339 | `prowess` |
+| Hadza | Grip strength | E | 0.191 | — |
+| Ju/'hoansi | Social networks | R | 0.216 | `cred` |
+| Lamalera | Food-sharing partners | R | 0.263 | `cred` |
+| Lamalera | **Quality of housing** | M | **0.241** | `material` |
+| Lamalera | **Boat shares** | M | **0.474** | *no analogue* |
+| Lamalera | RS | E | 0.296 | — |
+
+**Model comparison (R-84b config, leveling ON, `leader_share_frac`=0.20):** `prowess` 0.24–0.26 vs the
+returns-based embodied measures 0.237/0.339 ✓; `cred` 0.27 vs relational 0.216/0.263 ✓; `material` **0.237 vs
+housing 0.241** ✓ — a near-exact match on the comparable category.
+
+**The sharpened diagnosis this permits.** R-84b recorded model material Gini as "low" against the composite. It
+is not: it matches **housing** (a consumption good) almost exactly. The entire gap is **boat shares (0.474) — a
+PRODUCTIVE ASSET**, which the model has no analogue for. `material` is currently a consumption/prestige stock
+only. **A means-of-production capital that raises its owner's yield is therefore a specific, identified gap** —
+and the likely missing piece behind TARGETS T-5's agricultural arm (0.435 vs 0.48), since a productive asset is
+also the natural thing to make heritable (BHM material β 0.17 forager → 0.55–0.67 agricultural).
+
+### Hawkes et al. 1991 — text-layer copy filed (2026-07-18)
+`literature/Hawkes-HuntingIncomePatterns-1991.pdf` and `literature/hawkes-1991-pdf.pdf` both carry full text
+(~50k chars), replacing the image-only original for search purposes. The original scan is retained. No values
+re-derived yet — the pooled savanna return rates in the Resource Return-Rate Table stand.

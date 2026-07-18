@@ -186,6 +186,18 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     bit-exact and are adopted by flipping the flag in `run_se0_controlled_climate.py`'s preset with a
     `# CANONICAL <date>` note, not in the `DemographyConfig` default.)*
 
+17. **Declare a mechanism's TYPE, UNIT and INVARIANT before building it (added 2026-07-18).**
+    Binding contract: `docs/MECHANISM_CHARTER.md`. Every new mechanism's docstring must state (a) its **type**
+    from `S F T P D X C A N H O`; (b) the **unit** it operates on (agent/pair/household/band/settlement/cell) —
+    this line exists because R-82's redistribution operator was applied to a group of size 1-2 and read as
+    "inert"; (c) the category **invariant** and how a test asserts it (X conserves its total; A changes the graph
+    and NO quantity; T conserves count and every carried quantity; H acts only at births; O mutates nothing and
+    must not consume the model RNG). If a mechanism needs two types it is two mechanisms — split it.
+    **If a flag's ON/OFF output is indistinguishable, that is a specification bug, not a small effect size**
+    (DE-19), unless it is declared *gauge fixing*, where invariance is the point (`enable_cred_renorm`).
+    Prefer vectorized execution: T/P/D/X/C/H are elementwise, gather-by-index or segment-reduction and should not
+    be written as per-agent Python loops; A and N are where loops remain legitimate.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction

@@ -92,3 +92,12 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 
 ---
 *Verification Log opened 2026-07-09. Append/update rows as checks are performed — this is the skip-list.*
+
+### Elite-layer sources, second pass (2026-07-18)
+
+| Source | Status | Outcome |
+|---|---|---|
+| D'Altroy & Earle 1985 | **[VERIFIED - NEGATIVE]** | Fetched specifically to find a direct levy RATE that would supersede the outcome-anchoring of `leader_share_frac`. **None exists** - obligation is corvee LABOUR (mit'a) per household, not a share of product. The anchor stands as R-84b left it. **Do not re-fetch for this purpose.** Yields instead a stored-GRAIN decay anchor: **30%/yr maize loss** (our stored-food decay is [DESIGN]); must not be applied to durable prestige goods. |
+| BHM 2009 SOM (Table S4) | **[VERIFIED]** | Per-wealth-type Ginis obtained. Model matches facet-by-facet: prowess 0.24-0.26 vs 0.237/0.339; cred 0.27 vs 0.216/0.263; **material 0.237 vs Lamalera housing 0.241**. The remaining gap is entirely **boat shares 0.474 = a PRODUCTIVE ASSET the model lacks**. |
+| Hawkes et al. 1991 | **[TEXT LAYER OBTAINED]** | Two searchable copies filed, replacing the image-only scan. Pooled savanna return rates unchanged. |
+| Flannery & Marcus 2012 | **TOC ONLY** | Chapters identified for retrieval: **5** (Inequality without Agriculture, p.66 - our current stage), **10** (Rise and *Fall* of Hereditary Inequality in Farming Societies, p.187 - the next rung AND the cycles question), **16** (How to Turn Rank into Stratification, p.313 - T-5's failing agricultural arm), then **11** (Three Sources of Power in Chiefly Societies, p.208) and **9** (Prestige and Equality in Four Native American Societies, p.153). |

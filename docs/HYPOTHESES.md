@@ -163,3 +163,36 @@ Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, ar
 ---
 
 *End of HYPOTHESES — consolidated 2026-06-05; §H1ii-RETEST appended 2026-06-13. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*
+
+---
+
+## H-CYCLES — Secular cycles require a DELAYED negative feedback, not a stronger one
+
+**Status:** OPEN — pre-registered 2026-07-18. **Origin:** supervisor (architecture discussion, the field/operator
+framing). **Home of the criterion:** `MECHANISM_CHARTER.md` §5.
+
+**Claim.** The model has failed three times to produce secular cycles — connubium (R-67), substrate attractor
+(R-68), soil/swidden (R-71) — and these are not three facts but **one**: every feedback in the model is
+INSTANTANEOUS negative feedback, whose linearization has a real negative eigenvalue and therefore a stable node.
+A stable node returns to equilibrium exponentially; it cannot oscillate. Boehm leveling is the clearest case — it
+corrects excess *within the same step*, which is exactly why it CAPS inequality (3.68x -> 2.21x, R-83) rather
+than overshooting it.
+
+**Prediction (falsifiable).** Introducing a **lag** between a quantity and the correction that removes it, of
+order the measured relaxation time (~250 steps, from R-68's kill-half recovery), will produce sustained
+oscillation where no amount of strengthening an instantaneous feedback does. Specifically: elite NUMBERS
+responding to elite WEALTH with a generational (~20 yr = 240 step) delay.
+
+**How it could fail (and what each failure teaches):**
+- Oscillation appears but is damped -> the delay is too short relative to relaxation, or the loop gain too low.
+- Oscillation appears at the wrong period -> the delay is the wrong length; period should scale with it.
+- No oscillation at any delay -> the loop gain is below the Hopf threshold; the elite feedback is too weak to
+  matter regardless of timing, which would be a genuine and interesting negative.
+- Runaway instead -> the feedback is net positive, not delayed-negative (an R-66-class failure).
+
+**Test protocol.** Cheap first: linearize a mean-field reduction around the measured equilibrium and locate the
+Hopf boundary in (delay, gain) analytically. Only then build. **The mean-field reduction is an ANALYSIS TOOL for
+this hypothesis only** — explicitly NOT a replacement for the ABM (charter §5), which must keep the
+individual-level outputs (RS skew, dynasties, kinship).
+
+**Resolution:** *(none yet — OPEN, pre-registered 2026-07-18)*
