@@ -1280,3 +1280,65 @@ grep the specs first, then these).
 
 Remaining 19 chapters (Parts IV–V, kingdoms/empires/resistance) are beyond the model's current horizon and are
 filed for later stages, not queued.
+
+### Flannery & Marcus 2012 — EXTRACTION from the 5 priority chapters (read 2026-07-18) `[VERIFIED]`
+
+**Ch. 11, "Three Sources of Power in Chiefly Societies" — Goldman's Polynesian triad, an INDEPENDENT
+decomposition that matches the model's facets and then splits one of them.**
+- **mana** — sacred life-force. *"people of high rank were automatically born with more mana"* ⇒ **ASCRIBED,
+  heritable** = `cred`. The chief is the man with the most; so much that he is *tapu*.
+- **tohunga** — *"expertise"*: administrative, diplomatic, ritual, or craft. *"individuals could increase their
+  expertise through education, training, or apprenticeship"* ⇒ **ACHIEVED, learnable, SPECIALISED**.
+- **toa** — bravery/martial prowess. Critically: *"A key aspect of toa was that it allowed for a certain degree
+  of social mobility. A warrior of humble birth could rise in prominence to the point where he had to be taken
+  seriously, even by chiefly individuals."* ⇒ **the COMMONER'S MOBILITY CHANNEL.**
+
+⇒ **The model's single `prowess` scalar conflates tohunga and toa.** Goldman/Flannery separate them, and give
+them different *social functions*: expertise is cultivated and attaches to a role; martial prowess is the route
+by which low birth is overridden. This is the empirical basis for the specialization design (charter §8) and it
+says a warrior facet is not decoration — it is the mobility mechanism. Emphasis varies by society (Maori/Tikopia
+lean mana; Samoa/Easter Island lean expertise + force; Tonga/Hawaii, *the most unequal*, use "the entire
+playbook") — i.e. the WEIGHTS differ by society type, exactly as BHM's α does.
+
+**Ch. 10, "The Rise and Fall of Hereditary Inequality in Farming Societies" — the ethnographic anchor for
+H-CYCLES, and a warning about our own elite layer.**
+- **Kachin gumsa/gumlao cycling** (Leach): societies *"shifting back and forth"* between ranked (**gumsa**) and
+  egalitarian (**gumlao**) modes. Flannery: *"hereditary inequality was repeatedly created, **lasted for a few
+  generations**, and then collapsed."* ⇒ **a documented secular cycle, with a PERIOD of a few generations
+  (~60–100 yr).**
+- **The mechanism is a DELAYED negative feedback.** Ambitious leaders adopt prestige behaviour, and *"it only
+  increased their followers' resentment and hastened their overthrow."* Resentment **accumulates** and the
+  overthrow comes generations later — not the within-step correction our Boehm leveling applies. **This is
+  precisely the lag H-CYCLES predicts, observed in the field.**
+- **Friedman's ENDOGENOUS scenario** (Flannery prefers it to Leach's, which needs Shan princes to intervene):
+  hereditary rank is created by a **LEGITIMACY REINTERPRETATION**, not by accumulation. Successful lineages were
+  not credited with hard work — *"they believed that one only obtained good harvests through proper sacrifices to
+  the nats. The key shift in social logic was therefore from 'They must have pleased the nats' to 'They must be
+  descended from higher nats than we are.'"* Once descended from the ruling nats, the lineage controls the land
+  and is *entitled to tribute*.
+- **THE WARNING, aimed straight at our elite layer:** *"if feasting were all it took to produce hereditary
+  inequality, there would have been no achievement-based societies left for anthropologists to study."*
+  Competitive feasting *"instead of creating hereditary rank ... produced individual Big Men who had no way of
+  bequeathing renown to their offspring."*
+- **The gumlao vs gumsa premise lists are effectively two config states.** gumlao: all lineages equal; villages
+  autonomous; **no tribute owed to the headman**; equal bride-price; all siblings equal; splits produce no
+  senior/junior; **"Each headman is to be advised by a council of elders."** gumsa: lineages ranked; all
+  settlements under one chief; **"Everyone who does not belong to the chief's lineage must pay him tribute,
+  usually in the form of a thigh from every animal sacrificed"**; elite bride-price higher; **ultimogeniture**
+  (all property to the youngest son, to push older sons out to found new lineages); splits produce senior/junior.
+- **A third path: DEBT SLAVERY** via the mayu-dama bride-price system (a groom owed cattle, slit-gongs, swords).
+
+**Ch. 16, "How to Turn Rank into Stratification" — power-balance devices, as an explicit premise list.**
+Tongan premises 13–17: *"No Tongan dares assassinate his own chief, owing to the latter's high levels of mana"*;
+assassins can be **hired from other islands**; *"Dividing authority, by creating a line of secular chiefs that
+will coexist with sacred chiefs, makes political assassination more difficult"*; but *"Secular chiefs, however,
+pose the threat of usurpation"*; and *"To reduce the risk of usurpation, the sacred chief should limit the land
+(and other resources) allocated to the secular chief."* ⇒ a **sacred/secular office split** as an explicit
+anti-assassination + anti-usurpation control, with **resource allocation as the balancing knob.** Compare
+Tikopia (ch. 11): *"The simultaneous presence of four chiefs acted as a system of checks and balances,
+preventing one ambitious leader from taking over all of Tikopia."*
+
+**Ch. 5, "Inequality without Agriculture"** — the NW Coast/Nootka case at our current stage: salmon surplus
+beyond immediate consumption, and a social ladder whose **bottom rung is slaves** (*"could be bought, sold,
+mistreated, or even killed"*), acquired by raiding and by **debt** (enslaving women and children from debtor
+villages). Not yet extracted in detail; queued with ch. 9 (T-8's untested deposition/desertion split).

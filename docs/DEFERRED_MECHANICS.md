@@ -195,3 +195,59 @@ placeholders remain live.
 ---
 
 *End of DEFERRED_MECHANICS.md — seeded 2026-06-14 from Blueprint A (Agent↔Terrain Migration and Static Game Mechanics). 10 entries: GD-1 (game depletion), JV-1 (juvenile curve), CC-1 (NPP ceiling), RS-1 (risk-sensitivity), MR-1 (reserve anchoring + per-class), MR-2 (carried provision), PL-1 (pool scale-dependence), CL-1 (climate field — temperature/humidity, solar-forced), FD-1 (family dynamics — co-residence & provisioning), PA-1 (proto-agriculture yields — post-morph consequence).*
+
+
+---
+
+## From the Flannery & Marcus 2012 digest (queued 2026-07-18)
+
+Each has a literature anchor and a seam; none is built. Ordered by how load-bearing it is for the current arc.
+
+### DM-F1 — The LEGITIMACY channel (the `GroupVector.religion` stub)
+**Anchor:** Friedman's endogenous scenario in Flannery ch. 10 `[VERIFIED]` — hereditary rank is created by a
+reinterpretation of success ("they pleased the nats" → "they descend from higher nats"), after which the lineage
+controls land and is entitled to tribute.
+**Seam:** `group.py GroupVector.religion` — the cell exists and is inert. Charter type **C (Conversion)**:
+achieved status → ascribed rank, gated on a legitimating belief.
+**Why it matters now:** charter §9.1–9.2 — this is the candidate cause behind T-5's agricultural arm and behind
+father-was-leader sitting at 53–69% vs Hayden's 75%. It is also the natural carrier for **H-CYCLES**' lagged
+resentment stock, since Kachin rise AND collapse both run through legitimacy.
+
+### DM-F2 — Split `prowess` into EXPERTISE and MARTIAL facets
+**Anchor:** Goldman's tohunga vs toa (Flannery ch. 11) `[VERIFIED]`; toa is explicitly the social-mobility
+channel for humble birth.
+**Seam:** `prowess` is already an EMA over production credit — generalise to a per-activity vector (charter §8:
+a specialization is which operators an agent couples to). `aggrandizer` is already a de-facto agent type.
+**Note:** build AFTER the charter typing retrofit so specialised couplings inherit the invariants.
+
+### DM-F3 — gumsa/gumlao as an explicit society MODE switch
+**Anchor:** Leach's premise lists via Flannery ch. 10 `[VERIFIED]` — 13 gumlao premises vs 8 gumsa premises,
+covering tribute, bride-price, sibling equality, senior/junior lineage splits, and inheritance.
+**Seam:** the existing `morph` machinery (`society_from_character`) already switches society type on
+density × surplus; this would give the switch a *documented* premise set rather than a two-parameter rule.
+**Notable specifics:** gumsa **ultimogeniture** (all property to the youngest son, explicitly to push older sons
+out to found new lineages — a fission driver the model gets from thresholds instead); gumlao **"each headman is
+to be advised by a council of elders"** (third independent appearance of the council brake, after Boehm and the
+supervisor's own intuition).
+
+### DM-F4 — Sacred/secular office split and multi-office checks
+**Anchor:** Tongan premises 13–17 and Tikopia's four chiefs (Flannery chs. 16, 11) `[VERIFIED]`.
+**Seam:** `_maintain_leader_office` currently seats exactly one office per band. Generalising to N offices with
+distinct competences (sacred vs secular) is an A-type change, with *resource allocation to the secular office*
+as the documented balancing knob.
+
+### DM-F5 — Slavery as the bottom rung, incl. DEBT slavery
+**Anchor:** Flannery ch. 5 (NW Coast/Nootka: slaves *"could be bought, sold, mistreated, or even killed"*,
+acquired by raiding and by enslaving women and children from debtor villages) and ch. 10's mayu-dama bride-price
+debt path `[VERIFIED]`. Converges with Ames 1994's stratification axes (gender, age, **free/slave**,
+specialist/non-specialist, elite/non-elite).
+**Seam:** none yet — would need an agent status field and an unfree-labour term in production. **Deliberately
+deferred**: it is a large mechanism and the current arc has not yet closed the legitimacy question, which is
+upstream of it.
+
+### DM-F6 — A tribute rate anchored on the gumsa premise
+**Anchor:** gumsa premise 3 — tribute is *"usually in the form of a thigh from every animal sacrificed"*.
+**Why noted:** this is the closest thing to a direct levy RATE found so far (D'Altroy & Earle turned up none),
+and it is a levy on **game/sacrifice**, consistent with the hides-from-game choice in R-82b. It is a *share of a
+kill*, not of stored produce. Worth converting to a fraction if `leader_share_frac` is ever re-anchored off the
+BHM outcome calibration.

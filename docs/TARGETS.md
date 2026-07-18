@@ -169,8 +169,17 @@ The alpha-weighted composite Gini, computed on the model's three status facets w
 **Why it is a real target:** the forager arm is met almost trivially (the composite barely moves with the levy,
 because material is only 15% of forager weight), so the *discriminating* test is the AGRICULTURAL arm - reaching
 0.48 requires the model to produce material heritability, not just material accumulation. BHM's beta for material
-goes 0.17 (forager) -> 0.55-0.67 (agricultural); **the model currently has no material inheritance at all**, which
-is the most likely reason the agricultural arm falls short. That is a concrete, falsifiable next mechanism.
+goes 0.17 (forager) -> 0.55-0.67 (agricultural); **the model currently has no material inheritance at all**.
+
+**REFRAMED 2026-07-18 after the Flannery digest.** Do NOT close this gap by adding material heritability on its
+own. Flannery ch. 10: *"if feasting were all it took to produce hereditary inequality, there would have been no
+achievement-based societies left for anthropologists to study"* - competitive feasting *"produced individual Big
+Men who had no way of bequeathing renown to their offspring."* **The model is currently behaving CORRECTLY as an
+achievement-based society** (leaders 3.68x ahead, father-was-leader only 53-69%, no hereditary transmission), so
+the agricultural shortfall is most likely a MISSING MECHANISM rather than a calibration error. Friedman's
+endogenous account puts that mechanism in LEGITIMACY - achieved success reinterpreted as descent from higher
+spirits - not in accumulation. See MECHANISM_CHARTER §9 and DEFERRED_MECHANICS DM-F1. Forcing the Gini with a
+material-inheritance coefficient would hit the number while getting the cause wrong.
 
 ## T-6 - Big-man status is inherited ~75% of the time WITHOUT inheriting the office
 

@@ -195,4 +195,22 @@ Hopf boundary in (delay, gain) analytically. Only then build. **The mean-field r
 this hypothesis only** — explicitly NOT a replacement for the ABM (charter §5), which must keep the
 individual-level outputs (RS skew, dynasties, kinship).
 
-**Resolution:** *(none yet — OPEN, pre-registered 2026-07-18)*
+**ETHNOGRAPHIC ANCHOR ADDED 2026-07-18 (Flannery & Marcus ch. 10, [VERIFIED]).** The hypothesis was
+pre-registered on a purely dynamical argument. It now has a documented case: **Kachin gumsa/gumlao cycling**,
+where societies shift back and forth between ranked and egalitarian modes and *"hereditary inequality was
+repeatedly created, lasted for a few generations, and then collapsed."*
+- **The period is given: "a few generations" (~60–100 yr).** That is the target for any oscillation the model
+  produces, and it is ~3–5× the ~250-step relaxation time measured in R-68 — a plausible Hopf regime.
+- **The mechanism is explicitly a LAG:** leaders' prestige-seeking *"only increased their followers' resentment
+  and hastened their overthrow"* — resentment ACCUMULATES over generations, where our Boehm leveling corrects
+  within the step. This is direct field support for the delay, not just the dynamical argument.
+- **REFINEMENT to the prediction:** the lagged variable should be a **legitimacy/resentment stock**, not only
+  elite material wealth. Friedman's endogenous account makes rank a *legitimacy reinterpretation* ("they pleased
+  the nats" → "they descend from higher nats"), so both the rise AND the collapse run through legitimacy. The
+  model's `GroupVector.religion` cell — currently a **stub** — is the natural carrier.
+- **A second, DISTINCT cycling mode is named and should not be conflated:** Polynesian *status rivalry* among
+  near-equal heirs (assassination/overthrow/usurpation), which cycles *incumbents* without cycling the
+  ranked/unranked *regime*. Our R-84 challenge-succession already models something close to this — so the model
+  may already contain the Polynesian mode while lacking the Kachin one.
+
+**Resolution:** *(none yet — OPEN, pre-registered 2026-07-18; ethnographic anchor added same day)*

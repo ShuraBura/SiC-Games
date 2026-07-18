@@ -251,6 +251,46 @@ a specialization is **which operators an agent is coupled to**. `aggrandizer` is
 and `prowess` generalising from scalar to a per-activity vector is the natural basis. Build only after the typing
 retrofit, so specialised couplings inherit the invariants rather than re-introducing the R-82 unit error in new
 clothes.
+## 9. What a STRATIFICATION mechanism has to be (Flannery & Marcus 2012, added 2026-07-18)
+
+A design constraint, at the same level as §5's feedback criterion, and it bears directly on the elite layer.
+
+**9.1 Material accumulation alone does NOT produce hereditary rank.** Flannery's warning is blunt: *"if feasting
+were all it took to produce hereditary inequality, there would have been no achievement-based societies left for
+anthropologists to study."* Competitive feasting *"produced individual Big Men who had no way of bequeathing
+renown to their offspring."*
+
+**This reframes our own results rather than contradicting them.** The elite layer stratifies on material
+(R-82/R-83), and we measured exactly what Flannery describes: leaders 3.68× ahead, yet father-was-a-leader only
+53–69% and no hereditary transmission (R-84). **The model is behaving CORRECTLY as an achievement-based
+society.** T-5's failing agricultural arm (0.435 vs 0.48) is therefore probably NOT a calibration shortfall —
+it is a missing mechanism, and adding material heritability alone would be forcing the number rather than
+supplying the cause.
+
+**9.2 The missing operator is LEGITIMACY, and it is a C (Conversion), not an X (Exchange).** Friedman's
+endogenous scenario: success is reinterpreted, not accumulated — *"The key shift in social logic was ... from
+'They must have pleased the nats' to 'They must be descended from higher nats than we are.'"* Once a lineage is
+descended from the ruling spirits it controls the land and is entitled to tribute. **This converts ACHIEVED
+status into ASCRIBED rank — an off-diagonal in the capital matrix, from prowess/material into cred — gated on a
+legitimating belief.** The `GroupVector.religion` cell exists and is a **stub**; it is the natural carrier, and
+this is the first concrete reason to build it.
+
+**9.3 The status vector should be three-way, not two.** Goldman's Polynesian triad is an independent
+decomposition that matches ours and then splits one axis: **mana** (ascribed, born-with = `cred`), **tohunga**
+(expertise: administrative/ritual/craft, raised by training), **toa** (martial prowess). Our single `prowess`
+conflates the last two, and they have different social functions — expertise attaches to a role, while toa is
+*the channel by which low birth is overridden* (*"a warrior of humble birth could rise ... even by chiefly
+individuals"*). **A warrior facet is the social-mobility mechanism, not decoration.** Weights differ by society
+(Tonga/Hawaii, the most unequal, use "the entire playbook"), which is the same society-dependent weighting BHM's
+α supplies quantitatively.
+
+**9.4 Power-balance devices are structural, and cheap to model.** Tonga: a **sacred/secular office split** makes
+assassination harder but creates usurpation risk, controlled by *limiting the land allocated to the secular
+chief*. Tikopia: *"The simultaneous presence of four chiefs acted as a system of checks and balances, preventing
+one ambitious leader from taking over."* Both are A-type (Affiliation) constraints on the office graph, and both
+suggest that **the number and separation of offices is a governing parameter** — something the model currently
+fixes at one leader per band.
+
 
 ---
 
