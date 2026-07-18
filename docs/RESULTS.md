@@ -1918,4 +1918,45 @@ world, R-70/R-71); `enable_band_risk` (shelved, DE-4).
 
 ---
 
+### R-85b - The six residual flags: the dead-knob class is bigger than it looked, and it hides one level deeper (2026-07-18)
+
+**Closing R-85's residual.** Six flags were inert at both seeds despite a live reader and a non-zero magnitude at
+the reader site. Each had a specific hypothesis tested empirically rather than by reading. **All six are now
+explained, and none is a spec bug - but the dead-knob count rises from 5 to 7 (+1 chained).**
+
+| Flag | Diagnosis | Class |
+|---|---|---|
+| `enable_terrain_move_cost` | `move_cost_kcal = 0.0` | **DEAD KNOB** (hidden inside the field builder) |
+| `enable_site_appraisal` | `site_gain = 0.0` | **DEAD KNOB** (hidden inside the field builder) |
+| `enable_condition` | its EMA's only live consumer is the pathogen term, and `pathogen_gamma = 0.0` | **DEAD DOWNSTREAM** (chained) |
+| `enable_bonded_mating` | gated `if bonded and not pair_bonds`; the preset sets pair-bonds ON | **SUPERSEDED BY DESIGN** (F.3a replaced F.1) |
+| `enable_energetic_fertility` | factor = 1.0 for **99.75%** of birth-eligible draws; the rest span 0.9954-1.0 | **REGIME-GATED** (no food stress at this density) |
+| `enable_landscape_packing` | both density definitions give the SAME society target in **8 of 8** bands | **REGIME-GATED** (below threshold resolution) |
+
+**METHODOLOGICAL FINDING - the magnitude can be one level deeper than the flag.** R-85's gate scan looked for a
+companion parameter NEAR THE READER LINE and found five zeros. It MISSED `move_cost_kcal` and `site_gain`
+because those live inside the *field builders* (`_move_cost_field`, `_site_suitability_field`), not at the call
+site. The give-away was measurable and general: **the terrain `cost` layer has real spread (std 0.188) while the
+fields built from it have std EXACTLY 0.0** - a builder that multiplies a varying input by zero. **New check:
+scan for zero magnitudes along the whole dependency chain, and flag any derived field whose std is 0 while its
+input's is not.**
+
+**A SUBSTANTIVE consequence, not just bookkeeping.** `enable_energetic_fertility` is ON in the preset and reads
+as a live nutrition->fertility coupling, but on the population that actually uses it the factor is 1.0 in 99.75%
+of draws and never falls below 0.9954. **So the model's fertility is effectively NOT nutrition-modulated at
+current densities.** Any result that assumes energetic fertility is doing work needs re-reading in that light -
+it will only bite under real food stress, which this regime does not produce.
+
+**Two are correctly inert and should NOT be "fixed":** `enable_bonded_mating` is superseded by the pair-bond path
+(F.3a) and is dead whenever `enable_pair_bonds` is on - that is the intended supersession, not a defect;
+`enable_landscape_packing` is wired correctly and simply does not change the society target at ~0.011 agents/km2
+(both definitions read `complex_forager`). It would separate at higher density, which is what R-61 built it for.
+
+**The dead-knob list for decision (7 + 1 chained):**
+`leader_coherence_gain`, `malnutrition_fission_gain`, `repulsion_gain`, `pathogen_gamma`, `village_gain`,
+`move_cost_kcal`, `site_gain` - plus `enable_condition`, alive but feeding only the zero-gain pathogen term.
+Each needs a per-knob judgement: is the zero DELIBERATE (mechanism built and parked) or an OVERSIGHT?
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

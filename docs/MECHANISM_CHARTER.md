@@ -203,6 +203,12 @@ flag at a second seed, then classify. Findings on first run:
 **New standing check:** a flag audit must inspect the flag AND its magnitude parameter. `flag is True` is not
 evidence a mechanism is live.
 
+**And the magnitude can sit one level deeper than the flag (R-85b).** Two more dead knobs -
+`enable_terrain_move_cost` (`move_cost_kcal=0`) and `enable_site_appraisal` (`site_gain=0`) - were missed by a
+scan of the reader line, because the zero lives inside the *field builder*. The general tell is measurable:
+**a derived field whose standard deviation is exactly 0 while its input's is not** (terrain `cost` std 0.188 ->
+move-cost field std 0.000). Scan the whole dependency chain, and assert non-degeneracy on derived fields.
+
 ### 6.2 What a black-box differential audit CANNOT decide
 
 Learned on the first run, recorded so it is not re-attempted: **conservation invariants (X conserves its total,

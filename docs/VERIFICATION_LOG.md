@@ -113,7 +113,20 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 | Flag-vs-magnitude audit | **5 DEAD KNOBS** - leader_coherence_gain, malnutrition_fission_gain, repulsion_gain, pathogen_gamma, village_gain all 0.0 while their flags are ON. Invalidates the 2026-07-15 config-audit claim that all built mechanisms are correctly ON. |
 | Black-box conservation testing | **NOT SOUND** - trajectory coupling makes A-typed flags move conserved quantities legitimately. Conservation must be instrumented around the call. |
 
-**OPEN (R-85 residual):** 6 flags inert at both seeds with a live reader and non-zero magnitude -
-`enable_bonded_mating`, `enable_condition`, `enable_energetic_fertility`, `enable_landscape_packing`,
-`enable_site_appraisal`, `enable_terrain_move_cost`. Individually inspect before claiming defect or inertness.
-**Also open:** the in-step conservation instrumentation (the half of the charter audit this pass could not do).
+**R-85 residual - CLOSED 2026-07-18 (R-85b).** All six explained, none a spec bug:
+`enable_terrain_move_cost` (`move_cost_kcal=0`) and `enable_site_appraisal` (`site_gain=0`) are DEAD KNOBS whose
+magnitude sits inside the field builder, not at the reader; `enable_condition` is alive but its only consumer is
+the zero-gain pathogen term (CHAINED DEAD); `enable_bonded_mating` is SUPERSEDED BY DESIGN (dead whenever
+pair-bonds are on - F.3a replaced F.1); `enable_energetic_fertility` and `enable_landscape_packing` are
+REGIME-GATED (factor 1.0 in 99.75% of birth-eligible draws; both density definitions give the same society
+target in 8/8 bands).
+
+**Detection lesson:** a zero magnitude can sit one level deeper than the flag. The tell is general - **a derived
+field whose std is exactly 0 while its input's std is not** (terrain `cost` std 0.188 -> move-cost field std
+0.000). Scan the whole dependency chain, not the reader line.
+
+**Substantive consequence:** fertility is effectively NOT nutrition-modulated at current densities. Re-read any
+result that assumes the energetic-fertility coupling is doing work.
+
+**STILL OPEN:** the in-step conservation instrumentation (the half of the charter audit that a black-box
+differential cannot do); and the per-knob decision on the 7 dead knobs + 1 chained (supervisor, one by one).
