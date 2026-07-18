@@ -7,6 +7,12 @@ config with that ONE flag flipped, from the same seed, and record what actually 
 The baseline is the PRESET (not bare defaults) so that prerequisites are satisfied — flipping a flag whose
 prerequisite is off would falsely read as vacuous (this is the trap that made R-82 look inert).
 
+CORRECTION (R-85c, 2026-07-18): the first version flipped booleans only. Because most flags are paired with a
+gain that defaults to 0, turning a flag ON left the mechanism inert and produced a spurious "dead knob" verdict
+for seven flags that are in fact simply OFF in the forager preset and live in `emergent_village_demog()`. The
+harness now sets a live MAGNITUDE whenever it turns a flag on. Read `baseline_on` in the output: only rows with
+`baseline_on=True` are genuine ON→OFF tests of a mechanism the preset actually runs.
+
 What the signature is checked for:
   · VACUOUS      — signature identical to baseline. A specification bug (DE-19), UNLESS declared gauge fixing.
   · A-VIOLATION  — a flag typed Affiliation that moved a conserved quantity (it may only change the graph).
@@ -68,6 +74,25 @@ ENRICH = dict(
     enable_aggregation_sedentism=True,
 )
 
+# MAGNITUDES. **A BOOLEAN FLIP IS NOT ENABLING A MECHANISM.** Most flags are paired with a gain that DEFAULTS TO
+# ZERO, so flipping the flag True while leaving the gain at 0 produces no change — and reads as a dead mechanism.
+# The first version of this harness did exactly that and produced a spurious "7 dead knobs" finding (retracted;
+# see RESULTS R-85c). Values below are the live ones used by `emergent_village_demog()` and the stage harnesses,
+# so a flag turned ON here is turned on the way the project actually runs it.
+MAGNITUDE = {
+    "enable_leader_coherence": {"leader_coherence_gain": 2.0},
+    "enable_size_repulsion": {"repulsion_gain": 0.3},
+    "enable_village_scaling": {"village_gain": 5.0},
+    "enable_site_appraisal": {"site_gain": 0.3, "site_radius": 2, "site_lambda": 1.0},
+    "enable_terrain_move_cost": {"move_cost_kcal": 750.0},          # 0.01·BURN ≈ a 10 km move
+    "enable_malnutrition_fission": {"malnutrition_fission_gain": 2.0},
+    "enable_terrain_pathogen": {"pathogen_gamma": 1.0},
+    "enable_leveling": {"leveling_strength": 0.79, "leveling_share": 0.8},
+    "enable_leader_share": {"leader_share_frac": 0.20},
+    "enable_leader_office": {"office_grievance_gain": 0.05},
+    "enable_material_capture": {"material_hide_frac": 0.07},
+}
+
 # Known prerequisite chains: if a flag's prereq is not satisfied in the arm, "no change" is UNINFORMATIVE
 # rather than a spec bug. Reported separately so a false VACUOUS is never called a defect.
 PREREQ = {
@@ -107,7 +132,10 @@ def signature(seed=0, steps=120, n=300, flip=None):
         cur = getattr(d, flip, None)
         if cur is None:
             return None
-        d = d.model_copy(update={flip: (not cur)})
+        upd = {flip: (not cur)}
+        if not cur:                                   # turning a flag ON must also give it a LIVE magnitude,
+            upd.update(MAGNITUDE.get(flip, {}))       # else the zero-default gain makes it read as inert
+        d = d.model_copy(update=upd)
     w = TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=seed,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",

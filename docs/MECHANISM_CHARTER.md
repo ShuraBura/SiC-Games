@@ -191,23 +191,28 @@ flag at a second seed, then classify. Findings on first run:
   branch allocated from a band-id counter created only INSIDE that guard. **Every R-84 test set affiliation
   True**, so ten passing tests missed it; the audit hit it on the 7th flag.
 - **`enable_cred_renorm` is not a gauge** (above).
-- **A new defect class: FLAG ON, MAGNITUDE ZERO.** Five flags are enabled in the preset but multiplied by a gain
-  of exactly 0 — `enable_leader_coherence` (`leader_coherence_gain=0`), `enable_malnutrition_fission`
-  (`malnutrition_fission_gain=0`), `enable_size_repulsion` (`repulsion_gain=0`), `enable_terrain_pathogen`
-  (`pathogen_gamma=0`), `enable_village_scaling` (`village_gain=0`). They read as ON in any flag-level config
-  audit while contributing nothing. **This invalidates the 2026-07-15 config audit's claim that "all built
-  mechanisms are correctly ON".**
+- **~~A new defect class: FLAG ON, MAGNITUDE ZERO~~ — RETRACTED (R-85c).** The seven flags reported here as
+  "enabled in the preset with a dead gain" are **not enabled in that preset at all**, and run at live values in
+  `emergent_village_demog()`. The harness had flipped them ON while their gain stayed at the zero DEFAULT. The
+  claim that this invalidated the 2026-07-15 config audit is **also withdrawn**. See RESULTS R-85c.
+  **What is true, and still worth a standing check:** a boolean flip is not enabling a mechanism — most flags
+  pair with a gain that defaults to 0, so `enable_X=True` alone leaves X inert. That is a trap for whoever
+  enables a flag (it caught this harness), not evidence that a preset is misconfigured.
 - **Confirmed independently:** `enable_infanticide` has no reader (the known stub), and `enable_genealogy_log`
   [O] mutates nothing (the observer invariant HOLDS).
 
-**New standing check:** a flag audit must inspect the flag AND its magnitude parameter. `flag is True` is not
-evidence a mechanism is live.
+**New standing check (restated after R-85c):** a flag audit must inspect the flag AND its magnitude, **and must
+record the BASELINE STATE of the flag beside every verdict** — "does nothing when I turn it on" and "does
+nothing" are different claims, and conflating them is what produced the retracted finding. Scope a config audit
+to the preset FUNCTION, not the file: `run_se0_controlled_climate.py` contains two presets, and grepping the
+file attributes the union to both.
 
-**And the magnitude can sit one level deeper than the flag (R-85b).** Two more dead knobs -
-`enable_terrain_move_cost` (`move_cost_kcal=0`) and `enable_site_appraisal` (`site_gain=0`) - were missed by a
-scan of the reader line, because the zero lives inside the *field builder*. The general tell is measurable:
-**a derived field whose standard deviation is exactly 0 while its input's is not** (terrain `cost` std 0.188 ->
-move-cost field std 0.000). Scan the whole dependency chain, and assert non-degeneracy on derived fields.
+**~~And the magnitude can sit one level deeper than the flag (R-85b)~~ — RETRACTED with the above (R-85c):**
+`move_cost_kcal` and `site_gain` are 0 only because the forager preset does not enable those mechanisms; both
+are live in `emergent_village_demog()` (750.0 and 0.3). **The diagnostic technique nonetheless stands and is
+worth keeping:** *a derived field whose standard deviation is exactly 0 while its input's is not* (terrain `cost`
+std 0.188 -> move-cost field std 0.000) is a reliable tell that a builder is multiplying a varying input by
+zero — it correctly located the zero, and only the INTERPRETATION of why it was zero was wrong.
 
 ### 6.2 What a black-box differential audit CANNOT decide
 

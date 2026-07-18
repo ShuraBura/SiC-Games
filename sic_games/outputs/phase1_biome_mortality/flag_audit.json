@@ -417,7 +417,17 @@
    "flag": "enable_malnutrition_fission",
    "type": "A",
    "baseline_on": false,
-   "changed": [],
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
    "unmet_prereq": []
   },
   {
@@ -641,14 +651,34 @@
    "flag": "enable_site_appraisal",
    "type": "T",
    "baseline_on": false,
-   "changed": [],
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
    "unmet_prereq": []
   },
   {
    "flag": "enable_size_repulsion",
    "type": "A",
    "baseline_on": false,
-   "changed": [],
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
    "unmet_prereq": []
   },
   {
@@ -714,14 +744,33 @@
    "flag": "enable_terrain_move_cost",
    "type": "T",
    "baseline_on": false,
-   "changed": [],
+   "changed": [
+    "band_sig",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
    "unmet_prereq": []
   },
   {
    "flag": "enable_terrain_pathogen",
    "type": "N",
    "baseline_on": false,
-   "changed": [],
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
    "unmet_prereq": []
   },
   {

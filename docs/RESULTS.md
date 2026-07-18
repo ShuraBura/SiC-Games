@@ -1959,4 +1959,61 @@ Each needs a per-knob judgement: is the zero DELIBERATE (mechanism built and par
 
 ---
 
+### R-85c - RETRACTION: the "dead knobs" were an artifact of my own audit harness (2026-07-18)
+
+**Origin:** the supervisor asked whether a zeroed knob's job might already be done by ANOTHER mechanism. Checking
+that meant looking outside the single preset the audit had been using - and the answer overturned R-85's and
+R-85b's headline finding.
+
+**WHAT WAS WRONG.** R-85 reported "five flags enabled in the preset but multiplied by a gain of exactly 0", and
+R-85b added two more. **None of those seven flags is enabled in `realistic_forager_demog()`.** That preset
+enables 17 flags and none of the seven is among them. The audit harness flipped each flag `False -> True` while
+its companion gain stayed at the **zero DEFAULT**, so the mechanism stayed inert - and I read that inertness as a
+property of the configuration rather than of my own test.
+
+**They are also not dead anywhere.** All seven run at live values in `emergent_village_demog()` and the stage
+harnesses: `leader_coherence_gain=2.0`, `repulsion_gain=0.3`, `village_gain=5.0`, `site_gain=0.3`,
+`move_cost_kcal=750.0` (0.01·BURN, in the SAME FILE at line 113), `malnutrition_fission_gain=2.0`,
+`pathogen_gamma` swept in `run_2m_multibiome.py`. They are **preset-scoped village/scarcity-arc mechanisms,
+correctly absent from a forager preset** - not defects.
+
+**PROOF.** Re-running the audit with a MAGNITUDE map (each flag turned on at the value the project actually uses)
+makes **five of the seven active immediately**: `malnutrition_fission`, `size_repulsion`, `site_appraisal`,
+`terrain_move_cost`, `terrain_pathogen`. The other two (`leader_coherence`, `village_scaling`) remain inert for
+regime reasons - `village_scaling` needs villages, and the discrete settlement machinery is inactive in this
+world config.
+
+**RETRACTED:**
+- "Five dead knobs" (R-85) and "seven dead knobs, magnitude hides one level deeper" (R-85b). **Withdrawn.**
+- "This invalidates the 2026-07-15 config audit's claim that all built mechanisms are correctly ON."
+  **That retraction was itself wrong and is withdrawn.** The 2026-07-15 audit was not shown to be in error.
+- The per-knob supervisor decision this generated is **moot**; there is nothing to decide.
+
+**WHAT SURVIVES, and why each is unaffected:**
+| Finding | Status | Why it holds |
+|---|---|---|
+| `_next_band_id` crash under `enable_leader_office` + no band affiliation | **HOLDS** | a real AttributeError, reproduced and fixed, regression-tested |
+| `enable_cred_renorm` is NOT gauge fixing | **HOLDS** | it IS enabled in the forager preset, so this was a genuine ON->OFF test |
+| `enable_infanticide` is an unimplemented stub | **HOLDS** | established by reader search, independent of magnitudes |
+| `enable_genealogy_log` [O] mutates nothing | **HOLDS** | observer invariance; a magnitude would not change it |
+| `enable_bonded_mating` superseded by pair-bonds | **HOLDS** | enabled in the preset; a genuine ON->OFF test |
+| Black-box audits cannot test conservation | **HOLDS** | methodological, independent of this error |
+| `enable_energetic_fertility` factor ~1.0 in 99.75% of eligible draws | **HOLDS** | measured directly on the eligible population, not inferred from a flip |
+| `enable_landscape_packing` gives the same society target in 8/8 bands | **HOLDS** | measured directly |
+
+**THE REAL FINDING, correctly stated.** *A boolean flip is not enabling a mechanism.* Most flags are paired with
+a gain that **defaults to zero**, so `enable_X=True` alone leaves X inert. That is a genuine trap - it caught me,
+running a harness built specifically to catch this class of thing - but it is a trap for **whoever enables a
+flag**, not evidence that any preset is misconfigured. The harness now carries a MAGNITUDE map and sets a live
+gain whenever it turns a flag on, and its output records `baseline_on` so that only `True` rows are read as
+genuine tests of a running mechanism.
+
+**METHOD LESSON (the one that generalises).** The audit conflated "this flag does nothing when I turn it on" with
+"this flag does nothing". The distinguishing question is **what was the baseline state**, and I did not record it
+prominently enough to notice. A differential audit must report the baseline value beside every verdict.
+Second-order: I grepped `enable_*=True` across a FILE that contains two presets and attributed the union to one
+of them. **Scope a config audit to the function, not the file.**
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

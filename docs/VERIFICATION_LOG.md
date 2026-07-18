@@ -110,7 +110,7 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 | `enable_cred_renorm` gauge-invariance | **REFUTED** - moves every observable. The fixed 1.0 inheritance anchor makes cred rescaling non-scale-invariant. Re-typed R (Regulator). |
 | `enable_genealogy_log` observer invariance | **PASS** - mutates nothing. First positive confirmation of a charter type. |
 | `enable_infanticide` reader search | **CONFIRMED STUB** - no reader outside the config object. |
-| Flag-vs-magnitude audit | **5 DEAD KNOBS** - leader_coherence_gain, malnutrition_fission_gain, repulsion_gain, pathogen_gamma, village_gain all 0.0 while their flags are ON. Invalidates the 2026-07-15 config-audit claim that all built mechanisms are correctly ON. |
+| Flag-vs-magnitude audit | **RETRACTED (R-85c)** - those flags are NOT enabled in `realistic_forager_demog()`; the harness flipped them ON while their gain stayed at the zero DEFAULT. All seven run at live values in `emergent_village_demog()` (leader_coherence_gain=2.0, repulsion_gain=0.3, village_gain=5.0, site_gain=0.3, move_cost_kcal=750.0, malnutrition_fission_gain=2.0, pathogen_gamma swept). Re-run with a MAGNITUDE map: 5 of 7 active immediately. The claim invalidating the 2026-07-15 config audit is **also withdrawn**. |
 | Black-box conservation testing | **NOT SOUND** - trajectory coupling makes A-typed flags move conserved quantities legitimately. Conservation must be instrumented around the call. |
 
 **R-85 residual - CLOSED 2026-07-18 (R-85b).** All six explained, none a spec bug:
@@ -130,3 +130,11 @@ result that assumes the energetic-fertility coupling is doing work.
 
 **STILL OPEN:** the in-step conservation instrumentation (the half of the charter audit that a black-box
 differential cannot do); and the per-knob decision on the 7 dead knobs + 1 chained (supervisor, one by one).
+
+**R-85c correction (2026-07-18).** Two method errors, both mine, recorded so the pattern is recognisable:
+1. **Conflating "does nothing when turned ON" with "does nothing".** The distinguishing fact is the BASELINE
+   state of the flag; the harness computed it but did not surface it beside the verdict. Fixed - `baseline_on`
+   is now printed, and only `True` rows are genuine tests of a running mechanism.
+2. **Scoping a config grep to a FILE containing two presets.** `run_se0_controlled_climate.py` defines both
+   `realistic_forager_demog()` and `emergent_village_demog()`; grepping `enable_*=True` over the file
+   attributed the union to the forager preset. **Scope to the function.**
