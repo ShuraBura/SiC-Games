@@ -1161,8 +1161,39 @@ establish a personal claim by the dynamic of an autoexploitation put at the othe
 band output (`leader_share_frac` > 0) is by construction the CHIEFLY regime, not the big-man one** — which is why
 the same flag pairs naturally with `succession_dissolve=False`.
 
-### Smith, E.A. & Codding, B.F. (2021). "Ecological variation and institutionalized inequality in hunter-gatherer societies." *PNAS* 118(13):e2016134118.
-**Status: CITED, NOT YET FILED** (owed — cited in the R-83 commit and in the defensibility discussion). Carries the
-resource clumping × defensibility → institutionalized inequality result (r≈0.881), which converges with Hayden
-1995's "spatially restricted resource locations" precondition and with Dyson-Hudson & Smith 1978 (already filed).
-**Get the PDF and promote to [VERIFIED] before any claim leans on the 0.881 figure.**
+### Smith, E.A. & Codding, B.F. (2021). "Ecological variation and institutionalized inequality in hunter-gatherer societies." *PNAS* 118(13):e2016134118. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — full text read 2026-07-18** (open access via PMC8020663). Sample: **89 Pacific-coast
+North American hunter-gatherer societies** (34 Northwest Coast + 55 California), scored on a Hierarchy Index (HI,
+0–3) and a Resource Index (RI).
+
+**Headline correlation CONFIRMED:** *"the correlation between HI and RI was nearly as high (r = 0.766, n = 17) as
+for the full sample (**r = 0.881, n = 89**)"* — the second figure is the one this project cites. (Recorded because
+a first pass over a summarised fetch reported the figure as ABSENT; it is present. One fetch summary is not
+verification — read the numbers.)
+
+**Full result set:**
+| Statistic | Value | What it measures |
+|---|---|---|
+| **r (HI ~ RI), full sample** | **0.881** (n=89) | resource structure ↔ institutionalized hierarchy |
+| r (HI ~ RI), high-fish California | 0.766 (n=17) | the same within a sub-sample |
+| Random-forests variance explained | 86% | six-variable model |
+| GAM deviance explained | 71% | best model |
+| pSEM: RI → hierarchy | β_std **2.16**, P<0.0001 | direct effect |
+| pSEM: fishing-site ownership → hierarchy | β_std **0.96**, P=0.043 | direct effect |
+| pSEM: RI indirect (via fishing ownership) | 0.70, P=0.317 | n.s. — RI acts DIRECTLY |
+| Effect size: Resource Index | **0.37** | largest predictor |
+| Effect size: latitude / longitude | 0.35 / −0.22 | |
+| Effect size: fishing-site OWNERSHIP | 0.13 | |
+| Effect size: **NPP productivity** | **0.04** | essentially nil |
+| Effect size: offensive raiding | −0.01 | essentially nil |
+
+**Two findings that bear directly on this model.** (1) **NPP productivity has an effect size of 0.04 — raw
+productivity does almost nothing**, while resource STRUCTURE (RI) carries the result. This independently
+corroborates R-65's correction that *storability, not NPP, is the axis* (a claim that had over-reached on
+cross-world %stratified). (2) **Fishing-site OWNERSHIP is a significant direct predictor** (β_std 0.96, P=0.043) —
+the economic-defensibility channel (`enable_economic_defensibility`) measured in the ethnographic record, and the
+same phenomenon as Hayden 1995's "spatially restricted resource locations ... fishing rocks, weirs" precondition
+for a hereditary managerial class. Converges with Dyson-Hudson & Smith 1978 (already filed).
+
+**Note on offensive raiding (−0.01):** warfare does NOT predict hierarchy in this sample — relevant if a future
+stage reaches for a conflict-driven stratification route.

@@ -73,6 +73,90 @@
 
 **Status / superseded by:** replaced by the **POINT** form (Bettencourt-correct, R-54): the cell's OWN output scales super-linearly with its occupancy, per-capita premium `A_cell·(n^(β−1)−1)` *rises* with co-location and composes with (reinforces) GRP+cap packing. `aggl_mode="catchment"` is KEPT for comparison only (default `"point"`). The village-scale concentration ultimately comes from **forage cap + GRP + hierarchy-gated fission ceiling + catchment site-appraisal × resource scarcity** (R-54/R-55), not from any single co-location term.
 
+## DE-12 - "Wide-net -> scatter": connubium REACH as the driver of the boom-bust (REFUTED 2026-07-13, R-67)
+
+**What was tried:** Cut-2 (adaptive exogamous ring-search mating) robustly broke R-66's winner-take-all patriline
+fixation (top 0.89 -> 0.21-0.31), proving that fixation was a MATING-STRUCTURE artifact - but every reach setting
+boom-busted. The hypothesis was that a WIDE marriage net scatters people across the landscape and collapses the
+population, so narrowing the reach should fix it.
+**Why it fails:** REFUTED by direct test - **narrower reaches busted HARDER**, the opposite of the prediction. The
+real driver is skew-flattening: Cut-2 drops childless males 37% -> 23-28%, which removes the Malthusian brake.
+Reach width is not the lever. **Do not retune reach to cure a boom-bust.**
+**Status:** connubium arc CLOSED. Cut-2 stays default-OFF on branch `connubium-cut2` (not adopted). A separate
+skew-preservation fix is the open option, deferred.
+
+## DE-13 - The m*=25 "recovery" as a secular-cycle seed (NEGATIVE 2026-07-13, R-67)
+
+**What was tried:** at connubium m*=25 the population showed a peak-then-recover shape that looked like the first
+period of a Turchin secular cycle. Tested properly: 45k steps x 2 seeds.
+**Why it fails:** a **one-off founder-overshoot transient, not cycling** - single peak ~yr170, then a flat low
+plateau (~2000, vs Cut-1's 6400 over 43k steps); both seeds concordant. Dynasties slowly re-concentrate
+(top 0.02 -> 0.3-0.4) but never fixate and never cycle. **A single peak in a short window is not a cycle** - always
+run to multiple would-be periods before calling one.
+
+## DE-14 - Secular cycles from the SUBSISTENCE BASE (three independent negatives; standing as of 2026-07-15)
+
+**What was tried, three times, from three different directions:** (i) mating structure / connubium (R-67);
+(ii) the substrate's own attractor dynamics (R-68); (iii) agricultural soil depletion -> abandonment -> re-settle,
+the most promising candidate since it is a genuine oscillator in principle (R-71).
+**Why it fails:** all three are stable or transient. R-71 is the sharpest: emergent abandonment CURED the
+population ratchet (collapse -> equilibrium ~14,421 +/- 4.5%, 25 settlements churning) but produced **no cycles** -
+rotating swidden is a STABLE regime, which is also ethnographically correct.
+**Conclusion (load-bearing):** **secular cycles are NOT in the subsistence base.** They require either exogenous
+shocks (`enable_tier2_shock`, default-OFF) or the explicit Turchin elite/instability layer. **Do not attempt a
+fourth subsistence-side route to cycles without a new argument for why it differs from these three.**
+
+## DE-15 - Band size as an ENVIRONMENT-DEPENDENT emergent quantity (FAILED 2026-07-17, R-72)
+
+**What was tried:** `enable_emergent_band_size` v3 - derive band size from risk-pooling against environmental
+variance, so that Marlowe's 25-50 range emerges from biome rather than being hardcoded at 25.
+**Why it fails:** the environment-dependence does not appear - seeded correlation r = +0.165, n.s. Three separate
+explanations for the null were each falsified by measurement. The measured `cchunts` hunting CV (2.11) carries
+**no biome signal**, so there is no environmental variance gradient for band size to track in the first place.
+**Status:** ARC CLOSED. The mechanism remains but does not deliver environment-dependence; band size stays
+effectively ~25. Note the flag is default-OFF, so band size is currently HARDCODED 25 across all biomes - a known
+limitation whenever biomes are compared.
+
+## DE-16 - status->RS r~0.19 as a robust standing result (RE-CLASSIFIED as artifact 2026-07-17, R-76/R-77)
+
+**What it was:** R-19/R-20's headline "lineage of chiefs" result - status -> reproductive success at r ~ 0.19,
+matching von Rueden's cross-cultural figure.
+**Why it is not what it looked like:** the skew was carried by **~6x too much polygyny**. The polygyny mechanism
+had no outflow, so the rate knob never actually worked and the realized rate ran far above the configured one. At
+a realistic ~4% rate the correlation caps at ~0.07. Wife quality closes only about a third of the gap (0.07 vs
+0.19).
+**What survives:** von Rueden's 0.19 is a CROSS-CULTURAL average inflated by polygynous societies; the
+monogamy-dominant family model should target ~0.13-0.15, which it reaches. **Do not cite 0.19 as a matched
+target for a monogamous configuration.**
+
+## DE-17 - The FERTILITY channel for wife quality (structurally inert 2026-07-17, R-80)
+
+**What was tried:** route the wife-quality effect through fertility, so that higher-status men's wives have higher
+birth rates.
+**Why it fails:** structurally inert - overflow and need are anti-correlated in this economy, so the channel has
+no purchase regardless of coefficient. **This is a specification problem, not a tuning problem**; a bigger
+coefficient cannot rescue it.
+
+## DE-18 - Aggrandizer capture at the CELL unit (wrong unit 2026-07-17, R-82 -> R-83)
+
+**What was tried:** Hayden-style aggrandizer capture of redistributed output, executed per CELL.
+**Why it fails:** a cell holds 1-2 agents under forager dispersal - **there is no group to skim.** Capture stayed
+inert at 1.14x even at 80% capture, which reads as "the mechanism does not work" but is really "the unit is
+wrong."
+**Superseded by R-83:** the same mechanism at the BAND unit (~25) gives leader/other 3.68x. **General lesson:
+before concluding a social mechanism is inert, check the SIZE of the group it operates on.**
+
+## DE-19 - `succession_dissolve` measured against the band MEAN (vacuous 2026-07-18, R-84)
+
+**What was tried:** Sahlins' big-man dissolution regime, implemented as "a successor must exceed the band MEAN
+merit by `office_challenge_margin` (+25%), else the band stays leaderless."
+**Why it fails:** the maximum of ~25 lognormal-ish merit draws clears +25% over the mean essentially always, so
+the flag had **literally zero effect** - identical output, zero vacancies, ON and OFF. A mechanism that PASSES
+WHILE DOING NOTHING (same failure class as the R-74 vacuous test that asserted `1.0 == 1.0`).
+**Fixed, not abandoned:** re-specified against the NEAREST RIVAL rather than the mean - 2/18 bands leaderless,
+which is the intended interregnum. **Standing check: if a flag's ON/OFF output is indistinguishable, treat that as
+a specification bug, not a small effect size.**
+
 ---
 
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*

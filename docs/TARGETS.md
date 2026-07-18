@@ -148,3 +148,71 @@ coarse split as a byproduct; the fine mechanistic synergy is what remains here a
 
 *End of TARGETS — seeded 2026-06-05. Graduate a target by moving it to HYPOTHESES with a test
 spec; never mark a target "confirmed."*
+
+---
+
+## T-5 - Wealth inequality matches BHM 2009 by SOCIETY TYPE (not just in the forager case)
+
+**Status:** ACTIVE VALIDATION TARGET (forager arm already met). **Origin:** R-84b, 2026-07-18.
+**Source:** Borgerhoff Mulder et al. 2009 (*Science* 326:682) Table 2, `[VERIFIED]`.
+
+The alpha-weighted composite Gini, computed on the model's three status facets with BHM's own importance weights
+(embodied=`prowess`, relational=`cred`, material=`material`):
+
+| System | alpha (emb, rel, mat) | Target Gini | Model status |
+|---|---|---|---|
+| Hunter-gatherer | 0.46 / 0.39 / 0.15 | **0.25 +/- 0.04** | **MET** - 0.258 at `leader_share_frac`=0.20 |
+| Horticultural | 0.53 / 0.26 / 0.21 | 0.27 | not yet attempted |
+| Pastoral | 0.26 / 0.14 / 0.61 | 0.42 | not yet attempted |
+| Agricultural | 0.27 / 0.14 / 0.59 | **0.48** | **NOT MET** - best 0.435 (leveling off, share 0.50) |
+
+**Why it is a real target:** the forager arm is met almost trivially (the composite barely moves with the levy,
+because material is only 15% of forager weight), so the *discriminating* test is the AGRICULTURAL arm - reaching
+0.48 requires the model to produce material heritability, not just material accumulation. BHM's beta for material
+goes 0.17 (forager) -> 0.55-0.67 (agricultural); **the model currently has no material inheritance at all**, which
+is the most likely reason the agricultural arm falls short. That is a concrete, falsifiable next mechanism.
+
+## T-6 - Big-man status is inherited ~75% of the time WITHOUT inheriting the office
+
+**Status:** ACTIVE VALIDATION TARGET (partially met). **Origin:** R-84, 2026-07-18.
+**Source:** Hayden 1995 `[VERIFIED]`: *"About 75% of New Guinea Entrepreneur Big Men had fathers that were also
+Big Men"* - transmitted via moka partners and wives, **not** the position.
+
+**Model status:** `leader_tenure()["father_was_leader"]` = 53-69% (centred ~60%) vs the 75% target. Emergent, never
+an input - the office is never inherited in the model, so any continuity comes from heritable `cred`.
+**Why the gap is informative:** Hayden's actual channel is RELATIONAL capital (exchange partnerships), which the
+model does not transmit - `cred` is a scalar, not a partner network. Closing this gap most likely means making
+relational capital heritable, which is also the alpha=0.39 cell BHM says matters most for foragers after embodied.
+**Graduation:** becomes a HYPOTHESIS once relational capital is a transmissible object rather than a scalar.
+
+## T-7 - Hierarchy tracks resource STRUCTURE, not productivity
+
+**Status:** ACTIVE VALIDATION TARGET. **Origin:** 2026-07-18 (filed with Smith & Codding).
+**Source:** Smith & Codding 2021 (*PNAS* 118:e2016134118) `[VERIFIED]`, n=89 Pacific-coast HG societies.
+
+| Predictor of hierarchy | Effect size |
+|---|---|
+| Resource Index (structure) | **0.37** |
+| Fishing-site OWNERSHIP | 0.13 (pSEM direct b_std 0.96, P=0.043) |
+| **NPP productivity** | **0.04** |
+| Offensive raiding | -0.01 |
+
+with **r = 0.881 (n=89)** between the Hierarchy Index and Resource Index.
+
+**The model must reproduce the ORDERING, not just the existence of stratification:** varying raw productivity
+should move stratification hardly at all, while varying resource structure/defensibility should move it a lot.
+**This independently corroborates R-65's correction** ("storability, not NPP, is the axis") and is directly
+testable against the existing world survey. **Also note raiding at -0.01** - warfare does not predict hierarchy in
+this sample, which is a caution against reaching for a conflict-driven stratification route.
+
+## T-8 - Leaders are removed the way Boehm's societies remove them
+
+**Status:** MET at the attempt level. **Origin:** R-84, 2026-07-18.
+**Source:** Boehm 1993 Table I `[VERIFIED]`, columns counted over the 48-society survey.
+
+Desertion 17 : deposition 9 (~65% desertion) among removal-type sanctions. **Model: 62-74% of sanction ATTEMPTS
+are desertion.** The comparison is deliberately on attempts, not outcomes - Boehm codes which sanctions a society
+PRACTISES, and in the model a challenge can fail against the margin while a desertion cannot.
+**Still open:** the structural split (deposition in centralized societies, desertion in mobile/dispersed ones) is
+anchored but **not yet tested** - it predicts that turning on settlement-scale institutions should shift the model
+toward the deposition channel. That is a free prediction worth running.
