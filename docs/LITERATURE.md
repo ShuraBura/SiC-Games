@@ -1062,3 +1062,26 @@ dominates triggers a sanction whose escalation is anchored on the ladder above (
 Elites can only emerge where this leveling is **defeated** (storable/defensible surplus that cannot be shared out,
 circumscription, or scale beyond gossip-policing). Complements Testart 1982 (storage as the enabler) and Hayden
 (aggrandizers as the driver). NB the model already has a "Boehm gate" (`leader_society_weight`) — this is its anchor.
+
+### Testart, A. (1982). "The Significance of Food Storage among Hunter-Gatherers: Residence Patterns, Population Densities, and Social Inequalities [and Comments and Reply]." *Current Anthropology* 23(5):523–537.
+**Status: FILED + [VERIFIED] — full text read 2026-07-17** (`literature/Testart - 1982 - The Significance of Food Storage Among Hunter-Gatherers.pdf`, 15 pp). **Obtained from the author's own site**
+(`alaintestart.com/UK/documents/storage.pdf` — self-archived OA; note the host's TLS cert mismatches, fetched over
+plain HTTP). **This closes the long-standing "TO-GRAB (paywalled)" flag on Testart in this file** — every prior
+Testart citation in the docs was SEARCH-VERIFIED only; they can now be checked against the primary text.
+
+**What was lifted — the STORAGE prime-mover (the enabling condition of the elite layer).** Testart's thesis is that
+*storing* hunter-gatherers form a distinct economic type from *non-storing* ones, and that three traits covary with
+intensive seasonal storage: **(1) sedentism** (a stored stock must be guarded/returned to, so residence follows the
+store, not the resource), **(2) high population density** — storing foragers reach "among the highest known levels of
+population density" for hunter-gatherers — and **(3) socioeconomic inequality**. The California and Northwest Coast
+peoples are the type cases, and they "depart significantly from the commonly accepted definition of hunter-gatherer
+societies," which is Testart's challenge to treating agriculture as *the* milestone in social history: the break is
+**storage**, not farming. He also contrasts the **food-sharing** norm of non-storing foragers (§"Food sharing among
+nonstoring hunter-gatherers") with the differential accumulation storage permits — the same immediate- vs
+delayed-return axis Woodburn 1982 draws.
+
+**How it is used / will be used:** already the anchor for the storage + delayed-return mechanics (§4.5.11, the morph
+trigger, the overwintering granary). For the **elite layer** it supplies the *enabling condition*: storable surplus is
+what lets accumulation escape the sharing norm — i.e. the thing that **defeats Boehm's leveling** (see the Boehm 1993
+entry above). Chain: **storable surplus (Testart) → accumulation escapes sharing → leveling defeated (Boehm) →
+aggrandizer capture of redistribution (Hayden, TO-GRAB) → durable elite.**
