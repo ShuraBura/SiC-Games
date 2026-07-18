@@ -849,6 +849,46 @@ class DemographyConfig(BaseModel):
     # Prerequisite for the elite/material layer (a leaking homeostat can't be made state-dependent, Stage D).
     # Default OFF ⇒ bit-exact.
     enable_cred_renorm: bool = False
+    # ── ELITE LAYER, STAGE A (R-82): MATERIAL as a third capital cell ───────────────────────────────
+    # The status vector is [cred (ascribed), prowess (achieved), MATERIAL (durable)]. cred/prowess couple to
+    # the food contest and mating, but BOTH wash out materially — measured corr(cred, wealth) ≈ 0, because the
+    # sharing economy feeds everyone to their reserve cap each step. **Durability is the stratifying property**:
+    # a small per-step capture advantage integrates into a large stock gap only if the stock PERSISTS.
+    #
+    # ANCHORS (all [VERIFIED] in LITERATURE.md): **Sahlins 1968** — foragers deliberately "run below capacity"
+    # (~20–30%), so surplus is a SOCIAL outcome, not a technical given; **Boehm 1993** — that baseline is held
+    # by active leveling (38/48 societies remove an over-assertive individual; triggers include "lack of
+    # generosity or MONOPOLIZING RESOURCES"); **Testart 1982** — STORABLE surplus is the escape route, because
+    # a granary cannot be shared out the way a carcass can; **Hayden** (aggrandizer / control-of-redistribution,
+    # TO-GRAB) — the driver: the aggrandizer claims MORE THAN HE NEEDS and converts it to durable goods.
+    #
+    # MECHANISM — capture the granary LEFTOVER. The S.2 draw is deficit-capped, so weight-rich but near-full
+    # claimants leave surplus in the store ("any leftover … stays in the granary"). That leftover is exactly
+    # what an aggrandizer takes beyond need: it is claimed status^κ-weighted into a DURABLE `material` stock
+    # (not `wealth`, which is burned and capped). High cred ⇒ bigger claim ⇒ material stratification that does
+    # NOT wash out. Requires enable_storage (the granary) + the overwintering/seasonal zone.
+    enable_material_capture: bool = False
+    material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the granary LEFTOVER claimed as durable goods
+    material_decay: float = Field(0.0, ge=0.0, le=1.0)          # per-step depreciation of the durable stock (0 = imperishable)
+    # WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an
+    # "ambitious, accumulative aggrandizer" — "the best and most highly motivated minds of an epoch" — i.e. a
+    # PERSONALITY/STRATEGY TYPE held by a MINORITY, present in every society. It is NOT a rank in an inherited
+    # status order. (R-82's first cut weighted capture by cred^κ and measured corr(cred, material) = −0.018:
+    # a SPECIFICATION error, not a tuning one — the wrong variable.) Aggrandizers exist everywhere; what varies
+    # is whether conditions let them act — which is the gate below. That separation is the testable core of
+    # Hayden's thesis: hold the trait constant, vary the gate, and inequality should appear only under abundance.
+    aggrandizer_frac: float = Field(0.0, ge=0.0, le=1.0)        # share of agents who are aggrandizer-type
+    # WHEN capture is possible — the ABUNDANCE + INVULNERABILITY gate. [Hayden 1995 Fig. 6, p.77 VERIFIED] the
+    # top trait row is "Resource Abundance and Resources Invulnerable to Overexploitation or Degradation",
+    # running from MINIMUM expression among Egalitarian to MAXIMAL among Entrepreneurs/Chiefs. Extraction can
+    # only persist where it does not endanger the stock — otherwise Boehm leveling crushes the aggrandizer.
+    # Implemented against the GD-1 stock fraction B ∈ [0,1] (1.0 = at ceiling ⇒ invulnerable; low = overexploited).
+    material_invulnerability_min: float = Field(0.0, ge=0.0, le=1.0)   # min local stock fraction B for capture to fire
+    # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
+    # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
+    # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).
+    # Keeping it a separate scalar now means Stage E swaps one function, with no rearchitecting.
+    material_unit_value: float = Field(1.0, ge=0.0)
     # Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS
     # facet (achieved) joins the contest weight multiplicatively (Cobb–Douglas, equal within-domain exponents):
     # weight = ((cred+ε)·(prowess+ε))^κ. Default off → lineage-only = R-18 exact. Build step 1 ships the seam;

@@ -445,6 +445,12 @@ class TerrainWorld(mesa.Model):
         # at 1 = neutral reputation). The prowess facet joins the multiplicative contest weight only when
         # enabled (else lineage-only = R-18 exact; a uniform prowess cancels in the share ratio).
         agent.prowess = 1.0
+        agent.material = 0.0                       # R-82 Stage A: the DURABLE capital cell (granary leftover
+                                                   # captured; persists, unlike burned `wealth`)
+        # R-82: AGGRANDIZER type (Hayden 1995) — an ambition/strategy trait held by a MINORITY, present in every
+        # society and INDEPENDENT of inherited cred. Aggrandizers exist everywhere; the gate decides if they act.
+        _af = getattr(self._demog, "aggrandizer_frac", 0.0) if self._demog is not None else 0.0
+        agent.aggrandizer = 1.0 if (_af > 0.0 and self.random.random() < _af) else 0.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
         agent._partner = None                      # F.3a: a FEMALE's husband link (None = unpaired). Males use _wives.
@@ -1414,6 +1420,10 @@ class TerrainWorld(mesa.Model):
         sex_div = demog.sex_division if (demog is not None and game_on) else 0.0   # step 3: prowess-signal only
         # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
         store_on = demog is not None and demog.enable_storage
+        # R-82 Stage A: aggrandizer capture of the granary leftover into the durable `material` cell.
+        mat_on = store_on and getattr(demog, "enable_material_capture", False)
+        mat_frac = demog.material_capture_frac if mat_on else 0.0
+        mat_inv_min = getattr(demog, "material_invulnerability_min", 0.0) if mat_on else 0.0
         store_frac = demog.storable_fraction if store_on else 0.0
         # Resource-dependent storability (Testart): per-cell storable fraction from the local grain/fish/forage/game mix.
         sfrac_field = (self._storable_frac_field() if (store_on and getattr(demog, "enable_resource_storability", False))
@@ -1591,6 +1601,34 @@ class TerrainWorld(mesa.Model):
                         for (a, _), g in zip(needy, gives):
                             a.wealth += g
                             store -= g
+                # R-82 STAGE A — AGGRANDIZER CAPTURE of the granary LEFTOVER as DURABLE material.
+                # The S.2 draw above is deficit-capped, so surplus survives it ("any leftover … stays in the
+                # granary"). Hayden's aggrandizer is precisely who claims BEYOND need: that residue is taken
+                # status^κ-weighted into `material` — a stock that PERSISTS (unlike `wealth`, burned + capped
+                # each step), which is why it can stratify where the food share cannot (measured corr(cred,
+                # wealth) ≈ 0). Testart supplies the precondition (a granary can't be shared out like a carcass).
+                if mat_on and store > 0.0 and occ:
+                    # GATE (Hayden Fig. 6 top row): capture only where resources are ABUNDANT and INVULNERABLE
+                    # to overexploitation. B = GD-1 stock fraction (1.0 = at ceiling; low = being drawn down).
+                    # Where the stock is stressed, extraction endangers the group and Boehm leveling wins.
+                    B = 1.0
+                    Barr = getattr(tf, "_B", None)          # ClimateField.__getattr__ delegates to the base field
+                    if Barr is not None:
+                        try:
+                            B = float(Barr[cy, cx])
+                        except Exception:
+                            B = 1.0
+                    if B >= mat_inv_min:
+                        # WHO: the AGGRANDIZER type, not inherited cred (R-82 first cut keyed on cred^κ and got
+                        # corr(cred, material) = −0.018 — the wrong variable; Hayden's captor is an ambition type).
+                        mw = [getattr(a, "aggrandizer", 0.0) for a in occ]
+                        msum = sum(mw)
+                        if msum > 0.0:
+                            take = mat_frac * store
+                            for a, wi in zip(occ, mw):
+                                if wi > 0.0:
+                                    a.material += take * (wi / msum)
+                            store -= take
                 self._cell_store[key] = store
                 if morph_on and not band_society_on:
                     # S.4 settlement detector → society_from_character (the morph hook, finally called). A cell
@@ -2103,6 +2141,15 @@ class TerrainWorld(mesa.Model):
             for c in newborns:
                 self._log_genea("birth", c)
 
+        # R-82 Stage A: durable-capital depreciation. `material` is a STOCK (that is the point — it persists
+        # where `wealth` is burned), but nothing is imperishable: stores rot, prestige goods are given away in
+        # feasts, herds die. 0 ⇒ imperishable (bit-exact).
+        if self._demog is not None and getattr(self._demog, "material_decay", 0.0) > 0.0:
+            keep = 1.0 - self._demog.material_decay
+            for a in self.agent_list:
+                if a.material > 0.0:
+                    a.material *= keep
+
         # R-81: renormalise cred to population-mean 1 (fix the homeostat mean-inflation). Dynamics-neutral for
         # the relative (cred)^κ / normalised-mate weights; re-tightens the inheritance homeostat. Off ⇒ bit-exact.
         if self._demog is not None and getattr(self._demog, "enable_cred_renorm", False):
@@ -2164,9 +2211,38 @@ class TerrainWorld(mesa.Model):
     #: Aché cause-of-death tables (Table 5.1's classes are 0–3 / 4–14 / 15–59 / 60+).
     _AGE_CHILD_YR, _AGE_ELDER_YR = 15.0, 60.0
 
+    @staticmethod
+    def _gini(v: list) -> float:
+        """Gini of a non-negative vector; 0 for an empty/all-zero vector (no fake inequality)."""
+        v = sorted(x for x in v)
+        n = len(v); s = sum(v)
+        if n == 0 or s <= 0.0:
+            return 0.0
+        return (2.0 * sum((i + 1) * x for i, x in enumerate(v))) / (n * s) - (n + 1.0) / n
+
+    @staticmethod
+    def _top_share(v: list, frac: float) -> float:
+        """Share of the total held by the top `frac` of holders (0 if nothing is held)."""
+        v = sorted(v, reverse=True)
+        s = sum(v)
+        if not v or s <= 0.0:
+            return 0.0
+        return sum(v[:max(1, int(len(v) * frac))]) / s
+
+    @staticmethod
+    def _corr(xs: list, ys: list) -> float:
+        import math as _m
+        n = len(xs)
+        if n < 3:
+            return float("nan")
+        mx = sum(xs) / n; my = sum(ys) / n
+        sx = _m.sqrt(sum((x - mx) ** 2 for x in xs)); sy = _m.sqrt(sum((y - my) ** 2 for y in ys))
+        return (sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / (sx * sy)) if sx > 0 and sy > 0 else float("nan")
+
     def _demog_markers(self, pop: list) -> dict:
         """Markers for one group of live agents. `nan` where a denominator is empty — never a fake 0."""
         import statistics as _st
+        _gini = self._gini; _top_share = self._top_share; _corr = self._corr
         n = len(pop)
         if n == 0:
             return {"n": 0}
@@ -2193,6 +2269,12 @@ class TerrainWorld(mesa.Model):
             md += m_dead; fd += f_dead; dv += divorced
         nr = len(risk)
         nan = float("nan")
+        # R-82 markers read defensively: a diagnostic must never crash on a partially-populated agent
+        # (synthetic stand-ins in tests, or an agent built before a later stage's attributes existed).
+        _mat = [getattr(a, "material", 0.0) for a in pop]
+        _aggr = [getattr(a, "aggrandizer", 0.0) for a in pop]
+        _cells = {getattr(a, "pos", None) for a in pop} - {None}
+        _dens = (n / (len(_cells) * _CELL_KM2)) if _cells else nan
         return {
             "n": n,
             "n_male": len(males), "n_female": len(females),
@@ -2208,7 +2290,38 @@ class TerrainWorld(mesa.Model):
             "frac_motherless": (md / nr) if nr else nan,
             "frac_fatherless": (fd / nr) if nr else nan,
             "frac_parents_divorced": (dv / nr) if nr else nan,
+            # R-82 Stage A — the MATERIAL capital cell. The test of whether status gets material teeth:
+            # `material_gini` should RISE and persist (vs wealth_gini, which the sharing economy flattens),
+            # and `corr_cred_material` should be strongly positive (vs corr(cred, wealth) ≈ 0).
+            "material_mean": _st.mean(_mat),
+            "material_gini": _gini(_mat),
+            "material_top10_share": _top_share(_mat, 0.10),
+            "wealth_gini": _gini([getattr(a, "wealth", 0.0) for a in pop]),
+            "corr_cred_material": _corr([getattr(a, "cred", 1.0) for a in pop], _mat),
+            # capture must key on the AGGRANDIZER trait, not inherited cred (R-82 spec fix)
+            "frac_aggrandizer": sum(1 for a in _aggr if a > 0.0) / n,
+            "corr_aggr_material": _corr(_aggr, _mat),
+            # Hayden 1995 Fig. 6 (p.77) density bands — the stratification-stage benchmark
+            "density_per_km2": _dens,
+            "hayden_stage": self._hayden_stage(_dens) if _dens == _dens else "n/a",
         }
+
+    @staticmethod
+    def _hayden_stage(dens: float) -> str:
+        """Classify a local population density (people/km²) into Hayden 1995 Fig. 6's transegalitarian bands
+        (VERIFIED from the page image, p.77): Egalitarian .01–<.1 · Despots .1–.2 · Reciprocators .2–1.0 ·
+        Entrepreneurs 1.0–10.0 (Chiefs: no density given). The benchmark the elite layer must land in."""
+        if dens < 0.01:
+            return "sub-egalitarian"
+        if dens < 0.1:
+            return "egalitarian"
+        if dens < 0.2:
+            return "despot"
+        if dens < 1.0:
+            return "reciprocator"
+        if dens < 10.0:
+            return "entrepreneur"
+        return "above-Hayden-range"
 
     def demography(self, by: str | None = None) -> dict:
         """Demographic snapshot of the live population.
