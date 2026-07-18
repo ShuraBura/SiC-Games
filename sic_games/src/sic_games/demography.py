@@ -884,6 +884,25 @@ class DemographyConfig(BaseModel):
     # only persist where it does not endanger the stock — otherwise Boehm leveling crushes the aggrandizer.
     # Implemented against the GD-1 stock fraction B ∈ [0,1] (1.0 = at ceiling ⇒ invulnerable; low = overexploited).
     material_invulnerability_min: float = Field(0.0, ge=0.0, le=1.0)   # min local stock fraction B for capture to fire
+    # ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ──────────────────────────────────────────
+    # R-82's first working cut had capture with NO opposition and ran to material Gini 0.909 while sitting in
+    # Hayden's EGALITARIAN density band — chiefdom inequality at forager density, the opposite of his Fig. 6.
+    # Hayden's thesis needs BOTH: aggrandizers push, the group pushes back, and ABUNDANCE decides who wins.
+    # Boehm: egalitarian societies run a "reverse dominance hierarchy" — the rank and file act as a coalition to
+    # suppress upstarts. Of ~47 sanctioned behaviours he tabulates, "lack of generosity or MONOPOLIZING
+    # RESOURCES" is an explicit trigger (5); the majority involve dominance/self-assertion. The recurring
+    # sanction against a monopolizer is DESERTION and forced disgorging — the Chaco desert a chief "who was
+    # stingy", the Nambicuara leave one "too exacting", and "often it is in fact the entire group that leaves".
+    # MECHANISM: a co-resident coalition sanctions whoever holds conspicuously more material than the local
+    # norm, forcing him to redistribute the excess to his cell-mates (Boehm's sanction executed as Hayden's
+    # competitive feast — the two authors' mechanisms are the same act seen from either side).
+    # NOTE the deliberate asymmetry with capture: leveling is NOT abundance-gated. Capture is (it needs an
+    # invulnerable surplus); leveling always operates. So abundance alone decides the balance — under scarcity
+    # capture is gated off while leveling still bites (egalitarian); under abundance capture outruns it
+    # (stratified). That emergent competition IS Hayden's thesis, and it is what makes it falsifiable here.
+    enable_leveling: bool = False
+    leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess
+    leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned
     # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
     # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
     # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).

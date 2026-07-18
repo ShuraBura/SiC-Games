@@ -479,6 +479,7 @@ class TerrainWorld(mesa.Model):
         self.deaths_starv_this_step = 0
         self.deaths_senesc_this_step = 0
         self.deaths_orphan_this_step = 0              # R-74 diag: deaths carrying an elevated kin/orphan hazard
+        self.leveling_events_this_step = 0            # R-82 diag: Boehm sanctions applied to material-monopolizers
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -2140,6 +2141,42 @@ class TerrainWorld(mesa.Model):
         if self._genealogy_log is not None:               # Stage 2: observer log (after birth, parents/lineage set)
             for c in newborns:
                 self._log_genea("birth", c)
+
+        # R-82 Stage A: BOEHM LEVELING — the reverse-dominance coalition. Co-residents sanction whoever holds
+        # conspicuously more material than the local norm and force him to disgorge it to them (Boehm's sanction
+        # against "monopolizing resources", executed as Hayden's redistributive feast). Deliberately NOT
+        # abundance-gated — capture is, leveling isn't, so ABUNDANCE ALONE decides which force wins.
+        if self._demog is not None and getattr(self._demog, "enable_leveling", False):
+            lev_s = self._demog.leveling_strength
+            lev_sh = self._demog.leveling_share
+            if lev_s > 0.0 and lev_sh > 0.0:
+                by_cell: dict = {}
+                for a in self.agent_list:
+                    by_cell.setdefault(a.pos, []).append(a)
+                for occ_l in by_cell.values():
+                    if len(occ_l) < 2:
+                        continue                                  # no coalition of one
+                    mats = [a.material for a in occ_l]
+                    mean_m = sum(mats) / len(mats)
+                    if mean_m <= 0.0:
+                        continue
+                    for a in occ_l:
+                        excess = a.material - mean_m
+                        if excess <= 0.0:
+                            continue
+                        # conspicuousness = how far above the local norm he stands (Boehm: it is the VISIBLE
+                        # self-assertion that draws sanction, not absolute wealth)
+                        p = lev_s * (excess / mean_m)
+                        if p > 1.0:
+                            p = 1.0
+                        if a.random.random() < p:
+                            share = excess * lev_sh
+                            a.material -= share
+                            others = [x for x in occ_l if x is not a]
+                            per = share / len(others)
+                            for x in others:
+                                x.material += per
+                            self.leveling_events_this_step += 1
 
         # R-82 Stage A: durable-capital depreciation. `material` is a STOCK (that is the point — it persists
         # where `wealth` is burned), but nothing is imperishable: stores rot, prestige goods are given away in
