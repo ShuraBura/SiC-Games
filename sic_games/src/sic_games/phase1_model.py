@@ -480,6 +480,8 @@ class TerrainWorld(mesa.Model):
         self.deaths_senesc_this_step = 0
         self.deaths_orphan_this_step = 0              # R-74 diag: deaths carrying an elevated kin/orphan hazard
         self.leveling_events_this_step = 0            # R-82 diag: Boehm sanctions applied to material-monopolizers
+        self.leader_levy_this_step = 0.0              # R-83 diag: durable output levied by band leaders
+        self._hides_this_step = {}                    # R-83: per-agent durable output this step (for the levy)
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -1427,6 +1429,8 @@ class TerrainWorld(mesa.Model):
         mat_frac = demog.material_capture_frac if mat_on else 0.0
         mat_inv_min = getattr(demog, "material_invulnerability_min", 0.0) if mat_on else 0.0
         mat_hide = getattr(demog, "material_hide_frac", 0.0) if mat_on else 0.0
+        lead_share = (demog.leader_share_frac
+                      if (demog is not None and getattr(demog, "enable_leader_share", False)) else 0.0)
         store_frac = demog.storable_fraction if store_on else 0.0
         # Resource-dependent storability (Testart): per-cell storable fraction from the local grain/fish/forage/game mix.
         sfrac_field = (self._storable_frac_field() if (store_on and getattr(demog, "enable_resource_storability", False))
@@ -1573,6 +1577,9 @@ class TerrainWorld(mesa.Model):
                     else:
                         for a, h in zip(occ, hides):
                             a.material += h
+                    if lead_share > 0.0:                    # R-83: record this step's output for the band levy
+                        for a, h in zip(occ, hides):
+                            self._hides_this_step[a] = self._hides_this_step.get(a, 0.0) + h
             if sex_div > 0.0:
                 # Step 3: sex-divided PRODUCTION credit (prowess signal only) — meat → male hunters, forage →
                 # female gatherers. Independent of the Cred-weighted consumption share below. The credit is split
@@ -2143,6 +2150,40 @@ class TerrainWorld(mesa.Model):
         if self._genealogy_log is not None:               # Stage 2: observer log (after birth, parents/lineage set)
             for c in newborns:
                 self._log_genea("birth", c)
+
+        # R-83 (elite step 1): LEADER SHARE — "managerial rights" over the BAND's corporate output.
+        # The band owns the sites (`_cell_owner` is corporate); the leader does not own them, he CONTROLS the
+        # product — Hayden's "managerial rights over the resource locations and facilities of the group". Each
+        # band's current leader (recomputed from cred·prowess, so the office is contingent and deposable —
+        # Boehm) levies `leader_share_frac` of that step's durable output from his band-mates.
+        # This runs at BAND level (~25 agents) deliberately: R-82b's per-CELL capture had 1–2 agents and no
+        # group to skim (1.14×). The corporate unit is the band.
+        if (self._demog is not None and getattr(self._demog, "enable_leader_share", False)
+                and self._demog.leader_share_frac > 0.0 and self._hides_this_step):
+            lf = self._demog.leader_share_frac
+            leaders = self.band_leaders()
+            by_band: dict = {}
+            for a, h in self._hides_this_step.items():
+                if a.alive and h > 0.0:
+                    by_band.setdefault(a._group.band_id, []).append((a, h))
+            for bid, rows in by_band.items():
+                lead = leaders.get(bid)
+                if lead is None or not lead.alive:
+                    continue
+                levy = 0.0
+                for a, h in rows:
+                    if a is lead:
+                        continue                            # the leader keeps his own production
+                    take = lf * h
+                    if take > a.material:                   # never levy more than he actually holds
+                        take = a.material
+                    if take > 0.0:
+                        a.material -= take
+                        levy += take
+                if levy > 0.0:
+                    lead.material += levy
+                    self.leader_levy_this_step += levy
+        self._hides_this_step = {}
 
         # R-82 Stage A: BOEHM LEVELING — the reverse-dominance coalition. Co-residents sanction whoever holds
         # conspicuously more material than the local norm and force him to disgorge it to them (Boehm's sanction

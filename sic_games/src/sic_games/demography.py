@@ -906,6 +906,24 @@ class DemographyConfig(BaseModel):
     # invulnerable surplus); leveling always operates. So abundance alone decides the balance — under scarcity
     # capture is gated off while leveling still bites (egalitarian); under abundance capture outruns it
     # (stratified). That emergent competition IS Hayden's thesis, and it is what makes it falsifiable here.
+    # ── LEADER SHARE — "managerial rights" over CORPORATE product (R-83, elite-layer step 1) ──────────
+    # THE MISSING RUNG between corporate property and personal stratification. Cell ownership in this model is
+    # CORPORATE (`_cell_owner` maps a cell to a band_id), but stratification needs PERSONS to differ. The bridge
+    # is not ownership — it is AUTHORITY OVER corporate property. [Hayden 1995 VERIFIED]: on the NW Coast
+    # aggrandizers "control access to spatially restricted resource locations or productive facilities (fishing
+    # rocks, weirs, boats, deer fences, drying sheds)"; that class "had MANAGERIAL RIGHTS over the resource
+    # locations and facilities of the group". Managerial rights, not title — the Big-Man/chiefly position.
+    # WHY BAND-LEVEL: R-82b's aggrandizer capture was applied per CELL, where 1–2 agents sit, so there was no
+    # group to skim and the effect was 1.14×. Bands are ~25 agents and already tracked (`band_id`), so the
+    # corporate unit is the band. Wrong level, not wrong mechanism.
+    # NOT HEREDITARY, and that is anchored [Boehm 1993 VERIFIED]: leaders are DEPOSABLE — Iroquois sachems were,
+    # and among the Yokuts even "a HEREDITARY chief ... suspected of too much self-aggrandizement was ... ignored
+    # in favor of another chief". Councils of elders act as the brake (Navajo, Fox, Yokuts, Tupinamba, Cuna).
+    # So the office is held on CONTINGENT merit: `band_leaders()` recomputes it each step from cred·prowess, and
+    # Boehm leveling still bites the holder. Hereditary succession is a LATER rung, and Hayden says it appears
+    # only where resource locations are spatially restricted (NW Coast) — not where land is ubiquitous (New Guinea).
+    enable_leader_share: bool = False
+    leader_share_frac: float = Field(0.0, ge=0.0, le=1.0)      # share of the BAND's per-step durable output taken as managerial right
     enable_leveling: bool = False
     # ANCHOR [Boehm 1993, VERIFIED]: "Ousting or ostracizing the individual or removing him from a leadership
     # role involved **38 of the 48 societies**" reporting deliberate control of over-assertive leaders — i.e.
