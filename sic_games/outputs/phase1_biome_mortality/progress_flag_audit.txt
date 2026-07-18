@@ -1,0 +1,1 @@
+60/60 enable_village_scaling

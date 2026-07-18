@@ -1,0 +1,205 @@
+"""CHARTER RETROFIT — differential audit of every `enable_*` flag against its declared operator type.
+
+`docs/MECHANISM_CHARTER.md` §3 assigns each mechanism a TYPE whose INVARIANT is a test. This harness does the
+black-box half of that audit without touching the model: for each flag, run the realistic preset and the same
+config with that ONE flag flipped, from the same seed, and record what actually changed.
+
+The baseline is the PRESET (not bare defaults) so that prerequisites are satisfied — flipping a flag whose
+prerequisite is off would falsely read as vacuous (this is the trap that made R-82 look inert).
+
+What the signature is checked for:
+  · VACUOUS      — signature identical to baseline. A specification bug (DE-19), UNLESS declared gauge fixing.
+  · A-VIOLATION  — a flag typed Affiliation that moved a conserved quantity (it may only change the graph).
+  · O-VIOLATION  — a flag typed Observer that changed anything at all.
+  · GRAPH-INERT  — a flag typed Affiliation that changed quantities but NOT the graph (wrong type, or wrong unit).
+"""
+import os
+import sys
+import json
+
+sys.path.insert(0, os.path.normpath("sic_games/outputs/phase1_social_evolution"))
+from run_se0_controlled_climate import realistic_forager_demog
+
+from sic_games.capacity import NPPCapacityField
+from sic_games.climate import ClimateField
+from sic_games.config import CarbonConfig, KcalEconomyConfig, SubstrateConfig
+from sic_games.phase1_model import TerrainWorld
+from sic_games.terrain import generate_world, world_lottery_climate
+
+# charter §4 classification: flag -> primary type
+TYPES = {
+    "enable_productivity_mobility": "T", "enable_terrain_move_cost": "T", "enable_emergent_abandonment": "T",
+    "enable_site_appraisal": "T", "enable_landscape_packing": "T",
+    "enable_game": "P", "enable_agriculture": "P", "enable_agglomeration": "P", "enable_forage_cap": "P",
+    "enable_catchment_ceiling": "P", "enable_resource_storability": "P", "enable_improved_land": "P",
+    "enable_alluvial_renewal": "P",
+    "enable_soil_depletion": "D",
+    "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
+    "enable_leader_share": "X",
+    "enable_cred_status": "C", "enable_prowess_facet": "C", "enable_ascribed_mate_choice": "C",
+    "enable_material_capture": "C", "enable_standing": "C",
+    "enable_cred_renorm": "GAUGE",
+    "enable_pair_bonds": "A", "enable_bonded_mating": "A", "enable_marriage_aggregation": "A",
+    "enable_exogamy": "A", "enable_adaptive_connubium": "A", "enable_band_affiliation": "A",
+    "enable_dynamic_bands": "A", "enable_emergent_band_size": "A", "enable_size_repulsion": "A",
+    "enable_malnutrition_fission": "A", "enable_resource_directed_fusion": "A",
+    "enable_aggregation_sedentism": "A", "enable_settlement_scalar_stress": "A", "enable_village_scaling": "A",
+    "enable_village_budding": "A", "enable_morph": "A", "enable_economic_defensibility": "A",
+    "enable_leader_office": "A", "enable_leader_coherence": "A", "enable_band_family_knobs": "A",
+    "enable_orphan_mortality": "N", "enable_energetic_fertility": "N", "enable_sedentism_fertility": "N",
+    "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
+    "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
+    "enable_band_risk": "N", "enable_infanticide": "N",
+    "enable_genome": "H", "enable_paternity": "H",
+    "enable_tier2_shock": "F",
+    "enable_genealogy_log": "O",
+}
+# ENRICHED BASELINE. The bare preset has the whole elite layer OFF, so flipping e.g. `enable_leveling` alone
+# would do nothing for want of MATERIAL and read as VACUOUS — precisely the prerequisite false-negative that made
+# R-82 look inert. The baseline therefore turns the prerequisite CHAINS on so each flag is flipped in a live
+# context. (Charter §3.1: "unit" and context are part of a mechanism's identity.)
+ENRICH = dict(
+    enable_material_capture=True, material_hide_frac=0.07, material_capture_frac=0.0,
+    material_decay=0.002, aggrandizer_frac=0.15,
+    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8,
+    enable_leader_share=True, leader_share_frac=0.20,
+    enable_leader_office=True, office_grievance_gain=0.05,
+    enable_economic_defensibility=True,
+    enable_aggregation_sedentism=True,
+)
+
+# Known prerequisite chains: if a flag's prereq is not satisfied in the arm, "no change" is UNINFORMATIVE
+# rather than a spec bug. Reported separately so a false VACUOUS is never called a defect.
+PREREQ = {
+    "enable_leveling": ("enable_material_capture",), "enable_leader_share": ("enable_material_capture",),
+    "enable_leader_office": ("enable_band_affiliation",), "enable_improved_land": ("enable_economic_defensibility",),
+    "enable_alluvial_renewal": ("enable_soil_depletion",), "enable_soil_depletion": ("enable_agriculture",),
+    "enable_village_budding": ("enable_aggregation_sedentism",),
+    "enable_catchment_ceiling": ("enable_aggregation_sedentism",),
+    "enable_settlement_scalar_stress": ("enable_aggregation_sedentism",),
+    "enable_sedentism_fertility": ("enable_aggregation_sedentism",),
+    "enable_adaptive_connubium": ("enable_pair_bonds",), "enable_marriage_aggregation": ("enable_pair_bonds",),
+    "enable_bonded_mating": ("enable_pair_bonds",), "enable_exogamy": ("enable_band_affiliation",),
+    "enable_emergent_band_size": ("enable_band_affiliation",), "enable_dynamic_bands": ("enable_band_affiliation",),
+    "enable_band_family_knobs": ("enable_band_affiliation",), "enable_size_repulsion": ("enable_band_affiliation",),
+    "enable_malnutrition_fission": ("enable_band_affiliation",),
+    "enable_resource_directed_fusion": ("enable_band_affiliation",),
+    "enable_leader_coherence": ("enable_band_affiliation",),
+    "enable_paternity": ("enable_cred_status",),          # the _father gating discovered in R-74
+    "enable_ascribed_mate_choice": ("enable_cred_status",), "enable_prowess_facet": ("enable_cred_status",),
+    "enable_cred_renorm": ("enable_cred_status",), "enable_material_capture": ("enable_game",),
+}
+
+# conserved-quantity fields: an A-typed flag must NOT move these
+QUANT = ("tot_wealth", "tot_material", "pop_traj", "final_pop", "births", "deaths")
+GRAPH = ("band_sig", "n_bonds", "n_settlements")
+
+
+def signature(seed=0, steps=120, n=300, flip=None):
+    k = world_lottery_climate(seed, terrain="coastal", climate="temperate")
+    f = generate_world(k, mode="climate")
+    hf = ClimateField(NPPCapacityField(f, 75000.0, patch=(20, 20, 60), mode="tallavaara", aquatic=True,
+                                       enable_depletion=True), a_seas=0.5)
+    hf0 = NPPCapacityField(f, 75000.0, patch=(20, 20, 60), mode="tallavaara", aquatic=True, enable_depletion=True)
+    land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and hf0.level(x, y) > 0]
+    d = realistic_forager_demog().model_copy(update=ENRICH)
+    if flip is not None:
+        cur = getattr(d, flip, None)
+        if cur is None:
+            return None
+        d = d.model_copy(update={flip: (not cur)})
+    w = TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=seed,
+                     carbon_cfg=CarbonConfig(kappa=1.5),
+                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                   contest_exponent=1.5, move_cost_flat=0.0),
+                     harvest_field=hf, placement_positions=[land[i % len(land)] for i in range(n)],
+                     demography_cfg=d)
+    traj, births, deaths = [], 0, 0
+    for t in range(steps):
+        w.step()
+        if not w.agent_list:
+            break
+        births += getattr(w, "births_this_step", 0)
+        deaths += getattr(w, "deaths_starv_this_step", 0) + getattr(w, "deaths_senesc_this_step", 0)
+        if t % 10 == 0:
+            traj.append(len(w.agent_list))
+    al = w.agent_list
+    bands: dict = {}
+    for a in al:
+        bands[a._group.band_id] = bands.get(a._group.band_id, 0) + 1
+    return {
+        "pop_traj": tuple(traj),
+        "final_pop": len(al),
+        "tot_wealth": round(sum(getattr(a, "wealth", 0.0) for a in al), 6),
+        "tot_material": round(sum(getattr(a, "material", 0.0) for a in al), 6),
+        "band_sig": tuple(sorted(bands.values())),
+        "n_bonds": sum(1 for a in al if getattr(a, "_partner", None) is not None),
+        "n_settlements": len(getattr(w, "_settlement_sites", []) or []),
+        "births": births,
+        "deaths": deaths,
+        "pos_hash": hash(tuple(sorted((a.pos for a in al)))),
+    }
+
+
+def main():
+    prog = os.path.join(os.path.dirname(__file__), "progress_flag_audit.txt")
+    base = signature()
+    flags = sorted(f for f in TYPES if hasattr(realistic_forager_demog(), f))
+    rows = []
+    for i, fl in enumerate(flags, 1):
+        with open(prog, "w") as fh:
+            fh.write(f"{i}/{len(flags)} {fl}\n")
+            fh.flush()
+        try:
+            sig = signature(flip=fl)
+        except Exception as e:                       # a CRASH is itself an audit finding — record and continue
+            print(f"{i:3d}/{len(flags)} {fl:38s} [{TYPES[fl]}] -> *** CRASH *** {type(e).__name__}: {e}", flush=True)
+            rows.append({"flag": fl, "type": TYPES[fl], "baseline_on": None,
+                         "changed": ["CRASH"], "unmet_prereq": [], "error": f"{type(e).__name__}: {e}"})
+            continue
+        if sig is None:
+            continue
+        diff = sorted(kk for kk in base if base[kk] != sig[kk])
+        cfg0 = realistic_forager_demog().model_copy(update=ENRICH)
+        unmet = [p for p in PREREQ.get(fl, ()) if not getattr(cfg0, p, False)]
+        rows.append({"flag": fl, "type": TYPES[fl], "baseline_on": getattr(cfg0, fl),
+                     "changed": diff, "unmet_prereq": unmet})
+        print(f"{i:3d}/{len(flags)} {fl:38s} [{TYPES[fl]}] -> "
+              f"{','.join(diff) if diff else '*** NO CHANGE ***'}", flush=True)
+
+    out = os.path.join(os.path.dirname(__file__), "flag_audit.json")
+    with open(out, "w") as fh:
+        json.dump({"baseline": {k: str(v) for k, v in base.items()}, "rows": rows}, fh, indent=1)
+
+    print("\n" + "=" * 78)
+    print("VERDICTS (charter §3 invariants)")
+    print("=" * 78)
+    for r in rows:
+        ch, ty = set(r["changed"]), r["type"]
+        v = []
+        if "CRASH" in ch:
+            print(f"  {r['flag']:38s} [{ty}] :: *** CRASH *** {r.get('error','')}")
+            continue
+        if not ch:
+            if r["unmet_prereq"]:
+                v.append(f"no-change BUT PREREQ UNMET {r['unmet_prereq']} — uninformative, not a defect")
+            else:
+                v.append("VACUOUS — spec bug (DE-19) unless gauge" if ty != "GAUGE"
+                         else "gauge OK (invariance is the point)")
+        else:
+            if ty == "GAUGE":
+                v.append("GAUGE-VIOLATION — changed an observable")
+            if ty == "O" and ch:
+                v.append("O-VIOLATION — observer mutated state")
+            if ty == "A":
+                if ch & set(QUANT):
+                    v.append(f"A-VIOLATION — moved conserved quantity: {sorted(ch & set(QUANT))}")
+                if not (ch & set(GRAPH)):
+                    v.append("GRAPH-INERT — typed A but changed no graph field")
+        if v:
+            print(f"  {r['flag']:38s} [{ty}] preset={str(r['preset']):5s} :: {' | '.join(v)}")
+    print("\nWrote", out)
+
+
+if __name__ == "__main__":
+    main()

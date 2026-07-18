@@ -1851,4 +1851,71 @@ on material alone over-weights the one class the ethnography says matters least 
 
 ---
 
+### R-85 - Charter retrofit: the flag audit finds a crash in its own author's code, refutes a charter claim, and exposes five dead knobs (2026-07-18)
+
+**What was run.** The MECHANISM_CHARTER (adopted the same day) types every mechanism and gives each type an
+invariant. `audit_flag_invariants.py` implements the black-box half: for each of the 60 `enable_*` flags, run an
+ENRICHED baseline (prerequisite chains satisfied) and the same config with that one flag flipped, same seed, and
+diff a signature (population trajectory, totals, band structure, bonds, positions, births/deaths). Every
+no-change flag is then re-tested at a second seed and a longer horizon before being called a defect.
+
+**Why the baseline had to be enriched:** the realistic preset has the entire elite layer OFF, so flipping
+`enable_leveling` alone would do nothing for want of MATERIAL and read as vacuous. That is exactly the
+prerequisite false-negative that made R-82's capture look inert. The audit encodes the prerequisite chains
+explicitly and reports "prereq unmet" separately from "vacuous".
+
+**FINDING 1 - a live crash in code committed hours earlier.** `enable_leader_office` with
+`enable_band_affiliation=False` raised `AttributeError: 'TerrainWorld' object has no attribute '_next_band_id'`.
+R-84 deliberately placed `_maintain_leader_office` OUTSIDE the affiliation guard so the office could stand alone,
+but its desertion branch allocates a new band id from a counter initialised only INSIDE that guard. **All ten
+R-84 tests set `enable_band_affiliation=True`, so none could see it.** Fixed by initialising `_next_band_id`
+unconditionally (the affiliation seeding block re-zeroes it => bit-exact); regression test added.
+
+**FINDING 2 - `enable_cred_renorm` is NOT gauge fixing; the charter's own worked example was wrong.** The
+charter argued (same day) that renorm changes no observable because every downstream use of cred is relative.
+Measured: it moves population, deaths, wealth, material and band structure. **Root cause:** the cred inheritance
+homeostat reverts toward a **fixed 1.0 anchor**, so rescaling cred changes each agent's distance to that anchor
+and hence its children's cred - not scale-invariant. Not a bug (restoring the anchor was R-81's whole purpose),
+but not a gauge. Re-typed as a new category **R - Regulator**. The surviving rule is sharper: *a regulator is a
+gauge only if nothing downstream reads an absolute scale, and that is an empirical question* - measure it, do
+not assert it from the code.
+
+**FINDING 3 - a new defect class: FLAG ON, MAGNITUDE ZERO.** Of 11 flags inert at both seeds with prerequisites
+satisfied and a live reader present, **five are gated by a companion gain of exactly 0**:
+
+| Flag | Dead knob |
+|---|---|
+| `enable_leader_coherence` | `leader_coherence_gain = 0.0` |
+| `enable_malnutrition_fission` | `malnutrition_fission_gain = 0.0` |
+| `enable_size_repulsion` | `repulsion_gain = 0.0` |
+| `enable_terrain_pathogen` | `pathogen_gamma = 0.0` |
+| `enable_village_scaling` | `village_gain = 0.0` |
+
+They read as ON in any flag-level audit while contributing nothing. **This invalidates the 2026-07-15 config
+audit's conclusion that "all built mechanisms + prerequisites are correctly ON"** - five of those were dead.
+**New standing check: `flag is True` is not evidence a mechanism is live; inspect the magnitude too.**
+
+**CONFIRMED INDEPENDENTLY:** `enable_infanticide` has no reader outside the config (the known stub, now
+detected mechanically rather than by memory); `enable_genealogy_log` [O] mutates nothing - **the observer
+invariant HOLDS**, which is the first positive confirmation that a charter type is real rather than imposed.
+
+**METHODOLOGICAL LIMIT (recorded so it is not re-attempted).** A black-box differential audit **cannot** test
+conservation invariants. Over a long coupled run, changing the band graph changes who forages together and hence
+wealth - so an A-typed flag legitimately moves conserved quantities *in the trajectory* while its operator still
+conserves them *within its own step*. Conservation needs instrumentation **around the call**. The black-box
+audit soundly decides only vacuity, observer violations, crashes, and magnitude-zero gating.
+
+**RESIDUAL - 6 flags inert at both seeds, live reader, non-zero magnitude, no explanation yet:**
+`enable_bonded_mating`, `enable_condition`, `enable_energetic_fertility`, `enable_landscape_packing`,
+`enable_site_appraisal`, `enable_terrain_move_cost`. These are the remaining charter §6 candidates and need
+individual inspection - NOT yet claimed as defects.
+
+**Regime-gated and correctly inert (not defects), each already documented:** settlement machinery inactive in
+this world config (`enable_aggregation_sedentism`, `..._scalar_stress`, `enable_village_budding`,
+`enable_catchment_ceiling`); `enable_economic_defensibility` + `enable_improved_land` (DE-10: the claim gate
+never fires on unsaturated land); `enable_agriculture`/`enable_soil_depletion`/`enable_alluvial_renewal` (wrong
+world, R-70/R-71); `enable_band_risk` (shelved, DE-4).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

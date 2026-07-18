@@ -26,14 +26,14 @@ from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world, world_lottery_climate
 
 
-def _world(n=260, office=False, gain=0.05, share=0.2, dissolve=False, seed=0, **kw):
+def _world(n=260, office=False, gain=0.05, share=0.2, dissolve=False, seed=0, bands=True, **kw):
     k = world_lottery_climate(seed, terrain="coastal", climate="temperate")
     f = generate_world(k, mode="climate")
     hf = NPPCapacityField(f, 75000.0, patch=(20, 20, 60), mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and hf.level(x, y) > 0]
     d = DemographyConfig(enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
                          enable_paternity=True, mate_choice_strength=5.0, enable_prowess_facet=True,
-                         enable_pair_bonds=True, enable_band_affiliation=True,
+                         enable_pair_bonds=True, enable_band_affiliation=bands,
                          band_cohesion=0.3, band_split_size=45, band_merge_size=10,
                          enable_game=True, game_meat_frac=0.55,   # hides come from GAME — without it material stays 0
                          enable_material_capture=True, material_hide_frac=0.07, material_decay=0.002,
@@ -134,6 +134,20 @@ def test_dissolve_leaves_offices_vacant():
     t = w.leader_tenure()
     assert t["vacant"] > 0, "big-man dissolution should leave some band leaderless"
     assert set(w.band_leaders()) != {a._group.band_id for a in w.agent_list}
+
+
+def test_office_survives_without_band_affiliation():
+    """REGRESSION (charter flag audit, 2026-07-18): `_maintain_leader_office` runs OUTSIDE the
+    `enable_band_affiliation` guard so the office can stand alone — but the desertion branch allocates from
+    `_next_band_id`, which was only created INSIDE that guard. With affiliation off the office crashed with
+    AttributeError. Every R-84 test world sets enable_band_affiliation=True, so none of them caught it; the
+    differential flag audit did, on the 7th flag it tried."""
+    w = _world(office=True, gain=0.25, bands=False)
+    for _ in range(60):
+        w.step()
+        assert w.agent_list
+    assert isinstance(w._next_band_id, int)
+    w.leader_tenure()                                 # diagnostic must not blow up either
 
 
 def test_a_greedier_levy_draws_more_challenges():

@@ -62,6 +62,7 @@ linear operator exists for that, and asserting one would be numerology. The spec
 | **A — Affiliation** | changes the graph (who is bonded/grouped/owns) | **no quantity may change**; and it MUST demonstrably change the graph | partial — graph ops |
 | **N — Demographic** | changes the agent set | dimension-changing; must declare what a birth inherits and a death releases | hard — batch by mask |
 | **H — Inheritance** | copies state across an N event | acts **only** at birth events; a declared parent→child map | **full** — gather from parent index |
+| **R — Regulator** | holds a state variable at a setpoint | preserves *relative* values; is a gauge **only if** nothing downstream reads an absolute scale (must be MEASURED, not asserted) | **full** — normalize |
 
 **Read-only:**
 
@@ -77,7 +78,7 @@ describes the model rather than being imposed on it.
 
 Every new mechanism must, **in its docstring**, state:
 
-1. **Type** — one of `S F T P D X C A N H O`. If it needs two, it is **two mechanisms**; split it.
+1. **Type** — one of `S F T P D X C A N H R O`. If it needs two, it is **two mechanisms**; split it.
 2. **Unit** — the entity it operates on: agent · pair · household · **band** · settlement · cell · region.
    *This line exists because of R-82.* A social operator on a unit of size 1–2 is inert by construction.
 3. **Invariant** — the category's invariant, plus how it is asserted in tests.
@@ -104,7 +105,9 @@ Recorded 2026-07-18. Where a flag is composite the **primary** type is given fir
   `enable_leader_share`
 - **C Conversion** — `enable_cred_status` (cred → food share, exponent κ), `enable_prowess_facet`,
   `enable_ascribed_mate_choice` (status → mating), `enable_material_capture` (production → durable capital),
-  `enable_standing`, `enable_cred_renorm` (**gauge fixing**, not conversion — see below)
+  `enable_standing`
+- **R Regulator** — `enable_cred_renorm` (**re-typed from "gauge fixing" by measurement — R-85**; it moves
+  every observable, because the inheritance homeostat's fixed 1.0 anchor makes cred rescaling non-scale-invariant)
 - **A Affiliation** — `enable_pair_bonds`, `enable_bonded_mating`, `enable_marriage_aggregation`,
   `enable_exogamy`, `enable_adaptive_connubium`, `enable_band_affiliation`, `enable_dynamic_bands`,
   `enable_emergent_band_size`, `enable_size_repulsion`, `enable_malnutrition_fission`,
@@ -122,11 +125,19 @@ Recorded 2026-07-18. Where a flag is composite the **primary** type is given fir
 
 **Two classification findings worth keeping:**
 
-1. **`enable_cred_renorm` is not a Conversion — it is gauge fixing.** It rescales cred to population-mean 1, and
-   every downstream use is *relative* (`cred^κ/Σ`, normalised mate weights). It changes no observable. That is
-   exactly a choice of gauge, and it explains why R-81 could adopt it without disturbing R-19: a gauge change
-   cannot move a physical quantity. **New rule: a mechanism that changes no observable must be declared as gauge
-   fixing and must be shown to leave the diagnostics invariant.**
+1. **`enable_cred_renorm` — I classified this as gauge fixing and the audit REFUTED it (R-85).** The reasoning
+   was that it rescales cred to population-mean 1 while every downstream use is *relative* (`cred^κ/Σ`,
+   normalised mate weights), so it should change no observable. Measured: it moves population, deaths, wealth,
+   material, band structure — everything. **Why the reasoning failed:** the cred INHERITANCE homeostat reverts
+   toward a **fixed 1.0 anchor**, so rescaling cred changes each agent's *distance to that anchor* and therefore
+   its children's cred. Not scale-invariant. This is not a bug — restoring the anchor's meaning was precisely
+   R-81's purpose — but it is **not a gauge**, and calling it one was wrong.
+   **Re-typed as a new category, R — Regulator/Homeostat:** holds a state variable at a setpoint; changes
+   absolute values while preserving relative ones. The model has several (cred homeostat, band tolerable-size,
+   assabiyah).
+   **The rule that survives, sharpened:** *a regulator is a gauge ONLY IF nothing downstream references an
+   absolute scale — and that is an empirical question, not a design intention.* Run the differential audit to
+   decide it. Do not assert gauge-invariance from reading the code, which is exactly the error made here.
 2. **Affiliation is over-represented — 20 of 60 flags.** The model's social layer is overwhelmingly *topology*.
    That is the honest shape of the thing we built, and it says where the remaining compute cost lives (§7).
 
@@ -167,6 +178,39 @@ H-CYCLES specifically, never as the model.
 
 **Standing check, from DE-19:** if a flag's ON/OFF output is indistinguishable, that is a **specification bug**,
 not a small effect size — unless it is declared gauge fixing (§4), where invariance is the point.
+
+### 6.1 The audit that follows from this charter (R-85, 2026-07-18)
+
+`outputs/phase1_biome_mortality/audit_flag_invariants.py` + `audit_verdicts.py` implement the black-box half:
+flip each flag against an ENRICHED baseline (prerequisite chains satisfied — a bare preset makes
+material-dependent flags read as falsely vacuous, the R-82 trap), diff the signature, re-test every no-change
+flag at a second seed, then classify. Findings on first run:
+
+- **A CRASH in freshly-committed code.** `enable_leader_office` + `enable_band_affiliation=False` raised
+  `AttributeError: _next_band_id`. The office deliberately runs OUTSIDE the affiliation guard, but its desertion
+  branch allocated from a band-id counter created only INSIDE that guard. **Every R-84 test set affiliation
+  True**, so ten passing tests missed it; the audit hit it on the 7th flag.
+- **`enable_cred_renorm` is not a gauge** (above).
+- **A new defect class: FLAG ON, MAGNITUDE ZERO.** Five flags are enabled in the preset but multiplied by a gain
+  of exactly 0 — `enable_leader_coherence` (`leader_coherence_gain=0`), `enable_malnutrition_fission`
+  (`malnutrition_fission_gain=0`), `enable_size_repulsion` (`repulsion_gain=0`), `enable_terrain_pathogen`
+  (`pathogen_gamma=0`), `enable_village_scaling` (`village_gain=0`). They read as ON in any flag-level config
+  audit while contributing nothing. **This invalidates the 2026-07-15 config audit's claim that "all built
+  mechanisms are correctly ON".**
+- **Confirmed independently:** `enable_infanticide` has no reader (the known stub), and `enable_genealogy_log`
+  [O] mutates nothing (the observer invariant HOLDS).
+
+**New standing check:** a flag audit must inspect the flag AND its magnitude parameter. `flag is True` is not
+evidence a mechanism is live.
+
+### 6.2 What a black-box differential audit CANNOT decide
+
+Learned on the first run, recorded so it is not re-attempted: **conservation invariants (X conserves its total,
+A moves no quantity) are NOT testable this way.** Over a long coupled run, changing the band graph changes who
+forages together, which changes wealth — so an A-typed flag legitimately moves conserved quantities *in the
+trajectory* while the operator still conserves them *within its own step*. Conservation must be instrumented
+**around the call** (snapshot before/after the specific method), not inferred from trajectories. The black-box
+audit soundly decides only: **vacuity, observer violations, crashes, and magnitude-zero gating.**
 
 ## 7. Compute: the type tells you the vectorization strategy
 

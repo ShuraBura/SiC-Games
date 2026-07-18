@@ -309,6 +309,11 @@ class TerrainWorld(mesa.Model):
         self._band_malnutrition: dict[int, float] = {}         # M2: per-band malnutrition-fission pressure (diagnostic)
         self._band_starv_this_step: dict[int, int] = {}        # M2: starvation deaths per band THIS step (band_id → count)
         self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
+        self._next_band_id: int = 0                            # band-id allocator. Initialised UNCONDITIONALLY: the
+        # F.3c-1 seeding block below re-zeroes it under `enable_band_affiliation` (bit-exact), but `_maintain_leader_office`
+        # runs OUTSIDE that guard and allocates from it on a desertion-with-nowhere-to-go — so with affiliation OFF the
+        # attribute simply did not exist and the office crashed. Found by the charter flag audit, not by the R-84 tests,
+        # because every R-84 test world sets enable_band_affiliation=True.
         self._band_office: dict[int, int] = {}                 # R-84: band_id → INCUMBENT leader unique_id (the office, held across steps)
         self._office_since: dict[int, int] = {}                # R-84: leader uid → step he took office (tenure is clocked on the MAN, not the band)
         self._tenures_closed: list[int] = []                   # R-84: completed tenure lengths in steps (the tenure diagnostic)

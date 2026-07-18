@@ -101,3 +101,19 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 | BHM 2009 SOM (Table S4) | **[VERIFIED]** | Per-wealth-type Ginis obtained. Model matches facet-by-facet: prowess 0.24-0.26 vs 0.237/0.339; cred 0.27 vs 0.216/0.263; **material 0.237 vs Lamalera housing 0.241**. The remaining gap is entirely **boat shares 0.474 = a PRODUCTIVE ASSET the model lacks**. |
 | Hawkes et al. 1991 | **[TEXT LAYER OBTAINED]** | Two searchable copies filed, replacing the image-only scan. Pooled savanna return rates unchanged. |
 | Flannery & Marcus 2012 | **TOC ONLY** | Chapters identified for retrieval: **5** (Inequality without Agriculture, p.66 - our current stage), **10** (Rise and *Fall* of Hereditary Inequality in Farming Societies, p.187 - the next rung AND the cycles question), **16** (How to Turn Rank into Stratification, p.313 - T-5's failing agricultural arm), then **11** (Three Sources of Power in Chiefly Societies, p.208) and **9** (Prestige and Equality in Four Native American Societies, p.153). |
+
+### Charter retrofit - code checks (R-85, 2026-07-18)
+
+| Check | Result |
+|---|---|
+| `enable_leader_office` without `enable_band_affiliation` | **CRASH FIXED** - `_next_band_id` was created only inside the affiliation guard; the office runs outside it. Now initialised unconditionally (bit-exact); regression test `test_office_survives_without_band_affiliation`. |
+| `enable_cred_renorm` gauge-invariance | **REFUTED** - moves every observable. The fixed 1.0 inheritance anchor makes cred rescaling non-scale-invariant. Re-typed R (Regulator). |
+| `enable_genealogy_log` observer invariance | **PASS** - mutates nothing. First positive confirmation of a charter type. |
+| `enable_infanticide` reader search | **CONFIRMED STUB** - no reader outside the config object. |
+| Flag-vs-magnitude audit | **5 DEAD KNOBS** - leader_coherence_gain, malnutrition_fission_gain, repulsion_gain, pathogen_gamma, village_gain all 0.0 while their flags are ON. Invalidates the 2026-07-15 config-audit claim that all built mechanisms are correctly ON. |
+| Black-box conservation testing | **NOT SOUND** - trajectory coupling makes A-typed flags move conserved quantities legitimately. Conservation must be instrumented around the call. |
+
+**OPEN (R-85 residual):** 6 flags inert at both seeds with a live reader and non-zero magnitude -
+`enable_bonded_mating`, `enable_condition`, `enable_energetic_fertility`, `enable_landscape_packing`,
+`enable_site_appraisal`, `enable_terrain_move_cost`. Individually inspect before claiming defect or inertness.
+**Also open:** the in-step conservation instrumentation (the half of the charter audit this pass could not do).
