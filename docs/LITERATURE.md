@@ -1029,3 +1029,36 @@ amenorrhea) — the proximate driver behind Bocquet-Appel's transition. **How us
 not filed).**
 
 ### Cahill / Bar-Yosef / Cordain / Köppen-Körner — filed under "Pre-run audit anchors" (above).
+
+### Boehm, C. (1993). "Egalitarian Behavior and Reverse Dominance Hierarchy [and Comments and Reply]." *Current Anthropology* 34(3):227–254.
+**Status: FILED + [VERIFIED] — full text read 2026-07-17** (`literature/Boehm - 1993 - Egalitarian Behavior and Reverse Dominance Hierarchy.pdf`, 28 pp; obtained via the gwern research archive, extracted with `pymupdf`).
+
+**What was lifted — the LEVELING term for the elite layer (the condition that must be DEFEATED before elites can emerge).**
+Boehm's thesis is that forager egalitarianism is **not** a passive absence of hierarchy or a self-organizing ecological
+by-product, but an **actively and intentionally maintained** political achievement — the section is titled *"Intentional
+Leveling"*, and the abstract argues egalitarian society is "explained" chiefly by self-organizing factors when in fact
+"such societies are deliberately" egalitarian. The rank-and-file form a **reverse dominance hierarchy**: the coalition of
+followers dominates would-be dominators.
+
+**Sample: n = 48 societies** reporting intentional behavior to control leaders' negatively-evaluated tendencies (Table 1)
+— 12 North America, 11 Central/South America, 9 Africa, 5 Asia, 4 New Guinea, 3 Australia, 2 Oceania, 2 Mediterranean/
+Mideast. Subsistence: nomadic gatherers/hunters/herders + sedentary gardening or herding tribesmen; ~half bands/tribes
+with low-key leadership, a good number big-man societies or chiefdoms.
+
+**The escalating sanction ladder (section headings):** criticism → **ridicule** → **disobedience** → desertion/ostracism →
+**assassination**.
+
+**QUANTITATIVE ANCHORS (the modelable ones):**
+- **38 of 48 societies (79%)** exhibit behaviors that "terminated relations with an overly assertive individual or removed
+  him from a leadership role"; a further **28 instances** of manipulation by social pressure.
+- **Assassination reported in 11 of 48 societies (23%)** — the lethal tail of the ladder.
+- **Sanction TRIGGERS**, of 47 behaviors motivating negative sanctioning: **dominating others as leader (14)**, **being too
+  aggressive (13)**, ineffectiveness/partiality/unresponsiveness as leader (10), **"lack of generosity or monopolizing
+  resources" (5)**, moral transgressions (3), meanness (2). *"The great majority of these misbehaviours involve dominance
+  or self-assertion."*
+
+**How it will be used (elite layer):** the leveling term — an aggrandizer who accumulates (monopolizes resources) or
+dominates triggers a sanction whose escalation is anchored on the ladder above (removal ~79%, lethal ~23% of societies).
+Elites can only emerge where this leveling is **defeated** (storable/defensible surplus that cannot be shared out,
+circumscription, or scale beyond gossip-policing). Complements Testart 1982 (storage as the enabler) and Hayden
+(aggrandizers as the driver). NB the model already has a "Boehm gate" (`leader_society_weight`) — this is its anchor.
