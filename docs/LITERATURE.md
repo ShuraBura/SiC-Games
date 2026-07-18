@@ -1259,3 +1259,24 @@ also the natural thing to make heritable (BHM material β 0.17 forager → 0.55�
 `literature/Hawkes-HuntingIncomePatterns-1991.pdf` and `literature/hawkes-1991-pdf.pdf` both carry full text
 (~50k chars), replacing the image-only original for search purposes. The original scan is retained. No values
 re-derived yet — the pooled savanna return rates in the Resource Return-Rate Table stand.
+
+### Flannery, K. & Marcus, J. (2012). *The Creation of Inequality: How Our Prehistoric Ancestors Set the Stage for Monarchy, Slavery, and Empire*. Harvard University Press. `[FILED — all 24 chapters, text layers verified]`
+**Status: FILED 2026-07-18** — supervisor supplied all 24 chapters individually (`literature/Flannery-*.pdf`,
+591 pp total). **Text layers verified on every file; zero image-only**, so all are greppable (Rule 16 applies —
+grep the specs first, then these).
+
+**Not yet read.** Priority order for extraction when the elite layer next advances, with why:
+1. **`Flannery-InequalitywithoutAgriculture-2012.pdf`** (ch. 5, p.66, 24 pp) — inequality among foragers WITHOUT
+   farming. This is the stage the model is currently at; the direct check on R-83/R-84.
+2. **`Flannery-RiseFallHereditary-2012.pdf`** (ch. 10, p.187, 24 pp) — hereditary inequality in farming
+   societies, and note the **FALL**: documented cases of hereditary inequality COLLAPSING, which is the
+   ethnographic counterpart to **H-CYCLES** (charter §5) and to DE-14's three negatives.
+3. **`Flannery-TurnRankStratification-2012.pdf`** (ch. 16, p.313, 27 pp) — the rank→stratification mechanism,
+   i.e. exactly what TARGETS **T-5's agricultural arm** (0.435 vs 0.48) is failing to produce.
+4. **`Flannery-ThreeSourcesPower-2012.pdf`** (ch. 11, p.208, 22 pp) — a three-way power typology; a live test of
+   whether the MECHANISM_CHARTER's operator categories match an independent anthropological decomposition.
+5. **`Flannery-PrestigeEqualityFour-2012.pdf`** (ch. 9, p.153, 33 pp) — four Native American comparative cases;
+   bears on **T-8**'s untested structural split (deposition in centralized vs desertion in mobile societies).
+
+Remaining 19 chapters (Parts IV–V, kingdoms/empires/resistance) are beyond the model's current horizon and are
+filed for later stages, not queued.
