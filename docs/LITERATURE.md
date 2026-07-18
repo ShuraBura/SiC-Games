@@ -1085,3 +1085,21 @@ trigger, the overwintering granary). For the **elite layer** it supplies the *en
 what lets accumulation escape the sharing norm — i.e. the thing that **defeats Boehm's leveling** (see the Boehm 1993
 entry above). Chain: **storable surplus (Testart) → accumulation escapes sharing → leveling defeated (Boehm) →
 aggrandizer capture of redistribution (Hayden, TO-GRAB) → durable elite.**
+
+### Sahlins, M. (1968). "Notes on the Original Affluent Society." In Lee & DeVore (eds.), *Man the Hunter*, pp. 85–89 (discussion 9b).
+**Status: [VERIFIED] — full text read 2026-07-17.** **No new PDF needed: it is a chapter of the *Man the Hunter*
+volume ALREADY filed** (`literature/richard-b-lee-irven-devore-man-the-hunter.pdf`, 602 pp; Sahlins' contribution at
+the "Notes on the Original Affluent Society / Speaker: Sahlins" section).
+
+**What was lifted — the BASELINE the elite layer has to overturn.** Sahlins' point is not that foragers are rich but
+that they **deliberately run below productive capacity**: he sets out to explain "the inner meaning of **running below
+capacity**" — picking up Washburn's suggestion that "a 20–30 per cent use of productive capacity may prove quite
+adaptive over the long run" — against the textbook orthodoxy in which "the **specter of starvation stalks the
+stalker**." Foragers *could* produce more and do not.
+
+**Why it matters for the elite layer:** surplus is therefore **not a technical given that appears whenever resources
+allow** — it is a social outcome. An aggrandizer must actively *mobilise production past the customary level*, and
+Boehm 1993 supplies the enforcement that holds it at the customary level (leveling), while Testart 1982 supplies the
+escape route (storable surplus that cannot be shared out). **Sahlins = the baseline · Boehm = the enforcement ·
+Testart = the escape · Hayden = the driver.** Corrects a naive "resources → surplus → elites" chain: the resources
+were already there.
