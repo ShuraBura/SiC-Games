@@ -217,6 +217,10 @@ _DEFAULT_KNOBS: dict = {
 
 
 
+LEGIT_RELAX = 0.02   # R-86: per-step relaxation rate of cred toward its legitimacy-set target
+                     # (~50-step approach). A RATE; the magnitude is `legit_cred_gain`.
+
+
 class TerrainWorld(mesa.Model):
     """Mesa model: C agents on a terrain kcal economy.
 
@@ -318,6 +322,10 @@ class TerrainWorld(mesa.Model):
         self._office_since: dict[int, int] = {}                # R-84: leader uid → step he took office (tenure is clocked on the MAN, not the band)
         self._tenures_closed: list[int] = []                   # R-84: completed tenure lengths in steps (the tenure diagnostic)
         self._ever_leader: set[int] = set()                    # R-84: every uid that has ever held office (for the Hayden 75% father-son test)
+        self._lineage_legit: dict[int, float] = {}             # R-86: per-LINEAGE legitimacy stock (Friedman); mirrors _band_surplus
+        self._lineage_ascribed: set[int] = set()               # R-86: lineages that CROSSED — 'descended from higher nats'.
+        # The RATCHET. Once believed, descent is not re-earned each season; this is what separates ascribed rank
+        # from a Big Man's contingent renown, and a decaying stock alone reproduced only the latter.
         self._office_end: dict[str, int] = {"death": 0, "collision": 0, "deposed": 0}  # R-84: WHY tenures end
         # Stage 2 genealogy logger: a flat append-only event buffer (None ⇒ off). Pure observer (write-after-step).
         self._genealogy_log: list | None = (
@@ -495,6 +503,8 @@ class TerrainWorld(mesa.Model):
         self.depositions_this_step = 0                # R-84 diag: leaders removed by DEPOSITION (Boehm, 9/48)
         self.desertions_this_step = 0                 # R-84 diag: followers who WALKED AWAY (Boehm, 17/48 — the commoner channel)
         self.challenges_this_step = 0                 # R-84 diag: deposition ATTEMPTS (a challenge can fail ⇒ incumbent survives)
+        self.feast_spend_this_step = 0.0              # R-86 diag: material spent on sacrifices/feasts
+        self.legitimated_this_step = 0                # R-86 diag: agent-steps receiving the legitimated-lineage cred boost
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -2235,6 +2245,11 @@ class TerrainWorld(mesa.Model):
                                 x.material += per
                             self.leveling_events_this_step += 1
 
+        # R-86 DM-F1: the LEGITIMACY channel — lineages buy ritual standing with material, and sustained
+        # standing converts into HERITABLE cred (achieved → ascribed). Placed after leveling (you feast with
+        # what survived the coalition) and before cred renorm (so the mean is re-pinned after the injection).
+        self._do_legitimacy()
+
         # R-82 Stage A: durable-capital depreciation. `material` is a STOCK (that is the point — it persists
         # where `wealth` is burned), but nothing is imperishable: stores rot, prestige goods are given away in
         # feasts, herds die. 0 ⇒ imperishable (bit-exact).
@@ -2477,6 +2492,129 @@ class TerrainWorld(mesa.Model):
         for c, occ in occ_lists.items():
             groups.setdefault(find(c), []).extend(occ)
         return list(groups.values())
+
+    def _do_legitimacy(self) -> None:
+        """DM-F1 / R-86 — THE LEGITIMACY CHANNEL: how ACHIEVED success becomes ASCRIBED rank.
+
+        TYPE **C (Conversion)** · UNIT **LINEAGE** (patriline, competing within a band) · INVARIANT **DEBITED**
+        (the sacrifice SPENDS material) · ANCHOR [Flannery & Marcus 2012 ch.10, VERIFIED].
+
+        Flannery's warning is that our elite layer's premise cannot produce hereditary rank: *"if feasting were
+        all it took to produce hereditary inequality, there would have been no achievement-based societies left
+        for anthropologists to study"* — feasting *"produced individual Big Men who had no way of bequeathing
+        renown to their offspring."* R-83/R-84 measured exactly that (leaders 3.68× ahead, father-was-leader
+        53–69%, no transmission), so the model is a CORRECT achievement-based society and needs a different
+        mechanism for heredity.
+
+        Friedman's endogenous scenario supplies it, and it is a REINTERPRETATION rather than an accumulation:
+        success was not credited to labour but to ritual standing — *"they believed that one only obtained good
+        harvests through proper sacrifices to the nats. The key shift in social logic was therefore from 'They
+        must have pleased the nats' to 'They must be descended from higher nats than we are.'"* Once held to
+        descend from the ruling spirits, the lineage controls the land and *"was also entitled to receive
+        tribute from other lineages."*
+
+        Implemented in three parts:
+          1. **FEAST (debited).** Each lineage spends `legit_feast_frac` of its members' material on sacrifices.
+          2. **STANDING (relative, and local).** Legitimacy is an EMA of the lineage's SHARE of its band's total
+             feasting — Friedman's "most prestigious sacrifices" is a comparison among co-resident lineages, not
+             an absolute. A share is in [0,1], so the stock is bounded by construction and the threshold is
+             directly interpretable ("sustains more than half its band's ritual expenditure").
+          3. **CONVERSION.** Above `legit_threshold` the lineage's members get a per-step multiplicative boost to
+             `cred` — which is HERITABLE, so achieved standing becomes ascribed rank. The boost is a sustained
+             force against the cred homeostat's restoring pull, so it reaches an equilibrium spread rather than
+             compounding without bound.
+
+        Off ⇒ returns before touching anything ⇒ bit-exact."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_legitimacy", False):
+            return
+        ff = cfg.legit_feast_frac
+        if ff <= 0.0:
+            return
+        by_band: dict = {}
+        for a in self.agent_list:
+            lid = getattr(a, "_lineage", None)
+            if lid is not None:
+                by_band.setdefault(a._group.band_id, {}).setdefault(lid, []).append(a)
+
+        alpha = cfg.legit_decay                       # EMA weight: legitimacy tracks long-run ritual standing
+        for lins in by_band.values():
+            spend, total = {}, 0.0
+            guests = [a for ms in lins.values() for a in ms]
+            for lid, ms in lins.items():
+                s = 0.0
+                for a in ms:
+                    take = ff * a.material
+                    if take > 0.0:
+                        a.material -= take            # DEBITED — belief is bought, not asserted
+                        s += take
+                spend[lid] = s
+                total += s
+            if total <= 0.0:
+                continue
+            # A FEAST IS AN EXCHANGE, NOT A SINK. Flannery: the sponsor "could sponsor the most prestigious
+            # sacrifices AND FEED THE MOST VISITORS" — the material goes to the guests. Destroying it instead
+            # (the first cut) inflated the material Gini by ~0.18 through a pure drain, a confound that had
+            # nothing to do with legitimacy. Conserved within the band ⇒ the X invariant holds here.
+            per = total / len(guests)
+            for a in guests:
+                a.material += per
+            self.feast_spend_this_step += total
+            for lid, s in spend.items():
+                share = s / total
+                self._lineage_legit[lid] = (1.0 - alpha) * self._lineage_legit.get(lid, 0.0) + alpha * share
+
+        thr, cg = cfg.legit_threshold, cfg.legit_cred_gain
+        # THE RATCHET — this is the whole mechanism, and getting it wrong was the first two cuts' error.
+        # Friedman's key shift is "from 'They must have PLEASED the nats' to 'They must be DESCENDED FROM higher
+        # nats than we are.'" A decaying legitimacy stock that must be continually re-earned by feasting is the
+        # FORMER — still achievement-based, and Flannery is explicit that achievement alone "produced individual
+        # Big Men who had no way of bequeathing renown to their offspring." Measured: with a decaying stock,
+        # father-was-leader stayed at baseline (59-67% vs 65%) at every gain up to 20.
+        # So crossing the threshold ASCRIBES the lineage permanently: descent, once believed, is not contingent
+        # on this year's harvest. `_lineage_ascribed` is the ratchet; the EMA above only decides who crosses.
+        for lid, v in self._lineage_legit.items():
+            if v > thr:
+                self._lineage_ascribed.add(lid)
+        # NB the ratchet is recorded BEFORE the cred-gain guard below: whether a lineage is believed to descend
+        # from the nats is a fact about the society, not about how strongly we convert that belief into cred.
+        # (First cut had it after the guard, so `n_ascribed` silently read 0 whenever legit_cred_gain was 0.)
+        if cg <= 0.0 or thr >= 1.0:
+            return
+
+        # RELAXATION TOWARD A TARGET, not a compounding multiplier. The first cut multiplied cred by
+        # (1 + cg·excess) every step; that is an unbounded force against the homeostat's restoring pull and it
+        # WINS — measured cred Gini 0.968–0.988, i.e. one lineage holding essentially everything (the R-66
+        # winner-take-all failure mode). Same lesson as R-81: a sustained multiplicative push beats a
+        # contraction. Relaxing toward a target is bounded by construction.
+        for a in self.agent_list:
+            if getattr(a, "_lineage", None) in self._lineage_ascribed:
+                a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)
+                self.legitimated_this_step += 1
+
+    def legitimacy(self) -> dict:
+        """R-86 diagnostic: the per-lineage legitimacy stock. `n_legit` counts lineages over the threshold —
+        Friedman's "descended from higher nats". Pure observer."""
+        if self._demog is None or not getattr(self._demog, "enable_legitimacy", False):
+            return {"n_lineages": 0, "n_legit": 0, "n_ascribed": 0, "ascribed_frac_pop": 0.0, "mean": 0.0, "max": 0.0, "legit_frac_pop": 0.0}
+        live = {getattr(a, "_lineage", None) for a in self.agent_list}
+        vals = [v for k, v in self._lineage_legit.items() if k in live]
+        thr = self._demog.legit_threshold
+        over = {k for k, v in self._lineage_legit.items() if v > thr and k in live}
+        pop = len(self.agent_list)
+        asc = {k for k in self._lineage_ascribed if k in live}
+        return {
+            "n_lineages": len(vals),
+            "n_legit": len(over),
+            "n_ascribed": len(asc),
+            "ascribed_frac_pop": (sum(1 for a in self.agent_list
+                                      if getattr(a, "_lineage", None) in asc) / len(self.agent_list))
+                                 if self.agent_list else 0.0,
+            "mean": (sum(vals) / len(vals)) if vals else 0.0,
+            "max": max(vals) if vals else 0.0,
+            "legit_frac_pop": (sum(1 for a in self.agent_list
+                                   if getattr(a, "_lineage", None) in over) / pop) if pop else 0.0,
+        }
 
     def _maintain_leader_office(self) -> None:
         """R-84 CHALLENGE-SUCCESSION — leadership as a TENURED OFFICE, and the two ways it is lost.

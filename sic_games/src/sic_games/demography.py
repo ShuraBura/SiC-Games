@@ -965,6 +965,36 @@ class DemographyConfig(BaseModel):
     # leadership an achievement, and the whole structure will as such DISSOLVE with the demise of the pivotal
     # big-man." True ⇒ big-man regime (vacancy until someone re-earns it); False ⇒ chiefly office (filled at once).
     succession_dissolve: bool = False
+    # ── DM-F1 / R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ────────────────
+    # WHY THIS EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our elite layer's premise is insufficient:
+    # "if feasting were all it took to produce hereditary inequality, there would have been no
+    # achievement-based societies left for anthropologists to study" — competitive feasting "produced
+    # individual Big Men who had no way of bequeathing renown to their offspring." That is EXACTLY what the
+    # model measures (R-83/R-84: leaders 3.68× ahead, father-was-leader only 53–69%, no transmission), i.e. the
+    # model is a correct ACHIEVEMENT-BASED society and hereditary rank needs a different mechanism.
+    # THE MECHANISM [Friedman's endogenous scenario, via Flannery ch.10 VERIFIED]: rank is created by a
+    # REINTERPRETATION of success, not by accumulation. Successful lineages were not credited with hard work —
+    # "they believed that one only obtained good harvests through proper sacrifices to the nats. The key shift
+    # in social logic was therefore from 'They must have pleased the nats' to 'They must be descended from
+    # higher nats than we are.'" Once a lineage is held to descend from the ruling spirits it controls the
+    # region's land and "was also entitled to receive tribute from other lineages".
+    # CHARTER DECLARATION (MECHANISM_CHARTER §3.1):
+    #   TYPE      C (Conversion) — material → heritable cred, gated on a legitimating belief. An OFF-DIAGONAL
+    #             of the capital matrix: the achieved→ascribed cell.
+    #   UNIT      LINEAGE (patriline `_lineage`), competing WITHIN a band. Friedman's unit is explicit: "one
+    #             lineage convinces all the others". NOT the band, and not the agent (cf. R-82's unit error).
+    #   INVARIANT DEBITED, not catalytic — sponsoring the sacrifice SPENDS material ("could sponsor the most
+    #             prestigious sacrifices and feed the most visitors"); belief is bought, not merely asserted.
+    #   ANCHOR    [VERIFIED Flannery & Marcus 2012 ch.10] for the mechanism; the four rates are [DESIGN],
+    #             calibrated against TARGETS T-6 (Hayden's 75% father-was-leader) and T-5 (BHM composite Gini).
+    # NOTE on the seam: MECHANISM_CHARTER §9.2 named `GroupVector.religion` as the carrier. On inspection that
+    # cell is an int RELIGION ID, while legitimacy is a continuous per-LINEAGE stock — so it lives on the model
+    # as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for actual religion ids.
+    enable_legitimacy: bool = False
+    legit_feast_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of a lineage's material spent on sacrifices/feasts each step
+    legit_decay: float = Field(0.02, ge=0.0, le=1.0)       # legitimacy fades without renewal (~1/0.02 = 50-step memory)
+    legit_threshold: float = Field(0.5, ge=0.0, le=1.0)    # above this share of the band's feasting, the lineage is "descended from higher nats"
+    legit_cred_gain: float = Field(0.0, ge=0.0)            # per-step heritable-cred boost to a legitimated lineage's members
     # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
     # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
     # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).

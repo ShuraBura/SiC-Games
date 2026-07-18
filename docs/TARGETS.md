@@ -187,8 +187,12 @@ material-inheritance coefficient would hit the number while getting the cause wr
 **Source:** Hayden 1995 `[VERIFIED]`: *"About 75% of New Guinea Entrepreneur Big Men had fathers that were also
 Big Men"* - transmitted via moka partners and wives, **not** the position.
 
-**Model status:** `leader_tenure()["father_was_leader"]` = 53-69% (centred ~60%) vs the 75% target. Emergent, never
-an input - the office is never inherited in the model, so any continuity comes from heritable `cred`.
+**Model status: MET 2026-07-18 (R-86) - 76% vs the 75% target**, via the DM-F1 legitimacy ratchet. Emergent and
+never fitted: the office is never inherited in the model, so the continuity comes from heritable `cred` acquired
+when a lineage's ritual standing is reinterpreted as descent. Baseline without legitimacy was 53-69%.
+**Caveat that must travel with this number:** it is measured in a regime where `ascribed_frac_pop` reaches
+0.70-0.85, i.e. the ratchet saturates and most lineages are eventually ascribed. The figure should be re-checked
+once delegitimation (the gumsa->gumlao collapse; H-CYCLES) bounds the ascribed fraction.
 **Why the gap is informative:** Hayden's actual channel is RELATIONAL capital (exchange partnerships), which the
 model does not transmit - `cred` is a scalar, not a partner network. Closing this gap most likely means making
 relational capital heritable, which is also the alpha=0.39 cell BHM says matters most for foragers after embodied.

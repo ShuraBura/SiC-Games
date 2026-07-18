@@ -2016,4 +2016,74 @@ of them. **Scope a config audit to the function, not the file.**
 
 ---
 
+### R-86 - The LEGITIMACY channel: the RATCHET is the mechanism, and it hits Hayden's 75% (2026-07-18)
+
+**Origin:** DM-F1, the first item from the Flannery digest. Flannery ch.10 says our elite layer's premise cannot
+produce hereditary rank - *"if feasting were all it took to produce hereditary inequality, there would have been
+no achievement-based societies left for anthropologists to study"*; feasting *"produced individual Big Men who
+had no way of bequeathing renown to their offspring."* R-83/R-84 measured exactly that. Friedman's endogenous
+scenario supplies the missing mechanism as a **reinterpretation**, not an accumulation.
+
+**BUILD** (charter-declared: **type C** Conversion, **unit LINEAGE**, **invariant DEBITED**, anchor Flannery
+ch.10 `[VERIFIED]`): lineages spend material on sacrifices; legitimacy is an EMA of a lineage's SHARE of its
+band's ritual expenditure (bounded [0,1] by construction, so the threshold is interpretable); crossing the
+threshold converts into heritable `cred`.
+
+**THREE CUTS, and the first two were wrong in instructive ways.**
+
+**Cut 1 - the feast destroyed material.** Material Gini jumped 0.237 -> 0.416 from the debit alone, a pure drain
+with nothing to do with legitimacy. Flannery is explicit that the sponsor *"could sponsor the most prestigious
+sacrifices AND FEED THE MOST VISITORS"* - a feast is an EXCHANGE. Fixed: the spend is redistributed to the
+band's guests, conserving material (now asserted as the X invariant in tests). **With the feast conserved,
+material Gini goes DOWN, 0.237 -> ~0.10** - competitive feasting is a material LEVELLER, which is Boehm and
+Sahlins and precisely why it yields Big Men rather than dynasties.
+
+**Cut 2 - an unbounded multiplicative cred boost.** Measured cred Gini **0.968-0.988**: one lineage holding
+essentially everything, the R-66 winner-take-all failure mode. A sustained multiplicative push beats the
+homeostat's contraction - **the same lesson as R-81**. Fixed by relaxing toward a legitimacy-set target
+(`LEGIT_RELAX`), which is bounded by construction.
+
+**Cut 3 - THE RATCHET, which is the actual mechanism.** With a DECAYING legitimacy stock the result was a flat
+negative: father-was-leader stayed at baseline (59-67% vs 65%) at every gain up to 20, and the agricultural
+composite got WORSE. The diagnosis is conceptual and it was a misreading of the source. Friedman's key shift is
+*"from 'They must have **PLEASED** the nats' to 'They must be **DESCENDED FROM** higher nats than we are.'"* A
+stock that decays and must be re-earned by feasting **is still "pleased the nats"** - i.e. I had built the
+achievement-based mechanism Flannery says does not produce heredity. Crossing the threshold must **ASCRIBE the
+lineage permanently**: descent, once believed, is not contingent on this year's harvest.
+
+**RESULT with the ratchet** (2 seeds x 600, `feast=0.25`, `legit_cred_gain=20`, `threshold=0.15`):
+
+| | father-was-leader | agricultural composite |
+|---|---|---|
+| baseline (no legitimacy) | 65% | 0.247 |
+| decaying stock (cut 2) | 59-67% | 0.147-0.200 |
+| **RATCHET (cut 3)** | **76%** | 0.189 |
+| **TARGET** | **75% (Hayden)** | **0.48 (BHM)** |
+
+**T-6 IS MET: 76% vs Hayden's "about 75% of New Guinea Entrepreneur Big Men had fathers that were also Big
+Men"** - and it is EMERGENT, since the office is never inherited in the model and the target was never fitted.
+
+**T-5 IS NOT MET, and the reason is structural rather than a calibration shortfall.** The agricultural composite
+is 59% MATERIAL-weighted, and this mechanism *equalises* material (the feast redistributes) while concentrating
+CRED. It therefore moves the forager composite up and the agricultural composite down. **Legitimacy is not the
+route to material stratification** - it is the route to heritable RANK. Those are different things, and BHM's
+alpha weights make the difference measurable.
+
+**THE OPEN PROBLEM, and it is not optional polish: SATURATION.** `ascribed_frac_pop` reaches **0.70-0.85** - over
+600 steps most lineages eventually cross, so "descended from higher nats" stops being a distinction. A pure
+ratchet with no reverse has no equilibrium. **This is exactly why the Kachin cycle requires the gumsa -> gumlao
+COLLAPSE**: Flannery's *"hereditary inequality was repeatedly created, lasted for a few generations, and then
+collapsed."* The two halves are structurally coupled - **delegitimation is not Stage 2 polish, it is required
+for Stage 1 to remain meaningful**, and it is the same lagged resentment stock H-CYCLES predicts. Building it is
+the next step.
+
+**Also fixed in passing:** the ratchet was first recorded BELOW the `legit_cred_gain <= 0` guard, so the
+`n_ascribed` diagnostic read 0 whenever the conversion gain was 0 - whether a lineage is believed to descend
+from the nats is a fact about the society, not about how strongly we convert that belief. Regression-tested.
+
+**Status:** default-OFF, bit-exact. 7 new tests including the X-conservation assertion on the feast and the
+ratchet-does-not-leak assertion. The four rates remain `[DESIGN]`, calibrated against T-6.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
