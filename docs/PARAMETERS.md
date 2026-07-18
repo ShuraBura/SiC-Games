@@ -657,3 +657,48 @@ tail ~240, stratification sustained 9–16%, population plateaus ~7200 — STABL
 
 *PARAMETERS.md extracted 2026-06-08. Supersedes interim locked-param tables in `sic_games/CLAUDE.md`
 and `docs/ROADMAP.md`. Maintained by Code; updated any time a parameter is locked, swept, or retired.*
+
+
+## §22 - Elite layer (2026-07-17...18; RESULTS R-82/R-83/R-84/R-84b; branch `agriculture`; ALL default-OFF/bit-exact)
+
+### §22.1 - Durable material wealth (`enable_material_capture`; R-82)
+| Param | Value | Basis |
+|---|---|---|
+| `material_hide_frac` | 0.07 | [DESIGN] fraction of game yield carried as durable hides. Material comes from GAME, not the granary (the granary is food) - supervisor correction, R-82. |
+| `material_decay` | 0.002/step | [DESIGN] stores rot, prestige goods are given away, herds die. 0 => imperishable (bit-exact). |
+| `aggrandizer_frac` | 0.15 | [Hayden 1995] the captor is an ambition TYPE, not a rank. Keying capture on `cred^k` gave corr -0.018; keying on the type gave +0.780. |
+| `material_unit_value` | 1.0 | [DESIGN] VALUE HOOK, deliberately constant. Stage E replaces it with an exchange-set value (Kula/cattle/bride-price), NOT a price-setting market (Polanyi puts that far later). |
+
+### §22.2 - Boehm leveling (`enable_leveling`; R-82)
+| Param | Value | Basis |
+|---|---|---|
+| `leveling_strength` | 0.79 | **[Boehm 1993 VERIFIED]** "behaviors that terminated relations with an overly assertive individual or removed him from a leadership role involved **38 of the 48 societies**" => 38/48 = 0.79. Leveling is the NORM, not the exception. |
+| `leveling_share` | 0.8 | [DESIGN] fraction of the excess disgorged when sanctioned. |
+
+### §22.3 - Leader managerial rights (`enable_leader_share`; R-83, anchored R-84b)
+| Param | Value | Basis |
+|---|---|---|
+| `leader_share_frac` | **0.20** | **[Borgerhoff Mulder et al. 2009 Table 2, VERIFIED]** ANCHORED ON OUTCOME - no chiefly-due percentage exists in Sahlins 1972 or Ames 1994 (verified negative, both read directly). 0.20 gives an alpha-weighted composite Gini of 0.258 against BHM's forager target 0.25 +/- 0.04. NB the composite is nearly FLAT in this knob (0.248 -> 0.261 over 0 -> 0.5) because material carries only 15% of the forager weight - see R-84b. |
+
+**BHM alpha weights (the coupling-weight row of the capital/operator matrix), by society type:**
+| System | alpha embodied (`prowess`) | alpha relational (`cred`) | alpha material (`material`) | target Gini |
+|---|---|---|---|---|
+| Hunter-gatherer | 0.46 | 0.39 | 0.15 | 0.25 |
+| Horticultural | 0.53 | 0.26 | 0.21 | 0.27 |
+| Pastoral | 0.26 | 0.14 | 0.61 | 0.42 |
+| Agricultural | 0.27 | 0.14 | 0.59 | 0.48 |
+
+### §22.4 - Challenge-succession (`enable_leader_office`; R-84)
+| Param | Value | Basis |
+|---|---|---|
+| `office_deposition_share` | **9/26 = 0.346** | **[Boehm 1993 Table I, VERIFIED - columns counted]** DEPOSITION 9 vs DESERTION 17 across the 48-society survey. Deposition is the MINORITY channel; followers walking away is the commoner end of a bad leader. |
+| `office_overreach_weight` | **19/29 = 0.655** | **[Boehm 1993, the 47 coded motivations]** OVERREACH = "dominating others as leader" (14) + "lack of generosity or monopolizing resources" (5) = 19; FAILURE TO DELIVER = "ineffectiveness, partiality, or unresponsiveness in a leadership role" (10). |
+| `office_challenge_margin` | 0.25 | [DESIGN] a challenger must clear the incumbent's merit by this factor - so a challenge can FAIL ("until he dies or is challenged AND DEFEATED"). |
+| `office_grievance_gain` | 0.05 | [DESIGN, calibrated] per-step sanction hazard at unit grievance. Set so band tenure lands at 4-6 yr; at the band level tenure is bounded by band FUSION, not by the leader's life (R-84 honest limit). |
+| `succession_dissolve` | False | **[Sahlins 1972:209 VERIFIED]** False = Nootka chiefly office ("ascribed by right of chiefly due", "centricity is built into the structure") => outlives the holder. True = Siuai big-man ("the whole structure will as such dissolve with the demise of the pivotal big-man") => vacancy until someone re-earns it. |
+| office eligibility | `age >= menarche_months` | Not a knob - the model's existing producer-age threshold. Without it a high-cred CHILD could hold office (measured mean leader age 23.5 yr vs adult mean 34.1). |
+
+**Validation target (never an input):** `leader_tenure()["father_was_leader"]` vs **Hayden 1995's "about 75% of New
+Guinea Entrepreneur Big Men had fathers that were also Big Men"** - measured 53-69%. The office is never inherited
+in the model, so any continuity must EMERGE from heritable cred, which is Hayden's own mechanism (he transmits moka
+partners and wives, not the position).

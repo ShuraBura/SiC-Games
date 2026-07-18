@@ -309,6 +309,11 @@ class TerrainWorld(mesa.Model):
         self._band_malnutrition: dict[int, float] = {}         # M2: per-band malnutrition-fission pressure (diagnostic)
         self._band_starv_this_step: dict[int, int] = {}        # M2: starvation deaths per band THIS step (band_id → count)
         self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
+        self._band_office: dict[int, int] = {}                 # R-84: band_id → INCUMBENT leader unique_id (the office, held across steps)
+        self._office_since: dict[int, int] = {}                # R-84: leader uid → step he took office (tenure is clocked on the MAN, not the band)
+        self._tenures_closed: list[int] = []                   # R-84: completed tenure lengths in steps (the tenure diagnostic)
+        self._ever_leader: set[int] = set()                    # R-84: every uid that has ever held office (for the Hayden 75% father-son test)
+        self._office_end: dict[str, int] = {"death": 0, "collision": 0, "deposed": 0}  # R-84: WHY tenures end
         # Stage 2 genealogy logger: a flat append-only event buffer (None ⇒ off). Pure observer (write-after-step).
         self._genealogy_log: list | None = (
             [] if (demography_cfg is not None and getattr(demography_cfg, "enable_genealogy_log", False)) else None)
@@ -482,6 +487,9 @@ class TerrainWorld(mesa.Model):
         self.leveling_events_this_step = 0            # R-82 diag: Boehm sanctions applied to material-monopolizers
         self.leader_levy_this_step = 0.0              # R-83 diag: durable output levied by band leaders
         self._hides_this_step = {}                    # R-83: per-agent durable output this step (for the levy)
+        self.depositions_this_step = 0                # R-84 diag: leaders removed by DEPOSITION (Boehm, 9/48)
+        self.desertions_this_step = 0                 # R-84 diag: followers who WALKED AWAY (Boehm, 17/48 — the commoner channel)
+        self.challenges_this_step = 0                 # R-84 diag: deposition ATTEMPTS (a challenge can fail ⇒ incumbent survives)
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -535,6 +543,7 @@ class TerrainWorld(mesa.Model):
                 self._maintain_bands()
                 if getattr(self._demog, "enable_village_budding", False):
                     self._maintain_village_budding()   # Bandy 2004: large village sheds a rival-led daughter (relocates)
+            self._maintain_leader_office()        # R-84: tenure the office; Boehm deposition (9) / desertion (17)
             self._do_births_ibi()
         elif self._reproduction:
             self._do_births()
@@ -2464,15 +2473,192 @@ class TerrainWorld(mesa.Model):
             groups.setdefault(find(c), []).extend(occ)
         return list(groups.values())
 
-    def band_leaders(self) -> dict[int, "BaseAgent"]:
-        """Public diagnostic (Stage 1 leader coherence): map each live band_id (the affiliation `_group.band_id`,
-        NOT the spatial `bands()` grouping) to its current highest cred·prowess member. Used by the
-        leader-coherence benchmark to identify — and, in a controlled experiment, force-remove — a band's leader
-        at a scripted step (set `.alive = False`; the model's own death-pruning cleans it up next `step()`), and
-        to track leader-identity turnover."""
+    def _maintain_leader_office(self) -> None:
+        """R-84 CHALLENGE-SUCCESSION — leadership as a TENURED OFFICE, and the two ways it is lost.
+
+        THE DEFECT: `band_leaders()` recomputed argmax(cred·prowess) every step, so there was no incumbency, no
+        tenure, and a leader was never *removed* — he merely stopped being the maximum. The ethnography is the
+        reverse: leadership is HELD, and lost to a SANCTION.
+
+        ANCHOR [Boehm 1993 Table I, VERIFIED — columns counted across the 48-society survey]: DESERTION 17 vs
+        DEPOSITION 9. The commonest end of a bad leader is that his following WALKS AWAY, not a challenge-and-
+        defeat duel — so deposition is the MINORITY channel here (`office_deposition_share` = 9/26). The two
+        TRIGGERS come from Boehm's 47 coded motivations: OVERREACH ("dominating others as leader" 14 + "lack of
+        generosity or monopolizing resources" 5 = 19) and FAILURE TO DELIVER ("ineffectiveness, partiality, or
+        unresponsiveness in a leadership role" 10) ⇒ `office_overreach_weight` = 19/29.
+
+        SUCCESSION on the holder's death is two regimes [Sahlins 1972:209]: the Nootka chief's position is
+        "ascribed by right of chiefly due" so "centricity is built into the structure" and the office outlives
+        him; the Siuai big-man's following is "an achievement ... and the whole structure will as such dissolve
+        with the demise of the pivotal big-man" (`succession_dissolve`).
+
+        THE LOOP: overreach is read off the leader's own `material` relative to his band — exactly what
+        `leader_share_frac` inflates. A greedier levy raises the sanction hazard on the man taking it.
+        Off ⇒ returns before any RNG draw ⇒ bit-exact."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_leader_office", False):
+            return
         members: dict[int, list] = {}
         for a in self.agent_list:
             members.setdefault(a._group.band_id, []).append(a)
+        live = {a.unique_id: a for a in self.agent_list}
+        merit = lambda a: a.cred * getattr(a, "prowess", 1.0)
+        margin, dep_p = cfg.office_challenge_margin, cfg.office_deposition_share
+        w_over, gain, dissolve = cfg.office_overreach_weight, cfg.office_grievance_gain, cfg.succession_dissolve
+
+        # CARRY THE OFFICE WITH THE MAN. band_ids churn on every fusion/fission, so an office keyed to the BAND
+        # is vacated constantly by bookkeeping rather than by politics — measured: tenure capped at ~4 yr even
+        # with sanctions off, i.e. the churn, not death, was ending careers. A leader whose band merged or split
+        # has not stopped being a leader; he holds office in whatever band he now sits in (first claim wins; a
+        # collision between two carried leaders is settled by the ordinary challenge below). Tenure is therefore
+        # clocked on the MAN (`_office_since` keyed by uid), which is also what "held office until he died" means.
+        carried: dict[int, int] = {}
+        holders = [live[u] for u in self._band_office.values() if u in live]
+        holders.sort(key=merit, reverse=True)             # a COLLISION (two leaders fused into one band) is
+        for a in holders:                                 # settled by MERIT — not by dict order, which was
+            if a._group.band_id not in carried:           # ending 106 of 135 tenures as pure bookkeeping
+                carried[a._group.band_id] = a.unique_id
+        still = set(carried.values())
+        for uid, since in list(self._office_since.items()):
+            if uid not in still:                          # died, or lost a collision ⇒ his tenure closes here
+                self._tenures_closed.append(self.step_count - since)
+                self._office_end["death" if live.get(uid) is None else "collision"] += 1
+                del self._office_since[uid]
+        self._band_office = carried
+
+        adult = cfg.menarche_months                       # the model's producer-age threshold (as §prod-credit)
+        for bid in sorted(members):                       # deterministic order ⇒ reproducible RNG stream
+            ms = [x for x in members[bid] if x.age >= adult]   # ELIGIBILITY: office is held by ADULTS. Without
+            if not ms:                                    # this a high-cred CHILD could hold office — measured
+                continue                                  # mean leader age 23.5 yr vs adult mean 34.1.
+            uid = self._band_office.get(bid)
+            inc = live.get(uid) if uid is not None else None
+            if inc is not None and inc.age < adult:
+                inc = None                                # (cannot arise once seated, but keeps the invariant)
+            if inc is None:
+                cand = max(ms, key=merit)
+                if dissolve:
+                    # BIG-MAN REGIME (Sahlins' Siuai): the following was built by ONE man's generosity and does
+                    # not transfer. A successor must stand clear of his NEAREST RIVAL by `margin` — where two
+                    # contenders are close the band simply stays leaderless, which is the ethnographic
+                    # interregnum. (Against the band MEAN this bar is trivially cleared by the max of ~25 draws.)
+                    rivals = sorted((merit(x) for x in ms if x is not cand), reverse=True)
+                    if not rivals or rivals[0] <= 0.0 or merit(cand) < (1.0 + margin) * rivals[0]:
+                        continue                          # no one stands clear ⇒ band stays LEADERLESS
+                self._band_office[bid] = cand.unique_id
+                self._office_since[cand.unique_id] = self.step_count
+                self._ever_leader.add(cand.unique_id)
+                continue
+
+            others = [x for x in ms if x is not inc]
+            if not others:
+                continue
+            # OVERREACH (Boehm 19/29) — how far the leader's own durable holding stands above his band's norm.
+            mo = sum(x.material for x in others) / len(others)
+            over = 0.0 if mo <= 0.0 else (inc.material - mo) / mo
+            over = 0.0 if over < 0.0 else (1.0 if over > 1.0 else over)
+            # FAILURE TO DELIVER (Boehm 10/29) — the band's own hardship is what a leader is judged on.
+            ineff = min(self._band_starv_ema.get(bid, 0.0), 1.0)
+            p = gain * (w_over * over + (1.0 - w_over) * ineff)
+            if p <= 0.0:
+                continue
+            if self.random.random() >= min(p, 1.0):
+                continue
+            if self.random.random() < dep_p:
+                # DEPOSITION (the minority channel): a challenger must clear the incumbent by `margin`, so a
+                # challenge can FAIL and the incumbent survives it — "until he dies or is challenged AND
+                # DEFEATED". Attempts are counted separately from successes: Boehm's 9:17 is the ratio of
+                # sanctions ATTEMPTED (what a society practises), not of leaders actually unseated.
+                self.challenges_this_step += 1
+                chal = max(others, key=merit)
+                if merit(chal) > (1.0 + margin) * merit(inc):
+                    since = self._office_since.pop(inc.unique_id, None)
+                    if since is not None:
+                        self._tenures_closed.append(self.step_count - since)
+                    self._band_office[bid] = chal.unique_id
+                    self._office_since[chal.unique_id] = self.step_count
+                    self._ever_leader.add(chal.unique_id)
+                    self._office_end["deposed"] += 1
+                    self.depositions_this_step += 1
+            else:
+                # DESERTION (the MAJORITY channel): a follower walks away rather than unseat him — he joins the
+                # nearest other band ("an entire dissatisfied lineage might simply go away"), or founds his own.
+                quitter = self.random.choice(others)
+                qx, qy = quitter.pos
+                pool = [b for b in members if b != bid and members[b]]
+                if pool:
+                    def _cd2(b):
+                        g = members[b]
+                        cx = sum(x.pos[0] for x in g) / len(g); cy = sum(x.pos[1] for x in g) / len(g)
+                        return (cx - qx) ** 2 + (cy - qy) ** 2
+                    nb = min(pool, key=_cd2)
+                    members[nb].append(quitter)
+                else:
+                    nb = self._next_band_id; self._next_band_id += 1
+                    members[nb] = [quitter]
+                quitter._group.band_id = nb
+                members[bid].remove(quitter)
+                self.desertions_this_step += 1
+
+    def leader_tenure(self) -> dict:
+        """R-84 diagnostic: how long leaders actually HOLD office. `mean`/`median` are over completed tenures
+        (steps ⇒ months); `open_mean` covers sitting incumbents; `vacant` counts bands with no office-holder
+        (only non-zero under `succession_dissolve` — Sahlins' big-man structure that dissolved with its man).
+        Pure observer."""
+        if self._demog is None or not getattr(self._demog, "enable_leader_office", False):
+            return {"n_closed": 0, "mean": 0.0, "median": 0.0, "mean_years": 0.0, "open_mean": 0.0,
+                    "n_bands": 0, "n_held": 0, "vacant": 0, "father_was_leader": float("nan")}
+        closed = list(self._tenures_closed)
+        bids = {a._group.band_id for a in self.agent_list}
+        sitting = set(self._band_office.values())
+        open_t = [self.step_count - s for u, s in self._office_since.items() if u in sitting]
+        held = len([b for b in self._band_office if b in bids])
+        srt = sorted(closed)
+        # HAYDEN 1995 [VERIFIED]: "About 75% of New Guinea Entrepreneur Big Men had fathers that were also Big
+        # Men." The office is NOT inherited here — so any father-son continuity must EMERGE from the heritable
+        # status capital (cred) that wins it, which is precisely Hayden's mechanism (he transmits moka partners
+        # and wives, not the position). This is the validation target, not an input.
+        sons = [a for a in self.agent_list if a.unique_id in self._ever_leader
+                and getattr(a, "_father", None) is not None]
+        fwl = (sum(1 for a in sons if a._father.unique_id in self._ever_leader) / len(sons)) if sons else float("nan")
+        seated = set(self._band_office.values())
+        ages = [a.age / 12.0 for a in self.agent_list if a.unique_id in seated]
+        return {
+            "father_was_leader": fwl,
+            "n_scored": len(sons),
+            "ends": dict(self._office_end),
+            "leader_age": (sum(ages) / len(ages)) if ages else 0.0,
+            "n_closed": len(closed),
+            "mean": (sum(closed) / len(closed)) if closed else 0.0,
+            "median": (srt[len(srt) // 2]) if srt else 0.0,
+            "mean_years": (sum(closed) / len(closed) / 12.0) if closed else 0.0,
+            "open_mean": (sum(open_t) / len(open_t)) if open_t else 0.0,
+            "n_bands": len(bids),
+            "n_held": held,
+            "vacant": len(bids) - held,
+        }
+
+    def band_leaders(self) -> dict[int, "BaseAgent"]:
+        """Public diagnostic (Stage 1 leader coherence): map each live band_id (the affiliation `_group.band_id`,
+        NOT the spatial `bands()` grouping) to its leader. Used by the leader-coherence benchmark to identify —
+        and, in a controlled experiment, force-remove — a band's leader at a scripted step (set `.alive = False`;
+        the model's own death-pruning cleans it up next `step()`), and to track leader-identity turnover.
+
+        With `enable_leader_office` (R-84) this returns the sitting OFFICE-HOLDER, and a band whose office is
+        VACANT is simply absent from the map — so a dissolved big-man following levies nothing. Without it, the
+        legacy behaviour: the current highest cred·prowess member, recomputed fresh every step."""
+        members: dict[int, list] = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+        if self._demog is not None and getattr(self._demog, "enable_leader_office", False):
+            live = {a.unique_id: a for a in self.agent_list}
+            out: dict[int, "BaseAgent"] = {}
+            for bid in members:
+                uid = self._band_office.get(bid)
+                inc = live.get(uid) if uid is not None else None
+                if inc is not None and inc._group.band_id == bid:
+                    out[bid] = inc
+            return out
         return {bid: max(ms, key=lambda a: a.cred * getattr(a, "prowess", 1.0)) for bid, ms in members.items()}
 
     def dynasties(self, top: int = 15, sample_pairs: int = 400) -> dict:

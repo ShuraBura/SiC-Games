@@ -933,6 +933,38 @@ class DemographyConfig(BaseModel):
     # is the per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
     leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess [0.79 = Boehm 38/48]
     leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned [DESIGN]
+    # ── R-84 CHALLENGE-SUCCESSION: leadership as a TENURED OFFICE, and the two ways it is LOST ───────────
+    # DEFECT this fixes: `band_leaders()` recomputes argmax(cred·prowess) EVERY step ⇒ zero incumbency. There is
+    # no office, no tenure, and a leader is never *removed* — he merely stops being the maximum. The ethnography
+    # is the reverse: leadership is HELD, and lost to a SANCTION.
+    # ANCHOR [Boehm 1993 Table I, VERIFIED — columns counted from the 48-society world survey]:
+    #   Public opinion 10 · Criticism 6 · Ridicule 5 · Disobedience 7 · **DEPOSITION 9** · **DESERTION 17** ·
+    #   Exile 2 · Execution 10.
+    # DESERTION outnumbers DEPOSITION ≈2:1 — the commonest end of a bad leader is that his following WALKS AWAY,
+    # not a challenge-and-defeat duel ("if a bad chief was not deposed he might be deserted gradually" — Iban,
+    # Freeman 1970:114; "an entire dissatisfied lineage might simply go away" — Mandari, Buxton). And the split is
+    # structural, not arbitrary: DEPOSITION societies are the centralized ones (Iroquois sachems, Yap chiefs,
+    # Somali sultans, Iban, Assiniboin, Coeur d'Alene, Yokuts) while DESERTION societies are mobile/dispersed
+    # (Batek, Mendrig, Apache, Kutchin, Ute, Nambicuara, Yanomamö, Patagonia) — i.e. Sahlins' Nootka-vs-Siuai and
+    # Hayden's restricted-vs-ubiquitous resources, showing up as a sanction frequency.
+    # TRIGGERS [Boehm 1993, the 47 coded motivations for negative sanctioning]: "dominating others as leader" (14)
+    # + "lack of generosity or monopolizing resources" (5) = OVERREACH (19); "ineffectiveness, partiality, or
+    # unresponsiveness in a leadership role" (10) = FAILURE TO DELIVER. Hence `office_overreach_weight` = 19/29.
+    # THE LOOP THIS CLOSES: overreach is read off the leader's OWN material relative to his band — which is exactly
+    # what `leader_share_frac` inflates. A greedier levy raises the sanction hazard on the man taking it. Boehm's
+    # reverse dominance hierarchy as a feedback loop, not a constant.
+    enable_leader_office: bool = False
+    office_challenge_margin: float = Field(0.25, ge=0.0)       # challenger must exceed the incumbent's merit by this factor [DESIGN]
+    office_deposition_share: float = Field(9.0 / 26.0, ge=0.0, le=1.0)   # 0.346 = Boehm deposition 9 / (9 deposition + 17 desertion)
+    office_overreach_weight: float = Field(19.0 / 29.0, ge=0.0, le=1.0)  # 0.655 = Boehm (14 dominating + 5 monopolizing) / 29 leadership motivations
+    office_grievance_gain: float = Field(1.0, ge=0.0)          # per-step sanction hazard at unit grievance [DESIGN — calibrated on tenure]
+    # SUCCESSION ON THE HOLDER'S DEATH — two regimes [Sahlins 1972:209, VERIFIED]. The Nootka chief "is an
+    # officeholder in a lineage (house group), his following is this corporate group, and his central economic
+    # position is ascribed by right of chiefly due" ⇒ "centricity is built into the structure" and the office
+    # OUTLIVES him. The Siuai big-man's following "is an achievement — a result of generosity bestowed — the
+    # leadership an achievement, and the whole structure will as such DISSOLVE with the demise of the pivotal
+    # big-man." True ⇒ big-man regime (vacancy until someone re-earns it); False ⇒ chiefly office (filled at once).
+    succession_dissolve: bool = False
     # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
     # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
     # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).

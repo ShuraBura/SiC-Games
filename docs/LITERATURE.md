@@ -1103,3 +1103,66 @@ Boehm 1993 supplies the enforcement that holds it at the customary level (leveli
 escape route (storable surplus that cannot be shared out). **Sahlins = the baseline · Boehm = the enforcement ·
 Testart = the escape · Hayden = the driver.** Corrects a naive "resources → surplus → elites" chain: the resources
 were already there.
+
+
+---
+
+### Borgerhoff Mulder, M., Bowles, S., Hertz, T., et al. (2009). "Intergenerational Wealth Transmission and the Dynamics of Inequality in Small-Scale Societies." *Science* 326(5953):682–688. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — Table 1 & Table 2 read 2026-07-18** (NIH-PA author manuscript, 18 pp; extracted with
+`pymupdf`, Table 2 recovered by POSITIONAL extraction — the landscape table transposes under linear text dump).
+
+**Why it is the anchor for the elite layer's levy rate.** No source gives a chiefly-due PERCENTAGE — Sahlins 1972
+and Ames 1994 were both read directly for one and neither has it (a verified negative). So `leader_share_frac` is
+anchored on its OUTCOME, the way `leveling_strength` is on Boehm 38/48 and status→RS on von Rueden r≈0.19.
+
+**The mapping is unusually clean: BHM's three wealth classes ARE the model's three status facets,** and their
+Table 1 confirms it by what was actually measured per class —
+| BHM wealth class | What they measured (Table 1, HG rows) | Model facet |
+|---|---|---|
+| **Embodied** | Aché hunting returns, Aché/Hadza body weight, Hadza grip strength, Hadza foraging returns | `prowess` |
+| **Relational** | Ju/'hoansi exchange partners, Lamalera food-share partners | `cred` |
+| **Material** | Lamalera quality of housing, Lamalera boat shares | `material` |
+
+**Table 2 — importance (α), transmission (β) and inequality by economic system:**
+| System | α embodied | α relational | α material | β material | **α-weighted Gini** |
+|---|---|---|---|---|---|
+| Hunter-gatherer | 0.46 | 0.39 | **0.15** | 0.17 | **0.25** (SE 0.04) |
+| Horticultural | 0.53 | 0.26 | 0.21 | 0.09 | 0.27 (SE 0.03) |
+| Pastoral | 0.26 | 0.14 | **0.61** | 0.67 | 0.42 (SE 0.05) |
+| Agricultural | 0.27 | 0.14 | **0.59** | 0.55 | 0.48 (SE 0.04) |
+
+**What was lifted:** (1) the **α weights** — the empirical importance of each status facet BY SOCIETY TYPE, which
+is the coupling-weight row of the capital/operator matrix; (2) the **Gini targets** for the α-weighted composite;
+(3) the **β material** gradient (0.17 forager → 0.55–0.67 pastoral/agricultural) as the future anchor for material
+heritability. **The load-bearing caution: for foragers material carries only 15% of the weight** — so an elite
+layer that stratifies on material alone is over-weighting the one class the ethnography says matters least at that
+stage. BHM's own thesis is that inequality tracks *which* wealth class matters and *how heritable* it is, not how
+much any one man takes. NB their headline Ginis are the α-weighted COMPOSITE; per-class Ginis live in their Table
+S5 (supplementary, not in the author manuscript) — so the model must be compared on the composite, not on
+material alone. Their own note: "material wealth types ... display higher Gini coefficients."
+
+### Sahlins, M. (1972). *Stone Age Economics*. Aldine-Atherton. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — read 2026-07-18** (`literature/Sahlins - Stone Age Economics.pdf`, 363 pp, full text
+layer). Distinct from the already-filed Sahlins 1968 "Notes on the Original Affluent Society" (Lee & DeVore).
+
+**What was lifted — the OFFICE-vs-ACHIEVEMENT distinction (p.209), which is the succession model.** Contrasting a
+Melanesian big-man economy (Siuai) with a Northwest Coast chiefdom (Nootka): *"The thin line of difference is this:
+the Nootka leader is an officeholder in a lineage (house group), his following is this corporate group, and his
+central economic position is ascribed by right of chiefly due and chiefly obligation. So centricity is built into
+the structure. In Siuai, it is a personal achievement. The following is an achievement — a result of generosity
+bestowed — the leadership an achievement, and the whole structure will as such dissolve with the demise of the
+pivotal big-man."* ⇒ the two succession regimes coded as `succession_dissolve` (see MODEL_SPEC §4.9.2).
+
+**Corollary that constrains the levy itself (p.136–137):** the Melanesian big-man does NOT levy — he *mobilises*.
+*"Deploying his resources carefully, the emerging leader uses wealth to place others in his debt ... he constructs
+a following whose production may be harnassed to his ambition."* Whereas *"A Northwest Coast chieftain is a lineage
+head, and in this capacity is necessarily accorded a certain right to group resources. He is not obliged to
+establish a personal claim by the dynamic of an autoexploitation put at the others' disposal."* **So a levy on
+band output (`leader_share_frac` > 0) is by construction the CHIEFLY regime, not the big-man one** — which is why
+the same flag pairs naturally with `succession_dissolve=False`.
+
+### Smith, E.A. & Codding, B.F. (2021). "Ecological variation and institutionalized inequality in hunter-gatherer societies." *PNAS* 118(13):e2016134118.
+**Status: CITED, NOT YET FILED** (owed — cited in the R-83 commit and in the defensibility discussion). Carries the
+resource clumping × defensibility → institutionalized inequality result (r≈0.881), which converges with Hayden
+1995's "spatially restricted resource locations" precondition and with Dyson-Hudson & Smith 1978 (already filed).
+**Get the PDF and promote to [VERIFIED] before any claim leans on the 0.881 figure.**

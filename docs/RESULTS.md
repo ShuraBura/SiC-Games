@@ -1744,4 +1744,111 @@ The elite layer now builds on a homeostat that actually holds.
 
 ---
 
+### R-82 - Material wealth stratifies where food cannot; the captor is a TYPE, not a rank (2026-07-17)
+**Question.** Cred already skews the food draw, yet equilibrium inequality stays flat. Can a DURABLE stock do what
+a burned one cannot? **Build.** `material` as a stock (hides from game; `material_hide_frac`), `material_decay`,
+aggrandizer capture, Boehm leveling. **Result.** Durability alone stratifies - food is consumed, `material`
+persists, so small per-step differences integrate. **Two corrections, both mine:** (i) keying capture on `cred^k`
+gave corr -0.018 - Hayden's captor is an ambition TYPE (`aggrandizer_frac`), and re-keying gave +0.780;
+(ii) [SUPERVISOR-CAUGHT] material was drawn from the GRANARY, i.e. from food. Reworked to come from GAME as hides.
+Boehm leveling cuts the top decile 90% -> 28%. **Aggrandizer capture stayed inert at forager dispersal (1.14x even
+at 80% capture) - it needs co-residence.** That negative is what R-83 explains.
+
+### R-83 - Elite step 1: leader "managerial rights" over BAND corporate output -> 3.68x (2026-07-17)
+**The missing rung** [SUPERVISOR]: `_cell_owner` is CORPORATE (band_id), but stratification needs PERSONS to
+differ. The bridge is not ownership, it is AUTHORITY OVER corporate property - controlling the product of property
+one does not own. **Anchor** [Hayden 1995 VERIFIED]: NW-Coast aggrandizers "control access to spatially restricted
+resource locations or productive facilities" and that class "had MANAGERIAL RIGHTS over the resource locations and
+facilities of the group"; contrast New Guinea, where "more ubiquitous access to productive land probably limited
+the development of social stratification". **Result** (2 seeds x 600):
+
+| share | leveling | material Gini | leader/other | top-10% |
+|---|---|---|---|---|
+| 0.00 | OFF | 0.416 | 1.18x | 25.3% |
+| 0.20 | OFF | 0.487 | 2.11x | 34.1% |
+| 0.50 | OFF | 0.636 | **3.68x** | 53.6% |
+| 0.50 | ON | 0.281 | 2.21x | 24.2% |
+
+**The R-82 negative was the WRONG UNIT, not the wrong mechanism** - a cell holds 1-2 agents, a band ~25, and you
+cannot skim a group of one. Leveling does not abolish the leader's advantage, it CAPS it (3.68x -> 2.21x): the Big
+Man as the ethnography has him - ahead, but held there.
+
+### R-84 - Challenge-succession: DESERTION, not the duel, is how a leader goes (2026-07-18)
+**Origin** [SUPERVISOR]: "I am not sure that chief is hereditary yet ... in tribes chief holds office until he dies
+or challenged and defeated (vikings) ... perhaps council of elders (north american) ... need lit." **The lit
+confirms the correction and then corrects the mechanism.**
+
+**(a) NOT hereditary** [Boehm 1993 VERIFIED]: leaders are deposable (Iroquois sachems; Coeur d'Alene and Assiniboin
+for "remarkable meanness, parsimony"); even a *hereditary* Yokuts chief "suspected of too much self-aggrandizement
+was ... ignored in favor of another chief"; councils of ELDERS are the documented brake and are specifically North
+American (Navajo, Fox, Yokuts) plus Tupinamba, Cuna, Mandari; Boehm even has "incipient chiefdoms ... egalitarian
+despite hereditary leadership". **Every part of the supervisor's correction holds.**
+
+**(b) But the challenge-and-defeat duel is the MINORITY channel.** Boehm Table I columns, counted over the
+48-society survey: Public opinion 10 - Criticism 6 - Ridicule 5 - Disobedience 7 - **DEPOSITION 9** -
+**DESERTION 17** - Exile 2 - Execution 10. Followers walking away outnumbers deposition ~2:1 ("if a bad chief was
+not deposed he might be deserted gradually" - Iban; "an entire dissatisfied lineage might simply go away" -
+Mandari). And the split is STRUCTURAL: deposition societies are the centralized ones (Iroquois, Yap, Somali, Iban,
+Assiniboin, Coeur d'Alene, Yokuts), desertion societies the mobile/dispersed ones (Batek, Mendrig, Apache, Kutchin,
+Ute, Nambicuara, Yanomamo, Patagonia) - i.e. Sahlins' Nootka-vs-Siuai and Hayden's restricted-vs-ubiquitous
+resources, surfacing as a sanction frequency. The supervisor's biome hunch is right, with resource structure as the
+real axis.
+
+**(c) Two triggers** [Boehm's 47 coded motivations]: OVERREACH = "dominating others as leader" (14) + "lack of
+generosity or monopolizing resources" (5) = 19; FAILURE TO DELIVER = "ineffectiveness, partiality, or
+unresponsiveness in a leadership role" (10). **This closes a loop:** overreach is read off the leader's own
+material relative to his band - which `leader_share_frac` is what inflates - so a greedier levy raises the sanction
+hazard on the man taking it. Measured: 24 -> 82 -> 103 sanction attempts as the levy goes 0 -> 0.2 -> 0.5.
+
+**(d) Succession on death, two regimes** [Sahlins 1972:209]: Nootka office "ascribed by right of chiefly due" =>
+"centricity is built into the structure" and outlives him; the Siuai big-man's following "will as such dissolve
+with the demise of the pivotal big-man". Coded as `succession_dissolve` - ON leaves 2/18 bands leaderless (and
+levying nothing); OFF fills every office.
+
+**THREE DEFECTS THE BUILD EXPOSED, each found by measurement not inspection:**
+1. **Tenure was capped ~4 yr with sanctions OFF** - so it was not politics ending careers. The office was keyed to
+   `band_id`, and band_ids churn on every fusion/fission. Re-keyed the tenure clock to the MAN.
+2. **Collisions ended 106 of 135 tenures** (death only 29): when two bands fused, the surviving office-holder was
+   picked by dict order. Now resolved by MERIT.
+3. **Mean leader age 23.5 yr against an adult mean of 34.1 - leaders were YOUNGER than average**, inverting every
+   source. Cause: `max(ms, ...)` ranged over ALL band members, so a high-cred CHILD (inherited cred, default
+   prowess 1.0) could hold office. Gated on `menarche_months`. Leader age -> 34.0.
+
+**Validated after the fixes** (2 seeds x 600): desertion 62-74% of attempts vs the 65% that went in [OK]; leader
+age 34.0 vs adult 34.1 [OK]; father-was-a-leader 53-69% (centred ~60%) against **Hayden's 75% of New Guinea
+Entrepreneur Big Men** - same order, somewhat low, and EMERGENT (the office is never inherited here; any continuity
+comes from heritable cred, which is Hayden's own mechanism - he transmits moka partners and wives, not the
+position).
+
+**HONEST LIMIT:** band-level tenure settles at **4-6 yr**, bounded by band fusion rather than by the leader's life.
+A 20-year chief is a CHIEFDOM phenomenon and would need the office attached to the SETTLEMENT, not the band -
+which is exactly Hayden's precondition (spatially restricted resources) and the next rung.
+
+### R-84b - `leader_share_frac` anchored on BHM 2009, and the levy turns out to be nearly powerless (2026-07-18)
+**Verified negative first:** no chiefly-due PERCENTAGE exists in Sahlins 1972 or Ames 1994 - both read directly for
+one. So the levy is anchored on its OUTCOME, as `leveling_strength` was on Boehm 38/48. **Anchor** [Borgerhoff
+Mulder et al. 2009 Table 2]: their three wealth classes ARE the model's three facets (embodied=prowess,
+relational=cred, material=material - confirmed by what their Table 1 measures), with forager alpha = (0.46, 0.39,
+**0.15**) and an alpha-weighted Gini target of **0.25 +/- 0.04**; agricultural alpha = (0.27, 0.14, **0.59**),
+Gini **0.48**.
+
+| share | leveling | G_prowess | G_cred | G_material | **HG composite** | agri-weighted |
+|---|---|---|---|---|---|---|
+| 0.00 | ON | 0.241 | 0.281 | 0.181 | **0.248** | 0.211 |
+| 0.20 | ON | 0.257 | 0.267 | 0.237 | **0.258** | 0.247 |
+| 0.50 | ON | 0.243 | 0.275 | 0.281 | 0.261 | 0.270 |
+| 0.50 | OFF | 0.250 | 0.251 | 0.563 | 0.298 | **0.435** |
+| | | | | **BHM target** | **0.25** | **0.48** |
+
+**`leader_share_frac = 0.20` -> composite 0.258 vs 0.25 +/- 0.04 = the anchored forager value.**
+
+**THE REAL RESULT IS THE FLATNESS.** Across the whole levy range 0 -> 0.5 the forager composite moves only
+0.248 -> 0.261, because material carries just **15%** of the forager weight. **A levy cannot by itself make a
+forager society unequal** - the agricultural 0.48 is approached (0.435) only by removing leveling AND shifting the
+weight to material. That is BHM's own thesis (inequality tracks WHICH wealth class matters and how heritable it
+is, not how much any one man takes) and it is Testart's chain. **Standing caution for the elite layer: stratifying
+on material alone over-weights the one class the ethnography says matters least at the forager stage.**
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

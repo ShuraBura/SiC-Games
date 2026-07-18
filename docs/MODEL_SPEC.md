@@ -1780,6 +1780,85 @@ Lit added this arc (docs/LITERATURE.md): AGG1 Bettencourt; SK1–3 Walker/Gurven
 resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7), emergent bands & corrected band
 substrate (§4.8).*
 
+### §4.9 Elite layer - extraction methodology (2026-07-17...18; RESULTS R-82/R-83/R-84/R-84b)
+
+#### §4.9.1 Boehm 1993 Table I - recovering the sanction COUNTS (the succession anchor)
+
+Boehm's "World Survey of Egalitarian Sanctioning" is an x-marked matrix: 48 societies (rows) x 8 sanction types
+(columns). The narrative gives only the aggregate ("38 of the 48 societies"), which is what `leveling_strength`
+already used; the PER-SANCTION counts needed for succession are only in the matrix.
+
+**A linear `get_text()` dump DESTROYS this table** - it emits the header words and then a flat run of bare `x`
+tokens with no column association, so the counts cannot be read off. **Method: positional extraction.** Take
+`page.get_text("words")` (each word carries x0,y0,x1,y1), locate the x-centre of each column HEADER word, bucket
+every remaining word into a row by rounding y0, then assign each `x` mark to the column whose header centre is
+nearest its own x-centre. Script: `sic_games/outputs/phase1_biome_mortality/` (probe series); the same technique
+is required for Bird 2009 (§ image-table note) and for BHM Table 2 below.
+
+**Recovered counts (2026-07-18):** Public opinion 10 - Criticism 6 - Ridicule 5 - Disobedience 7 - **Deposition 9**
+- **Desertion 17** - Exile 2 - Execution 10. (Total 66 marks over 48 societies; Boehm notes "in many cases a
+single society exhibited both types of behavior", so marks exceed societies as expected - a consistency check
+that the bucketing did not double-count.)
+
+**Transformation to parameters.** Removal-type sanctions are deposition and desertion; the rest are pressure.
+`office_deposition_share = 9/(9+17) = 0.346`. This is the ratio of sanctions **ATTEMPTED** - what a society
+practises - not of leaders actually unseated, because a deposition can FAIL against the challenge margin while a
+desertion cannot fail. The model therefore counts `challenges_this_step` (attempts) separately from
+`depositions_this_step` (successes), and only the attempt ratio is compared to Boehm.
+
+**The trigger weights** come from Boehm's separate tally of 47 coded motivations: too aggressive 13, dominating
+others as leader 14, ineffectiveness/partiality/unresponsiveness in a leadership role 10, lack of generosity or
+monopolizing resources 5, moral transgressions 3, meanness 2. Restricting to LEADERSHIP conduct (14 + 10 + 5 = 29
+of 47, i.e. 62%) and splitting it into overreach (14 + 5 = 19) vs failure-to-deliver (10) gives
+`office_overreach_weight = 19/29 = 0.655`.
+
+#### §4.9.2 Sahlins 1972:209 - the two succession regimes (qualitative -> a boolean)
+
+The Siuai-vs-Nootka contrast is the operative distinction and is coded as a single flag rather than a rate,
+because Sahlins states it as a structural dichotomy, not a frequency: the Nootka leader's "central economic
+position is ascribed by right of chiefly due ... So centricity is built into the structure", whereas in Siuai "the
+whole structure will as such dissolve with the demise of the pivotal big-man" => `succession_dissolve`.
+
+**Implementation note that follows from the same page.** Sahlins is explicit that the big-man does NOT levy - he
+mobilises through debt ("uses wealth to place others in his debt"), while the Nootka chief "is necessarily
+accorded a certain right to group resources". **Therefore a non-zero `leader_share_frac` IS the chiefly regime by
+construction**, and pairing it with `succession_dissolve=True` models a mixed case that Sahlins does not describe.
+Flagged so a future run does not silently combine them and call the result ethnographic.
+
+**Dissolution bar.** In dissolve mode a successor must clear his NEAREST RIVAL by `office_challenge_margin`, not
+the band MEAN. Measured reason: against the mean, the max of ~25 lognormal-ish merit draws clears +25% essentially
+always, so the flag had literally zero effect (identical output, 0 vacancies). Against the nearest rival it leaves
+2/18 bands leaderless, which is the intended interregnum.
+
+#### §4.9.3 Borgerhoff Mulder et al. 2009 Table 2 - the composite-Gini anchor
+
+**Extraction.** The NIH-PA author manuscript renders Table 2 in landscape, so a linear dump transposes it: rows of
+the printed table appear as interleaved column fragments. Recovered by the same positional method as §4.9.1
+(bucket `get_text("words")` by rounded y, read each recovered line as one printed COLUMN). Cross-check that the
+extraction is correct: the recovered alpha rows sum to 1.000 within each economic system (0.46+0.39+0.15 = 1.00;
+0.27+0.14+0.59 = 1.00), and the recovered forager/horticultural Ginis (0.25/0.27) reproduce the paper's own
+narrative statement that they sit "almost exactly [at] the average of the Gini measure of disposable income for
+Denmark, Norway and Finland (0.24)".
+
+**The class->facet mapping is read off their Table 1, not assumed** - i.e. from what each class was operationalised
+as in the forager populations: embodied = Ache hunting returns / Ache and Hadza body weight / Hadza grip strength /
+Hadza foraging returns (=> `prowess`); relational = Ju/'hoansi exchange partners, Lamalera food-share partners
+(=> `cred`); material = Lamalera quality of housing, Lamalera boat shares (=> `material`).
+
+**Composite computation (the comparison the model must be judged on).** Per-facet Gini is computed over ADULTS
+(`age >= menarche_months`) with the standard sorted-rank estimator, then combined as
+`G_composite = a_e * G(prowess) + a_r * G(cred) + a_m * G(material)` using the alpha row for the society type
+being modelled. **The model's `material_gini` must NOT be compared to BHM's headline number directly** - the
+headline is the alpha-weighted composite across all three classes, and the paper states separately that material
+wealth types display HIGHER Ginis than the composite. Per-class Ginis are in their Table S5 (supplementary, absent
+from the author manuscript), so the composite is the only like-for-like comparison currently available.
+
+**Verified negative recorded here so it is not re-searched.** No chiefly-due PERCENTAGE - the fraction of group
+product a leader receives - exists in Sahlins 1972 (Stone Age Economics, full text searched) or Ames 1994 (NW
+Coast, full text searched). Both were read directly for one. This is why `leader_share_frac` is anchored on
+outcome rather than rate. If a future source supplies a direct rate (Earle on staple finance is the obvious
+candidate), it supersedes the outcome calibration.
+
 > **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
 coefficients, fertility params) are authoritative in `docs/PARAMETERS.md`. This document records
 **methodology — how each literature value was extracted and transformed** — not the values themselves.

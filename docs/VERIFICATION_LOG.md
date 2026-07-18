@@ -65,4 +65,30 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 8. **Climate/season** fields — `ClimateField.season/regime`, seasonal amplitude per biome (PROVISIONAL).
 
 ---
+
+## Elite layer - source verification (2026-07-18; R-82/R-83/R-84/R-84b)
+
+| Source | Status | What was verified, and how |
+|---|---|---|
+| Boehm 1993, *Curr. Anthro.* 34(3) | **[VERIFIED]** | Full text + **Table I recovered by POSITIONAL extraction** (linear dump destroys the x-mark matrix). Counts: Public opinion 10, Criticism 6, Ridicule 5, Disobedience 7, **Deposition 9**, **Desertion 17**, Exile 2, Execution 10. Consistency check: 66 marks over 48 societies, consistent with Boehm's "in many cases a single society exhibited both types". Also the 47-motivation tally (13/14/10/5/3/2) and the 38/48 removal aggregate that `leveling_strength` already used. |
+| Hayden 1995 (`literature/hayden1995.pdf`) | **[VERIFIED]** | "MANAGERIAL RIGHTS over the resource locations and facilities of the group" (NW Coast, spatially restricted resources) vs New Guinea "more ubiquitous access ... limited the development of social stratification". **"About 75% of New Guinea Entrepreneur Big Men had fathers that were also Big Men"** - transmitted via moka partners and wives, NOT the position. Strict positional inheritance appears only at the Ahousaht chiefdom (Rosman & Rubel 1971:80). |
+| Sahlins 1972 *Stone Age Economics* | **[VERIFIED]** | Full text layer, 363 pp. p.209 Siuai-vs-Nootka office/achievement contrast (the succession dichotomy); p.136-137 the big-man MOBILISES via debt rather than levying, while the NW Coast chief is "accorded a certain right to group resources". |
+| Borgerhoff Mulder et al. 2009 *Science* 326:682 | **[VERIFIED]** | Tables 1 and 2 of the NIH-PA author manuscript; **Table 2 recovered by POSITIONAL extraction** (landscape layout transposes under linear dump). Cross-checks passed: alpha rows sum to 1.000 per system; recovered forager/horticultural Ginis 0.25/0.27 reproduce the paper's own Nordic-comparison statement (0.24). |
+| Ames 1994 (AGG6) | **[VERIFIED - NEGATIVE]** | Full text searched for a chiefly extraction RATE. **None exists.** Qualitative elite control of production only. |
+| Sahlins 1972 (rate search) | **[VERIFIED - NEGATIVE]** | Full text searched for a chiefly-due PERCENTAGE. **None exists.** This is why `leader_share_frac` is anchored on outcome (BHM composite Gini), not on a rate. |
+| Smith & Codding 2021 *PNAS* | **CITED, NOT FILED** | **OWED.** Cited in the R-83 commit for clumping x defensibility -> institutionalized inequality (r=0.881). Get the PDF before any claim leans on the figure. |
+
+**Code checks performed (R-84, all found by MEASUREMENT not inspection - added to the standing skip-list):**
+1. **Tenure keyed to the wrong object** - office was keyed to `band_id`; band_ids churn on every fusion/fission, capping tenure at ~4 yr even with sanctions OFF. Re-keyed to the MAN. *Lesson: when a diagnostic is flat against a knob that should move it, check what the clock is attached to before tuning the knob.*
+2. **Collision resolution by dict order** - ended 106 of 135 tenures (death only 29). Now by merit.
+3. **Eligibility unbounded** - `max(ms, ...)` over ALL band members let a high-cred CHILD hold office; mean leader age 23.5 yr vs adult mean 34.1. Gated on `menarche_months`.
+4. **Vacuous flag** - `succession_dissolve` measured against the band MEAN had literally zero effect (identical output, 0 vacancies), because the max of ~25 draws clears +25% over the mean essentially always. Re-specified against the nearest RIVAL. *Same failure class as the R-74 vacuous test: a mechanism that "passes" while doing nothing.*
+
+**OPEN for the elite layer:**
+- `office_grievance_gain` and `office_challenge_margin` are [DESIGN], calibrated on tenure, not lit-anchored.
+- Band-level tenure is bounded by band FUSION (4-6 yr), not by the leader's life. A chiefly 20-yr tenure needs the office attached to the SETTLEMENT - the next rung, and Hayden's precondition.
+- `material_invulnerability_min` gate still unexercised in a stressed/high-density regime.
+- Father-was-leader lands 53-69% vs Hayden's 75% - same order, somewhat low; worth revisiting once relational capital (exchange partners) is transmissible, since that is Hayden's actual channel.
+
+---
 *Verification Log opened 2026-07-09. Append/update rows as checks are performed — this is the skip-list.*
