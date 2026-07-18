@@ -2103,6 +2103,17 @@ class TerrainWorld(mesa.Model):
             for c in newborns:
                 self._log_genea("birth", c)
 
+        # R-81: renormalise cred to population-mean 1 (fix the homeostat mean-inflation). Dynamics-neutral for
+        # the relative (cred)^κ / normalised-mate weights; re-tightens the inheritance homeostat. Off ⇒ bit-exact.
+        if self._demog is not None and getattr(self._demog, "enable_cred_renorm", False):
+            cr = [a.cred for a in self.agent_list if getattr(a, "use_cred_status", False)]
+            if cr:
+                mc = sum(cr) / len(cr)
+                if mc > 0.0:
+                    for a in self.agent_list:
+                        if getattr(a, "use_cred_status", False):
+                            a.cred /= mc
+
     def morph_to_society(self, name: str) -> None:
         """Evolving-society hook: re-bundle the family/status knobs to a new society preset mid-run — swaps the
         demographic config + the substrate `contest_exponent` (κ). Drive it from `society_from_character` on the

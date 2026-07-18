@@ -1712,4 +1712,36 @@ ones** (status→fertility). von Rueden's *dominant* real-world pathway is there
 
 ---
 
+## R-81 — The cred homeostat was silently leaking: a contraction validated pre-selection, defeated by R-19's mate-choice. Fixed by renormalising to mean-1 (2026-07-17)
+
+**Origin:** the cred-dynamics diagnostic (built while designing the elite layer). Branch `cred-renorm`.
+
+**The defect.** cred inheritance reverts toward a FIXED 1.0 anchor: `child.cred = (1−ρ)·base·noise + ρ·1.0`.
+The code comment calls it "a TRUE contraction that bounds the no-decay lineage facet (red-team BLOCKER fix)" —
+and it was, **in R-18, before mate-choice existed**. R-19/R-20 then added (a) fertility-weighted paternity
+(high-cred father more ⇒ the next generation over-samples high status) and (b) a `base = cred·prowess` product
+(mean > 1 when the facets correlate). **Both inject an upward bias each generation that defeats the fixed-1.0
+contraction.** Measured on the canonical village stack: mean cred **1 → 18.6 over 2000 steps** (max 242), so the
+`ρ·1.0` pull becomes negligible next to `(1−ρ)·base` and **the homeostat progressively loses grip** — nobody
+re-checked it after adding selection.
+
+**Why it matters (and why it didn't visibly break anything yet).** Cred enters every downstream weight
+RELATIVELY — `(cred)^κ / Σ(cred)^κ` for the food contest, normalised `(cred·prowess)^m` mate weights — so the
+absolute drift is cosmetic for the dynamics (the Gini still plateaued ~0.5). But a homeostat that leaks at scale
+**cannot be made state-dependent** — which is exactly what the elite layer's Stage D (a conditional homeostat
+for secular cycles) requires. A leaking homeostat is not a floor you can build two capitals on.
+
+**The fix — `enable_cred_renorm` (R-81).** Renormalise cred to population-mean 1 each step. This restores the
+anchor's meaning (1.0 = the running mean again ⇒ constant homeostat grip ρ at any scale), and it sidesteps the
+"revert-to-co-moving-mean" unbounded-drift the red-team originally blocked (that had no fixed scale; a hard
+per-step rescale pins the scale). **Re-verified SAFE** (4 seeds × 800 steps, canonical): mean **1.75 → 1.00**
+(pinned), **Gini 0.332 → 0.326**, **status→RS +0.248 → +0.261**, eq_pop 728 → 702 — all within noise, **R-19
+preserved**. Adopted CANONICAL. 777 pass.
+
+**Note.** This reinforces R-77/R-80: part of the model's late-run status skew was the *inflating* cred mean
+(the homeostat losing grip), not a real hierarchy — with the grip restored, the Gini is the same but honest.
+The elite layer now builds on a homeostat that actually holds.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

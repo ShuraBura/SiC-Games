@@ -836,6 +836,19 @@ class DemographyConfig(BaseModel):
     enable_cred_status: bool = False
     cred_seed_sigma: float = Field(0.0, ge=0.0)      # founder log-status spread; 0 = uniform (no hierarchy)
     cred_inherit_sigma: float = Field(0.0, ge=0.0)   # lineage-copy noise at birth; 0 = exact inheritance
+    # CRED RENORMALISATION (R-81) — per-step rescale of cred to population-mean 1. FIXES a latent homeostat
+    # defect: the inheritance reverts toward a FIXED 1.0 anchor (a contraction validated in R-18, pre-selection),
+    # but R-19/R-20 added fertility-weighted mate-choice + a `cred·prowess` product base — both inject an upward
+    # bias each generation that DEFEATS the fixed-1.0 contraction (measured: mean cred 1→18.6 over 2000 steps, so
+    # the homeostat's `ρ·1.0` pull becomes negligible vs `(1−ρ)·base` ⇒ the homeostat progressively loses grip).
+    # Renormalising to mean-1 each step restores the anchor's meaning (1.0 = the running mean again) ⇒ constant
+    # homeostat grip ρ at any scale, without the "revert-to-co-moving-mean" unbounded-drift the red-team blocked
+    # (RT: that had no fixed scale; this pins the scale hard). Cred enters every downstream weight RELATIVELY
+    # (`(cred)^κ` / Σ, normalised mate weights), so the rescale is dynamics-neutral for those — but it re-tightens
+    # the inheritance homeostat, which LOWERS the realised Gini (so it re-touches R-19's status→RS; re-verify).
+    # Prerequisite for the elite/material layer (a leaking homeostat can't be made state-dependent, Stage D).
+    # Default OFF ⇒ bit-exact.
+    enable_cred_renorm: bool = False
     # Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS
     # facet (achieved) joins the contest weight multiplicatively (Cobb–Douglas, equal within-domain exponents):
     # weight = ((cred+ε)·(prowess+ε))^κ. Default off → lineage-only = R-18 exact. Build step 1 ships the seam;

@@ -47,6 +47,13 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
         enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+        # CANONICAL 2026-07-17: renormalise cred to mean-1 each step (R-81). Fixes a latent homeostat defect —
+        # the fixed-1.0 reversion anchor (a contraction validated pre-selection in R-18) is defeated by R-19/R-20's
+        # fertility-weighted mate-choice + cred·prowess product, so the cred mean drifts (1→18.6 over 2000 steps)
+        # and the homeostat loses grip. Re-verified SAFE: pins mean→1, Gini 0.332→0.326, status→RS +0.248→+0.261
+        # (both within noise) — R-19 preserved. Prerequisite for the elite/material layer (a leaking homeostat
+        # cannot be made state-dependent for secular cycles, Stage D).
+        enable_cred_renorm=True,
         enable_prowess_facet=True, prowess_decay=0.05, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
         # CANONICAL 2026-07-17: orphan-conditioned child mortality (Hill & Hurtado 1996 Tab. 13.1; R-74).
