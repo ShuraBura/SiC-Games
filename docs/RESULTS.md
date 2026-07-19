@@ -2173,4 +2173,81 @@ and that the ratchet stays monotone when the reverse is disabled. `resent_*` rem
 
 ---
 
+### R-87d - H-CYCLES resolved NEGATIVE, on instruments that were fixed twice and validated against controls (2026-07-18)
+
+**This supersedes the verdicts in R-87 and R-87c, both of which were instrument artifacts.** The supervisor
+asked two questions that broke the analysis open: *"how good is the SNR of cycle diagnostics?"* and *"plot the
+solution over the data and I will judge."* Neither verdict survived being looked at.
+
+**THE THREE INSTRUMENT FAILURES, in order.**
+1. **R-87 (autocorrelation, uncalibrated).** Reported "no cycles" against an INVENTED threshold of 0.2, with no
+   positive control, no null floor, and no detrending on a series whose population grew 500 -> 3200.
+2. **R-87c (autocorrelation, calibrated).** Measured the null (white-noise peak mean 0.088 / max 0.138) and
+   found the 0.19 measurement ABOVE it - so the negative was withdrawn as underpowered. **Also wrong**: that
+   null was computed at a different series length than some comparisons used, and length changes the floor
+   substantially (n=900 -> 0.138 max; n=225 -> 0.197 p95).
+3. **Sinusoid fit (new instrument, still mis-specified).** Built to report an amplitude and a curve that could
+   be drawn on the data. It returned amplitude 0.260, "period" 250 yr, r2 0.301, clearing its null - **and it
+   was fitting the grid ceiling.** A 250 yr period in a 300 yr window is 1.2 cycles: a trend wearing a
+   sinusoid's clothes.
+
+**WHAT THE RAW DATA ACTUALLY SHOWS (plotted for the supervisor, and decisive).** `frac_gumsa(t)` is not
+oscillatory in any form. It is: a build-up to ~90% ranked over ~25 yr; a sustained ranked phase; a violent spiky
+collapse around yr 75-125; then **~150 yr pinned at zero** (28% of samples exactly 0); then a terminal jump to
+1.0. **One episode, then the mechanism dies.** No fit of any periodic model is appropriate, which is why two
+different periodic instruments both produced confident wrong answers.
+
+**TWO DETECTOR FIXES (supervisor-approved), then re-validated per charter D1:**
+- **Reject any period beyond window/3.** A fit that cannot complete three cycles is describing a trend. Both
+  instruments had happily returned ~250-270 yr from a 300 yr window.
+- **Require a genuine LOCAL MAXIMUM in the autocorrelation**, not merely the largest value in a wandering tail.
+  The unfixed code took `argmax` unconditionally, so pure drift always produced a "peak".
+
+**POSITIVE CONTROL AFTER THE FIXES (D1) - the fixes tighten without blinding:** a real 75 yr cycle injected into
+a 300 yr window is still recovered at 75.3 yr (autocorrelation) and 74.5 yr (fit) at every amplitude >= 0.10;
+pure noise returns fit amplitude 0.029 against a null p95 of 0.034.
+
+**FINAL RESULT on the real series, both instruments fixed and validated:**
+
+| lag memory | n | AC period | AC peak | fit amp (null p95) | r2 | correlation time | verdict |
+|---|---|---|---|---|---|---|---|
+| 167 yr | 900 | 69.0 yr | **-0.021** | 0.174 (0.061) | 0.140 | 15 yr | NO CYCLE |
+| 83 yr | 900 | 59.0 yr | **-0.028** | 0.130 (0.074) | 0.051 | 33 yr | NO CYCLE |
+| 4 yr (control) | 900 | 59.3 yr | **-0.122** | 0.135 (0.067) | 0.079 | 32 yr | NO CYCLE |
+
+The autocorrelation "peaks" are **NEGATIVE** - a turning point inside a negative region, which is definitively
+not recurrence. The sinusoid explains 5-14% of variance.
+
+**A DIAGNOSTIC RULE THIS PRODUCED:** `fit_amp` clears its null in BOTH arms (0.174 vs 0.061; 0.130 vs 0.074)
+while explaining 14% and 5% of variance. **An amplitude-versus-null test alone would have declared a cycle in
+both.** Goodness-of-fit is the discriminator, and a verdict rule must require BOTH: amplitude above the null AND
+r2 above a floor. Added to the charter.
+
+**H-CYCLES: RESOLVED NEGATIVE.** A delayed negative feedback, built explicitly to supply the missing complex
+eigenvalue pair, does not produce cycles. This is the fourth independent negative (R-67, R-68, R-71, R-87d) and
+the first one measured on validated instruments.
+
+**AND THE THIRD ARM KILLS THE ONE POSITIVE I HAD CLAIMED.** Correlation times are **15 / 33 / 32 yr** for lags
+of **167 / 83 / 4 yr**. That is not monotone, and the 4 yr NEGATIVE CONTROL has the same memory (32 yr) as the
+83 yr lag. **The resentment lag does not set the system's correlation time at all.** An earlier draft of this
+entry claimed "correlation time rises with the lag" on the strength of the first two arms; the control arm
+refutes it. Written down because it is the fifth time in one day that a pattern read off a partial sweep
+dissolved when the full sweep landed - **do not draw a trend from two points when a third is still running.**
+
+**So the lag parameter is not governing the dynamics.** Combined with the dwell-time inversion (10.2 yr at the
+83 yr lag vs 3.9 yr at 167 yr), two independent metrics agree the mechanism's timescale is set by something
+OTHER than `resent_alpha` - most likely the band fission/fusion churn that R-84 already showed dominates
+leader tenure (106 of 135 tenures ended by band collision, not politics). **That is the thing to identify
+before any further cycle work**: a delayed feedback cannot govern a system whose own substrate turns over
+faster than the delay.
+
+**What does survive:** large-amplitude regime switching exists where the three prior negatives had none. The
+mechanism does something real - it is neither periodic nor lag-governed.
+
+**Reported quantity going forward is CORRELATION TIME (15-33 yr) and DWELL TIME, not period** - the ethnography
+claims spell duration ("lasted for a few generations"), never a fixed period, and the model is 2-6x short of
+that 60-100 yr anchor.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

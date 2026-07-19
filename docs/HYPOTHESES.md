@@ -243,6 +243,15 @@ model alternates far too fast. The likely cause is no longer "missing lag" (the 
 right direction) but that the reversion trigger — a hard threshold on a noisy quantity — is crossed
 stochastically rather than by clean build-up.
 
+**RESOLVED NEGATIVE 2026-07-18 (R-87d), on fixed and control-validated instruments.** Both detectors were
+re-specified (reject periods beyond window/3; require a genuine local maximum) and re-validated against a
+positive control — a real 75 yr cycle is still recovered at 75.3 yr. On the real series the autocorrelation
+peaks are NEGATIVE (−0.021, −0.028) and the sinusoid explains 5–14% of variance. The raw trace, plotted and
+inspected, is one build-and-collapse episode followed by ~150 yr pinned at zero: not oscillatory in any form.
+**A delayed negative feedback is NOT sufficient for secular cycles.** Fourth independent negative, and the first
+on validated instruments. Reported quantity is now CORRELATION TIME (15–33 yr), which does rise with the lag,
+and DWELL TIME — both 2–6× short of the 60–100 yr ethnographic anchor.
+
 **Next step:** measure per-band spell lengths directly rather than inferring them from aggregate counts, then
 calibrate `resent_threshold` against the dwell anchor. Also explain the non-monotonicity (the 83-yr lag gives
 longer dwell than the 167-yr lag), which no simple lag story predicts.

@@ -355,6 +355,16 @@ re-run purely because `frac_gumsa` had not been persisted.)*
 the gain may be zero, and it may be zero one level down inside a field builder. A reliable tell: **a derived
 field whose standard deviation is exactly 0 while its input's is not.** *(R-85b.)*
 
+**D12 — A VERDICT NEEDS BOTH EFFECT SIZE AND GOODNESS-OF-FIT.** An amplitude (or any effect size) that clears
+its null is not sufficient — the model that produced it must also explain the data. *(R-87d: the sinusoid fit
+cleared its null in both arms, 0.174 vs 0.061 and 0.130 vs 0.074, while explaining only 14% and 5% of variance.
+Amplitude-versus-null alone would have declared a cycle in both. The series was not sinusoidal at all.)*
+
+**D13 — REJECT UNRESOLVABLE SCALES.** A period, wavelength or timescale longer than ~1/3 of the observation
+window cannot be distinguished from a trend. Cap the search grid. *(R-87d: two independent instruments both
+returned ~250–270 yr from a 300 yr window — one arc, reported as a cycle.)* Related: require a genuine local
+maximum rather than the largest value in a tail; an unconditional `argmax` turns drift into a "peak".
+
 **D10 — MEASURE INVARIANCE, NEVER ASSERT IT FROM READING CODE.** *(`enable_cred_renorm` was declared gauge-fixing
 on the argument that all downstream cred use is relative; measurement refuted it — the inheritance homeostat's
 fixed 1.0 anchor makes rescaling non-scale-invariant. A differential ON/OFF run is cheap; the reasoning was not

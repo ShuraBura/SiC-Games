@@ -98,10 +98,22 @@ def period_of(series, sample_every=4):
     if len(neg) == 0:
         return None, 0.0                      # never goes negative => no oscillation, just drift
     start = neg[0]
-    seg = ac[start:]
-    if len(seg) < 3:
+    # FIX 1 (2026-07-18, supervisor-approved) — REJECT UNRESOLVABLE PERIODS. A "period" longer than a third of
+    # the window cannot complete three cycles and is indistinguishable from a trend. The unfixed detector
+    # happily returned 269 yr from a 300 yr window: one arc, not a cycle.
+    lag_cap = len(x) // 3
+    seg_end = min(len(ac), lag_cap)
+    if seg_end - start < 3:
         return None, 0.0
-    k = int(np.argmax(seg)) + start
+    seg = ac[start:seg_end]
+    # FIX 2 — REQUIRE A LOCAL MAXIMUM, not merely the largest value in a wandering tail. The unfixed detector
+    # took argmax unconditionally, so pure drift always produced a "peak" wherever the tail happened to be
+    # highest. A real periodicity has a turning point; noise does not.
+    interior = np.arange(1, len(seg) - 1)
+    peaks = interior[(seg[1:-1] > seg[:-2]) & (seg[1:-1] > seg[2:])]
+    if len(peaks) == 0:
+        return None, 0.0                      # no turning point => no periodicity
+    k = int(peaks[np.argmax(seg[peaks])]) + start
     return k * sample_every, float(ac[k])
 
 
