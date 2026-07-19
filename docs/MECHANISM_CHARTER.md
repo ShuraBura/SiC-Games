@@ -360,6 +360,14 @@ on the argument that all downstream cred use is relative; measurement refuted it
 fixed 1.0 anchor makes rescaling non-scale-invariant. A differential ON/OFF run is cheap; the reasoning was not
 sound.)*
 
+**D11 — PLOT ANY GRAPHICAL RESULT, with its floors on the same axes.** Time series, sweeps, distributions,
+response/power curves and before/after comparisons get rendered as a chart for visual verification, not reported
+only as a table. Show the **null floor** and, where relevant, the **detection floor** on the same axes so a
+reader can see whether the signal clears them instead of taking the verdict on trust. *(R-87's cycle verdict was
+three autocorrelation numbers in a table and read as "no cycles"; plotted against its own noise floor, one value
+was visibly above the noise and below only an invented cut-off. The picture made in one glance a point the table
+had buried.)* D8 (persist the raw series) exists so plots can be redrawn without re-running the model.
+
 ### The habit these encode
 
 Before reporting any result, ask: **if the effect I am claiming (or denying) were absent (or present), would this

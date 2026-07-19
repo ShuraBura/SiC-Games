@@ -1,1 +1,1 @@
-alpha=0.0005 step 2200/3600 pop=3627 rev=1376
+alpha=0.0005 step 2600/3600 pop=5386 rev=1776

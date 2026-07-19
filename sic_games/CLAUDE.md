@@ -212,6 +212,18 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     and the magnitudes downstream, not just the flag; and **measure** invariance rather than asserting it from
     reading the code.
 
+19. **PLOT IT — show the supervisor the picture, not just the table (added 2026-07-18).**
+    Any analysis that is inherently graphical — time series, sweeps, distributions, power/response curves,
+    trends, before/after comparisons — must be rendered as a chart in the chat for visual verification, not
+    reported only as numbers. Tables hide what eyes catch instantly: a trend the statistic was blind to, an
+    outlier driving a mean, a threshold sitting in the wrong place. **Worked example:** R-87's cycle verdict was
+    a table of three autocorrelation values and read as "no cycles"; plotted against its own measured noise
+    floor, one value was visibly ABOVE the noise and below only an invented cut-off — obvious in the picture,
+    invisible in the table.
+    Pair it with §10: a plot of a result should show the **null floor** and, where relevant, the **detection
+    floor** on the same axes, so the reader can see whether the signal clears them rather than taking a verdict
+    on trust. Persist the raw series (D8) so a plot can be redrawn without re-running the model.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction
