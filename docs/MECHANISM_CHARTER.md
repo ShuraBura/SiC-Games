@@ -365,6 +365,14 @@ window cannot be distinguished from a trend. Cap the search grid. *(R-87d: two i
 returned ~250–270 yr from a 300 yr window — one arc, reported as a cycle.)* Related: require a genuine local
 maximum rather than the largest value in a tail; an unconditional `argmax` turns drift into a "peak".
 
+**D14 — COMPUTE EVERY HEADLINE NUMBER TWO WAYS.** Where a quantity has more than one reasonable estimator, use
+both and report only what they agree on. *(R-87d: correlation time from the ACF's 1/e crossing gave
+15 / 33 / 32 yr and looked like a trend; a log-linear fit to the same decay gave 22.2 / 22.6 / 20.7 yr — flat.
+The first is a single point on a noisy curve. A whole claim rested on the difference.)* Likewise prefer a DIRECT
+measurement to an inference: dwell time inferred from aggregate counts gave 3.9 / 10.2 / 4.8 yr; measured as
+run-lengths it is 2.7 / 3.6 / 4.6 yr with maxima of 17.7 / 81.0 / 58.7 — **and the skew, which the mean hid,
+was the interesting part.** `outputs/phase1_biome_mortality/verify_numbers.py` is the standing self-check.
+
 **D10 — MEASURE INVARIANCE, NEVER ASSERT IT FROM READING CODE.** *(`enable_cred_renorm` was declared gauge-fixing
 on the argument that all downstream cred use is relative; measurement refuted it — the inheritance homeostat's
 fixed 1.0 anchor makes rescaling non-scale-invariant. A differential ON/OFF run is cheap; the reasoning was not

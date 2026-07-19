@@ -2211,9 +2211,11 @@ pure noise returns fit amplitude 0.029 against a null p95 of 0.034.
 
 | lag memory | n | AC period | AC peak | fit amp (null p95) | r2 | correlation time | verdict |
 |---|---|---|---|---|---|---|---|
-| 167 yr | 900 | 69.0 yr | **-0.021** | 0.174 (0.061) | 0.140 | 15 yr | NO CYCLE |
-| 83 yr | 900 | 59.0 yr | **-0.028** | 0.130 (0.074) | 0.051 | 33 yr | NO CYCLE |
-| 4 yr (control) | 900 | 59.3 yr | **-0.122** | 0.135 (0.067) | 0.079 | 32 yr | NO CYCLE |
+| 167 yr | 900 | 69.0 yr | **-0.021** | 0.174 (0.061) | 0.140 | 22.2 yr | NO CYCLE |
+| 83 yr | 900 | 59.0 yr | **-0.028** | 0.130 (0.074) | 0.051 | 22.6 yr | NO CYCLE |
+| 4 yr (control) | 900 | 59.3 yr | **-0.122** | 0.135 (0.067) | 0.079 | 20.7 yr | NO CYCLE |
+
+(correlation time from a log-linear fit to the ACF decay, not the 1/e crossing — see the correction below)
 
 The autocorrelation "peaks" are **NEGATIVE** - a turning point inside a negative region, which is definitively
 not recurrence. The sinusoid explains 5-14% of variance.
@@ -2227,12 +2229,25 @@ r2 above a floor. Added to the charter.
 eigenvalue pair, does not produce cycles. This is the fourth independent negative (R-67, R-68, R-71, R-87d) and
 the first one measured on validated instruments.
 
-**AND THE THIRD ARM KILLS THE ONE POSITIVE I HAD CLAIMED.** Correlation times are **15 / 33 / 32 yr** for lags
-of **167 / 83 / 4 yr**. That is not monotone, and the 4 yr NEGATIVE CONTROL has the same memory (32 yr) as the
-83 yr lag. **The resentment lag does not set the system's correlation time at all.** An earlier draft of this
-entry claimed "correlation time rises with the lag" on the strength of the first two arms; the control arm
-refutes it. Written down because it is the fifth time in one day that a pattern read off a partial sweep
-dissolved when the full sweep landed - **do not draw a trend from two points when a third is still running.**
+**AND THE THIRD ARM KILLS THE ONE POSITIVE I HAD CLAIMED.** An earlier draft claimed "correlation time rises
+with the lag" from the first two arms; the control arm refutes it. Fifth time in one day a pattern read off a
+partial sweep dissolved when the full sweep landed - **do not draw a trend from two points when a third is
+still running.**
+
+**CORRECTION (self-check, `verify_numbers.py`): the correlation-time FIGURES were estimator noise.** Reported as
+15 / 33 / 32 yr from the ACF's **1/e crossing** - a SINGLE POINT on a noisy curve. An independent
+**log-linear fit to the whole ACF decay** gives **22.2 / 22.6 / 20.7 yr**, i.e. essentially IDENTICAL across
+lags of 167 / 83 / 4 yr. The two estimators disagree by 30-50%, so the crossing figures should not be quoted.
+**Use ~22 yr, uniform.** This strengthens rather than weakens the conclusion: on the robust estimator every arm
+has the same memory regardless of the lag, which refutes lag-governance more cleanly than the
+non-monotonicity did.
+
+**DWELL TIME, measured directly instead of estimated.** The earlier 3.9 / 10.2 / 4.8 yr were INFERRED from
+aggregate reversion counts assuming ~25 agents/band. Measured as run-lengths of the thresholded series:
+mean ranked spell **2.7 / 3.6 / 4.6 yr** over 32 / 41 / 14 spells. **But the distribution is heavily skewed -
+maximum spells reach 17.7 / 81.0 / 58.7 yr.** Occasional spells DO land in the ethnographic 60-100 yr range;
+they are rare among many short ones, and reporting only the mean hid that. Any future calibration against the
+"few generations" anchor must use the spell-length DISTRIBUTION, not its mean.
 
 **So the lag parameter is not governing the dynamics.** Combined with the dwell-time inversion (10.2 yr at the
 83 yr lag vs 3.9 yr at 167 yr), two independent metrics agree the mechanism's timescale is set by something
