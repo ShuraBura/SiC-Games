@@ -84,7 +84,12 @@ def period_of(series, sample_every=4):
     x = np.asarray(series, dtype=float)
     if len(x) < 60:
         return None, 0.0
-    x = x - x.mean()
+    # LINEAR DETREND (R-87c). Subtracting only the mean leaves any monotone drift in the series, and the power
+    # analysis shows a full-range drift drags a GENUINELY PRESENT cycle from ac_peak 0.43 down to 0.11 and
+    # reports the wrong period (137 yr for a true 75). The R-87 run grew 500 -> 3200 agents, so this was a real
+    # contamination biased AGAINST detecting cycles.
+    t = np.arange(len(x), dtype=float)
+    x = x - np.polyval(np.polyfit(t, x, 1), t)
     if x.std() < 1e-9:
         return None, 0.0
     ac = np.correlate(x, x, mode="full")[len(x) - 1:]
@@ -110,16 +115,22 @@ if __name__ == "__main__":
     # The ethnographic anchor (60-100 yr) sits between the first two; the last is the negative control.
     for alpha in (0.0005, 0.001, 0.02):
         series, rev, pops = run(alpha, steps=3600)
+        np.save(os.path.join(os.path.dirname(__file__), f"hcycles_series_a{alpha}.npy"),
+                np.asarray(series))          # R-87c: keep the raw series; re-analysis must not need a re-run
         if not series:
             print(f"{alpha:7.3f}  *** EXTINCT ***")
             continue
         per, peak = period_of(series)
         arr = np.asarray(series)
         mem_yr = (1.0 / alpha) / 12.0
+        # Compare to the MEASURED white-noise floor (R-87c: mean 0.088, p95 0.112, max 0.138 over 40 trials),
+        # not to an invented cut. The detector's sensitivity dies at SNR ~ 1 (cycle amp ~ noise amp).
         if per is None:
             verdict = "NO CYCLE"
-        elif peak < 0.2:
-            verdict = "weak/none"
+        elif peak < 0.112:
+            verdict = "within noise"
+        elif peak < 0.20:
+            verdict = "ABOVE noise floor"
         else:
             verdict = "CYCLES"
         pstr = f"{per / 12.0:10.1f}" if per else f"{'-':>10}"

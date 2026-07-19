@@ -198,6 +198,20 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     Prefer vectorized execution: T/P/D/X/C/H are elementwise, gather-by-index or segment-reduction and should not
     be written as per-agent Python loops; A and N are where loops remain legitimate.
 
+18. **Validate the INSTRUMENT, not just the mechanism (added 2026-07-18).**
+    Binding contract: `docs/MECHANISM_CHARTER.md` §10. Four findings in one day turned out to be artifacts of
+    the measuring apparatus, not facts about the model. Before reporting any result ask: **if the effect I am
+    claiming (or denying) were absent (or present), would this instrument have told me?**
+    The two cheapest and highest-yield, both usually a few lines against synthetic data with no model run:
+    **(D1) a POSITIVE CONTROL before any negative** — inject the effect, show the instrument finds it, report the
+    detection floor; and **(D2) a NULL FLOOR before any positive** — report what the statistic gives on shuffled
+    or noise data and compare to THAT, never to an invented threshold.
+    Also: record the **baseline state** beside every verdict ("does nothing when toggled" ≠ "does nothing");
+    confirm a swept parameter is actually **rate-limiting** before concluding from the sweep; **detrend** before
+    any periodicity claim; **save the raw series** so re-analysis never needs a re-run; check the **magnitude**
+    and the magnitudes downstream, not just the flag; and **measure** invariance rather than asserting it from
+    reading the code.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction

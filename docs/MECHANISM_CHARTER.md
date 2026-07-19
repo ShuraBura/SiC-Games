@@ -296,6 +296,77 @@ one ambitious leader from taking over."* Both are A-type (Affiliation) constrain
 suggest that **the number and separation of offices is a governing parameter** — something the model currently
 fixes at one leader per band.
 
+## 10. THE DIAGNOSTIC DISCIPLINE — rules for the instrument, not the mechanism
+
+**Adopted 2026-07-18 after four findings in one day turned out to be artifacts of the measuring apparatus rather
+than facts about the model.** §3 governs what a MECHANISM must declare. This section governs what a MEASUREMENT
+must declare, and it exists because the failures were not careless — each passed review, and each was caught by
+an outside question rather than by the person who ran it.
+
+**The single sentence that unifies all four:** *the mechanism was validated; the instrument was not.* Effort went
+into showing a mechanism does something, and none into showing the instrument could tell if it didn't.
+
+### The four failures these rules are derived from
+
+| # | Failure | What the instrument actually did | Rule |
+|---|---|---|---|
+| R-82 | "aggrandizer capture is inert" | a redistribution statistic computed over a unit of size 1–2 | **D6** |
+| R-85/85c | "seven dead knobs" | flipped booleans without their magnitudes; never recorded the baseline state; grepped a file holding two presets | **D3 D7 D9** |
+| R-87 | "the lag doesn't matter" | swept a time constant that was nullified — the driving signal ran 20× the threshold, so every arm crossed in ~12 steps | **D4** |
+| R-87c | "no cycles, fourth negative" | an autocorrelation test whose sensitivity, noise floor and trend-robustness were all unmeasured | **D1 D2 D5 D8** |
+
+### The rules (binding on any reported measurement)
+
+**D1 — POSITIVE CONTROL before any negative.** Never report "X does not occur" without showing the instrument
+detects X when X is *injected*. Report the **detection floor**. *(R-87c: the cycle detector goes blind below
+SNR ≈ 1 — a cycle must be about as large as the noise to register. Unmeasured, a "fourth independent negative"
+was reported on the project's central open question.)*
+
+**D2 — NULL FLOOR before any positive, and never an invented threshold.** Report what the statistic returns on
+shuffled/noise data, and compare against that. *(R-87c: white-noise ac_peak is mean 0.088 / max 0.138 over 40
+trials. The measured 0.19 was ABOVE the noise ceiling and had been dismissed as "weak/none" only because an
+invented 0.2 cut happened to sit above it.)*
+
+**D3 — RECORD THE BASELINE STATE beside every verdict.** *"Does nothing when I toggle it"* and *"does nothing"*
+are different claims, and only the baseline distinguishes them. *(R-85c: seven flags reported as
+"enabled-with-a-dead-gain" were simply OFF in that preset and live in another.)*
+
+**D4 — VERIFY THE SWEPT PARAMETER IS RATE-LIMITING.** Before drawing any conclusion from a sweep, confirm the
+parameter changes the OUTCOME, not merely its own value — e.g. sweeping a time constant, check that the event
+TIMING actually moves. If the arms behave identically, the parameter is not governing. *(R-87: a lag sweep in
+which all three arms were effectively instantaneous.)*
+
+**D5 — DETREND BEFORE ANY TEMPORAL CLAIM.** Autocorrelation, periodicity and stationarity claims on a series
+from a growing population must remove the trend, and say so. *(R-87c: a full-range drift drags a genuinely
+present cycle from ac_peak 0.43 to 0.11 and misreports the period by 80%. The R-87 run grew 500 → 3200 agents
+undetrended, biasing it AGAINST finding cycles.)*
+
+**D6 — DECLARE THE UNIT of every statistic.** A statistic over the wrong unit is §3.1's unit error in
+measurement form. *(R-82.)*
+
+**D7 — SCOPE A CONFIG AUDIT TO THE FUNCTION, NOT THE FILE.** `run_se0_controlled_climate.py` defines both
+`realistic_forager_demog()` and `emergent_village_demog()`; grepping the file attributes the union to both.
+*(R-85c.)*
+
+**D8 — SAVE THE RAW SERIES.** Re-analysis must never require re-running the model. *(R-87c forced a ~20-minute
+re-run purely because `frac_gumsa` had not been persisted.)*
+
+**D9 — CHECK THE MAGNITUDE, AND THE MAGNITUDES DOWNSTREAM.** `flag is True` is not evidence a mechanism is live;
+the gain may be zero, and it may be zero one level down inside a field builder. A reliable tell: **a derived
+field whose standard deviation is exactly 0 while its input's is not.** *(R-85b.)*
+
+**D10 — MEASURE INVARIANCE, NEVER ASSERT IT FROM READING CODE.** *(`enable_cred_renorm` was declared gauge-fixing
+on the argument that all downstream cred use is relative; measurement refuted it — the inheritance homeostat's
+fixed 1.0 anchor makes rescaling non-scale-invariant. A differential ON/OFF run is cheap; the reasoning was not
+sound.)*
+
+### The habit these encode
+
+Before reporting any result, ask: **if the effect I am claiming (or denying) were absent (or present), would this
+instrument have told me?** If that question has not been answered with a run, the result is not yet a finding.
+D1 and D2 are the two that would have caught the most, and they are the cheapest — a positive control and a null
+floor are usually a few lines against synthetic data, with no model run at all.
+
 
 ---
 
