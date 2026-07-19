@@ -125,3 +125,81 @@ def test_ascription_raises_cred_above_the_rest():
     if not oth:
         pytest.skip("everything ascribed at this horizon — saturation, see R-86 open issue")
     assert sum(asc) / len(asc) > sum(oth) / len(oth)
+
+
+# ── R-87 / DM-F1 stage 2: DELEGITIMATION, the gumsa → gumlao collapse ──────────────────────────────────
+# The ratchet alone has no equilibrium (R-86: ascribed_frac_pop 0.70–0.85, nobility becomes universal). Leach's
+# Kachin cycle supplies the reverse: hereditary inequality "repeatedly created, lasted for a few generations,
+# and then collapsed", driven by ACCUMULATED resentment — "prestige ... only increased their followers'
+# resentment and hastened their overthrow". The lag is the mechanism, not a detail (MECHANISM_CHARTER §5).
+
+
+def _dworld(n=260, alpha=0.05, thr=0.3, seed=0):
+    w = _world(n=n, legit=True, feast=0.25, cg=10.0, thr=0.10, seed=seed)
+    w._demog = w._demog.model_copy(update=dict(enable_delegitimation=True,
+                                               resent_alpha=alpha, resent_threshold=thr))
+    return w
+
+
+def test_delegitimation_defaults_off():
+    c = DemographyConfig()
+    assert c.enable_delegitimation is False
+
+
+def test_delegitimation_off_leaves_the_ratchet_monotone():
+    """With the reverse disabled, ascription may only grow — the R-86 behaviour must be unchanged."""
+    w = _world(legit=True, thr=0.10)
+    for _ in range(120):
+        w.step()
+        assert w.agent_list
+    seen = set(w._lineage_ascribed)
+    for _ in range(60):
+        w.step()
+        assert seen <= w._lineage_ascribed
+
+
+def test_reversion_revokes_ascription():
+    """THE POINT: with resentment on, ascription must be LOSABLE — otherwise nobility saturates."""
+    w = _dworld(alpha=0.4, thr=0.05)                  # deliberately hair-trigger, to force the event
+    ever, reverted = set(), 0
+    for _ in range(200):
+        w.step()
+        assert w.agent_list
+        ever |= w._lineage_ascribed
+        reverted += w.reversions_this_step
+    assert ever, "nobody was ever ascribed — the test would be vacuous"
+    assert reverted > 0, "no band ever reverted to gumlao"
+    assert w._lineage_ascribed != ever, "ascription was never actually revoked"
+
+
+def test_resentment_is_bounded_and_resets_on_reversion():
+    w = _dworld(alpha=0.4, thr=0.05)
+    for _ in range(200):
+        w.step()
+        assert w.agent_list
+        assert all(v >= 0.0 for v in w._band_resentment.values())
+        assert all(v < w._demog.resent_threshold + 1e-9 for v in w._band_resentment.values()), \
+            "resentment above threshold should have triggered a reversion and reset"
+
+
+def test_delegitimation_bounds_the_ascribed_fraction():
+    """R-86's open problem, closed: the ratchet alone runs to 0.70-0.85 ascribed. The reverse must hold it
+    below that, or 'descended from higher nats' stops being a distinction."""
+    def frac(deleg):
+        w = _dworld(alpha=0.3, thr=0.10) if deleg else _world(legit=True, thr=0.10)
+        for _ in range(300):
+            w.step()
+            assert w.agent_list
+        return w.legitimacy()["ascribed_frac_pop"]
+    assert frac(True) < frac(False), "delegitimation must reduce the ascribed fraction"
+
+
+def test_gumsa_state_diagnostic():
+    w = _dworld()
+    for _ in range(120):
+        w.step()
+        assert w.agent_list
+    g = w.gumsa_state()
+    assert g["n_bands"] > 0
+    assert 0.0 <= g["frac_gumsa"] <= 1.0
+    assert g["max_resentment"] >= g["mean_resentment"] >= 0.0

@@ -2086,4 +2086,91 @@ ratchet-does-not-leak assertion. The four rates remain `[DESIGN]`, calibrated ag
 
 ---
 
+### R-87 - Delegitimation (gumsa -> gumlao): regime SWITCHING appears, periodicity does not. H-CYCLES partly supported, prediction NOT met (2026-07-18)
+
+**Origin:** R-86 derived the need for this. The ascription ratchet works (father-was-leader 76% vs Hayden's 75%)
+but has no equilibrium - `ascribed_frac_pop` runs to 0.70-0.85 and nobility becomes universal. Leach's Kachin
+cycle supplies the reverse, and it is a LAG: prestige-seeking *"only increased their followers' resentment and
+hastened their overthrow"*, so hereditary inequality *"lasted for a few generations, and then collapsed."*
+
+**BUILD** (charter-declared: type **C reverse**, unit **BAND** - Leach's gumlao premise 1 is "All lineages are
+considered equal", a whole-community reversion - invariant: changes ascription and cred only). Resentment is a
+slow EMA of the ascribed lineages' cred advantage over commoners; crossing the threshold de-ascribes every
+lineage in the band and resets. Hysteresis comes from having to rebuild legitimacy from zero.
+
+**THE EXPERIMENT WAS BROKEN ON THE FIRST PASS, and the failure is worth recording.** `resent_privilege_ref` was
+left at 1.0 while ascription confers a cred advantage of ~`legit_cred_gain` = 10 - so privilege ran at **20x the
+threshold** and even a nominal "40-year" EMA crossed in ~12 steps. All three arms of the lag sweep were
+therefore effectively INSTANTANEOUS, and the sweep tested nothing. Symptom: `mean_gumsa` 0.03-0.11 with ~1500
+reversions - hierarchy squashed the moment it formed, in every arm. **Third time this session that a sweep
+varied a parameter that was not the operative one** (cf. R-85c). Fixed by normalising privilege so the EMA time
+constant governs.
+
+**CORRECTED RESULT** (1 seed x 3600 steps = 300 yr, privilege normalised, crossing times ~115 / ~58 / ~3 yr):
+
+| lag memory | reversions | mean gumsa | sd gumsa | autocorr peak | verdict |
+|---|---|---|---|---|---|
+| 167 yr | 2576 | 0.258 | 0.353 | **0.19** | weak/none |
+| 83 yr | 1609 | 0.476 | 0.428 | 0.13 | weak/none |
+| 4 yr (control) | 2047 | 0.269 | 0.389 | **0.03** | weak/none |
+
+**H-CYCLES: PREDICTION NOT MET. This is a FOURTH independent negative for secular cycles** (after connubium
+R-67, substrate R-68, soil R-71). A delayed negative feedback, built explicitly to supply the missing complex
+eigenvalue pair, does **not** produce periodic behaviour at any lag from 4 to 167 years.
+
+**But it is NOT a null result, and two things distinguish it from the three prior negatives.**
+
+1. **The lag pushes in the PREDICTED DIRECTION.** Autocorrelation peak rises monotonically with lag length:
+   0.03 (4 yr control) -> 0.13 (83 yr) -> 0.19 (167 yr). The mechanism does what the theory says; it simply
+   never reaches an amplitude that constitutes a cycle.
+2. **Large-amplitude SYSTEM-WIDE regime switching now exists where nothing switched before.** `sd_gumsa` = 0.428
+   against a mean of 0.476 - the society swings across nearly the full range from mostly-ranked to
+   mostly-egalitarian. **Tested against the independent-bands null**: if ~N bands flipped independently,
+   sd(frac_gumsa) = sqrt(p(1-p)/N) = 0.112 / 0.079 / 0.056 for N = 20 / 40 / 80. Measured 0.428 is **3.8-7.7x
+   that null**, so bands are switching TOGETHER, not averaging out. The prior negatives had no switching at all.
+
+**So the honest summary: the model now produces APERIODIC BISTABLE SWITCHING between ranked and egalitarian
+regimes, not a limit cycle.** Leach's Kachin are described as cycling; this reproduces the *alternation* and the
+*amplitude* but not the *regularity*. Whether real gumsa/gumlao alternation is genuinely periodic or merely
+recurrent is itself worth checking before treating the missing periodicity as a model defect - "repeatedly
+created, lasted for a few generations, then collapsed" describes recurrence, and does not by itself assert a
+fixed period.
+
+**THE SOURCE WAS RE-READ, AND I HAD MEASURED THE WRONG QUANTITY (R-87b, same day).** Flannery's Kachin are
+*"created, overthrown, and **periodically reinstated**"*, *"this **repetitive cycle**"*, *"**oscillated
+between**"* - and the duration claim is *"lasted for **a few generations**"*. **Periodicity in the strict
+(fixed-interval) sense is nowhere asserted; RECURRENCE plus a characteristic SPELL DURATION is.** The
+autocorrelation test above therefore measures a property the ethnography never claims. **The right metric is
+DWELL TIME in gumsa**, and my H-CYCLES prediction over-specified the source.
+
+**Dwell time, estimated from the aggregate counts** (dwell = band-steps in gumsa / exits; band count assumed
+~25 agents/band, so this is an estimate, not a measurement):
+
+| lag memory | ~bands | mean gumsa dwell |
+|---|---|---|
+| 167 yr | 128 | **3.9 yr** |
+| 83 yr | 115 | **10.2 yr** |
+| 4 yr | 121 | **4.8 yr** |
+
+**Against the anchor of ~60-100 yr, dwell is one to two orders SHORT.** So there IS still a real gap - the model
+alternates far too fast - but it is a different gap from the one the autocorrelation test reported, and it has a
+different likely cause: the reversion trigger fires too easily, not that the feedback lacks a lag.
+
+**Open leads, re-ordered after that correction:**
+- **Measure dwell time directly** (per-band spell lengths, not inferred from aggregate counts) and calibrate
+  `resent_threshold` against the ~60-100 yr anchor. This is now the primary metric for H-CYCLES, replacing the
+  autocorrelation period.
+- **The reversion trigger is a hard threshold on a noisy quantity**, so bands cross it stochastically rather
+  than by clean build-up - the likely reason spells are short and irregular. A smooth hazard, or hysteresis on
+  the reversion itself (a band that just reverted resisting immediate re-ranking), is the natural next cut.
+- Coupling between bands is NOT the missing piece - the null test above shows they are already correlated.
+- Note the non-monotonicity: the 83-yr lag gives the LONGEST dwell (10.2 yr), longer than the 167-yr lag
+  (3.9 yr). That is not what a simple lag story predicts and should be explained before more tuning.
+
+**Status:** default-OFF, bit-exact. 13 tests on the legitimacy/delegitimation pair, including that
+delegitimation BOUNDS the ascribed fraction (R-86's open problem, closed), that resentment resets on reversion,
+and that the ratchet stays monotone when the reverse is disabled. `resent_*` remain `[DESIGN]`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

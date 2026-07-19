@@ -323,6 +323,7 @@ class TerrainWorld(mesa.Model):
         self._tenures_closed: list[int] = []                   # R-84: completed tenure lengths in steps (the tenure diagnostic)
         self._ever_leader: set[int] = set()                    # R-84: every uid that has ever held office (for the Hayden 75% father-son test)
         self._lineage_legit: dict[int, float] = {}             # R-86: per-LINEAGE legitimacy stock (Friedman); mirrors _band_surplus
+        self._band_resentment: dict[int, float] = {}           # R-87: slow per-band resentment EMA (the LAG that H-CYCLES rides on)
         self._lineage_ascribed: set[int] = set()               # R-86: lineages that CROSSED — 'descended from higher nats'.
         # The RATCHET. Once believed, descent is not re-earned each season; this is what separates ascribed rank
         # from a Big Man's contingent renown, and a decaying stock alone reproduced only the latter.
@@ -505,6 +506,7 @@ class TerrainWorld(mesa.Model):
         self.challenges_this_step = 0                 # R-84 diag: deposition ATTEMPTS (a challenge can fail ⇒ incumbent survives)
         self.feast_spend_this_step = 0.0              # R-86 diag: material spent on sacrifices/feasts
         self.legitimated_this_step = 0                # R-86 diag: agent-steps receiving the legitimated-lineage cred boost
+        self.reversions_this_step = 0                 # R-87 diag: bands reverting gumsa → gumlao this step
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -2249,6 +2251,7 @@ class TerrainWorld(mesa.Model):
         # standing converts into HERITABLE cred (achieved → ascribed). Placed after leveling (you feast with
         # what survived the coalition) and before cred renorm (so the mean is re-pinned after the injection).
         self._do_legitimacy()
+        self._do_delegitimation()   # R-87: the gumsa → gumlao reversion (the lagged counterforce)
 
         # R-82 Stage A: durable-capital depreciation. `material` is a STOCK (that is the point — it persists
         # where `wealth` is burned), but nothing is imperishable: stores rot, prestige goods are given away in
@@ -2591,6 +2594,86 @@ class TerrainWorld(mesa.Model):
             if getattr(a, "_lineage", None) in self._lineage_ascribed:
                 a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)
                 self.legitimated_this_step += 1
+
+    def _do_delegitimation(self) -> None:
+        """R-87 / DM-F1 stage 2 — the gumsa → gumlao COLLAPSE, and the H-CYCLES test.
+
+        TYPE **C (Conversion, reverse)** · UNIT **BAND** · INVARIANT changes only ascription + cred, never a
+        conserved quantity · ANCHOR [Leach via Flannery ch.10, VERIFIED].
+
+        WHY IT IS REQUIRED, not optional. R-86's ratchet works — father-was-leader 76% vs Hayden's 75% — but a
+        ratchet with no reverse has no equilibrium: `ascribed_frac_pop` runs to 0.70–0.85 and nobility becomes
+        universal, i.e. meaningless. The model derived the need for this before the ethnography was consulted
+        for it.
+
+        THE MECHANISM IS A LAG, and that is the whole point. Boehm-style leveling (R-82) corrects excess WITHIN
+        THE STEP, which is exactly why it caps inequality instead of overshooting it. Here, resentment
+        ACCUMULATES: prestige-seeking "only increased their followers' resentment and hastened their overthrow",
+        and the result is that hereditary inequality "lasted for A FEW GENERATIONS, and then collapsed." So
+        `resent_alpha` is a generational EMA (~20 yr), and it is the delayed negative feedback that
+        MECHANISM_CHARTER §5 identifies as the missing ingredient for oscillation — the model's three failures
+        to cycle (DE-14) all being instantaneous-feedback systems.
+
+        WHY PER BAND. Leach's gumlao premise 1 is "All lineages are considered equal" — the reversion is a
+        whole-community flip, not one family losing face. A per-lineage collapse would also average away in
+        aggregate; a synchronized one can actually show as a cycle.
+
+        HYSTERESIS. After a flip the band's lineages must rebuild legitimacy from zero (~50+ steps of feasting)
+        and resentment restarts, so a band cannot chatter between modes.
+
+        Off ⇒ returns before touching anything ⇒ bit-exact."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_delegitimation", False):
+            return
+        alpha, thr = cfg.resent_alpha, cfg.resent_threshold
+        ref = cfg.resent_privilege_ref
+
+        members: dict = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+
+        for bid, ms in members.items():
+            asc = [a for a in ms if getattr(a, "_lineage", None) in self._lineage_ascribed]
+            oth = [a for a in ms if getattr(a, "_lineage", None) not in self._lineage_ascribed]
+            if not asc or not oth:
+                # no ranked/commoner distinction in this band ⇒ nothing to resent; let it cool
+                self._band_resentment[bid] = self._band_resentment.get(bid, 0.0) * (1.0 - alpha)
+                continue
+            # PRIVILEGE = how far the ascribed stand above the commoners on the heritable facet. This is what
+            # ascription actually confers, so it is what gets resented.
+            m_a = sum(a.cred for a in asc) / len(asc)
+            m_o = sum(a.cred for a in oth) / len(oth)
+            priv = 0.0 if m_o <= 0.0 else max(0.0, (m_a - m_o) / m_o) / ref
+            r = (1.0 - alpha) * self._band_resentment.get(bid, 0.0) + alpha * priv
+            if r >= thr:
+                # THE REVERSION. Every lineage present loses ascription; the band is gumlao again.
+                for a in ms:
+                    self._lineage_ascribed.discard(getattr(a, "_lineage", None))
+                    self._lineage_legit.pop(getattr(a, "_lineage", None), None)
+                self._band_resentment[bid] = 0.0
+                self.reversions_this_step += 1
+            else:
+                self._band_resentment[bid] = r
+
+    def gumsa_state(self) -> dict:
+        """R-87 diagnostic: the ranked/egalitarian regime split. `frac_gumsa` is the fraction of bands holding at
+        least one ascribed lineage — the series whose oscillation H-CYCLES predicts. Pure observer."""
+        if self._demog is None or not getattr(self._demog, "enable_legitimacy", False):
+            return {"n_bands": 0, "frac_gumsa": 0.0, "mean_resentment": 0.0, "max_resentment": 0.0}
+        members: dict = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+        if not members:
+            return {"n_bands": 0, "frac_gumsa": 0.0, "mean_resentment": 0.0, "max_resentment": 0.0}
+        ranked = sum(1 for ms in members.values()
+                     if any(getattr(a, "_lineage", None) in self._lineage_ascribed for a in ms))
+        rs = [self._band_resentment.get(b, 0.0) for b in members]
+        return {
+            "n_bands": len(members),
+            "frac_gumsa": ranked / len(members),
+            "mean_resentment": sum(rs) / len(rs),
+            "max_resentment": max(rs),
+        }
 
     def legitimacy(self) -> dict:
         """R-86 diagnostic: the per-lineage legitimacy stock. `n_legit` counts lineages over the threshold —

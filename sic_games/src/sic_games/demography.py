@@ -995,6 +995,25 @@ class DemographyConfig(BaseModel):
     legit_decay: float = Field(0.02, ge=0.0, le=1.0)       # legitimacy fades without renewal (~1/0.02 = 50-step memory)
     legit_threshold: float = Field(0.5, ge=0.0, le=1.0)    # above this share of the band's feasting, the lineage is "descended from higher nats"
     legit_cred_gain: float = Field(0.0, ge=0.0)            # per-step heritable-cred boost to a legitimated lineage's members
+    # ── DM-F1 stage 2 / R-87: DELEGITIMATION — the gumsa → gumlao collapse ───────────────────────────────
+    # NOT optional polish. R-86 built the ascription RATCHET and it works (father-was-leader 76% vs Hayden's
+    # 75%), but a ratchet with no reverse HAS NO EQUILIBRIUM: `ascribed_frac_pop` reaches 0.70–0.85, at which
+    # point "descended from higher nats" stops being a distinction. The model derived the need for a collapse.
+    # ANCHOR [Leach via Flannery ch.10, VERIFIED]: Kachin society shifts between ranked (**gumsa**) and
+    # egalitarian (**gumlao**) modes — "hereditary inequality was repeatedly created, lasted for a few
+    # generations, and then collapsed." The driver is accumulated RESENTMENT, not an instantaneous check:
+    # ambitious leaders' prestige-seeking "only increased their followers' resentment and HASTENED THEIR
+    # OVERTHROW." gumlao premise 1 is "All lineages are considered equal" — a WHOLE-COMMUNITY reversion, which
+    # is why the flip is per-BAND rather than per-lineage.
+    # THIS IS THE H-CYCLES TEST. MECHANISM_CHARTER §5: every feedback in the model so far is INSTANTANEOUS
+    # negative feedback ⇒ a stable node ⇒ exponential return, never oscillation (three independent negatives,
+    # DE-14). A DELAYED negative feedback is what admits a complex eigenvalue pair. `resent_alpha` IS that
+    # delay, and it is the one parameter the hypothesis actually rides on.
+    # Ethnographic period to hit: "a few generations" ≈ 60–100 yr ≈ 720–1200 steps.
+    enable_delegitimation: bool = False
+    resent_alpha: float = Field(0.004, gt=0.0, le=1.0)     # EMA weight on privilege; 1/240 ≈ a 20-yr generational memory
+    resent_threshold: float = Field(0.5, ge=0.0)           # accumulated resentment that triggers the gumlao reversion
+    resent_privilege_ref: float = Field(1.0, gt=0.0)       # cred-advantage ratio treated as unit privilege [DESIGN]
     # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
     # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
     # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).

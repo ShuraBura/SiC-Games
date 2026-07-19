@@ -213,4 +213,36 @@ repeatedly created, lasted for a few generations, and then collapsed."*
   ranked/unranked *regime*. Our R-84 challenge-succession already models something close to this — so the model
   may already contain the Polynesian mode while lacking the Kachin one.
 
-**Resolution:** *(none yet — OPEN, pre-registered 2026-07-18; ethnographic anchor added same day)*
+**Resolution (2026-07-18, R-87): PREDICTION NOT MET — but partially supported, and the hypothesis is REFINED
+rather than refuted.**
+
+A delayed negative feedback was built explicitly to supply the missing complex eigenvalue pair (the gumsa→gumlao
+resentment/reversion mechanism, R-87). Swept across lag memories of 4, 83 and 167 years, it produced **no
+periodic behaviour at any lag** — a fourth independent negative for secular cycles.
+
+Two results keep the hypothesis alive in refined form:
+- **The lag acts in the predicted direction.** Autocorrelation peak rises monotonically with lag length
+  (0.03 → 0.13 → 0.19). The mechanism behaves as the theory says; it does not reach cycle amplitude.
+- **Large-amplitude system-wide regime switching now exists**, where the three prior negatives had none:
+  sd(frac_gumsa) = 0.428 vs an independent-bands null of 0.056–0.112, i.e. **3.8–7.7× the null**, so bands
+  switch together. The model alternates between ranked and egalitarian across nearly the full range.
+
+**Refined statement:** a delayed negative feedback is apparently sufficient for **recurrent regime alternation**
+but not for **periodicity**.
+
+**AND THE PREDICTION WAS MIS-SPECIFIED — by me, not by the source.** The literature check was run the same day:
+Flannery's Kachin are "created, overthrown, and **periodically reinstated**", "this **repetitive cycle**",
+"**oscillated between**", with the duration claim "lasted for **a few generations**". **A fixed period is
+nowhere asserted; recurrence plus a characteristic SPELL DURATION is.** The autocorrelation test therefore
+measured a property the ethnography does not claim, and H-CYCLES' "period ~60–100 yr" should be restated as
+**"mean dwell time in the ranked regime ~60–100 yr"**.
+
+**On the corrected metric the model still misses, but differently and by a diagnosable amount:** estimated mean
+gumsa dwell is **3.9 / 10.2 / 4.8 yr** at the three lags, i.e. **one to two orders short** of the anchor. The
+model alternates far too fast. The likely cause is no longer "missing lag" (the lag is built and acts in the
+right direction) but that the reversion trigger — a hard threshold on a noisy quantity — is crossed
+stochastically rather than by clean build-up.
+
+**Next step:** measure per-band spell lengths directly rather than inferring them from aggregate counts, then
+calibrate `resent_threshold` against the dwell anchor. Also explain the non-monotonicity (the 83-yr lag gives
+longer dwell than the 167-yr lag), which no simple lag story predicts.
