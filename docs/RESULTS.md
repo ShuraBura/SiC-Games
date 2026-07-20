@@ -2265,4 +2265,56 @@ that 60-100 yr anchor.
 
 ---
 
+### R-86v - The 76% SURVIVES validation, but it measures CONCENTRATION, not TRANSMISSION (2026-07-20)
+
+**Why this was run.** R-86's father-was-leader = 76% was the elite arc's one positive result, was written into
+TARGETS T-6 as MET, and had never been held to the standard R-87d established. It is a **single summary
+statistic over a possibly-skewed population** - exactly the shape that failed in R-87d, where a mean dwell of
+2.7 yr described almost none of the actual spells.
+
+**D1 POSITIVE CONTROL passes.** A synthetic population with known father-son transmission returns the lift it
+was built with: 1.0 -> 1.02, 1.5 -> 1.52, 2.0 -> 2.01, 2.5 -> 2.51. The statistic can measure heredity.
+
+**D2 NULL: the feared artifact is NOT present.** `father_was_leader` = P(father ever led | self ever led). If a
+large share of the population ever led, leaders having leader fathers would be arithmetic. The measured base
+rate P(father ever led) is **0.44**, not ~0.70, and the measured value sits far in the right tail of a 2000-shuffle
+permutation null (**z = 3.1 to 4.9** at every age gate). **The 76% is a genuine signal.**
+
+**BUT THE UNGATED LIFT WAS AGE-INFLATED.** The comparison pool averages **17.7 yr** while leaders average
+**36.0 yr** - the pool is full of agents who have not yet had their chance to lead, which deflates the base rate
+and inflates the ratio. Age-matching fixes it:
+
+| arm | age gate | n | measured | base rate | **lift** | z |
+|---|---|---|---|---|---|---|
+| legitimacy ON | none | 52 | 0.757 | 0.439 | **1.72** | 4.87 |
+| legitimacy ON | >= 25 yr | 43 | 0.769 | 0.536 | **1.43** | 3.36 |
+| legitimacy ON | >= 35 yr | 30 | 0.767 | 0.537 | **1.43** | 3.06 |
+| baseline OFF | none | 50 | 0.655 | 0.427 | 1.54 | 3.34 |
+| baseline OFF | >= 25 yr | 38 | 0.627 | 0.439 | **1.43** | 2.63 |
+| baseline OFF | >= 35 yr | 22 | 0.614 | 0.393 | 1.58 | 2.50 |
+
+**THE FINDING THAT CHANGES THE INTERPRETATION: age-matched, the two arms have the SAME LIFT (1.43 vs 1.43).**
+The legitimacy channel raises the raw fraction (0.769 vs 0.627) **by raising the base rate in step**
+(0.536 vs 0.439). It concentrates leadership into fewer lineages, so fathers AND sons within those lineages both
+lead more often - **but the father->son ASSOCIATION is not strengthened at all.**
+
+**So the ratchet produces CONCENTRATION, not TRANSMISSION.** R-86 framed it as "achieved success becomes ascribed
+rank"; the transmission ratio was already present in the baseline, supplied by `cred` inheritance. What
+legitimacy adds is that more of a favoured lineage's members hold office. That is a real effect and it is what
+moves the raw fraction toward Hayden's number, but it is not a new heredity channel.
+
+**T-6 STATUS: MET on Hayden's own metric, with a caveat that cannot currently be removed.** Hayden reports
+"about 75% of New Guinea Entrepreneur Big Men had fathers that were also Big Men" - a RAW FRACTION whose base
+rate he does not give. Without it we cannot compute HIS lift, so the raw-fraction comparison (0.769 vs 0.75) is
+the only like-for-like available, and **it cannot distinguish concentration from transmission**. If big-man
+status in New Guinea was rare (say 10% of men), Hayden's 75% implies a lift near 7 and our 1.43 is nowhere near
+it. **Finding Hayden's base rate is now the single highest-value literature question for this target.**
+
+**Method notes for reuse:** the age gate matters and should be standard for any statistic conditioned on a
+life-course event - an ungated pool mixes agents who have had their chance with those who have not. And report
+the LIFT beside the raw fraction always; the fraction alone moved 0.655 -> 0.757 (looks like a large mechanism
+effect) while the lift did not move at all.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

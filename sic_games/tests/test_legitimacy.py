@@ -12,7 +12,16 @@ The load-bearing detail is the RATCHET. Friedman's key shift is "from 'They must
 'They must be DESCENDED FROM higher nats than we are'". A legitimacy stock that decays and must be re-earned by
 feasting is the former — still achievement-based, and Flannery says achievement alone "produced individual Big
 Men who had no way of bequeathing renown to their offspring". Measured: with a decaying stock, father-was-leader
-sat at baseline (59–67% vs 65%) at every gain up to 20. With the ratchet it reaches **76% vs Hayden's 75%**.
+sat at baseline (59–67% vs 65%) at every gain up to 20. With the ratchet it reaches 76% vs Hayden's 75%.
+
+VALIDATED AND QUALIFIED (R-86v, 2026-07-20). The 76% is a genuine signal — z = 3.1–4.9 against a 2000-shuffle
+permutation null, base rate 0.44 (not the ~0.70 that would have made it arithmetic), and the lift statistic
+passes a positive control. **But the mechanism supplies CONCENTRATION, not TRANSMISSION:** age-matched (the
+comparison pool averages 17.7 yr against leaders at 36.0, so an ungated pool inflates the ratio), legitimacy ON
+and OFF give the SAME lift over null, 1.43 vs 1.43. Legitimacy raises the raw fraction by raising the base rate
+in step (0.536 vs 0.439) — more of a favoured lineage's members hold office — while the father→son ASSOCIATION
+is unchanged and was already supplied by `cred` inheritance. Hayden's own base rate is unknown, so his lift
+cannot be computed and the raw-fraction match cannot distinguish the two.
 """
 import pytest
 

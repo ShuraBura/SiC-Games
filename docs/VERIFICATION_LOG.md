@@ -129,7 +129,8 @@ field whose std is exactly 0 while its input's std is not** (terrain `cost` std 
 result that assumes the energetic-fertility coupling is doing work.
 
 **STILL OPEN:** the in-step conservation instrumentation (the half of the charter audit that a black-box
-differential cannot do); and the per-knob decision on the 7 dead knobs + 1 chained (supervisor, one by one).
+differential cannot do). ~~the per-knob decision on the 7 dead knobs~~ - **withdrawn, see R-85c: there are no
+dead knobs; those flags are simply off in the forager preset and live in `emergent_village_demog()`.**
 
 **R-85c correction (2026-07-18).** Two method errors, both mine, recorded so the pattern is recognisable:
 1. **Conflating "does nothing when turned ON" with "does nothing".** The distinguishing fact is the BASELINE
@@ -138,3 +139,16 @@ differential cannot do); and the per-knob decision on the 7 dead knobs + 1 chain
 2. **Scoping a config grep to a FILE containing two presets.** `run_se0_controlled_climate.py` defines both
    `realistic_forager_demog()` and `emergent_village_demog()`; grepping `enable_*=True` over the file
    attributed the union to the forager preset. **Scope to the function.**
+
+### R-86v father-was-leader validation (2026-07-20)
+| Check | Result |
+|---|---|
+| D1 positive control | **PASS** - lift recovered 1.02 / 1.52 / 2.01 / 2.51 against built-in 1.0 / 1.5 / 2.0 / 2.5 |
+| D2 null floor | **PASS** - base rate 0.44 (not ~0.70); measured is z = 3.1-4.9 in a 2000-shuffle permutation null |
+| D14 two estimators | lift and odds ratio agree in direction (1.72 / 4.93 ON vs 1.54 / 2.94 OFF, ungated) |
+| **Age bias FOUND** | comparison pool mean age 17.7 yr vs leaders 36.0 yr; ungated lift 1.72 falls to **1.43** age-matched |
+| **Mechanism effect** | age-matched lift is IDENTICAL ON vs OFF (1.43 vs 1.43) - legitimacy supplies CONCENTRATION, not transmission |
+
+**Standing method note:** any statistic conditioned on a life-course event needs an AGE GATE - an ungated pool
+mixes agents who have had their chance with those who have not. And always report the LIFT beside the raw
+fraction: here the fraction moved 0.655 -> 0.757 (reads as a large mechanism effect) while the lift did not move.

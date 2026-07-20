@@ -187,12 +187,20 @@ material-inheritance coefficient would hit the number while getting the cause wr
 **Source:** Hayden 1995 `[VERIFIED]`: *"About 75% of New Guinea Entrepreneur Big Men had fathers that were also
 Big Men"* - transmitted via moka partners and wives, **not** the position.
 
-**Model status: MET 2026-07-18 (R-86) - 76% vs the 75% target**, via the DM-F1 legitimacy ratchet. Emergent and
-never fitted: the office is never inherited in the model, so the continuity comes from heritable `cred` acquired
-when a lineage's ritual standing is reinterpreted as descent. Baseline without legitimacy was 53-69%.
-**Caveat that must travel with this number:** it is measured in a regime where `ascribed_frac_pop` reaches
-0.70-0.85, i.e. the ratchet saturates and most lineages are eventually ascribed. The figure should be re-checked
-once delegitimation (the gumsa->gumlao collapse; H-CYCLES) bounds the ascribed fraction.
+**Model status: MET on Hayden's metric, VALIDATED 2026-07-20 (R-86v) - and the mechanism's role is narrower
+than R-86 claimed.** Age-matched measured value 0.769 vs Hayden's 0.75, sitting far in the right tail of a
+permutation null (z = 3.1-4.9). The 76% is a genuine signal, not a base-rate artifact (null base rate 0.44).
+
+**Three caveats that must travel with this number:**
+1. **The mechanism supplies CONCENTRATION, not TRANSMISSION.** Age-matched, legitimacy ON and OFF give the SAME
+   lift over null (1.43 vs 1.43). Legitimacy raises the raw fraction (0.769 vs 0.627) by raising the base rate
+   in step (0.536 vs 0.439) - more of a favoured lineage's members hold office. The father->son association is
+   unchanged and was already supplied by `cred` inheritance.
+2. **Hayden's base rate is unknown**, so his LIFT cannot be computed and the raw-fraction match cannot
+   distinguish concentration from transmission. If big-man status was rare (~10% of men), his 75% implies a
+   lift near 7 against our 1.43. **Finding that base rate is the highest-value open literature question here.**
+3. Measured in a regime where `ascribed_frac_pop` reaches 0.70-0.85 (the ratchet saturates); re-check once
+   delegitimation bounds it.
 **Why the gap is informative:** Hayden's actual channel is RELATIONAL capital (exchange partnerships), which the
 model does not transmit - `cred` is a scalar, not a partner network. Closing this gap most likely means making
 relational capital heritable, which is also the alpha=0.39 cell BHM says matters most for foragers after embodied.
