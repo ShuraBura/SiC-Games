@@ -386,6 +386,16 @@ three autocorrelation numbers in a table and read as "no cycles"; plotted agains
 was visibly above the noise and below only an invented cut-off. The picture made in one glance a point the table
 had buried.)* D8 (persist the raw series) exists so plots can be redrawn without re-running the model.
 
+**THE WRAPPER (2026-07-20).** `outputs/phase1_biome_mortality/verdict.py` makes D1/D2/D12 structural
+rather than remembered: `Verdict.render()` raises `DetectorNotValidated` unless both `.positive_control()` and
+`.null()` have been attached, and raises `PositiveControlFailed` outright if the positive control did not
+recover the known effect. A `fit_r2` below `r2_floor` (default 0.30) downgrades a verdict that clears the null
+to REJECTED, with the reason stated. `.second_estimate()` implements D14 — an independent estimator must be
+supplied and disagreement is flagged, never averaged away. Regression-tested in
+`tests/test_verdict_wrapper.py`, including a locked-in reproduction of the actual R-87 case (0.19 clears the
+null p95 but is correctly rejected for r2=0.14, not for an invented threshold). **Use this for any future
+detection claim** — a rule that lives only in a docstring gets skipped under time pressure; this cannot be.
+
 ### The habit these encode
 
 Before reporting any result, ask: **if the effect I am claiming (or denying) were absent (or present), would this
