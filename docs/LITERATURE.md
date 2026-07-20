@@ -1377,7 +1377,7 @@ can be anchored to.
 the only available like-for-like check. Do not re-search for this base rate without a new source; log this as
 the prior attempt.
 
-### Karmin, M., et al. (2015). "A recent bottleneck of Y chromosome diversity coincides with a global change in culture." *Genome Research* 25(4):459-466. `[VERIFIED via two independent fetches, PDF NOT YET FILED]`
+### Karmin, M., et al. (2015). "A recent bottleneck of Y chromosome diversity coincides with a global change in culture." *Genome Research* 25(4):459-466. `[VERIFIED, FILED]`
 
 **Why this was sought:** R-86v found Hayden's 75% father-was-leader figure has no stated base rate, so no lift
 is computable against it (verified negative, logged 2026-07-20). Searched for a DIFFERENTLY-anchored source on
@@ -1411,10 +1411,32 @@ differential reproductive success") and Poznik et al. 2016 (*Nat Genet* 48:593-5
 Karmin in von Rueden & Jaeggi 2016 for the same bottleneck literature; may sharpen the number or extend it to
 specific societies rather than a global average.
 
-**STATUS: PDF not filed.** Per the download-permission rule, filing requires explicit go-ahead (file, size,
-source) rather than an autonomous pull - flagging for the supervisor rather than silently downloading, same
-handling as Smith & Codding 2021 before it was filed.
+**STATUS: FILED 2026-07-20** (`literature/Genome Res.-2015-Karmin-459-66.pdf`, supervisor-supplied) **and
+PRIMARY-SOURCE VERIFIED** - the extracted PDF text was checked directly against the quote above, word for word:
+*"the Y chromosome plot suggested a reduction at around 8-4 kya... when the female Ne is up to 17-fold higher
+than the male Ne."* Confirms the two independent fetches used to first find this were both accurate.
+
+**Two bonus citations found in Karmin's own bibliography while verifying - SHARPER statistics than the aggregate
+17x Ne ratio, each a direct "top lineage(s) -> % of population" number:**
+
+- **Zerjal, T., et al. (2003). "The Genetic Legacy of the Mongols." *American Journal of Human Genetics*
+  72(3):717-721.** `[secondary-source verified, PDF NOT YET FILED]` - ONE Y-chromosome lineage, dated to
+  ~1000 years ago and attributed to Genghis Khan, is carried by **~8% of men across 16 populations spanning the
+  Pacific to the Caspian Sea** (~0.5% of the world total). A single elite dynasty's capture, at continental
+  scale and with a named historical figure - about as close as population genetics gets to a Hayden-style
+  "one aggrandizer's lineage" statistic, but with a real percentage attached.
+- **Yan, S., et al. (2014). "Y chromosomes of 40% Chinese descend from three Neolithic super-grandfathers."
+  *PLoS ONE* 9(8):e105691.** `[secondary-source verified, PDF NOT YET FILED, open access]` - **three founder
+  lineages account for ~40% of Chinese men**, from star-like expansions dated to ~6000 years ago (Neolithic,
+  linked to the spread of agriculture). A small-founder-set dominance statistic, one level up from Zerjal's
+  single dynasty.
+
+**Together the three give three anchors at three scales of the SAME phenomenon** (patrilineal fixation under
+social stratification), all hard genetic data: one elite lineage's continental capture (Zerjal, ~8%), a
+small founder set's national capture (Yan, 3 lineages -> 40%), and the aggregate population-wide Ne collapse
+(Karmin, 17x). None require guessing a base rate the way Hayden's 75% did.
 
 **Proposed use:** see TARGETS T-9 - a replacement/supplement for T-6 that compares the model's OWN existing
-`dynasties()` diagnostic (`eff_lineages`, the inverse-Simpson effective lineage count) between an egalitarian
-and a stratified arm, rather than chasing an unquantifiable ethnographic fraction.
+`dynasties()` diagnostic against these three, at the level each is actually comparable: `top_share` (largest
+single lineage's fraction) against Zerjal's ~8%; the summed share of the top 3 lineages against Yan's ~40%;
+and `eff_lineages` (inverse-Simpson effective count), egalitarian vs stratified, against Karmin's ~17x Ne ratio.

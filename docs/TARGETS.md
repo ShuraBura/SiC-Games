@@ -269,6 +269,17 @@ is the SAME shape Karmin describes: a male-lineage-specific collapse, not a gene
    the stand-in "unstratified" baseline, not a true female-lineage count) but a real, falsifiable quantitative
    target where T-6 offered none.
 
+**TWO SHARPER COMPANION TARGETS, added 2026-07-20 (LITERATURE.md, same entry) - more literally comparable to
+`dynasties()`'s existing output than the aggregate Ne ratio, since both are direct "top lineage(s) share":**
+- **Zerjal et al. 2003:** one lineage = ~8% of men (continental scale, ~1000 yr old, a named single dynasty).
+  Compare directly against `dynasties()["top_share"]` (largest single lineage / population) in a stratified arm.
+- **Yan et al. 2014:** three lineages = ~40% of men (national scale, ~6000 yr old, Neolithic/agricultural).
+  Compare against the SUMMED share of the top 3 rows of `dynasties()`'s per-lineage table in a stratified arm.
+
+These are arguably the more natural first test - `top_share` and a top-3 sum are already computed by
+`dynasties()` with no new instrumentation needed, unlike constructing the egalitarian/stratified eff_lineages
+ratio for the Karmin comparison. **PDFs for Zerjal and Yan not yet filed** (secondary-source verified only).
+
 **Honest limits, stated up front:** (a) Karmin's ratio is female:male within ONE bottleneck period; the model
 comparison is stratified:egalitarian across two CONFIGURATIONS, so the two ratios are analogous, not identical
 quantities - the comparison tests order-of-magnitude concentration, not a literal replication. (b) the timing
