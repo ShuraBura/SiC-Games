@@ -1342,3 +1342,37 @@ preventing one ambitious leader from taking over all of Tikopia."*
 beyond immediate consumption, and a social ladder whose **bottom rung is slaves** (*"could be bought, sold,
 mistreated, or even killed"*), acquired by raiding and by **debt** (enslaving women and children from debtor
 villages). Not yet extracted in detail; queued with ch. 9 (T-8's untested deposition/desertion split).
+
+### Big-man BASE RATE search — VERIFIED NEGATIVE (2026-07-20)
+
+**Question:** R-86v found the model's father->son leadership LIFT (1.43) cannot be compared to Hayden's 75%
+without knowing what fraction of New Guinea men were big men — Hayden reports a raw fraction, not a rate
+relative to a base. Searched for that base rate across the sources most likely to carry it.
+
+**Checked, all negative:**
+- **Hayden 1995 itself** (`literature/hayden1995.pdf`, full text, 72pp) — the source of the 75% figure. No
+  population-level base rate given anywhere in the paper; the only proportions present are unrelated (violent
+  death rates, subsistence percentages).
+- **Sahlins, *Stone Age Economics*** (full text, 363pp) — extensive QUALITATIVE big-man material (the
+  "rubbish man" contrast; "the success of only a FEW and the inevitable failure of the MANY"; the Kapauku
+  "fish-tail" bifurcate household distribution) but no quantified fraction. The Botukebo village table
+  (Table 3.4, Pospisil 1963) is 16 HOUSEHOLDS' sweet-potato production intensity, not a census of big-men vs
+  commoners.
+- **Flannery & Marcus ch. 6** ("Agriculture and Achieved Renown") and **ch. 9** ("Prestige and Equality in Four
+  Native American Societies") — both read in full; neither contains proportion/percentage language for
+  achievement-based leadership frequency.
+- **Web search** — no secondary source states the figure either. Sahlins' foundational 1963 paper ("Poor Man,
+  Rich Man, Big-man, Chief") is the most likely original home of such a number but is paywalled
+  (JSTOR/Cambridge); not pursued via a mirror (project policy on copyrighted works).
+
+**Read as a finding, not just a gap:** anthropologists describe big-man status as a GRADIENT (poor man ->
+rubbish man -> ordinary man -> big man; Sahlins) rather than a threshold category, which is plausibly WHY no
+source quantifies "the base rate" — there is no agreed population to divide by. **Qualitatively, every source
+that touches the question agrees big men were a small minority** ("only a few" vs "the many," Sahlins), which
+bounds the true lift ABOVE our model's 1.43 without fixing a value — consistent with, not contradicting, R-86v's
+finding that the model under-produces concentration relative to the ethnography, but not something a number
+can be anchored to.
+
+**Standing conclusion for T-6:** the raw-fraction comparison (age-matched model 0.769 vs Hayden's 0.75) remains
+the only available like-for-like check. Do not re-search for this base rate without a new source; log this as
+the prior attempt.
