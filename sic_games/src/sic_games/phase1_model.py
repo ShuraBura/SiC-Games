@@ -2621,6 +2621,14 @@ class TerrainWorld(mesa.Model):
         HYSTERESIS. After a flip the band's lineages must rebuild legitimacy from zero (~50+ steps of feasting)
         and resentment restarts, so a band cannot chatter between modes.
 
+        R-89 FIX. A band that random-walks to 100% ascribed has no live commoner ("oth") left to found privilege
+        on, and the original code let resentment merely decay in that case — a ONE-WAY DOOR, since ascription
+        only grows (R-86) and nothing else could ever push the band back out. Measured: a 4000-step pilot hit
+        this within 2625 steps and then sat pinned at ascribed_frac=1.0 for the remaining 34% of the run (R-89).
+        Fix: fall back to the population-wide commoner mean when a band has none of its own — the wider society
+        is still a real point of comparison even for a village that has gone entirely gumsa (Leach's Kachin
+        Hills were never uniformly ranked). Bands that still have live commoners are unaffected byte-for-byte.
+
         Off ⇒ returns before touching anything ⇒ bit-exact."""
         cfg = self._demog
         if cfg is None or not getattr(cfg, "enable_delegitimation", False):
@@ -2629,20 +2637,26 @@ class TerrainWorld(mesa.Model):
         ref = cfg.resent_privilege_ref
 
         members: dict = {}
+        pop_oth_cred = []
         for a in self.agent_list:
             members.setdefault(a._group.band_id, []).append(a)
+            if getattr(a, "_lineage", None) not in self._lineage_ascribed:
+                pop_oth_cred.append(a.cred)
+        # R-89: population-wide commoner baseline, used only when a band has ascribed members but none of its
+        # own commoners left. Ultimate fallback (no commoner alive anywhere) is the model's own default cred.
+        pop_m_o = (sum(pop_oth_cred) / len(pop_oth_cred)) if pop_oth_cred else 1.0
 
         for bid, ms in members.items():
             asc = [a for a in ms if getattr(a, "_lineage", None) in self._lineage_ascribed]
             oth = [a for a in ms if getattr(a, "_lineage", None) not in self._lineage_ascribed]
-            if not asc or not oth:
-                # no ranked/commoner distinction in this band ⇒ nothing to resent; let it cool
+            if not asc:
+                # no ranked lineage in this band ⇒ nothing to resent; let it cool
                 self._band_resentment[bid] = self._band_resentment.get(bid, 0.0) * (1.0 - alpha)
                 continue
             # PRIVILEGE = how far the ascribed stand above the commoners on the heritable facet. This is what
             # ascription actually confers, so it is what gets resented.
             m_a = sum(a.cred for a in asc) / len(asc)
-            m_o = sum(a.cred for a in oth) / len(oth)
+            m_o = (sum(a.cred for a in oth) / len(oth)) if oth else pop_m_o
             priv = 0.0 if m_o <= 0.0 else max(0.0, (m_a - m_o) / m_o) / ref
             r = (1.0 - alpha) * self._band_resentment.get(bid, 0.0) + alpha * priv
             if r >= thr:

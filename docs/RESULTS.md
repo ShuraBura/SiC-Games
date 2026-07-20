@@ -2377,4 +2377,127 @@ demography (R-58...R-64) and should not be done casually to chase a cycle result
 
 ---
 
+### R-89 - The delegitimation trap: full ascription is an ABSORBING state, not an equilibrium (2026-07-20)
+
+**Origin.** T-9 pilot (2 arms, 4000 steps / 3000 founders, stratified arm = full R-82...R-87 elite stack) run
+to check whether dynastic concentration (`eff_lineages`/`lin_top_share`) diverges from baseline before
+committing to the full 15,000-step campaign. The stratified arm's tail showed `ascribed_frac`/`frac_gumsa`
+pinned at exactly 1.0 and `leader_tenure` frozen at 9.2-9.3yr across 39+ consecutive checkpoints (950 steps) -
+too clean to be a converged steady state.
+
+**BUG 1, confirmed by reading the code.** `_do_legitimacy()`'s cred-conversion step relaxes EVERY ascribed
+agent's cred toward one fixed target:
+```
+a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)   # cg = legit_cred_gain, the SAME constant for every lineage
+```
+Once ascription reaches 100% of the population, everyone relaxes toward the same number, so cred stops
+differentiating between lineages. Measured: `gini_cred` collapses from a peak of 0.67 (step 150) to a
+permanent 0.006-0.010 from step 2625 on.
+
+**BUG 2, confirmed by reading the code - the one that matters.** `_do_delegitimation()`'s resentment update
+requires a live non-ascribed "oth" group WITHIN THE SAME BAND to compute privilege:
+```
+if not asc or not oth:
+    self._band_resentment[bid] = self._band_resentment.get(bid, 0.0) * (1.0 - alpha)   # decay only, never rebuild
+    continue
+```
+Once every lineage present in a band is ascribed, `oth` is empty, resentment can only decay, and reversion
+(`r >= thr`) can never fire again for that band. **This is a one-way door**: nothing in the mechanism can push
+a fully-saturated band back out. Ascription is a per-lineage ratchet that only grows (R-86), so any band will
+eventually random-walk into full saturation given enough time - and once there, it is stuck permanently.
+
+**MEASURED, directly from the pilot's logged trajectory** (`campaign_trajectory_t9_stratified.json`, plotted
+in `plots/r89_ascription_trap.png` / `_zoom.png`):
+- Steps 1-2600: genuine oscillation. `ascribed_frac` ranges from 0.0 up to 0.68 and back down to 0.03-0.13
+  repeatedly; `frac_gumsa` swings 0.3-1.0. This is the intended Leach gumsa<->gumlao dynamic, and it is real for
+  the first 65% of the pilot.
+- Step 2600 -> 2625 (one 25-step window): `ascribed_frac` jumps 0.651 -> 1.0 population-wide; `frac_gumsa`
+  hits 1.0 simultaneously.
+- Steps 2625-4000 (remaining 1375 steps, 34% of the pilot): `ascribed_frac`/`frac_gumsa` pinned at exactly
+  1.0, zero deviation across 39 checkpoints. `leader_tenure` frozen 9.2-9.3yr. No reversions.
+
+**T-9's actual metrics are computed from lineage counts, not cred - confirmed by reading `dynasties()`.**
+`eff_lineages`/`lin_top_share`/`size_gini` are computed purely from `sizes = [len(v) for v in groups.values()]`
+(population count per patriline); no `cred` term appears anywhere in that calculation, so BUG 1 cannot
+contaminate them directly.
+
+**BUG 2's effect on T-9's metrics, in THIS pilot, is small and continuous with the pre-trap trend, not a
+discontinuity.** Directly measured (excluding the initial 1200-step founder shakeout, which is ordinary
+finite-population lineage extinction, same process R-66/connubium-cut2 already characterized):
+
+| | pre-trap (step 1200-2625) | post-trap (step 2625-4000) |
+|---|---|---|
+| eff_lineages, mean | 3.39 (range 2.9-4.4) | 3.00 (range 2.9-3.1) |
+| lin_top_share, mean | 0.430 (range 0.406-0.450) | 0.444 (range 0.407-0.472) |
+
+Both continue the same slow-consolidation direction they were already on (n_lineages itself falls 8 -> 5 across
+steps 2400-2800, smoothly through the trap boundary) - a modest further tightening, not a jump timed to the
+trap.
+
+**BUT this pilot cannot clear the full campaign.** The trap had only 1375 of 4000 steps (34%) to act here. A
+15,000-step campaign (3.75x longer, same population-scale dynamics) would be expected to hit the same trap at a
+similarly early step and then spend roughly 12,000+ steps - 80%+ of the run - frozen in a state the mechanism
+was never designed to reach. Whether the modest post-trap drift seen above stays modest over 10,000+ additional
+trapped steps, rather than compounding, is not established by a 1375-step window. Running the full campaign on
+the mechanism as-is means the "stratified" arm's headline numbers would mostly describe a broken-oscillator
+end-state, not the Leach cycle R-87/88 were built to produce.
+
+**RECOMMENDATION, ACTIONED.** Fixed BUG 2: `_do_delegitimation()` now falls back to the population-wide
+commoner mean when a band has ascribed members but none of its own commoners left (`sic_games/phase1_model.py`,
+`_do_delegitimation`), so a fully-ascribed band remains capable of reverting. Bands that still have live
+commoners of their own are untouched — confirmed byte-for-byte, see validation below. Two new regression tests
+(`test_saturation_trap_is_fixed_by_the_population_fallback`, `test_fully_ascribed_band_can_still_revert`) force
+the exact broken state directly and check resentment builds/fires. Full suite: 812 passed, 1 xfailed (was 810
+before the two new tests). BUG 1 (fixed cred-relaxation target) left as-is per plan — see validation below for
+whether it still matters.
+
+**VALIDATION, part 1: the fix is inert on unaffected bands.** Re-ran the stratified arm at the pilot's own
+scale (`campaign_progress_t9_stratified_fix.txt`, 6000 steps, 50% longer than the original pilot). Steps 1-200
+are reproduced BIT-FOR-BIT against the original pre-fix pilot (every logged field, to the printed decimal) -
+exactly as expected, since the fix only changes behaviour in the specific edge case (`not oth` while `asc` is
+non-empty) that does not arise that early.
+
+**VALIDATION, part 2: at full campaign scale, still no recovery within 6000 steps - the fix looked dead on
+arrival.** `ascribed_frac` saturated even earlier this time (step 1950 vs. 2625) and then stayed pinned at
+exactly 1.0 for the remaining 4050 steps (67.5% of the run), same as the unfixed pilot. Zero reversions logged.
+This is NOT a sign the fix doesn't work (see part 3) - `run_campaign.py` was never logging
+`mean_resentment`/`max_resentment`, so there was no way to see whether resentment was climbing toward threshold
+and simply hadn't arrived yet, or was genuinely inert.
+
+**VALIDATION, part 3: a small, per-step-instrumented probe (`probe_r89_fix.py`, N=500, the campaign's actual
+ELITE_KW values - `resent_alpha=0.001`, `resent_threshold=0.5`, `resent_privilege_ref=10.0`, nothing
+hair-triggered) settles it directly: the fix works, and the pre-fix code could not possibly have produced
+this under any parameter setting.** Plotted in `plots/r89_fix_validation.png`:
+
+- Steps ~400-2650: `max_resent` (the most-resentful band) sits flat at 0.225 for ~2250 steps - unremarkable;
+  R-88 already established band churn resets most bands' resentment long before a slow (alpha=0.001, ~1000-step
+  time-constant) EMA matures, so individual bands plateau at whatever their local privilege gap supports.
+- Step ~2650 on (population-wide `ascribed_frac` locks near 1.0): `max_resent` and `mean_resent` both start
+  climbing in a sustained way for the first time - the population-wide fallback engaging exactly where it
+  should.
+- **Step 3102: `max_resent` reaches 0.5 and a reversion FIRES.** `ascribed_frac` drops 1.000 -> 0.611 in a
+  single step - "every lineage present loses ascription", exactly the reversion code's documented behaviour.
+  Under the pre-fix code this was mathematically impossible: `oth` was empty, so resentment could only decay,
+  never reach the threshold, ever, regardless of `resent_alpha`/`resent_threshold`/any other parameter. This is
+  a structural difference, not a tuning one.
+- After the reversion: `max_resent` snaps to 0.489 (a DIFFERENT band, one that did not revert) and sits there
+  for the remaining 2400 steps without crossing again, while `ascribed_frac` climbs back to ~0.97-0.98 and
+  `mean_resent` decays 0.20 -> 0.02. Plausible mechanism, not yet directly confirmed: the reverted band's
+  ex-nobles carry residual high cred (cred is not reset on reversion, only status is), so they raise the
+  population-wide commoner baseline everyone else's fallback compares against, damping the remaining stuck
+  band's privilege signal just below threshold.
+
+**READING THE TIMESCALE.** One full cycle (climb, cross, partial recovery) took ~3100 of 5500 probed steps at
+N=500; the real campaign-scale run got 4050 post-saturation steps without completing one. Slow and irregular is
+consistent with what R-87/88 set out to model in the first place - Leach's own claim is that hereditary
+inequality "lasted for A FEW GENERATIONS, and then collapsed" (generational, not a fast flicker), and R-88
+already established that no band-attached social memory can express a timescale the band substrate itself
+outlives. **What changed is not the speed of the cycle - it is that a cycle can now complete AT ALL.** The
+open question this does not resolve: whether the full 15,000-step campaign (roughly 3x this probe's horizon,
+and with ~13,000 steps of runway past a saturation onset around step 2000) sees multiple reversions, one, or
+lands in another multi-thousand-step plateau like the 2400-step one observed here. Not settled by current
+evidence either way.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -191,6 +191,60 @@ def test_resentment_is_bounded_and_resets_on_reversion():
             "resentment above threshold should have triggered a reversion and reset"
 
 
+def test_saturation_trap_is_fixed_by_the_population_fallback():
+    """R-89 regression. Before the fix, a band with zero live commoners of its own ('oth' empty) had its
+    resentment merely decay every step (`if not asc or not oth: ... continue`) — a ONE-WAY DOOR, since
+    ascription only ever grows (R-86) and nothing else could push the band back out. Measured in a real
+    4000-step pilot: one band's saturation went population-wide at step 2625 and stayed frozen (ascribed_frac
+    pinned at exactly 1.0) for the remaining 34% of the run. Force the exact broken state — one band, every
+    present lineage ascribed, given real cred privilege — and confirm resentment still builds, via the
+    population-wide fallback reference, instead of freezing at zero."""
+    w = _dworld(alpha=0.4, thr=100.0)        # deliberately unreachable: isolates "does resentment BUILD" from
+    for _ in range(60):                      # "does it also cross threshold", which test_fully_ascribed_band_
+        w.step()                             # can_still_revert covers separately
+        assert w.agent_list
+    members: dict = {}
+    for a in w.agent_list:
+        members.setdefault(a._group.band_id, []).append(a)
+    bid, ms = max(members.items(), key=lambda kv: len(kv[1]))
+    assert len(ms) >= 2, "need a band with more than one agent for the test to mean anything"
+    lineages = {getattr(a, "_lineage", None) for a in ms}
+    w._lineage_ascribed |= lineages                 # force full saturation of this one band
+    for a in ms:
+        a.cred = 50.0                                # real privilege: far above the population baseline
+    w._band_resentment[bid] = 0.0
+    for _ in range(10):
+        w._do_delegitimation()
+        assert lineages <= w._lineage_ascribed, "threshold=100 must not have been reachable — test setup bug"
+    assert w._band_resentment[bid] > 0.0, \
+        "resentment never built in a fully-ascribed band — the R-89 saturation trap has returned"
+
+
+def test_fully_ascribed_band_can_still_revert():
+    """R-89: not just that resentment builds, but that it can cross threshold and fire an actual reversion,
+    even though the band itself has no live commoners left to compare against."""
+    w = _dworld(alpha=0.4, thr=0.05)
+    for _ in range(60):
+        w.step()
+        assert w.agent_list
+    members: dict = {}
+    for a in w.agent_list:
+        members.setdefault(a._group.band_id, []).append(a)
+    bid, ms = max(members.items(), key=lambda kv: len(kv[1]))
+    lineages = {getattr(a, "_lineage", None) for a in ms}
+    w._lineage_ascribed |= lineages
+    for a in ms:
+        a.cred = 50.0
+    w._band_resentment[bid] = 0.0
+    reverted = False
+    for _ in range(60):
+        w._do_delegitimation()
+        if not (lineages & w._lineage_ascribed):
+            reverted = True
+            break
+    assert reverted, "a fully-ascribed band never reverted — the saturation trap is still a one-way door"
+
+
 def test_delegitimation_bounds_the_ascribed_fraction():
     """R-86's open problem, closed: the ratchet alone runs to 0.70-0.85 ascribed. The reverse must hold it
     below that, or 'descended from higher nats' stops being a distinction."""
