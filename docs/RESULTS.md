@@ -2317,4 +2317,64 @@ effect) while the lift did not move at all.
 
 ---
 
+### R-88 - BAND CHURN, not resent_alpha, sets the delegitimation timescale (2026-07-20)
+
+**Origin.** R-87d found the delegitimation mechanism's correlation time (~20-22 yr) was IDENTICAL across three
+resentment-memory settings spanning 4 to 167 years - the lag parameter measurably did not govern the dynamics.
+R-84 had already found something structurally similar: 106 of 135 leader tenures ended by band COLLISION, not
+by politics. This tests whether the same substrate churn is the common cause.
+
+**MECHANISM, confirmed by reading the code (not inferred).** `_maintain_bands()` FISSION mints a fresh
+`band_id` (`new_id = self._next_band_id; self._next_band_id += 1`) for roughly half a splitting band's members;
+`self._band_resentment.get(new_id, 0.0)` then returns 0.0 - a SILENT reset, independent of `resent_alpha`,
+regardless of what had accumulated. FUSION moves every agent onto the surviving `band_id` and simply abandons
+the smaller band's resentment entry. Neither event passes through `_do_delegitimation()`, so neither is counted
+in `reversions_this_step` - these are resets nobody was tracking.
+
+**MEASURED** (`probe_band_churn.py`, 2 arms x 3600 steps, band lifetime = first-seen to last-seen span for
+every band_id that ever existed):
+
+| | 83 yr lag | 4 yr control |
+|---|---|---|
+| band lifetime, median | 10.2 yr | 10.2 yr |
+| band lifetime, mean | 17.5 yr | 17.5 yr |
+| bands created | 2,277 | 2,407 |
+
+**Band lifetime is IDENTICAL across both arms** (median AND mean, to one decimal place) - confirming band churn
+is exogenous to delegitimation, driven purely by `band_split_size`/`band_merge_size` and population dynamics,
+not coupled to resentment at all.
+
+**THE MATCH: mean band lifetime (17.5 yr) sits almost exactly on R-87d's measured correlation time (~20-22 yr),
+uniform across resentment memories of 4, 83 AND 167 years.** For the long memories (83, 167 yr) band churn caps
+the observed timescale far below the nominal setting; for the short control (4 yr, nominal memory ~4.2 yr),
+band identity itself OUTLASTS the resentment memory, so the band substrate sets the pace either way. **Band
+churn, not `resent_alpha`, is the governor** - a delayed social feedback cannot express a memory longer than the
+unit carrying it survives.
+
+**A SAMPLING-BIAS FINDING IN THE PROBE ITSELF, recorded so it is not mistaken for a second effect.** The same
+probe's "age" statistic (age of a currently-live band, sampled at random timepoints) reported median 54 yr /
+mean ~78 yr - roughly 5x the lifetime figures. This is NOT a second timescale; it is the inspection paradox
+(the bus-waiting-time problem): sampling at random timepoints oversamples long-lived bands, the same way asking
+riders at a stop "how long is your commute" oversamples people on the longest routes. **Lifetime (unbiased,
+computed over the full population of band_ids that ever existed) is the correct statistic; age (sampled at
+timepoints) is confounded and should not be quoted as a timescale.**
+
+**PERFORMANCE, checked in passing (the supervisor asked).** Today's additions (R-86 legitimacy + R-87
+delegitimation) cost ~9% extra per step at matched population (11.7 -> 12.7 ms/step, N~500, both pure Python
+per-agent loops, unvectorized - consistent with the model's existing style, charter types A/N/C are the loop-
+legitimate categories). The perceived slowness of the H-CYCLES/band-churn runs is population size, not these
+mechanisms: those runs grew to 6,800-7,500 agents (15-20x the N=500 these were tuned at), and per-step cost
+scales with population throughout the model, not specifically here. The band-churn probe's own instrumentation
+(a full-population band_id scan every step) added further overhead on top, separate from the model's own cost.
+
+**CONSEQUENCE for the elite/legitimacy arc.** A delayed social feedback (resentment, or any future slow social
+mechanism) cannot express a memory longer than ~15-20 yr while attached to the BAND as its unit, because the
+band itself does not survive longer than that on average. Two paths forward, not mutually exclusive:
+(a) attach slow social state to something with a longer natural lifetime - the LINEAGE (already used for
+ascription) or the SETTLEMENT rather than the band; (b) reduce band churn itself, e.g. widen
+`band_split_size`/`band_merge_size` so bands persist longer - but this changes the substrate's calibrated
+demography (R-58...R-64) and should not be done casually to chase a cycle result.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

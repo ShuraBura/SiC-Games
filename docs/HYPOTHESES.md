@@ -252,6 +252,16 @@ inspected, is one build-and-collapse episode followed by ~150 yr pinned at zero:
 on validated instruments. Reported quantity is now CORRELATION TIME (15–33 yr), which does rise with the lag,
 and DWELL TIME — both 2–6× short of the 60–100 yr ethnographic anchor.
 
-**Next step:** measure per-band spell lengths directly rather than inferring them from aggregate counts, then
-calibrate `resent_threshold` against the dwell anchor. Also explain the non-monotonicity (the 83-yr lag gives
-longer dwell than the 167-yr lag), which no simple lag story predicts.
+**RESOLVED FURTHER (R-88, 2026-07-20): the non-monotonicity is explained, and the governor is identified.**
+Band lifetime (median 10.2 yr, mean 17.5 yr) is IDENTICAL across the 83-yr and 4-yr-control arms - band churn
+is exogenous, driven by `band_split_size`/`band_merge_size`, not by resentment. Mean band lifetime (17.5 yr)
+sits almost exactly on the measured correlation time (~20-22 yr) uniform across ALL THREE tested memories
+(4/83/167 yr): `_maintain_bands()` FISSION mints a fresh `band_id` whose `_band_resentment` entry defaults to
+0.0 (a silent reset never counted in `reversions_this_step`), and FUSION abandons the absorbed band's entry
+entirely. **A delayed social feedback cannot express a memory longer than the unit carrying it survives** - the
+band does not live long enough for `resent_alpha` to matter at 83 or 167 yr, and even the 4-yr control's own
+short memory is itself governed by band turnover rather than by its own alpha.
+
+**Next step:** either move the slow social state to a longer-lived unit (LINEAGE or SETTLEMENT instead of BAND)
+before re-testing periodicity, or treat this as the standing explanation and move on - re-running H-CYCLES on
+the band unit without addressing this would re-measure the same ceiling.
