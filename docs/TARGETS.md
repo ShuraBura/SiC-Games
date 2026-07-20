@@ -237,3 +237,41 @@ PRACTISES, and in the model a challenge can fail against the margin while a dese
 **Still open:** the structural split (deposition in centralized societies, desertion in mobile/dispersed ones) is
 anchored but **not yet tested** - it predicts that turning on settlement-scale institutions should shift the model
 toward the deposition channel. That is a free prediction worth running.
+
+---
+
+## T-9 - Male-lineage effective-count collapse under stratification (Karmin et al. 2015)
+
+**Status:** PROPOSED 2026-07-20, replacing/supplementing T-6 as the primary quantitative check on lineage
+concentration. **Origin:** the search for a better-anchored alternative to Hayden's uncomputable 75% (T-6),
+triggered by R-86v finding no base rate exists to compute Hayden's lift against.
+
+**Why this is a stronger target than T-6:** Karmin et al. 2015 (Genome Research, `[VERIFIED]`, LITERATURE.md) is
+a population-GENETICS statistic, not an ethnographic fraction - **female effective population size ran up to
+17x male effective population size at the Y-chromosome bottleneck's peak (about 8-4 kya)**, i.e. male lineages
+collapsed toward a few dominant patrilines while female-mediated diversity did not. This is a hard number with
+a stated timing and geography, unlike T-6's unquantifiable raw fraction.
+
+**The model already produces the qualitative signature, found independently before this source was located.**
+R-66 (2026-07-13, deep-time Carbon-civilization campaign): *"patriline-name-fixation not equal to genetic"* -
+`_lineage` (patriline) concentrates hard while autosomal genome diversity (H about 0.88-0.999) stays high. That
+is the SAME shape Karmin describes: a male-lineage-specific collapse, not a general population bottleneck.
+
+**What is needed to turn this into a real test (not yet run):**
+1. Compute `dynasties()["eff_lineages"]` (the inverse-Simpson effective patriline count) for a matched pair of
+   arms - EGALITARIAN (elite layer off) vs STRATIFIED (economic defensibility + material capture + legitimacy
+   all on) - at a comparable population size and horizon.
+2. Express the result as a RATIO: `eff_lineages(egalitarian) / eff_lineages(stratified)`, the model's own
+   analogue of Karmin's female:male Ne ratio (a collapse in effective lineage count under stratification,
+   against a roughly unchanged baseline).
+3. Compare that ratio's ORDER OF MAGNITUDE to Karmin's about 17x - not an exact match (the model has no
+   autosomal/maternal-lineage tracking to form a literal Nf, so the comparison is EGALITARIAN-eff_lineages as
+   the stand-in "unstratified" baseline, not a true female-lineage count) but a real, falsifiable quantitative
+   target where T-6 offered none.
+
+**Honest limits, stated up front:** (a) Karmin's ratio is female:male within ONE bottleneck period; the model
+comparison is stratified:egalitarian across two CONFIGURATIONS, so the two ratios are analogous, not identical
+quantities - the comparison tests order-of-magnitude concentration, not a literal replication. (b) the timing
+(8-4 kya, Neolithic/Bronze Age agricultural societies) matches the model's "agricultural" society-type target
+(T-5) better than the forager stage the elite layer currently operates at - this target is more naturally a
+Stage-C/agricultural check than an immediate one. (c) not yet run - this is a proposal, not a result.

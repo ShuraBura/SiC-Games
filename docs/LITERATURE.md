@@ -1376,3 +1376,45 @@ can be anchored to.
 **Standing conclusion for T-6:** the raw-fraction comparison (age-matched model 0.769 vs Hayden's 0.75) remains
 the only available like-for-like check. Do not re-search for this base rate without a new source; log this as
 the prior attempt.
+
+### Karmin, M., et al. (2015). "A recent bottleneck of Y chromosome diversity coincides with a global change in culture." *Genome Research* 25(4):459-466. `[VERIFIED via two independent fetches, PDF NOT YET FILED]`
+
+**Why this was sought:** R-86v found Hayden's 75% father-was-leader figure has no stated base rate, so no lift
+is computable against it (verified negative, logged 2026-07-20). Searched for a DIFFERENTLY-anchored source on
+leadership/lineage concentration - one with real quantitative statistics rather than a raw ethnographic
+fraction.
+
+**What it is:** a population-GENETICS study, not an ethnographic one - 456 Y-chromosome sequences from diverse
+world populations, reconstructing male effective population size (Ne) through time via coalescent methods.
+Categorically different evidence from anything else anchoring this project: hard demographic inference from DNA,
+not observer report.
+
+**The verified statistic** (confirmed via two independent fetches converging on the same figure - the general
+web search and a direct WebFetch of the PMC full text, which returned the quote verbatim): *"a reduction at
+around 8-4 kya when the female Ne is up to 17-fold higher than the male Ne."* I.e. at the bottleneck's peak,
+**female effective population size ran up to 17x male effective population size** - a small number of male
+lineages produced a hugely disproportionate share of descendants, while female-mediated lineages did not
+collapse the same way. Regionally staggered, tracking "the earlier spread of farming in the Near East, East
+Asia, and South Asia than in Europe." Explicitly NOT limited to one or a few haplotypes - a general pattern
+across the male line, not a single dynasty's fluke.
+
+**THE CONVERGENCE, found by checking our own prior results rather than assumed:** this is the SAME signature
+already reported, independently and before this literature search, in the SiC Games Carbon-civilization deep-
+time campaign (R-66, 2026-07-13): *"patriline-name-fixation not equal to genetic"* and *"autosomal genome stays
+diverse (H about 0.88): non-patrilineal maternal alleles keep flowing even as one surname dominates."* Karmin's
+whole point is the same shape - the collapse is MALE-LINEAGE-SPECIFIC, not a general population bottleneck
+(which would show in autosomal/maternal signal too). The model produced this qualitative pattern on its own,
+unprompted, months before this source was found to anchor it.
+
+**Companion citations, not yet followed up:** Balaresque et al. 2015 ("Y-chromosome descent clusters and male
+differential reproductive success") and Poznik et al. 2016 (*Nat Genet* 48:593-599) - both cited alongside
+Karmin in von Rueden & Jaeggi 2016 for the same bottleneck literature; may sharpen the number or extend it to
+specific societies rather than a global average.
+
+**STATUS: PDF not filed.** Per the download-permission rule, filing requires explicit go-ahead (file, size,
+source) rather than an autonomous pull - flagging for the supervisor rather than silently downloading, same
+handling as Smith & Codding 2021 before it was filed.
+
+**Proposed use:** see TARGETS T-9 - a replacement/supplement for T-6 that compares the model's OWN existing
+`dynasties()` diagnostic (`eff_lineages`, the inverse-Simpson effective lineage count) between an egalitarian
+and a stratified arm, rather than chasing an unquantifiable ethnographic fraction.
