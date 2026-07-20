@@ -23,6 +23,12 @@ long run answers the elite/dynasty, settlement-hierarchy, mating-network, and in
 Run:  py -3 -u sic_games/outputs/substrate_run/run_campaign.py            (from repo root)
 Env:  C_FOUNDERS 3000 | C_STEPS 15000 | C_SEED 0 | C_LOGEVERY 25 | C_GENEVERY 200 | C_FLUSHEVERY 500
       C_TERR coastal | C_CLIM temperate | C_TAG "" | C_GENOME 1
+      C_ELITE 0 — T-9 (2026-07-20): the R-82...R-87 elite/legitimacy stack (material capture, leader share,
+      Boehm leveling, leader office, legitimacy ratchet, gumsa/gumlao delegitimation), at the values validated
+      in those results. Bit-exact OFF when C_ELITE=0 (every enable_* it touches defaults False regardless).
+      Lets this harness's PROVEN long-horizon substrate (R-58...R-66) test whether that stack changes DYNASTIC
+      CONCENTRATION (dynasties()/eff_lineages/top_share) against Karmin/Zerjal/Yan (LITERATURE.md, TARGETS T-9) —
+      a combination never run together before this.
 """
 import sys, os, time, json, statistics, subprocess
 from collections import Counter
@@ -58,7 +64,22 @@ DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibilit
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
 MSTAR     = int(os.environ.get("C_MSTAR", "50"))         # Cut-2 mate-search pool m* (probe: m*=50 → median reach 496 ≈ Wobst)
+ELITE     = os.environ.get("C_ELITE", "0") == "1"        # T-9: the R-82...R-87 elite/legitimacy stack — see module docstring
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
+
+# T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
+# office_deposition_share/office_overreach_weight (Boehm Table I) and legit_feast/cred_gain/threshold (R-86
+# calibrated to Hayden's 75%) — see PARAMETERS §22 and TARGETS T-6. resent_alpha uses R-88's better-measured
+# 83-yr arm (correlation time ~22.6 yr on the log-linear estimator, D14) since R-88 found the lag itself does not
+# govern the observed dynamics — band churn does — so the exact alpha is no longer the load-bearing choice here.
+ELITE_KW = dict(
+    enable_material_capture=True, material_hide_frac=0.07, material_decay=0.002, aggrandizer_frac=0.15,
+    enable_leader_share=True, leader_share_frac=0.20,
+    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8,
+    enable_leader_office=True, office_grievance_gain=0.05,
+    enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
+    enable_delegitimation=True, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
+) if ELITE else {}
 
 PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
 OUT   = os.path.join(HERE, f"campaign_trajectory{TAG}.json")
@@ -144,6 +165,14 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         g = w.genetics(sample_pairs=1500)
         row["heterozygosity"] = round(g.get("heterozygosity", 0.0), 4)
         row["mean_relatedness"] = round(g.get("mean_relatedness", 0.0), 4)
+    if ELITE:                                          # T-9: legitimacy/office readout, cheap (O(bands)/O(agents))
+        lg = w.legitimacy()
+        gs = w.gumsa_state()
+        t = w.leader_tenure()
+        row["ascribed_frac"] = round(lg.get("ascribed_frac_pop", 0.0), 3)
+        row["frac_gumsa"] = round(gs.get("frac_gumsa", 0.0), 3)
+        row["leader_tenure_yr"] = round(t.get("mean_years", 0.0), 1)
+        row["leader_levy"] = round(w.leader_levy_this_step, 1)
     return row, cur_leaders
 
 
@@ -175,7 +204,8 @@ def main():
         enable_improved_land=IMPROVED,
         enable_soil_depletion=SOIL, enable_alluvial_renewal=SOIL,
         enable_emergent_abandonment=(SOIL and os.environ.get("C_ABANDON", "0") == "1"),
-        enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG))
+        enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG,
+        **ELITE_KW))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -185,11 +215,11 @@ def main():
     meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
                 genome=GENOME, genea_csv=os.path.basename(GENEA), connubium=CONNUBIUM,
-                m_star=(MSTAR if cut2 else 3), defend=DEFEND)
+                m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE)
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
         f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
         f"defend={DEFEND} improved={IMPROVED} budding={BUD}{'(thr'+str(BUD_THR)+')' if BUD else ''} "
-        f"genome={GENOME} genealogy={'ON' if GENEALOG else 'OFF'} flush/{FLUSHEVERY}")
+        f"elite={ELITE} genome={GENOME} genealogy={'ON' if GENEALOG else 'OFF'} flush/{FLUSHEVERY}")
     traj = []
     prev_leaders: dict = {}
     last_con: dict = {}
@@ -211,12 +241,14 @@ def main():
                 json.dump(dict(meta=meta, traj=traj), fh)     # crash-safe trajectory checkpoint
             el = time.time() - t0
             eta = el / step * (STEPS - step)
+            elite_str = (f" | asc={row['ascribed_frac']} gumsa={row['frac_gumsa']} "
+                        f"tenure={row['leader_tenure_yr']}y levy={row['leader_levy']}") if ELITE else ""
             log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} vil={row['n_villages']}"
                 f"(med{row['village_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
                 f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} mRSg={row['male_rs_gini']} "
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
-                f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']} "
-                f"| {el/60:.1f}m eta{eta/60:.0f}m")
+                f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']}"
+                f"{elite_str} | {el/60:.1f}m eta{eta/60:.0f}m")
     genea_rows += w.flush_genealogy(GENEA)               # final flush
     log(f"DONE step={step} in {(time.time()-t0)/60:.1f} min -> {OUT} ; genealogy rows={genea_rows} -> {GENEA}")
 
