@@ -173,6 +173,8 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         row["frac_gumsa"] = round(gs.get("frac_gumsa", 0.0), 3)
         row["leader_tenure_yr"] = round(t.get("mean_years", 0.0), 1)
         row["leader_levy"] = round(w.leader_levy_this_step, 1)
+        row["mean_resentment"] = round(gs.get("mean_resentment", 0.0), 3)    # R-89: was invisible before —
+        row["max_resentment"] = round(gs.get("max_resentment", 0.0), 3)      # couldn't tell "stuck" from "climbing"
     return row, cur_leaders
 
 
@@ -224,11 +226,13 @@ def main():
     prev_leaders: dict = {}
     last_con: dict = {}
     genea_rows = 0
-    t0 = time.time()
+    cum_reversions = 0                                   # R-89: summed every step, not just at LOGEVERY —
+    t0 = time.time()                                      # a reversion can fire and re-ascribe within one gap
     for step in range(1, STEPS + 1):
         w.step()
         if not w.agent_list:
             log(f"[{step}] EXTINCT"); break
+        cum_reversions += w.reversions_this_step
         c = w.connubium()
         if c:
             last_con = c                                 # seasonal gathering fires every aggregation_period steps
@@ -236,13 +240,17 @@ def main():
             genea_rows += w.flush_genealogy(GENEA)       # append + clear buffer (bounded memory)
         if step % LOGEVERY == 0 or step == 1:
             row, prev_leaders = snapshot(w, step, menarche, prev_leaders, last_con)
+            if ELITE:
+                row["cum_reversions"] = cum_reversions
             traj.append(row)
             with open(OUT, "w", encoding="utf-8") as fh:
                 json.dump(dict(meta=meta, traj=traj), fh)     # crash-safe trajectory checkpoint
             el = time.time() - t0
             eta = el / step * (STEPS - step)
             elite_str = (f" | asc={row['ascribed_frac']} gumsa={row['frac_gumsa']} "
-                        f"tenure={row['leader_tenure_yr']}y levy={row['leader_levy']}") if ELITE else ""
+                        f"tenure={row['leader_tenure_yr']}y levy={row['leader_levy']} "
+                        f"resent(mean/max)={row['mean_resentment']}/{row['max_resentment']} "
+                        f"revs={row['cum_reversions']}") if ELITE else ""
             log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} vil={row['n_villages']}"
                 f"(med{row['village_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
                 f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} mRSg={row['male_rs_gini']} "
