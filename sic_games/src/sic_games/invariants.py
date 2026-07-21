@@ -37,6 +37,8 @@ from dataclasses import dataclass
 # that cries wolf gets ignored, which would reproduce the very failure it exists to prevent.
 STUCK_WINDOW = 20        # ~500 steps at the campaign's LOGEVERY=25
 FROZEN_WINDOW = 20
+NEVER_FIRED_WINDOW = 60  # a mechanism that has NEVER fired needs a long window: slow EMAs (resent_alpha=0.001
+                         # is a ~1000-step time constant) are legitimately quiet for a long warm-up
 ABSORBING_WINDOW = 40    # lineage count legitimately plateaus; only a very long freeze is informative
 
 # Fields that SHOULD move in a live system. Deliberately excludes pop/n_bands/etc., which plateau at a healthy
@@ -108,11 +110,24 @@ def check(rows: list[dict], cfg: dict | None = None) -> list[Violation]:
     # ── FROZEN: a cumulative counter that stopped while its driver is live ──────────────────────────────
     # A monotone counter read at ONE timepoint looks like a big number whether or not it is still moving.
     # Reversions are only meaningful while there is something to revert (ascribed_frac > 0).
+    # "STOPPED" and "NEVER STARTED" are different diagnoses and must not share a message. R-93 exposed this: the
+    # rule fired at step 475 saying the mechanism "is dead", when at that point resentment simply had not had
+    # time to mature (resent_alpha=0.001 ⇒ ~1000-step time constant). The outcome happened to be right — it
+    # never fired in 3000 steps — but the stated reason was wrong, and a checker that misattributes a cause
+    # sends the reader hunting in the wrong place.
     if _tail_constant(rows, "cum_reversions", FROZEN_WINDOW) and (cur.get("ascribed_frac") or 0) > 0:
-        out.append(Violation(
-            "reversions-frozen", "FROZEN",
-            f"cum_reversions stuck at {cur.get('cum_reversions')} for {FROZEN_WINDOW} snapshots while "
-            f"ascribed_frac={cur.get('ascribed_frac')} — the reversion mechanism is dead, not quiet"))
+        n = cur.get("cum_reversions")
+        if n:
+            out.append(Violation(
+                "reversions-frozen", "FROZEN",
+                f"cum_reversions stopped at {n} for {FROZEN_WINDOW} snapshots while "
+                f"ascribed_frac={cur.get('ascribed_frac')} — it was firing and then died"))
+        elif len(rows) >= NEVER_FIRED_WINDOW and _tail_constant(rows, "cum_reversions", NEVER_FIRED_WINDOW):
+            out.append(Violation(
+                "reversions-never-fired", "FROZEN",
+                f"cum_reversions still 0 after {NEVER_FIRED_WINDOW} snapshots with ascribed_frac="
+                f"{cur.get('ascribed_frac')} — the mechanism has never once fired; suspect its threshold is "
+                f"out of range for this regime rather than that it is merely slow"))
 
     # ── STUCK: a field that should fluctuate, pinned ────────────────────────────────────────────────────
     for key in STUCK_WATCH:
@@ -153,7 +168,10 @@ if __name__ == "__main__":                       # re-check any archived traject
             blob = json.load(fh)
         rows = blob.get("traj", blob) if isinstance(blob, dict) else blob
         meta = blob.get("meta", {}) if isinstance(blob, dict) else {}
-        cfg = {"legit_threshold": 0.15} if meta.get("elite") else {}
+        # read the mode from meta rather than assuming: assuming cost a false DOMAIN positive on an
+        # already-fixed run, which is precisely how a checker teaches people to ignore it
+        cfg = ({"legit_threshold": meta.get("legit_threshold", 0.15),
+                "relative_legitimacy": meta.get("rellegit", False)} if meta.get("elite") else {})
         found = first_violations(rows, cfg)
         last = rows[-1].get("step") if rows else 0
         print(f"\n=== {path}  ({len(rows)} snapshots, to step {last}) ===")

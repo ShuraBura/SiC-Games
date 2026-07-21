@@ -229,7 +229,8 @@ def main():
     meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
                 genome=GENOME, genea_csv=os.path.basename(GENEA), connubium=CONNUBIUM,
-                m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE)
+                m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE, rellegit=RELLEGIT,
+                legit_threshold=ELITE_KW.get("legit_threshold"))
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
         f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
         f"defend={DEFEND} improved={IMPROVED} budding={BUD}{'(thr'+str(BUD_THR)+')' if BUD else ''} "

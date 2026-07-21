@@ -2550,6 +2550,50 @@ conservative.
 **Single seed per arm.** The large contrasts (eff 5.9 vs 1.8) are far beyond noise; the smaller ones are not
 defended without replication.
 
+### R-93 - Relative legitimacy: fixing one hidden denominator immediately exposes the next (2026-07-21)
+
+**The fix.** `legit_threshold` compared a lineage's SHARE of its band's feasting to a CONSTANT. Mean share is
+1/lineages_per_band, so the test discriminated only above 1/0.15 = 6.67 lineages/band, against a FILED Hill 2011
+target of ~7 - a FIVE PERCENT margin. Measured lpb was 2.14-3.69, so the AVERAGE lineage cleared the bar and
+nobility was universal by arithmetic. Now normalised by the competing-lineage count: 1.0 means "exactly an
+average lineage". Scale-free, and Friedman's own logic.
+
+**MEASURED at campaign scale** (3000 founders x 3000 steps, elite stack ON, segmentation ON in both R-92/R-93):
+
+| arm | n_lineages | eff_lineages | top_share | lineages/band | ascribed | strat% |
+|---|---|---|---|---|---|---|
+| control | 5 | 3.4 | 0.422 | 2.14 | 1.000 | 11.5 |
+| R-92 segmentation | 28 | 5.9 | 0.235 | 3.69 | 0.581 | 7.8 |
+| **R-93 + relative** | **96** | **18.1** | **0.154** | **6.66** | **0.063** | **23.3** |
+
+**lineages_per_band 6.66 against the Hill target of ~7 - essentially met**, from 2.14 at the start of this arc.
+R-92 alone could not get there because lpb is bounded above by eff_lineages; relative legitimacy lifted
+eff_lineages to 18.1, which raised the ceiling. Nobility is now a real 6% minority rather than everyone.
+
+**BUT: the reversion mechanism now NEVER FIRES.** cum_reversions = 0 across all 3000 steps, against 5,741 in the
+R-92 arm. Diagnosed: resentment peaks at 0.166 against `resent_threshold` 0.5, where R-92 peaked at 0.499.
+Privilege is `(mean_cred_ascribed - mean_cred_other)/mean_cred_other / resent_privilege_ref`, and
+`resent_privilege_ref=10.0` was implicitly calibrated in the regime where ascription was UNIVERSAL and cred
+saturated toward 1+legit_cred_gain=11. With nobility a genuine minority the privilege signal is much smaller and
+the threshold sits out of range.
+
+**THE SAME BUG CLASS, ONE LAYER DOWN.** `resent_privilege_ref` is a normaliser and `resent_threshold` a
+threshold on the normalised quantity - the identical structure to the bug just fixed, calibrated against the
+BROKEN version of the mechanism upstream. Fixing the forward mechanism moved the regime out from under the
+reverse one. Any threshold on a normalised quantity has a validity domain; this is the third instance in three
+results (legit_threshold, resent_privilege_ref, and R-92's rate/eff interaction).
+
+**TWO DEFECTS IN THE R-91 CHECKER ITSELF, found by running it on the fix:**
+- it reported the quiet reversion counter as *"the reversion mechanism is dead"* at step 475, when at that point
+  a resent_alpha=0.001 EMA (~1000-step constant) had simply not matured. The outcome was right, the stated cause
+  wrong - and a checker that misattributes a cause sends the reader hunting in the wrong place. Now separates
+  STOPPED (was firing, died) from NEVER-FIRED (longer window, and points at the threshold's range).
+- the OFFLINE CLI re-check produced a false DOMAIN positive on an already-fixed run, because trajectory `meta`
+  did not record the mode while the live harness passed it correctly. `meta` now carries it.
+
+**Not yet done:** re-anchor `resent_privilege_ref`/`resent_threshold` for the minority-elite regime, then re-test
+whether the gumsa<->gumlao cycle returns. Single seed.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

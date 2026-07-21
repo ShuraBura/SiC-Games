@@ -4,7 +4,8 @@ D1 applied to the instrument itself: every rule here is first exercised on a rec
 observed failure (the positive control), and then on a healthy trajectory that must stay silent (the null).
 A checker that has only ever been tested on invented inputs is not evidence about anything.
 """
-from sic_games.invariants import check, first_violations, STUCK_WINDOW, FROZEN_WINDOW, ABSORBING_WINDOW
+from sic_games.invariants import (check, first_violations, STUCK_WINDOW, FROZEN_WINDOW,
+                                  ABSORBING_WINDOW, NEVER_FIRED_WINDOW)
 
 ELITE_CFG = {"legit_threshold": 0.15}
 
@@ -106,3 +107,35 @@ def test_tolerates_missing_fields():
     """Older archived trajectories predate these fields; the checker must not crash on them."""
     rows = [dict(step=25 * i, pop=1000) for i in range(50)]
     assert check(rows, ELITE_CFG) == []
+
+
+def test_relative_legitimacy_suppresses_the_domain_rule():
+    """R-93: once the stock is normalised by the competing-lineage count there is no hidden denominator left,
+    so the DOMAIN rule must go quiet. It fired on an already-fixed run via the CLI path (which did not know the
+    mode) while the live run correctly stayed silent -- a false positive against a repaired mechanism."""
+    rows = _healthy()
+    rows[-1] = dict(rows[-1], lineages_per_band=2.14)
+    assert "share-threshold-degenerate" in {v.code for v in check(rows, ELITE_CFG)}
+    relcfg = dict(ELITE_CFG, relative_legitimacy=True)
+    assert "share-threshold-degenerate" not in {v.code for v in check(rows, relcfg)}
+
+
+def test_never_fired_is_distinguished_from_stopped():
+    """Two different diagnoses. A counter that STOPPED was alive and died; one that never moved may simply be
+    slow to warm up (resent_alpha=0.001 is a ~1000-step time constant), so it needs a much longer window and a
+    different message -- pointing at the threshold's range rather than at a dead mechanism."""
+    rows = _healthy(NEVER_FIRED_WINDOW + 10)
+    for i in range(-NEVER_FIRED_WINDOW, 0):
+        rows[i] = dict(rows[i], cum_reversions=0, ascribed_frac=0.5)
+    codes = {v.code for v in check(rows, ELITE_CFG)}
+    assert "reversions-never-fired" in codes
+    assert "reversions-frozen" not in codes, "a never-started counter must not be reported as having died"
+
+
+def test_short_quiet_spell_with_zero_is_not_flagged():
+    """A slow EMA is legitimately quiet during warm-up; only a LONG silence is informative."""
+    rows = _healthy(FROZEN_WINDOW + 5)
+    for i in range(-FROZEN_WINDOW, 0):
+        rows[i] = dict(rows[i], cum_reversions=0, ascribed_frac=0.5)
+    codes = {v.code for v in check(rows, ELITE_CFG)}
+    assert "reversions-never-fired" not in codes and "reversions-frozen" not in codes
