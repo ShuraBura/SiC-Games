@@ -92,7 +92,10 @@ def check(rows: list[dict], cfg: dict | None = None) -> list[Violation]:
     # Ascription fires when a lineage's SHARE of its band's feasting exceeds `legit_threshold`. Mean share is
     # 1/lineages_per_band, so the test discriminates only while lineages_per_band > 1/legit_threshold. Below
     # that, the AVERAGE lineage clears the bar and "nobility" is universal by arithmetic, not by competition.
-    thr = cfg.get("legit_threshold")
+    # R-93: the rule applies ONLY to the absolute formulation. Under relative legitimacy the stock is already
+    # normalised by the competing-lineage count, so there is no hidden denominator left to drift — firing here
+    # would be a false positive against a fixed mechanism, and a checker that cries wolf is one that gets ignored.
+    thr = None if cfg.get("relative_legitimacy") else cfg.get("legit_threshold")
     lpb = cur.get("lineages_per_band")
     if thr and lpb is not None and lpb > 0:
         need = 1.0 / thr

@@ -795,6 +795,18 @@ class DemographyConfig(BaseModel):
     # NB this is NOT the size-CAPPED segmentation rejected in R-90: hazard scales with size (a Yule process,
     # which is what generates realistic skewed haplogroup distributions) but nothing bounds a lineage's size,
     # so `top_share` stays a free measurement rather than an artifact of a threshold.
+    # ── RELATIVE legitimacy (R-93) — `legit_threshold` compares a lineage's SHARE of its band's feasting to a
+    # CONSTANT, and a share has a hidden denominator: the mean share is 1/lineages_per_band, so the test only
+    # discriminates while lineages_per_band > 1/legit_threshold. At the campaign's 0.15 that boundary is 6.67,
+    # against a Hill 2011 target of ~7 — a FIVE PERCENT margin. Nobody changed the parameter; the substrate
+    # drifted under it (measured lpb 2.14-3.69), at which point the AVERAGE lineage clears the bar and
+    # "nobility" becomes universal by arithmetic rather than by competition. R-92 confirmed a healthier
+    # substrate does NOT rescue it: the DOMAIN violation still fires at step ~650 with segmentation on.
+    # Fix: normalise the share by the number of lineages actually competing in that band, so the stored stock is
+    # a RELATIVE share where 1.0 means "exactly an average lineage" — scale-free, and Friedman's logic anyway
+    # ("one lineage convinces all the others" is about standing out from your neighbours, not clearing a fixed bar).
+    enable_relative_legitimacy: bool = False
+    legit_rel_multiplier: float = Field(2.0, ge=0.0)      # cross at this MULTIPLE of an average lineage's share
     enable_lineage_split: bool = False
     lineage_split_rate: float = Field(0.0, ge=0.0, le=1.0)    # per-MEMBER per-step hazard (lineage hazard = rate·n)
     lineage_split_min_segment: int = Field(8, ge=1)           # both halves must reach this, else the split is skipped

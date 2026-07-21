@@ -2574,6 +2574,7 @@ class TerrainWorld(mesa.Model):
                 by_band.setdefault(a._group.band_id, {}).setdefault(lid, []).append(a)
 
         alpha = cfg.legit_decay                       # EMA weight: legitimacy tracks long-run ritual standing
+        rel_legit = getattr(cfg, "enable_relative_legitimacy", False)   # R-93: scale-free crossing test
         for lins in by_band.values():
             spend, total = {}, 0.0
             guests = [a for ms in lins.values() for a in ms]
@@ -2598,9 +2599,16 @@ class TerrainWorld(mesa.Model):
             self.feast_spend_this_step += total
             for lid, s in spend.items():
                 share = s / total
+                if rel_legit:
+                    # R-93: scale by how many lineages are actually competing here, so the stock is a RELATIVE
+                    # share — 1.0 means "exactly what an average lineage contributed", independent of how many
+                    # lineages the band happens to hold. Without this the mean share is 1/len(lins), so a fixed
+                    # threshold silently stops discriminating once diversity falls below 1/threshold.
+                    share *= len(lins)
                 self._lineage_legit[lid] = (1.0 - alpha) * self._lineage_legit.get(lid, 0.0) + alpha * share
 
-        thr, cg = cfg.legit_threshold, cfg.legit_cred_gain
+        thr = cfg.legit_rel_multiplier if rel_legit else cfg.legit_threshold
+        cg = cfg.legit_cred_gain
         # THE RATCHET — this is the whole mechanism, and getting it wrong was the first two cuts' error.
         # Friedman's key shift is "from 'They must have PLEASED the nats' to 'They must be DESCENDED FROM higher
         # nats than we are.'" A decaying legitimacy stock that must be continually re-earned by feasting is the

@@ -69,6 +69,8 @@ ELITE     = os.environ.get("C_ELITE", "0") == "1"        # T-9: the R-82...R-87 
 BRANCH    = float(os.environ.get("C_BRANCH", "0"))       # R-90/R-92 per-birth SUB-BRANCH tag rate (0 = off, bit-exact)
 SPLIT     = float(os.environ.get("C_SPLIT", "0"))        # R-92 per-member per-step lineage SEGMENTATION hazard
 SPLITMIN  = int(os.environ.get("C_SPLITMIN", "8"))       # R-92 minimum viable segment (both sides)
+RELLEGIT  = os.environ.get("C_RELLEGIT", "0") == "1"     # R-93 scale-free ascription test (share vs band mean)
+RELMULT   = float(os.environ.get("C_RELMULT", "2.0"))    # R-93 crossing multiple of an average lineage share
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 # T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
@@ -83,6 +85,7 @@ ELITE_KW = dict(
     enable_leader_office=True, office_grievance_gain=0.05,
     enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
     enable_delegitimation=True, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
+    enable_relative_legitimacy=RELLEGIT, legit_rel_multiplier=RELMULT,
 ) if ELITE else {}
 
 PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
@@ -256,7 +259,8 @@ def main():
             # R-91: complain about CONTRADICTIONS as they appear, rather than printing yet another field.
             # Only the FIRST occurrence of each code is logged — a violation that persists is one event, and a
             # checker that repeats itself every snapshot is one that gets ignored.
-            for v in invariant_check(traj, {"legit_threshold": ELITE_KW.get("legit_threshold")} if ELITE else {}):
+            for v in invariant_check(traj, {"legit_threshold": ELITE_KW.get("legit_threshold"),
+                                            "relative_legitimacy": RELLEGIT} if ELITE else {}):
                 if v.code not in seen_violations:
                     seen_violations.add(v.code)
                     log(f"  !! [{step}] {v}")
