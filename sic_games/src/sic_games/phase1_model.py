@@ -2755,18 +2755,38 @@ class TerrainWorld(mesa.Model):
             return
         alpha = cfg.resent_alpha
         rel_res = getattr(cfg, "enable_relative_resentment", False)      # R-94: effect-size privilege
+        acc = getattr(cfg, "enable_resentment_accumulator", False)       # R-95: build up, do not merely track
+        ytr = cfg.resent_years_to_revolt
         thr = cfg.resent_effect_threshold if rel_res else cfg.resent_threshold
         ref = cfg.resent_privilege_ref
 
+        # R-95: WHO HOLDS THE GRUDGE. Default: the band — but R-88 measured band lifetime at 10.2 yr median
+        # against a grudge needing 700-1600 yr to mature, so the memory outlived its container by ~40-100x and
+        # band fission reset it to zero. Leach's gumlao premises describe VILLAGES (autonomous, with headmen and
+        # councils), not 25-person residential bands. Keyed by SETTLEMENT SITE, following R-71's precedent
+        # exactly: the place remembers while its members churn. Agents outside any settlement keep the band.
+        vil = getattr(cfg, "enable_village_resentment", False)
         members: dict = {}
         pop_oth_cred = []
         for a in self.agent_list:
-            members.setdefault(a._group.band_id, []).append(a)
+            if vil:
+                site = self._nearest_settlement(a.pos)
+                key = ("v", site) if site is not None else ("b", a._group.band_id)
+            else:
+                key = a._group.band_id
+            members.setdefault(key, []).append(a)
             if getattr(a, "_lineage", None) not in self._lineage_ascribed:
                 pop_oth_cred.append(a.cred)
         # R-89: population-wide commoner baseline, used only when a band has ascribed members but none of its
         # own commoners left. Ultimate fallback (no commoner alive anywhere) is the model's own default cred.
         pop_m_o = (sum(pop_oth_cred) / len(pop_oth_cred)) if pop_oth_cred else 1.0
+        # R-94: population fallback SUMS, computed once per step and reused by every band that has no
+        # commoners of its own — see the perf note in the effect-size branch below.
+        pop_oth_n = len(pop_oth_cred)
+        pop_oth_s = sum(pop_oth_cred)
+        pop_oth_q = sum(v * v for v in pop_oth_cred)
+        if pop_oth_n == 0:
+            pop_oth_n, pop_oth_s, pop_oth_q = 1, 1.0, 1.0        # matches the pop_m_o=1.0 ultimate fallback
 
         for bid, ms in members.items():
             asc = [a for a in ms if getattr(a, "_lineage", None) in self._lineage_ascribed]
@@ -2784,16 +2804,41 @@ class TerrainWorld(mesa.Model):
                 # it does not care whether cred sits near 1 or near 11, which is exactly what broke the ratio
                 # form when R-93 turned ascription from universal into a minority. Threshold is then anchorable
                 # on Cohen (0.8 = "large") rather than invented.
-                vals = [a.cred for a in asc] + ([a.cred for a in oth] if oth else pop_oth_cred)
-                nv = len(vals)
-                mu = sum(vals) / nv
-                sd = (sum((v - mu) ** 2 for v in vals) / nv) ** 0.5
+                # POOLED SPREAD FROM RUNNING SUMS, never by materialising the list. The first cut rebuilt
+                # `asc + pop_oth_cred` per band whenever a band had no commoners of its own — O(pop) per band
+                # per step, i.e. ~1.4M operations a step at campaign scale, and it made the run 3-4x slower at a
+                # LOWER population. The population sums are hoisted above and reused.
+                n1 = len(asc)
+                s1 = sum(a.cred for a in asc)
+                q1 = sum(a.cred * a.cred for a in asc)
+                if oth:
+                    n2 = len(oth)
+                    s2 = sum(a.cred for a in oth)
+                    q2 = sum(a.cred * a.cred for a in oth)
+                else:
+                    n2, s2, q2 = pop_oth_n, pop_oth_s, pop_oth_q
+                nv = n1 + n2
+                mu = (s1 + s2) / nv
+                var = max(0.0, (q1 + q2) / nv - mu * mu)     # clamp: catastrophic cancellation can go slightly <0
+                sd = var ** 0.5
                 # sd≈0 means the band is uniform: no DISCERNIBLE privilege to resent, whatever the means say.
                 priv = 0.0 if sd <= 1e-9 else min(max(0.0, (m_a - m_o) / sd), RESENT_EFFECT_CAP)
             else:
                 priv = 0.0 if m_o <= 0.0 else max(0.0, (m_a - m_o) / m_o) / ref
-            r = (1.0 - alpha) * self._band_resentment.get(bid, 0.0) + alpha * priv
-            if r >= thr:
+            # R-95: ACCUMULATE, as this mechanism's own docstring has always claimed it does. An EMA TRACKS —
+            # it converges to whatever it is fed, so a threshold at or above the typical privilege can never be
+            # crossed at ANY horizon (measured R-94: the grudge rose to 0.796 against a threshold of 0.800 and
+            # stopped, 1 revolt in 3000 years). Accumulating makes TIME-TO-REVOLT the anchored quantity — which
+            # is Leach's actual claim, "a few generations" — and retires the threshold as a free parameter:
+            # it is fixed at 1.0, because `resent_years_to_revolt` already sets the scale. Privilege scales the
+            # rate, so twice the gap boils over in half the time.
+            if acc:
+                r = self._band_resentment.get(bid, 0.0) + priv / ytr
+                fired = r >= 1.0
+            else:
+                r = (1.0 - alpha) * self._band_resentment.get(bid, 0.0) + alpha * priv
+                fired = r >= thr
+            if fired:
                 # THE REVERSION. Every lineage present loses ascription; the band is gumlao again.
                 for a in ms:
                     self._lineage_ascribed.discard(getattr(a, "_lineage", None))
@@ -2802,6 +2847,12 @@ class TerrainWorld(mesa.Model):
                 self.reversions_this_step += 1
             else:
                 self._band_resentment[bid] = r
+
+        if vil:                                  # R-95: forget the grudge of a village that no longer exists,
+            live = set(members)                  # exactly as R-71 forgets a dissolved site's remembered hardship
+            for k in list(self._band_resentment):
+                if k not in live:
+                    self._band_resentment.pop(k, None)
 
     def gumsa_state(self) -> dict:
         """R-87 diagnostic: the ranked/egalitarian regime split. `frac_gumsa` is the fraction of bands holding at

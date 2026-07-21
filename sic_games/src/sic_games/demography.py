@@ -814,6 +814,26 @@ class DemographyConfig(BaseModel):
     # than a re-tuned constant: privilege becomes an EFFECT SIZE — the noble/commoner cred gap divided by the
     # band's own pooled spread — which has no denominator left to drift AND lets the threshold be anchored on
     # Cohen's conventions (0.2 small / 0.5 medium / 0.8 large) instead of invented.
+    # ── RESENTMENT AS A TRUE ACCUMULATOR, HELD BY THE VILLAGE (R-95). Two flags, separable but ENTANGLED —
+    # neither works alone, and there is a test asserting exactly that.
+    #
+    # (a) ACCUMULATOR. `_do_delegitimation`'s own docstring says in capitals that resentment ACCUMULATES, after
+    #     Leach — *"prestige-seeking only increased their followers' resentment and hastened their overthrow"*.
+    #     The code implemented an EMA, which does not accumulate: it TRACKS, converging to whatever it is fed.
+    #     So a threshold at or above the typical privilege can NEVER be crossed at any horizon. Measured (R-94):
+    #     the grudge rose to 0.796 against a threshold of 0.800 and stopped — 1 revolt in 3000 years.
+    #     Accumulating instead makes the TIME-TO-REVOLT the anchored quantity, which is what Leach actually
+    #     claims, and removes the threshold as a free parameter (it is fixed at 1.0 by construction).
+    # (b) VILLAGE UNIT. R-88 measured band lifetime at 10.2 yr median / 17.5 mean, while the grudge needed
+    #     700-1600 yr to mature — the memory outlived its container by ~40-100x, and band fission resets it to
+    #     zero. Leach's gumlao premises describe VILLAGES ("villages autonomous", headmen, councils of elders),
+    #     not 25-person residential bands, so the settlement is both the lit-correct unit AND the one that
+    #     persists. Follows R-71's per-SITE precedent exactly: the place remembers, the members churn.
+    enable_resentment_accumulator: bool = False
+    resent_years_to_revolt: float = Field(80.0, gt=0.0)   # yr to revolt at UNIT privilege (effect size 1.0);
+    # [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then
+    # collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the time.
+    enable_village_resentment: bool = False
     enable_relative_resentment: bool = False
     resent_effect_threshold: float = Field(0.8, ge=0.0)   # sustained effect size that triggers reversion (Cohen "large")
     enable_relative_legitimacy: bool = False
