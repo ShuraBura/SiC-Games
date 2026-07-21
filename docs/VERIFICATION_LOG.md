@@ -152,3 +152,17 @@ dead knobs; those flags are simply off in the forager preset and live in `emerge
 **Standing method note:** any statistic conditioned on a life-course event needs an AGE GATE - an ungated pool
 mixes agents who have had their chance with those who have not. And always report the LIFT beside the raw
 fraction: here the fraction moved 0.655 -> 0.757 (reads as a large mechanism effect) while the lift did not move.
+
+### Lineage / legitimacy arc - code checks (R-89 ... R-93, 2026-07-20/21)
+
+| # | claim | how checked | result |
+|---|---|---|---|
+| 1 | `_do_delegitimation` cannot fire once a band is fully ascribed | read the guard: `if not asc or not oth: ... continue` | CONFIRMED - resentment could only decay; a one-way door. Fixed with a population-wide commoner fallback. |
+| 2 | the ascription cred target is a fixed constant, not lineage-relative | read `a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)` | CONFIRMED - explains gini_cred collapsing to ~0.008 once ascription saturates. |
+| 3 | `dynasties()`'s eff_lineages/top_share are NOT contaminated by that cred collapse | read the function: computed from `sizes = [len(v) for v in groups.values()]`, no cred term anywhere | CONFIRMED - the T-9 statistics were safe. |
+| 4 | the society classifier reads ascription | read `society_from_character(density, surplus_frac)` and grepped for any ascription reference in the morph path | **FALSIFIED** - it reads density and surplus ONLY. `ascribed_frac=1.0` can coexist with 88% "egalitarian_forager" bands. Still open. |
+| 5 | live `_father` chains are deep enough to reconstruct a sub-clade | measured chain depth over ALL live agents at steps 80/200/400 | **FALSIFIED** - max depth 2, median 1. First measurement was biased (sampled `agent_list[:200]`, which is founder-heavy); re-measured unbiased. Design changed to a carried tag (DE-21). |
+| 6 | lineage branching affects population size | 3 seeds x 2 rates x elite on/off | NOT REAL - 631 vs 634 and 329 vs 328. The apparent 3490 -> 635 was single-seed RNG-stream divergence. |
+| 7 | `lineages_per_band` can reach the Hill target by raising the split rate | computed the null two independent ways (binomial and Poisson), agreeing to 2dp | **FALSIFIED** - expected distinct lineages in a band of ~29 equals `eff_lineages`, so lpb is CAPPED by it. Rate increases LOWER eff_lineages. Ceiling lifted later by R-93 instead. |
+| 8 | the R-91 checker's DOMAIN rule is correct under relative legitimacy | ran the checker on the R-93 arm, live vs offline | **DEFECT FOUND** - the offline CLI produced a false positive because trajectory `meta` did not record the mode; the live harness was correct. `meta` now carries it. |
+| 9 | a quiet reversion counter means the mechanism is dead | inspected the R-93 trajectory | **DEFECT FOUND** - at step 475 the EMA had simply not matured (resent_alpha=0.001 ~ 1000-step constant). Right outcome, wrong stated cause. Rule now separates STOPPED from NEVER-FIRED. |

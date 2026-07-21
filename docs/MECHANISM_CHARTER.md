@@ -396,6 +396,25 @@ supplied and disagreement is flagged, never averaged away. Regression-tested in
 null p95 but is correctly rejected for r2=0.14, not for an invented threshold). **Use this for any future
 detection claim** — a rule that lives only in a docstring gets skipped under time pressure; this cannot be.
 
+
+**D15 — A THRESHOLD ON A SHARE OR RATIO HAS A VALIDITY DOMAIN; STATE IT, AND CHECK IT.** Any constant compared
+against a normalised quantity carries a hidden denominator, and when that denominator drifts the test stops
+meaning what it was set to mean - SILENTLY, producing a plausible-looking result rather than an error.
+*(THREE instances in three consecutive results. (1) `legit_threshold=0.15` compares a lineage's SHARE of band
+feasting to a constant; mean share is 1/lineages_per_band, so it discriminates only above 1/0.15 = 6.67 against
+a target of 7 - a FIVE PERCENT margin. Nobody changed it; the substrate drifted under it, and below the
+boundary the AVERAGE lineage clears the bar so nobility becomes universal by arithmetic. (2)
+`resent_privilege_ref=10.0` normalises the noble/commoner cred gap; it was calibrated while ascription was
+UNIVERSAL and cred saturated, so once nobility became a real 6% minority the signal collapsed and reversions
+NEVER fired - the reverse mechanism had been tuned against the BROKEN forward mechanism. (3) It reappeared
+inside the TEST FIXTURE written to catch it: "one sponsor at double the others" is not fixed RELATIVE standing,
+because the standout inflates the total it is measured against - 2n/(n+1), i.e. 1.50 at n=3 and 1.82 at n=10.)*
+**Practice:** prefer a SCALE-FREE formulation (compare to the observed mean, not to a constant); where a
+constant is unavoidable, record its validity domain beside it in PARAMETERS and add a DOMAIN rule to
+`sic_games/invariants.py` so drift is reported rather than discovered. **Beware especially a threshold
+calibrated against a mechanism that is later fixed** - repairing an upstream mechanism moves the regime out
+from under everything downstream that was tuned to it.
+
 ### The habit these encode
 
 Before reporting any result, ask: **if the effect I am claiming (or denying) were absent (or present), would this

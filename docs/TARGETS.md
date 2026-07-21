@@ -242,8 +242,8 @@ toward the deposition channel. That is a free prediction worth running.
 
 ## T-9 - Male-lineage effective-count collapse under stratification (Karmin et al. 2015)
 
-**Status:** PROPOSED 2026-07-20, replacing/supplementing T-6 as the primary quantitative check on lineage
-concentration. **Origin:** the search for a better-anchored alternative to Hayden's uncomputable 75% (T-6),
+**Status:** PROPOSED 2026-07-20; **NOT YET RUNNABLE as designed - see the 2026-07-21 note below.**
+Replacing/supplementing T-6 as the primary quantitative check on lineage concentration. **Origin:** the search for a better-anchored alternative to Hayden's uncomputable 75% (T-6),
 triggered by R-86v finding no base rate exists to compute Hayden's lift against.
 
 **Why this is a stronger target than T-6:** Karmin et al. 2015 (Genome Research, `[VERIFIED]`, LITERATURE.md) is
@@ -286,3 +286,30 @@ quantities - the comparison tests order-of-magnitude concentration, not a litera
 (8-4 kya, Neolithic/Bronze Age agricultural societies) matches the model's "agricultural" society-type target
 (T-5) better than the forager stage the elite layer currently operates at - this target is more naturally a
 Stage-C/agricultural check than an immediate one. (c) not yet run - this is a proposal, not a result.
+
+**UPDATE 2026-07-21 (R-89 -> R-93) - why this target could not be run as written, and what changed.**
+
+The comparison assumed the model's lineage pool was a live population that stratification could concentrate.
+It was not: `_lineage` could only be LOST, never created, so the pool was an ABSORBING process that fixates
+with probability 1 regardless of the elite layer. Measured: 3000 founding patrilines -> 5 by step 1950, then
+frozen. Worse, R-91's replay showed **every historical campaign run** reached that state (R-66's arms 61-62% of
+the run, R-67's cycling tests 67-74%), so any egalitarian-vs-stratified contrast run before this would have
+compared two frozen end-states rather than two live dynamics.
+
+Three fixes later (R-90 branching -> R-92 segmentation -> R-93 relative legitimacy) the substrate now sustains
+diversity: eff_lineages 3.4 -> **18.1**, top_share 0.422 -> **0.154**, lineages_per_band 2.14 -> **6.66**
+against the FILED Hill 2011 ~7. **T-9 is now runnable in principle.**
+
+**Two things to settle before running it:**
+1. `resent_privilege_ref` must be re-anchored for the minority-elite regime, or the stratified arm has no
+   working reversion mechanism at all (0 reversions vs 5,741 - RESULTS R-93).
+2. **The UNIT of the comparison must be declared (D6).** Zerjal 2003 is one lineage at ~8% of men across a
+   region; Yan 2014 is the top THREE at ~40% of Chinese men; the model's `top_share` is top-ONE. These are not
+   interchangeable, and an earlier plot of ours drew Yan's 40% as a line against top-one - a unit mismatch that
+   was removed rather than left on the axes.
+
+**A SECOND, ALREADY-FILED TARGET was found to be live during this work** and is now the sharper near-term check:
+MODEL_SPEC §4.8.8's **~7 lineages/band + dominant-lineage share 0.38 (Hill et al. 2011)**, which R-25 passed and
+the lineage collapse silently broke. It had no standing test - it was validated once in a one-off probe and
+never checked again, so it regressed unnoticed for months. `dynasties()` now reports `lineages_per_band` and
+`dom_lineage_share` on every snapshot. **Recommend promoting it to a standing test with a declared horizon.**

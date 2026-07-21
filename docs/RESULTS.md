@@ -2498,6 +2498,87 @@ and with ~13,000 steps of runway past a saturation onset around step 2000) sees 
 lands in another multi-thousand-step plateau like the 2400-step one observed here. Not settled by current
 evidence either way.
 
+### R-90 - Lineage BRANCHING: the mechanism was necessary, the SHAPE was wrong (2026-07-20)
+
+*(Documented retroactively 2026-07-21 - the mechanism was built and committed at the time, the RESULTS entry
+was missed. Superseded in shape by R-92; recorded because the FAILURE is the instructive part.)*
+
+**Origin.** R-89 established `_lineage` was founder-seeded and only ever LOST by extinction, never created - an
+absorbing Markov chain, so fixation has probability 1. Measured: 3000 founding patrilines -> 5 by step 1950,
+then frozen at exactly 5 for the next 5,650 steps. That breaks the FILED Hill 2011 target R-25 already passed
+(~7 lineages/band is impossible with 5 worldwide) and freezes the elite layer.
+
+**Built:** the standard infinite-allele device already used by `genome_mutation` - with probability
+`lineage_branch_rate` a newborn founds a new named line. Default OFF, no RNG draw when off, bit-exact.
+
+**MEASURED, and it FAILED on the statistic that matters.** Campaign scale, 3000 founders x 3000 steps:
+n_lineages rose 5 -> 32, but `eff_lineages` (inverse-Simpson) FELL 3.4 -> 1.8 and `top_share` ROSE 0.42 -> 0.73.
+`lineages_per_band` barely moved (2.14 -> 2.33 against a target of ~7). **Diversity up on paper, down in
+substance.** Cause: a per-birth branch mints a SINGLETON, and a lineage of one usually leaves no descendants, so
+the mechanism adds a churning tail of ephemeral names while the dominant lineage keeps its mass untouched.
+
+**It DID fix the R-89 trap** (1,089 reversions in the final third vs 0 for the control), which is why the
+diagnosis needed BOTH statistics - judged on `n_lineages` alone it looked like a success.
+
+**THREE METHOD ERRORS, all caught before they shipped a number, all recorded because they recur:**
+- the presence test was UNDERPOWERED: at rate 0.05 the world gives ~51 births in 60 steps => ~2.6 expected
+  events => P(zero) ~ 7%, and seed 0 drew zero, failing a test whose mechanism was working.
+- the first calibration sweep had NO POSITIVE CONTROL (D1/D4): on the plain substrate the Hill target was
+  already met AT RATE 0.0 (7.34 lin/band), so the swept parameter was not rate-limiting and the sweep could
+  only ever have said "change nothing". The collapse requires the ELITE STACK, where male_rs_gini ~0.70.
+- a monotone population drop across that sweep (3490 -> 635) was checked and is NOT real: 3 seeds x 2 rates x
+  elite on/off gives 631 vs 634 and 329 vs 328. Single-seed RNG-stream divergence; within-condition spread
+  (802/647/444) exceeds any between-condition difference.
+
+**Interpretation that survives.** Male-lineage collapse under an inequality layer is what Karmin 2015 REPORTS
+(female Ne up to 17x male Ne, 8-4 kya). The model reproducing a Y-bottleneck is CORRECT; what is wrong is that
+it cannot RECOVER from one, because named lines could only die. See R-92 for the corrected shape.
+
+---
+
+### R-91 - CONSISTENCY INVARIANTS: complaining when two numbers cannot both be true (2026-07-20)
+
+*(Documented retroactively 2026-07-21; tool committed at the time.)*
+
+**Why it exists, and why it is not more D-series.** D1-D14 ask *"is this measurement trustworthy?"* and they
+work - in one session they caught an underpowered test, a sweep with no positive control, and a fake population
+crash. They do NOT catch the failure behind R-89/R-90's worst errors, where every number was INDIVIDUALLY
+CORRECT and the RELATIONSHIP between them was impossible. `ascribed_frac=1.0` sat beside `pct_stratified=11.5`
+in the SAME log line for hours, unnoticed. **More FIELDS do not help - that line already carried ~20. Passive
+reporting is exactly what failed.** `sic_games/invariants.py` is ACTIVE: it returns violations and the harness
+prints them, so a 90-minute run says something is incoherent at minute 3.
+
+**Four rule classes**, each generalised from a real failure rather than invented: CONTRADICTION (two fields
+mutually impossible) - DOMAIN (a threshold on a share whose hidden denominator drifted) - FROZEN (a cumulative
+counter that stopped while its driver is live) - STUCK (a field that should fluctuate, pinned).
+
+**Validated as an INSTRUMENT (D1 applied reflexively).** Every rule is exercised first on a reconstruction of
+the actual observed failure, then on a healthy trajectory that must stay silent - the null is asserted before
+any positive is trusted. It also must NOT fire when high ascription is accompanied by genuinely ranked
+societies, i.e. it keys on the contradiction, not on one field being large.
+
+**EARLINESS, the whole point.** Replayed on the R-90 control arm it names the ROOT CAUSE (share threshold
+degenerate) at **step 475**, against step 1950 where the collapse first became visible by eye - about 2.5
+minutes into a 16-minute run.
+
+**IT SURFACED A FINDING NOBODY HAD LOOKED FOR.** Replayed over all 15 archived campaign trajectories, **every
+historical run reached the absorbing lineage state**: the R-66 deep-time arms froze at step ~5,700-5,800 of
+15,000 (61-62% of the run); the R-67 45,000-step cycling tests at 11,525 and 14,850 (74% and 67%). Those runs'
+DYNASTY numbers were therefore measured in a pool that could no longer change. It discriminates rather than
+firing everywhere: `t9_baseline` (no elite stack) and both swidden runs come back clean.
+
+**R-66 RE-CHECK, done from the archived trajectories (no re-runs needed).** Dynasty metrics AT the freeze point
+vs at end-of-run: `off` top_share 0.317 -> 0.886 (eff_lineages 6.6 -> 1.3); `on` 0.630 -> 0.453 (eff 2.4 -> 3.3).
+**R-66's DIRECTION survives and is real** - with defensibility off one patriline runs away, with it on the
+system resists, and eff_lineages RISING under `on` is not something drift alone produces. **What does not
+survive is the headline NUMBER:** 88.6% is the endpoint of a closed pool, where fixation is near-guaranteed
+given enough time, not a measured property of defensibility. R-67's claims (no cycling; connubium breaking
+fixation) hold at BOTH the freeze point and the end, and stand unchanged.
+
+**Two defects in the checker itself, found later by running it on R-93's fix** - see R-93.
+
+---
+
 ### R-92 - Lineage SEGMENTATION works; the per-band target is blocked by a CEILING, not by the mechanism (2026-07-21)
 
 **Origin.** R-90's per-birth branching had the wrong shape: it minted SINGLETON lineages, which mostly die, so

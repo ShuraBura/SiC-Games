@@ -702,3 +702,45 @@ and `docs/ROADMAP.md`. Maintained by Code; updated any time a parameter is locke
 Guinea Entrepreneur Big Men had fathers that were also Big Men"** - measured 53-69%. The office is never inherited
 in the model, so any continuity must EMERGE from heritable cred, which is Hayden's own mechanism (he transmits moka
 partners and wives, not the position).
+
+### §22.5 - Lineage descent: branching + segmentation (`enable_lineage_branching` / `enable_lineage_split`; R-90 -> R-92)
+
+`_lineage` was founder-seeded and only ever LOST by extinction, never created - an ABSORBING process, so
+fixation has probability 1 (measured: 3000 patrilines -> 5 by step 1950, then frozen 5,650 steps). These two
+flags are a PAIR; neither does anything useful alone.
+
+| param | value | provenance |
+|---|---|---|
+| `lineage_branch_rate` | **0.05** (campaign) | [DESIGN] per-BIRTH probability the child starts a new heritable `_subclan` tag. Singletons are HARMLESS at sub-branch level - the tag either grows into a real body of kin or vanishes unnoticed. Sets the pool segmentation later draws on; mean sub-branch size ~ 1/rate, so it must sit comfortably above `lineage_split_min_segment`. |
+| `lineage_split_rate` | **3e-5** (campaign) | [DESIGN, calibrated to Hill 2011 via R-92] per-MEMBER per-step hazard; a lineage of n segments at rate n*rate (a Yule process - what generates realistic skewed haplogroup distributions). **LOW BEATS HIGH:** 5x this rate gives 3x the lineages but LOWER eff_lineages (5.9 -> 4.1) and HIGHER top_share (0.235 -> 0.347), regressing toward R-90's singleton pathology. |
+| `lineage_split_min_segment` | **8** | [DESIGN] both sides must reach this or the cleavage is SKIPPED. This is what makes a new lineage born VIABLE rather than as a singleton - the whole R-90 -> R-92 correction. |
+
+**No CEILING is imposed on lineage size.** Hazard scales with size but nothing caps it, so `top_share` stays a
+free measurement rather than an artifact of a trigger - the distinction from size-TRIGGERED segmentation, which
+would have destroyed the very statistic T-9 compares against Zerjal 2003 / Yan 2014.
+
+**Implementation constraint, measured not assumed:** the cleavage follows the heritable `_subclan` tag rather
+than an ancestor chain, because live `_father` chains reach a MAXIMUM DEPTH OF 2 (median 1) even at step 400 -
+a chain terminates at the first ancestor born without an assigned father, and early births largely lack one.
+Deep ancestry exists only in the offline genealogy CSV, never in memory.
+
+### §22.6 - Relative legitimacy (`enable_relative_legitimacy`; R-93)
+
+| param | value | provenance |
+|---|---|---|
+| `legit_rel_multiplier` | **2.0** (campaign) | [DESIGN] a lineage crosses at this MULTIPLE of an average lineage's feasting share (1.0 == exactly average). Replaces the absolute `legit_threshold`, which compared a SHARE to a CONSTANT and so carried a hidden denominator. |
+
+**Why the absolute form had to go - the arithmetic, because it is the general lesson.** Mean share is
+1/`lineages_per_band`, so `legit_threshold=0.15` discriminates only while lineages_per_band > 1/0.15 = **6.67**,
+against a FILED Hill 2011 target of ~7. **A five percent margin.** Nobody changed the parameter; the substrate
+drifted under it (measured lpb 2.14-3.69), and below the boundary the AVERAGE lineage clears the bar, so
+"nobility" becomes universal by arithmetic rather than by competition. **ANY threshold applied to a share or a
+ratio has a validity domain and fails SILENTLY when its denominator moves** - see MECHANISM_CHARTER D15.
+
+**Measured effect** (campaign scale, segmentation on in both arms): lineages_per_band 3.69 -> **6.66** (target
+~7), eff_lineages 5.9 -> 18.1, top_share 0.235 -> 0.154, ascribed_frac 0.581 -> 0.063. NB segmentation ALONE
+could not reach the target, because `lineages_per_band` is CAPPED BY `eff_lineages`; this lifted the ceiling.
+
+**KNOWN CONSEQUENCE, not yet resolved:** it kills the gumsa/gumlao reversion entirely (0 reversions vs 5,741),
+because `resent_privilege_ref=10.0` was implicitly calibrated when ascription was UNIVERSAL and cred saturated.
+The same bug class, one layer down, tuned against the BROKEN upstream mechanism. See RESULTS R-93.

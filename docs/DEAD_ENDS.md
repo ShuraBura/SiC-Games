@@ -157,6 +157,37 @@ WHILE DOING NOTHING (same failure class as the R-74 vacuous test that asserted `
 which is the intended interregnum. **Standing check: if a flag's ON/OFF output is indistinguishable, treat that as
 a specification bug, not a small effect size.**
 
+## DE-20 - Per-birth SINGLETON lineage branching (wrong shape 2026-07-20, R-90 -> R-92)
+
+**What it was:** with probability `lineage_branch_rate`, a newborn founds a whole new `_lineage` - the standard
+infinite-allele device, already used by `genome_mutation`.
+
+**Why it failed:** a new line starts with exactly ONE member, and a lineage of one usually leaves no
+descendants. So it produced a churning tail of ephemeral names: at campaign scale n_lineages rose 5 -> 32 while
+`eff_lineages` FELL 3.4 -> 1.8 and `top_share` ROSE 0.42 -> 0.73, and `lineages_per_band` barely moved
+(2.14 -> 2.33 against a target of ~7). **Count up, substance down.** Judged on `n_lineages` alone it looked
+like a success - the failure is only visible on the effective-diversity measure.
+
+**Superseded by** R-92 segmentation: branching now seeds a heritable `_subclan` tag (singletons harmless at
+sub-branch level) and a separate operator promotes one to a full lineage only once it HAS grown. The device is
+therefore not dead, only relocated - which is why the flag and rate survive with changed meaning.
+
+## DE-21 - Splitting a lineage by walking ANCESTOR CHAINS (not computable 2026-07-21, R-92)
+
+**What it was:** the textbook definition of a sub-clade - pick a living apical ancestor, split off exactly its
+live patrilineal descendants. The first cut of R-92.
+
+**Why it failed, and it is a fact about the model rather than the idea:** MEASURED, live `_father` chains reach
+a MAXIMUM DEPTH OF 2 (median 1) even after 400 steps. A chain terminates at the first ancestor born without an
+assigned father, and early births largely lack one (father-link rate 19% at step 80, rising to 74% by step 400).
+So "the descendants of an ancestor" can never be more than a handful, and the mechanism silently did nothing.
+Deep ancestry exists only in the offline genealogy CSV stream, never in memory.
+
+**Superseded by** the heritable `_subclan` tag, which CARRIES the sub-clade instead of reconstructing it - and
+which is, conveniently, exactly what a Y-haplogroup label is. **Revive only if** per-agent ancestry is ever
+retained in memory; note that was presumably avoided deliberately, since retaining the full ancestry graph over
+a 45,000-step run is unbounded.
+
 ---
 
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*
