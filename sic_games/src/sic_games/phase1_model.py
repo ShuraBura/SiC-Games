@@ -217,6 +217,8 @@ _DEFAULT_KNOBS: dict = {
 
 
 
+RESENT_EFFECT_CAP = 5.0   # R-94: a uniform-ish band can give an enormous effect size off a tiny absolute gap;
+                          # cap so one degenerate band cannot dominate the EMA
 LEGIT_RELAX = 0.02   # R-86: per-step relaxation rate of cred toward its legitimacy-set target
                      # (~50-step approach). A RATE; the magnitude is `legit_cred_gain`.
 
@@ -2751,7 +2753,9 @@ class TerrainWorld(mesa.Model):
         cfg = self._demog
         if cfg is None or not getattr(cfg, "enable_delegitimation", False):
             return
-        alpha, thr = cfg.resent_alpha, cfg.resent_threshold
+        alpha = cfg.resent_alpha
+        rel_res = getattr(cfg, "enable_relative_resentment", False)      # R-94: effect-size privilege
+        thr = cfg.resent_effect_threshold if rel_res else cfg.resent_threshold
         ref = cfg.resent_privilege_ref
 
         members: dict = {}
@@ -2775,7 +2779,19 @@ class TerrainWorld(mesa.Model):
             # ascription actually confers, so it is what gets resented.
             m_a = sum(a.cred for a in asc) / len(asc)
             m_o = (sum(a.cred for a in oth) / len(oth)) if oth else pop_m_o
-            priv = 0.0 if m_o <= 0.0 else max(0.0, (m_a - m_o) / m_o) / ref
+            if rel_res:
+                # R-94: privilege as an EFFECT SIZE — the gap in units of the band's OWN spread. Scale-free, so
+                # it does not care whether cred sits near 1 or near 11, which is exactly what broke the ratio
+                # form when R-93 turned ascription from universal into a minority. Threshold is then anchorable
+                # on Cohen (0.8 = "large") rather than invented.
+                vals = [a.cred for a in asc] + ([a.cred for a in oth] if oth else pop_oth_cred)
+                nv = len(vals)
+                mu = sum(vals) / nv
+                sd = (sum((v - mu) ** 2 for v in vals) / nv) ** 0.5
+                # sd≈0 means the band is uniform: no DISCERNIBLE privilege to resent, whatever the means say.
+                priv = 0.0 if sd <= 1e-9 else min(max(0.0, (m_a - m_o) / sd), RESENT_EFFECT_CAP)
+            else:
+                priv = 0.0 if m_o <= 0.0 else max(0.0, (m_a - m_o) / m_o) / ref
             r = (1.0 - alpha) * self._band_resentment.get(bid, 0.0) + alpha * priv
             if r >= thr:
                 # THE REVERSION. Every lineage present loses ascription; the band is gumlao again.

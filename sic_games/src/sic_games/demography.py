@@ -805,6 +805,17 @@ class DemographyConfig(BaseModel):
     # Fix: normalise the share by the number of lineages actually competing in that band, so the stored stock is
     # a RELATIVE share where 1.0 means "exactly an average lineage" — scale-free, and Friedman's logic anyway
     # ("one lineage convinces all the others" is about standing out from your neighbours, not clearing a fixed bar).
+    # ── SCALE-FREE resentment (R-94) — the SAME bug class as legit_threshold, one layer down. Privilege was
+    # `(mean_cred_ascribed − mean_cred_other)/mean_cred_other ÷ resent_privilege_ref`, with ref=10.0 chosen while
+    # ascription was UNIVERSAL and cred saturated toward 1+legit_cred_gain=11. Once R-93 made nobility a real 6%
+    # minority the gap shrank, privilege peaked at 0.166 against a 0.5 threshold, and reversions NEVER fired
+    # (0 vs 5,741). The reverse mechanism had been tuned against the BROKEN forward mechanism, so repairing the
+    # forward one moved the regime out from under it. Per charter D15, the fix is a scale-free measure rather
+    # than a re-tuned constant: privilege becomes an EFFECT SIZE — the noble/commoner cred gap divided by the
+    # band's own pooled spread — which has no denominator left to drift AND lets the threshold be anchored on
+    # Cohen's conventions (0.2 small / 0.5 medium / 0.8 large) instead of invented.
+    enable_relative_resentment: bool = False
+    resent_effect_threshold: float = Field(0.8, ge=0.0)   # sustained effect size that triggers reversion (Cohen "large")
     enable_relative_legitimacy: bool = False
     legit_rel_multiplier: float = Field(2.0, ge=0.0)      # cross at this MULTIPLE of an average lineage's share
     enable_lineage_split: bool = False

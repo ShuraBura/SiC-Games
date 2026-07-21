@@ -71,6 +71,8 @@ SPLIT     = float(os.environ.get("C_SPLIT", "0"))        # R-92 per-member per-s
 SPLITMIN  = int(os.environ.get("C_SPLITMIN", "8"))       # R-92 minimum viable segment (both sides)
 RELLEGIT  = os.environ.get("C_RELLEGIT", "0") == "1"     # R-93 scale-free ascription test (share vs band mean)
 RELMULT   = float(os.environ.get("C_RELMULT", "2.0"))    # R-93 crossing multiple of an average lineage share
+RELRES    = os.environ.get("C_RELRES", "0") == "1"       # R-94 effect-size privilege (scale-free resentment)
+RESEFF    = float(os.environ.get("C_RESEFF", "0.8"))     # R-94 reversion effect-size threshold (Cohen "large")
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 # T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
@@ -86,6 +88,7 @@ ELITE_KW = dict(
     enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
     enable_delegitimation=True, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
     enable_relative_legitimacy=RELLEGIT, legit_rel_multiplier=RELMULT,
+    enable_relative_resentment=RELRES, resent_effect_threshold=RESEFF,
 ) if ELITE else {}
 
 PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
