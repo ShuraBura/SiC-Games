@@ -2498,6 +2498,58 @@ and with ~13,000 steps of runway past a saturation onset around step 2000) sees 
 lands in another multi-thousand-step plateau like the 2400-step one observed here. Not settled by current
 evidence either way.
 
+### R-92 - Lineage SEGMENTATION works; the per-band target is blocked by a CEILING, not by the mechanism (2026-07-21)
+
+**Origin.** R-90's per-birth branching had the wrong shape: it minted SINGLETON lineages, which mostly die, so
+it inflated the lineage COUNT while concentration got worse (n_lineages 5->32 but eff_lineages 3.4->1.8,
+top_share 0.42->0.73). Replaced by a PAIR - branching now seeds a heritable `_subclan` tag (singletons harmless
+there), and `_do_lineage_split` promotes a sub-branch to a full lineage only once it has grown.
+
+**A DESIGN CONSTRAINT DISCOVERED BY MEASUREMENT, not assumed.** The first cut split off "the live patrilineal
+descendants of an apical ancestor" - the textbook sub-clade. It is not computable here: live `_father` chains
+reach a MAXIMUM DEPTH OF 2 (median 1) even after 400 steps, because a chain terminates at the first ancestor
+born without an assigned father and early births largely lack one (father-link rate 19% at step 80 -> 74% by
+step 400). Deep ancestry exists only in the offline genealogy CSV, never in memory. Hence the inherited tag,
+which is in any case what a Y-haplogroup label actually is.
+
+**MEASURED at campaign scale** (3000 founders x 3000 steps, elite stack ON, all arms identical otherwise):
+
+| arm | n_lineages | eff_lineages | top_share | lineages/band |
+|---|---|---|---|---|
+| control (no mechanism) | 5 | 3.4 | 0.422 | 2.14 |
+| R-90 singleton branching | 32 | 1.8 | 0.733 | 2.33 |
+| **R-92 segmentation, rate 3e-5** | 28 | **5.9** | **0.235** | **3.69** |
+| R-92 segmentation, rate 1.5e-4 | 82 | 4.1 | 0.347 | 3.51 |
+
+**RATE IS NOT THE LEVER, and pushing it reproduces the pathology it was built to fix.** 5x the rate gives 3x
+the lineages but LOWER effective diversity and HIGHER concentration - splitting faster shatters lineages into
+fragments quicker than they can grow. The LOW rate is adopted as the better setting.
+
+**INDEPENDENT CONFIRMATION from R-91.** The consistency checker - written before these runs existed and not
+touched for them - drops from SIX violations on the control (frozen lineage pool, dead reversion mechanism,
+ascription pinned at 1.0, frac_gumsa pinned, rank-vs-society contradiction, absorbing state) to exactly ONE on
+both segmentation arms. The R-89 trap and the absorbing state are gone.
+
+**THE HILL TARGET IS STILL MISSED (3.69 vs ~7), and the reason is a CEILING the mechanism cannot lift.**
+Computed null, two independent routes agreeing to 2dp: for a band of size b drawn at random from a distribution
+with inverse-Simpson E, expected distinct lineages = E*(1-(1-1/E)^b) ~ E, because b (~29) >> E. **So
+`lineages_per_band` is bounded above by `eff_lineages`** - 7 per band is arithmetically impossible while the
+effective count worldwide is 5.9, at any rate. Two separate deficits therefore remain, NEITHER of them the
+segmentation rate:
+  (a) eff_lineages must exceed ~7 - needs a more EVEN lineage-size distribution, and raising the split rate
+      moves it the wrong way (5.9 -> 4.1);
+  (b) observed lpb is only 63% of even that ceiling (3.69 vs 5.87) - bands over-represent locally-resident
+      lineages. This is SPATIAL, i.e. the marriage-relocation/connubium machinery (cf. R-67/R-68 on Cut-2's
+      spatial effects), not the descent mechanism.
+
+**CAVEAT ON THAT NULL, recorded so the 63% is not over-read.** It assumes equal-sized lineages, so it
+UNDER-estimates expected distinct for a skewed distribution - which is why the R-90 arm reads a nonsensical
+129%. For the segmentation arms the true shortfall is therefore WORSE than 63%; the clustering conclusion is
+conservative.
+
+**Single seed per arm.** The large contrasts (eff 5.9 vs 1.8) are far beyond noise; the smaller ones are not
+defended without replication.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
