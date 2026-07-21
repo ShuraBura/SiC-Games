@@ -43,6 +43,7 @@ from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world, world_lottery_climate
 from sic_games.capacity import NPPCapacityField
 from sic_games.climate import ClimateField
+from sic_games.invariants import check as invariant_check
 
 FOUNDERS  = int(os.environ.get("C_FOUNDERS", "3000"))
 STEPS     = int(os.environ.get("C_STEPS", "15000"))
@@ -231,6 +232,7 @@ def main():
     prev_leaders: dict = {}
     last_con: dict = {}
     genea_rows = 0
+    seen_violations: set = set()          # R-91: log each contradiction once, on first appearance
     cum_reversions = 0                                   # R-89: summed every step, not just at LOGEVERY —
     t0 = time.time()                                      # a reversion can fire and re-ascribe within one gap
     for step in range(1, STEPS + 1):
@@ -248,6 +250,13 @@ def main():
             if ELITE:
                 row["cum_reversions"] = cum_reversions
             traj.append(row)
+            # R-91: complain about CONTRADICTIONS as they appear, rather than printing yet another field.
+            # Only the FIRST occurrence of each code is logged — a violation that persists is one event, and a
+            # checker that repeats itself every snapshot is one that gets ignored.
+            for v in invariant_check(traj, {"legit_threshold": ELITE_KW.get("legit_threshold")} if ELITE else {}):
+                if v.code not in seen_violations:
+                    seen_violations.add(v.code)
+                    log(f"  !! [{step}] {v}")
             with open(OUT, "w", encoding="utf-8") as fh:
                 json.dump(dict(meta=meta, traj=traj), fh)     # crash-safe trajectory checkpoint
             el = time.time() - t0
