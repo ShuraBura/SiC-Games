@@ -168,6 +168,15 @@ Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, ar
 
 ## H-CYCLES — Secular cycles require a DELAYED negative feedback, not a stronger one
 
+> **VERDICT 2026-07-21 (R-97): the delayed feedback was BUILT, WORKS, and is NOT SUFFICIENT.** The lag now
+> exists as the hypothesis asked (R-95: resentment accumulates on a village-held memory, time-to-revolt anchored
+> to Leach's few generations), revolts fire in every arm, and villages genuinely flip between ranked and
+> egalitarian. **There are still no cycles** — ac_peak 0.068/0.083/0.078/-0.008 against a calibrated 0.13 noise
+> floor, on a detector re-validated at this resolution (9/9 injected cycles found). The hypothesis is therefore
+> answered in the negative AS STATED: a delayed negative feedback at VILLAGE scale is not what produces secular
+> cycles. The uncoupled-oscillator diagnosis says why — and points at a superordinate polity, not a better lag.
+> **Restate before re-testing:** H-CYCLES should be re-scoped to the supra-village rung or retired.
+
 **Status:** OPEN — pre-registered 2026-07-18. **Origin:** supervisor (architecture discussion, the field/operator
 framing). **Home of the criterion:** `MECHANISM_CHARTER.md` §5.
 

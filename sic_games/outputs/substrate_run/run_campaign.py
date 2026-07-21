@@ -240,6 +240,17 @@ def main():
                 genome=GENOME, genea_csv=os.path.basename(GENEA), connubium=CONNUBIUM,
                 m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE, rellegit=RELLEGIT,
                 legit_threshold=ELITE_KW.get("legit_threshold"))
+    # KNOWN-INERT COMBINATIONS. A flag switched on without its companion does nothing while LOOKING enabled --
+    # R-85c's lesson ("distinguish 'does nothing when I turn it on' from 'does nothing'") and charter D4. This is
+    # a mechanical guard rather than another rule to remember, because D4 already existed and was still missed:
+    # a biome comparison was run with C_SOIL=1 and C_ABANDON=0, and the two arms came out BYTE-IDENTICAL for
+    # 1000 steps because soil depletion without abandonment produces no rotation at all (R-71: n_settle frozen
+    # 12-16 vs 25 churning).
+    if SOIL and os.environ.get("C_ABANDON", "0") != "1":
+        log("  !! CONFIG: C_SOIL=1 with C_ABANDON=0 -- soil depletes but villages never relocate, so there is "
+            "NO swidden rotation. R-71 measured this as the frozen-settlement case. Set C_ABANDON=1 for swidden.")
+    if IMPROVED and not DEFEND:
+        log("  !! CONFIG: C_IMPROVED=1 needs C_DEFEND=1 -- worked land cannot be claimed without defensibility.")
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
         f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
         f"defend={DEFEND} improved={IMPROVED} budding={BUD}{'(thr'+str(BUD_THR)+')' if BUD else ''} "

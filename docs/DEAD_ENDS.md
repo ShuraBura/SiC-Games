@@ -106,6 +106,20 @@ rotating swidden is a STABLE regime, which is also ethnographically correct.
 shocks (`enable_tier2_shock`, default-OFF) or the explicit Turchin elite/instability layer. **Do not attempt a
 fourth subsistence-side route to cycles without a new argument for why it differs from these three.**
 
+**REVISION 2026-07-21 (R-97) — the second half of that conclusion is SUPERSEDED.** The elite/instability layer
+was subsequently built and made to work (R-86...R-96: a sustained noble minority AND ongoing revolts, in a
+patchwork of ranked and egalitarian villages). **It still does not cycle** — all four arms score below R-87's
+calibrated noise floor (ac_peak 0.068 / 0.083 / 0.078 / -0.008 against p95 0.13), on a detector re-validated at
+that resolution first (9/9 injected cycles detected, down to amplitudes smaller than the observed variation).
+**A FOURTH independent negative, this one from the elite side.**
+The elite layer is therefore **necessary-but-not-sufficient**. The mechanism of the failure is visible: villages
+each keep their own grudge and revolt on their own clock, and uncoupled oscillators sum to a flat aggregate.
+What is missing is a **superordinate polity** — Turchin's cycles are a property of STATES (taxation, standing
+armies, elite overproduction competing for finite OFFICES), and this model tops out at autonomous villages.
+**We built the Kachin; Turchin was writing about kingdoms.** The standing instruction is unchanged for the
+subsistence side, and now extends: **do not attempt a fifth route to cycles at VILLAGE scale either.** The next
+legitimate attempt is at the supra-village rung (ROADMAP already records this as a prerequisite).
+
 ## DE-15 - Band size as an ENVIRONMENT-DEPENDENT emergent quantity (FAILED 2026-07-17, R-72)
 
 **What was tried:** `enable_emergent_band_size` v3 - derive band size from risk-pooling against environmental

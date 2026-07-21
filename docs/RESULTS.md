@@ -2675,6 +2675,63 @@ results (legit_threshold, resent_privilege_ref, and R-92's rate/eff interaction)
 **Not yet done:** re-anchor `resent_privilege_ref`/`resent_threshold` for the minority-elite regime, then re-test
 whether the gumsa<->gumlao cycle returns. Single seed.
 
+### R-97 - The elite layer WORKS and still does not cycle. Turchin's cycles are not at this SCALE (2026-07-21)
+
+**The question this arc existed to answer.** R-67/R-68/R-71 gave three independent negatives for secular cycles
+from the subsistence base, and the standing conclusion (DE-14) was that cycles REQUIRE the explicit Turchin
+elite/instability layer. That layer now works: R-96 sustains a real noble minority AND ongoing revolts, in a
+patchwork of ranked and egalitarian villages (ascribed 0.365, 678 revolts, frac_gumsa ranging 0.58-0.99). So:
+does it cycle?
+
+**INSTRUMENT REUSED, NOT REBUILT.** `probe_hcycles.period_of` — the detector fixed twice and supervisor-approved
+in R-87c/d (linear detrend; period capped at window/3; a genuine local maximum required). Null floor from R-87's
+own white-noise calibration: ac_peak mean 0.03, **p95 0.13**, max 0.19. Compared against 0.13, not an invented
+cut-off (using an invented 0.2 was R-87c's original error).
+
+**D1 FIRST — the detector was re-validated at THIS resolution before any negative was read.** Campaign snapshots
+are 121 points at 25-step spacing, far coarser than the series R-87 validated on, so an underpowered detector
+would have produced a worthless negative. Injecting known cycles into noise matched to the observed magnitude
+(sd 0.143): **9/9 DETECTED**, down to amplitude 0.08 — i.e. smaller than the variation actually present in the
+arms. The instrument is adequate; a negative is interpretable.
+
+**RESULT — all four arms below the noise floor** (`probe_r97_cycles.py`, series `frac_gumsa`):
+
+| arm | sd | period reported | ac_peak | vs null 0.13 |
+|---|---|---|---|---|
+| coastal (R-96) | 0.172 | 375 yr | 0.068 | BELOW |
+| tropical, no soil | 0.131 | 500 yr | 0.083 | BELOW |
+| tropical, rotation OFF | 0.131 | 500 yr | 0.078 | BELOW |
+| TRUE swidden (rotation ON) | 0.137 | 825 yr | **-0.008** | BELOW |
+
+**NO CYCLES. A FOURTH independent negative, and the first from the elite side.**
+
+**WHY, and it is visible in the mechanism rather than inferred.** Villages DO flip — thousands of revolts in
+every arm. But each village keeps its own grudge against its own nobles and revolts when its own threshold is
+crossed. **Nothing couples one village's timing to its neighbours'.** Independent oscillators with no coupling
+sum to a flat aggregate, which is exactly what the series show.
+
+**THE REFRAME, which is the actual finding.** The missing ingredient is not a better elite mechanism — it is a
+LEVEL OF POLITICAL ORGANISATION this model does not have. Turchin's secular cycles are a property of STATES:
+taxation, standing armies, elite overproduction competing for a finite number of OFFICES, fiscal crisis. What
+synchronises local rise-and-fall into an aggregate cycle is a superordinate polity that all the villages belong
+to. **We built the Kachin; Turchin was writing about kingdoms.** Autonomous villages with big men and hereditary
+rank produce exactly what Leach describes — local, unsynchronised rise and fall — and that is what the model now
+reproduces. The negative is therefore evidence about SCALE, not a failure of the elite layer.
+
+**This was already flagged twice and proceeded past.** ROADMAP's Dynamic Social Evolution stage says the Ibn
+Khaldun dynastic cycle *"needs a large settled/stratified polity (a keystone chief + succession crisis); the
+current model tops out at mobile-forager bands ~25, so the settlement/high-tier-resource substrate is a
+PREREQUISITE."* The prerequisite was recorded and the elite layer was built at village scale anyway.
+
+**Where the next rung is already visible in filed sources:** the gumsa premises describe *"all settlements under
+one chief"* with tribute flowing upward; Flannery ch.16 (Tonga) gives sacred/secular chief splits, assassination
+constrained by mana, and resource allocation as the balancing knob — filed, extracted, and unbuilt. R-64 already
+produces stratified CENTRES above ordinary villages, so the substrate has the beginnings of a hierarchy that the
+political layer was never attached to.
+
+**CONSEQUENCE for DE-14:** its conclusion ("cycles require the explicit Turchin elite layer") is now SUPERSEDED —
+the elite layer is necessary-but-not-sufficient. See the dated revision there.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
