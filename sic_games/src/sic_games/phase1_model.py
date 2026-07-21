@@ -2531,6 +2531,33 @@ class TerrainWorld(mesa.Model):
             groups.setdefault(find(c), []).extend(occ)
         return list(groups.values())
 
+    def _rank_units(self) -> dict:
+        """R-96 — agent → the COMMUNITY that grants and revokes its rank.
+
+        The settlement when village-scale resentment is on (Leach's gumlao premises describe villages with
+        headmen and councils), else the band. Shared by `_do_legitimacy`, `_do_delegitimation` and the
+        diagnostics so all four cannot drift apart on what a community is."""
+        vil = self._demog is not None and getattr(self._demog, "enable_village_resentment", False)
+        out = {}
+        for a in self.agent_list:
+            if vil:
+                site = self._nearest_settlement(a.pos)
+                out[a] = ("v", site) if site is not None else ("b", a._group.band_id)
+            else:
+                out[a] = a._group.band_id
+        return out
+
+    def _rank_keys(self) -> dict:
+        """R-96 — agent → the key under which its lineage's rank is held.
+
+        GLOBAL mode (default): the lineage id, so a lineage is noble everywhere at once. LOCAL mode: the pair
+        (community, lineage), so it is noble IN A PLACE. Polymorphic on purpose — every consumer indexes the
+        same sets and dicts either way, so OFF is bit-exact rather than a parallel code path."""
+        if self._demog is None or not getattr(self._demog, "enable_local_ascription", False):
+            return {a: getattr(a, "_lineage", None) for a in self.agent_list}
+        units = self._rank_units()
+        return {a: (units[a], getattr(a, "_lineage", None)) for a in self.agent_list}
+
     def _do_legitimacy(self) -> None:
         """DM-F1 / R-86 — THE LEGITIMACY CHANNEL: how ACHIEVED success becomes ASCRIBED rank.
 
@@ -2569,15 +2596,21 @@ class TerrainWorld(mesa.Model):
         ff = cfg.legit_feast_frac
         if ff <= 0.0:
             return
+        # R-96: feasting, and the standing it buys, are reckoned WITHIN a community — the same community that
+        # can later revoke the rank. Grouping and revocation must share a unit or a lineage can be ennobled by
+        # one body and stripped by another.
+        _local = getattr(cfg, "enable_local_ascription", False)
+        _units = self._rank_units() if _local else None
         by_band: dict = {}
         for a in self.agent_list:
             lid = getattr(a, "_lineage", None)
             if lid is not None:
-                by_band.setdefault(a._group.band_id, {}).setdefault(lid, []).append(a)
+                unit = _units[a] if _local else a._group.band_id
+                by_band.setdefault(unit, {}).setdefault(lid, []).append(a)
 
         alpha = cfg.legit_decay                       # EMA weight: legitimacy tracks long-run ritual standing
         rel_legit = getattr(cfg, "enable_relative_legitimacy", False)   # R-93: scale-free crossing test
-        for lins in by_band.values():
+        for unit, lins in by_band.items():
             spend, total = {}, 0.0
             guests = [a for ms in lins.values() for a in ms]
             for lid, ms in lins.items():
@@ -2601,13 +2634,14 @@ class TerrainWorld(mesa.Model):
             self.feast_spend_this_step += total
             for lid, s in spend.items():
                 share = s / total
+                key = (unit, lid) if _local else lid
                 if rel_legit:
                     # R-93: scale by how many lineages are actually competing here, so the stock is a RELATIVE
                     # share — 1.0 means "exactly what an average lineage contributed", independent of how many
                     # lineages the band happens to hold. Without this the mean share is 1/len(lins), so a fixed
                     # threshold silently stops discriminating once diversity falls below 1/threshold.
                     share *= len(lins)
-                self._lineage_legit[lid] = (1.0 - alpha) * self._lineage_legit.get(lid, 0.0) + alpha * share
+                self._lineage_legit[key] = (1.0 - alpha) * self._lineage_legit.get(key, 0.0) + alpha * share
 
         thr = cfg.legit_rel_multiplier if rel_legit else cfg.legit_threshold
         cg = cfg.legit_cred_gain
@@ -2633,8 +2667,9 @@ class TerrainWorld(mesa.Model):
         # WINS — measured cred Gini 0.968–0.988, i.e. one lineage holding essentially everything (the R-66
         # winner-take-all failure mode). Same lesson as R-81: a sustained multiplicative push beats a
         # contraction. Relaxing toward a target is bounded by construction.
+        _keys = self._rank_keys()
         for a in self.agent_list:
-            if getattr(a, "_lineage", None) in self._lineage_ascribed:
+            if _keys[a] in self._lineage_ascribed:
                 a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)
                 self.legitimated_this_step += 1
 
@@ -2766,6 +2801,7 @@ class TerrainWorld(mesa.Model):
         # councils), not 25-person residential bands. Keyed by SETTLEMENT SITE, following R-71's precedent
         # exactly: the place remembers while its members churn. Agents outside any settlement keep the band.
         vil = getattr(cfg, "enable_village_resentment", False)
+        rkeys = self._rank_keys()                # R-96: rank is held per community when local ascription is on
         members: dict = {}
         pop_oth_cred = []
         for a in self.agent_list:
@@ -2775,7 +2811,7 @@ class TerrainWorld(mesa.Model):
             else:
                 key = a._group.band_id
             members.setdefault(key, []).append(a)
-            if getattr(a, "_lineage", None) not in self._lineage_ascribed:
+            if rkeys[a] not in self._lineage_ascribed:
                 pop_oth_cred.append(a.cred)
         # R-89: population-wide commoner baseline, used only when a band has ascribed members but none of its
         # own commoners left. Ultimate fallback (no commoner alive anywhere) is the model's own default cred.
@@ -2789,8 +2825,8 @@ class TerrainWorld(mesa.Model):
             pop_oth_n, pop_oth_s, pop_oth_q = 1, 1.0, 1.0        # matches the pop_m_o=1.0 ultimate fallback
 
         for bid, ms in members.items():
-            asc = [a for a in ms if getattr(a, "_lineage", None) in self._lineage_ascribed]
-            oth = [a for a in ms if getattr(a, "_lineage", None) not in self._lineage_ascribed]
+            asc = [a for a in ms if rkeys[a] in self._lineage_ascribed]
+            oth = [a for a in ms if rkeys[a] not in self._lineage_ascribed]
             if not asc:
                 # no ranked lineage in this band ⇒ nothing to resent; let it cool
                 self._band_resentment[bid] = self._band_resentment.get(bid, 0.0) * (1.0 - alpha)
@@ -2840,9 +2876,12 @@ class TerrainWorld(mesa.Model):
                 fired = r >= thr
             if fired:
                 # THE REVERSION. Every lineage present loses ascription; the band is gumlao again.
+                # R-96: strip only THIS community's rank. Under the global set this discarded the lineage
+                # everywhere, so one village's revolt de-ranked it in every other village — measured R-95 at
+                # ~7% of all lineages per revolt, which annihilated nobility instead of cycling it.
                 for a in ms:
-                    self._lineage_ascribed.discard(getattr(a, "_lineage", None))
-                    self._lineage_legit.pop(getattr(a, "_lineage", None), None)
+                    self._lineage_ascribed.discard(rkeys[a])
+                    self._lineage_legit.pop(rkeys[a], None)
                 self._band_resentment[bid] = 0.0
                 self.reversions_this_step += 1
             else:
@@ -2853,6 +2892,14 @@ class TerrainWorld(mesa.Model):
             for k in list(self._band_resentment):
                 if k not in live:
                     self._band_resentment.pop(k, None)
+        if getattr(cfg, "enable_local_ascription", False):
+            # R-96: and forget the RANK of a community that no longer exists, or the sets grow without bound
+            # across a long campaign as villages come and go.
+            livek = set(rkeys.values())
+            self._lineage_ascribed.intersection_update(livek)
+            for k in list(self._lineage_legit):
+                if k not in livek:
+                    self._lineage_legit.pop(k, None)
 
     def gumsa_state(self) -> dict:
         """R-87 diagnostic: the ranked/egalitarian regime split. `frac_gumsa` is the fraction of bands holding at
@@ -2864,8 +2911,9 @@ class TerrainWorld(mesa.Model):
             members.setdefault(a._group.band_id, []).append(a)
         if not members:
             return {"n_bands": 0, "frac_gumsa": 0.0, "mean_resentment": 0.0, "max_resentment": 0.0}
+        rk = self._rank_keys()
         ranked = sum(1 for ms in members.values()
-                     if any(getattr(a, "_lineage", None) in self._lineage_ascribed for a in ms))
+                     if any(rk[a] in self._lineage_ascribed for a in ms))
         rs = [self._band_resentment.get(b, 0.0) for b in members]
         return {
             "n_bands": len(members),
@@ -2879,7 +2927,8 @@ class TerrainWorld(mesa.Model):
         Friedman's "descended from higher nats". Pure observer."""
         if self._demog is None or not getattr(self._demog, "enable_legitimacy", False):
             return {"n_lineages": 0, "n_legit": 0, "n_ascribed": 0, "ascribed_frac_pop": 0.0, "mean": 0.0, "max": 0.0, "legit_frac_pop": 0.0}
-        live = {getattr(a, "_lineage", None) for a in self.agent_list}
+        rk = self._rank_keys()                   # R-96: a key is a lineage id, or (community, lineage) when local
+        live = set(rk.values())
         vals = [v for k, v in self._lineage_legit.items() if k in live]
         thr = self._demog.legit_threshold
         over = {k for k, v in self._lineage_legit.items() if v > thr and k in live}
@@ -2889,8 +2938,7 @@ class TerrainWorld(mesa.Model):
             "n_lineages": len(vals),
             "n_legit": len(over),
             "n_ascribed": len(asc),
-            "ascribed_frac_pop": (sum(1 for a in self.agent_list
-                                      if getattr(a, "_lineage", None) in asc) / len(self.agent_list))
+            "ascribed_frac_pop": (sum(1 for a in self.agent_list if rk[a] in asc) / len(self.agent_list))
                                  if self.agent_list else 0.0,
             "mean": (sum(vals) / len(vals)) if vals else 0.0,
             "max": max(vals) if vals else 0.0,

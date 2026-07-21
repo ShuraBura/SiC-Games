@@ -829,6 +829,16 @@ class DemographyConfig(BaseModel):
     #     zero. Leach's gumlao premises describe VILLAGES ("villages autonomous", headmen, councils of elders),
     #     not 25-person residential bands, so the settlement is both the lit-correct unit AND the one that
     #     persists. Follows R-71's per-SITE precedent exactly: the place remembers, the members churn.
+    # ── LOCAL ascription (R-96). `_lineage_ascribed` was a GLOBAL set while every mechanism acting on it is
+    # LOCAL, so one village's revolt de-ranked that lineage in EVERY other village at once. Measured (R-95):
+    # ~7% of all lineages stripped per revolt, and nobility went from 82% of villages to 3% — annihilated
+    # rather than cycled. It contradicts the anchor directly: Leach's observation is that communities sit in
+    # DIFFERENT states simultaneously ("shifting back and forth"), which a single global set cannot represent.
+    # With this on, rank is held per (community, lineage): a lineage is noble IN A PLACE, and a revolt touches
+    # only the community that revolted. The community is the settlement when village resentment is on, else
+    # the band. Rank is NOT portable — a family that moves must earn standing where it arrives, which is what
+    # "villages autonomous" implies.
+    enable_local_ascription: bool = False
     enable_resentment_accumulator: bool = False
     resent_years_to_revolt: float = Field(80.0, gt=0.0)   # yr to revolt at UNIT privilege (effect size 1.0);
     # [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then

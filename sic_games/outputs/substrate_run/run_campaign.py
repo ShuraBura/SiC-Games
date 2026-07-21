@@ -76,6 +76,7 @@ RESEFF    = float(os.environ.get("C_RESEFF", "0.8"))     # R-94 reversion effect
 RESACC    = os.environ.get("C_RESACC", "0") == "1"       # R-95 resentment ACCUMULATES (vs merely tracking)
 RESVIL    = os.environ.get("C_RESVIL", "0") == "1"       # R-95 the VILLAGE holds the grudge, not the band
 RESYTR    = float(os.environ.get("C_RESYTR", "80"))      # R-95 yr to revolt at unit privilege [Leach ~60-100]
+LOCASC    = os.environ.get("C_LOCASC", "0") == "1"       # R-96 rank held per (community, lineage), not globally
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 # T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
@@ -93,7 +94,7 @@ ELITE_KW = dict(
     enable_relative_legitimacy=RELLEGIT, legit_rel_multiplier=RELMULT,
     enable_relative_resentment=RELRES, resent_effect_threshold=RESEFF,
     enable_resentment_accumulator=RESACC, enable_village_resentment=RESVIL,
-    resent_years_to_revolt=RESYTR,
+    resent_years_to_revolt=RESYTR, enable_local_ascription=LOCASC,
 ) if ELITE else {}
 
 PROG  = os.path.join(HERE, f"campaign_progress{TAG}.txt")
