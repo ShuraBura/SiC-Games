@@ -783,6 +783,21 @@ class DemographyConfig(BaseModel):
     # cap, destroying the very statistic T-9 measures against Zerjal/Yan. Rate 0.0 ⇒ no RNG draw ⇒ bit-exact.
     enable_lineage_branching: bool = False
     lineage_branch_rate: float = Field(0.0, ge=0.0, le=1.0)   # per-BIRTH prob the child founds a new named line
+    # ── LINEAGE SEGMENTATION (R-92) — the CORRECTED SHAPE of the above. Per-birth branching mints SINGLETONS,
+    # and a lineage of one usually leaves no descendants, so it adds a churning tail of ephemeral names that
+    # inflates the COUNT while the dominant line keeps its mass untouched. Measured (R-90, campaign scale):
+    # n_lineages 5→32 but eff_lineages (inverse-Simpson) FELL 3.4→1.8 and top_share ROSE 0.42→0.73 — diversity
+    # up on paper, down in substance, and lineages_per_band barely moved (2.14→2.33 against a target of ~7).
+    # Real Y-haplogroup trees do not sprout singletons at the tip; an existing line SEGMENTS into sub-clades
+    # that inherit real membership. So: pick a living member as the apical ancestor and split off ALL of its
+    # live patrilineal descendants as a new named line. Both halves are viable and both stay spread across
+    # bands, which is what lifts per-band diversity toward the Hill 2011 target.
+    # NB this is NOT the size-CAPPED segmentation rejected in R-90: hazard scales with size (a Yule process,
+    # which is what generates realistic skewed haplogroup distributions) but nothing bounds a lineage's size,
+    # so `top_share` stays a free measurement rather than an artifact of a threshold.
+    enable_lineage_split: bool = False
+    lineage_split_rate: float = Field(0.0, ge=0.0, le=1.0)    # per-MEMBER per-step hazard (lineage hazard = rate·n)
+    lineage_split_min_segment: int = Field(8, ge=1)           # both halves must reach this, else the split is skipped
     # ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo
     # instead of the blind spatial aggregation_radius. A ~25-band is too small to self-mate under a real prohibition →
     # marriage must reach across bands → the pool self-organizes to ~connubium scale. blueprint …_Connubium. Default OFF

@@ -315,6 +315,7 @@ class TerrainWorld(mesa.Model):
         self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
         self._next_lineage_id: int = 0                         # R-90: lineage-id allocator for BRANCHING (new named
         # lines founded post-hoc). Bumped past the founder block below, since founders take ids 0..n_agents-1.
+        self._next_subclan_id: int = 0                         # R-92: allocator for heritable sub-branch tags
         self._next_band_id: int = 0                            # band-id allocator. Initialised UNCONDITIONALLY: the
         # F.3c-1 seeding block below re-zeroes it under `enable_band_affiliation` (bit-exact), but `_maintain_leader_office`
         # runs OUTSIDE that guard and allocates from it on a desertion-with-nowhere-to-go — so with affiliation OFF the
@@ -391,8 +392,11 @@ class TerrainWorld(mesa.Model):
             if self._founder_buffer_steps > 0.0:         # carried mobile reserve for the founding transient
                 agent._founder_store = self._founder_buffer_steps * self._burn
             agent._lineage = fid                         # each founder seeds a unique lineage (patriline tracking)
+            agent._subclan = fid                         # R-92: and its first sub-branch
             if fid >= self._next_lineage_id:             # R-90: keep the branch allocator clear of founder ids
                 self._next_lineage_id = fid + 1
+            if fid >= self._next_subclan_id:
+                self._next_subclan_id = fid + 1
             if self._demog is not None and getattr(self._demog, "enable_genome", False):
                 agent._genome = Genome.founder(self.random, loci=self._demog.genome_loci)   # unique founder signature
             if self._demog is not None:
@@ -482,6 +486,10 @@ class TerrainWorld(mesa.Model):
         agent._mother = None                      # C.2b mother-link (set at IBI birth) for provisioning
         agent._father = None                      # B+ step 4: father-link (set at IBI birth via mate-choice)
         agent._lineage = None                     # lineage-tracking ID (founder-seeded; patrilineal descent)
+        agent._subclan = None                     # R-92: heritable SUB-branch tag within the lineage. Inherited
+        # patrilineally exactly like `_lineage`, so members sharing a tag ARE a descent group BY CONSTRUCTION —
+        # which is what makes a genealogically coherent split possible without walking ancestor chains (measured:
+        # live patriline chains in this model are at most 2 deep, so chain-walking cannot find a real sub-clade).
         agent._genome = None                      # neutral-marker genome (population genetics; founder-seeded / inherited when enabled)
         # P6 social capital: relational standing — accrues with tenure among co-resident band, lost on leaving (Wiessner hxaro)
         agent._use_standing = self._demog is not None and getattr(self._demog, "enable_standing", False)
@@ -512,6 +520,7 @@ class TerrainWorld(mesa.Model):
         self.legitimated_this_step = 0                # R-86 diag: agent-steps receiving the legitimated-lineage cred boost
         self.reversions_this_step = 0                 # R-87 diag: bands reverting gumsa → gumlao this step
         self.lineage_branches_this_step = 0           # R-90 diag: births founding a NEW named descent line
+        self.lineage_splits_this_step = 0             # R-92 diag: lineages SEGMENTING into two named sub-clades
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -567,6 +576,8 @@ class TerrainWorld(mesa.Model):
                     self._maintain_village_budding()   # Bandy 2004: large village sheds a rival-led daughter (relocates)
             self._maintain_leader_office()        # R-84: tenure the office; Boehm deposition (9) / desertion (17)
             self._do_births_ibi()
+            self._do_lineage_split()   # R-92: named lines SEGMENT into sub-clades (after births, so newborns
+                                       # are already placed in their father's line and can be carried by a split)
         elif self._reproduction:
             self._do_births()
         self.occupied = {a.pos for a in self.agent_list}
@@ -2177,12 +2188,20 @@ class TerrainWorld(mesa.Model):
                 if a._genome is not None:                                   # neutral genome: Mendelian ½/½ (uniparental if father unresolved)
                     child._genome = Genome.inherit(a._genome, getattr(child._father, "_genome", None),
                                                    self.random, mutation=cfg.genome_mutation)
-                # R-90 LINEAGE BRANCHING — applied here, AFTER both the matriline default and the patriline
-                # override above have settled `child._lineage`, so it is the final assignment either way.
+                # R-92: the SUB-BRANCH tag, inherited patrilineally exactly like `_lineage` (matriline fallback
+                # when no father was resolved), so a shared tag always means a shared descent group.
+                _f = getattr(child, "_father", None)
+                child._subclan = _f._subclan if _f is not None else a._subclan
+                # R-90 BRANCHING, RESHAPED (R-92). It used to mint a whole new LINEAGE here, which made every new
+                # line a SINGLETON — and a lineage of one usually dies, so it produced a churn of ephemeral names:
+                # measured n_lineages 5→32 while eff_lineages FELL 3.4→1.8 and top_share ROSE 0.42→0.73. Count up,
+                # substance down. It now seeds a new SUB-CLAN instead, where starting at one member is harmless:
+                # the tag either grows into a real body of kin or vanishes unnoticed. Only once it HAS grown can
+                # `_do_lineage_split` promote it to a full lineage — so new lineages are born viable, not tiny.
                 # `lbr == 0.0` ⇒ no RNG draw at all ⇒ the stream is untouched ⇒ bit-exact.
                 if lbr > 0.0 and self.random.random() < lbr:
-                    child._lineage = self._next_lineage_id
-                    self._next_lineage_id += 1
+                    child._subclan = self._next_subclan_id
+                    self._next_subclan_id += 1
                     self.lineage_branches_this_step += 1
                 newborns.append(child)
                 self.births_this_step += 1
@@ -2608,6 +2627,83 @@ class TerrainWorld(mesa.Model):
             if getattr(a, "_lineage", None) in self._lineage_ascribed:
                 a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)
                 self.legitimated_this_step += 1
+
+    def _do_lineage_split(self) -> None:
+        """R-92 — LINEAGE SEGMENTATION: an existing named line splits into two real sub-clades.
+
+        TYPE **N (Novelty)** · UNIT **LINEAGE** · INVARIANT conserves membership exactly (every agent keeps a
+        lineage; the two segments partition the old one) · ANCHOR the RATE is calibrated against
+        [Hill et al. 2011, FILED] via MODEL_SPEC §4.8.8 (~7 lineages/band, dominant-lineage share 0.38).
+
+        WHY THIS REPLACES R-90's PER-BIRTH BRANCHING. That minted SINGLETONS, and a lineage of one usually dies,
+        so it produced a churn of ephemeral names: n_lineages rose 5→32 while eff_lineages FELL 3.4→1.8 and
+        top_share ROSE 0.42→0.73. Count up, substance down. Real haplogroup trees segment — the sub-clade
+        inherits an existing body of members, so both halves persist and both stay spread across bands, which is
+        what per-band diversity actually needs.
+
+        THE CLEAVAGE IS GENEALOGICAL, not random. A random half would not be a descent group at all, and it
+        would put close kin into different lineages — which matters because `_lineage` is also the patriclan
+        EXOGAMY unit (`exogamy_degree="lineage"`). The cleavage is the heritable `_subclan` tag: inherited
+        patrilineally exactly like `_lineage`, so agents sharing a tag ARE a descent group by construction.
+
+        WHY NOT WALK ANCESTOR CHAINS, which was the first cut and does not work. Splitting off "the live
+        patrilineal descendants of an apical ancestor" is the textbook definition of a sub-clade, but it is not
+        computable here: MEASURED, live `_father` chains in this model reach a maximum depth of 2 (median 1) even
+        after 400 steps, because a chain terminates at the first ancestor born without an assigned father and
+        early births largely lack one (father-link rate 19% at step 80, rising to 74% by step 400). Deep ancestry
+        exists only in the offline genealogy CSV, never in memory. So the sub-clade has to be CARRIED as an
+        inherited tag rather than reconstructed on demand — which is also, conveniently, exactly what a
+        Y-haplogroup label is.
+
+        HAZARD SCALES WITH SIZE (`rate·n`) — the Yule process, which is what generates the skewed lineage-size
+        distributions real haplogroup data shows. It applies no CEILING: a big lineage segments more often, but
+        nothing bounds how large it may become, so `top_share` remains a free measurement. This is the specific
+        distinction from the size-TRIGGERED segmentation rejected in R-90, which would have made `top_share` an
+        artifact of the trigger and destroyed the statistic T-9 compares against Zerjal 2003 / Yan 2014.
+
+        DEGENERATE SPLITS ARE SKIPPED, not forced: if either side would fall below `lineage_split_min_segment`
+        the draw is spent and nothing happens. That both avoids re-creating the singleton problem and makes the
+        apical ancestor effectively selected from mid-tree, without needing to rank candidates.
+
+        Off (or rate 0) ⇒ returns before any RNG draw ⇒ bit-exact."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_lineage_split", False):
+            return
+        rate = cfg.lineage_split_rate
+        if rate <= 0.0:
+            return
+        min_seg = cfg.lineage_split_min_segment
+
+        groups: dict = {}
+        for a in self.agent_list:
+            lid = getattr(a, "_lineage", None)
+            if lid is not None:
+                groups.setdefault(lid, []).append(a)
+
+        for lid, ms in sorted(groups.items()):          # sorted ⇒ deterministic iteration order
+            n = len(ms)
+            if n < 2 * min_seg:
+                continue
+            if self.random.random() >= min(1.0, rate * n):
+                continue
+            subs: dict = {}
+            for x in ms:
+                subs.setdefault(getattr(x, "_subclan", None), []).append(x)
+            if len(subs) < 2:
+                continue                                 # one undivided descent group — nothing to segment along
+            # The LARGEST sub-branch that leaves both sides viable secedes. Largest-first is the ethnographic
+            # shape (a lineage segments along its major cleavage, not a random twig) and it is what makes the
+            # daughter line born big enough to persist — the whole point of the R-90 correction.
+            for _, seg in sorted(((len(v), k) for k, v in subs.items()), reverse=True):
+                seg = subs[seg]
+                if len(seg) < min_seg or n - len(seg) < min_seg:
+                    continue
+                new_id = self._next_lineage_id
+                self._next_lineage_id += 1
+                for x in seg:
+                    x._lineage = new_id
+                self.lineage_splits_this_step += 1
+                break                                    # one segmentation per lineage per step
 
     def _do_delegitimation(self) -> None:
         """R-87 / DM-F1 stage 2 — the gumsa → gumlao COLLAPSE, and the H-CYCLES test.

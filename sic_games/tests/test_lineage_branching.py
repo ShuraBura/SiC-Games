@@ -1,4 +1,11 @@
-"""R-90 — LINEAGE BRANCHING: a named descent group can be founded, not only inherited or lost.
+"""R-90 — BRANCHING: new heritable sub-branches appear, so descent is not a pure absorbing process.
+
+RESHAPED BY R-92, and these tests were rewritten with it. Branching originally minted a whole new LINEAGE per
+birth, which made every new line a SINGLETON; singletons mostly die, so it added a churn of ephemeral names
+that inflated the COUNT while concentration got WORSE (campaign scale: n_lineages 5->32 but eff_lineages
+3.4->1.8, top_share 0.42->0.73). It now seeds a `_subclan` tag instead, where starting at one member is
+harmless — the tag either grows into a real body of kin or vanishes. `_do_lineage_split` (R-92) promotes one
+to a full lineage only once it HAS grown, so new lineages are born viable. See test_lineage_split.py.
 
 CHARTER DECLARATION (MECHANISM_CHARTER §3.1):
   TYPE      N (Novelty) — introduces a new label into a heritable discrete space.
@@ -65,37 +72,48 @@ def test_off_is_bit_exact():
     assert a.lineage_branches_this_step == b.lineage_branches_this_step == 0
 
 
-def test_branching_fires_and_mints_fresh_ids():
-    """A branched child must get an id that collides with NO founder and no earlier branch.
-
-    RATE 0.3 IS DELIBERATE, and the first cut of this test got it wrong. At 0.05 this world produces ~51
-    births in 60 steps ⇒ ~2.6 expected branches ⇒ P(zero) ≈ 0.95^51 ≈ 7%, and seed 0 duly drew zero, failing
-    a test whose mechanism was in fact working (verified: at rate 1.0 every birth branches). A presence
-    assertion has to be POWERED, not merely true in expectation — at 0.3 the expected count is ~15 and
-    P(zero) ≈ 1e-8."""
+def test_branching_fires_and_mints_fresh_subclan_ids():
+    """Branching now tags SUB-BRANCHES, not lineages. Rate 0.3 is deliberate: at 0.05 this world yields ~51
+    births in 60 steps => ~2.6 expected events => P(zero) ~ 7%, and the first cut of this test duly drew zero
+    and failed on a working mechanism. A presence assertion has to be POWERED."""
     w = _world(branch=True, rate=0.3)
     seen_new = set()
     for _ in range(60):
         w.step()
         assert w.agent_list
         for a in w.agent_list:
-            if a._lineage is not None and a._lineage >= 260:      # 260 founders ⇒ ids 0..259
-                seen_new.add(a._lineage)
+            if a._subclan is not None and a._subclan >= 260:      # 260 founders => tags 0..259
+                seen_new.add(a._subclan)
     assert seen_new, "branching never fired at rate 0.3"
-    assert w._next_lineage_id > 260
-    # every minted id is unique BY CONSTRUCTION (monotone allocator); assert no live agent shares a branch id
-    # with a founder id range it should not occupy
+    assert w._next_subclan_id > 260
     assert all(i >= 260 for i in seen_new)
 
 
-def test_branching_raises_lineage_diversity():
-    """THE POINT: branching must hold lineage count UP against the drift that otherwise fixates it."""
+def test_branching_alone_does_not_create_lineages():
+    """THE R-92 CORRECTION, asserted. Branching must no longer touch `_lineage` at all — a new named line may
+    only arrive via segmentation, which guarantees it is born with real membership."""
+    w = _world(branch=True, rate=0.3)
+    founders = {a._lineage for a in w.agent_list}
+    for _ in range(60):
+        w.step()
+        assert w.agent_list
+    assert {a._lineage for a in w.agent_list} <= founders, "branching minted a lineage — singleton regression"
+
+
+def test_branching_raises_subclan_diversity():
+    """It must hold SUB-BRANCH diversity up against drift — that is the pool segmentation later draws on.
+
+    NB the previous version of this test compared LINEAGE counts and still passed after the R-92 reshaping,
+    which it should not have: branching no longer touches `_lineage`, so it was passing purely because adding
+    an RNG draw shifts the whole stream and yields a different trajectory. A false pass, kept in mind here."""
+    def subclans(w):
+        return len({a._subclan for a in w.agent_list})
     off = _world(branch=False, seed=5)
-    on = _world(branch=True, rate=0.3, seed=5)     # powered, per the note in the fires-and-mints test
+    on = _world(branch=True, rate=0.3, seed=5)
     for _ in range(120):
         off.step(); on.step()
         assert off.agent_list and on.agent_list
-    assert on.dynasties()["n_lineages"] > off.dynasties()["n_lineages"]
+    assert subclans(on) > subclans(off)
 
 
 def test_branching_does_not_cap_top_share():
