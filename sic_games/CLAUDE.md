@@ -224,6 +224,23 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     floor** on the same axes, so the reader can see whether the signal clears them rather than taking a verdict
     on trust. Persist the raw series (D8) so a plot can be redrawn without re-running the model.
 
+20. **CHECK THE BIOME-DEPENDENCE of every mechanism before generalising it (added 2026-07-21).**
+    A mechanism validated in ONE world is a claim about that world. Ask of each: *is this universal, or is it
+    the signature of a particular ecology?* — and where the ethnographic source names a setting, **run that
+    setting**, not a convenient one. Record the world beside the result: `coastal-temperate`, `C_SOIL=0` are
+    part of the finding, not run trivia. **Worked example:** the entire R-86…R-96 elite/legitimacy arc was
+    built and validated only in `coastal-temperate` with soil depletion OFF, while its anchor — Leach's Kachin
+    gumsa/gumlao cycle — describes RAIN-FED SWIDDEN HILL FARMERS. Worse, R-71 had ALREADY measured that this
+    model yields two regimes from terrain alone (rain-fed swidden → egalitarian, strat 0.4%; alluvial floodplain
+    → stratified, 11–16%), so terrain-dependence was a known property of the substrate that the elite layer was
+    never once tested against.
+    **It cuts both ways:** a mechanism that works in only one biome may be broken, or may be a genuine
+    PREDICTION about where the phenomenon occurs — but only if the sweep is run deliberately. And when a
+    mechanism does look biome-dependent, hold the confound fixed with a same-biome arm toggling only the
+    suspected driver: swidden also drives constant relocation, so a cycle appearing there could be the ecology
+    or could be villages dissolving before a village-held memory matures (the R-88/R-95 container-churn failure
+    in a new costume). See MECHANISM_CHARTER §10 D16.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction

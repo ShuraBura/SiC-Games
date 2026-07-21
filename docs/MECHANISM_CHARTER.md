@@ -415,12 +415,43 @@ constant is unavoidable, record its validity domain beside it in PARAMETERS and 
 calibrated against a mechanism that is later fixed** - repairing an upstream mechanism moves the regime out
 from under everything downstream that was tuned to it.
 
+
+**D16 — CHECK THE BIOME-DEPENDENCE OF EVERY MECHANISM BEFORE GENERALISING IT.** A mechanism validated in one
+world is a claim about that world until tested in another. Ask of every new mechanism: *is this universal, or is
+it the signature of a particular ecology?* — and where the ethnographic case has a known setting, RUN THAT
+SETTING, not a convenient one.
+
+*(The whole R-86…R-96 elite/legitimacy arc was built and validated exclusively in `coastal-temperate` with soil
+depletion OFF. The anchor is Leach's Kachin gumsa/gumlao cycle, and the Kachin are RAIN-FED SWIDDEN HILL
+FARMERS — which is not that world, and is in fact the regime R-71 had already measured as ANTI-hierarchical
+(stratification 0.4% under rotating swidden vs 11–16% in the same world without soil depletion). So a mechanism
+whose whole purpose is to make hereditary rank rise and collapse was never once run in the ecology its source
+describes. Worse, R-71 had ALREADY established that this model produces two regimes from terrain alone —
+rain-fed swidden → mobile/egalitarian, alluvial floodplain → sedentary/stratified — so terrain-dependence was a
+known property of the substrate that the elite layer was nonetheless never tested against.)*
+
+**This cuts both ways, and the second way is the interesting one.** A mechanism that only works in one biome may
+be BROKEN — or it may be a genuine prediction about where the phenomenon occurs. Leach's cycle plausibly needs a
+setting rich enough to generate rank but too unstable to hold it: persistent hierarchy on floodplains, no
+hierarchy in marginal country, and CYCLING only in the band between. That is a result worth having, but only if
+the biome sweep is run deliberately rather than discovered by accident years later.
+
+**Practice.** (a) Record the world a mechanism was validated in, beside its result — `coastal-temperate`,
+`C_SOIL=0` and so on are part of the finding, not run trivia. (b) Where the anchor names an ecology, run that
+ecology. (c) When a mechanism looks biome-dependent, hold the CONFOUND fixed: swidden drives constant
+relocation, so a cycle appearing there might be the ecology or might be villages dissolving before a
+village-held memory matures — the same container-churn failure as R-88/R-95 in a new costume. Separate them with
+a same-biome arm that toggles only the suspected driver.
+
 ### The habit these encode
 
 Before reporting any result, ask: **if the effect I am claiming (or denying) were absent (or present), would this
 instrument have told me?** If that question has not been answered with a run, the result is not yet a finding.
 D1 and D2 are the two that would have caught the most, and they are the cheapest — a positive control and a null
 floor are usually a few lines against synthetic data, with no model run at all.
+
+And ask the second question (D16): **in which world is this true?** A result carries the world it was measured
+in. Ten results from one biome are one result.
 
 
 ---

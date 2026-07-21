@@ -166,3 +166,11 @@ fraction: here the fraction moved 0.655 -> 0.757 (reads as a large mechanism eff
 | 7 | `lineages_per_band` can reach the Hill target by raising the split rate | computed the null two independent ways (binomial and Poisson), agreeing to 2dp | **FALSIFIED** - expected distinct lineages in a band of ~29 equals `eff_lineages`, so lpb is CAPPED by it. Rate increases LOWER eff_lineages. Ceiling lifted later by R-93 instead. |
 | 8 | the R-91 checker's DOMAIN rule is correct under relative legitimacy | ran the checker on the R-93 arm, live vs offline | **DEFECT FOUND** - the offline CLI produced a false positive because trajectory `meta` did not record the mode; the live harness was correct. `meta` now carries it. |
 | 9 | a quiet reversion counter means the mechanism is dead | inspected the R-93 trajectory | **DEFECT FOUND** - at step 475 the EMA had simply not matured (resent_alpha=0.001 ~ 1000-step constant). Right outcome, wrong stated cause. Rule now separates STOPPED from NEVER-FIRED. |
+
+### Biome-dependence audit of the elite layer (2026-07-21)
+
+| # | claim | how checked | result |
+|---|---|---|---|
+| 1 | Leach's gumsa/gumlao cycle is a general social dynamic | read the filed LITERATURE entry | **QUALIFIED** — Flannery prefers Friedman's endogenous scenario *"to Leach's, which needs Shan princes to intervene"*. Leach's own model requires adjacent valley STATES. The code implements Friedman's version, so the cycle was kept while its stated cause was dropped — a deliberate choice, but one that had not been written down as a limitation. |
+| 2 | the elite layer was validated across worlds | re-read the run configs of R-89…R-96 | **FALSIFIED** — every arm was `coastal-temperate` with `C_SOIL=0`. The mechanism's own ethnographic source describes rain-fed swidden hill farmers. |
+| 3 | terrain-dependence of hierarchy was unknown | grepped RESULTS | **ALREADY KNOWN** — R-71 measured two regimes from terrain alone (rain-fed swidden → EGALITARIAN, strat 0.4%; alluvial floodplain → STRATIFIED, 11–16%). The elite layer was built on top of that finding without ever being tested against it. |
