@@ -773,6 +773,16 @@ class DemographyConfig(BaseModel):
     enable_genome: bool = False
     genome_loci: int = Field(32, ge=1)                    # number of neutral loci (relatedness resolution ~1/L)
     genome_mutation: float = Field(0.0, ge=0.0, le=1.0)   # per-locus per-birth mutation prob (0 = pure drift / infinite-allele)
+    # ── LINEAGE BRANCHING (R-90). `_lineage` (the named patriline/patriclan — the exogamy unit AND the dynasty unit)
+    # was founder-seeded and only ever LOST by extinction, never created: an ABSORBING process that fixates with
+    # probability 1. Measured (R-89): 3000 founding lines drifted to 5 by step 1950 and stuck there, which (a) breaks
+    # the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage share 0.38 that R-25 already passed, and
+    # (b) freezes the elite layer, since with no non-ascribed lineage left the gumsa→gumlao reversion cannot fire.
+    # Real named descent groups both die AND branch. Same INFINITE-ALLELE device genome_mutation already uses.
+    # Deliberately NOT size-triggered segmentation: capping lineage size would make `top_share` an artifact of the
+    # cap, destroying the very statistic T-9 measures against Zerjal/Yan. Rate 0.0 ⇒ no RNG draw ⇒ bit-exact.
+    enable_lineage_branching: bool = False
+    lineage_branch_rate: float = Field(0.0, ge=0.0, le=1.0)   # per-BIRTH prob the child founds a new named line
     # ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo
     # instead of the blind spatial aggregation_radius. A ~25-band is too small to self-mate under a real prohibition →
     # marriage must reach across bands → the pool self-organizes to ~connubium scale. blueprint …_Connubium. Default OFF

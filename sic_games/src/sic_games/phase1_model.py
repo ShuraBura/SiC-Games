@@ -313,6 +313,8 @@ class TerrainWorld(mesa.Model):
         self._band_malnutrition: dict[int, float] = {}         # M2: per-band malnutrition-fission pressure (diagnostic)
         self._band_starv_this_step: dict[int, int] = {}        # M2: starvation deaths per band THIS step (band_id → count)
         self._band_starv_ema: dict[int, float] = {}            # M2: EMA of per-band per-capita starvation rate (the M2 signal)
+        self._next_lineage_id: int = 0                         # R-90: lineage-id allocator for BRANCHING (new named
+        # lines founded post-hoc). Bumped past the founder block below, since founders take ids 0..n_agents-1.
         self._next_band_id: int = 0                            # band-id allocator. Initialised UNCONDITIONALLY: the
         # F.3c-1 seeding block below re-zeroes it under `enable_band_affiliation` (bit-exact), but `_maintain_leader_office`
         # runs OUTSIDE that guard and allocates from it on a desertion-with-nowhere-to-go — so with affiliation OFF the
@@ -389,6 +391,8 @@ class TerrainWorld(mesa.Model):
             if self._founder_buffer_steps > 0.0:         # carried mobile reserve for the founding transient
                 agent._founder_store = self._founder_buffer_steps * self._burn
             agent._lineage = fid                         # each founder seeds a unique lineage (patriline tracking)
+            if fid >= self._next_lineage_id:             # R-90: keep the branch allocator clear of founder ids
+                self._next_lineage_id = fid + 1
             if self._demog is not None and getattr(self._demog, "enable_genome", False):
                 agent._genome = Genome.founder(self.random, loci=self._demog.genome_loci)   # unique founder signature
             if self._demog is not None:
@@ -507,6 +511,7 @@ class TerrainWorld(mesa.Model):
         self.feast_spend_this_step = 0.0              # R-86 diag: material spent on sacrifices/feasts
         self.legitimated_this_step = 0                # R-86 diag: agent-steps receiving the legitimated-lineage cred boost
         self.reversions_this_step = 0                 # R-87 diag: bands reverting gumsa → gumlao this step
+        self.lineage_branches_this_step = 0           # R-90 diag: births founding a NEW named descent line
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -2068,6 +2073,8 @@ class TerrainWorld(mesa.Model):
         bonded = getattr(cfg, "enable_bonded_mating", False)
         pair_bonds = getattr(cfg, "enable_pair_bonds", False)   # F.3a: the durable partner gates + fathers
         loc = getattr(cfg, "enable_band_family_knobs", False)   # F.3c-2b: per-band lineage/descent knobs
+        lbr = (cfg.lineage_branch_rate                          # R-90: per-birth new-named-line prob (0 ⇒ inert)
+               if getattr(cfg, "enable_lineage_branching", False) else 0.0)
         affil = getattr(cfg, "enable_band_affiliation", False)  # F.3a: band-level co-residence for the husband (polygyny)
         mate_r = getattr(cfg, "bonded_mate_radius", 0)
         males_by_cell: dict[tuple[int, int], list] = {}
@@ -2170,6 +2177,13 @@ class TerrainWorld(mesa.Model):
                 if a._genome is not None:                                   # neutral genome: Mendelian ½/½ (uniparental if father unresolved)
                     child._genome = Genome.inherit(a._genome, getattr(child._father, "_genome", None),
                                                    self.random, mutation=cfg.genome_mutation)
+                # R-90 LINEAGE BRANCHING — applied here, AFTER both the matriline default and the patriline
+                # override above have settled `child._lineage`, so it is the final assignment either way.
+                # `lbr == 0.0` ⇒ no RNG draw at all ⇒ the stream is untouched ⇒ bit-exact.
+                if lbr > 0.0 and self.random.random() < lbr:
+                    child._lineage = self._next_lineage_id
+                    self._next_lineage_id += 1
+                    self.lineage_branches_this_step += 1
                 newborns.append(child)
                 self.births_this_step += 1
         self.agent_list.extend(newborns)
@@ -2932,8 +2946,24 @@ class TerrainWorld(mesa.Model):
                                         else getattr(a, "_n_fathered", 0) for a in ms])), 2),
                 relatedness=(round(mean_pairwise_relatedness(gs, self._diag_rng, sample_pairs), 3)
                              if len(gs) >= 2 else None)))
+        # R-90: the PER-BAND lineage composition — the direct read-out for the FILED Hill 2011 target
+        # (~7 lineages/band, dominant-lineage share 0.38) that R-25 passed and R-89's lineage collapse broke.
+        # UNIT: the AFFILIATION band (`_group.band_id`), the same unit R-25 validated on — NOT the spatial
+        # `bands()` partition (D6: the unit is part of the statistic). Bands of 1 are excluded from the
+        # dominant-share mean, where the share is trivially 1.0 and would bias it upward.
+        by_band: dict = {}
+        for a in al:
+            by_band.setdefault(a._group.band_id, []).append(a)
+        lpb, doms = [], []
+        for ms in by_band.values():
+            lc = Counter(getattr(a, "_lineage", None) for a in ms)
+            lpb.append(len(lc))
+            if len(ms) > 1:
+                doms.append(lc.most_common(1)[0][1] / len(ms))
         return dict(n_lineages=len(groups), top_share=round(sizes[0] / pop, 3),
-                    size_gini=round(_gini(sizes), 3), eff_lineages=round(eff, 1), top=rows)
+                    size_gini=round(_gini(sizes), 3), eff_lineages=round(eff, 1), top=rows,
+                    lineages_per_band=round(float(np.mean(lpb)), 2) if lpb else 0.0,
+                    dom_lineage_share=round(float(np.mean(doms)), 3) if doms else 0.0)
 
     def settlements(self) -> dict:
         """Per-settlement panel (campaign — urban hierarchy + lifespans). For each maintained settlement site with

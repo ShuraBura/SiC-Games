@@ -65,6 +65,7 @@ DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibilit
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
 MSTAR     = int(os.environ.get("C_MSTAR", "50"))         # Cut-2 mate-search pool m* (probe: m*=50 → median reach 496 ≈ Wobst)
 ELITE     = os.environ.get("C_ELITE", "0") == "1"        # T-9: the R-82...R-87 elite/legitimacy stack — see module docstring
+BRANCH    = float(os.environ.get("C_BRANCH", "0"))       # R-90 per-birth lineage-branching rate (0 = off, bit-exact)
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 # T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
@@ -153,6 +154,9 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         lin_size_gini=dyn.get("size_gini", 0), eff_lineages=dyn.get("eff_lineages", 0),
         dom_dyn_rs=top0.get("rs"), dom_dyn_related=top0.get("relatedness"),
         male_rs_gini=round(gini(male_rs), 3),
+        # R-90: the FILED Hill 2011 per-band target (~7 lineages/band, dom-share 0.38) — R-25 passed it, the
+        # R-89 lineage collapse broke it, and it is the calibration read-out for lineage_branch_rate
+        lineages_per_band=dyn.get("lineages_per_band", 0), dom_lineage_share=dyn.get("dom_lineage_share", 0),
         # settlement hierarchy
         n_settle=st.get("n", 0), settle_med=st.get("median", 0), settle_max=st.get("max", 0),
         primate_ratio=st.get("primate_ratio"), zipf_slope=st.get("zipf_slope"),
@@ -207,6 +211,7 @@ def main():
         enable_soil_depletion=SOIL, enable_alluvial_renewal=SOIL,
         enable_emergent_abandonment=(SOIL and os.environ.get("C_ABANDON", "0") == "1"),
         enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG,
+        enable_lineage_branching=(BRANCH > 0.0), lineage_branch_rate=BRANCH,
         **ELITE_KW))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
@@ -253,7 +258,8 @@ def main():
                         f"revs={row['cum_reversions']}") if ELITE else ""
             log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} vil={row['n_villages']}"
                 f"(med{row['village_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
-                f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} mRSg={row['male_rs_gini']} "
+                f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} nlin={row['n_lineages']} "
+                f"lpb={row['lineages_per_band']}/dom={row['dom_lineage_share']} mRSg={row['male_rs_gini']} "
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
                 f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']}"
                 f"{elite_str} | {el/60:.1f}m eta{eta/60:.0f}m")
