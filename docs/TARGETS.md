@@ -308,8 +308,13 @@ against the FILED Hill 2011 ~7. **T-9 is now runnable in principle.**
    line against top-one before the mismatch was caught. **The filed PDF supplies the matched number**: the
    per-clade breakdown is *"16% for Oα, 11% for Oβ, and 14% for Oγ"*, so **largest single clade = 16%** is the
    like-for-like anchor for `top_share`. Measured: 0.154 (R-93/R-94), 0.192 (R-96) - same order, matched unit.
-   Zerjal's ~8% remains one lineage across 16 populations and is SECONDARY-source only (PDF fetch failed; see
-   LITERATURE), so it should not carry a headline comparison until filed.
+   **Zerjal is now FILED and primary-verified too, but anchors a DIFFERENT quantity and must not be compared
+   to `top_share`.** Its ~8% is one NAMED lineage, notable for expanding across 16 populations in ~1,000 years,
+   and is nowhere claimed to be the largest. It therefore anchors SINGLE-DYNASTY EXPANSION RATE AND REACH, not
+   modal share — the model's comparable measurement is one ascribed lineage's growth trajectory, not the
+   maximum over lineages. **All three targets are now filed and primary-verified, measuring three different
+   things:** Karmin = aggregate male/female Ne ratio (17x); Yan = modal clade share (16%); Zerjal =
+   single-dynasty expansion (0 -> ~8% of a continent in ~1,000 yr).
 
 **A SECOND, ALREADY-FILED TARGET was found to be live during this work** and is now the sharper near-term check:
 MODEL_SPEC §4.8.8's **~7 lineages/band + dominant-lineage share 0.38 (Hill et al. 2011)**, which R-25 passed and

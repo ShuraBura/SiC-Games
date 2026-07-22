@@ -1420,13 +1420,27 @@ than the male Ne."* Confirms the two independent fetches used to first find this
 17x Ne ratio, each a direct "top lineage(s) -> % of population" number:**
 
 - **Zerjal, T., et al. (2003). "The Genetic Legacy of the Mongols." *American Journal of Human Genetics*
-  72(3):717-721.** `[secondary-source verified, PDF NOT FILED - FETCH ATTEMPTED AND FAILED 2026-07-21]`
-  **Attempted and why it failed, so nobody repeats it:** PMC (PMC1180246) serves a *"Preparing to download..."*
-  bot-detection interstitial rather than the file, which was NOT worked around; Cell Press
-  (`cell.com/action/showPdf`) returns HTML; and Europe PMC has **no XML full text** for it (2003 AJHG predates
-  structured deposit), so the REST route that would have allowed primary-source verification without the PDF
-  returns 0 bytes. **Needs a manual download.** The statistic below therefore remains SECONDARY-source only and
-  must not be quoted as primary-verified. - ONE Y-chromosome lineage, dated to
+  72(3):717-721.** DOI 10.1086/367774. `[VERIFIED, FILED 2026-07-21]`
+  (`literature/Zerjal et al. - 2003 - The Genetic Legacy of the Mongols.pdf`, 5 pp, supervisor-supplied after an
+  automated fetch failed: PMC serves a bot-detection interstitial, which was not worked around; Cell Press
+  returns HTML; and Europe PMC holds no XML full text since 2003 AJHG predates structured deposit.)
+
+  **PRIMARY-SOURCE VERIFIED**, checked against the extracted text: *"It was found in **16 populations**
+  throughout a large region of Asia, stretching from the Pacific to the Caspian Sea, and was present at high
+  frequency: **~8% of the men** in this region carry it"*; *"a single male line, probably originating in
+  Mongolia, has spread in the last **~1,000 years** to represent ~8% of the males in a region stretching from
+  northeast China to Uzbekistan"*; *"about **16 million men, ~0.5% of the world's total**"*.
+
+  **A UNIT DISTINCTION THAT MATTERS FOR T-9, and it is NOT the same statistic as Yan's.** Zerjal's 8% is ONE
+  NAMED lineage — notable for its recent, rapid, geographically vast expansion — and is **not claimed to be the
+  largest** in that region. Yan's 16% (Oα) IS the modal clade. So:
+  - **Yan 16% -> `top_share`** (largest lineage share). Like-for-like.
+  - **Zerjal 8% -> NOT `top_share`.** It anchors a different quantity: how far and how fast a SINGLE elite line
+    can expand — 0 to ~8% of a continent in ~1,000 years. The model's comparable measurement is the growth
+    trajectory of one ascribed lineage, not the maximum over lineages.
+  Quoting Zerjal against `top_share` would repeat the top-1/top-3 mismatch this file already had to correct
+  once. Three sources, three DIFFERENT measurements: Karmin = aggregate Ne ratio; Yan = modal clade share;
+  Zerjal = single-dynasty expansion rate and reach. - ONE Y-chromosome lineage, dated to
   ~1000 years ago and attributed to Genghis Khan, is carried by **~8% of men across 16 populations spanning the
   Pacific to the Caspian Sea** (~0.5% of the world total). A single elite dynasty's capture, at continental
   scale and with a named historical figure - about as close as population genetics gets to a Hayden-style
