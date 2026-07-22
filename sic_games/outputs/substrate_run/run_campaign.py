@@ -163,6 +163,11 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         village_max=max(villages) if villages else 0,
         pct_complex=round(100 * socs.get("complex_forager", 0) / pop, 1) if pop else 0,
         pct_stratified=round(100 * socs.get("stratified_chiefdom", 0) / pop, 1) if pop else 0,
+        # R-101: the THIRD rung was only ever implied by subtraction, which makes a cross-tab impossible
+        pct_egalitarian=round(100 * socs.get("egalitarian_forager", 0) / pop, 1) if pop else 0,
+        n_band_egal=sum(1 for v in w._band_society.values() if v == "egalitarian_forager"),
+        n_band_complex=sum(1 for v in w._band_society.values() if v == "complex_forager"),
+        n_band_strat=sum(1 for v in w._band_society.values() if v == "stratified_chiefdom"),
         gini_cred=round(gini(cred), 3), gini_wealth=round(gini(wealth), 3),
         surplus_med=round(statistics.median(list(w._band_surplus.values())), 3) if w._band_surplus else 0,
         surplus_max=round(max(w._band_surplus.values()), 3) if w._band_surplus else 0,
@@ -195,6 +200,11 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         row["frac_gumsa"] = round(gs.get("frac_gumsa", 0.0), 3)
         row["leader_tenure_yr"] = round(t.get("mean_years", 0.0), 1)
         row["leader_levy"] = round(w.leader_levy_this_step, 1)
+        ld = w.leadership()                              # R-101: origins of rule, not just its duration
+        row["office_lineages"] = ld["office_lineages"]
+        row["office_top_share"] = ld["office_top_share"]
+        row["office_dynastic"] = ld["office_dynastic"]
+        row["office_repeat_lin"] = ld["office_repeat_lin"]
         row["mean_resentment"] = round(gs.get("mean_resentment", 0.0), 3)    # R-89: was invisible before —
         row["max_resentment"] = round(gs.get("max_resentment", 0.0), 3)      # couldn't tell "stuck" from "climbing"
     return row, cur_leaders
@@ -238,11 +248,24 @@ def main():
                                                    contest_exponent=1.5, move_cost_flat=0.0, **GRP),
                      harvest_field=cap, placement_positions=pos, demography_cfg=demog)
     menarche = demog.menarche_months
+    # R-101: dump the FULL demography config, not a curated subset. A finished run must carry enough to answer
+    # questions nobody asked before it started — the previous 16 hand-picked keys omitted residence,
+    # patriline_weight and the society preset, so a post-hoc question about descent or residence could not even
+    # establish which setting the run had used.
+    try:
+        _full_cfg = demog.model_dump()
+    except Exception:
+        _full_cfg = {k: getattr(demog, k) for k in dir(demog) if not k.startswith("_")}
+    _full_cfg = {k: v for k, v in _full_cfg.items() if isinstance(v, (int, float, str, bool, type(None)))}
     meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
+                terrain=TERR, climate=CLIM,
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
-                genome=GENOME, genea_csv=os.path.basename(GENEA), connubium=CONNUBIUM,
-                m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE, rellegit=RELLEGIT,
-                legit_threshold=ELITE_KW.get("legit_threshold"))
+                genome=GENOME, genea_csv=os.path.basename(GENEA), genealogy_on=GENEALOG,
+                connubium=CONNUBIUM, m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE,
+                rellegit=RELLEGIT, legit_threshold=ELITE_KW.get("legit_threshold"),
+                residence=getattr(demog, "aggregation_residence", None),
+                patriline_weight=getattr(demog, "patriline_weight", None),
+                demography_config=_full_cfg)
     # KNOWN-INERT COMBINATIONS. A flag switched on without its companion does nothing while LOOKING enabled --
     # R-85c's lesson ("distinguish 'does nothing when I turn it on' from 'does nothing'") and charter D4. This is
     # a mechanical guard rather than another rule to remember, because D4 already existed and was still missed:

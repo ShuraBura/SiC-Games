@@ -330,6 +330,9 @@ class TerrainWorld(mesa.Model):
         self._office_since: dict[int, int] = {}                # R-84: leader uid → step he took office (tenure is clocked on the MAN, not the band)
         self._tenures_closed: list[int] = []                   # R-84: completed tenure lengths in steps (the tenure diagnostic)
         self._ever_leader: set[int] = set()                    # R-84: every uid that has ever held office (for the Hayden 75% father-son test)
+        self._lineage_office_count: dict = {}                  # R-101: how many times each LINEAGE has TAKEN office.
+        # A count, not a set: 'has this lineage held office before' is TRUE BY CONSTRUCTION for anyone currently
+        # holding it, so the set version could only ever return 1.0. Repeat acquisitions are the real signal.
         self._lineage_legit: dict[int, float] = {}             # R-86: per-LINEAGE legitimacy stock (Friedman); mirrors _band_surplus
         self._band_resentment: dict[int, float] = {}           # R-87: slow per-band resentment EMA (the LAG that H-CYCLES rides on)
         self._lineage_ascribed: set[int] = set()               # R-86: lineages that CROSSED — 'descended from higher nats'.
@@ -3064,6 +3067,8 @@ class TerrainWorld(mesa.Model):
                 self._band_office[bid] = cand.unique_id
                 self._office_since[cand.unique_id] = self.step_count
                 self._ever_leader.add(cand.unique_id)
+                _cl = getattr(cand, '_lineage', None)
+                self._lineage_office_count[_cl] = self._lineage_office_count.get(_cl, 0) + 1
                 continue
 
             others = [x for x in ms if x is not inc]
@@ -3094,6 +3099,8 @@ class TerrainWorld(mesa.Model):
                     self._band_office[bid] = chal.unique_id
                     self._office_since[chal.unique_id] = self.step_count
                     self._ever_leader.add(chal.unique_id)
+                    _hl = getattr(chal, '_lineage', None)
+                    self._lineage_office_count[_hl] = self._lineage_office_count.get(_hl, 0) + 1
                     self._office_end["deposed"] += 1
                     self.depositions_this_step += 1
             else:
@@ -3152,6 +3159,38 @@ class TerrainWorld(mesa.Model):
             "n_bands": len(bids),
             "n_held": held,
             "vacant": len(bids) - held,
+        }
+
+    def leadership(self) -> dict:
+        """R-101 — WHO rules, and whether office runs in families. Pure observer.
+
+        Built because the campaign could report `leader_tenure_yr` but nothing about the ORIGINS of leaders, so
+        no post-hoc question about dynastic capture of office was answerable from a finished run.
+
+          office_lineages     distinct lineages currently holding a band office
+          office_top_share    largest lineage's share of those offices — dynastic CAPTURE of office, which is a
+                              different thing from `lin_top_share` (share of PEOPLE): a small lineage can hold
+                              most offices, and that is precisely the interesting case
+          office_dynastic     share of current leaders whose lineage has taken office MORE THAN ONCE — office
+                              running in families rather than individuals. Counted, not set-membership: "has
+                              held office before" is true by construction for a sitting leader and could only
+                              ever report 1.0
+          office_repeat_lin   share of offices held by lineages holding more than one simultaneously
+        """
+        leaders = self.band_leaders()
+        if not leaders:
+            return {"n_leaders": 0, "office_lineages": 0, "office_top_share": 0.0,
+                    "office_dynastic": 0.0, "office_repeat_lin": 0.0}
+        lins = [getattr(a, "_lineage", None) for a in leaders.values()]
+        n = len(lins)
+        c = Counter(lins)
+        cnt = self._lineage_office_count
+        return {
+            "n_leaders": n,
+            "office_lineages": len(c),
+            "office_top_share": round(c.most_common(1)[0][1] / n, 3),
+            "office_dynastic": round(sum(1 for l in lins if cnt.get(l, 0) > 1) / n, 3),
+            "office_repeat_lin": round(sum(v for v in c.values() if v > 1) / n, 3),
         }
 
     def band_leaders(self) -> dict[int, "BaseAgent"]:
