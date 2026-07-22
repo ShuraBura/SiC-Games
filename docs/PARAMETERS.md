@@ -744,3 +744,20 @@ could not reach the target, because `lineages_per_band` is CAPPED BY `eff_lineag
 **KNOWN CONSEQUENCE, not yet resolved:** it kills the gumsa/gumlao reversion entirely (0 reversions vs 5,741),
 because `resent_privilege_ref=10.0` was implicitly calibrated when ascription was UNIVERSAL and cred saturated.
 The same bug class, one layer down, tuned against the BROKEN upstream mechanism. See RESULTS R-93.
+
+### §22.7 - Resentment, rank scope, and the hierarchy unlock (R-94 -> R-98; all default-OFF/bit-exact)
+
+| param | value | provenance |
+|---|---|---|
+| `enable_relative_resentment` / `resent_effect_threshold` | False / **0.8** | [Cohen conventions] privilege as an EFFECT SIZE - the noble/commoner cred gap in units of the band's OWN pooled spread. Replaces `(m_a-m_o)/m_o / resent_privilege_ref`, whose ref=10.0 was calibrated while ascription was UNIVERSAL and cred saturated; once nobility became a 6% minority the signal collapsed and reversions never fired. 0.8 = Cohen "large". Charter D15. |
+| `enable_resentment_accumulator` | False | resentment ACCUMULATES rather than tracks. The old EMA converged to its input, so a threshold at/above typical privilege could NEVER be crossed at any horizon (measured: grudge 0.796 vs threshold 0.800, 1 revolt in 3000 yr). With this on the crossing threshold is FIXED AT 1.0 by construction and stops being a knob. |
+| `resent_years_to_revolt` | **80** | **[Leach via Flannery ch.10, VERIFIED]** yr to revolt at UNIT privilege (effect size 1.0). Hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the wait. **This is now the calibrated quantity in place of a threshold.** |
+| `enable_village_resentment` | False | the SETTLEMENT holds the grudge, not the band. R-88 measured band lifetime 10.2 yr median vs 700-1600 yr for the grudge to mature, and fission resets it - the memory outlived its container 40-100x. Leach's gumlao premises describe VILLAGES with headmen and councils. Follows R-71's per-site precedent. |
+| `enable_local_ascription` | False | rank held per (community, lineage) instead of one GLOBAL set. Globally, one village's revolt de-ranked that lineage EVERYWHERE (~7% of all lineages per revolt), annihilating nobility instead of cycling it - and contradicting Leach, whose whole observation is communities in DIFFERENT states at once. **Requires a persistent community: band-keyed local rank produces NO ascription at all** (stock resets on fission ~10 yr, needs ~50 to mature), so pair it with `enable_village_resentment`. |
+| `enable_rank_hierarchy` / `rank_hierarchy_frac` | False / **0.15** | a band holding ranked lineages climbs ONE rung on the society ladder, converting `LEADER_SOCIETY_WEIGHT` 0.0 -> 0.5. Without it a fully-ranked but sparse/poor village stays `egalitarian_forager` and its nobility has no structural consequence at all. Applied AFTER the aquatic gate: Leach's gumsa were swidden hill farmers with no glut and no surplus yet ranked, so Testart's route is one road to hierarchy and not the only one. **0.15 is DERIVED**: ~1/7, from the FILED Hill 2011 ~7 lineages/band, i.e. "at least one lineage here is ranked". |
+
+**PAIRING, because these are not independent.** The intended full stack is
+`relative_legitimacy + relative_resentment + resentment_accumulator + village_resentment + local_ascription +
+rank_hierarchy`, on top of `lineage_branching + lineage_split`. Two hard dependencies are enforced or tested:
+segmentation needs branching (no sub-branches to cleave along without it), and local ascription needs the
+village unit (a band-keyed stock never matures).

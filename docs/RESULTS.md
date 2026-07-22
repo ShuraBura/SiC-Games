@@ -2675,6 +2675,117 @@ results (legit_threshold, resent_privilege_ref, and R-92's rate/eff interaction)
 **Not yet done:** re-anchor `resent_privilege_ref`/`resent_threshold` for the minority-elite regime, then re-test
 whether the gumsa<->gumlao cycle returns. Single seed.
 
+### R-94 - Scale-free resentment: privilege as an EFFECT SIZE (2026-07-21)
+
+*(Documented retroactively 2026-07-21 with R-95/R-96/R-98; all four were committed at the time.)*
+
+**Third instance of charter D15 in three consecutive results.** Privilege was
+`(m_asc - m_oth)/m_oth / resent_privilege_ref`, and ref=10.0 had been chosen while ascription was UNIVERSAL and
+cred saturated toward `1+legit_cred_gain`=11. When R-93 made nobility a real 6% minority the gap shrank,
+resentment peaked at 0.166 against a 0.5 threshold, and reversions NEVER fired - 0 in 3000 steps against 5,741
+before. **The reverse mechanism had been calibrated against the BROKEN forward mechanism**, so repairing the
+forward one moved the regime out from under it.
+
+**Fix, per D15: scale-free rather than re-tuned.** Privilege is now the gap in units of the band's OWN pooled
+spread - an effect size, with no denominator left to drift - and the threshold is ANCHORED on Cohen's
+conventions (0.8 = "large") instead of invented. Guards: sd≈0 yields zero privilege rather than dividing by
+zero, and the value is capped so one near-uniform band cannot dominate the accumulator off a tiny absolute gap.
+
+**A PERFORMANCE BUG introduced and fixed here, recorded because the symptom was misleading:** the first cut
+rebuilt `asc + pop_oth_cred` per band whenever a band had no commoners of its own - O(pop) per band per step,
+~1.4M operations/step at campaign scale. The run went 3-4x slower at a LOWER population, which is what exposed
+it. Replaced with running sums hoisted once per step.
+
+---
+
+### R-95 - Resentment ACCUMULATES, and the VILLAGE holds it (2026-07-21)
+
+**Two paired fixes; neither works alone, and a test asserts that rather than leaving it as a claim.**
+
+**(a) The mechanism never accumulated.** `_do_delegitimation`'s own docstring says in capitals that resentment
+ACCUMULATES, after Leach. The code was an EMA, which does not accumulate - it TRACKS, converging to whatever it
+is fed. **A threshold at or above the typical privilege can therefore NEVER be crossed, at any horizon.**
+Measured: the grudge rose to **0.796 against a threshold of 0.800** and stopped there; 1 revolt in 3000 years.
+The irony worth recording is that 0.8 was correctly ANCHORED (Cohen "large") and the real effect sizes genuinely
+are ~0.8 - a good anchor pointed at the wrong quantity, because a running average cannot exceed its own mean.
+
+**(b) The memory outlived its container by ~40-100x.** R-88 measured band lifetime at 10.2 yr median / 17.5
+mean; the grudge needed 700-1600 yr to mature, and band fission resets it to zero. Leach's gumlao premises
+describe VILLAGES ("villages autonomous", headmen, councils of elders), not 25-person residential bands. Now
+held by the SETTLEMENT, following R-71's per-site precedent exactly: the place remembers, the members churn.
+
+**What is now anchored, and what stopped being free:** the crossing threshold is FIXED AT 1.0 by construction -
+it is no longer a knob. What is calibrated instead is a TIME, `resent_years_to_revolt`=80, from Flannery ch.10's
+*"lasted for a few generations, and then collapsed"*. Privilege scales it: twice the gap, half the wait.
+
+**RESULT: revolts fire (323 vs 0 and 1) but nobility is EXTERMINATED rather than cycled** - villages holding
+nobility fell 82% -> 3%, and the revolt curve flattened for want of anything left to overthrow. That exposed
+R-96.
+
+---
+
+### R-96 - Rank is LOCAL: a lineage is noble in a place, not in the world (2026-07-21)
+
+**A SCOPE MISMATCH present since R-86.** `_lineage_ascribed` was a single GLOBAL set while every mechanism
+acting on it is local, so `discard(lineage)` at a revolt de-ranked that lineage in EVERY other village at the
+same instant. Measured: ~7% of all lineages stripped per revolt, which is why R-95 annihilated nobility instead
+of cycling it. **It contradicts the anchor head-on** - Leach's observation is that communities sit in DIFFERENT
+states simultaneously; a single global set cannot represent that at any parameter setting.
+
+**Invisible until now for the recurring reason:** before R-93 the ascription threshold was degenerate, so status
+was re-earned within a few years and the global strip was undone before anyone could notice the scope was wrong.
+Fixing the threshold made status genuinely hard to earn, at which point the same strip became permanent.
+
+**Rank is now keyed per (community, lineage).** The key is polymorphic - a bare lineage id when off, a pair when
+on - so ONE code path serves both and OFF stays bit-exact (the 15 existing legitimacy tests pass unchanged).
+
+**RESULT - the first arm where nobility and revolts COEXIST:**
+
+| arm | ascribed | revolts | frac_gumsa |
+|---|---|---|---|
+| R-93 | 0.063 | 0 | decaying (nobility permanent, never overthrown) |
+| R-95 global rank | 0.006 | 323 | 0.03 (nobility annihilated) |
+| **R-96 local rank** | **0.365** | **678** | **0.58-0.99 (a patchwork)** |
+
+Also eff_lineages 10.0, lineages_per_band 6.12, gini_cred 0.508, strat 19.9%.
+
+**A TEST FAILED USEFULLY and became a finding:** with rank keyed to BANDS nobody is ever ennobled at all,
+because the legitimacy stock resets on band fission (~10 yr) while needing ~50 to mature - R-95's container
+churn reappearing one level up, in the FORWARD mechanism. Local rank therefore REQUIRES a persistent community;
+that dependency is now a standing test.
+
+---
+
+### R-98 - RANK unlocks HIERARCHY (2026-07-21)
+
+**The gap.** `society_from_character(density, surplus_frac)` reads CROWDING and SURPLUS only and never asks
+whether anyone is ranked. So a village where every lineage is hereditary nobility stayed labelled
+`egalitarian_forager` if sparse and poor - and since `LEADER_SOCIETY_WEIGHT` is **0.0** there, that nobility had
+NO structural consequence: no growth past the band cap, no scalar-stress relief (Johnson 1982), the entire elite
+layer decorative with respect to settlement size. **The model had surplus->hierarchy but not rank->hierarchy.**
+This is what the R-91 checker flags as the rank-vs-society CONTRADICTION.
+
+**The anchor says rank can come first.** Leach's gumsa were rain-fed SWIDDEN HILL FARMERS - no storable glut, no
+great surplus - yet had ranked lineages, chiefs, tribute and "all settlements under one chief". Testart's
+storable-surplus route is ONE road to hierarchy, not the only one. The promotion is therefore applied AFTER the
+aquatic gate, deliberately overriding it.
+
+**A band holding ranked lineages climbs ONE rung** (egalitarian -> complex -> stratified, stratified a fixed
+point), converting leader weight 0.0 -> 0.5. Rank opens the route; it does not hand out chiefdoms.
+
+**Threshold DERIVED, not picked:** 0.15 ~ 1/7, because the FILED Hill 2011 target is ~7 lineages/band, so one
+ranked lineage among them is ~0.14 of heads. It means "at least one lineage here is ranked".
+
+**INHERITANCE LIT AUDIT (asked 2026-07-21), recorded here since it scopes the next mechanism:**
+- **by SOCIETY - QUANTIFIED.** BHM 2009 Table 2 `beta material`: hunter-gatherer 0.17, horticultural 0.09,
+  pastoral 0.67, agricultural 0.55. Filed + verified, and the same table the alpha weights already come from.
+- **by RANK - ATTESTED, NOT QUANTIFIED.** gumsa "elite bride-price higher" vs gumlao "equal bride-price";
+  "splits produce senior/junior" vs "no senior/junior". Direction anchored, magnitude would be [DESIGN].
+- **by GEOGRAPHY - NOTHING NEW NEEDED.** BHM's categories are economic systems, and terrain acts THROUGH
+  subsistence; biome->society already exists, so plains vs mountain differ by supporting different economies.
+
+---
+
 ### R-97 - The elite layer WORKS and still does not cycle. Turchin's cycles are not at this SCALE (2026-07-21)
 
 **The question this arc existed to answer.** R-67/R-68/R-71 gave three independent negatives for secular cycles

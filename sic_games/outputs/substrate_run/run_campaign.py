@@ -249,6 +249,12 @@ def main():
     if SOIL and os.environ.get("C_ABANDON", "0") != "1":
         log("  !! CONFIG: C_SOIL=1 with C_ABANDON=0 -- soil depletes but villages never relocate, so there is "
             "NO swidden rotation. R-71 measured this as the frozen-settlement case. Set C_ABANDON=1 for swidden.")
+    if SPLIT > 0.0 and BRANCH <= 0.0:
+        log("  !! CONFIG: C_SPLIT>0 with C_BRANCH=0 -- segmentation cleaves along the heritable _subclan tag, so "
+            "with no branching every lineage is one undivided group and NOTHING can ever split. Set C_BRANCH>0.")
+    if LOCASC and not RESVIL:
+        log("  !! CONFIG: C_LOCASC=1 with C_RESVIL=0 -- band-keyed local rank produces NO ascription at all "
+            "(the stock resets on band fission ~10yr but needs ~50yr to mature). Set C_RESVIL=1.")
     if IMPROVED and not DEFEND:
         log("  !! CONFIG: C_IMPROVED=1 needs C_DEFEND=1 -- worked land cannot be claimed without defensibility.")
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
