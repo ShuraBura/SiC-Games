@@ -303,10 +303,13 @@ against the FILED Hill 2011 ~7. **T-9 is now runnable in principle.**
 **Two things to settle before running it:**
 1. `resent_privilege_ref` must be re-anchored for the minority-elite regime, or the stratified arm has no
    working reversion mechanism at all (0 reversions vs 5,741 - RESULTS R-93).
-2. **The UNIT of the comparison must be declared (D6).** Zerjal 2003 is one lineage at ~8% of men across a
-   region; Yan 2014 is the top THREE at ~40% of Chinese men; the model's `top_share` is top-ONE. These are not
-   interchangeable, and an earlier plot of ours drew Yan's 40% as a line against top-one - a unit mismatch that
-   was removed rather than left on the axes.
+2. **The UNIT of the comparison must be declared (D6) - and for Yan this is now RESOLVED.** The headline 40%
+   is the top-THREE combined while the model's `top_share` is top-ONE; an earlier plot of ours drew 40% as a
+   line against top-one before the mismatch was caught. **The filed PDF supplies the matched number**: the
+   per-clade breakdown is *"16% for Oα, 11% for Oβ, and 14% for Oγ"*, so **largest single clade = 16%** is the
+   like-for-like anchor for `top_share`. Measured: 0.154 (R-93/R-94), 0.192 (R-96) - same order, matched unit.
+   Zerjal's ~8% remains one lineage across 16 populations and is SECONDARY-source only (PDF fetch failed; see
+   LITERATURE), so it should not carry a headline comparison until filed.
 
 **A SECOND, ALREADY-FILED TARGET was found to be live during this work** and is now the sharper near-term check:
 MODEL_SPEC §4.8.8's **~7 lineages/band + dominant-lineage share 0.38 (Hill et al. 2011)**, which R-25 passed and

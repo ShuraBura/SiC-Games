@@ -1420,13 +1420,32 @@ than the male Ne."* Confirms the two independent fetches used to first find this
 17x Ne ratio, each a direct "top lineage(s) -> % of population" number:**
 
 - **Zerjal, T., et al. (2003). "The Genetic Legacy of the Mongols." *American Journal of Human Genetics*
-  72(3):717-721.** `[secondary-source verified, PDF NOT YET FILED]` - ONE Y-chromosome lineage, dated to
+  72(3):717-721.** `[secondary-source verified, PDF NOT FILED - FETCH ATTEMPTED AND FAILED 2026-07-21]`
+  **Attempted and why it failed, so nobody repeats it:** PMC (PMC1180246) serves a *"Preparing to download..."*
+  bot-detection interstitial rather than the file, which was NOT worked around; Cell Press
+  (`cell.com/action/showPdf`) returns HTML; and Europe PMC has **no XML full text** for it (2003 AJHG predates
+  structured deposit), so the REST route that would have allowed primary-source verification without the PDF
+  returns 0 bytes. **Needs a manual download.** The statistic below therefore remains SECONDARY-source only and
+  must not be quoted as primary-verified. - ONE Y-chromosome lineage, dated to
   ~1000 years ago and attributed to Genghis Khan, is carried by **~8% of men across 16 populations spanning the
   Pacific to the Caspian Sea** (~0.5% of the world total). A single elite dynasty's capture, at continental
   scale and with a named historical figure - about as close as population genetics gets to a Hayden-style
   "one aggrandizer's lineage" statistic, but with a real percentage attached.
 - **Yan, S., et al. (2014). "Y chromosomes of 40% Chinese descend from three Neolithic super-grandfathers."
-  *PLoS ONE* 9(8):e105691.** `[secondary-source verified, PDF NOT YET FILED, open access]` - **three founder
+  *PLoS ONE* 9(8):e105691.** `[VERIFIED, FILED 2026-07-21]`
+  (`literature/yan2014_three_neolithic_super_grandfathers_PLoSONE.pdf`, 7 pp, fetched from PLoS open access and
+  checked directly against the extracted text.)
+
+  **PRIMARY-SOURCE VERIFIED, and it supplies a BETTER statistic than the headline.** Verbatim: *"three strong
+  star-like Neolithic expansions at ~6 kya ... indicates that ~40% of modern Chinese are patrilineal descendants
+  of only three super-grandfathers at that time"*, and crucially the **PER-CLADE BREAKDOWN**: *"encompass more
+  than 40% of the present Han Chinese in total (estimated **16% for Oα, 11% for Oβ, and 14% for Oγ**)"*.
+
+  **THIS RESOLVES A UNIT MISMATCH (D6) that had made the target unusable as stated.** The headline 40% is the
+  top-THREE combined, while the model's `dynasties()["top_share"]` is the top-ONE — not interchangeable, and an
+  earlier plot of ours drew 40% as a line against top-one before the mismatch was caught and the line removed.
+  The breakdown gives the correctly-matched number: **largest single clade = 16%**. For reference the model's
+  measured `top_share` is 0.154 (R-93/R-94) and 0.192 (R-96) — the same order, on a like-for-like unit. - **three founder
   lineages account for ~40% of Chinese men**, from star-like expansions dated to ~6000 years ago (Neolithic,
   linked to the spread of agriculture). A small-founder-set dominance statistic, one level up from Zerjal's
   single dynasty.
