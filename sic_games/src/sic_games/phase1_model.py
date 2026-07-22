@@ -1777,14 +1777,9 @@ class TerrainWorld(mesa.Model):
                     mean_npp = sum(self._fields.npp_gm2[cy, cx] for (cx, cy) in cells) / nc
                     if glut < morph_aq_thr or mean_npp < morph_npp_floor:
                         target = "egalitarian_forager"
-                # R-98: RANK UNLOCKS HIERARCHY. Applied AFTER the aquatic gate on purpose — the gate encodes
-                # Testart's storable-glut route to complexity, and Leach's gumsa is the counter-example: swidden
-                # hill farmers with no glut and no great surplus, yet ranked lineages, chiefs and tribute. A band
-                # that actually holds ranked lineages therefore climbs one rung regardless of the gate, which is
-                # what gives its nobility any structural consequence at all (LEADER_SOCIETY_WEIGHT is 0.0 in the
-                # egalitarian state, so without this the elite layer cannot affect settlement size).
-                if rank_on and n > 0 and asc_n.get(bid, 0) / n >= rank_frac:
-                    target = _RANK_LADDER[target]
+                # R-98's one-rung promotion was applied here and is SUPERSEDED by R-99's graded weight; see
+                # DEAD_ENDS DE-22. It promoted the whole village on a threshold of one ranked lineage in seven,
+                # which measured 70.6% stratified against R-64's validated 9-16%.
                 c0 = self._band_settle.get(bid, 0)
                 c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
                 if c >= settle_T:
@@ -2695,6 +2690,32 @@ class TerrainWorld(mesa.Model):
                 a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)
                 self.legitimated_this_step += 1
 
+    def _privilege_effect(self, ms, rkeys) -> float:
+        """R-99 — how far this community's RANKED stand above its COMMONERS, in units of its own cred spread.
+
+        ZERO WHEN THERE IS NO DISTINCTION, IN EITHER DIRECTION. No ranked lineage present is obviously flat; so
+        is a community where EVERY lineage is ranked, because binary ascription cannot express a gradient among
+        nobles. That second case is the R-89 degeneracy, and forcing 0.0 here closes it rather than leaving the
+        back door open via a population-wide fallback — "nobility universal, i.e. meaningless" (R-87's own note).
+
+        SHARED by `_do_delegitimation` (resentment from below) and the leader-weight gate (organisational
+        capacity above), deliberately: they are two consequences of ONE measured quantity, and a second copy
+        would drift. Scale-free by construction, so it carries no hidden denominator (charter D15)."""
+        asc = [a for a in ms if rkeys[a] in self._lineage_ascribed]
+        oth = [a for a in ms if rkeys[a] not in self._lineage_ascribed]
+        if not asc or not oth:
+            return 0.0
+        n1, n2 = len(asc), len(oth)
+        s1 = sum(a.cred for a in asc); s2 = sum(a.cred for a in oth)
+        q1 = sum(a.cred * a.cred for a in asc); q2 = sum(a.cred * a.cred for a in oth)
+        nv = n1 + n2
+        mu = (s1 + s2) / nv
+        var = max(0.0, (q1 + q2) / nv - mu * mu)     # clamp: cancellation can go slightly negative
+        sd = var ** 0.5
+        if sd <= 1e-9:
+            return 0.0                                # uniform community: no DISCERNIBLE privilege
+        return min(max(0.0, s1 / n1 - s2 / n2) / sd, RESENT_EFFECT_CAP)
+
     def _do_lineage_split(self) -> None:
         """R-92 — LINEAGE SEGMENTATION: an existing named line splits into two real sub-clades.
 
@@ -3586,6 +3607,16 @@ class TerrainWorld(mesa.Model):
             new_repulsion: dict[int, float] = {}
             new_malnutrition: dict[int, float] = {}
             new_starv_ema: dict[int, float] = {}
+            # R-99: per-band graded rank weight, computed once for this pass. None => feature off, and nothing
+            # is computed at all, so OFF stays bit-exact.
+            rank_w = None
+            _rk = None
+            _ref = 1.0
+            if (self._demog is not None and getattr(self._demog, "enable_rank_hierarchy", False)
+                    and self._lineage_ascribed):
+                _ref = max(1e-9, self._demog.resent_effect_threshold)   # Cohen "large" — reused, not reinvented
+                _rk = self._rank_keys()
+                rank_w = {}
             for bid, ms in members.items():
                 surplus = self._band_surplus.get(bid, 0.0)
                 a_prev = self._band_assabiyah.get(bid, 0.0)
@@ -3594,6 +3625,8 @@ class TerrainWorld(mesa.Model):
                 for a in ms:                                   # mirror onto the collective-identity vector
                     a._group.assabiyah = a_new
                 society = self._band_society.get(bid)
+                if rank_w is not None:
+                    rank_w[bid] = min(1.0, self._privilege_effect(ms, _rk) / _ref)
 
                 leader_term = 0.0
                 if leader_on and leader_gain > 0.0:
@@ -3603,6 +3636,14 @@ class TerrainWorld(mesa.Model):
                     ratio = top_status / (mean_status + 1e-9)          # ≥1; 1 = no distinct leader
                     leader_strength = 1.0 - 1.0 / ratio                # self-normalizing, saturating ∈ [0,1)
                     weight = leader_society_weight(society)            # Boehm gate
+                    if rank_w is not None:
+                        # R-99: RANK IS AN ALTERNATIVE ROUTE TO HIERARCHY, taken as a MAX rather than a sum —
+                        # Testart's storable-surplus road and Leach's ranked-lineage road are two ways to the
+                        # same organisational capacity, not two additive bonuses. Normalised by
+                        # `resent_effect_threshold` (Cohen's "large", already in the config for resentment), so
+                        # a community whose nobles stand a LARGE effect above its commoners earns the full
+                        # stratified weight and no NEW constant is introduced.
+                        weight = max(weight, rank_w.get(bid, 0.0))
                     leader_term = leader_gain * weight * leader_strength
                 new_leader[bid] = leader_term
 
