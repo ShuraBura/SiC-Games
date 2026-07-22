@@ -219,6 +219,9 @@ _DEFAULT_KNOBS: dict = {
 
 RESENT_EFFECT_CAP = 5.0   # R-94: a uniform-ish band can give an enormous effect size off a tiny absolute gap;
                           # cap so one degenerate band cannot dominate the EMA
+_RANK_LADDER = {"egalitarian_forager": "complex_forager",      # R-98: rank promotes ONE rung, never further
+                "complex_forager": "stratified_chiefdom",
+                "stratified_chiefdom": "stratified_chiefdom"}
 LEGIT_RELAX = 0.02   # R-86: per-step relaxation rate of cred toward its legitimacy-set target
                      # (~50-step approach). A RATE; the magnitude is `legit_cred_gain`.
 
@@ -1730,6 +1733,17 @@ class TerrainWorld(mesa.Model):
                     band_cell_n[(bid, (cx, cy))] = band_cell_n.get((bid, (cx, cy)), 0) + 1
             land_pack = getattr(self._demog, "enable_landscape_packing", False)   # R-61: landscape vs band-member density
             self._band_surplus = {}
+            # R-98: per-band ascribed head-count for the rank->hierarchy unlock. Computed once here
+            # rather than per band, and skipped entirely when the flag is off (=> bit-exact).
+            rank_on = self._demog is not None and getattr(self._demog, "enable_rank_hierarchy", False)
+            rank_frac = self._demog.rank_hierarchy_frac if rank_on else 0.0
+            asc_n: dict = {}
+            if rank_on and self._lineage_ascribed:
+                _rk = self._rank_keys()
+                for _a in self.agent_list:
+                    if _rk[_a] in self._lineage_ascribed:
+                        _b = _a._group.band_id
+                        asc_n[_b] = asc_n.get(_b, 0) + 1
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
                 # LANDSCAPE population density (all agents on the band's cells / area = the Binford quantity) when on;
@@ -1763,6 +1777,14 @@ class TerrainWorld(mesa.Model):
                     mean_npp = sum(self._fields.npp_gm2[cy, cx] for (cx, cy) in cells) / nc
                     if glut < morph_aq_thr or mean_npp < morph_npp_floor:
                         target = "egalitarian_forager"
+                # R-98: RANK UNLOCKS HIERARCHY. Applied AFTER the aquatic gate on purpose — the gate encodes
+                # Testart's storable-glut route to complexity, and Leach's gumsa is the counter-example: swidden
+                # hill farmers with no glut and no great surplus, yet ranked lineages, chiefs and tribute. A band
+                # that actually holds ranked lineages therefore climbs one rung regardless of the gate, which is
+                # what gives its nobility any structural consequence at all (LEADER_SOCIETY_WEIGHT is 0.0 in the
+                # egalitarian state, so without this the elite layer cannot affect settlement size).
+                if rank_on and n > 0 and asc_n.get(bid, 0) / n >= rank_frac:
+                    target = _RANK_LADDER[target]
                 c0 = self._band_settle.get(bid, 0)
                 c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
                 if c >= settle_T:

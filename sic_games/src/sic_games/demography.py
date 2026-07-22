@@ -838,6 +838,22 @@ class DemographyConfig(BaseModel):
     # only the community that revolted. The community is the settlement when village resentment is on, else
     # the band. Rank is NOT portable — a family that moves must earn standing where it arrives, which is what
     # "villages autonomous" implies.
+    # ── RANK UNLOCKS HIERARCHY (R-98). `society_from_character(density, surplus_frac)` decides a band's society
+    # from CROWDING and SURPLUS only — it never asks whether anyone is actually ranked. So a village where every
+    # lineage is hereditary nobility is still labelled `egalitarian_forager` if it is sparse and poor, and since
+    # LEADER_SOCIETY_WEIGHT is 0.0 there, its nobility has NO structural consequence: it cannot grow past the
+    # band cap, sheds no scalar stress, and the whole elite layer is decorative with respect to settlement size.
+    # The model has surplus→hierarchy but not rank→hierarchy.
+    # THE ANCHOR SAYS RANK CAN COME FIRST. Leach's gumsa were rain-fed SWIDDEN HILL FARMERS without a storable
+    # glut — no aquatic gate, no great surplus — yet had ranked lineages, chiefs, tribute, and "all settlements
+    # under one chief". Testart's preconditions are one route to hierarchy, not the only one.
+    # So a band holding ranked lineages is promoted ONE rung on the ladder, and deliberately only one: this
+    # opens the route, it does not hand out chiefdoms.
+    enable_rank_hierarchy: bool = False
+    rank_hierarchy_frac: float = Field(0.15, ge=0.0, le=1.0)   # ascribed head-count share that counts as "ranked"
+    # 0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among them is
+    # ≈0.14 of heads. The threshold therefore means "at least one lineage here is ranked", tied to a target the
+    # model already carries rather than picked freely.
     enable_local_ascription: bool = False
     enable_resentment_accumulator: bool = False
     resent_years_to_revolt: float = Field(80.0, gt=0.0)   # yr to revolt at UNIT privilege (effect size 1.0);
