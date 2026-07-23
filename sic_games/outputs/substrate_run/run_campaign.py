@@ -79,6 +79,30 @@ RESYTR    = float(os.environ.get("C_RESYTR", "80"))      # R-95 yr to revolt at 
 LOCASC    = os.environ.get("C_LOCASC", "0") == "1"       # R-96 rank held per (community, lineage), not globally
 RANKHIER  = os.environ.get("C_RANKHIER", "0") == "1"     # R-98 ranked lineages unlock a rung of hierarchy
 RANKFRAC  = float(os.environ.get("C_RANKFRAC", "0.15"))  # R-98 ascribed head-share counting as "ranked" (~1/7, Hill 2011)
+RESIDENCE = os.environ.get("C_RESIDENCE", "")            # R-102 {virilocal|uxorilocal|flexible}; "" = preset default.
+                                                          # [Ember & Ember 1971] filed as REFERENCE with "comparisons
+                                                          # deferred" -- never swept until now.
+MAXMIN    = float(os.environ.get("C_MAXMIN", "0"))       # wall-clock budget in MINUTES; 0 = unlimited.
+                                                          # Runtime here scales with POPULATION, not steps: 3000
+                                                          # steps cost 16 min at pop 6k (fs3kg) but 173 min at pop
+                                                          # 39k (bio_swidden_true). So a rich world can silently
+                                                          # turn a "15000-step run" into a multi-day one -- c1bud
+                                                          # had to be KILLED at step 11200 ("impractically slow at
+                                                          # 29k pop"). A budget converts that manual kill into a
+                                                          # clean stop that still writes a valid trajectory.
+INEQGATE  = os.environ.get("C_INEQGATE", "0") == "1"     # R-103 stratified requires UNEQUAL wealth (default OFF = bit-exact)
+GINIMIN   = float(os.environ.get("C_GINIMIN", "0.40"))   # R-103 within-band cred-Gini floor for stratified [BHM 2009]
+ENDOGAMY  = os.environ.get("C_ENDOGAMY", "0") == "1"     # R-103b Flannery class endogamy (assortative-by-cred mating);
+ENDOG_A   = float(os.environ.get("C_ENDOG_A", "1.5"))    #   the mechanism that CUTS a noble/commoner break. Default OFF.
+MATINHERIT = os.environ.get("C_MATINHERIT", "0") == "1"  # R-103d bequeath durable capital at death (default OFF = dissolves)
+MATRULE   = os.environ.get("C_MATRULE", "primogeniture") # none|primogeniture|partible_equal|patrilineal_sons [Goody/EA]
+HEIRSTAT  = os.environ.get("C_HEIRSTAT", "0") == "1"     # R-103e primogeniture heir = highest-CRED child (rank+estate together)
+NOBLEXEMPT = os.environ.get("C_NOBLEXEMPT", "0") == "1"  # R-103e legitimate nobles EXEMPT from wealth-leveling (Flannery ch.16)
+SEDFERT   = os.environ.get("C_SEDFERT", "1") == "1"      # sedentism->fertility boost. DEFAULT ON = bit-exact with
+                                                          # every prior campaign. Exposed as an ablation knob for
+                                                          # R-103: the flat-tropical 22x residence split is
+                                                          # hypothesised to be a concentration->sedentism->fertility
+                                                          # feedback; turning this OFF is the direct test.
 BAND_SPLIT = 45                                           # village = a band grown past the fission cap (R-55)
 
 # T-9 elite-stack values, at what R-82...R-87 validated. All [DESIGN] except leveling_strength (Boehm 38/48) and
@@ -153,6 +177,70 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     common = set(cur_leaders) & set(prev_leaders)
     leader_turnover = round(sum(1 for b in common if cur_leaders[b] != prev_leaders[b]) / len(common), 3) if common else 0.0
     assab = list(w._band_assabiyah.values())
+    # R-103 calibration diagnostic: per-band cred Gini, computed HERE independent of the gate so it is visible in
+    # every run (gate on OR off). The stratified LABEL should sit on bands whose members are UNEQUAL — this lets
+    # the report show whether it does. `strat_band_gini_med` is the median per-band Gini among stratified-labelled
+    # bands; if it is LOW while pct_stratified is high, the label is decoupled from inequality (the diagnosed bug).
+    _band_cred: dict = {}
+    for a in al:
+        _band_cred.setdefault(a._group.band_id, []).append(getattr(a, "cred", 1.0))
+    _bg = {bid: gini(cs) for bid, cs in _band_cred.items() if len(cs) >= 5}
+    _strat_bg = [_bg[bid] for bid in _bg if w._band_society.get(bid) == "stratified_chiefdom"]
+    # R-103 re-diagnosis: WITHIN-band gini (_bg) did NOT separate genuine from artifact (all ~0.23). The real
+    # axis is BETWEEN-band — do the stratified bands stand ABOVE the rest, or is everyone uniformly affluent?
+    _band_mean = {bid: (sum(cs) / len(cs)) for bid, cs in _band_cred.items() if len(cs) >= 5}
+    _between_gini = gini(list(_band_mean.values()))                     # inequality ACROSS band means
+    _strat_ids = [bid for bid in _band_mean if w._band_society.get(bid) == "stratified_chiefdom"]
+    _oth_ids = [bid for bid in _band_mean if bid not in _strat_ids]
+    _strat_mu = (sum(_band_mean[b] for b in _strat_ids) / len(_strat_ids)) if _strat_ids else 0.0
+    _oth_mu = (sum(_band_mean[b] for b in _oth_ids) / len(_oth_ids)) if _oth_ids else 0.0
+    _strat_lift = round(_strat_mu / _oth_mu, 3) if _oth_mu > 0 else 0.0   # >1 ⇒ stratified bands really are richer
+    # R-103b — FLANNERY'S BREAK. Rank is a CONTINUUM; stratification is a GAP between an endogamous noble stratum
+    # and commoners (Flannery ch.16). Gini measures the continuum's SPREAD and cannot see the gap — so here we
+    # measure, WITHIN each village, the noble/commoner cred separation as Cohen's d (reusing R-99's privilege
+    # effect idea). d≈0 = one continuum (rank); d large = two separated strata (a real break). The mechanism that
+    # should CUT the gap is class endogamy (enable_ascribed_mate_choice); this diagnostic runs regardless so ON/OFF
+    # can be compared. `frac_villages_broken` = share of villages whose nobles stand a LARGE effect above commoners.
+    _rk = w._rank_keys() if hasattr(w, "_rank_keys") else {}
+    _asc = getattr(w, "_lineage_ascribed", set())
+    _band_noble: dict = {}; _band_comm: dict = {}
+    for a in al:
+        (_band_noble if _rk.get(a) in _asc else _band_comm).setdefault(a._group.band_id, []).append(getattr(a, "cred", 1.0))
+
+    def _cohen_d(x, y):
+        if len(x) < 3 or len(y) < 3:
+            return None
+        mx, my = statistics.mean(x), statistics.mean(y)
+        vx, vy = statistics.pvariance(x), statistics.pvariance(y)
+        sp = ((vx + vy) / 2.0) ** 0.5
+        return (mx - my) / sp if sp > 1e-9 else 0.0
+
+    _dvals = []
+    for bid in _band_mean:                     # villages with >=5 members
+        d = _cohen_d(_band_noble.get(bid, []), _band_comm.get(bid, []))
+        if d is not None:
+            _dvals.append(d)
+    _village_gap_d_med = round(statistics.median(_dvals), 3) if _dvals else 0.0
+    _frac_villages_broken = round(sum(1 for d in _dvals if d >= 0.8) / len(_dvals), 3) if _dvals else 0.0
+    # R-103c — WHAT IS AN ELITE MADE OF? Three currencies, three very different Flannery meanings:
+    #   cred     = prestige/renown  → the BIG-MAN currency (achieved by feasting; Flannery ch.6/10)
+    #   material = durable capital  → the CHIEF currency (accumulated + INHERITED estate; Flannery ch.16)
+    #   food     = perishable reserve (wealth) → subsistence, neither
+    # And two ways to be "elite": by LINEAGE (ascribed → should carry a HERITABLE estate if chiefs exist) vs by
+    # OFFICE (current leader → a lifetime perquisite if big-men). A big-man regime shows a LEADER lift in cred but
+    # NO ascribed-LINEAGE lift in material (nothing crosses generations). A chiefly regime shows a heritable
+    # material lift on the noble LINEAGE. Lift = elite mean / commoner mean (1.0 = no advantage). This is the
+    # instrument that was missing: every prior diagnostic read cred only, so material stratification was invisible.
+    _mat = [getattr(a, "material", 0.0) for a in al]
+    _ldr_ids = {ld.unique_id for ld in w.band_leaders().values()} if hasattr(w, "band_leaders") else set()
+    _nob = [a for a in al if _rk.get(a) in _asc]; _com = [a for a in al if _rk.get(a) not in _asc]
+    _lead = [a for a in al if a.unique_id in _ldr_ids]; _nonl = [a for a in al if a.unique_id not in _ldr_ids]
+
+    def _lift(grp, ref, attr):
+        if not grp or not ref:
+            return 0.0
+        rm = statistics.mean(getattr(a, attr, 0.0) for a in ref)
+        return round(statistics.mean(getattr(a, attr, 0.0) for a in grp) / rm, 3) if rm > 1e-9 else 0.0
     row = dict(
         step=step, pop=pop, births=w.births_this_step, deaths_starv=w.deaths_starv_this_step,
         mean_reserve=round(statistics.mean(wealth) / w._reserve_full, 3) if pop else 0,
@@ -169,6 +257,21 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         n_band_complex=sum(1 for v in w._band_society.values() if v == "complex_forager"),
         n_band_strat=sum(1 for v in w._band_society.values() if v == "stratified_chiefdom"),
         gini_cred=round(gini(cred), 3), gini_wealth=round(gini(wealth), 3),
+        band_cred_gini_med=round(statistics.median(_bg.values()), 3) if _bg else 0.0,   # R-103 calibration
+        strat_band_gini_med=round(statistics.median(_strat_bg), 3) if _strat_bg else 0.0,
+        n_strat_bands=len(_strat_bg),
+        between_band_gini=round(_between_gini, 3),      # R-103: inequality ACROSS bands (the real discriminator?)
+        strat_lift=_strat_lift,                         # stratified-band mean cred / other-band mean cred (>1 = real)
+        village_gap_d_med=_village_gap_d_med,           # R-103b Flannery: median noble/commoner Cohen's d per village
+        frac_villages_broken=_frac_villages_broken,     #   share of villages with a LARGE (d>=0.8) noble/commoner break
+        n_villages_gapd=len(_dvals),
+        # R-103c elite currency breakdown — LINEAGE (ascribed) lift vs OFFICE (leader) lift, per currency
+        noble_cred_lift=_lift(_nob, _com, "cred"), noble_material_lift=_lift(_nob, _com, "material"),
+        noble_food_lift=_lift(_nob, _com, "wealth"),
+        leader_cred_lift=_lift(_lead, _nonl, "cred"), leader_material_lift=_lift(_lead, _nonl, "material"),
+        leader_food_lift=_lift(_lead, _nonl, "wealth"),
+        gini_material=round(gini(_mat), 3), mean_material=round(statistics.mean(_mat), 2) if _mat else 0.0,
+        frac_ascribed_pop=round(len(_nob) / pop, 3) if pop else 0.0,
         surplus_med=round(statistics.median(list(w._band_surplus.values())), 3) if w._band_surplus else 0,
         surplus_max=round(max(w._band_surplus.values()), 3) if w._band_surplus else 0,
         assab_med=round(statistics.median(assab), 3) if assab else 0,
@@ -228,10 +331,15 @@ def main():
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
     cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
-        enable_landscape_packing=True, enable_sedentism_fertility=True,
+        enable_landscape_packing=True, enable_sedentism_fertility=SEDFERT,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True,
         enable_catchment_ceiling=True, enable_settlement_scalar_stress=True, settle_catchment_radius=1,
         enable_economic_defensibility=DEFEND,
+        enable_stratification_inequality_gate=INEQGATE, stratification_gini_min=GINIMIN,   # R-103
+        enable_ascribed_mate_choice=ENDOGAMY, ascribed_mate_strength=(ENDOG_A if ENDOGAMY else 0.0),  # R-103b endogamy
+        enable_material_inheritance=MATINHERIT, material_inheritance_rule=MATRULE,   # R-103d bequest
+        material_heir_by_status=HEIRSTAT,                                            # R-103e estate follows rank
+        enable_noble_leveling_exemption=NOBLEXEMPT,                                  # R-103e ch.16 exemption
         enable_adaptive_connubium=cut2, mate_search_min_eligible=(MSTAR if cut2 else 3),
         enable_exogamy=cut2, exogamy_degree="lineage",
         enable_village_budding=BUD, village_fission_threshold=BUD_THR,
@@ -241,6 +349,10 @@ def main():
         enable_genome=GENOME, genome_loci=48, enable_genealogy_log=GENEALOG,
         enable_lineage_branching=(BRANCH > 0.0), lineage_branch_rate=BRANCH,
         enable_lineage_split=(SPLIT > 0.0), lineage_split_rate=SPLIT, lineage_split_min_segment=SPLITMIN,
+        # R-102: post-marital residence. Applied HERE and not in ELITE_KW because residence is a property of the
+        # SUBSTRATE, not of the elite layer -- an elite-off arm still has one, and burying it inside the elite
+        # dict would silently pin every non-elite run to the preset default.
+        **({"aggregation_residence": RESIDENCE} if RESIDENCE else {}),
         **ELITE_KW))
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
@@ -294,6 +406,15 @@ def main():
     seen_violations: set = set()          # R-91: log each contradiction once, on first appearance
     cum_reversions = 0                                   # R-89: summed every step, not just at LOGEVERY —
     t0 = time.time()                                      # a reversion can fire and re-ascribe within one gap
+    # SLEEP-AWARE BUDGET (2026-07-22). The budget must meter COMPUTE, not wall-clock: the machine suspended
+    # mid-run today and 25.4 min of wall time elapsed across 50 steps that normally cost 0.2 min, which would
+    # have silently robbed a later arm of ~17% of its step count for no work done. We cannot use process CPU
+    # time either (child work, IO waits), so instead we sum the per-snapshot deltas and DISCOUNT any delta that
+    # is implausible against the run's own recent pace — the run calibrates its own normal.
+    last_t = t0
+    deltas: list = []          # recent inter-snapshot wall deltas (seconds); the pace reference
+    compute_s = 0.0            # summed deltas with suspensions discounted — what the budget spends
+    suspended_s = 0.0          # total time attributed to suspension (reported, never charged)
     for step in range(1, STEPS + 1):
         w.step()
         if not w.agent_list:
@@ -332,7 +453,39 @@ def main():
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
                 f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']}"
                 f"{elite_str} | {el/60:.1f}m eta{eta/60:.0f}m")
+            _now = time.time()
+            _d = _now - last_t
+            last_t = _now
+            if deltas:
+                _med = sorted(deltas[-20:])[len(deltas[-20:]) // 2]
+                # Suspension looks like a delta far outside the run's own recent pace. The threshold is
+                # RELATIVE because the true pace varies hugely with population (0.1 min/snapshot at pop 6k,
+                # minutes at pop 39k), so any absolute cutoff would be wrong in one regime or the other.
+                if _d > max(3.0 * _med, _med + 120.0):
+                    suspended_s += _d - _med
+                    log(f"  [{step}] SUSPENSION: {_d/60:.1f}m elapsed vs {_med/60:.2f}m pace — "
+                        f"charging pace, not wall (budget protected)")
+                    _d = _med
+            deltas.append(_d)
+            compute_s += _d
+            # Budget spends COMPUTE. The wall-clock backstop at 3x is a safety net: if the discount logic ever
+            # misjudged a genuine slowdown as suspension it could otherwise run unbounded, and an arm that
+            # never terminates is worse than one that stops early.
+            if MAXMIN > 0 and (compute_s / 60.0 >= MAXMIN or el / 60.0 >= 3.0 * MAXMIN):
+                _why = "COMPUTE" if compute_s / 60.0 >= MAXMIN else "WALL-BACKSTOP"
+                log(f"  [{step}] BUDGET {MAXMIN:.0f}m reached at step {step}/{STEPS} [{_why}] — "
+                    f"compute={compute_s/60:.1f}m wall={el/60:.1f}m suspended={suspended_s/60:.1f}m")
+                break
     genea_rows += w.flush_genealogy(GENEA)               # final flush
+    # Persist the OUTCOME, not just the intent: `meta["steps"]` is what was ASKED for, so a truncated run would
+    # otherwise look like a complete one to any offline reader. D15's lesson generalised — record the denominator.
+    meta["steps_completed"] = step
+    meta["truncated"] = step < STEPS
+    meta["wall_minutes"] = round((time.time() - t0) / 60.0, 1)
+    meta["compute_minutes"] = round(compute_s / 60.0, 1)
+    meta["suspended_minutes"] = round(suspended_s / 60.0, 1)
+    with open(OUT, "w", encoding="utf-8") as fh:
+        json.dump(dict(meta=meta, traj=traj), fh)
     log(f"DONE step={step} in {(time.time()-t0)/60:.1f} min -> {OUT} ; genealogy rows={genea_rows} -> {GENEA}")
 
 

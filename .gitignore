@@ -30,6 +30,8 @@ sic_games/outputs/**/logs/
 literature/*.pdf
 literature/*.epub
 literature/*.djvu
+# D-PLACE Ethnographic Atlas coded data (14MB, re-obtainable from github.com/D-PLACE; cross-tabs live in docs/LITERATURE.md)
+literature/dplace_ea/
 
 # OS / editor -------------------------------------------------------------
 .DS_Store

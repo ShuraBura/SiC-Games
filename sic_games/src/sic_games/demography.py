@@ -349,6 +349,16 @@ class DemographyConfig(BaseModel):
     # (montane salmon rivers) morph COMPLEX. SEPARATES survival-storage from complexity. Default OFF ⇒ bit-exact.
     morph_aquatic_gated: bool = False
     morph_aquatic_threshold: float = Field(0.15, ge=0.0, le=1.0)  # complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL]
+    # R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus
+    # (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence — Testart's own chain
+    # is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped the differentials step.
+    # Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45% stratified while having the
+    # LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality. When ON, a would-be stratified
+    # band must also show within-band cred concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact.
+    enable_stratification_inequality_gate: bool = False
+    stratification_gini_min: float = Field(0.40, ge=0.0, le=1.0)  # BHM 2009 Table 2 α-weighted Gini: forager 0.25,
+    #   horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40.
+    #   PROVISIONAL: within-band Gini runs below whole-population Gini, so calibrate on the validated baseline.
     # PACKING MEASURE (R-61 fix): the morph "packed" test vs Binford 0.091/km². Default = a band's members / its
     # footprint area (a band's density over its own range ~0.017 = a NORMAL forager → never packs). Binford's 0.091 is
     # a LANDSCAPE population density, so `enable_landscape_packing` uses (all agents on the band's cells / area) — is the
@@ -970,6 +980,26 @@ class DemographyConfig(BaseModel):
     material_hide_frac: float = Field(0.0, ge=0.0)              # durable yield per unit meat taken (sets UNITS only)
     material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the cell's hide pool claimed by aggrandizers
     material_decay: float = Field(0.0, ge=0.0, le=1.0)          # per-step depreciation of the durable stock (0 = imperishable)
+    # R-103d MATERIAL INHERITANCE — bequeath durable capital at death, the missing 'bequeathing' step (Flannery
+    # ch.10: big men "had no way of bequeathing renown to their offspring") that converts a lifetime OFFICE
+    # advantage into a heritable LINEAGE estate. Rule is regime-dependent [Goody 1976 diverging devolution;
+    # D-PLACE EA075×EA028 cross-tab, LITERATURE.md]. Default OFF ⇒ material dissolves at death (bit-exact).
+    enable_material_inheritance: bool = False
+    material_inheritance_rule: str = Field("primogeniture")     # none|primogeniture|partible_equal|patrilineal_sons
+    #   primogeniture   → whole estate to the ELDEST surviving child (concentrates; the extensive-agri pattern)
+    #   partible_equal  → split equally among ALL surviving children (dissipates; Goody's intensive-agri devolution)
+    #   patrilineal_sons→ split equally among surviving SONS (the EA-modal 43-61% rule)
+    # R-103e — HEIR COUPLED TO STATUS. Estate+rank should pass TOGETHER (Flannery ch.16 chiefly primogeniture),
+    # not to a random child. ON ⇒ primogeniture picks the highest-CRED (status) child, so wealth follows rank.
+    material_heir_by_status: bool = False
+    # R-103e — LEGITIMACY EXEMPTS THE NOBLE FROM LEVELING. The load-bearing device (Flannery ch.16 "how to turn
+    # rank into stratification"; Friedman: a legitimated lineage's holding is "his by right… entitled to tribute",
+    # NOT overreach-grievance). Without it, the model's Boehm overreach mechanism DEPOSES any material accumulator,
+    # so an elite can never lock in. ON ⇒ an ASCRIBED (noble) leader's material-overreach grievance is scaled by
+    # (1 - noble_exemption_frac); his FAILURE-TO-DELIVER grievance is untouched (a noble is still deposed for
+    # famine, just not for wealth). Default OFF ⇒ bit-exact.
+    enable_noble_leveling_exemption: bool = False
+    noble_exemption_frac: float = Field(1.0, ge=0.0, le=1.0)    # 1.0 = full waiver of the wealth-grievance for nobles
     # WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an
     # "ambitious, accumulative aggrandizer" — "the best and most highly motivated minds of an epoch" — i.e. a
     # PERSONALITY/STRATEGY TYPE held by a MINORITY, present in every society. It is NOT a rank in an inherited
@@ -1340,7 +1370,8 @@ def biome_default_society(biome_code: int | None = None, aquatic_rich: bool = Fa
     return "complex_forager" if aquatic_rich else "egalitarian_forager"
 
 
-def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
+def society_from_character(density_per_km2: float, surplus_frac: float,
+                           wealth_gini: float | None = None, gini_min: float | None = None) -> str:
     """Morph hook — map a band's measured CHARACTER (density vs Binford packing; surplus = Testart storage
     enabler) onto the complexity ladder. surplus_frac = mean reserve fraction above subsistence (0..1).
       below packing & no defendable surplus → egalitarian (mobile, leveled);
@@ -1349,11 +1380,18 @@ def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
     Note: this ladder is the storage/packing (complexity) axis only — the patrilineal/matrilineal DESCENT types
     are set by history/biome, not reached by density. And in the current forage-only model the equilibrium
     density (~0.065–0.1/km²) sits AT/below packing, so a band stays egalitarian until a carrying-capacity boost
-    (storage/aquatic/agriculture — the deferred surplus mechanic) lifts it past the threshold."""
+    (storage/aquatic/agriculture — the deferred surplus mechanic) lifts it past the threshold.
+
+    R-103 INEQUALITY GATE (`gini_min` not None ⇒ ON; None ⇒ bit-exact with the level-only classifier). When on,
+    the stratified verdict additionally requires `wealth_gini ≥ gini_min` — a packed, affluent, but EQUAL band is
+    complex (affluent-egalitarian), not stratified. Closes the diagnosed decoupling where the stratified LABEL
+    ran opposite to measured inequality (a uniformly-rich world read 45% stratified at cred-Gini 0.29)."""
     packed = density_per_km2 >= BINFORD_PACKING_PER_KM2
     if not packed and surplus_frac < 0.5:
         return "egalitarian_forager"
     if packed and surplus_frac >= 0.7:
+        if gini_min is not None and (wealth_gini is None or wealth_gini < gini_min):
+            return "complex_forager"          # packed + affluent but EQUAL ⇒ not stratified (Testart's missing step)
         return "stratified_chiefdom"
     return "complex_forager"
 

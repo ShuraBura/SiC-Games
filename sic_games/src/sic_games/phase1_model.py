@@ -289,6 +289,7 @@ class TerrainWorld(mesa.Model):
         self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
+        self._band_cred_gini: dict[int, float] = {}            # R-103 per-band cred Gini (inequality gate; empty unless on)
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._claim_events_this_step: int = 0                  # instability diagnostic: defensibility contest events this step
@@ -548,12 +549,30 @@ class TerrainWorld(mesa.Model):
                     continue
                 self._step_agent(agent)
 
+        # R-103d MATERIAL INHERITANCE (default OFF ⇒ this whole block is skipped, bit-exact). Built ONCE before the
+        # prune: a parent→living-children index, so a dying agent's durable estate can be bequeathed rather than
+        # dissolving. This is the 'bequeathing' step big-men lack (Flannery ch.10). Heirs are children still ALIVE
+        # (a child dying the same step does not inherit — the estate goes to survivors).
+        _inh_rule = getattr(self._demog, "material_inheritance_rule", "none") if self._demog is not None else "none"
+        _heirs_of = None
+        if getattr(self._demog, "enable_material_inheritance", False) and _inh_rule != "none":
+            _heirs_of = {}
+            for c in self.agent_list:
+                if c.alive:
+                    if c._father is not None:
+                        _heirs_of.setdefault(c._father, []).append(c)
+                    if c._mother is not None:
+                        _heirs_of.setdefault(c._mother, []).append(c)
+
         # Prune dead agents. `agent.remove()` deregisters the corpse from Mesa's `self.agents`
         # AgentSet too — without it, dead agents linger frozen at their death cell and any metric
         # read off `self.agents` (e.g. the band tests) silently counts CORPSES as live population.
         # The dynamics already run off `agent_list` (live), so this is a measurement-correctness fix.
         for a in self.agent_list:
             if not a.alive:
+                if _heirs_of is not None and getattr(a, "material", 0.0) > 0.0:
+                    self._bequeath(a, _heirs_of.get(a, ()), _inh_rule,
+                                   by_status=getattr(self._demog, "material_heir_by_status", False))
                 self.occupied.discard(a.pos)
                 self._log_genea("death", a)                # Stage 2: observer log (band_id/lineage at death)
                 # F.3a bond dissolution on death: a dead WIFE leaves her husband's _wives; a dead HUSBAND widows
@@ -590,6 +609,30 @@ class TerrainWorld(mesa.Model):
             self._do_births()
         self.occupied = {a.pos for a in self.agent_list}
         self._update_standing()          # P6: tenure builds standing; leaving/isolation forfeits it (ready for next harvest)
+
+    def _bequeath(self, dead, heirs, rule, by_status=False) -> None:
+        """R-103d — transfer a dead agent's durable `material` estate to heirs by the inheritance `rule`.
+        No eligible heir ⇒ the estate DISSOLVES (unchanged from the default OFF path), so a lineage that fails to
+        reproduce loses its capital — the mechanism cannot manufacture wealth, only redistribute it across a real
+        parent→child link. Deterministic tie-break by unique_id so runs stay reproducible.
+
+        R-103e `by_status`: primogeniture sends the estate to the highest-CRED (status) heir rather than the eldest,
+        so wealth and rank pass TOGETHER (Flannery ch.16 chiefly primogeniture) instead of the estate leaking to a
+        random child who does not carry the lineage's standing."""
+        heirs = [h for h in heirs if h.alive]
+        if rule == "patrilineal_sons":
+            heirs = [h for h in heirs if h.sex == "male"]
+        if not heirs:
+            return
+        est = dead.material
+        if rule == "primogeniture":                          # whole estate to ONE heir
+            key = (lambda h: (getattr(h, "cred", 1.0), h.age, h.unique_id)) if by_status else (lambda h: (h.age, h.unique_id))
+            max(heirs, key=key).material += est
+        else:                                                # partible_equal / patrilineal_sons: split equally
+            per = est / len(heirs)
+            for h in heirs:
+                h.material += per
+        dead.material = 0.0
 
     def _update_defensibility_claims(self) -> None:
         """Economic-defensibility (Dyson-Hudson & Smith 1978) claim maintenance. A cell is CLAIMABLE when its
@@ -1697,7 +1740,12 @@ class TerrainWorld(mesa.Model):
                     # settle timer = hysteresis, so it holds through a bad year, not flickers). Per-cell → local.
                     density = len(occ) / _CELL_KM2
                     surplus_frac = store / cap_cell if cap_cell > 0.0 else 0.0
-                    target = society_from_character(density, surplus_frac)
+                    if getattr(self._demog, "enable_stratification_inequality_gate", False):   # R-103
+                        target = society_from_character(density, surplus_frac,
+                                                        wealth_gini=_gini([getattr(a, "cred", 1.0) for a in occ]),
+                                                        gini_min=self._demog.stratification_gini_min)
+                    else:
+                        target = society_from_character(density, surplus_frac)
                     c0 = self._cell_settle.get(key, 0)
                     c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
                     if c >= settle_T:
@@ -1728,14 +1776,19 @@ class TerrainWorld(mesa.Model):
             band_members: dict[int, int] = {}
             band_cells: dict[int, set] = {}
             band_cell_n: dict[tuple, int] = {}              # (bid, cell) → THIS band's members on that cell
+            ineq_gate = getattr(self._demog, "enable_stratification_inequality_gate", False)   # R-103
+            band_creds: dict[int, list] = {} if ineq_gate else {}   # per-band cred sample for the inequality gate
             for (cx, cy), occ in occ_lists.items():
                 for a in occ:
                     bid = a._group.band_id
                     band_members[bid] = band_members.get(bid, 0) + 1
                     band_cells.setdefault(bid, set()).add((cx, cy))
                     band_cell_n[(bid, (cx, cy))] = band_cell_n.get((bid, (cx, cy)), 0) + 1
+                    if ineq_gate:
+                        band_creds.setdefault(bid, []).append(getattr(a, "cred", 1.0))
             land_pack = getattr(self._demog, "enable_landscape_packing", False)   # R-61: landscape vs band-member density
             self._band_surplus = {}
+            self._band_cred_gini = {}                        # R-103: per-band cred Gini (populated only when the gate is on)
             # R-98: per-band ascribed head-count for the rank->hierarchy unlock. Computed once here
             # rather than per band, and skipped entirely when the flag is off (=> bit-exact).
             rank_on = self._demog is not None and getattr(self._demog, "enable_rank_hierarchy", False)
@@ -1764,7 +1817,13 @@ class TerrainWorld(mesa.Model):
                 cap_band = store_cap_mult * self._reserve_full * n
                 surplus_frac = store_share / cap_band if cap_band > 0.0 else 0.0
                 self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
-                target = society_from_character(density, surplus_frac)
+                if ineq_gate:                                   # R-103: stratified requires UNEQUAL cred, not just high surplus
+                    _wg = _gini(band_creds.get(bid, ()))
+                    self._band_cred_gini[bid] = _wg
+                    target = society_from_character(density, surplus_frac,
+                                                    wealth_gini=_wg, gini_min=self._demog.stratification_gini_min)
+                else:
+                    target = society_from_character(density, surplus_frac)
                 if morph_aq_gated and target != "egalitarian_forager":
                     # complexity requires a STORABLE SEASONAL AQUATIC GLUT in a PRODUCTIVE setting (salmon-river /
                     # Nile-floodplain signature). TWO conditions on the band's cells:
@@ -3024,6 +3083,12 @@ class TerrainWorld(mesa.Model):
         merit = lambda a: a.cred * getattr(a, "prowess", 1.0)
         margin, dep_p = cfg.office_challenge_margin, cfg.office_deposition_share
         w_over, gain, dissolve = cfg.office_overreach_weight, cfg.office_grievance_gain, cfg.succession_dissolve
+        # R-103e legitimacy EXEMPTION from wealth-leveling (Flannery ch.16 / Friedman). OFF ⇒ `_exempt` stays a
+        # no-op and this is bit-exact. ON ⇒ an ASCRIBED leader's material-overreach is scaled by (1-frac); rank
+        # keys are computed ONCE here, not per band.
+        _exempt_on = getattr(cfg, "enable_noble_leveling_exemption", False)
+        _exempt_frac = getattr(cfg, "noble_exemption_frac", 1.0) if _exempt_on else 0.0
+        _exempt_rk = self._rank_keys() if _exempt_on else None
 
         # CARRY THE OFFICE WITH THE MAN. band_ids churn on every fusion/fission, so an office keyed to the BAND
         # is vacated constantly by bookkeeping rather than by politics — measured: tenure capped at ~4 yr even
@@ -3078,7 +3143,10 @@ class TerrainWorld(mesa.Model):
             mo = sum(x.material for x in others) / len(others)
             over = 0.0 if mo <= 0.0 else (inc.material - mo) / mo
             over = 0.0 if over < 0.0 else (1.0 if over > 1.0 else over)
-            # FAILURE TO DELIVER (Boehm 10/29) — the band's own hardship is what a leader is judged on.
+            if _exempt_rk is not None and _exempt_rk.get(inc) in self._lineage_ascribed:
+                over *= (1.0 - _exempt_frac)      # R-103e: a legitimate noble's accumulation is HIS BY RIGHT
+            # FAILURE TO DELIVER (Boehm 10/29) — the band's own hardship is what a leader is judged on. NOT
+            # exempted: a noble is still deposed for famine, only his WEALTH ceases to be a grievance.
             ineff = min(self._band_starv_ema.get(bid, 0.0), 1.0)
             p = gain * (w_over * over + (1.0 - w_over) * ineff)
             if p <= 0.0:
