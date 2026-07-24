@@ -94,6 +94,24 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
 5. **Benchmark targets are the bottleneck.** Several mechanisms have no direct number (levy rate, exemption,
    endogamy) — benchmark on OUTCOMES, and say so. Digestion must extract every available target (like T-5/T-9).
 
+## R-103h — DIVERSE-WORLD DIAGNOSTIC (overnight, 8 arms x ~15k budget-capped, 2026-07-24)
+
+4 worlds x {forage, agri=improved_land}. Current validated stack (R-89..R-101; R-103 goods OFF). No machine-sleep.
+
+1. **R-103g ROBUST — CONFIRMED.** The wealth-in-people aristocracy replicates across ALL biomes: noble
+   lineage_size_lift **3.3-5.8x** and lineage_size_gini **0.51-0.68** (BHM stratified range) in 7 of 8 arms, while
+   GOODS (material lift) stays flat **1.0-1.14** everywhere. Not a coastal-tropical artifact. The elite is in people.
+2. **Nieboer-Domar fork NOT demonstrated with this proxy.** improved_land (worked/ownable land) did NOT wake the
+   goods axis (material lift ~1.0-1.1 in both forage AND agri arms). Worked land != true circumscription (resources
+   still not scarce enough to trap labour). A real goods-elite needs a CIRCUMSCRIPTION mechanism (bounded
+   resources), not just claimable land. Open question, not closed.
+3. **ANOMALY (n=1): coastal-tropical + agri** — the one arm where the people-elite INVERTED: lineage_size_lift 1.11
+   (vs 3.97 forage), noble cred lift 0.50 (nobles LOWER cred). Ascription attached to small/low-cred lineages here.
+   Seed fluke or a real aquatic-rich x agriculture interaction — needs replication (matched seeds).
+4. **ISSUE FLOATED UP (checker false-positive):** invariants.py flags `leader_tenure_yr` as STUCK, but it is
+   CONVERGING to a sensible ~7.8yr equilibrium, not frozen. The STUCK detector should exempt metrics that have
+   legitimately reached equilibrium. Checker tuning, NOT a model bug. (No extinctions; budgets fired cleanly.)
+
 ## R-103g — THE ELITE WAS IN PEOPLE, NOT GOODS (2026-07-23, reframing finding)
 
 The whole R-103 arc measured GOODS (material/cred/food) and found the noble lineage flat (~1.0) → "big men not
