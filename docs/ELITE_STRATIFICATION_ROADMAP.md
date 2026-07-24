@@ -105,10 +105,17 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
   benchmark: STRUCTURE moves toward chiefdom — ascribed_frac 0.32→0.22 (elite NARROWS), %stratified 3.8→5.9,
   village_gap_d 0.137→0.216, noble_cred_lift 1.05→1.24 — but the MATERIAL estate does NOT compound
   (noble_material_lift oscillates ~1.0–1.16; gini_material flat ~0.16). The estate drains as fast as it fills.
-- **HYPOTHESIS for the non-compounding:** gumsa/gumlao REVERSION delegitimises a chiefly lineage → it loses the
-  exemption → its estate is disgorged (Flannery: rank "lasted a few generations then collapsed"). NEXT TEST:
-  tribute with `enable_delegitimation` OFF — does the estate lock in? If yes, the model grows the Kachin cycle on
-  the MATERIAL axis, and permanent stratification needs ch.16 lock-in devices. If no, tribute too weak / decay.
+- **HYPOTHESIS (reversion collapses the estate) — FALSIFIED (2026-07-23).** Tribute with `enable_delegitimation`
+  OFF did NOT compound; it was WORSE — noble_material_lift 1.16→1.05, village_gap_d 0.22→0.06, and ascribed_frac
+  ratcheted to **0.45** (the nobility-universal degeneracy returns). The reversion is PROTECTIVE — it culls the
+  elite to keep it narrow and the break open. It is not the blocker.
+- **The real blocker (diagnosed):** the CHIEF is recomputed each step (top-cred ascribed member), so tribute
+  sprays across a CHURNING set of chiefs and never accumulates in ONE persistent lineage. Material also decays
+  (~0.002/step) faster than a churning chief can refill. **NEXT LINK = a genuinely HEREDITARY chiefly office**
+  (succession → the heir, so the tribute-right + estate stay with one lineage across generations). The
+  achieved-leadership model (merit=cred·prowess, recomputed) structurally lacks this — it is the (5→6) step.
+  Companion levers: slower material_decay for durable prestige goods (staple vs wealth, D'Altroy&Earle);
+  endogamy sealing the break. STATUS axis already responds; only the WEALTH axis needs the hereditary office.
 
 ## NEXT (the digestion session, dependency order)
 1. Digest Johnson & Earle + Earle (staple/wealth finance) → the sequence + tribute target.
