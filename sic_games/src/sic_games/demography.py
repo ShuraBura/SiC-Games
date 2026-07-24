@@ -1000,6 +1000,17 @@ class DemographyConfig(BaseModel):
     # famine, just not for wealth). Default OFF ⇒ bit-exact.
     enable_noble_leveling_exemption: bool = False
     noble_exemption_frac: float = Field(1.0, ge=0.0, le=1.0)    # 1.0 = full waiver of the wealth-grievance for nobles
+    # R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE and cannot
+    # make a hereditary estate (R-103e benchmark: leader_material_lift rose to 1.26 but noble_material_lift stayed
+    # 1.10 — the levy concentrates in the office, not the lineage). This is the LINEAGE channel: in each band the
+    # locally-dominant ASCRIBED lineage's head (the CHIEF, by legitimacy+rank, NOT by winning the office contest)
+    # levies `lineage_tribute_frac` of every non-chief-lineage member's durable production. The estate therefore
+    # persists across office turnover and is bequeathed WITHIN the lineage — Friedman "the legitimated lineage
+    # controls resources and is entitled to tribute"; Earle wealth finance. Rate anchor: gumsa "a thigh from every
+    # animal" ≈ 0.10–0.15 of a kill (DM-F6; no % levy rate exists in the lit — D'Altroy&Earle verified neg — so
+    # this is calibrated to OUTCOME: noble_material_lift > 1). Default OFF ⇒ bit-exact.
+    enable_lineage_tribute: bool = False
+    lineage_tribute_frac: float = Field(0.15, ge=0.0, le=1.0)
     # WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an
     # "ambitious, accumulative aggrandizer" — "the best and most highly motivated minds of an epoch" — i.e. a
     # PERSONALITY/STRATEGY TYPE held by a MINORITY, present in every society. It is NOT a rank in an inherited

@@ -521,6 +521,7 @@ class TerrainWorld(mesa.Model):
         self.deaths_orphan_this_step = 0              # R-74 diag: deaths carrying an elevated kin/orphan hazard
         self.leveling_events_this_step = 0            # R-82 diag: Boehm sanctions applied to material-monopolizers
         self.leader_levy_this_step = 0.0              # R-83 diag: durable output levied by band leaders
+        self.lineage_tribute_this_step = 0.0         # R-103f diag: durable output levied by CHIEFLY lineages
         self._hides_this_step = {}                    # R-83: per-agent durable output this step (for the levy)
         self.depositions_this_step = 0                # R-84 diag: leaders removed by DEPOSITION (Boehm, 9/48)
         self.desertions_this_step = 0                 # R-84 diag: followers who WALKED AWAY (Boehm, 17/48 — the commoner channel)
@@ -2323,6 +2324,44 @@ class TerrainWorld(mesa.Model):
                 if levy > 0.0:
                     lead.material += levy
                     self.leader_levy_this_step += levy
+
+        # R-103f PER-LINEAGE (CHIEFLY) TRIBUTE — the wealth-finance channel that builds a HEREDITARY estate rather
+        # than an office hoard. The CHIEF of a band = the highest cred·prowess member of an ASCRIBED lineage there
+        # (defined by legitimacy+rank, NOT by winning the office contest — so the estate survives office turnover
+        # and is bequeathed within the lineage). Every member NOT of the chief's lineage pays `lineage_tribute_frac`
+        # of this step's durable production to the chief. One winner per band ⇒ concentrates even when ascription is
+        # broad. Default OFF ⇒ skipped, bit-exact. [Friedman; Earle wealth finance; gumsa 'a thigh' ≈ DM-F6]
+        if (self._demog is not None and getattr(self._demog, "enable_lineage_tribute", False)
+                and self._demog.lineage_tribute_frac > 0.0 and self._hides_this_step and self._lineage_ascribed):
+            tf = self._demog.lineage_tribute_frac
+            rk = self._rank_keys()
+            prod_by_band: dict = {}
+            for a, h in self._hides_this_step.items():
+                if a.alive and h > 0.0:
+                    prod_by_band.setdefault(a._group.band_id, []).append((a, h))
+            members_by_band: dict = {}
+            for a in self.agent_list:
+                if rk.get(a) in self._lineage_ascribed:
+                    members_by_band.setdefault(a._group.band_id, []).append(a)
+            for bid, rows in prod_by_band.items():
+                asc_here = members_by_band.get(bid)
+                if not asc_here:
+                    continue                                    # no ascribed lineage present ⇒ no chief, no tribute
+                chief = max(asc_here, key=lambda a: a.cred * getattr(a, "prowess", 1.0))
+                chief_lin = rk.get(chief)
+                trib = 0.0
+                for a, h in rows:
+                    if rk.get(a) == chief_lin:
+                        continue                                # the chief's own lineage does not pay itself
+                    take = tf * h
+                    if take > a.material:
+                        take = a.material
+                    if take > 0.0:
+                        a.material -= take
+                        trib += take
+                if trib > 0.0:
+                    chief.material += trib
+                    self.lineage_tribute_this_step += trib
         self._hides_this_step = {}
 
         # R-82 Stage A: BOEHM LEVELING — the reverse-dominance coalition. Co-residents sanction whoever holds
@@ -2332,6 +2371,14 @@ class TerrainWorld(mesa.Model):
         if self._demog is not None and getattr(self._demog, "enable_leveling", False):
             lev_s = self._demog.leveling_strength
             lev_sh = self._demog.leveling_share
+            # R-103e — the SAME legitimacy exemption the overreach-deposition path uses (line ~3146), applied here
+            # to the WEALTH-DISGORGEMENT. This is the coupling that was missing: without it a levied estate is
+            # stripped back to the local norm every step, so an ascribed noble could hold OFFICE (deposition-exempt)
+            # yet never ACCUMULATE (still disgorged). A legitimate noble's material is "his by right" (Flannery
+            # ch.16 / Friedman), so his excess is not conspicuous/sanctionable. OFF ⇒ `_lx_rk` is None ⇒ bit-exact.
+            _lx_on = getattr(self._demog, "enable_noble_leveling_exemption", False)
+            _lx_frac = getattr(self._demog, "noble_exemption_frac", 1.0) if _lx_on else 0.0
+            _lx_rk = self._rank_keys() if _lx_on else None
             if lev_s > 0.0 and lev_sh > 0.0:
                 by_cell: dict = {}
                 for a in self.agent_list:
@@ -2347,6 +2394,10 @@ class TerrainWorld(mesa.Model):
                         excess = a.material - mean_m
                         if excess <= 0.0:
                             continue
+                        if _lx_rk is not None and _lx_rk.get(a) in self._lineage_ascribed:
+                            excess *= (1.0 - _lx_frac)            # legitimate accumulation is not sanctioned
+                            if excess <= 0.0:
+                                continue                          # fully exempt (frac=1.0) ⇒ no disgorgement
                         # conspicuousness = how far above the local norm he stands (Boehm: it is the VISIBLE
                         # self-assertion that draws sanction, not absolute wealth)
                         p = lev_s * (excess / mean_m)

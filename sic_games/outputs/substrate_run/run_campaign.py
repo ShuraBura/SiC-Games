@@ -96,6 +96,9 @@ ENDOGAMY  = os.environ.get("C_ENDOGAMY", "0") == "1"     # R-103b Flannery class
 ENDOG_A   = float(os.environ.get("C_ENDOG_A", "1.5"))    #   the mechanism that CUTS a noble/commoner break. Default OFF.
 MATINHERIT = os.environ.get("C_MATINHERIT", "0") == "1"  # R-103d bequeath durable capital at death (default OFF = dissolves)
 MATRULE   = os.environ.get("C_MATRULE", "primogeniture") # none|primogeniture|partible_equal|patrilineal_sons [Goody/EA]
+LINTRIB   = os.environ.get("C_LINTRIBUTE", "0") == "1"   # R-103f per-lineage chiefly tribute (default OFF)
+TRIBFRAC  = float(os.environ.get("C_TRIBFRAC", "0.15"))  # R-103f share of production the chief levies [gumsa a-thigh]
+DELEGIT   = os.environ.get("C_DELEGIT", "1") == "1"      # R-103f test knob: gumsa/gumlao reversion (default ON, bit-exact)
 HEIRSTAT  = os.environ.get("C_HEIRSTAT", "0") == "1"     # R-103e primogeniture heir = highest-CRED child (rank+estate together)
 NOBLEXEMPT = os.environ.get("C_NOBLEXEMPT", "0") == "1"  # R-103e legitimate nobles EXEMPT from wealth-leveling (Flannery ch.16)
 SEDFERT   = os.environ.get("C_SEDFERT", "1") == "1"      # sedentism->fertility boost. DEFAULT ON = bit-exact with
@@ -116,7 +119,7 @@ ELITE_KW = dict(
     enable_leveling=True, leveling_strength=0.79, leveling_share=0.8,
     enable_leader_office=True, office_grievance_gain=0.05,
     enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
-    enable_delegitimation=True, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
+    enable_delegitimation=DELEGIT, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
     enable_relative_legitimacy=RELLEGIT, legit_rel_multiplier=RELMULT,
     enable_relative_resentment=RELRES, resent_effect_threshold=RESEFF,
     enable_resentment_accumulator=RESACC, enable_village_resentment=RESVIL,
@@ -340,6 +343,7 @@ def main():
         enable_material_inheritance=MATINHERIT, material_inheritance_rule=MATRULE,   # R-103d bequest
         material_heir_by_status=HEIRSTAT,                                            # R-103e estate follows rank
         enable_noble_leveling_exemption=NOBLEXEMPT,                                  # R-103e ch.16 exemption
+        enable_lineage_tribute=LINTRIB, lineage_tribute_frac=TRIBFRAC,               # R-103f chiefly tribute
         enable_adaptive_connubium=cut2, mate_search_min_eligible=(MSTAR if cut2 else 3),
         enable_exogamy=cut2, exogamy_degree="lineage",
         enable_village_budding=BUD, village_fission_threshold=BUD_THR,
