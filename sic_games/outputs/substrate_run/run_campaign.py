@@ -244,6 +244,25 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
             return 0.0
         rm = statistics.mean(getattr(a, attr, 0.0) for a in ref)
         return round(statistics.mean(getattr(a, attr, 0.0) for a in grp) / rm, 3) if rm > 1e-9 else 0.0
+    # R-103g — WEALTH-IN-PEOPLE. Does the noble lineage hold more PEOPLE (the non-decaying, self-reproducing
+    # accumulation form; Guyer; Nieboer-Domar: elites in LAND-ABUNDANT worlds control persons, not goods)? We have
+    # measured every GOODS currency and found the lineage flat; this asks whether the chiefly elite has been
+    # sitting in FOLLOWERS all along (the R-103c 'wrong currency' trap, one axis over). Diagnostic only, no mechanism.
+    _lin_size: dict = {}
+    for a in al:
+        k = _rk.get(a)
+        _lin_size[k] = _lin_size.get(k, 0) + 1
+
+    def _people_lift(grp, ref, fn):
+        if not grp or not ref:
+            return 0.0
+        rm = statistics.mean(fn(a) for a in ref)
+        return round(statistics.mean(fn(a) for a in grp) / rm, 3) if rm > 1e-9 else 0.0
+    _nm = [a for a in _nob if a.sex == "male" and a.age >= menarche]
+    _cm = [a for a in _com if a.sex == "male" and a.age >= menarche]
+    _lin_of = lambda a: _lin_size.get(_rk.get(a), 1)                 # size of the agent's lineage (corporate following)
+    _wives_of = lambda a: len(getattr(a, "_wives", ()))
+    _kids_of = lambda a: getattr(a, "_n_fathered", 0)
     row = dict(
         step=step, pop=pop, births=w.births_this_step, deaths_starv=w.deaths_starv_this_step,
         mean_reserve=round(statistics.mean(wealth) / w._reserve_full, 3) if pop else 0,
@@ -271,6 +290,10 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         # R-103c elite currency breakdown — LINEAGE (ascribed) lift vs OFFICE (leader) lift, per currency
         noble_cred_lift=_lift(_nob, _com, "cred"), noble_material_lift=_lift(_nob, _com, "material"),
         noble_food_lift=_lift(_nob, _com, "wealth"),
+        # R-103g wealth-in-PEOPLE: does the noble lineage hold more followers/wives/children than commoners?
+        noble_lineage_size_lift=_people_lift(_nob, _com, _lin_of),
+        noble_wives_lift=_people_lift(_nm, _cm, _wives_of), noble_fathered_lift=_people_lift(_nm, _cm, _kids_of),
+        lineage_size_gini=round(gini(list(_lin_size.values())), 3),
         leader_cred_lift=_lift(_lead, _nonl, "cred"), leader_material_lift=_lift(_lead, _nonl, "material"),
         leader_food_lift=_lift(_lead, _nonl, "wealth"),
         gini_material=round(gini(_mat), 3), mean_material=round(statistics.mean(_mat), 2) if _mat else 0.0,

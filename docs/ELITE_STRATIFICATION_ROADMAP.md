@@ -94,6 +94,31 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
 5. **Benchmark targets are the bottleneck.** Several mechanisms have no direct number (levy rate, exemption,
    endogamy) — benchmark on OUTCOMES, and say so. Digestion must extract every available target (like T-5/T-9).
 
+## R-103g — THE ELITE WAS IN PEOPLE, NOT GOODS (2026-07-23, reframing finding)
+
+The whole R-103 arc measured GOODS (material/cred/food) and found the noble lineage flat (~1.0) → "big men not
+chiefs". Measuring the PEOPLE axis instead: **noble lineages command 2.9x the followers of commoner lineages**
+(noble_lineage_size_lift), with **lineage_size_gini 0.50** (BHM stratified range 0.4-0.6) — while STILL flat in
+every goods currency. The chiefly elite EXISTS; it is a WEALTH-IN-PEOPLE aristocracy (Guyer; Kopytoff&Miers), and
+every prior diagnostic was one axis over (the R-103c 'wrong currency' trap, again).
+
+**Nieboer-Domar, confirmed in the model:** in a LAND-ABUNDANT / open-resource world you cannot hold an elite in
+goods (dependents just leave and forage elsewhere — which is why material never compounded, all day). Elites here
+form in PEOPLE. The material machinery (tribute/inheritance/exemption, R-103d-f) is the right tool for a
+CIRCUMSCRIBED (land-scarce) world, NOT this one — a real biome-dependence fork to test.
+
+**Substrate-driven, not the stack:** lineage_size_lift is 2.9 in BASE and 2.5 with the full tribute stack — the
+aristocracy comes from polygyny + status->RS + lineage branching, NOT from anything built this session. It is
+stable (~2.7x), Kachin-scale, not runaway.
+
+**CONSEQUENCES (rewrite the spine):**
+1. Stratification classifier + elite diagnostics must key on FOLLOWING (lineage/dependent concentration), not goods.
+2. Goods-accumulation (tribute etc.) is deferred to the circumscribed-world arm; it is not this world's elite axis.
+3. No new mechanism needed to CREATE the elite. To make it COMPOUND further: the non-decaying wealth-in-people
+   forms — clientage -> bridewealth -> slavery (Flannery ch.5 NW Coast; Kachin mayu-dama). Lit to FILE: Guyer 1993,
+   Kopytoff & Miers 1977, Nieboer 1900 / Domar 1970.
+CAVEAT: lineage_size is a PROXY for a following (Nootka/conical-clan reading); causation likely size->ascription.
+
 ## R-103e/f PROGRESS (2026-07-23, link 2 build)
 
 - **Office-levy shortcut RULED OUT (R-103e).** Strengthening + exempting the existing `leader_share` levy raised
