@@ -94,6 +94,33 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
 5. **Benchmark targets are the bottleneck.** Several mechanisms have no direct number (levy rate, exemption,
    endogamy) — benchmark on OUTCOMES, and say so. Digestion must extract every available target (like T-5/T-9).
 
+## R-105 — CARRYING-CAPACITY BUG: agglomeration escaped the ceiling (2026-07-26) **[FIX UNVERIFIED]**
+
+**The bug.** Point-mode agglomeration adds a SUPERLINEAR occupancy bonus `aggl_R*(n**aggl_a - n)` to ANY occupied
+cell (phase1_model.py ~1602), but the R-63 carrying-capacity ceiling was gated on `(cx,cy) in _settlement_sites`
+(~1606). Non-settlement cells therefore had UNCAPPED increasing returns: more crowding -> superlinearly more food
+-> more people. No Malthusian limit exists on that path.
+
+**Evidence (R-104 arm coastal-tropical seed 3, specimen `campaign_trajectory_r104_ctrop_forage_s3.json`):** sat at
+pop ~3000 for 1750 steps, then surplus_med climbed 0.50->0.70->0.94->**1.00 (saturated)** and pop went
+3259->4794->8340->17800->40919->**97551** in 1250 steps, with **ZERO starvation deaths** at 61 agents/cell and
+mean_reserve unchanged at 0.316. n_settle stayed FLAT at ~32 (capped path) while n_villages exploded 20->751
+(uncapped path) — the signature that localises it. Tier-1 foraging is NOT at fault (occupants split a cell via
+compute_harvest_shares).
+
+**The fix (committed c2c6067, NOT yet suite-tested).** `enable_aggl_ceiling` applies the ceiling wherever the
+agglomeration bonus applies. Default OFF in config (every pre-R-105 result reproduces bit-exactly); ON in the
+campaign harness via `C_AGGLCEIL` (set 0 to reproduce the gap for A/B).
+Partial verification: re-running the exploding specimen with the fix showed starvation RETURN (74 deaths by step
+500 vs 0 during the explosion) and surplus FALLING (0.609->0.536) instead of saturating; stable at pop 5023 @1250.
+Needs to clear step 2000 (where the buggy arm tipped) to be conclusive.
+
+**CONSEQUENCES — carry into every downstream reading.**
+- Expect the fix to LOWER carrying capacity in dense runs. **R-64's validated 9-16% stratification, and any
+  population-equilibrium/village-count result, are PROVISIONAL until re-validated with C_AGGLCEIL=1.**
+- The R-103h flat-tropical 40k explosion and the R-104 "seed bifurcation" (seeds 0/1/2 -> 5937-8504; seed 3 ->
+  97551) are almost certainly this bug, NOT ecology or bistability.
+
 ## R-103h — DIVERSE-WORLD DIAGNOSTIC (overnight, 8 arms x ~15k budget-capped, 2026-07-24)
 
 4 worlds x {forage, agri=improved_land}. Current validated stack (R-89..R-101; R-103 goods OFF). No machine-sleep.
