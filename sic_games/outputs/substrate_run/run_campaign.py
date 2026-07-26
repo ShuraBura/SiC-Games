@@ -99,6 +99,12 @@ MATRULE   = os.environ.get("C_MATRULE", "primogeniture") # none|primogeniture|pa
 LINTRIB   = os.environ.get("C_LINTRIBUTE", "0") == "1"   # R-103f per-lineage chiefly tribute (default OFF)
 TRIBFRAC  = float(os.environ.get("C_TRIBFRAC", "0.15"))  # R-103f share of production the chief levies [gumsa a-thigh]
 DELEGIT   = os.environ.get("C_DELEGIT", "1") == "1"      # R-103f test knob: gumsa/gumlao reversion (default ON, bit-exact)
+PATCHSZ   = int(os.environ.get("C_PATCH", "0"))          # R-103i CIRCUMSCRIPTION (Carneiro): capacity sub-window
+                                                          # size; 0 = the validated default PATCH. NPPCapacityField
+                                                          # masks capacity to (X0,Y0,size) with ZERO outside, so a
+                                                          # smaller patch = bounded arable land the population
+                                                          # cannot disperse out of. SELF-VERIFYING: meta's
+                                                          # habitable_cells reports the realised bounded area.
 HEIRSTAT  = os.environ.get("C_HEIRSTAT", "0") == "1"     # R-103e primogeniture heir = highest-CRED child (rank+estate together)
 NOBLEXEMPT = os.environ.get("C_NOBLEXEMPT", "0") == "1"  # R-103e legitimate nobles EXEMPT from wealth-leveling (Flannery ch.16)
 SEDFERT   = os.environ.get("C_SEDFERT", "1") == "1"      # sedentism->fertility boost. DEFAULT ON = bit-exact with
@@ -350,8 +356,9 @@ def main():
         sha = "?"
     k = world_lottery_climate(SEED, terrain=TERR, climate=CLIM)
     f = generate_world(k, mode="climate")
-    base = NPPCapacityField(f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
-    base0 = NPPCapacityField(f, BURN, patch=(X0, Y0, PATCH), mode="tallavaara", aquatic=True, enable_depletion=True)
+    _patch = (X0, Y0, PATCHSZ if PATCHSZ > 0 else PATCH)     # R-103i: shrink ⇒ circumscription
+    base = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
+    base0 = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
     cap = ClimateField(base, a_seas=0.4, regime_driver=None)      # seasonal, NO regime forcing (endogenous only)
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
@@ -397,7 +404,7 @@ def main():
         _full_cfg = {k: getattr(demog, k) for k in dir(demog) if not k.startswith("_")}
     _full_cfg = {k: v for k, v in _full_cfg.items() if isinstance(v, (int, float, str, bool, type(None)))}
     meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
-                terrain=TERR, climate=CLIM,
+                terrain=TERR, climate=CLIM, patch_size=(PATCHSZ if PATCHSZ > 0 else PATCH),
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
                 genome=GENOME, genea_csv=os.path.basename(GENEA), genealogy_on=GENEALOG,
                 connubium=CONNUBIUM, m_star=(MSTAR if cut2 else 3), defend=DEFEND, elite=ELITE,

@@ -130,13 +130,25 @@ def check(rows: list[dict], cfg: dict | None = None) -> list[Violation]:
                 f"out of range for this regime rather than that it is merely slow"))
 
     # ── STUCK: a field that should fluctuate, pinned ────────────────────────────────────────────────────
+    # CONVERGENCE IS NOT STUCKNESS (fix 2026-07-24, R-103h). The first cut flagged `leader_tenure_yr` in nearly
+    # every arm of the diverse-world sweep — but it was not frozen, it was CONVERGING to a sensible ~7.8 yr
+    # equilibrium (0 → 4.0 → 6.7 → 7.7 → 7.8 …) and then sitting there, which for a rounded mean is exactly what
+    # a healthy equilibrium looks like. A checker that cries wolf on every run is one that gets ignored (the
+    # reason the STUCK rule exists at all). So a tail-constant value is only a VIOLATION when it is either
+    #   (a) pinned at a BOUND (0.0/1.0) — the R-89 "nobility universal / gumsa everywhere" degeneracy, or
+    #   (b) constant over the ENTIRE history — i.e. it never moved at all, so nothing ever drove it.
+    # A metric that varied and then settled has equilibrated, and that is a result, not a fault.
     for key in STUCK_WATCH:
         if _tail_constant(rows, key, STUCK_WINDOW):
             v = cur.get(key)
             at_bound = v in (0.0, 1.0)
+            never_moved = _tail_constant(rows, key, len(rows))
+            if not (at_bound or never_moved):
+                continue                                  # converged to an equilibrium — healthy, not stuck
+            why = " (a BOUND)" if at_bound else " (never varied at all)"
             out.append(Violation(
                 f"{key}-stuck", "STUCK",
-                f"{key} pinned at {v}{' (a BOUND)' if at_bound else ''} for {STUCK_WINDOW} snapshots"))
+                f"{key} pinned at {v}{why} for {STUCK_WINDOW} snapshots"))
 
     # ── STUCK (absorbing): lineage count that cannot recover ────────────────────────────────────────────
     # `_lineage` could only ever be lost, never founded (R-90), making fixation certain. A long-frozen count is
