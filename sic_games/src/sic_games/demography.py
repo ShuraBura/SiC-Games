@@ -355,6 +355,14 @@ class DemographyConfig(BaseModel):
     # Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45% stratified while having the
     # LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality. When ON, a would-be stratified
     # band must also show within-band cred concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact.
+    # R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR
+    # occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 carrying-capacity ceiling was gated on
+    # `(cx,cy) in _settlement_sites`. So a NON-settlement cell got unbounded increasing returns: more crowding →
+    # superlinearly more food → more people. Diagnosed R-104: a run sat at pop ~3000 for 1750 steps, then
+    # surplus_med saturated at 1.0 and pop went 3259→97551 with ZERO starvation at 61 agents/cell. ON ⇒ the
+    # ceiling also applies wherever the agglomeration bonus is applied. Default OFF ⇒ bit-exact with every
+    # pre-R-105 result (which were all run with the gap open).
+    enable_aggl_ceiling: bool = False
     enable_stratification_inequality_gate: bool = False
     stratification_gini_min: float = Field(0.40, ge=0.0, le=1.0)  # BHM 2009 Table 2 α-weighted Gini: forager 0.25,
     #   horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40.

@@ -1603,7 +1603,12 @@ class TerrainWorld(mesa.Model):
                 else:
                     na = no ** aggl_a
                     S += float(aggl_R[cy, cx]) * (na / (na + aggl_h ** aggl_a))  # catchment R·L(n) (falsified)
-            if ceiling_on and settle_on and (cx, cy) in self._settlement_sites:
+            # R-105: the ceiling must cover the AGGLOMERATION bonus too. It was gated on settlement sites only,
+            # so the superlinear (n**aggl_a - n) term at NON-settlement cells was UNCAPPED — an unbounded
+            # increasing-returns loop with no Malthusian limit (R-104: pop 3259→97551, zero starvation).
+            _cap_here = (settle_on and (cx, cy) in self._settlement_sites) or (
+                aggl_on and aggl_R is not None and getattr(self._demog, "enable_aggl_ceiling", False))
+            if ceiling_on and _cap_here:
                 S = min(S, self._settlement_carrying_capacity((cx, cy)))         # R-63: a village can't out-produce its catchment
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the

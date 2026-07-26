@@ -367,6 +367,7 @@ def main():
         enable_landscape_packing=True, enable_sedentism_fertility=SEDFERT,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True,
         enable_catchment_ceiling=True, enable_settlement_scalar_stress=True, settle_catchment_radius=1,
+        enable_aggl_ceiling=(os.environ.get("C_AGGLCEIL", "1") == "1"),   # R-105 bugfix; C_AGGLCEIL=0 reproduces the gap
         enable_economic_defensibility=DEFEND,
         enable_stratification_inequality_gate=INEQGATE, stratification_gini_min=GINIMIN,   # R-103
         enable_ascribed_mate_choice=ENDOGAMY, ascribed_mate_strength=(ENDOG_A if ENDOGAMY else 0.0),  # R-103b endogamy
