@@ -1954,16 +1954,25 @@ class TerrainWorld(mesa.Model):
         c_alpha = demog.condition_alpha if cond_on else 0.0
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
-            if cond_on:                      # S0: slow EMA of nutritional status → body condition / immune competence
-                _rs = a.reserve_scale()
-                _lo = a.reserve_floor * _rs; _span = self._reserve_full * _rs - _lo
-                _frac = (a._fed_reserve - _lo) / _span if _span > 0 else 1.0
-                _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
-                a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             if mcf is not None and getattr(a, "_moved_this_step", False):
                 a.wealth -= float(mcf[a.pos[1], a.pos[0]])     # Stage 1b: realized terrain move cost (drain movers)
                 a._moved_this_step = False
+            if cond_on:                      # S0: slow EMA of nutritional status → body condition / immune competence
+                # SAMPLED AT THE TROUGH (2026-07-27). This EMA used to read `_fed_reserve`, i.e. wealth
+                # POST-harvest but PRE-burn — the PEAK of the metabolic cycle. `_frac` clamps at 1.0, so any
+                # agent whose harvest topped it up read "completely fed", and the EMA of a near-constant 1.0
+                # stayed at 1.0. Measured: mean `_condition` 0.9998 (min 0.974) in a crowded BOREAL world, so
+                # the mortality multiplier it feeds was ~1.0002 and `enable_nutrition_synergy` was silently
+                # DEAD whenever `enable_condition` was on (ablation displacement 0.3468 -> 0.0000). Reading
+                # wealth after maintenance + movement costs is the trough, so a real deficit is visible.
+                # `_fed_reserve` is deliberately NOT changed: energetic fertility and the legacy synergy
+                # branch read it, and both want the post-harvest value.
+                _rs = a.reserve_scale()
+                _lo = a.reserve_floor * _rs; _span = self._reserve_full * _rs - _lo
+                _frac = (a.wealth - _lo) / _span if _span > 0 else 1.0
+                _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
+                a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.age += 1
             if a._founder_store > 0.0:
                 # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the
