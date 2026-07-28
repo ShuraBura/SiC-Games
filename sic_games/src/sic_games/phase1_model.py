@@ -3921,6 +3921,28 @@ class TerrainWorld(mesa.Model):
                 if side(a):
                     a._group.band_id = new_id
 
+    @staticmethod
+    def _kin_affinity(a, b) -> float:
+        """Kinship between two agents — the village-fission cleavage axis (Alvard 2009; see the call site).
+
+        Uses the model's OWN relatedness measure (genome identity-by-state) when genomes are live, so nothing
+        new is invented. Genealogical fallback when they are not, in decreasing closeness: shared parent or
+        parent-child 0.5, same patriline 0.25, otherwise 0. Symmetric, and deterministic — no RNG."""
+        if a is b:
+            return 1.0
+        ga, gb = getattr(a, "_genome", None), getattr(b, "_genome", None)
+        if ga is not None and gb is not None:
+            return ga.relatedness(gb)
+        am, af = getattr(a, "_mother", None), getattr(a, "_father", None)
+        bm, bf = getattr(b, "_mother", None), getattr(b, "_father", None)
+        if ((am is not None and am is bm) or (af is not None and af is bf)
+                or am is b or af is b or bm is a or bf is a):
+            return 0.5                                              # siblings, or parent and child
+        la, lb = getattr(a, "_lineage", None), getattr(b, "_lineage", None)
+        if la is not None and la == lb:
+            return 0.25                                             # same patriline, no closer tie known
+        return 0.0
+
     def _maintain_village_budding(self) -> None:
         """Bandy 2004 / Chagnon 1975 VILLAGE FISSIONING — the ethnographic settlement-SPREAD/recovery mode. A VILLAGE
         (the multi-band cluster within settle_radius of a settlement site) grown past `village_fission_threshold`
@@ -3954,13 +3976,30 @@ class TerrainWorld(mesa.Model):
             bids = Counter(a._group.band_id for a in village)
             if "stratified" in str(self._band_society.get(bids.most_common(1)[0][0], "")):
                 continue                                            # integrated village → fission suppressed (Bandy)
-            lin_ct = Counter(getattr(a, "_lineage", None) for a in village)
-            top = [l for l, _ in lin_ct.most_common(2) if l is not None]
-            if len(top) < 2:
-                continue                                            # single-lineage village → no cleavage line
-            faction = [a for a in village if getattr(a, "_lineage", None) == top[1]]
-            if len(faction) < minf * len(village):
-                continue                                            # rival bloc too small to carry a fission
+            # CLEAVE ON KINSHIP, NOT LINEAGE (2026-07-27). This used to split off the SECOND-LARGEST LINEAGE.
+            # Alvard 2009 (literature/AlvardPaper2.pdf), reanalysing Chagnon's Mishimishimaböwei-teri axe fight
+            # — a village that had itself just fissioned — finds factions assort by GENETIC KINSHIP (~15% of
+            # variance) and NOT by lineage: lineage alone explains ~3%, and once kinship is controlled it is no
+            # longer significant (p=0.281), its solo effect being mere covariance with relatedness. The paper's
+            # own summary: "lineage identity explained nothing". Lineage-assorted factions are Alvard's LAMALERA
+            # (whaling-crew) pattern, not the Yanomamö fission one.
+            # Measured cost of the old rule: a 475-person village here held 126 lineages, largest 8.2%, so no
+            # lineage bloc could reach the required share and budding NEVER fired at any village size.
+            # Chagnon's mechanism is competing headmen — the village splits between its two highest-standing
+            # men, each keeping those more closely related to him.
+            adults = [a for a in village if a.age >= cfg.menarche_months] or list(village)
+            if len(adults) < 2:
+                continue                                            # nobody to compete → no cleavage
+            adults.sort(key=lambda x: (getattr(x, "cred", 0.0) * getattr(x, "prowess", 1.0), x.unique_id),
+                        reverse=True)
+            head, rival = adults[0], adults[1]                      # incumbent headman vs his rival
+            faction = [a for a in village
+                       if self._kin_affinity(a, rival) > self._kin_affinity(a, head)]
+            # A village with no real cleavage yields only the rival himself (everyone else is equidistant
+            # between the two men), and one person is not a daughter village. Two is the minimum bloc that can
+            # carry a fission; `village_bud_min_faction` (default 0) can impose a share requirement on top.
+            if len(faction) < 2 or len(faction) < minf * len(village):
+                continue                                            # no rival bloc to carry a fission
             # NEAREST open storable daughter site (its distance = the relocation cost that drives circumscription)
             best, bestd = None, R + 1
             for yy in range(max(0, sy - R), min(H, sy + R + 1)):

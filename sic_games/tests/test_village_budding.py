@@ -1,5 +1,19 @@
-"""Village budding (Bandy 2004 / Chagnon 1975): a village past the fission threshold sheds its 2nd-largest lineage
-faction, which relocates to a nearby available storable site and founds a daughter village. Default-OFF ⇒ bit-exact."""
+"""Village budding (Bandy 2004): a village past the fission threshold sheds a rival faction, which relocates to a
+nearby available storable site and founds a daughter village. Default-OFF ⇒ bit-exact.
+
+CLEAVAGE AXIS CHANGED 2026-07-27 — these tests used to pin a split along the 2nd-largest LINEAGE. Alvard 2009
+(literature/AlvardPaper2.pdf), reanalysing Chagnon's Mishimishimaböwei-teri axe fight — a village that had just
+fissioned — finds factions assort by GENETIC KINSHIP (~15% of variance), while lineage alone explains ~3% and
+becomes non-significant (p=0.281) once kinship is controlled: "lineage identity explained nothing". Lineage-
+assorted factions are that paper's LAMALERA contrast case, not the Yanomamö fission pattern. The village now
+splits between its two highest-standing men, each keeping those more closely related to him.
+
+The old rule also silently disabled the mechanism: it required a rival lineage bloc of ≥25% (a share with no
+[ANCHORED] tag, and absent from Bandy, which never mentions faction size), while a measured 475-person village
+held 126 lineages with the largest at 8.2%. Budding never fired at any village size.
+
+Test villages are therefore built as KIN GROUPS (agents sharing a father) rather than lineage labels, since a
+shared label is not a kin tie and the cleavage no longer reads labels."""
 import pytest
 
 from sic_games.config import KcalEconomyConfig
@@ -27,6 +41,20 @@ def _place(w, cell, n, lineage, band_id):
     return out
 
 
+def _kin_group(w, cell, n, lineage, band_id, cred=1.0, leader_cred=None):
+    """A FACTION: `n` agents sharing one father, so they are siblings (r=0.5 under the genealogical fallback)
+    and genuinely closer to each other than to anyone else. The father is an identity only — never added to
+    `agent_list`, so he is not a village member. `leader_cred` marks the faction's standing man."""
+    dad = w._make_agent(sex="male", lh_cfg=None)          # identity only; deliberately NOT placed in the village
+    out = _place(w, cell, n, lineage, band_id)
+    for a in out:
+        a._father = dad
+        a.cred = cred
+    if leader_cred is not None:
+        out[0].cred = leader_cred
+    return out
+
+
 def _site_with_neighbor(w):
     """A storable cell that has ANOTHER storable cell within [sep+1, R] (so a daughter site exists)."""
     aqf = w._s_pot_field(); persist = w._demog.settle_persist_threshold
@@ -44,18 +72,19 @@ def test_village_budding_defaults_off():
     c = DemographyConfig()
     assert c.enable_village_budding is False
     assert c.village_fission_threshold == 170
-    assert c.village_bud_min_faction == 0.25
+    assert c.village_bud_min_faction == 0.0      # the 25% rival-bloc rule was unanchored and blocked budding
     assert c.village_circumscription_gain == 0.6
 
 
-def test_budding_sheds_rival_lineage_to_new_site():
+def test_budding_sheds_rival_kin_faction_to_new_site():
+    """The village splits between its two standing men, each keeping his own kin (Alvard 2009)."""
     # circ_gain=0 isolates the fires-behaviour from the circumscription threshold-rise (tested separately)
     w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20,
                village_circumscription_gain=0.0)
     site = _site_with_neighbor(w)
     assert site is not None, "coastal world should have a storable site with a storable neighbor in reach"
-    maj = _place(w, site, 20, 1, 0)          # majority lineage-1 (band_id 0)
-    riv = _place(w, site, 10, 2, 0)          # rival lineage-2 (10/30 = 33% ≥ min_faction 0.25)
+    maj = _kin_group(w, site, 20, 1, 0, cred=1.0, leader_cred=9.0)   # incumbent headman + his kin
+    riv = _kin_group(w, site, 10, 2, 0, cred=1.0, leader_cred=5.0)   # rival headman + his kin
     w._settlement_sites[site] = w._demog.settle_release_steps
     w._next_band_id = 7                       # invariant: the id counter is above all live band_ids (as in a real run)
     n0 = len(w._settlement_sites)
@@ -73,7 +102,8 @@ def test_circumscription_raises_threshold_and_blocks_small_bud():
     w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20,
                village_circumscription_gain=5.0)            # eff_thr = 20·(1+5·d/8) ≫ 30 at any reachable d ≥ 3
     site = _site_with_neighbor(w)
-    _place(w, site, 20, 1, 0); riv = _place(w, site, 10, 2, 0)
+    _kin_group(w, site, 20, 1, 0, cred=1.0, leader_cred=9.0)
+    riv = _kin_group(w, site, 10, 2, 0, cred=1.0, leader_cred=5.0)
     w._settlement_sites[site] = w._demog.settle_release_steps
     w._next_band_id = 7
     n0 = len(w._settlement_sites)
@@ -82,10 +112,12 @@ def test_circumscription_raises_threshold_and_blocks_small_bud():
     assert len(w._settlement_sites) == n0
 
 
-def test_single_lineage_village_does_not_bud():
+def test_single_kin_group_village_does_not_bud():
+    """One kin group = no cleavage: every member is equidistant between the two standing men, so the only
+    'faction' is the rival himself, and one man is not a daughter village."""
     w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20)
     site = _site_with_neighbor(w)
-    riv = _place(w, site, 30, 1, 0)          # ONE lineage → no cleavage line
+    riv = _kin_group(w, site, 30, 1, 0, cred=1.0, leader_cred=9.0)   # ONE kin group -> no cleavage line
     w._settlement_sites[site] = w._demog.settle_release_steps
     n0 = len(w._settlement_sites)
     w._maintain_village_budding()
@@ -96,7 +128,8 @@ def test_stratified_village_does_not_bud():
     """Bandy: integrative institutions (stratification) suppress fission."""
     w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=20)
     site = _site_with_neighbor(w)
-    _place(w, site, 20, 1, 0); riv = _place(w, site, 10, 2, 0)
+    _kin_group(w, site, 20, 1, 0, cred=1.0, leader_cred=9.0)
+    riv = _kin_group(w, site, 10, 2, 0, cred=1.0, leader_cred=5.0)
     w._band_society[0] = "stratified_chiefdom"     # the village's band is stratified
     w._settlement_sites[site] = w._demog.settle_release_steps
     n0 = len(w._settlement_sites)
@@ -107,7 +140,8 @@ def test_stratified_village_does_not_bud():
 def test_below_threshold_does_not_bud():
     w = _world(enable_village_budding=True, enable_band_affiliation=True, village_fission_threshold=50)
     site = _site_with_neighbor(w)
-    _place(w, site, 20, 1, 0); riv = _place(w, site, 10, 2, 0)   # 30 ≤ 50 threshold
+    _kin_group(w, site, 20, 1, 0, cred=1.0, leader_cred=9.0)
+    riv = _kin_group(w, site, 10, 2, 0, cred=1.0, leader_cred=5.0)   # 30 ≤ 50 threshold
     w._settlement_sites[site] = w._demog.settle_release_steps
     w._maintain_village_budding()
     assert all(a._group.band_id == 0 for a in riv)

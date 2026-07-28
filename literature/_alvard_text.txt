@@ -1,0 +1,1020 @@
+Kinship and Cooperation
+The Axe Fight Revisited
+Michael Alvard
+Published online: 16 September 2009
+# Springer Science + Business Media, LLC 2009
+Abstract Chagnon’s analysis of a well-known axe fight in the Yanomamö village of
+Mishimishiböwei-teri (Chagnon and Bugos 1979) is among the earliest empirical
+tests of kin selection theory for explaining cooperation in humans. Kin selection
+theory describes how cooperation can be organized around genetic kinship and is a
+fundamental tool for understanding cooperation within family groups. Previous
+analysis on groups of cooperative Lamaleran whale hunters suggests that the role of
+genetic kinship as a principle for organizing cooperative human groups could be less
+important in certain cases than previously thought (Alvard Human Nature 14:129–
+163, 2003b). Evidence that supports a strong role for genetic kinship — groups are
+found to be more related than expected by chance — may be spurious because of the
+correlation between social structure and genetic kinship. Reanalysis of Chagnon ’s
+data using matrix regression techniques, however, confirms that genetic kinship was
+the primary organizing principle in the axe fight; affinal relations were also
+important, whereas lineage identity explained nothing.
+Keywords Behavioral ecology . Kin selection . Alliance . Kinship . Yanomamö .
+Lamalera . Network analysis
+Kin selection theory provides a critical tool that evolutionary biologists use for
+understanding the nature of sociality. It shows that organisms can increase their
+inclusive fitness both directly via their own reproduction and indirectly by helping
+genetically related individuals (Hamilton 1964a, b). Hamilton ’s rule is well known.
+Altruism is favored when the actor ’s fitness benefit ( b) from an action directed at
+Hum Nat (2009) 20:394 –416
+DOI 10.1007/s12110-009-9074-4
+M. Alvard ( *)
+Department of Anthropology, Texas A & M University, College Station, TX 77843-4352, USA
+e-mail: Alvard@tamu.edu
+another, discounted by the pair ’s genetic relatedness ( r), is greater than the fitness
+cost to the actor ( rb > c). Because kin share genes owing to common descent,
+behaviors that increase the reproductive success of relatives can also increase the
+future representation of ego ’s genes. While it is clear that costs and benefits mediate
+the effects of genetic relatedness, as r approaches zero, according to Hamilton ’s
+equation, the likelihood of altruism also drops to zero. Thus, kin selection theory
+predicts that, all other things being equal, individuals will be more likely to favor kin
+than nonkin, and close kin than more distant kin.
+Kin selection has been successful at explaining apparent altruism in a wide
+variety of organisms and contexts, including eusociality in insects (Hamilton 1964b),
+helping at the nest (Baglione et al. 2003; Hatchwell and Sharp 2006), alarm calling
+(Sherman 1977), and mating partnerships (Krakauer 2005). Among organisms who
+live in small family groups, kin selection provides a particularly robust explanation
+for much of the cooperation and altruism observed among close family members
+(Silk 2002). Evolutionary anthropologists were quick to realize kin selection theory ’s
+potential to explain aspects of human social behavior (Chagnon and Irons 1979).
+Evidence suggests that the higher than expected fertility displayed by human
+females, given their body size and the highly dependant offspring they produce
+(Kaplan et al. 2000), is at least partially subsidized by close consanguineous kin,
+such as grandmothers (Hawkes 2003) and other offspring (Kramer 2005), in addition
+to affines like husbands (Marlowe 2003). Work on altruistic cooperation among
+humans finds that helpers are often much more closely genetically related than
+expected by chance (Crognier et al. 2002; Gibson and Mace 2005; Kramer 2005;
+Borgerhoff Mulder 2007; Sear and Mace 2008; Tymicki 2004). Having close kin
+who help can lead to greater fertility for women (Bereczkei 1998; Sear et al. 2003).
+People are less likely to kill kin than nonkin (Daly and Wilson 1988; Johnson and
+Johnson 1991, 1997). Kin selection has been invoked to explain adoption in Oceania
+(Silk 1980, 1990), and garden labor exchange among farmers (Berte 1988; Hames
+1987).
+One of the first analyses to use kin selection theory to examine the role of genetic
+kinship for organizing human social behavior was Napoleon Chagnon ’s analysis of a
+Yanomamö axe fight that he observed in the village of Mishimishiböwei-teri,
+V enezuela (Chagnon and Bugos 1979). This work is significant for a variety of
+reasons. It can be viewed as one of the first attempts to direct the anthropological
+interest in kinship and nepotism within a context of Darwinism (V oland 1998
+). The
+analysis was published in Evolutionary Biology and Human Social Behavior: An
+Anthropological Perspective (Chagnon and Irons 1979), which many consider to be
+a seminal work of anthropological behavioral ecology. The fight is also a very well
+known ethnographic example because of the large number of people who have seen
+the film of its events and who read Chagnon ’s work as undergraduates in
+anthropology courses (Asch and Chagnon 1975). As will be discussed below,
+combatants on each side of the conflict were found to be both more related to one
+another than expected by chance and more related to their own group than to the
+other faction, matching basic predictions of kin selection theory.
+While it is clear that kin selection is an important force favoring certain kinds of
+cooperation among close kin, there is growing evidence that kin selection is limited
+in a variety of ways. One principal limitation is its ability to generate cooperation in
+Hum Nat (2009) 20:394 –416 395
+sizable groups without conflicts of interest (Alvard 2003b; Lukas et al. 2005; Wilson
+and Hölldobler 2005). Subsequent theoretical developments have generated a
+number of hypothetical mechanisms to explain cooperation in groups larger than
+can be organized by genetic kinship. This theory and the results from Lamalera,
+reviewed below, show that the cooperative coalitions that form to hunt whales are
+produced through alternative organizing mechanisms not attributable to kin selection
+that also, incidentally, produce higher levels of relatedness.
+Many tests of kin selection, however, including Chagnon and Bugos ’s( 1979)
+classic examination of the Yanomamö axe fight, have involved simply demonstrat-
+ing that cooperators are closely related or more closely related than one would
+expect by chance. In order to learn if alternative mechanisms were at play in the axe
+fight, the methodology that produced the Lamalera results was applied to the original
+Yanomamö dataset. The results are discussed in the context of new theory to try to
+understand human cooperation.
+The Y anomamö and the Axe Fight
+The Yanomamö described here are swidden horticulturalists living in the rainforests
+of southern V enezuela. The considerable variation in the nature of Yanomamö
+villages follows variation in g eography and ecology (Chagnon 1992). The
+description below is limited to the Yanomamö living in the lowland regions of
+the upper Orinoco and Mavava drainages and is derived from the work of Chagnon;
+the ethnographic present is the late 1960s and early 1970s (Chagnon 1968, 1974,
+1979a, b, 1992). Yanomamö villages are small compared to Lamalera, ranging from
+50 or so up to 250 individuals. Socially, they are organized into unnamed
+exogamous patrilineages that form alliances via spouse exchange. Chagnon points
+out that mate exchanges between lineages bind the descent groups into affinal
+alliances and at the same time increase the average degree of genetic relatedness
+within groups. Solidarity begins to deteriorate as village populations grow beyond
+250 or so, and village fissioning often occurs. Villages eventually splinter for reasons
+often related to mate competition (Chagnon 1979b).
+A number of variables are predicted to be important for explaining the pattern
+of affiliation in the axe fight. Much of this is discussed in Chagnon and Bugos ’s
+1979 chapter, so only the matters germane to this paper will be reviewed here.
+The subject of that chapter is one conflict that occurred in the Yanomamö village
+of Mishimishimaböwei-teri in 1971. Mish imishimaböwei-teri had fissioned at
+some point preceding the fight. Leading up to the fight, members of the splinter
+group return for an extended visit and ten sions rise among the hosts. The conflict
+is triggered when a member of the visiting group named Mohesiwä demands
+plantains from a host women, Sinabimi; she denies him the plantains and he
+beats her. After she returns to the village in tears, Sinabimi ’s half-brother Uuwä
+challenges Mohesiwä in the center of the village. Factions form that back each
+side of the clash and the conflict escalates to clubs, machetes, and then axes. As
+Chagnon notes, such fights are common, and the combination of photographic
+documentation and extensive demographic data make a detailed analysis
+possible.
+396 Hum Nat (2009) 20:394 –416
+Original Y anomamö Results
+The two factions, host and visitors, formed with 13 and 17 members, respectively.
+Chagnon and Bugos ( 1979) made two specific predictions to test kin selection
+theory. The first was that each faction member would be more closely related
+genetically to their respective main fighter than to the other group ’s primary fighter.
+Second, members of each group would be more related to each other than to the
+other group. Consistent with both of their predictions, the authors reported that each
+of the factions, as a group, was indeed more closely related to the principal fighter of
+their own faction than to their opponents ’ principal fighter. The members of each
+faction were also more closely related to one another on average than they were to
+the other faction. The two groups were related to each other to the degree of mean
+r=0.0633.
+1 The members of the visitors ’ faction were related to one another to the
+degree of mean r=0.2124. The members of the hosts ’ faction were related to one
+another to the degree of mean r=0.0883. Although stated somewhat convolutedly, it
+is clear that Chagnon and Bugos ( 1979) felt that genetic relatedness mediated the
+interpersonal behavior in the fight and that the results provided support for kin
+selection theory. They temper the interpretation, however, by stating, “It is also clear
+the relatedness alone cannot account for all the bonds of attraction or tactics of
+recruitment in events [like the axe fight].
+Lamalera Analysis and Results
+Lamalera is located on the island of Lambata, in the province of Nusa Tenggara
+Timur, Indonesia. The people of Lamalera are complex marine foragers whose
+subsistence activities revolve around cooperative hunting for large marine mammals
+and ray, and the trade for carbohydrates. The primary prey are sperm whale,
+accounting for the bulk of the prey harvested by weight, and ray, which account for
+the largest number of prey harvested (Alvard and Nolin 2002). The village has a
+population of approximately 1,200 people who are divided into 21 major named
+patrilineal clans, the larger of which are further divided into named lineages called
+lango béla. The named lineages manage whaling vessels called téna that are crewed
+by groups of 8 –14 men. Previous work has shown that returns from whaling are
+greater than alternative forms of meat acquisition and that the cooperation during the
+hunts is best modeled as a game of coordination rather than a prisoner ’s dilemma
+(Alvard and Nolin 2002). Hunters are assured of their shares of the catch via a
+complex and mutually agreed upon set of distribution norms (Alvard 2002).
+Individual hunters, particularly harpooners, reap significant reproductive benefits.
+Harpooners have significantly more offspring than other men, marry significantly
+earlier, and start reproducing at an earlier age (Alvard and Gillespie 2004). For
+additional ethnographic details see Barnes ( 1996). Lamalera provides an excellent
+opportunity to test hypotheses for explaining cooperative behavior in the context of
+1 The coefficient of relatedness ( r) is defined as the probability that two individuals share a copy of an
+allele through common descent (Wright 1922).
+Hum Nat (2009) 20:394 –416 397
+big game hunting — a context that many feel was integral to the evolution of a
+number of uniquely human traits (Kaplan et al. 2000).
+The dataset at Lamalera is larger and more complex than the Yanomamö dataset.
+The Yanomamö sample consists of one event with two factions consisting of 13 and
+17 individuals each. In Lamalera, the sample consists of all 853 hunts that occurred
+over the course of 80 hunt days (between May 3 and August 5, 1999). Crew
+identifications were collected for each hunt. For each pair of individuals within the
+community the coefficient of relatedness was calculated using pedigrees developed
+from kinship data and a computer program written by Jeff Long (now at the
+University of New Mexico, Albuquerque).
+Initially, the same test used by Chagnon and Bugos ( 1979) was applied to the
+Lamalera data. The basic kin selection hypothesis predicts that hunters who affiliate
+into hunting crews should be more closely related to one another than expected by
+chance. Hunting crews were indeed found to be much more related among
+themselves than if they assorted randomly. Using data on a sample of 189 of the
+hunters and 853 hunts,
+2 it was shown that the average coefficient of relatedness
+within crews was r =0.0362 ( N =853 hunts). This level of relatedness is
+approximately six times greater than what would be expected if crews formed
+randomly ( r=0.00631, p<0.0001).
+The Lamalera analyses went beyond simply testing to see if cooperators were
+more closely related than expected. A form of network analysis was applied, and the
+resulting data describe aspects of the relationship between individuals rather than
+characteristics of individuals themselves (Wasserman and Faust 1994). Kinship data
+are intrinsically suitable to this approach. Radcliff-Brown anticipated this develop-
+ment, as quoted by Hughes ( 1988:57): “The kind of mathematics which will be
+required ultimately for a full development of the science of society will not be
+metrical but will be . . . the calculus of relations (Radcliffe-Brown 1957).”
+In Lamalera, affiliation was analyzed as a similarity matrix constructed from all
+hunter dyads.
+3 Each hunter is represented by both a row and a column; the degree of
+affiliation is represented in each cell by the number of times that each dyad hunted
+together on the same boat on the same day. These data were reduced using
+multidimensional scaling and K-means cluster analysis (Bishop et al. 1975)t o
+produce 20 clusters or coalitions of men who regularly crewed together on the same
+téna. The average coefficient of relatedness within these clusters, averaged across all
+clusters (r=0.044), was statistically equivalent to the result obtained from the sample
+of individual hunts (ranging from 0.125 to 0.0123; N=20, p=0.4124).
+One strength of the network method is that other types of data that describe the
+relationships between members of a group can be used in the same way and
+hypotheses can be readily tested. In the earlier Lamalera analysis, the affiliation
+matrix serves as the independent variable and two matrices serve as the dependent
+variables. A lineage affiliation matrix was created by scoring a 1 in the cell for dyads
+having a common lineage. If the pair does not share a lineage a 0 is scored. The
+2 The 290-man sample was limited to 189 by including only regular hunters (above the ninetieth percentile
+in number of days hunted) whose patriline was known and whose pedigrees were complete at least as far
+back as grandparents.
+3 The original axe fight kinship data were presented in matrix format, although a network analysis was not
+applied (Chagnon and Bugos 1979: tables 8.1 –8.3).
+398 Hum Nat (2009) 20:394 –416
+biological kinship matrix is scored with the coefficient of relatedness ( r) for the pair
+in each cell. The relationship between the normalized similarity affiliation matrix
+and the model matrices was examined using a matrix permutation or QAP
+(Quadratic Assignment Procedure) test (Freeman et al. 1992; Hubert and Schultz
+1976; Krackhardt 1987).
+4 This test involves first computing a Pearson ’s correlation
+coefficient between the corresponding cells of the two matrices. The rows and
+columns of the observed matrix are then randomly permutated and the correlation is
+computed again. The permutation is repeated (in this case, 2,000 times) in order to
+compute the proportion of times that a random correlation is larger than or equal to
+the observed correlation. A low proportion (<0.05) suggests a relationship between
+the matrices that is unlikely to occur by chance. Similar permutations techniques are
+used to do multiple matrix regression (Kapsalis and Berman 1996a, b; Smouse and
+Long 1992; Smouse et al. 1986).
+The primary results were that, while significant, biological kinship alone explains
+only 3.9% of the variance in the affiliation (Alvard 2003b). When lineage identity is
+added for the multiple regression analysis, both variables explain 10.7% of the
+variance. As indicated by the standard parameter estimate, lineage ’s effect on
+affiliation is nearly 2.5 times as strong as genetic kinship ( β=0.0631 vs. β=0.2925).
+More importantly, when genetic kinship is dropped from the multivariate analysis,
+the amount of variance remains virtually unchanged ( R
+2 =10.3) and the strength of
+the estimate increases ( R2 =0.3215.)
+These results reflect the correlation between lineage membership and genetic
+kinship. In a patrilineal system all potential male cooperators who are relatives at r=
+0.50 (brothers, sons, and fathers) are also fellow lineage members; this is not true for
+male kin with more distant degrees of relatedness (uncles, cousins, and nephews). In
+terms of genetic kinship, nuclear kin ( r=0.5) are more likely to affiliate, but more
+distant kin ( r<0.5) are just as likely not to affiliate.
+Additional (unpublished) analyses done to examine the results reviewed above
+confirmed the standard prediction from kin selection theory — that crews and clusters
+were more closely related than expected by chance. These new analyses found that
+not all cluster members were more related on average among their own members
+than they were to members of other clusters (N * [N −1] =380 comparisons).
+Members of six of the 20 clusters (30%) were more related on average to members
+of at least one other cluster then they were to members of their own cluster. In
+addition, genetic relatedness within the clusters was significantly less than what
+could have been obtained with different mixes of the same hunters. Using a
+computer algorithm that swapped hunters between boats with the goal of
+maximizing mean relatedness within clusters, the mean relatedness across all 20
+crew clusters nearly tripled to r=0.115 (a significant threefold increase from the
+observed r=0.044; t=−4.57, df=19, p=0.00021).
+5
+In contrast to the predictions of kin selection theory, Lamaleran whale hunters
+clearly assort according to lineage identity and not to genetic kinship in spite of the
+4 The procedures were performed using UCINET software (Borgatti et al. 2002).
+5 There are constraints to how crews are formed in the real world. For example, each real crew requires a
+harpooner and a helmsman. The simulation illustrates how closely related a crew could become if there
+were no constraints. The analysis was done in collaboration with Dr. David Carlson, Texas A&M
+University.
+Hum Nat (2009) 20:394 –416 399
+fact that initial analysis indicated positive assortment by genetic kinship. The next
+step was to check for this possibility in one of the earliest studies to test for predicted
+patterns of nepotism, the axe fight. Although Chagnon ’s conclusions seemed sound
+when originally presented, the results of the analysis applied to the Lamalera data
+opened the possibility that more could be learned from the classic Yanomamö work.
+Specifically, the possibility exists that the original results favoring kin selection
+could be spurious and better explained by lineage structures.
+Applying the New Methodology to the Y anomamö Data
+The Yanomamö data for this reanalysis come from three sources. The analysis
+focuses on the 30 individuals identified as fight participants by Chagnon and Bugos
+(1979). Genetic kinship data were obtained from Chagnon (personal communica-
+tion) in a form slightly modified from the data presented in Chagnon and Bugos
+(1979) and the datasets included on the compact disk (CD) provided by Biella et al.
+(1997). A spreadsheet computer file included with the CD named DY ADIC2
+contains the coefficients of relatedness between all but nine participants.
+6 Data
+obtained directly from Chagnon includes the missing individuals. Some of the
+coefficients also differ slightly from those in the original paper. For example, person
+#0029 and person #0517 are reported to be related at r=0.1718 in Chagnon and
+Bugos ( 1979). In the dyadic file, the value is listed as r=0.17969. These differences
+represent changes made to the dataset in the years subsequent to the publication of
+the original article and the CD (Chagnon, personal communication). The spreadsheet
+named PARTICIP .XLS, also on the CD, identifies the lineage to which each
+participant belongs, and his or her faction in the conflict. Finally, participants ’
+spouses are identified in Appendix B of Chagnon ’s Studying the Yanomamö (1974).
+In the following analysis, faction affiliation is the dependent variable and
+represented by a matrix containing all dyads of the 30 participants in the fight — a1
+scores an allied relationship, a 0 scores an antagonistic one. In addition to genetic
+kinship and lineage identity, an independent variable indicating an affinal
+relationship between dyads was also examined. An affinal relationship was scored
+as 1 if one of the pair and the spouse of the other share a lineage. Although affinal
+ties were not examined for Lamalera, Chagnon emphasizes the importance of such
+ties in Yanomamö sociopolitics.
+Table 1 presents the univariate regression results. Consistent with the original
+results, but in contrast to the results found in Lamalera, genetic relatedness is an
+important factor for explaining affiliative behavior in Mishimishiböwei-teri. Genetic
+kinship explains around 15% of the variance in faction affiliation, about four times
+the amount of variance in crew affiliation explained by kinship among the Lamalera
+whale hunters. Also in contrast to the Lamalera results, lineage membership explains
+very little of the variance in faction affiliation in the axe fight. Although significant
+(p=0.01), lineage membership alone explains only about 3% of the variance. Finally,
+affinal ties, on their own, have a significant effect ( p<0.000) and explain 2% of the
+variance.
+6 ID numbers 29, 67, 390, 517, 950, 1062, 1278, 1827, and 2505
+400 Hum Nat (2009) 20:394 –416
+Table 2 presents the results of four multiple QAP regressions with different
+combinations of the three independent variables. Combining lineage ID and kinship
+finds that lineage no longer has a significant effect on faction ( p=0.281; Table 2A).
+In addition, no more of the variance is explained than was the case for genetic
+kinship alone. This suggests that the small lineage effect observed in the univariate
+analysis was the result of covariance between lineage and genetic kinship. Lineage
+members are more closely related than expected by chance; the multiple regression
+controls for this, and as a result, lineage loses its power independent of kinship. The
+opposite result was found among the Lamalera whale hunters.
+The regression with genetic kinship and the affinal relationship finds that both are
+significant and the amount of variance explained increases to nearly 18% (Table 2B).
+Having an affinal relationship significantly increases the probability that two
+participants are on the same side of the fight ( p<0.000). The standardized
+coefficients indicate that genetic kinship has more than twice the effect as affinal
+relationships. In the absence of genetic kinship, lineage and affinal ties each have the
+same strength, as measured by the standardized parameter estimate, and both are
+significant, though the amount of variance explained by these two variables is less
+than half of those of analyses that include genetic kinship (Table 2C). Finally, an
+analysis with all three variables clearly shows that genetic kinship and affinal
+relationship each have independent effects, while lineage does not (Table 2D).
+Table 2 Multivariate results of QAP regression
+Independent variable Standardized parameter estimate p R2
+A.
+Genetic kinship 0.3797 <0.000 0.148
+Lineage 0.0154 0.281
+B.
+Genetic kinship 0.4001 <0.000 0.179
+Affinal 0.1755 <0.000
+C.
+Lineage 0.2420 0.001 0.072
+Affinal 0.2203 <0.000
+D.
+Genetic kinship 0.3674 <0.000 0.183
+Lineage 0.0836 0.068
+Affinal 0.1993 <0.000
+Table 1 Univariate results of QAP regression
+Independent variable Standardized parameter estimate pR 2
+Genetic kinship 0.3861 <0.000 0.149
+Lineage 0.1723 0.010 0.030
+Affinal 0.1437 <0.000 0.021
+Hum Nat (2009) 20:394 –416 401
+The Axe Fight in Detail
+These results can be better understood by examining in more detail how members of
+the lineages assorted during the fight (Fig. 1). Five lineages are represented in the
+fight: lineage 1222 with 15 participants, lineage 2967 with nine participants, lineage
+2700 with 3, lineage 1443 with 2, and one lone member of lineage 2936.
+Importantly, lineage 1222 is split between the factions; seven members support the
+visitors and eight members support the home faction. Each half of 1222 is supported
+by two different, smaller lineages. All nine members of 2967, along with the one
+member of 2936, support the visiting half of 1222. The home faction ’s 1222
+members are joined by the two 1443 and the three 2700 members.
+The impact of genetic relatedness can be visualized in a multidimensional scaling
+(MDS) analysis that was applied to the matrix consisting of the coefficient of
+relatedness values for each pair in the entire sample. MDS is used to analyze
+similarities and dissimilarities between objects as distances in a Euclidean space
+(Borg and Groenen 2005; Kruskal and Wish 1978). Using the 30-person sample
+mentioned above, an MDS analysis specifying nine dimensions results in a stress
+value of 0.0391 after 12 iterations.
+7
+Figure 2 presents a scatterplot of the first two dimensions. Dimension 1 clusters
+the participants into groupings that can be interpreted to match the factions. It
+correctly classifies all but five of the 30 participants (Fisher ’s exact, one tailed p=
+0.0001, Goodman and Kruskal ’s λ=0.61).
+8 All 13 members of faction 2 (home) have
+positive score on dimension 1, 12 of the 17-member faction 1 (visitors) are assigned
+a negative score on dimension 1. The incorrectly assigned individuals will be
+discussed below.
+The strength of kinship is apparent especially for faction 1 through two clusters of
+siblings (Fig. 3). According to Chagnon and Bugos, “It is also clear that the visitors
+are, as a group, much more highly related among themselves than are the members
+of the fighting group that opposed them, in the fight ” (1979:226). The first cluster
+(cluster A, Fig. 3) consists of the older generation of lineage 2967 males —
+Daramasiwä (#336), Wadoshewä (#1929), and Yoroshianawä (#2194) — all full sibs,
+along with Hemoshabuma (#517), the lone member of lineage 2936, who is their
+strong nephew ( r=0.3125).
+9 Continuing along the negative end of the dimension 1
+axis is another cluster (B) formed with full sibs — the brothers Mohesiwä (#1246),
+Törawä (#1837), Amomiawä (#67), and Morokaböwä (#1278), and their sister
+Naakahedami (#1312). This group forms the next generation of 2967 members, and
+all are Wadoshewä ’s offspring. Mohesiwä is the man who instigated the fracas by
+7 Stress is the most common measure of goodness-of-fit for MDS analyses. A general rule of thumb is that
+a stress value larger than 0.15 is unacceptable (Kruskal and Wish 1978).
+8 Goodman and Kruskal ’s Lambda ( λ) is a proportional reduction in error (PRE) statistic used to measure
+how knowledge of a participant ’s score on dimension 1 reduces the error in assigning him (or her) to his
+(or her) observed faction. The reduction in error is determined by comparing faction assignments made
+with knowledge of dimension 1 to assignments made randomly (Johnson 1988). A λ of 0.61 means that
+the error is reduced by nearly 61% over what is expected by chance.
+9 I use the term “strong” in this context to mean a relationship that has a degree of relatedness greater than
+is usually associated with the vernacular kin term. In this instance, a nephew, who would normally be
+related to an uncle by r=0.25, is actually more closely related because the pair is related in multiple ways
+(or “loops,” to use Chagnon and Bugos ’s 1979 terminology).
+402 Hum Nat (2009) 20:394 –416
+Fig 1 Lineages represented in the Yanomamö axe fight, and their members ’distribution according to the
+two factions
+Fig. 2 Scatterplot of MDS dimensions 1 and 2 indicating the two factions
+Hum Nat (2009) 20:394 –416 403
+accosting Sinabimi, and Törawä is his younger brother, staunch supporter, and the
+youth whom Keböwä strikes with the axe near the end of the fight. They are joined
+in the cluster by Ruamowa (#1568, lineage 1222), their strong cousin ( r=0.25) who
+also is Tourawa ’s brother-in-law, and Ahsökawä (#29, lineage 1222), who is
+Ruwamowä’s strong half brother ( r=0.32) and who also shares the associated
+relationships to the other lineage 2967 males.
+As we move along the axis toward the positive end of dimension 1, we come to
+the bulk of lineage 1222 members. Among the fight participants, the core of lineage
+1222 is formed by a group of sibs and half sibs who were all fathered by the same
+deceased man (#1650). This sib group is split between the two factions, and most are
+presented in polygon C: Borowama (#259), Uuwä (#1897), Nanokawä (#1335),
+Husiheami (#714), Sinabimi (#1744), and Iyaböwä (#723). Borowama is the mother
+of the 2967 sibs (cluster B) who form the majority lineage of faction 1 (the visitors).
+She is also Sinabimi ’s half sister. Sinabimi, as mentioned, is the woman who was
+accosted by Mohesiwä at the start of the fight. Borowama is at the center of the
+entire network and located on dimension 1 halfway between her set of offspring and
+her sibs. She sides with her husband Wadoshewä (#1929), their son Mohesiwä, and
+the rest of her offspring, rather than with her sister Sinabimi and the rest of her sibs
+and lineage mates. In fact, it is clear from Chagnon and Bugos ( 1979) and the film
+that Mohesiwä ’s mother (Borowama) and his sister (Naakahedami) are early and
+energetic verbal antagonists in the conflict. Borowama ’s half brother Uuwä, on the
+other hand, famously defends his half sister Sinabimi by challenging Mohesiwä at
+the initial stage of the conflict, whereas Borowama ’s full brother, Nanokawä, does
+not and instead follows his sister Borowama). This is perhaps because he is tied to
+lineage 2967 through a sibling marriage exchange: Nanokawä ’s sister ’s husband
+Fig. 3 Scatterplot of MDS dimensions 1 and 2 indicating the location of individuals
+404 Hum Nat (2009) 20:394 –416
+(Wadoshewä) is Nanokawä ’sw i f e’s (#2217) brother. Recall that Wadoshewä is
+Mohesiwä’s father. Husiheami (#714; Borowama ’s co-wife to Wadoshewä as well as
+her half sister) and Iyaböwä (male, #723) also ally with the visitors against their half
+sister, Sinabimi. Finally, Maiyahariwä (#1109) is a more distant cousin: his
+grandfather and the grandfather of the 1222 sibs of polygon C are brothers.
+The negative end of dimension 2 is anchored by the sib group (cluster D) that
+forms the base of lineage 2700: Yoinakuwä (#2248), husband of Sinabimi, and
+Keböwä (#910) his brother (these are the two men who escalate the fight to axes and
+machetes in defense of Sinabimi), and Yaukuima, their sister (#2209). They are cross
+cousins to the lineage 1222 sib group that forms polygon C, and in fact, all have
+spouses from lineage 1222), and are key allies with the faction 2 (home) half of
+lineage 1222. Note that Yaukuima (#2209) does not side with her husband
+Nanokawa, but with her brothers. Cluster E, Tomömamowä (#1827) and Hääma
+(#390), young and unmarried males, are a full sib pair who are parallel cousins to the
+sib group that forms polygon C; along with another parallel cousin, Kumishiwä
+(1062), they are also from lineage 1222 and allied with faction 2. As noted by
+Chagnon and Bugos ( 1979:231), this alliance appears to be related via the affinal
+links to the lineage 2700 sib group (cluster D) mentioned above. Kumishiwä ’s sister
+(#1614) is married to Yoinakuwä. The sister (#657) of Tomömamowä (#1827) and
+Hääma (#390) is married to Yoinakuwä ’s brother Keböwä.
+Finally, Hererewä (#2505, lineage 2967) seems out of place and is an example of
+alliance via affinal tie. His mother (#457) is half sib with the lineage 2700 sib cluster
+(D): Keböwä (#910), Yaukuima (#2209), and Yoinakuwä (#2248; Sinabimi ’s
+husband). Hererewä allies himself against his uncles and their wives (and against
+his genetics) and sides with his more distantly genetically related lineage mates in
+lineage 2967. This may have to do with the fact that his wife (#1178) is Nanokawä ’s
+daughter, providing the affinal tie to faction 1 ’s side of lineage 1222.
+The positive end of dimension 2 is anchored by a father (Ishiweiwä, #777) and
+son (Kodedeari, #950) pair from lineage 1443 — the other allies with the home
+faction of 1222. Kodedeari is Kaaböwä ’s (#789) maternal uncle. Next, Kaaböwä and
+his half sister Huuhuumi (#2513) have nearly identical kin networks; both belong to
+lineage 1222 and are located in the same location on the plot, but they are drawn to
+different factions. Huuhuumo is married to Mohesiwä, instigator of the incident that
+precipitated the fight and leader of faction 1. She sides with her husband rather than
+her brother.
+It is clear from the MDS analysis that the strength of genetic kinship indicated
+from the matrix permutation test comes from the support that nuclear family
+members provided one another during the fight. Clusters of male siblings dominate
+each faction. Of course, siblings share lineage identity, and if it were not for the fact
+that the members of lineage 1222 split their allegiances, the relative strength of
+genetic kinship versus lineage identity as indicated by the statistical analysis above
+might not have been as clear. Based on that analysis, it might be tempting to say that,
+in the case of the axe fight, kinship trumped lineage loyalty, especially for members
+of lineage 1222. While it is true that lineage 1222 splintered, it did not do so in a
+way that suggests people were acting as would be predicted by Hamilton ’s rule. In
+fact, as mentioned above, the five participants misidentified by dimension 1 of the
+MDS analysis are more closely related to their kin in faction 2, but they nonetheless
+Hum Nat (2009) 20:394 –416 405
+side with faction 1. Looking more closely at these individuals can tell us something
+about the nature of alliance formation in the axe fight case.
+Two of these individuals are women; this is significant because only six women
+were involved in the conflict. In both cases it appears that the woman sides with her
+husband rather than her male siblings. Husiheami (#714, lineage 1222) sides with
+her husband Wadoshewä (#1929), his brothers, and Borowama, her co-wife and half
+sister. Huuhuumi (#2513, 1222), as mentioned above, sides with her husband
+Mohesiwä rather than her brother. The men who are incorrectly assigned clearly
+follow their affinal alliances. Nanokawä (#1335) follows his full sister Borowama,
+perhaps because he is tied to lineage 2967, the majority lineage in faction 1, through
+the sibling marriage exchange mentioned above. Hererewä ’s (#2505, lineage 2967)
+wife (#1178, lineage 1222) is Nanokawä ’s daughter; providing the affinal tie to
+faction 1’s side of lineage 1222. Finally, Iyaböwä (#723) allies against his half sister
+Sinabimi and with the visitors. According to the dataset provided by Chagnon, he is
+married to a 42-year-old man (#256, lineage 1443), but this is obviously an error. In
+Chagnon’s book ( 1974), his spouse is indicated as #2489, an 11-year-old female
+from the same lineage as he. This makes sense because the girl ’s father is
+Ruwamowä (#1568), and Iyaböwä is likely allying with his father-in-law.
+It appears that marriage alliance and not genetic kinship played a role in the
+fracture of lineage 1222 and the overall structure of the two factions. Lineage 1222
+is tightly linked via marriage to both lineage 2967 and lineage 2700, and many
+individuals appear to ally with their respective affinal lineages. Some women sided
+with their husbands and children, and some men sided with their wives ’families. Of
+the 30 participants, 25 are married to a total of 36 spouses (a number of men have
+multiple spouses; lineage ID for 2 spouses is unknown). Of faction 1 ’s 19 marriages,
+13 are part of the 1222 –2967 marriage alliance. In faction 2, 8 of the 15 marriages
+are part of the 1222 –2700 marriage alliance (Table 3). Affinal links clearly weaken
+the lineage ties. The importance of affinal alliances for the Yanomamö is stressed by
+Chagnon ( 1975) in his analysis of village fissioning, which often involves lineages
+splitting as people side with affinal kin and their matrimonial concerns.
+Table 3 Cross-tabulation of marriages between lineages for the two factions of the axe fight. The shaded
+cells indicate the number of marriages between members of lineage 1222 and members of lineages 2700
+and 2967
+Faction 1: Lineage marriage relationships  
+Spouse’s Lineage Ego’s 
+lineage 1222 1443 2700 2936 2967 
+1222 2 1 1 0 6 
+2936 0 0 0 0 1 
+2967 7 0 0 1 0 
+Faction 2: Lineage marriage relationships   
+Spouse’s Lineage Ego’s 
+lineage 81 200 1222 1380 1443 2700 2936 2967 
+1222 1 1 0 0 1 3 1 1 
+1443 1 0 0 1 0 0 0 0 
+2700 0 0 5 0 0 0 0 0 
+406 Hum Nat (2009) 20:394 –416
+Discussion
+It is also clear the relatedness alone cannot account for all the bonds of
+attraction or tactics of recruitment in events such as the one analyzed here and
+that affinity or alliance likewise operates to build coalitions (Chagnon and
+Bugos 1979:237).
+The initial analysis of genetic relationships at Lamalera indicated that hunting
+coalitions were significantly more related than expected by chance — an important
+prediction of Hamiltonian kin selection theory but one that was misleading in the
+Lamalera case. More comprehensive Lamalera analysis, reviewed above, indicate
+that lineage identity rather than genetic kinship was the major factor organizing
+cooperative hunting groups at that site. The conclusion that the Hamiltonian
+account was potentially specious at Lamalera provided part of the motivation for
+reexamining the Yanomamö axe figh t using the new matrix methods. The
+reanalysis of the Yanomamö axe fight data supports Chagnon and Bugos ’s
+(1979) original conclusion that genetic kinship, rather than lineage, was the
+primary factor determining who helped whom; siblings, especially, tended to side
+with one another.
+Further motivation for this reanalysis was provided by the mounting theoretical
+and empirical work that is reassessing kin selection ’s role in explaining altruism in
+general. In the 1960s and 1970s, kin selection and reciprocity were offered as
+alternative mechanisms to group selection to explain apparently altruistic behaviors.
+More recently, a number of researchers using new data and theory are concluding
+that kin selection appears to be more limited than initially thought as a satisfactory
+universal explanation of cooperation (Chapais 2001; Clutton-Brock 2002; Griffin
+and West 2002), especially for the large-scale cooperation seen among humans
+(Henrich 2004). Although genetic kinship can be important for the evolution of
+cooperation, it is clearly not essential, and in some cases can be a hindrance. Wilson
+(2005) points out that kin selection can be as much a dissolutive force as a binding
+one, at least in the social evolution of insects, and that the close genetic relatedness
+shared by members of the eusocial insects is as likely a consequence as a cause of
+group living (Wilson and Wilson 2007; Wilson 2005, 2008; Wilson and Hölldobler
+2005).
+Griffin and West ( 2002) note that the direct benefits of cooperation — those
+obtained by the individual himself rather than indirectly through the help provided to
+kin— have been underappreciated in previous work. Although limited dispersal can
+result in groups whose members are closely related to one another, in many cases
+individuals behave cooperatively because it is in their own direct self-interest, and
+benefits obtained indirectly through kin are secondary for the development of
+cooperative behavior. This conclusion is supported by recent research on food
+sharing by the Aché hunter-gathers now living on a reservation in Paraguay. Allen-
+Arave et al. ( 2008) show that Aché households transfer food in a manner more
+consistent with the direct fitness gains from expected reciprocity than the indirect
+fitness benefits from nepotistic investment. Although Aché share with kin, they do
+not share with the kin who could benefit the most. Rather, they share with kin who
+Hum Nat (2009) 20:394 –416 407
+are more likely to pay them back — observations that match the hypothesis of
+reciprocity more closely than that of kin selection. Hames and McCabe ( 2007) come
+to similar conclusions with meal sharing among the Ye ’kwana of V enezuela.
+Although there are cases that support the kin selection hypothesis (e.g., Ziker and
+Schnegg 2005), a recent review of food sharing among foragers and hunter
+horticulturalists by Gurven ( 2004) concludes that reciprocal altruism has more robust
+support than does kin selection.
+These results suggest an important point. Appreciating the nature of the adaptive
+problem is critical for understanding the mechanisms that produce cooperative
+s o l u t i o n s( H a m e sa n dM c C a b e2007). Diverse solutions like food sharing,
+coalitionary support, or large-group collective action are produced via different
+evolutionary mechanisms because the adaptive problems are often strikingly
+different. A similar point is raised by Alvard and Nolin ( 2002) when they argue
+that reciprocity, and the prisoner ’s dilemma game that is often used to model it, may
+not be the best paradigm for understanding certain cases of cooperation because
+reciprocity does not conform to the payoff structure of many socioecological
+conditions (see also Gurven and Winking 2008; Borgerhoff Mulder 2007;
+Winterhalder 1997). In some conditions it may be compelling to evoke kin
+selection. For example, a post hoc interpretation of this paper ’s results is that there
+are good inclusive fitness reasons for indi viduals to ally with close kin in the axe
+fight (e.g., avoiding death or serious injury of a kinsman). These same reasons are
+not apparent in the Lamalera case, where close kin are not numerous enough to
+form crews and less-related kin have diffuse interests.
+These observations point to a key di fference between the Lamalera and
+Yanomamö cases: group size. Lamaleran crews range between 8 and 14 and are
+very similar in size to the axe fight factions, but the population from which the
+hunting coalitions were culled is much larger. The village of Lamalera is an order of
+magnitude larger than Mishimishiböwei-teri in population, and hundreds participate
+in the village whale hunt, compared with the 30 Yanomamö participants in the axe
+fight. The axe fight involved a relatively small group of people. Recent theoretical
+developments (e.g., Lukas et al. 2005) suggest that the factions may have been at the
+large end of the range of group size that can be organized around genetic principles.
+For at least two reasons it is difficult for kin selection principles to produce the
+larger, cooperative, tribal groups commonly seen in humans (see detailed discussion
+in Alvard 2003b). First, in the absence of extreme reproductive skew, where a few
+members of a group reproduce much more than others — such as is the case in the
+social insects (Keller and Reeve 1994)— and high levels of endogamy, it is difficult
+to form large groups of closely related individuals. In most populations, as groups
+become larger the average degree of relatedness within the groups drops rapidly
+(Aviles et al. 2004; Campbell 1983; Lukas et al. 2005; Richerson and Boyd 1999).
+Keller and Reeve ( 1994) were working with naked mole rats, whose reproductive
+skew and level of endogamy are similar to those of the eusocial insects (Reeve et al.
+1990). Relative to other human populations, the Yanomamö could be characterized
+as having moderate levels of skew owing to polygyny and high levels of endogamy
+owing to bilateral cross-cousin marriage. This creates a context in which larger
+groups of closely related kin would be able to form, although there still are
+constraints to how large groups of close kin can grow.
+408 Hum Nat (2009) 20:394 –416
+In Lamalera, for example, there is a significant negative relationship between
+mean relatedness within a lineage and lineage size, even though large lineages are
+better able to organize whaling operations. Within the village of Mishimishiböwei-
+teri, the same relationship exists. The five lineages represented in the fight exhibit a
+negative relationship between the number of participants and their average
+relatedness ( R
+2 =0.61 p=0.07). In particular, lineage 1222, the lineage with the
+largest number of members in the fight, has a low mean relatedness, though the two
+opposite sides of the conflict are significantly more related among themselves. In a
+sample of nine villages, Chagnon ( 1975: Fig. 3) found a negative relationship
+between village size and the average r within villages. As village size increases,
+average relatedness falls.
+One factor examined with the Yanomamö data but not the Lamalera data was the
+impact of affinal relationships on faction formation.
+10 Chagnon stressed the role of
+affinal relationships in Yanomamö life, especially in terms of mate acquisition.
+Exceptional male reproductive success is fundamentally the result of some males ’
+ability to acquire multiple wives, which in turn depends on their, and their lineages ’,
+ability to form coalitions with males from other lineages (Chagnon 1980). Ideally,
+men from two localized lineages reciprocally exchange women with each other. To
+the extent that this occurs over time, the two lineages become closely linked in a
+variety of social and political ways, and conflict is reduced. Owing to the nature of
+Yanomamö marriage, these other males are likely to be kin as well. One outcome of
+this marriage system is the situation in which affinal kin in one ’s own village may be
+more closely related than many of one ’s own lineage members, and this condition
+places lineage at odds with genetic kinship once more. This was apparent in the axe
+fight.
+Allegiance to one ’s lineage may exist only to the extent that association with
+fellow lineage members provides benefits. A key benefit of group fissioning is that it
+reduces competition for mates between more distantly related lineage members
+within the same village (Chagnon 1979b, 1980). Once a pattern of reciprocal
+exchange between lineage segments is established, close local affinal and nuclear
+family ties can trump more general lineage affiliations. This is apparent at the village
+level, just as in the axe fight, where genetic relatedness trumps lineage loyalties in
+many fission events; villages do not split along lineage lines, and the degree of
+relatedness is higher after fissioning within the new villages than before (Chagnon
+1975, 1981). Pierre van den Berghe ’s lucid interpretation of Chagnon ’s Yanomamö
+work succinctly points out that “at least for the Yanomamö, unilineal descent is thus
+clearly not the paramount principle of social organization ” (V an den Berghe
+1979:148).
+In addition, when groups become large, conflicts of interest develop that genetic
+kinship cannot resolve (V an den Berghe 1979). This can be seen when groups try to
+organize beyond the nuclear family. In an exogamous context, ego is equally related
+to his maternal and paternal cousins ( r=0.125), but the two cousins are not related to
+each other at all (Alvard 2003b). This was one of the points stressed in the original
+Lamalera paper (Alvard 2003b); as group size increases it becomes difficult for
+10 Affinal marriage alliance has not attracted the attention of human behavioral ecologists interested in
+cooperative relationships (other than Chagnon).
+Hum Nat (2009) 20:394 –416 409
+people to organize around a large, unambiguous contingent of close genetic kin. This
+conclusion was emphasized by a number of earlier students of unlineality (e.g.,
+Ember et al. 1974; Sahlins 1961; V an den Berghe 1979).
+An interpretation consistent with the data is that, among the Yanomamö, kin
+selection forces enhance close family allegiances at the expense of more inclusive
+organization principles, such as lineality, and this favors smaller Hamiltonian groups.
+Affinal ties and mating considerations also work to weaken lineage loyalties. In
+contrast, it appears that the Lamalerans have institutions (see Ostrom 1990; Paciotti
+and Borgerhoff Mulder 2004) in place that allow the formation of groups larger than
+could be produced via mechanisms based around genetic kinship. One could
+speculate that these mechanisms are related to the more robust lineage system
+developed, in part, to solve the organizational requirements of whaling operations.
+Although patrilineal descent principles are at play in Yanomamö society, it is clear
+that they are not as important for the Yanomamö as they are for other groups
+(Chagnon 1979a). The lineages are not named, for example, as they are in Lamalera
+and other societies. The primary function of Yanomamö lineages is to regulate
+marriage via the exchange of spouses in order to establish alliances with other
+descent groups (see also V an den Berghe 1979:455).
+11 Paradoxically, this benefit
+seems to weaken lineages as cohesive institutions in the long run.
+Among the Yanomamö, lineages find it increasingly difficult to maintain cohesion
+as villages become larger; this fact motivated Chagnon ’s work with village fissioning
+(Chagnon 1975, 1979b). The axe fight is a good case study. Lineage 1222 is
+Mishimishiböwei-teri’s largest, but it is also the lineage that split in the fission that
+occurred subsequent to the fight, and in the axe fight itself.
+Membership in a large group has many advantages, however, and although forces
+are at work to drive lineages apart, other forces work to keep them together.
+Chagnon points out that group size is a key to survival among the Yanomamö, and
+groups that are unable to maintain sufficient size fission into smaller units and are
+vulnerable to the predation of larger groups. The structure provided by a lineage
+system may be selected, in part, because it allows larger groups. Large lineages are
+the most important politically, and village headmen regularly come from the largest
+lineages within a village. Patrilineal descent in combination with polygyny, which
+is widespread among the Yanomamö Chagnon studied, allows the formation of
+larger groups than would be possible with matrilineal descent (Chagnon
+1979a:388) owing to the greater reproductive success for males made possible
+by polygynous matings. Chagnon ’s argument describing the military advantages of
+large lineages to explain the cultural evolution of patrilineality versus matrilineality
+reads as a model for group selection (see Henrich 2004; Sahlins 1961). He goes on to
+show that not only are men from larger lineages more likely to be polygynous, but that
+women from larger lineages are able to produce larger numbers of children. Clearly,
+advantages accrue to people who can maintain large, cohesive groups, but the
+Y anomamö lack the ability to the extent found in other societies, such as the Lamalera
+whale hunters.
+11 Lamalera lineages function in additional ways; lineages organize whaling operations as corporations.
+Decent groups in Lamalera are classically corporate in the sense that they exist as institutions in perpetuity,
+or at least beyond the life of any particular individual, and they hold property, such as the whaling boats.
+410 Hum Nat (2009) 20:394 –416
+These results suggest an interesting way of looking at how genetic kinship plays a
+role at various levels of cooperation. Part of the result at Lamalera may be explained by
+the size of the cooperative groups involved. Groups differ in their optimal size for a
+variety of reasons, and different principles of organization may work better at different
+scales (Richerson and Boyd 1999). A cross-cultural study of 15 small-scale societies
+found that while the economic lives of Amazonian horticulturalists like the
+Machiguenga and the Tsimane involve small groups that are almost entirely
+economically independent at the family level, Lamalera ranked as requiring the
+largest nonkin cooperative groups (Henrich et al. 2005). In other words, subsistence in
+Lamalera requires larger groups, and optimal sizes that are difficult to achieve with
+high degrees of average relatedness. It is likely that relatively larger groups are
+required for a subsistence strategy like that found at Lamalera to be competitive, but
+they cannot be formed using genetic kinship as a mechanism of organization. For the
+reasons discussed above, genetic kinship cannot resolve conflicting loyalties with
+sufficient certainty. Not all strategies require such large groups, however (Kelly 1995).
+Most ethnographically described hunters, like the Y anomamö, live in smaller groups
+whose membership can be supplied more easily by close kin. Although the Lamalera
+result suggests that kinship may not be the primary organizing factor for the groups of
+hunters at that site, surely in many situations it would be. This may explain why the
+Y anomamö have a harder time maintaining lineage cohesion; there is no compelling
+reason for them to do so, unlike at Lamalera.
+It is becoming increasingly apparent that kin selection (and reciprocity) is not up
+to the task of producing cooperative solutions that require large groups as part of the
+answer (Boyd and Richerson 1988). There are alternatives, however. Clutton-Brock
+and colleagues refer to one process as “group augmentation, ” where the mutualistic
+benefits of collective action arise though activities that can be done only, or more
+efficiently, as part of a larger group. Maynard Smith and Szathmary ( 1995) refer to
+this sort of cooperation as “synergistic mutualism. ” Benefits can accrue to
+individuals in the absence of kin selection even when most group members are in
+fact kin (Clutton-Brock 2002; Kokko et al. 2001). In this case, simply being part of a
+larger group provides sufficient direct benefits independent of any indirect benefits
+obtained via kin selection.
+The process of group augmentation may be analogous to a coordination game (in
+the parlance of game theory) or mutualism, where the individual benefits from
+coordinating activities are significant, but only if the activities are done as a group
+(Cooper 1999; Schelling 1960; Sugden 1986). This sort of mutualistic cooperation or
+coordination is at play among the Lamalera whale hunters (Alvard and Nolin 2002).
+Hunting in Lamalera can be described as a classic weak-link coordination game (V an
+Huyck et al. 1990), where a minimum number of men are required to crew a whaling
+boat successfully (Alvard and Nolin 2002). A close genetic relationship between the
+hunters is not needed for the cooperation to develop and in fact can be a hindrance as
+shown above. Nor are the defection problems often associated with reciprocity an
+issue because in a coordination problem individuals are always better off
+cooperating, even though it is not always easy to achieve.
+12
+12 In the prisoner ’s dilemma, in contrast, defectors always have a higher expected payoff than cooperators
+(Taylor and Nowak 2007).
+Hum Nat (2009) 20:394 –416 411
+It is interesting to speculate that different organizing mechanisms may play more
+or less important roles depending on the context. To reap the benefits of cooperation,
+individuals have to make decisions about whom they should affiliate with based on
+expectations of others ’ behaviors. The organizing mechanisms help answer the
+question, “Whom can I trust? ” (Alcorta and Sosis 2005; Barclay 2004; Henrich
+2006; Nesse 2001; Tomasello et al. 2005). Each of the key mechanisms thought to
+play an important role in the evolution of cooperation shares the principle of positive
+assortment; the mechanisms produce a context in which cooperators can identify and
+interact with each other and avoid defectors, freeloaders, or others with different
+loyalties and norms of conduct (Fletcher and Doebeli 2006; Taylor and Nowak 2007;
+Wilson and Dugatkin 1997). For problems that require small groups, genetic kinship
+is sufficient. For more complex coordination problems that require larger groups,
+socially constructed and culturally transmitted identities based on notions of
+kinship— lineages and clans, for example — allow the formation of larger affiliations
+(Alvard 2003a; Jones 2000, 2003; Quinlan and Flinn 2005). Systems of unilineal
+descent provide great advantages when tribal groups are in conflict with other groups
+that are more simply organized. The classic examples are the segmental systems of
+East Africa, where lower-order segments organized by unilineal descent easily
+combine into higher-order segments when needed. The Nuer and their territorial
+expansion at the expense of the Dinka is a good example (Evans-Pritchard 1940;
+Kelly 1985). In larger armies, men form kin-like bonds with men who are otherwise
+strangers. It is clear that the bonds that men may form during warfare can be
+independent of genetic kinship, especially when examined from a local point of
+view— during actual battles, for example.
+Historically, there is some evidence that segmentary lineage systems are replaced,
+in turn, with even more inclusive organizing principles. Two examples come to
+mind, but there are surely more. In 508
+BC the ancient, clan-based requirement of
+Athenian citizenship (phratries) was replaced with one based on locality (demes;
+Lambert 1993). A similar process occurred early in the formation of the Mongol
+empire, when Genghis Khan dissolved his followers ’ steppe tribal identities and
+replaced them with a Mongol imperial identity (Weatherford 2004). In both these
+cases, societies that had moved beyond Hamiltonian-based social organization to
+form classic lineage-based systems evolved further to adopt social structures that
+allowed even larger, more inclusive groups. Understanding these higher-order
+mechanisms, and in what sort of contexts they are favored, is a major challenge for
+evolutionary anthropologists.
+References
+Alcorta, C. S., & Sosis, R. (2005). Ritual, emotion, and sacred symbols: The evolution of religion as an
+adaptive complex. Human Nature, 16 , 323 –359.
+Allen-Arave, W., Gurven, M., & Hill, K. (2008). Reciprocal altruism, rather than kin selection,
+maintains nepotistic food transfers on an Ache reservation. Evolution and Human Behavior, 29 ,
+305–318.
+Alvard, M. (2002). Carcass ownership and meat distribution by big-game cooperative hunters. Research in
+Economic Anthropology, 21 ,9 9 –132.
+Alvard, M. (2003a). The adaptive nature of culture. Evolutionary Anthropology, 12 , 136 –149.
+412 Hum Nat (2009) 20:394 –416
+Alvard, M. (2003b). Kinship, lineage, and an evolutionary perspective on cooperative hunting groups in
+Indonesia. Human Nature, 14 , 129 –163.
+Alvard, M., & Gillespie, A. (2004). Good Lamalera whale hunters accrue reproductive benefits. Research
+in Economic Anthropology, 23 , 225 –247.
+Alvard, M., & Nolin, D. (2002). Rousseau ’s whale hunt? Coordination among big-game hunters. Current
+Anthropology, 43, 533 –559.
+Asch, T., & Chagnon, N. (1975). “The Ax fight ” (film). Watertown: Documentary Educational Resources.
+Aviles, L., Fletcher, J. A., & Cutter, A. D. (2004). The kin composition of social groups: Trading group
+size for degree of altruism. American Naturalist, 164 , 132 –144.
+Baglione, V ., Canestrari, D., Marcos, J. M., & Ekman, J. (2003). Kin selection in cooperative alliances of
+carrion crows. Science, 300 , 1947 –1949.
+Barclay, P . (2004). Trustworthiness and competitive altruism can also solve the “Tragedy of the
+Commons.” Evolution and Human Behavior , 25 , 209 –220.
+Barnes, R. H. (1996). Sea hunters of Indonesia: Fishers and weavers of Lamalera . New York: Clarendon.
+Bereczkei, T. (1998). Kinship network, direct childcare, and fertility among Hungarians and Gypsies.
+Evolution and Human Behavior , 19 , 283 –298.
+Berte, N. (1988). K ’ekchi’ horticultural labor exchange: Productive and reproductive. In L. Betzig, M.
+Borgerhoff Mulder & P . Turke (Eds.), Human reproductive behaviour: A Darwinian perspective (pp.
+83–96). New York: Cambridge University Press.
+Biella, P ., Chagnon, N., & Seaman, G. (1997). Yanomamo interactive: The ax fight (CD/ROM) . Ft. Worth:
+Harcourt Brace.
+Bishop, Y . M. M., Fienberg, S. E., & Holland, P . W. (1975). Discrete multivariate analysis: Theory and
+practice. Cambridge: MIT.
+Borg, I., & Groenen, P . (2005). Modern multidimensional scaling: Theory and applications (2nd ed.).
+New York: Springer.
+Borgatti, S., Everett, M., & Freeman, L. (2002). UCINET for Windows: Software for social network
+analysis. Lexington, KY: Analytic Technologies. (Available at http://www.analytictech.com/).
+Borgerhoff Mulder, M. (2007). Hamilton ’s rule and kin competition: The Kipsigis case. Evolution and
+Human Behavior , 28, 299 –312.
+Boyd, R., & Richerson, P . J. (1988). The evolution of reciprocity in sizable groups. Journal of Theoretical
+Biology, 132, 337 –356.
+Campbell, D. (1983). The two distinct routes beyond kin selection to ultrasociality: Implications for the
+humanities and social sciences. In D. Bridgeman (Ed.), Nature of prosocial development: Theories
+and strategies (pp. 71 –81). New York: Academic.
+Chagnon, N. (1968). Y anomamo social organization and warfare. In M. Fried, M. Harris & R. Murphy
+(Eds.), War: The anthropology of armed conflict and aggression (pp. 109 –159). New York: Natural
+History.
+Chagnon, N. (1974). Studying the Yanomamö . New York: Holt.
+Chagnon, N. (1975). Geneaology, solidarity, and relatedness: Limits to local group size and patterns of
+fissioning in an expanding population. Yearbook of Physical Anthropology, 19 ,9 5 –110.
+Chagnon, N. (1979a). Is reproductive success equal in egalitarian societies? In N. Chagnon & W. Irons
+(Eds.), Evolutionary biology and human social behavior: An anthropological perspective (pp. 374 –
+401). North Scituate: Duxbury.
+Chagnon, N. (1979b). Mate competition, favoring close kin and fissioning among the Y anomamo Indians.
+In N. Chagnon & W. Irons (Eds.), Evolutionary biology and human social behavior: An
+anthropological perspective (pp. 86 –132). North Scituate: Duxbury.
+Chagnon, N. (1980). Kin selection theory, kinship, marriage and fitness among the Y anomamö Indians. In R.
+Alexander & D. Tinkle (Eds.),Sociobiology: Beyond nature/nurture?(pp. 545–571). New Y ork: Westview.
+Chagnon, N. (1981). Terminological kinship, genealogical relatedness and village fissioning among the
+Yanomamö Indians. In R. Alexander & D. Tinkle (Eds.), Natural selection and social behavior (pp.
+490–508). New Y ork: Chiron.
+Chagnon, N. (1992). Yanomamö (4th ed.). Fort Worth: Harcourt Brace Jovanovich.
+Chagnon, N., & Bugos, P . (1979). Kin selection and conflict: An analysis of a Yanomamö ax fight. In N.
+Chagnon & W. Irons (Eds.), Evolutionary biology and human social behavior: An anthropological
+perspective (pp. 213 –238). North Scituate: Duxbury.
+Chagnon, N., & Irons, W. (eds). (1979). Evolutionary biology and human social behavior: An
+anthropological perspective. North Scituate: Duxbury.
+Chapais, B. (2001). Primate nepotism: What is the explanatory value of kin selection? International
+Journal of Primatology, 22 , 203 –229.
+Hum Nat (2009) 20:394 –416 413
+Clutton-Brock, T. (2002). Breeding together: Kin selection and mutualism in cooperative vertebrates.
+Science, 296 ,6 9 –72.
+Cooper, R. (1999). Coordination games: Complementarities and macroeconomics . New York: Cambridge
+University Press.
+Crognier, E., Villena, M., & V argas, E. (2002). Helping patterns and reproductive success in Aymara
+communities. American Journal of Human Biology, 14 , 372 –379.
+Daly, M., & Wilson, M. (1988). Homicide. New York: Aldine de Gruyter.
+Ember, C. R., Ember, M., & Pasternak, B. (1974). On the development of unilineal descent. Journal of
+Anthropological Research, 30 ,6 9 –94.
+Evans-Pritchard, E. (1940). The Nuer: A description of the modes of livelihood and political institutions
+of a Neolithic people . Oxford: Clarendon.
+Fletcher, J. A., & Doebeli, M. (2006). How altruism evolves: Assortment and synergy. Journal of
+Evolutionary Biology, 19 , 1389 –1393.
+Freeman, L. C., Freeman, S. C., & Romney, A. K. (1992). The implications of social structure for
+dominance hierarchies in red deer, Cervus elaphus L. Animal Behaviour , 44, 239 –245.
+Gibson, M. A., & Mace, R. (2005). Helpful grandmothers in rural Ethiopia: A study of the effect of kin on
+child survival and growth. Evolution and Human Behavior , 26 , 469 –482.
+Griffin, A. S., & West, S. A. (2002). Kin selection: Fact and fiction. Trends in Ecology and Evolution, 17 ,
+15–21.
+Gurven, M. (2004). To give and to give not: The behavioral ecology of human food transfers. Behavioral
+and Brain Sciences, 27 , 543 –560.
+Gurven, M., & Winking, J. (2008). Collective action in action: Prosocial behavior in and out of the
+laboratory. American Anthropologist, 110 , 179 –190.
+Hames, R. (1987). Garden labor exchange among the Y e’kwana. Ethology and Sociobiolology, 8,2 5 9–284.
+Hames, R., & McCabe, C. (2007). Meal sharing among the Y e ’kwana. Human Nature, 18 ,1 –21.
+Hamilton, W . D. (1964a). Genetical evolution of social behaviour, I.Journal of Theoretical Biology, 7,1 –16.
+Hamilton, W. D. (1964b). Genetical evolution of social behaviour, 2. Journal of Theoretical Biology, 7 ,
+17–52.
+Hatchwell, B. J., & Sharp, S. P . (2006). Kin selection, constraints, and the evolution of cooperative
+breeding in long-tailed tits. Advances in the Study of Behavior , 36 , 355 –395.
+Hawkes, K. (2003). Grandmothers and the evolution of human longevity. American Journal of Human
+Biology, 15, 380 –400.
+Henrich, J. (2004). Cultural group selection, coevolutionary processes and large-scale cooperation.
+Journal of Economic Behavior and Organization, 53 ,3 –35.
+Henrich, J. (2006). Cooperation, punishment, and the evolution of human institutions.Science, 312,6 0–61.
+Henrich, J., Boyd, R., Bowles, S., Camerer, C., Fehr, E., Gintis, H., et al. (2005). “Economic man ” in
+cross-cultural perspective: Behavioral experiments in 15 small-scale societies. Behavioral and Brain
+Sciences, 28 , 795 –855.
+Hubert, L., & Schultz, J. (1976). Quadratic assignment as a general data-analysis strategy. British Journal
+of Mathematical and Statistical Psychology, 29 , 190 –241.
+Hughes, A. L. (1988). Evolution and human kinship . New Y ork: Oxford University Press.
+Johnson, A. (1988). Relationships between nominal-scale variables. In A. Johnson (Ed.), Statistics (pp.
+146–149). San Diego: Harcourt Brace Jovanovich.
+Johnson, S. B., & Johnson, R. C. (1991). Support and conflict of kinsmen in Norse earldoms, Icelandic
+families, and the English royalty. Ethology and Sociobiology, 12 ,2 1 1–220.
+Johnson, R. C., & Johnson, S. B. (1997). Kinship and the quest for wealth and power as influences on
+conflict in the Punjab, 1839 –1845. Evolution and Human Behavior , 18 , 341 –348.
+Jones, D. (2000). Group nepotism and human kinship. Current Anthropology, 41 , 779 –809.
+Jones, D. (2003). The generative psychology of kinship, Part 1: Cognitive universals and evolutionary
+psychology. Evolution and Human Behavior , 24 , 303 –319.
+Kaplan, H., Hill, K., Lancaster, J., & Hurtado, A. M. (2000). A theory of human life history evolution:
+Diet, intelligence, and longevity. Evolutionary Anthropology, 9 , 156 –185.
+Kapsalis, E., & Berman, C. M. (1996a). Models of affiliative relationships among free-ranging rhesus
+monkeys ( Macaca mulatta ), 1: Criteria for kinship. Behaviour , 133, 1209 –1234.
+Kapsalis, E., & Berman, C. M. (1996b). Models of affiliative relationships among free-ranging rhesus
+monkeys ( Macaca mulatta ), 2: Testing predictions for three hypothesized organizing principles.
+Behaviour , 133, 1235 –1263.
+Keller, L., & Reeve, H. K. (1994). Partitioning of reproduction in animal societies. Trends in Ecology and
+Evolution, 9 ,9 8 –102.
+414 Hum Nat (2009) 20:394 –416
+Kelly, R. C. (1985). The Nuer conquest: The structure and development of an expansionist system . Ann
+Arbor: University of Michigan Press.
+Kelly, R. L. (1995). The foraging spectrum: Diversity in hunter-gatherer lifeways . Washington:
+Smithsonian Institution.
+Kokko, H., Johnstone, R. A., & Clutton-Brock, T. H. (2001). The evolution of cooperative breeding
+through group augmentation. Proceedings of the Royal Society of London, B: Biological Sciences,
+268, 187 –196.
+Krackhardt, D. (1987). QAP partialling as a test of spuriousness. Social Networks, 9 , 171 –186.
+Krakauer, A. H. (2005). Kin selection and cooperative courtship in wild turkeys. Nature, 434,6 9 –72.
+Kramer, K. L. (2005). Children ’s help and the pace of reproduction: Cooperative breeding in humans.
+Evolutionary Anthropology, 14 , 224 –237.
+Kruskal, J., & Wish, M. (1978). Multidimensional scaling . Beverly Hills: Sage.
+Lambert, S. D. (1993). The phratries of Attica . Ann Arbor: University of Michigan Press.
+Lukas, D., Reynolds, V ., Boesch, C., & Vigilant, L. (2005). To what extent does living in a group mean
+living with kin? Molecular Ecology, 14 , 2181 –2196.
+Marlowe, F. W. (2003). A critical period for provisioning by Hadza men: Implications for pair bonding.
+Evolution and Human Behavior , 24 , 217 –229.
+Maynard Smith, J., & Szathmary, E. (1995). The major transitions in evolution . New Y ork: Oxford
+University Press.
+Nesse, R. M. (2001). Evolution and the capacity for commitment . New York: Russell Sage Foundation.
+Ostrom, E. (1990). Governing the commons: The evolution of institutions for collective action . New York:
+Cambridge University Press.
+Paciotti, B., & Borgerhoff Mulder, M. (2004). Sungusungu: The role of preexisting and evolving social
+institutions among Tanzanian vigilante organizations. Human Organization, 63 ,1 1 2–124.
+Quinlan, R. J., & Flinn, M. V . (2005). Kinship, sex, and fitness in a Caribbean community. Human Nature,
+16,3 2 –57.
+Radcliffe-Brown, A. R. (1957). A natural science of society . Glencoe: Free.
+Reeve, H. K., Westneat, D. F., Noon, W. A., Sherman, P . W., & Aquadro, C. F. (1990). DNA
+fingerprinting reveals high-levels of inbreeding in colonies of the eusocial naked mole-rat.
+Proceedings of the National Academy of Sciences (USA), 87 , 2496 –2500.
+Richerson, P . J., & Boyd, R. (1999). Complex societies: The evolutionary origins of a crude
+superorganism. Human Nature, 10 , 253 –289.
+Sahlins, M. D. (1961). The segmentary lineage: An organization of predatory expansion. American
+Anthropologist, 63, 322 –345.
+Schelling, T. (1960). The strategy of conflict . Cambridge: Harvard University Press.
+Sear, R., & Mace, R. (2008). Who keeps children alive? A review of the effects of kin on child survival.
+Evolution and Human Behavior , 29 ,1 –18.
+Sear, R., Mace, R., & McGregor, I. A. (2003). The effects of kin on female fertility in rural Gambia.
+Evolution and Human Behavior , 24 ,2 5 –42.
+Sherman, P . (1977). Nepotism and the evolution of alarm calls. Science, 197 , 1246 –1253.
+Silk, J. B. (1980). Adaption and kinship in Oceania. American Anthropologist, 82 , 799 –820.
+Silk, J. B. (1990). Human adoption in evolutionary perspective. Human Nature, 1 ,2 5 –52.
+Silk, J. B. (2002). Kin selection in primate groups. International Journal of Primatology, 23 , 849 –875.
+Smouse, P . E., & Long, J. C. (1992). Matrix correlation analysis in anthropology and genetics. Yearbook of
+Physical Anthropology, 35 , 187 –213.
+Smouse, P . E., Long, J. C., & Sokal, R. R. (1986). Multiple regression and correlation extensions of the
+Mantel test of matrix correspondence. Systematic Zoology, 35 , 627 –632.
+Sugden, R. (1986). The economics of rights, co-operation, and welfare . Oxford: Blackwell.
+Taylor, C., & Nowak, M. A. (2007). Transforming the dilemma. Evolution, 61 , 2281 –2292.
+Tomasello, M., Carpenter, M., Call, J., Behne, T., & Moll, H. (2005). Understanding and sharing
+intentions: The origins of cultural cognition. Behavioral and Brain Sciences, 28 , 675 –691.
+Tymicki, K. (2004). Kin influence on female reproductive behavior: The evidence from reconstitution of
+the Bejsce Parish registers, 18th to 20th centuries, Poland. American Journal of Human Biology, 16 ,
+508–522.
+V an den Berghe, P . L. (1979). Human family systems: An evolutionary view . New Y ork: Elsevier.
+V an Huyck, J. B., Battalio, R. C., & Beil, R. O. (1990). Tacit coordination games, strategic uncertainty,
+and coordination failure. American Economic Review, 80 , 234 –248.
+V oland, E. (1998). Evolutionary ecology of human reproduction. Annual Review of Anthropology, 27 ,
+347–374.
+Hum Nat (2009) 20:394 –416 415
+Wasserman, S., & Faust, K. (1994). Social network analysis: Methods and applications . New York:
+Cambridge University Press.
+Weatherford, J. M. (2004). Genghis Khan and the making of the modern world (1st ed.). New York:
+Crown.
+Wilson, E. O. (2005). Kin selection as the key to altruism: Its rise and fall. Social Research, 72 , 159–166.
+Wilson, E. O. (2008). One giant leap: How insects achieved altruism and colonial life.Bioscience, 58,1 7–25.
+Wilson, D. S., & Dugatkin, L. A. (1997). Group selection and assortative interactions. American
+Naturalist, 149 , 336 –351.
+Wilson, E. O., & Hölldobler, B. (2005). Eusociality: Origin and consequences. Proceedings of the
+National Academy of Sciences (USA), 102 , 13367 –13371.
+Wilson, D. S., & Wilson, E. O. (2007). Rethinking the theoretical foundation of sociobiology. Quarterly
+Review of Biology, 82 , 327 –348.
+Winterhalder, B. (1997). Gifts given, gifts taken: The behavioral ecology of nonmarket, intragroup
+exchange. Journal of Archaeological Research, 5 , 121 –168.
+Wright, S. (1922). Coefficients of inbreeding and relationship. American Naturalist, 56 , 330 –338.
+Ziker, J., & Schnegg, M. (2005). Food sharing at meals: Kinship, reciprocity, and clustering in the Taimyr
+Autonomous Okrug, northern Russia. Human Nature, 16 , 178 –210.
+Michael Alvard is an evolutionary anthropologist at Texas A&M University who received his PhD from
+the University of New Mexico in 1993. He has conducted fieldwork in Amazonian Peru with Piro and
+Machiguenga Indians; with Wana blowgun hunters and trappers in Central Sulawesi, Indonesia; with the
+Lamalera whale hunters of Lembata, Indonesia; and with artisanal fishermen in the commonwealth of
+Dominica. His research interests include the evolution of cooperation, the interaction between culture and
+genetics, and subsistence hunting.
+416 Hum Nat (2009) 20:394 –416

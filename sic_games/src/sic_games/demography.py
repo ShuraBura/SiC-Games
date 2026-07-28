@@ -736,7 +736,15 @@ class DemographyConfig(BaseModel):
     # morph → hierarchy handles it). Requires enable_band_affiliation. Default OFF ⇒ no-op (bit-exact).
     enable_village_budding: bool = False
     village_fission_threshold: int = Field(170, ge=10)        # BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index 157–186); =Alberti N≈127–158 / Yanomamö ~200 range [ANCHORED, Bandy 2004 p.330]
-    village_bud_min_faction: float = Field(0.25, ge=0.0, le=1.0)  # the rival (2nd) lineage bloc must be ≥ this fraction of the village to carry a fission (else too leader-dominated to split)
+    village_bud_min_faction: float = Field(0.0, ge=0.0, le=1.0)   # minimum rival-bloc share to carry a fission.
+    #   WAS 0.25, which silently disabled budding: measured, a 475-person village held 126 lineages with the
+    #   largest at 8.2%, so no bloc could ever reach a quarter. That 0.25 was the ONE budding parameter with no
+    #   [ANCHORED] tag, and it is absent from the load-bearing source — Bandy 2004 (filed) models fission as
+    #   scaling with village SIZE and relocation COST and never mentions faction size; "lineage" appears in it
+    #   once, in a bibliography entry. The lineage-cleavage premise came from Chagnon, which LITERATURE.md
+    #   records as NOT OBTAINED / corroborating only. Default 0 ⇒ the kinship cleavage below decides the split;
+    #   raise it to re-impose a minimum-bloc rule. [DESIGN — deliberately unanchored, was blocking an anchored
+    #   mechanism]
     village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range
     village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
