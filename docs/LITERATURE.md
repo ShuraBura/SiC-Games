@@ -795,6 +795,41 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 ### Chagnon, N.A. (1975). "Genealogy, Solidarity, and Relatedness: Limits to Local Group Size and Patterns of Fissioning in an Expanding Population." *Yearbook of Physical Anthropology* 19:95–110.
 **What is being lifted (SCOPING):** the canonical Yanomamö fission ethnography — villages fission along LINEAGE/LEADERSHIP cleavages; intra-village conflict rises sharply above **~200 inhabitants** → split; a large village develops SEVERAL competing headmen (from the largest patrilineages) and cleaves between them. Grounds the "internal leadership competition drives fission" mechanism (supervisor's hypothesis, confirmed). **Status: NOT OBTAINED (paywalled, no DOI). CORROBORATING ONLY — the ~200 threshold + leadership-cleavage driver are cited from secondary ethnographic summaries; the load-bearing fission anchors (Bandy 2004 + Alberti 2014) are FILED. Not a blocker.**
 **Citation tag:** [SCOPING — Yanomamö fission ~200 / leadership-cleavage driver; secondary-cited]
+**[SUPERSEDED IN PART, 2026-07-27 — see Alvard 2009 below.]** The "cleaves along LINEAGE lines" half of this entry
+is contradicted by the one paper on this fight we actually hold. The ~200 size figure stands.
+
+### Alvard, M. (2009). "Kinship and Cooperation: The Axe Fight Revisited." *Human Nature* 20:394–416.
+**Status: FILED and READ (`literature/AlvardPaper2.pdf`; text at `literature/_alvard_text.txt`).** Obtained
+2026-07-27 while checking the budding cleavage axis. **[VERIFIED — read directly, not summarised.]**
+
+**What was lifted — THE CLEAVAGE AXIS OF VILLAGE FISSION.** Matrix-regression reanalysis of Chagnon's data on
+the Mishimishimaböwei-teri axe fight (a village that had itself recently fissioned; the splinter group was
+visiting when the fight broke out). Who sides with whom:
+
+| predictor of faction affiliation | variance explained |
+|---|---|
+| **genetic kinship** | **~15%** |
+| lineage membership | ~3% (p=0.01) |
+| affinal (in-law) ties | ~2% (p<0.000) |
+
+**The decisive result:** entered together, **lineage is no longer significant (p=0.281)** and adds no variance
+over kinship alone — its univariate effect was covariance with relatedness ("lineage members are more closely
+related than expected by chance"). The paper's own abstract: *"genetic kinship was the primary organizing
+principle in the axe fight; affinal relations were also important, whereas lineage identity explained nothing."*
+The CONTRAST case in the same paper — Lamalera whaling crews — is the reverse: there lineage explains ~10% and
+kinship drops out. So lineage-assorted factions are real, but they are the Lamalera pattern, **not** the
+Yanomamö fission pattern.
+
+**Also lifted (village demography):** Yanomamö villages run **50 to ~250 individuals**; "solidarity begins to
+deteriorate as village populations grow beyond 250 or so, and village fissioning often occurs"; splits are
+"often related to mate competition". NOTE: the paper does **not** state a count of lineages per village — an
+earlier "~2 major patrilineages" claim in this project came from a PNAS *profile* piece, not a paper, and is
+**withdrawn as unsourced**.
+
+**How used (PARAMETERS §21.8):** village budding now cleaves on KINSHIP (genome identity-by-state, genealogical
+fallback) between the two highest-standing men, replacing the 2nd-largest-lineage split. Independent check: the
+resulting village-size distribution moved into this paper's stated 50–250 band without being tuned for it.
+**Citation tag:** [ANCHOR — village fission cleaves on kinship, NOT lineage; village size 50–250; VERIFIED]
 
 ### Forge, A. (1972). "Normative Factors in the Settlement Size of Neolithic Cultivators (New Guinea)." In P.J. Ucko, R. Tringham & G.W. Dimbleby (eds.), *Man, Settlement and Urbanism*, Duckworth, London, pp. 363–376.
 **What is being lifted (SCOPING):** the classic face-to-face village size ceiling (~150–400 before segmentation is forced), a companion anchor to Alberti's logistic (P=0.5 at N≈127, 0.99 at N≈158, already FILED) and Yanomamö ~200 for the fission threshold. **Status: NOT OBTAINED (edited-volume chapter). REDUNDANT — superseded for our use by Alberti (N≈127–158, filed) + Yanomamö ~200. Not a blocker.**

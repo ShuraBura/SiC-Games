@@ -658,6 +658,37 @@ holds** (settlement median 100 → 104, tail 295 → 283). The struck figures do
 **2.7–12.5% across seeds** (within-run range 1.2–25.7) with the gap open OR closed, and population sits at
 ~9.8k not 7.2k on today's stack. See ELITE_STRATIFICATION_ROADMAP R-105.
 
+### §21.8 — Village budding: cleavage axis + the retired bloc rule (2026-07-27)
+
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| `village_fission_threshold` | **170** | ANCHORED | Bandy 2004 p.330, **re-verified from the filed PDF**: Chiaramaya 186 + Cerro Choncaya 157 ⇒ "on the order of 170" |
+| `village_circumscription_gain` | **0.6** | ANCHORED | Bandy 2004 p.330: Sonaji reached 277 pre-fission ⇒ threshold rose "more than 50 percent" when the peninsula filled |
+| `village_bud_min_faction` | ~~0.25~~ → **0.0** | DESIGN (retired) | The 25% rival-bloc rule was the ONE budding parameter with **no anchor tag**, and is **absent from Bandy**, which never mentions faction size ("lineage" appears once, in a bibliography entry). It silently disabled the mechanism: a measured 475-person village held **126 lineages, largest 8.2%**, so no bloc could ever qualify. A ≥2-member floor replaces it (one man is not a daughter village) |
+| cleavage axis | ~~2nd-largest lineage~~ → **kinship** | ANCHORED | **Alvard 2009** (see LITERATURE): factions assort by genetic kinship (~15% of variance); lineage alone ~3% and **non-significant once kinship is controlled (p=0.281)** |
+
+**Result at the unmodified threshold of 170:** budding fires. Settlements 14 → 35 (Bandy's settlement-system
+expansion), and — an independent check not tuned for — village median 452 → **135**, moving 1/14 → **21/35** of
+villages into the ethnographic 50–250 band. Villages with no open site in reach still grow and stratify
+(max 483), which is Bandy's other fork.
+
+### §21.9 — Body condition sampling point (2026-07-27)
+
+`enable_condition`'s EMA read `_fed_reserve` — wealth POST-harvest but PRE-burn, the **peak** of the metabolic
+cycle — and its fraction clamps at 1.0, so a topped-up agent read "completely fed". Measured `_condition` mean
+**0.9998** in a crowded boreal world ⇒ the mortality multiplier it feeds was ~1.0002 and
+`enable_nutrition_synergy` was **silently dead whenever `enable_condition` was on**. Now sampled after
+maintenance + movement costs. `_fed_reserve` is unchanged (energetic fertility and the legacy synergy branch
+both want the post-harvest value). **Bit-exact for all prior results — `enable_condition` defaults OFF and the
+campaigns run it off.**
+
+**KNOWN LIMITATION, do not read the fix as success:** post-fix `_condition` is ~0.32 for essentially every agent
+(p05 0.314, p95 0.347) and reads the same in a crowded boreal world (0.328) as a comfortable temperate one
+(0.331). Reserves are homeostatic and shortfall is lethal quickly, so survivors cluster at the setpoint and
+there is no chronic-malnutrition state to detect. The branch applies a near-uniform ~2× multiplier (pop 991 →
+761) rather than discriminating. **Recommendation: leave `enable_condition` OFF** until S0 is reworked to
+measure shortfall FREQUENCY rather than reserve LEVEL.
+
 ---
 
 *PARAMETERS.md extracted 2026-06-08. Supersedes interim locked-param tables in `sic_games/CLAUDE.md`

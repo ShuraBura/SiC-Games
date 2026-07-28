@@ -93,11 +93,16 @@ PRECOND = {
     "births": ("births", "nobody was born (a birth-triggered mechanism cannot fire)"),
     "villages": ("n_villages", "no band ever exceeded the village threshold"),
     "lineages": ("n_lineages", "only one lineage exists (no lineage structure to act on)"),
+    # A mechanism with a SIZE gate needs a unit that reached that size. Measured 2026-07-27: village budding
+    # read INERT in this regime purely because the 600-agent world never grows a village to the fission
+    # threshold of 170 - it fires at that same unmodified threshold in a larger world. "No village big enough"
+    # is a dead WORLD, not a dead mechanism, and must not be reported as one.
+    "big_village": ("max_village", "no village ever reached village_fission_threshold"),
 }
 NEEDS = {
     # settlement-gated
     "enable_catchment_ceiling": "settlements", "enable_aggl_ceiling": "settlements",
-    "enable_settlement_scalar_stress": "settlements", "enable_village_budding": "settlements",
+    "enable_settlement_scalar_stress": "settlements", "enable_village_budding": "big_village",
     "enable_village_scaling": "villages", "enable_sedentism_fertility": "settlements",
     "enable_emergent_abandonment": "settlements", "enable_site_appraisal": "settlements",
     "enable_aggregation_sedentism": "settlements",
@@ -168,6 +173,7 @@ def signature(update, steps=STEPS, **world):
     w = _build(update, **world)
     births = deaths = 0
     max_settle = 0
+    max_village = 0
     for _ in range(steps):
         w.step()
         if not w.agent_list:
@@ -175,6 +181,16 @@ def signature(update, steps=STEPS, **world):
         births += getattr(w, "births_this_step", 0)
         deaths += getattr(w, "deaths_starv_this_step", 0) + getattr(w, "deaths_senesc_this_step", 0)
         max_settle = max(max_settle, len(getattr(w, "_settlement_sites", []) or []))
+    # largest VILLAGE (settlement neighbourhood), vs the fission threshold - the size gate budding needs
+    _sep = getattr(w._demog, "settle_radius", 2)
+    _ca: dict = {}
+    for _a in w.agent_list:
+        _ca.setdefault(_a.pos, 0)
+        _ca[_a.pos] += 1
+    for (_sx, _sy) in (getattr(w, "_settlement_sites", {}) or {}):
+        _v = sum(_ca.get((_sx + dx, _sy + dy), 0)
+                 for dx in range(-_sep, _sep + 1) for dy in range(-_sep, _sep + 1))
+        max_village = max(max_village, _v)
     al = w.agent_list
     bands: dict = {}
     lin: set = set()
@@ -210,7 +226,9 @@ def signature(update, steps=STEPS, **world):
     )
     probes = dict(max_settlements=max_settle, bonds=sig["bonds"], tot_material=sig["tot_material"],
                   n_ascribed=sig["n_ascribed"] or sig["n_ascribed_lineages"], deaths=deaths, births=births,
-                  n_villages=sig["n_villages"], n_lineages=sig["n_lineages"])
+                  n_villages=sig["n_villages"], n_lineages=sig["n_lineages"],
+                  max_village=(max_village if max_village >= getattr(w._demog, "village_fission_threshold", 170)
+                               else 0))
     return sig, probes, round(time.time() - t0, 1)
 
 
@@ -256,6 +274,18 @@ def assess(flag):
         key, why = PRECOND[need]
         if not probes.get(key):
             unmet = why
+    if unmet is None:
+        # CONFIG PREREQUISITES, not just world units. A flag whose chain is OFF in the baseline has nothing to
+        # act on no matter how the world turns out - measured 2026-07-27: `enable_improved_land` read INERT
+        # here only because `enable_economic_defensibility` is off in the campaign baseline, and it is
+        # demonstrably live once that chain is on. Reuses the audit's PREREQ table rather than a second list.
+        try:
+            import audit_flag_invariants as _A
+            _missing = [p for p in _A.PREREQ.get(flag, ()) if not getattr(cfg, p, False)]
+        except Exception:
+            _missing = []
+        if _missing:
+            unmet = f"prerequisite(s) OFF in the baseline config: {', '.join(_missing)}"
 
     if changed:
         verdict = "LIVE"

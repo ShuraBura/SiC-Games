@@ -11,7 +11,8 @@
   "deaths": 830,
   "births": 1046,
   "n_villages": 5,
-  "n_lineages": 206
+  "n_lineages": 206,
+  "max_village": 284
  },
  "regime": {
   "n": 600,
@@ -41,9 +42,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.2,
-   "base_secs": 31.6,
-   "delta_secs": -2.4
+   "secs": 12.8,
+   "base_secs": 13.9,
+   "delta_secs": -1.1
   },
   {
    "flag": "enable_aggl_ceiling",
@@ -65,9 +66,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.7,
-   "base_secs": 31.9,
-   "delta_secs": -2.2
+   "secs": 13.5,
+   "base_secs": 14.1,
+   "delta_secs": -0.6
   },
   {
    "flag": "enable_agglomeration",
@@ -89,9 +90,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 22.8,
-   "base_secs": 31.5,
-   "delta_secs": -8.7
+   "secs": 10.1,
+   "base_secs": 14.0,
+   "delta_secs": -3.9
   },
   {
    "flag": "enable_aggregation_sedentism",
@@ -113,9 +114,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 28.3,
-   "base_secs": 31.8,
-   "delta_secs": -3.5
+   "secs": 12.2,
+   "base_secs": 14.0,
+   "delta_secs": -1.8
   },
   {
    "flag": "enable_agriculture",
@@ -136,19 +137,19 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 26.7,
-   "base_secs": 31.7,
-   "delta_secs": -5.0
+   "secs": 12.1,
+   "base_secs": 14.0,
+   "delta_secs": -1.9
   },
   {
    "flag": "enable_alluvial_renewal",
-   "verdict": "INERT",
+   "verdict": "UNTESTABLE",
    "baseline_on": false,
    "changed": [],
-   "unmet_precondition": null,
-   "secs": 32.3,
-   "base_secs": 31.9,
-   "delta_secs": 0.4
+   "unmet_precondition": "prerequisite(s) OFF in the baseline config: enable_soil_depletion",
+   "secs": 14.6,
+   "base_secs": 14.0,
+   "delta_secs": 0.6
   },
   {
    "flag": "enable_ascribed_mate_choice",
@@ -168,9 +169,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.9,
-   "base_secs": 31.5,
-   "delta_secs": -0.6
+   "secs": 14.5,
+   "base_secs": 14.0,
+   "delta_secs": 0.5
   },
   {
    "flag": "enable_band_affiliation",
@@ -192,9 +193,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 14.1,
-   "base_secs": 31.7,
-   "delta_secs": -17.6
+   "secs": 6.8,
+   "base_secs": 14.0,
+   "delta_secs": -7.2
   },
   {
    "flag": "enable_band_family_knobs",
@@ -215,9 +216,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.5,
-   "base_secs": 31.8,
-   "delta_secs": -1.3
+   "secs": 14.7,
+   "base_secs": 14.0,
+   "delta_secs": 0.7
   },
   {
    "flag": "enable_band_risk",
@@ -225,9 +226,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 30.9,
-   "base_secs": 31.6,
-   "delta_secs": -0.7
+   "secs": 15.1,
+   "base_secs": 13.9,
+   "delta_secs": 1.2
   },
   {
    "flag": "enable_bonded_mating",
@@ -235,9 +236,9 @@
    "baseline_on": true,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 30.8,
-   "base_secs": 31.9,
-   "delta_secs": -1.1
+   "secs": 14.7,
+   "base_secs": 14.1,
+   "delta_secs": 0.6
   },
   {
    "flag": "enable_catchment_ceiling",
@@ -258,9 +259,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.4,
-   "base_secs": 31.9,
-   "delta_secs": -2.5
+   "secs": 14.2,
+   "base_secs": 14.0,
+   "delta_secs": 0.2
   },
   {
    "flag": "enable_condition",
@@ -268,9 +269,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.1,
-   "base_secs": 31.7,
-   "delta_secs": -0.6
+   "secs": 15.2,
+   "base_secs": 14.0,
+   "delta_secs": 1.2
   },
   {
    "flag": "enable_cred_renorm",
@@ -291,15 +292,33 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.4,
-   "base_secs": 31.5,
-   "delta_secs": -1.1
+   "secs": 15.0,
+   "base_secs": 14.0,
+   "delta_secs": 1.0
   },
   {
    "flag": "enable_cred_status",
-   "verdict": "CRASH",
+   "verdict": "LIVE",
    "baseline_on": true,
-   "note": "ZeroDivisionError: division by zero"
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_settlements",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_precondition": null,
+   "secs": 11.8,
+   "base_secs": 14.0,
+   "delta_secs": -2.2
   },
   {
    "flag": "enable_delegitimation",
@@ -320,9 +339,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.2,
-   "base_secs": 31.6,
-   "delta_secs": -1.4
+   "secs": 14.8,
+   "base_secs": 13.9,
+   "delta_secs": 0.9
   },
   {
    "flag": "enable_density_disease",
@@ -343,9 +362,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.0,
-   "base_secs": 31.8,
-   "delta_secs": -0.8
+   "secs": 15.5,
+   "base_secs": 14.1,
+   "delta_secs": 1.4
   },
   {
    "flag": "enable_dynamic_bands",
@@ -366,9 +385,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.5,
-   "base_secs": 31.9,
-   "delta_secs": -4.4
+   "secs": 13.8,
+   "base_secs": 14.0,
+   "delta_secs": -0.2
   },
   {
    "flag": "enable_economic_defensibility",
@@ -379,7 +398,9 @@
     "bonds",
     "final_pop",
     "n_ascribed_lineages",
+    "n_claims",
     "n_lineages",
+    "n_owned",
     "pop_hash",
     "pos_hash",
     "tot_cred",
@@ -387,9 +408,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.3,
-   "base_secs": 31.9,
-   "delta_secs": -2.6
+   "secs": 14.4,
+   "base_secs": 14.0,
+   "delta_secs": 0.4
   },
   {
    "flag": "enable_emergent_abandonment",
@@ -397,9 +418,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 29.9,
-   "base_secs": 31.7,
-   "delta_secs": -1.8
+   "secs": 15.2,
+   "base_secs": 14.0,
+   "delta_secs": 1.2
   },
   {
    "flag": "enable_emergent_band_size",
@@ -420,9 +441,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.2,
-   "base_secs": 31.5,
-   "delta_secs": -2.3
+   "secs": 14.7,
+   "base_secs": 14.0,
+   "delta_secs": 0.7
   },
   {
    "flag": "enable_energetic_fertility",
@@ -444,9 +465,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.0,
-   "base_secs": 31.9,
-   "delta_secs": -1.9
+   "secs": 15.2,
+   "base_secs": 13.9,
+   "delta_secs": 1.3
   },
   {
    "flag": "enable_exogamy",
@@ -467,9 +488,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.1,
-   "base_secs": 31.6,
-   "delta_secs": -1.5
+   "secs": 15.3,
+   "base_secs": 14.0,
+   "delta_secs": 1.3
   },
   {
    "flag": "enable_forage_cap",
@@ -489,9 +510,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 24.1,
-   "base_secs": 31.9,
-   "delta_secs": -7.8
+   "secs": 12.4,
+   "base_secs": 14.1,
+   "delta_secs": -1.7
   },
   {
    "flag": "enable_game",
@@ -512,9 +533,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 20.6,
-   "base_secs": 31.8,
-   "delta_secs": -11.2
+   "secs": 10.5,
+   "base_secs": 14.0,
+   "delta_secs": -3.5
   },
   {
    "flag": "enable_genealogy_log",
@@ -522,9 +543,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.5,
-   "base_secs": 31.7,
-   "delta_secs": -0.2
+   "secs": 15.5,
+   "base_secs": 14.0,
+   "delta_secs": 1.5
   },
   {
    "flag": "enable_genome",
@@ -545,19 +566,19 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.6,
-   "base_secs": 31.8,
-   "delta_secs": -1.2
+   "secs": 14.6,
+   "base_secs": 14.0,
+   "delta_secs": 0.6
   },
   {
    "flag": "enable_improved_land",
-   "verdict": "INERT",
+   "verdict": "UNTESTABLE",
    "baseline_on": false,
    "changed": [],
-   "unmet_precondition": null,
-   "secs": 32.0,
-   "base_secs": 31.5,
-   "delta_secs": 0.5
+   "unmet_precondition": "prerequisite(s) OFF in the baseline config: enable_economic_defensibility",
+   "secs": 15.1,
+   "base_secs": 14.1,
+   "delta_secs": 1.0
   },
   {
    "flag": "enable_infanticide",
@@ -565,9 +586,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.8,
-   "base_secs": 31.9,
-   "delta_secs": -0.1
+   "secs": 15.0,
+   "base_secs": 13.9,
+   "delta_secs": 1.1
   },
   {
    "flag": "enable_landscape_packing",
@@ -588,9 +609,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 33.5,
-   "base_secs": 31.9,
-   "delta_secs": 1.6
+   "secs": 15.8,
+   "base_secs": 14.0,
+   "delta_secs": 1.8
   },
   {
    "flag": "enable_leader_coherence",
@@ -611,9 +632,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 32.1,
-   "base_secs": 31.6,
-   "delta_secs": 0.5
+   "secs": 15.1,
+   "base_secs": 14.0,
+   "delta_secs": 1.1
   },
   {
    "flag": "enable_leader_office",
@@ -633,9 +654,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 28.6,
-   "base_secs": 31.7,
-   "delta_secs": -3.1
+   "secs": 13.7,
+   "base_secs": 14.0,
+   "delta_secs": -0.3
   },
   {
    "flag": "enable_leader_share",
@@ -657,9 +678,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.2,
-   "base_secs": 31.8,
-   "delta_secs": -1.6
+   "secs": 14.7,
+   "base_secs": 14.0,
+   "delta_secs": 0.7
   },
   {
    "flag": "enable_legitimacy",
@@ -680,9 +701,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.3,
-   "base_secs": 31.5,
-   "delta_secs": -4.2
+   "secs": 13.3,
+   "base_secs": 14.1,
+   "delta_secs": -0.8
   },
   {
    "flag": "enable_leveling",
@@ -702,9 +723,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.4,
-   "base_secs": 31.9,
-   "delta_secs": -1.5
+   "secs": 14.4,
+   "base_secs": 13.9,
+   "delta_secs": 0.5
   },
   {
    "flag": "enable_life_history",
@@ -725,9 +746,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.3,
-   "base_secs": 31.9,
-   "delta_secs": -4.6
+   "secs": 13.3,
+   "base_secs": 14.0,
+   "delta_secs": -0.7
   },
   {
    "flag": "enable_lineage_branching",
@@ -748,9 +769,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.0,
-   "base_secs": 31.6,
-   "delta_secs": -1.6
+   "secs": 14.9,
+   "base_secs": 14.0,
+   "delta_secs": 0.9
   },
   {
    "flag": "enable_lineage_split",
@@ -771,9 +792,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.6,
-   "base_secs": 31.7,
-   "delta_secs": -0.1
+   "secs": 17.3,
+   "base_secs": 14.0,
+   "delta_secs": 3.3
   },
   {
    "flag": "enable_lineage_tribute",
@@ -793,9 +814,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.6,
-   "base_secs": 31.5,
-   "delta_secs": -1.9
+   "secs": 16.2,
+   "base_secs": 14.0,
+   "delta_secs": 2.2
   },
   {
    "flag": "enable_local_ascription",
@@ -817,9 +838,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.9,
-   "base_secs": 31.8,
-   "delta_secs": -3.9
+   "secs": 15.2,
+   "base_secs": 14.1,
+   "delta_secs": 1.1
   },
   {
    "flag": "enable_malnutrition_fission",
@@ -839,9 +860,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 32.3,
-   "base_secs": 31.9,
-   "delta_secs": 0.4
+   "secs": 17.4,
+   "base_secs": 14.0,
+   "delta_secs": 3.4
   },
   {
    "flag": "enable_marriage_aggregation",
@@ -863,9 +884,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 24.8,
-   "base_secs": 31.9,
-   "delta_secs": -7.1
+   "secs": 13.5,
+   "base_secs": 13.9,
+   "delta_secs": -0.4
   },
   {
    "flag": "enable_material_capture",
@@ -884,9 +905,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 25.8,
-   "base_secs": 31.6,
-   "delta_secs": -5.8
+   "secs": 14.0,
+   "base_secs": 14.0,
+   "delta_secs": 0.0
   },
   {
    "flag": "enable_material_inheritance",
@@ -907,9 +928,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.4,
-   "base_secs": 31.7,
-   "delta_secs": -0.3
+   "secs": 16.7,
+   "base_secs": 14.1,
+   "delta_secs": 2.6
   },
   {
    "flag": "enable_morph",
@@ -930,9 +951,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.5,
-   "base_secs": 31.8,
-   "delta_secs": -4.3
+   "secs": 14.7,
+   "base_secs": 14.0,
+   "delta_secs": 0.7
   },
   {
    "flag": "enable_noble_leveling_exemption",
@@ -953,9 +974,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.8,
-   "base_secs": 31.5,
-   "delta_secs": 0.3
+   "secs": 16.5,
+   "base_secs": 14.0,
+   "delta_secs": 2.5
   },
   {
    "flag": "enable_nutrition_synergy",
@@ -963,9 +984,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.9,
-   "base_secs": 31.9,
-   "delta_secs": 0.0
+   "secs": 16.7,
+   "base_secs": 13.9,
+   "delta_secs": 2.8
   },
   {
    "flag": "enable_orphan_mortality",
@@ -986,9 +1007,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.9,
-   "base_secs": 31.6,
-   "delta_secs": -0.7
+   "secs": 16.4,
+   "base_secs": 14.0,
+   "delta_secs": 2.4
   },
   {
    "flag": "enable_pair_bonds",
@@ -1010,9 +1031,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 38.3,
-   "base_secs": 31.9,
-   "delta_secs": 6.4
+   "secs": 19.3,
+   "base_secs": 14.0,
+   "delta_secs": 5.3
   },
   {
    "flag": "enable_paternity",
@@ -1032,9 +1053,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.3,
-   "base_secs": 31.7,
-   "delta_secs": -0.4
+   "secs": 15.9,
+   "base_secs": 14.0,
+   "delta_secs": 1.9
   },
   {
    "flag": "enable_productivity_mobility",
@@ -1055,9 +1076,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.4,
-   "base_secs": 31.8,
-   "delta_secs": -0.4
+   "secs": 15.6,
+   "base_secs": 14.1,
+   "delta_secs": 1.5
   },
   {
    "flag": "enable_provisioning",
@@ -1065,9 +1086,9 @@
    "baseline_on": true,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.0,
-   "base_secs": 31.5,
-   "delta_secs": -0.5
+   "secs": 15.9,
+   "base_secs": 14.0,
+   "delta_secs": 1.9
   },
   {
    "flag": "enable_prowess_facet",
@@ -1088,9 +1109,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 27.5,
-   "base_secs": 31.9,
-   "delta_secs": -4.4
+   "secs": 13.6,
+   "base_secs": 13.9,
+   "delta_secs": -0.3
   },
   {
    "flag": "enable_rank_hierarchy",
@@ -1098,9 +1119,9 @@
    "baseline_on": true,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 30.6,
-   "base_secs": 31.6,
-   "delta_secs": -1.0
+   "secs": 15.4,
+   "base_secs": 14.0,
+   "delta_secs": 1.4
   },
   {
    "flag": "enable_relative_legitimacy",
@@ -1121,9 +1142,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.7,
-   "base_secs": 31.9,
-   "delta_secs": -1.2
+   "secs": 15.2,
+   "base_secs": 14.0,
+   "delta_secs": 1.2
   },
   {
    "flag": "enable_relative_resentment",
@@ -1143,9 +1164,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.6,
-   "base_secs": 31.7,
-   "delta_secs": -0.1
+   "secs": 15.7,
+   "base_secs": 14.0,
+   "delta_secs": 1.7
   },
   {
    "flag": "enable_resentment_accumulator",
@@ -1165,9 +1186,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.6,
-   "base_secs": 31.8,
-   "delta_secs": -0.2
+   "secs": 15.9,
+   "base_secs": 13.9,
+   "delta_secs": 2.0
   },
   {
    "flag": "enable_resource_directed_fusion",
@@ -1187,9 +1208,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.2,
-   "base_secs": 31.9,
-   "delta_secs": -1.7
+   "secs": 15.3,
+   "base_secs": 14.1,
+   "delta_secs": 1.2
   },
   {
    "flag": "enable_resource_storability",
@@ -1210,9 +1231,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.1,
-   "base_secs": 31.5,
-   "delta_secs": -1.4
+   "secs": 15.3,
+   "base_secs": 14.0,
+   "delta_secs": 1.3
   },
   {
    "flag": "enable_sedentism_fertility",
@@ -1233,9 +1254,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 33.8,
-   "base_secs": 31.6,
-   "delta_secs": 2.2
+   "secs": 16.7,
+   "base_secs": 14.0,
+   "delta_secs": 2.7
   },
   {
    "flag": "enable_settlement_scalar_stress",
@@ -1257,9 +1278,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.9,
-   "base_secs": 31.9,
-   "delta_secs": 0.0
+   "secs": 15.8,
+   "base_secs": 14.0,
+   "delta_secs": 1.8
   },
   {
    "flag": "enable_site_appraisal",
@@ -1280,9 +1301,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 33.8,
-   "base_secs": 31.7,
-   "delta_secs": 2.1
+   "secs": 16.6,
+   "base_secs": 14.0,
+   "delta_secs": 2.6
   },
   {
    "flag": "enable_size_repulsion",
@@ -1303,9 +1324,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 34.7,
-   "base_secs": 31.8,
-   "delta_secs": 2.9
+   "secs": 17.1,
+   "base_secs": 13.9,
+   "delta_secs": 3.2
   },
   {
    "flag": "enable_soil_depletion",
@@ -1313,9 +1334,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 31.6,
-   "base_secs": 31.9,
-   "delta_secs": -0.3
+   "secs": 16.0,
+   "base_secs": 14.1,
+   "delta_secs": 1.9
   },
   {
    "flag": "enable_standing",
@@ -1336,9 +1357,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.8,
-   "base_secs": 31.5,
-   "delta_secs": -1.7
+   "secs": 15.3,
+   "base_secs": 14.0,
+   "delta_secs": 1.3
   },
   {
    "flag": "enable_storage",
@@ -1359,9 +1380,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 25.9,
-   "base_secs": 31.6,
-   "delta_secs": -5.7
+   "secs": 13.3,
+   "base_secs": 14.0,
+   "delta_secs": -0.7
   },
   {
    "flag": "enable_store_anchor",
@@ -1382,9 +1403,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.4,
-   "base_secs": 31.9,
-   "delta_secs": -0.5
+   "secs": 15.5,
+   "base_secs": 14.0,
+   "delta_secs": 1.5
   },
   {
    "flag": "enable_stratification_inequality_gate",
@@ -1404,9 +1425,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 33.9,
-   "base_secs": 31.7,
-   "delta_secs": 2.2
+   "secs": 16.6,
+   "base_secs": 14.0,
+   "delta_secs": 2.6
   },
   {
    "flag": "enable_terrain_move_cost",
@@ -1426,9 +1447,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 31.1,
-   "base_secs": 31.5,
-   "delta_secs": -0.4
+   "secs": 15.6,
+   "base_secs": 14.0,
+   "delta_secs": 1.6
   },
   {
    "flag": "enable_terrain_pathogen",
@@ -1449,9 +1470,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 33.6,
-   "base_secs": 31.9,
-   "delta_secs": 1.7
+   "secs": 16.9,
+   "base_secs": 14.1,
+   "delta_secs": 2.8
   },
   {
    "flag": "enable_terrain_risk",
@@ -1472,9 +1493,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 29.0,
-   "base_secs": 31.8,
-   "delta_secs": -2.8
+   "secs": 14.5,
+   "base_secs": 13.9,
+   "delta_secs": 0.6
   },
   {
    "flag": "enable_tier2_shock",
@@ -1495,9 +1516,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 30.7,
-   "base_secs": 31.6,
-   "delta_secs": -0.9
+   "secs": 15.7,
+   "base_secs": 14.0,
+   "delta_secs": 1.7
   },
   {
    "flag": "enable_village_budding",
@@ -1505,9 +1526,9 @@
    "baseline_on": false,
    "changed": [],
    "unmet_precondition": null,
-   "secs": 29.2,
-   "base_secs": 31.9,
-   "delta_secs": -2.7
+   "secs": 14.8,
+   "base_secs": 14.0,
+   "delta_secs": 0.8
   },
   {
    "flag": "enable_village_resentment",
@@ -1528,9 +1549,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 23.1,
-   "base_secs": 31.8,
-   "delta_secs": -8.7
+   "secs": 11.0,
+   "base_secs": 13.9,
+   "delta_secs": -2.9
   },
   {
    "flag": "enable_village_scaling",
@@ -1551,9 +1572,9 @@
     "tot_wealth"
    ],
    "unmet_precondition": null,
-   "secs": 24.3,
-   "base_secs": 31.7,
-   "delta_secs": -7.4
+   "secs": 11.7,
+   "base_secs": 14.0,
+   "delta_secs": -2.3
   }
  ]
 }
