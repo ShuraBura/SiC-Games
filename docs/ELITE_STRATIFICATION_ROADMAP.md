@@ -66,7 +66,7 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
 | `enable_legitimacy` | 1 | achieved→ascribed cred | Hayden; Friedman (ch.10) | Hayden 75% (R-86) ✓ |
 | `enable_delegitimation` | 1 | gumsa/gumlao reversion | Leach/Friedman (ch.10) | ~60–100 yr cycle |
 | `enable_rank_hierarchy` | 1 | ranked lineages unlock a rung | Hill; Testart | R-99 (superseded gate) |
-| `enable_*_ascription`, `relative_legitimacy`, `*_resentment` | 1 | scale-free ascription + revolt | R-89…R-96 | R-64 9–16% strat |
+| `enable_*_ascription`, `relative_legitimacy`, `*_resentment` | 1 | scale-free ascription + revolt | R-89…R-96 | ~~R-64 9–16% strat~~ → **no usable benchmark**: R-105 measured 2.7–12.5% across 5 seeds (within-run 1.2–25.7) |
 | `enable_material_capture` | 2 | durable capital by aggrandizers | Hayden 1995 | corr(cred,mat) −0.018 ✓ |
 | **TRIBUTE (to build)** | **2** | **legit lineage levies a share of others' `material`** (WEALTH finance — the existing leader levy, strengthened + hereditary + legit-gated) | D'Altroy&Earle 1985 (staple vs wealth); gumsa "a thigh" ≈10–15%/kill (DM-F6); Friedman | **OUTCOME-based** (no rate exists — verified neg): noble_material_lift>1, gini_material & elite-share in BHM/EA range |
 | `enable_noble_leveling_exemption` | 3 | nobles exempt from wealth-leveling | Flannery ch.16 | outcome-based |
@@ -94,7 +94,7 @@ legitimacy-gated tribute, preserving the decoupling as the default so poor influ
 5. **Benchmark targets are the bottleneck.** Several mechanisms have no direct number (levy rate, exemption,
    endogamy) — benchmark on OUTCOMES, and say so. Digestion must extract every available target (like T-5/T-9).
 
-## R-105 — CARRYING-CAPACITY BUG: agglomeration escaped the ceiling (2026-07-26) **[FIX UNVERIFIED]**
+## R-105 — CARRYING-CAPACITY BUG: agglomeration escaped the ceiling (2026-07-26) **[FIX VERIFIED]**
 
 **The bug.** Point-mode agglomeration adds a SUPERLINEAR occupancy bonus `aggl_R*(n**aggl_a - n)` to ANY occupied
 cell (phase1_model.py ~1602), but the R-63 carrying-capacity ceiling was gated on `(cx,cy) in _settlement_sites`
@@ -108,18 +108,62 @@ mean_reserve unchanged at 0.316. n_settle stayed FLAT at ~32 (capped path) while
 (uncapped path) — the signature that localises it. Tier-1 foraging is NOT at fault (occupants split a cell via
 compute_harvest_shares).
 
-**The fix (committed c2c6067, NOT yet suite-tested).** `enable_aggl_ceiling` applies the ceiling wherever the
-agglomeration bonus applies. Default OFF in config (every pre-R-105 result reproduces bit-exactly); ON in the
-campaign harness via `C_AGGLCEIL` (set 0 to reproduce the gap for A/B).
-Partial verification: re-running the exploding specimen with the fix showed starvation RETURN (74 deaths by step
-500 vs 0 during the explosion) and surplus FALLING (0.609->0.536) instead of saturating; stable at pop 5023 @1250.
-Needs to clear step 2000 (where the buggy arm tipped) to be conclusive.
+**The fix (committed c2c6067).** `enable_aggl_ceiling` applies the ceiling wherever the agglomeration bonus
+applies. Default OFF in config (every pre-R-105 result reproduces bit-exactly); ON in the campaign harness via
+`C_AGGLCEIL` (set 0 to reproduce the gap for A/B).
+
+**VERIFICATION (2026-07-26).**
+1. **The runaway is stopped.** The exploding specimen re-run with the fix cleared step 2000 — where the buggy arm
+   tipped — and kept going to 2750: pop 5023 (@1250) → 5508 (@2000) → 5468 (@2750), n_villages plateaued at 41-44
+   (vs 20 → 751), surplus_med 0.43-0.61 and FALLING at the tip point instead of saturating at 1.00, starvation
+   deaths present throughout. `campaign_trajectory_fix.json`.
+2. **Suite: 912 pass / 1 xfail, unchanged** — i.e. the default-OFF path is bit-exact. That is all the old suite
+   could show, because nothing exercised the ON path, so `sic_games/tests/test_aggl_ceiling.py` (7 tests) now
+   pins it: cap reaches non-settlement cells when ON, the bug reproduces when OFF, no over-reach when
+   agglomeration is off, and crowding stops buying food. **919 pass / 1 xfail** with it.
+3. **Budget defect fixed alongside** (`run_campaign.py`): the compute budget and its 3× wall backstop were
+   checked only inside the `C_LOGEVERY` snapshot branch, so at `LOGEVERY=250` a slow block ran for hours
+   uninterruptible — which is why the runaway arm consumed the whole R-104 night. Metering is now per-STEP
+   (finer suspension detection too: a sleep is ONE oversized step delta, slow compute is many). No population
+   cap — a cap would hide the phenomenon. Smoke-tested: budget 1m with LOGEVERY=2000 now stops at step 579.
+
+**R-64 RE-VALIDATION A/B (`C_AGGLCEIL` 0 vs 1, coastal-temperate, 5 seeds × 2000 steps, ELITE=0 DEFEND=0;
+`run_r105_r64_ab.py` / `summarize_r105_ab.py`).** Sustained medians over steps ≥ 800 (R-65: %strat is a
+FLUCTUATING quantity — a single snapshot is not the statistic), pooled across seeds:
+
+| quantity | gap OPEN (ceil0) | gap CLOSED (ceil1) | R-64 published |
+|---|---|---|---|
+| settlement median | 100 [85-110] | 104 [88-109] (+4%) | ~100 |
+| settlement max | 295 [208-349] | 283 [191-332] (−4%) | ~241 |
+| population | 9840 [8275-12323] | 9880 [6854-12232] (+0%) | ~7200 plateau |
+| %stratified | 6.1 [2.7-12.5] | 6.0 [2.9-14.1] (−2%) | 9-16 sustained |
+| gini_cred | 0.442 [0.372-0.53] | 0.331 [0.305-0.45] (−25%) | — |
+
+1. **The settlement-size rung is UNAFFECTED and still reproduces R-64** (median ~100, tail ~250-350). R-64's
+   village result does not rest on the bug. *(Read the `settle_*` columns, not `village_*`: the campaign
+   harness's "village" is a BAND over `band_split`=45, which is NOT R-64's site-cell occupancy.)*
+2. **No detectable effect on %stratified at n=5.** Direction is seed-dependent (2 seeds down, 3 up; −52% to
+   +122%), and the spread WITHIN the gap-open arm alone (2.7-12.5) exceeds any ceil0→ceil1 difference. The
+   honest statement is not "stratification survived the fix" but "this A/B cannot resolve an effect against
+   seed variance" — R-65 said exactly this about %strat and it is still true.
+3. **The expectation that the fix would LOWER carrying capacity is NOT borne out here** (pop +0%). The runaway is
+   a TAIL regime that has to be entered — coastal-temperate over 2000 steps never crosses the tipping density,
+   which is why R-64 looked stable at the time. Expect the fix to bite where density is already high.
+4. **Only consistent shift: within-band cred Gini falls ~25%** (4 of 5 seeds). Plausibly the uncapped surplus was
+   inflating the status spread; not established, and no benchmark is attached to it yet.
 
 **CONSEQUENCES — carry into every downstream reading.**
-- Expect the fix to LOWER carrying capacity in dense runs. **R-64's validated 9-16% stratification, and any
-  population-equilibrium/village-count result, are PROVISIONAL until re-validated with C_AGGLCEIL=1.**
-- The R-103h flat-tropical 40k explosion and the R-104 "seed bifurcation" (seeds 0/1/2 -> 5937-8504; seed 3 ->
-  97551) are almost certainly this bug, NOT ecology or bistability.
+- **R-64's "9-16% stratification" is not re-established, and was never a robust number.** Today's gap-open arm
+  gives per-seed sustained medians of 2.7-12.5% with within-run ranges of 1.2-25.7%. Treat 9-16% as one seed's
+  snapshot band, superseded by the 5-seed distribution above — for the reason R-65 already gave.
+- The R-103h flat-tropical 40k explosion and the R-104 "seed bifurcation" (seeds 0/1/2 → 5937-8504; seed 3 →
+  97551) remain the best candidates for this bug rather than ecology or bistability; the R-104 replication was
+  relaunched on the fixed substrate (2026-07-26) to settle it. Pre-fix arms archived under
+  `sic_games/outputs/substrate_run/pre_r105_buggy/` (they are evidence, not results — see its README).
+- **RESIDUAL SCOPE, deliberately not closed here:** `ceiling_on` is itself gated on
+  `enable_aggregation_sedentism`, so a run with agglomeration ON and aggregation-sedentism OFF still gets NO
+  ceiling even with this flag set. The older Stage-1 `climate_viz` runs are in that configuration. Campaign runs
+  set both, so the campaign arc is covered. Pinned by a test so the gap stays visible.
 
 ## R-103h — DIVERSE-WORLD DIAGNOSTIC (overnight, 8 arms x ~15k budget-capped, 2026-07-24)
 

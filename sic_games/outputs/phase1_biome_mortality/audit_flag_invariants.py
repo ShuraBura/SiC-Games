@@ -59,6 +59,30 @@ TYPES = {
     "enable_genome": "H", "enable_paternity": "H",
     "enable_tier2_shock": "F",
     "enable_genealogy_log": "O",
+    # ── RETROFIT 2026-07-26 (R-105/R-106) ───────────────────────────────────────────────────────
+    # The table above was frozen at R-85 (2026-07-18). Everything built since — the whole
+    # legitimacy/resentment arc (R-86…R-99), the R-103 accumulation stack, and the R-105 fix — was
+    # NEVER CLASSIFIED, so 15 of 75 flags had no invariant and the audit could not see them. That
+    # blind spot has a cost on the record: R-104's circumscription gradient ran with
+    # `enable_material_inheritance`/`_lineage_tribute`/`_noble_leveling_exemption` all OFF and its
+    # "material stays flat" reading was void — the mechanisms under test were disabled.
+    # Types per MECHANISM_CHARTER §3. The three marked PROVISIONAL are judgement calls made during
+    # the retrofit and want the author's confirmation (§3.1 puts the declaration in the docstring).
+    "enable_aggl_ceiling": "P",                    # bounds field→agent extraction: Σ extracted ≤ availability
+    "enable_legitimacy": "C",                      # achieved cred → ascribed rank (capital → capital)
+    "enable_delegitimation": "C",                  # the reverse conversion (gumsa → gumlao)
+    "enable_relative_legitimacy": "C",             # same conversion, scale-free criterion
+    "enable_local_ascription": "C",                # same conversion, per-community scoping
+    "enable_rank_hierarchy": "C",                  # ranked lineages → a rung of hierarchy
+    "enable_relative_resentment": "C",             # PROVISIONAL — grievance state feeding delegitimation
+    "enable_resentment_accumulator": "C",          # PROVISIONAL — ditto, accumulating rather than tracking
+    "enable_village_resentment": "C",              # PROVISIONAL — ditto, held by the village unit
+    "enable_stratification_inequality_gate": "C",  # inequality state → society label (label feeds κ, so not O)
+    "enable_lineage_branching": "H",               # copies a lineage tag across a BIRTH event
+    "enable_lineage_split": "A",                   # segments the lineage graph; must move no quantity
+    "enable_material_inheritance": "X",            # dead → heirs; Σ material conserved
+    "enable_lineage_tribute": "X",                 # commoners → chiefly lineage; Σ material conserved
+    "enable_noble_leveling_exemption": "X",        # modifies who the leveling exchange takes from
 }
 # ENRICHED BASELINE. The bare preset has the whole elite layer OFF, so flipping e.g. `enable_leveling` alone
 # would do nothing for want of MATERIAL and read as VACUOUS — precisely the prerequisite false-negative that made
@@ -72,6 +96,19 @@ ENRICH = dict(
     enable_leader_office=True, office_grievance_gain=0.05,
     enable_economic_defensibility=True,
     enable_aggregation_sedentism=True,
+)
+# RETROFIT 2026-07-26. The elite/accumulation arc needs its own prerequisites live or all 15 newly-classified
+# flags read as VACUOUS for want of context — the same false-negative ENRICH exists to prevent. NOTE: this
+# CHANGES THE BASELINE, so verdicts here are not directly comparable to the R-85 run; the whole audit is
+# re-run rather than patched. Values are run_campaign.py's ELITE_KW (i.e. how the project actually runs it).
+ENRICH.update(
+    enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
+    enable_band_affiliation=True, enable_morph=True,
+    enable_agglomeration=True, aggl_mode="point", aggl_beta=1.15, aggl_tier2=5.0,
+    enable_catchment_ceiling=True,
+    enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
+    enable_delegitimation=True, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
+    enable_lineage_branching=True, lineage_branch_rate=0.05,
 )
 
 # MAGNITUDES. **A BOOLEAN FLIP IS NOT ENABLING A MECHANISM.** Most flags are paired with a gain that DEFAULTS TO
@@ -91,7 +128,36 @@ MAGNITUDE = {
     "enable_leader_share": {"leader_share_frac": 0.20},
     "enable_leader_office": {"office_grievance_gain": 0.05},
     "enable_material_capture": {"material_hide_frac": 0.07},
+    # RETROFIT 2026-07-26 — R-85c's lesson applied to the elite arc. `lineage_branch_rate`,
+    # `lineage_split_rate`, `legit_cred_gain` and `legit_feast_frac` ALL default to 0.0, so flipping
+    # their flags without a magnitude would have reproduced the retracted "dead knob" finding exactly.
+    # Values are the live ones from run_campaign.py's ELITE_KW / the R-104 STACK.
+    "enable_legitimacy": {"legit_feast_frac": 0.25, "legit_cred_gain": 10.0, "legit_threshold": 0.15,
+                          "legit_decay": 0.02},
+    "enable_delegitimation": {"resent_alpha": 0.001, "resent_threshold": 0.5, "resent_privilege_ref": 10.0},
+    "enable_relative_legitimacy": {"legit_rel_multiplier": 2.0},
+    "enable_relative_resentment": {"resent_effect_threshold": 0.8},
+    "enable_village_resentment": {"resent_years_to_revolt": 80.0},
+    "enable_rank_hierarchy": {"rank_hierarchy_frac": 0.15},
+    "enable_lineage_branching": {"lineage_branch_rate": 0.05},
+    "enable_lineage_split": {"lineage_split_rate": 0.00003, "lineage_split_min_segment": 8},
+    "enable_lineage_tribute": {"lineage_tribute_frac": 0.15},
+    "enable_material_inheritance": {"material_inheritance_rule": "primogeniture"},
+    "enable_noble_leveling_exemption": {"noble_exemption_frac": 1.0},
+    "enable_stratification_inequality_gate": {"stratification_gini_min": 0.40},
+    # ALSO RETROFIT 2026-07-26 — five entries R-85c's own fix MISSED. Each of these flags pairs with a gain that
+    # defaults to 0 while the project runs it non-zero, so this harness has been flipping them dead ever since.
+    # Found by `tests/test_mechanism_audit_coverage.py`, which now fails if a new one appears.
+    "enable_ascribed_mate_choice": {"ascribed_mate_strength": 2.5},   # default 0.0, presets 2.5
+    "enable_bonded_mating": {"bonded_mate_radius": 1},                # default 0,   presets 1
+    "enable_cred_status": {"cred_seed_sigma": 0.5, "cred_inherit_sigma": 0.1},   # default 0.0 ⇒ all cred equal
+    "enable_game": {"game_meat_frac": 0.55, "game_meat_cv": 0.73},    # default 0.0 ⇒ no meat stream at all
+    "enable_prowess_facet": {"prowess_decay": 0.05},                  # default 0.0, adopted value 0.05
 }
+# Flags whose only prefix-matching parameter is legitimately 0 in the project — no magnitude is missing.
+# `enable_paternity` carries the `_father` link (R-74); `paternal_provision_frac` is 0.0 in EVERY preset, so a
+# zero default is the live value rather than a dead knob.
+MAGNITUDE_EXEMPT = {"enable_paternity"}
 
 # Known prerequisite chains: if a flag's prereq is not satisfied in the arm, "no change" is UNINFORMATIVE
 # rather than a spec bug. Reported separately so a false VACUOUS is never called a defect.
@@ -113,6 +179,22 @@ PREREQ = {
     "enable_paternity": ("enable_cred_status",),          # the _father gating discovered in R-74
     "enable_ascribed_mate_choice": ("enable_cred_status",), "enable_prowess_facet": ("enable_cred_status",),
     "enable_cred_renorm": ("enable_cred_status",), "enable_material_capture": ("enable_game",),
+    # RETROFIT 2026-07-26 — the elite arc's chains. Without these, every flag below reads "no change"
+    # for want of a prerequisite and would be miscalled a spec bug.
+    "enable_aggl_ceiling": ("enable_agglomeration", "enable_catchment_ceiling", "enable_aggregation_sedentism"),
+    "enable_legitimacy": ("enable_cred_status",),
+    "enable_delegitimation": ("enable_legitimacy",),
+    "enable_relative_legitimacy": ("enable_legitimacy",),
+    "enable_local_ascription": ("enable_legitimacy",),
+    "enable_rank_hierarchy": ("enable_legitimacy",),
+    "enable_relative_resentment": ("enable_delegitimation",),
+    "enable_resentment_accumulator": ("enable_delegitimation",),
+    "enable_village_resentment": ("enable_delegitimation",),
+    "enable_material_inheritance": ("enable_material_capture",),
+    "enable_lineage_tribute": ("enable_material_capture", "enable_legitimacy"),
+    "enable_noble_leveling_exemption": ("enable_leveling", "enable_legitimacy"),
+    "enable_lineage_split": ("enable_lineage_branching",),
+    "enable_stratification_inequality_gate": ("enable_morph",),
 }
 
 # conserved-quantity fields: an A-typed flag must NOT move these
@@ -225,7 +307,9 @@ def main():
                 if not (ch & set(GRAPH)):
                     v.append("GRAPH-INERT — typed A but changed no graph field")
         if v:
-            print(f"  {r['flag']:38s} [{ty}] preset={str(r['preset']):5s} :: {' | '.join(v)}")
+            # was r['preset'] — a KeyError on the first row that produced a verdict, i.e. the reporting
+            # path only ever ran when the audit found NOTHING. Fixed in the 2026-07-26 retrofit.
+            print(f"  {r['flag']:38s} [{ty}] baseline_on={str(r['baseline_on']):5s} :: {' | '.join(v)}")
     print("\nWrote", out)
 
 

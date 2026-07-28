@@ -3797,7 +3797,12 @@ class TerrainWorld(mesa.Model):
                     mean_status = sum(statuses) / len(statuses)
                     top_status = max(statuses)
                     ratio = top_status / (mean_status + 1e-9)          # ≥1; 1 = no distinct leader
-                    leader_strength = 1.0 - 1.0 / ratio                # self-normalizing, saturating ∈ [0,1)
+                    # The 1e-9 guards the RATIO's denominator but not the ratio when it is itself a divisor.
+                    # With `enable_cred_status=False` every cred is 0 ⇒ top_status 0 ⇒ ratio 0.0 ⇒
+                    # ZeroDivisionError, so the cred ABLATION could not be run at all (found by the mechanism
+                    # battery, 2026-07-26). Zero status spread means no distinct leader, which is strength 0 —
+                    # the same value the ratio→1 limit gives. Bit-exact wherever any cred is non-zero.
+                    leader_strength = (1.0 - 1.0 / ratio) if ratio > 0.0 else 0.0
                     weight = leader_society_weight(society)            # Boehm gate
                     if rank_w is not None:
                         # R-99: RANK IS AN ALTERNATIVE ROUTE TO HIERARCHY, taken as a MAX rather than a sum —

@@ -1,0 +1,420 @@
+{
+ "rows": [
+  {
+   "flag": "enable_genealogy_log",
+   "verdict": "BY-DESIGN",
+   "why": "BY-DESIGN: charter type O (Observer) - zero mutation IS its invariant"
+  },
+  {
+   "flag": "enable_band_risk",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "zero-default gain: band_risk_penalty=0.0",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 12,
+   "probes": {
+    "max_settlements": 7,
+    "bonds": 190,
+    "tot_material": 3084164589.613425,
+    "n_ascribed": 27,
+    "deaths": 830,
+    "births": 1046,
+    "n_villages": 5,
+    "n_lineages": 206
+   },
+   "recipe": {
+    "extra": {
+     "band_risk_penalty": 0.05
+    },
+    "world": {}
+   },
+   "secs": 11.8
+  },
+  {
+   "flag": "enable_provisioning",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "provision_self_keep=1.0 -> the mother keeps everything, so nothing is provisioned",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 12,
+   "probes": {
+    "max_settlements": 7,
+    "bonds": 211,
+    "tot_material": 3061345267.5337,
+    "n_ascribed": 35,
+    "deaths": 798,
+    "births": 1104,
+    "n_villages": 7,
+    "n_lineages": 219
+   },
+   "recipe": {
+    "extra": {
+     "provision_self_keep": 0.6
+    },
+    "world": {}
+   },
+   "secs": 10.9
+  },
+  {
+   "flag": "enable_alluvial_renewal",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "prereq enable_soil_depletion was OFF",
+   "changed": [
+    "tot_material"
+   ],
+   "n_changed": 1,
+   "probes": {
+    "max_settlements": 11,
+    "bonds": 130,
+    "tot_material": 1439074252.816494,
+    "n_ascribed": 20,
+    "deaths": 1386,
+    "births": 1233,
+    "n_villages": 5,
+    "n_lineages": 184
+   },
+   "recipe": {
+    "extra": {
+     "enable_soil_depletion": true,
+     "enable_agriculture": true
+    },
+    "world": {
+     "n": 900,
+     "patch": 24,
+     "terr": "flat",
+     "clim": "temperate"
+    }
+   },
+   "secs": 11.6
+  },
+  {
+   "flag": "enable_improved_land",
+   "verdict": "STILL-INERT",
+   "unmet_precondition": null,
+   "why": "needs economic_defensibility AND a world with cultivable land to claim",
+   "changed": [],
+   "n_changed": 0,
+   "probes": {
+    "max_settlements": 11,
+    "bonds": 152,
+    "tot_material": 1801631362.633576,
+    "n_ascribed": 16,
+    "deaths": 1356,
+    "births": 1260,
+    "n_villages": 4,
+    "n_lineages": 211
+   },
+   "recipe": {
+    "extra": {
+     "enable_economic_defensibility": true,
+     "enable_agriculture": true
+    },
+    "world": {
+     "n": 900,
+     "patch": 24,
+     "terr": "flat",
+     "clim": "temperate"
+    }
+   },
+   "secs": 13.1
+  },
+  {
+   "flag": "enable_nutrition_synergy",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "needs actual undernourishment: poor biome + crowding",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 10,
+   "probes": {
+    "max_settlements": 0,
+    "bonds": 122,
+    "tot_material": 1036587729.080871,
+    "n_ascribed": 23,
+    "deaths": 1830,
+    "births": 1150,
+    "n_villages": 0,
+    "n_lineages": 166
+   },
+   "recipe": {
+    "extra": {},
+    "world": {
+     "n": 1200,
+     "patch": 18,
+     "terr": "flat",
+     "clim": "boreal"
+    }
+   },
+   "secs": 12.1
+  },
+  {
+   "flag": "enable_soil_depletion",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "coastal sites are AQUATIC-dominant and exempt from soil (R-53) - retest inland",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 12,
+   "probes": {
+    "max_settlements": 11,
+    "bonds": 160,
+    "tot_material": 1460391920.629927,
+    "n_ascribed": 24,
+    "deaths": 1375,
+    "births": 1247,
+    "n_villages": 3,
+    "n_lineages": 191
+   },
+   "recipe": {
+    "extra": {
+     "enable_agriculture": true
+    },
+    "world": {
+     "n": 900,
+     "patch": 24,
+     "terr": "flat",
+     "clim": "temperate"
+    }
+   },
+   "secs": 12.3
+  },
+  {
+   "flag": "enable_village_budding",
+   "verdict": "STILL-INERT",
+   "unmet_precondition": null,
+   "why": "village_fission_threshold ~170 never reached; lower it to test the wiring",
+   "changed": [],
+   "n_changed": 0,
+   "probes": {
+    "max_settlements": 14,
+    "bonds": 338,
+    "tot_material": 4169528920.30826,
+    "n_ascribed": 57,
+    "deaths": 1720,
+    "births": 2022,
+    "n_villages": 10,
+    "n_lineages": 368
+   },
+   "recipe": {
+    "extra": {
+     "village_fission_threshold": 60.0
+    },
+    "world": {
+     "n": 1200,
+     "patch": 30,
+     "terr": "coastal",
+     "clim": "temperate"
+    }
+   },
+   "secs": 20.2
+  },
+  {
+   "flag": "enable_rank_hierarchy",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "needs a band whose ascribed head-share clears rank_hierarchy_frac=0.15",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 12,
+   "probes": {
+    "max_settlements": 14,
+    "bonds": 338,
+    "tot_material": 4169528920.30826,
+    "n_ascribed": 57,
+    "deaths": 1720,
+    "births": 2022,
+    "n_villages": 10,
+    "n_lineages": 368
+   },
+   "recipe": {
+    "extra": {
+     "legit_threshold": 0.08
+    },
+    "world": {
+     "n": 1200,
+     "patch": 30,
+     "terr": "coastal",
+     "clim": "temperate"
+    }
+   },
+   "secs": 19.0
+  },
+  {
+   "flag": "enable_emergent_abandonment",
+   "verdict": "UNTESTABLE",
+   "unmet_precondition": "no settlement ever formed",
+   "why": "needs settlements under HARDSHIP to abandon",
+   "changed": [],
+   "n_changed": 0,
+   "probes": {
+    "max_settlements": 0,
+    "bonds": 122,
+    "tot_material": 1036587729.080871,
+    "n_ascribed": 23,
+    "deaths": 1830,
+    "births": 1150,
+    "n_villages": 0,
+    "n_lineages": 166
+   },
+   "recipe": {
+    "extra": {},
+    "world": {
+     "n": 1200,
+     "patch": 18,
+     "terr": "flat",
+     "clim": "boreal"
+    }
+   },
+   "secs": 12.3
+  },
+  {
+   "flag": "enable_condition",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "its only consumer is the nutrition-synergy branch (phase1_model:4012)",
+   "changed": [
+    "births",
+    "bonds",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 10,
+   "probes": {
+    "max_settlements": 0,
+    "bonds": 108,
+    "tot_material": 1085784846.816776,
+    "n_ascribed": 21,
+    "deaths": 1825,
+    "births": 1141,
+    "n_villages": 0,
+    "n_lineages": 166
+   },
+   "recipe": {
+    "extra": {
+     "enable_nutrition_synergy": true
+    },
+    "world": {
+     "n": 1200,
+     "patch": 18,
+     "terr": "flat",
+     "clim": "boreal"
+    }
+   },
+   "secs": 10.6
+  },
+  {
+   "flag": "enable_bonded_mating",
+   "verdict": "REVIVED",
+   "unmet_precondition": null,
+   "why": "SUPERSEDED by enable_pair_bonds (phase1_model:2171 `if bonded and not pair_bonds`)",
+   "changed": [
+    "births",
+    "deaths",
+    "final_pop",
+    "n_ascribed_lineages",
+    "n_lineages",
+    "n_villages",
+    "pop_hash",
+    "pos_hash",
+    "tot_cred",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "n_changed": 11,
+   "probes": {
+    "max_settlements": 0,
+    "bonds": 0,
+    "tot_material": 8888317292.757195,
+    "n_ascribed": 29,
+    "deaths": 1921,
+    "births": 2761,
+    "n_villages": 15,
+    "n_lineages": 428
+   },
+   "recipe": {
+    "extra": {
+     "enable_pair_bonds": false
+    },
+    "world": {
+     "n": 1200,
+     "patch": 30,
+     "terr": "coastal",
+     "clim": "temperate"
+    }
+   },
+   "secs": 23.3
+  },
+  {
+   "flag": "enable_infanticide",
+   "verdict": "BY-DESIGN",
+   "why": "BY-DESIGN: documented UNIMPLEMENTED STUB (demography.py:232) - no logic reads it"
+  }
+ ]
+}

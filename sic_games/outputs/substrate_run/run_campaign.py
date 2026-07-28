@@ -444,10 +444,11 @@ def main():
     # SLEEP-AWARE BUDGET (2026-07-22). The budget must meter COMPUTE, not wall-clock: the machine suspended
     # mid-run today and 25.4 min of wall time elapsed across 50 steps that normally cost 0.2 min, which would
     # have silently robbed a later arm of ~17% of its step count for no work done. We cannot use process CPU
-    # time either (child work, IO waits), so instead we sum the per-snapshot deltas and DISCOUNT any delta that
-    # is implausible against the run's own recent pace — the run calibrates its own normal.
+    # time either (child work, IO waits), so instead we sum the per-STEP deltas and DISCOUNT any delta that
+    # is implausible against the run's own recent pace — the run calibrates its own normal. (Metering was
+    # per-SNAPSHOT until R-105, which made the check unreachable inside a slow LOGEVERY block; see below.)
     last_t = t0
-    deltas: list = []          # recent inter-snapshot wall deltas (seconds); the pace reference
+    deltas: list = []          # recent per-STEP wall deltas (seconds); the pace reference
     compute_s = 0.0            # summed deltas with suspensions discounted — what the budget spends
     suspended_s = 0.0          # total time attributed to suspension (reported, never charged)
     for step in range(1, STEPS + 1):
@@ -488,34 +489,50 @@ def main():
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
                 f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']}"
                 f"{elite_str} | {el/60:.1f}m eta{eta/60:.0f}m")
-            _now = time.time()
-            _d = _now - last_t
-            last_t = _now
-            if deltas:
-                _med = sorted(deltas[-20:])[len(deltas[-20:]) // 2]
-                # Suspension looks like a delta far outside the run's own recent pace. The threshold is
-                # RELATIVE because the true pace varies hugely with population (0.1 min/snapshot at pop 6k,
-                # minutes at pop 39k), so any absolute cutoff would be wrong in one regime or the other.
-                if _d > max(3.0 * _med, _med + 120.0):
-                    suspended_s += _d - _med
-                    log(f"  [{step}] SUSPENSION: {_d/60:.1f}m elapsed vs {_med/60:.2f}m pace — "
-                        f"charging pace, not wall (budget protected)")
-                    _d = _med
-            deltas.append(_d)
-            compute_s += _d
-            # Budget spends COMPUTE. The wall-clock backstop at 3x is a safety net: if the discount logic ever
-            # misjudged a genuine slowdown as suspension it could otherwise run unbounded, and an arm that
-            # never terminates is worse than one that stops early.
-            if MAXMIN > 0 and (compute_s / 60.0 >= MAXMIN or el / 60.0 >= 3.0 * MAXMIN):
+        # ── BUDGET, metered EVERY STEP (R-105 fix) ──────────────────────────────────────────────────
+        # This block used to live inside the snapshot branch, so it could only fire once per LOGEVERY
+        # steps. With C_LOGEVERY=250 (every overnight campaign) a single block can cost HOURS at high
+        # population, and neither the compute budget nor the 3x wall backstop could interrupt it — the
+        # backstop was unreachable by construction. Per-step metering also gives the suspension detector
+        # a finer signal: a machine sleep is ONE oversized step delta, whereas genuinely slow compute is
+        # many moderately-sized ones. The snapshot-level version could not tell those apart at all.
+        _now = time.time()
+        _d = _now - last_t
+        last_t = _now
+        if deltas:
+            _win = deltas[-100:]                     # ~a few LOGEVERY blocks; adapts as pop (and pace) grows
+            _med = sorted(_win)[len(_win) // 2]
+            # Suspension looks like a delta far outside the run's own recent pace. The threshold is
+            # RELATIVE because the true pace varies hugely with population, so any absolute cutoff would
+            # be wrong in one regime or the other. The +120s floor also keeps the once-per-LOGEVERY
+            # snapshot+JSON-dump cost (seconds) from being misread as a suspension at a fast pace.
+            if _d > max(3.0 * _med, _med + 120.0):
+                suspended_s += _d - _med
+                log(f"  [{step}] SUSPENSION: {_d/60:.1f}m elapsed vs {_med/60:.2f}m pace — "
+                    f"charging pace, not wall (budget protected)")
+                _d = _med
+        deltas.append(_d)
+        compute_s += _d
+        # Budget spends COMPUTE. The wall-clock backstop at 3x is a safety net: if the discount logic ever
+        # misjudged a genuine slowdown as suspension it could otherwise run unbounded, and an arm that
+        # never terminates is worse than one that stops early. NOTE: no population cap — a cap would hide
+        # the very phenomenon a runaway is evidence of (explicit call, 2026-07-26). Time is the only limit.
+        if MAXMIN > 0:
+            wall_s = _now - t0
+            if compute_s / 60.0 >= MAXMIN or wall_s / 60.0 >= 3.0 * MAXMIN:
                 _why = "COMPUTE" if compute_s / 60.0 >= MAXMIN else "WALL-BACKSTOP"
                 log(f"  [{step}] BUDGET {MAXMIN:.0f}m reached at step {step}/{STEPS} [{_why}] — "
-                    f"compute={compute_s/60:.1f}m wall={el/60:.1f}m suspended={suspended_s/60:.1f}m")
+                    f"compute={compute_s/60:.1f}m wall={wall_s/60:.1f}m suspended={suspended_s/60:.1f}m")
                 break
     genea_rows += w.flush_genealogy(GENEA)               # final flush
     # Persist the OUTCOME, not just the intent: `meta["steps"]` is what was ASKED for, so a truncated run would
     # otherwise look like a complete one to any offline reader. D15's lesson generalised — record the denominator.
     meta["steps_completed"] = step
     meta["truncated"] = step < STEPS
+    # Now that the budget can stop MID-block (R-105), steps_completed can run ahead of the last trajectory row
+    # by up to LOGEVERY-1 steps. Record which step the last row actually describes, so cross-arm comparison
+    # uses the row's denominator and not the loop's.
+    meta["last_snapshot_step"] = traj[-1]["step"] if traj else 0
     meta["wall_minutes"] = round((time.time() - t0) / 60.0, 1)
     meta["compute_minutes"] = round(compute_s / 60.0, 1)
     meta["suspended_minutes"] = round(suspended_s / 60.0, 1)

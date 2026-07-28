@@ -643,7 +643,8 @@ m≈0.9 ⇒ g\*≈49) would give the predicted 2× room to show.
 ### §21.7 — Village economy: catchment ceiling + settlement scalar stress (R-63/R-64 — the emergent village-size mechanism)
 | Name | Value | Status | Grounding |
 |---|---|---|---|
-| enable_catchment_ceiling | False | opt-in | settled-cell food capped at Σ(sustainable yield over catchment) — a village can't out-produce its land (Bettencourt subsistence ceiling; R-54). Stops the unbounded `n^1.15` runaway |
+| enable_catchment_ceiling | False | opt-in | settled-cell food capped at Σ(sustainable yield over catchment) — a village can't out-produce its land (Bettencourt subsistence ceiling; R-54). Stops the unbounded `n^1.15` runaway **at settlement sites only — see the next row** |
+| enable_aggl_ceiling | False | opt-in (ON in the campaign harness, `C_AGGLCEIL`) | R-105 BUGFIX. The row above was gated on `(cx,cy) in _settlement_sites`, so the superlinear agglomeration bonus at NON-settlement cells escaped it entirely — unbounded increasing returns, no Malthusian limit (R-104: pop 3259→97551, zero starvation). ON ⇒ the ceiling applies wherever the bonus applies. Default OFF ⇒ every pre-R-105 result is bit-exact. Still requires `enable_aggregation_sedentism` (residual scope, R-105) |
 | catchment_ceiling_mult | **1.0** | DESIGN | 1.0 = the land's own capacity |
 | enable_settlement_scalar_stress | False | opt-in | over-crowded settlement repels residence-pin agents, prob=`size_repulsion(village_pop, midpoint, society)` (Johnson 1982, dissipated by REPULSION_SOCIETY_FACTOR). **The village-size cap** |
 | settlement_ss_gain | **1.0** | DESIGN | max repel prob for an egalitarian over-crowded village |
@@ -651,7 +652,11 @@ m≈0.9 ⇒ g\*≈49) would give the predicted 2× room to show.
 | settlement_ss_width | **50.0** | DESIGN | Alberti 2014 logistic width |
 
 **R-64 result (2000 steps, all-on):** village median ~100, p90 ~154, **77% in Bar-Yosef 50–150**, bounded stratified
-tail ~240, stratification sustained 9–16%, population plateaus ~7200 — STABLE, no runaway. See RESULTS R-64.
+tail ~240, ~~stratification sustained 9–16%, population plateaus ~7200~~ — STABLE, no runaway. See RESULTS R-64.
+**[R-105, 2026-07-26]** Re-validated with `enable_aggl_ceiling` ON (5 seeds × 2000 steps): the **village-size rung
+holds** (settlement median 100 → 104, tail 295 → 283). The struck figures do not: sustained %stratified is
+**2.7–12.5% across seeds** (within-run range 1.2–25.7) with the gap open OR closed, and population sits at
+~9.8k not 7.2k on today's stack. See ELITE_STRATIFICATION_ROADMAP R-105.
 
 ---
 
