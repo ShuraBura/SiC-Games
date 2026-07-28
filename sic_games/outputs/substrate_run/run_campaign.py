@@ -57,6 +57,7 @@ TAG       = os.environ.get("C_TAG", "")
 GENOME    = os.environ.get("C_GENOME", "1") == "1"
 GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream (off for long cycling runs → save disk/time)
 BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
+LEGITTHR  = float(os.environ.get("C_LEGITTHR", "0.15"))  # ascription gate; swept to test ascribed_frac vs EA 3.6-7.8%
 BUD_THR   = int(os.environ.get("C_BUD_THR", "150"))      # fission threshold (Bandy ~150 open → ~277 circumscribed)
 IMPROVED  = os.environ.get("C_IMPROVED", "0") == "1"     # agriculture: cultivable land claimable where WORKED (needs C_DEFEND=1)
 SOIL      = os.environ.get("C_SOIL", "0") == "1"         # Layer-B1 soil depletion + terrain-dependent (alluvial) renewal
@@ -124,7 +125,7 @@ ELITE_KW = dict(
     enable_leader_share=True, leader_share_frac=0.20,
     enable_leveling=True, leveling_strength=0.79, leveling_share=0.8,
     enable_leader_office=True, office_grievance_gain=0.05,
-    enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=0.15, legit_decay=0.02,
+    enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=LEGITTHR, legit_decay=0.02,
     enable_delegitimation=DELEGIT, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,
     enable_relative_legitimacy=RELLEGIT, legit_rel_multiplier=RELMULT,
     enable_relative_resentment=RELRES, resent_effect_threshold=RESEFF,

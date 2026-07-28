@@ -1,0 +1,54 @@
+BATTERY 4 — interference over 10 mechanisms | 400 steps | 7 workers
+  world {'n': 1000, 'patch': 24, 'terr': 'flat', 'clim': 'temperate'}
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  C1 NULL full-live baseline twice -> IDENTICAL (PASS)  [15.0s/run]
+  preconditions: {'max_settlements': 12, 'bonds': 194, 'tot_material': np.float64(1779183693.654931), 'n_ascribed': 32, 'deaths': 1563, 'births': 1518, 'n_villages': 2, 'n_lineages': 231}
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+
+SINGLE-MECHANISM DISPLACEMENT (turning it OFF against the full-live stack)
+  enable_band_risk                   d=1.179796
+  enable_provisioning                d=0.933229
+  enable_alluvial_renewal            d=0.287167
+  enable_nutrition_synergy           d=0.0   (zero — escalating)
+  enable_soil_depletion              d=1.281516
+  enable_rank_hierarchy              d=0.149425
+  enable_condition                   d=0.304019
+  enable_material_inheritance        d=2.574356
+  enable_lineage_tribute             d=1.903424
+  enable_catchment_ceiling           d=9.603007
+
+ESCALATION of zero-displacement mechanisms (re-ablated in a stressed world)
+  enable_nutrition_synergy           *** MASKED — zero under stress too; another mechanism absorbs it ***
+
+PAIR INTERFERENCE
+  DESTRUCTIVE  band_risk                  + catchment_ceiling          dA=1.180 dB=9.603 dAB=8.047
+  DESTRUCTIVE  condition                  + material_inheritance       dA=0.304 dB=2.574 dAB=1.030
+  DESTRUCTIVE  condition                  + lineage_tribute            dA=0.304 dB=1.903 dAB=0.361
+  DESTRUCTIVE  condition                  + catchment_ceiling          dA=0.304 dB=9.603 dAB=8.088
+  DESTRUCTIVE  band_risk                  + lineage_tribute            dA=1.180 dB=1.903 dAB=0.416
+  DESTRUCTIVE  provisioning               + material_inheritance       dA=0.933 dB=2.574 dAB=1.094
+  DESTRUCTIVE  material_inheritance       + catchment_ceiling          dA=2.574 dB=9.603 dAB=8.232
+  DESTRUCTIVE  band_risk                  + material_inheritance       dA=1.180 dB=2.574 dAB=1.212
+  DESTRUCTIVE  rank_hierarchy             + material_inheritance       dA=0.149 dB=2.574 dAB=1.372
+  DESTRUCTIVE  soil_depletion             + rank_hierarchy             dA=1.282 dB=0.149 dAB=0.149
+  DESTRUCTIVE  soil_depletion             + condition                  dA=1.282 dB=0.304 dAB=0.304
+  DESTRUCTIVE  provisioning               + lineage_tribute            dA=0.933 dB=1.903 dAB=1.394
+  super-additive band_risk                + provisioning             dA=1.180 dB=0.933 dAB=3.475
+  super-additive alluvial_renewal         + nutrition_synergy        dA=0.287 dB=0.000 dAB=0.843
+
+MASKED 1 | DESTRUCTIVE pairs 18 | super-additive 2
+229s -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery4_results.json

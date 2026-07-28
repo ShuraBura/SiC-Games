@@ -1,0 +1,11 @@
+BATTERY 2 — performance of 5 mechanisms | 400 steps | 1 workers
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  1/5 enable_band_risk                         [N] cost -0.5s (-4%) moved 12 fields
+  2/5 enable_provisioning                      [X] cost -1.3s (-10%) moved 12 fields  !! X moved TOTAL tot_wealth by -9.3% — an exchange should redistribute, not create; X moved TOTAL tot_cred by -9.9% — an exchange should redistribute, not create
+  3/5 enable_alluvial_renewal                  [P] cost +0.4s (+3%) moved 1 fields
+  4/5 enable_soil_depletion                    [D] cost -0.5s (-4%) moved 12 fields
+  5/5 enable_rank_hierarchy                    [C] cost -0.9s (-5%) moved 12 fields
+
+aggregate added cost of this set: -2.8s on a 12.9s baseline run
+134s -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery2_results.json
