@@ -83,7 +83,14 @@ KEYS = ("pop", "pct_stratified", "gini_cred", "band_med", "settle_med", "settle_
 TARGETS = {
     "band_med": (25.0, 18.0, 35.0, "Johnson scalar stress / R-72"),
     "settle_med": (100.0, 50.0, 150.0, "Bar-Yosef 50-150; R-63/R-64"),
-    "connubium_med": (475.0, 300.0, 700.0, "Wobst ~475"),
+    # CORRECTED 2026-07-27. The first version of this scorecard used "Wobst ~475" and scored 0/7 — against a
+    # target LITERATURE.md retired on 2026-07-13. Wobst's own simulation returned MES = 79-332; the 175-475
+    # figure is an EXTRAPOLATION to 1-2 hex tiers, not a result, and calibrating to it "over-scattered the
+    # population" (R-67). The anchor is White 2017's spatial-independent MVP ~150 (140-150 for this model's
+    # restrictive marriage config), with the spatial REACH left to emerge density-dependently — Wobst's MES
+    # SHRINKS as residential units aggregate, because a large village already contains the pool. Band = Wobst's
+    # actual simulated range. The contested "500" is Birdsell's dialectal tribe, a different quantity again.
+    "connubium_med": (150.0, 79.0, 332.0, "White 2017 MVP ~150; band = Wobst 1974 simulated MES 79-332"),
     "lineage_size_gini": (0.60, 0.51, 0.68, "BHM 2009 stratified range; R-103g"),
     "lin_top_share": (0.16, 0.08, 0.30, "T-9 Karmin et al. 2015"),
     "ascribed_frac": (0.057, 0.036, 0.078, "EA true-elite 3.6-7.8%"),
