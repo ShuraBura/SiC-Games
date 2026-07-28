@@ -200,6 +200,12 @@ def signature(update, steps=STEPS, **world):
         n_ascribed_lineages=len(asc_lin),
         n_villages=sum(1 for v in bands.values() if v > getattr(w._demog, "band_split_size", 45)),
         n_lineages=len(lin),
+        # LAND TENURE (added 2026-07-27). The signature had 13 fields and none of them was ownership, so a
+        # mechanism whose whole job is to change who owns which cell — `enable_improved_land`,
+        # `enable_economic_defensibility` — could do exactly that and still read INERT. The instrument could
+        # not see the quantity the mechanism moves. Same class as the settle_med/village_med mix-up.
+        n_owned=len(getattr(w, "_cell_owner", {}) or {}),
+        n_claims=len(getattr(w, "_cell_claim", {}) or {}),
         births=births, deaths=deaths,
     )
     probes = dict(max_settlements=max_settle, bonds=sig["bonds"], tot_material=sig["tot_material"],

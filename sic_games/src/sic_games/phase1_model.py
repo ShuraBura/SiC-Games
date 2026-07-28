@@ -1262,10 +1262,23 @@ class TerrainWorld(mesa.Model):
             def_teth = self._demog.defensibility_tether
             # CONSOLIDATE (Stage A): each band's PRIMARY reach = its RICHEST owned cell (tether target), so members
             # converge on ONE central place rather than scattering across every plot the band happens to hold.
+            # RANK BY THE RESOURCE THAT MAKES THE CELL WORTH HOLDING (2026-07-27). This scored every owned cell
+            # by `aquatic_food` alone, so a WORKED CULTIVABLE cell — the entire point of `enable_improved_land`
+            # — was valued at its AQUATIC value (≈0 in the interior) when choosing the band's central place.
+            # Measured: improved_land added 40 claimable worked cells inside settlement catchments, and none of
+            # them could ever win the tether. The agrarian path could be owned but never became a centre, which
+            # is why the mechanism read inert. S_pot = max(aquatic, cultivability) is the model's OWN notion of
+            # site potential (`_s_pot_field`, already used by the settlement catchment yield), so this uses the
+            # same quantity rather than inventing one. improved_land OFF ⇒ aquatic-only ⇒ bit-exact.
             aqf = self._fields.aquatic_food
+            _rank_f = aqf
+            if getattr(self._demog, "enable_improved_land", False):
+                _sp = self._s_pot_field()
+                if _sp is not None:
+                    _rank_f = _sp
             best: dict[int, tuple[float, tuple[int, int]]] = {}
             for c, b in cell_owner.items():
-                val = float(aqf[c[1], c[0]])
+                val = float(_rank_f[c[1], c[0]])
                 cur = best.get(b)
                 if cur is None or val > cur[0] or (val == cur[0] and c < cur[1]):
                     best[b] = (val, c)
