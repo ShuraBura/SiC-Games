@@ -116,13 +116,16 @@ def main():
         print("*** CONTROL FAILED — no verdicts. ***")
         return
 
+    masked_out, saturated_out = [], []
     singles = [(f,) for f in FLAGS]
     pairs = list(itertools.combinations(FLAGS, 2))
     rows = []
 
     def flush():
         json.dump(dict(controls=dict(null=null_ok), world=WORLD, full=FULL, steps=STEPS,
-                       base=base, probes=probes, rows=rows), open(OUT, "w", encoding="utf-8"), indent=1)
+                       base=base, probes=probes, rows=rows,
+                       masked=masked_out, input_saturated=saturated_out),
+                  open(OUT, "w", encoding="utf-8"), indent=1)
 
     t0 = time.time()
     d_single = {}
@@ -137,14 +140,42 @@ def main():
                 d_single[r["off"][0]] = r["dist"]
 
     print("\nSINGLE-MECHANISM DISPLACEMENT (turning it OFF against the full-live stack)", flush=True)
-    masked = []
+    zero = [f for f in FLAGS if d_single.get(f) == 0.0]
     for f in FLAGS:
         d = d_single.get(f)
-        tag = ""
-        if d is not None and d == 0.0:
-            tag = "  *** MASKED — live alone, contributes NOTHING in the full stack ***"
-            masked.append(f)
-        print(f"  {f:34s} d={d}{tag}", flush=True)
+        print(f"  {f:34s} d={d}{'   (zero — escalating)' if d == 0.0 else ''}", flush=True)
+
+    # ── ESCALATION: zero displacement has TWO causes and they are not the same finding ───────────
+    # MASKED           another live mechanism absorbs it — genuine destructive interference.
+    # INPUT-SATURATED  its input variable has no spread in THIS world, so it has nothing to act on.
+    #                  Not interference at all; the same "dead world, not dead mechanism" distinction
+    #                  Battery 1 draws, which the first version of this battery failed to carry over.
+    # Measured case (2026-07-27): `enable_nutrition_synergy` read d=0.0 here and was reported MASKED. Direct
+    # measurement showed a2_cap_hits=0 (the cap never fires) and mean `_condition` 0.9998 — agents are simply
+    # never undernourished in this world, so the multiplier is ~1.0002 and the EXPECTED number of flipped
+    # death outcomes over the whole run is ~1e-3. A bit-identical run is the predicted result, not a mask.
+    # The two are separated by re-ablating in a STRESSED world: live there ⇒ input-saturated here.
+    masked, saturated = [], []
+    if zero:
+        import battery3_resuscitate as B3
+        print("\nESCALATION of zero-displacement mechanisms (re-ablated in a stressed world)", flush=True)
+        for f in zero:
+            try:
+                s_base, s_probes, _ = B1.signature(dict(FULL), steps=STEPS, **B3.POOR)
+                upd = dict(FULL); upd[f] = False
+                s_flip, _, _ = B1.signature(upd, steps=STEPS, **B3.POOR)
+                d_stress = dist(s_base, s_flip)
+            except Exception as e:
+                print(f"  {f:34s} escalation failed: {type(e).__name__}: {e}", flush=True)
+                continue
+            if d_stress > 0.0:
+                saturated.append(f)
+                print(f"  {f:34s} INPUT-SATURATED — d=0.0 here but {d_stress:.4f} under stress: "
+                      f"nothing to act on in this world, NOT interference", flush=True)
+            else:
+                masked.append(f)
+                print(f"  {f:34s} *** MASKED — zero under stress too; another mechanism absorbs it ***",
+                      flush=True)
 
     print("\nPAIR INTERFERENCE", flush=True)
     destructive, superadd = [], []
