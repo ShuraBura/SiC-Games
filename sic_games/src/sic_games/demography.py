@@ -746,6 +746,36 @@ class DemographyConfig(BaseModel):
     #   raise it to re-impose a minimum-bloc rule. [DESIGN — deliberately unanchored, was blocking an anchored
     #   mechanism]
     village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range
+    # ── EMERGENT FISSION HAZARD (2026-07-27) ────────────────────────────────────────────────────────
+    # Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. Bandy 2004 is explicit that the
+    # threshold is not a constant — "if the cost of fissioning is low ... fissioning may be expected to occur
+    # frequently and at a VERY LOW population threshold" — and that the outcome is a RACE: Johnson's growth →
+    # conflict resolves "in only one of two ways: (1) the village fissions or (2) institutions ... emerge ...
+    # in such a way that fissioning is not necessary", the latter opening the way to "greater social group
+    # sizes, and spiraling social inequality". A village whose economy works therefore does NOT split, and
+    # large stable centres become an OUTCOME rather than something suppressed by hand.
+    enable_bud_hazard: bool = False        # OFF ⇒ the old size-threshold path, bit-exact
+    # SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress | size).
+    # Read from the filed PDF: slope 0.147 (95% CI 0.098–0.196), intercept −18.636 (95% CI −24.76…−12.51),
+    # which reproduce his stated inflection at size 127 (−b0/b1 = 126.8) and max stress ~158. [ANCHORED]
+    bud_hazard_b0: float = Field(-18.636)
+    bud_hazard_b1: float = Field(0.147, ge=0.0)
+    # BASE RATE — Bandy 2004's own event counts. Three fission events, and in ALL THREE the village was the
+    # largest of its phase: Chiaramaya + Cerro Choncaya (top two of Early Chiripa, a 500-yr phase) and Sonaji
+    # (largest of Middle Chiripa, 200 yr) ⇒ ~2–5 × 10⁻³ per large-village-year. This is the CEILING hazard, for
+    # a maximally-stressed village with every modifier at maximum and an open site next door. [ANCHORED —
+    # bracket, not a point; the realised rate is an output to compare back against 2–5e-3.]
+    bud_hazard_per_yr: float = Field(0.005, ge=0.0)
+    bud_steps_per_year: float = Field(12.0, gt=0.0)           # model calendar (2000 steps ≈ 167 yr)
+    # MODIFIER WEIGHTS — Bandy names the DIRECTIONS ("factors favouring fissioning include resource depletion
+    # and a high level of internal conflict"; "factors discouraging ... high levels of investment in landscape
+    # (nonportable) capital, and social circumscription") but gives no coefficients. Each weight w mixes its
+    # factor in as (1−w) + w·factor, so w=0 ablates that factor and w=1 applies it fully. [DESIGN — deliberately
+    # not dressed up as anchored. Their COMBINED effect has a validation target instead: Bandy's regional
+    # signature of early frequent fissioning followed by cessation as integration appears.]
+    bud_w_depletion: float = Field(1.0, ge=0.0, le=1.0)       # granaries empty ⇒ fission (favours)
+    bud_w_capital: float = Field(1.0, ge=0.0, le=1.0)         # owned/improved land ⇒ stay (discourages)
+    bud_w_integration: float = Field(1.0, ge=0.0, le=1.0)     # complex/stratified ⇒ stay (Bandy's branch 2)
     village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at

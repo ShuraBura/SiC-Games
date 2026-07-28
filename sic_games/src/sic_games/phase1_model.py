@@ -290,6 +290,8 @@ class TerrainWorld(mesa.Model):
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._band_cred_gini: dict[int, float] = {}            # R-103 per-band cred Gini (inequality gate; empty unless on)
+        self.bud_events = 0                                    # CUMULATIVE village fissions (not per-step): the
+        #   realised rate, to be compared back against Bandy's 2-5e-3 per large-village-year
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._claim_events_this_step: int = 0                  # instability diagnostic: defensibility contest events this step
@@ -3961,6 +3963,7 @@ class TerrainWorld(mesa.Model):
         if aqf is None or not self._settlement_sites:
             return
         thr_base = cfg.village_fission_threshold; circ_gain = cfg.village_circumscription_gain
+        haz_on = getattr(cfg, "enable_bud_hazard", False)   # emergent hazard vs the legacy size threshold
         minf = cfg.village_bud_min_faction
         R = cfg.village_bud_search_radius; persist = cfg.settle_persist_threshold; sep = cfg.settle_radius
         hf = self._harvest_field; W = getattr(hf, "width", N); H = getattr(hf, "height", N)
@@ -3971,10 +3974,26 @@ class TerrainWorld(mesa.Model):
         for (sx, sy) in list(self._settlement_sites):
             village = [a for dx in range(-sep, sep + 1) for dy in range(-sep, sep + 1)
                        for a in cell_agents.get((sx + dx, sy + dy), ())]
-            if len(village) <= thr_base:            # below even the open-landscape threshold → can't fission
-                continue
             bids = Counter(a._group.band_id for a in village)
-            if "stratified" in str(self._band_society.get(bids.most_common(1)[0][0], "")):
+            _u = None
+            if haz_on:
+                # ── EMERGENT HAZARD (2026-07-27) — see DemographyConfig for the provenance of every term.
+                # P(critical scalar stress | size) is Alberti 2014's FITTED logistic, so the steepness is a
+                # published number with a CI rather than a knob. The ceiling rate is Bandy's own event counts.
+                _z = cfg.bud_hazard_b0 + cfg.bud_hazard_b1 * len(village)
+                p_size = 1.0 / (1.0 + math.exp(-_z)) if -700 < _z < 700 else (0.0 if _z <= 0 else 1.0)
+                ceil_step = cfg.bud_hazard_per_yr / cfg.bud_steps_per_year
+                # EXACT EARLY-OUT. Every modifier below is ≤ 1, so p_size·ceiling is an upper bound on the
+                # true hazard. Drawing ONCE and testing the bound first is distribution-identical to testing
+                # the full hazard, and it means the expensive part (catchment scan, site search, kinship)
+                # runs ~1e-4 of the time instead of every village every step. That cost was what made the
+                # previous version 70 s/step at 400+ settlements.
+                _u = self.random.random()
+                if _u >= p_size * ceil_step:
+                    continue
+            elif len(village) <= thr_base:          # legacy path: below the open-landscape threshold
+                continue
+            if not haz_on and "stratified" in str(self._band_society.get(bids.most_common(1)[0][0], "")):
                 continue                                            # integrated village → fission suppressed (Bandy)
             # CLEAVE ON KINSHIP, NOT LINEAGE (2026-07-27). This used to split off the SECOND-LARGEST LINEAGE.
             # Alvard 2009 (literature/AlvardPaper2.pdf), reanalysing Chagnon's Mishimishimaböwei-teri axe fight
@@ -4012,9 +4031,39 @@ class TerrainWorld(mesa.Model):
                     best, bestd = (xx, yy), d
             if best is None:
                 continue         # CIRCUMSCRIBED (no open site in reach) → no bud → village grows + stratifies (Bandy → morph)
-            # Bandy fission COST: the threshold RISES with relocation distance — base (open) → ~+60% when circumscribed
-            if len(village) <= thr_base * (1.0 + circ_gain * bestd / R):
-                continue                                            # not large enough to justify relocation at this cost
+            if haz_on:
+                # ── THE MODIFIERS. Bandy names each direction; the weights are DESIGN and each is bounded in
+                # [0,1], so they can only ever DAMP the anchored ceiling, never inflate it.
+                # DEPLETION (favours) — "factors that would appear to favour fissioning include resource
+                # depletion". `_band_surplus` is the morph detector's per-band stored-food fraction, i.e.
+                # literally whether the economy is working. Full granaries ⇒ depletion 0 ⇒ no reason to split,
+                # which is the whole point of making this emergent.
+                _tot = sum(bids.values())
+                _sur = sum(self._band_surplus.get(b, 0.0) * n for b, n in bids.items()) / _tot if _tot else 0.0
+                depletion = 1.0 - (0.0 if _sur < 0.0 else (1.0 if _sur > 1.0 else _sur))
+                # CAPITAL (discourages) — "high levels of investment in landscape (nonportable) capital". The
+                # share of the village's own catchment it has claimed. Naturally in [0,1]; no invented scale.
+                _cat = [((sx + dx) % W, (sy + dy) % H)
+                        for dx in range(-sep, sep + 1) for dy in range(-sep, sep + 1)]
+                capital = (sum(1 for c in _cat if c in self._cell_owner) / len(_cat)) if _cat else 0.0
+                # INTEGRATION (discourages) — Johnson's second branch, now GRADED rather than a hard gate:
+                # institutions that manage conflict make fissioning "not necessary".
+                _soc = str(self._band_society.get(bids.most_common(1)[0][0], ""))
+                integration = 1.0 if "stratified" in _soc else (0.5 if "complex" in _soc else 0.0)
+                haz = (p_size * ceil_step
+                       * ((1.0 - cfg.bud_w_depletion) + cfg.bud_w_depletion * depletion)
+                       * ((1.0 - cfg.bud_w_capital) + cfg.bud_w_capital * (1.0 - capital))
+                       * ((1.0 - cfg.bud_w_integration) + cfg.bud_w_integration * (1.0 - integration))
+                       # CIRCUMSCRIPTION (discourages) — same anchored gain as the legacy threshold-rise
+                       # (Bandy: 170 open → 277 circumscribed ⇒ +60%), now damping the hazard instead.
+                       / (1.0 + circ_gain * bestd / R))
+                if _u >= haz:
+                    continue
+                self.bud_events += 1
+            else:
+                # Bandy fission COST: the threshold RISES with relocation distance — base → ~+60% circumscribed
+                if len(village) <= thr_base * (1.0 + circ_gain * bestd / R):
+                    continue                                        # not large enough to justify the relocation
             new_id = self._next_band_id; self._next_band_id += 1     # BUD: rival faction migrates + founds the daughter
             for a in faction:
                 a._group.band_id = new_id; a.pos = best

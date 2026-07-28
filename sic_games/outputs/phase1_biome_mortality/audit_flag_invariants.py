@@ -80,6 +80,7 @@ TYPES = {
     "enable_stratification_inequality_gate": "C",  # inequality state → society label (label feeds κ, so not O)
     "enable_lineage_branching": "H",               # copies a lineage tag across a BIRTH event
     "enable_lineage_split": "A",                   # segments the lineage graph; must move no quantity
+    "enable_bud_hazard": "A",                      # fission rule for the settlement graph (2026-07-27)
     "enable_material_inheritance": "X",            # dead → heirs; Σ material conserved
     "enable_lineage_tribute": "X",                 # commoners → chiefly lineage; Σ material conserved
     "enable_noble_leveling_exemption": "X",        # modifies who the leveling exchange takes from
@@ -194,6 +195,7 @@ PREREQ = {
     "enable_lineage_tribute": ("enable_material_capture", "enable_legitimacy"),
     "enable_noble_leveling_exemption": ("enable_leveling", "enable_legitimacy"),
     "enable_lineage_split": ("enable_lineage_branching",),
+    "enable_bud_hazard": ("enable_village_budding",),
     "enable_stratification_inequality_gate": ("enable_morph",),
 }
 
