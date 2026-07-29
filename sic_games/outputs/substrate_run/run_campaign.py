@@ -327,6 +327,47 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         claim_events=ins.get("claim_events", 0), cells_owned=ins.get("n_owned", 0),
         leader_turnover=leader_turnover,
     )
+    # ── MARKER MATRIX (2026-07-27) ──────────────────────────────────────────────────────────────
+    # These quantities were all COMPUTED by demography() and none of them reached a campaign
+    # trajectory, so no long run has ever scored them. Several are anchored targets that have gone
+    # unmeasured for the entire project; polygyny in particular sat 15x off Marlowe unnoticed
+    # because nothing carried it forward. Cost is one demography() pass per snapshot, i.e. per
+    # C_LOGEVERY steps, which is negligible beside the step loop.
+    _dg = w.demography()
+    row.update(
+        # REPRODUCTION / MATING — the channel that drives every dynastic marker downstream
+        frac_polygynous_m=round(_dg.get("frac_polygynous_m", 0.0), 4),   # Marlowe (Hadza) ~0.04
+        mean_wives_married_m=round(_dg.get("mean_wives_married_m", 0.0), 3),
+        frac_paired_adult_f=round(_dg.get("frac_paired_adult_f", 0.0), 3),
+        # DEMOGRAPHIC ENGINE — a marker read on a steeply growing population means something
+        # different from one read at stationarity, so these travel WITH the others by design.
+        median_age_yr=round(_dg.get("median_age_yr", 0.0), 2),
+        dependency_ratio=round(_dg.get("dependency_ratio", 0.0), 3),
+        sex_ratio_m_f=round(_dg.get("sex_ratio_m_f", 0.0), 3),
+        frac_child=round(_dg.get("frac_child", 0.0), 3),
+        frac_motherless=round(_dg.get("frac_motherless", 0.0), 4),       # Aché ~0.02 (Hill & Hurtado)
+        frac_fatherless=round(_dg.get("frac_fatherless", 0.0), 4),
+        # WEALTH CONCENTRATION — the direct test of "does material accrue to the elite"
+        material_gini=round(_dg.get("material_gini", 0.0), 4),
+        material_top10_share=round(_dg.get("material_top10_share", 0.0), 4),
+        wealth_gini=round(_dg.get("wealth_gini", 0.0), 4),
+        corr_cred_material=round(_dg.get("corr_cred_material", 0.0), 4),
+        density_per_km2=round(_dg.get("density_per_km2", 0.0), 5),
+    )
+    # STATUS -> REPRODUCTIVE SUCCESS (von Rueden & Jaeggi: r ~= 0.19 cross-system, ~0.15 monogamous).
+    # R-77 showed the model's old +0.170 was an ARTIFACT of 6x excess polygyny, so this must be
+    # re-measured on the corrected stack rather than carried over.
+    _m = [a for a in w.agent_list if a.sex == "male" and a.age >= menarche]
+    if len(_m) > 8:
+        _x = [getattr(a, "prowess", 1.0) for a in _m]
+        _y = [float(getattr(a, "_n_fathered", 0)) for a in _m]
+        _mx, _my = sum(_x) / len(_x), sum(_y) / len(_y)
+        _sx = sum((v - _mx) ** 2 for v in _x) ** 0.5
+        _sy = sum((v - _my) ** 2 for v in _y) ** 0.5
+        row["status_rs_r"] = (round(sum((a - _mx) * (b - _my) for a, b in zip(_x, _y)) / (_sx * _sy), 4)
+                              if _sx > 0 and _sy > 0 else None)
+    else:
+        row["status_rs_r"] = None
     if step % GENEVERY == 0 and GENOME:
         g = w.genetics(sample_pairs=1500)
         row["heterozygosity"] = round(g.get("heterozygosity", 0.0), 4)
