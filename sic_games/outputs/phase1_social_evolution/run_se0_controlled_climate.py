@@ -42,7 +42,20 @@ def realistic_forager_demog() -> DemographyConfig:
     society-gated ASCRIBED mate-choice), matching run_3m/run_3o + the ascribed-mate-choice recalibration
     (PARAMETERS §18). Stage 1+ flip on their own extra flag and pass an edited copy."""
     return DemographyConfig(
-        polygyny_rate=0.3, max_wives=3,
+        # POLYGYNY CALIBRATED TO MARLOWE (adopted 2026-07-27). R-76/R-77 diagnosed polygyny as a stock that only
+        # FILLS — `polygyny_rate` gates who is considered, but a polygynous bond never ended, so a 150x change in
+        # the rate moved the level only 2.8x and Marlowe's 4% was unreachable. R-76 built `polygyny_attrition`
+        # as the missing outflow and calibrated the pair to rate 0.005 / attrition 0.02.
+        # THE FIX WAS NEVER ADOPTED: `polygyny_attrition` sat at 0.0 in the default AND in both presets, while
+        # `max_wives=3` kept the inflow on. Measured here before adoption: 60.2% of married men polygynous,
+        # 15x Marlowe's ~4%. With the calibrated pair: 4.2%, i.e. 1.0x the anchor. Attrition alone gives 37% —
+        # both knobs are needed, which is R-76's inflow/attrition equilibrium.
+        # ANCHOR [Marlowe, The Hadza, VERIFIED]: "there are usually only about 4% of men with 2 wives", and the
+        # outflow from the same page: "polygynous marriages are less enduring".
+        # CONSEQUENCE, recorded so it is not read as a regression — R-77 showed the old status→RS was an
+        # ARTIFACT of the excess: correcting polygyny takes status→RS from +0.170 to ~+0.019 against von
+        # Rueden's 0.19. The high value was being carried by polygyny that should not have been there.
+        polygyny_rate=0.005, max_wives=3, polygyny_attrition=0.02,
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
