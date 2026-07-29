@@ -58,6 +58,7 @@ GENOME    = os.environ.get("C_GENOME", "1") == "1"
 GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream (off for long cycling runs → save disk/time)
 BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
 LEGITTHR  = float(os.environ.get("C_LEGITTHR", "0.15"))  # ascription gate; swept to test ascribed_frac vs EA 3.6-7.8%
+BUDHAZ    = os.environ.get("C_BUDHAZ", "0") == "1"       # emergent fission HAZARD (Alberti logistic x Bandy rate)
 BUD_THR   = int(os.environ.get("C_BUD_THR", "150"))      # fission threshold (Bandy ~150 open → ~277 circumscribed)
 IMPROVED  = os.environ.get("C_IMPROVED", "0") == "1"     # agriculture: cultivable land claimable where WORKED (needs C_DEFEND=1)
 SOIL      = os.environ.get("C_SOIL", "0") == "1"         # Layer-B1 soil depletion + terrain-dependent (alluvial) renewal
@@ -318,6 +319,8 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         lineages_per_band=dyn.get("lineages_per_band", 0), dom_lineage_share=dyn.get("dom_lineage_share", 0),
         # settlement hierarchy
         n_settle=st.get("n", 0), settle_med=st.get("median", 0), settle_max=st.get("max", 0),
+        bud_events=getattr(w, "bud_events", 0),   # CUMULATIVE fissions -> the realised rate, scored against
+        #                                            Bandy's 2-5e-3 per large-village-year
         primate_ratio=st.get("primate_ratio"), zipf_slope=st.get("zipf_slope"),
         # mating + instability + leadership
         connubium_med=con.get("median"), connubium_p90=con.get("p90"),
@@ -378,7 +381,7 @@ def main():
         enable_lineage_tribute=LINTRIB, lineage_tribute_frac=TRIBFRAC,               # R-103f chiefly tribute
         enable_adaptive_connubium=cut2, mate_search_min_eligible=(MSTAR if cut2 else 3),
         enable_exogamy=cut2, exogamy_degree="lineage",
-        enable_village_budding=BUD, village_fission_threshold=BUD_THR,
+        enable_village_budding=BUD, enable_bud_hazard=BUDHAZ, village_fission_threshold=BUD_THR,
         enable_improved_land=IMPROVED,
         enable_soil_depletion=SOIL, enable_alluvial_renewal=SOIL,
         enable_emergent_abandonment=(SOIL and os.environ.get("C_ABANDON", "0") == "1"),
