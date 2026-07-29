@@ -22,464 +22,464 @@
  },
  "steps": 400,
  "base": {
-  "final_pop": 707,
-  "pop_hash": 3527860640503559190,
-  "tot_wealth": 30822589.044623,
-  "tot_material": 2570088455.768251,
-  "tot_cred": 707.0,
-  "pos_hash": 3781823956982584952,
-  "bonds": 162,
-  "n_settlements": 20,
+  "final_pop": 401,
+  "pop_hash": 472431785287205821,
+  "tot_wealth": 17677503.932602,
+  "tot_material": 544364284.030762,
+  "tot_cred": 401.0,
+  "pos_hash": 8380304805609859397,
+  "bonds": 85,
+  "n_settlements": 14,
   "n_ascribed": 0,
-  "n_ascribed_lineages": 31,
-  "n_villages": 3,
-  "n_lineages": 216,
-  "n_owned": 15,
-  "n_claims": 21,
-  "births": 1220,
-  "deaths": 1513
+  "n_ascribed_lineages": 21,
+  "n_villages": 1,
+  "n_lineages": 120,
+  "n_owned": 13,
+  "n_claims": 13,
+  "births": 809,
+  "deaths": 1408
  },
  "probes": {
-  "max_settlements": 20,
-  "bonds": 162,
-  "tot_material": 2570088455.768251,
-  "n_ascribed": 31,
-  "deaths": 1513,
-  "births": 1220,
-  "n_villages": 3,
-  "n_lineages": 216,
-  "max_village": 507
+  "max_settlements": 14,
+  "bonds": 85,
+  "tot_material": 544364284.030762,
+  "n_ascribed": 21,
+  "deaths": 1408,
+  "births": 809,
+  "n_villages": 1,
+  "n_lineages": 120,
+  "max_village": 0
  },
  "rows": [
   {
    "off": [
     "enable_band_risk"
    ],
-   "secs": 17.3,
-   "dist": 0.834658
+   "secs": 11.6,
+   "dist": 0.410497
   },
   {
    "off": [
     "enable_provisioning"
    ],
-   "secs": 18.9,
-   "dist": 0.34627
+   "secs": 10.6,
+   "dist": 3.053614
   },
   {
    "off": [
     "enable_alluvial_renewal"
    ],
-   "secs": 18.7,
-   "dist": 1e-06
+   "secs": 12.3,
+   "dist": 1.2e-05
   },
   {
    "off": [
     "enable_nutrition_synergy"
    ],
-   "secs": 24.5,
-   "dist": 5.838715
+   "secs": 13.1,
+   "dist": 6.316502
   },
   {
    "off": [
     "enable_soil_depletion"
    ],
-   "secs": 17.0,
-   "dist": 2e-06
+   "secs": 10.0,
+   "dist": 5e-06
   },
   {
    "off": [
     "enable_rank_hierarchy"
    ],
-   "secs": 15.5,
+   "secs": 10.4,
    "dist": 0.0
   },
   {
    "off": [
     "enable_condition"
    ],
-   "secs": 22.6,
-   "dist": 5.357126
+   "secs": 11.4,
+   "dist": 7.017621
   },
   {
    "off": [
     "enable_material_inheritance"
    ],
-   "secs": 17.3,
-   "dist": 1.251794
+   "secs": 9.3,
+   "dist": 4.275535
   },
   {
    "off": [
     "enable_lineage_tribute"
    ],
-   "secs": 15.7,
-   "dist": 1.077532
+   "secs": 9.4,
+   "dist": 2.611013
   },
   {
    "off": [
     "enable_catchment_ceiling"
    ],
-   "secs": 17.4,
-   "dist": 2.072138
+   "secs": 13.8,
+   "dist": 8.150213
   },
   {
    "off": [
     "enable_band_risk",
     "enable_provisioning"
    ],
-   "secs": 15.8,
-   "dist": 0.981081
+   "secs": 9.1,
+   "dist": 3.073102
   },
   {
    "off": [
     "enable_band_risk",
     "enable_alluvial_renewal"
    ],
-   "secs": 15.1,
-   "dist": 0.834656
+   "secs": 10.6,
+   "dist": 2.115038
   },
   {
    "off": [
     "enable_band_risk",
     "enable_nutrition_synergy"
    ],
-   "secs": 19.5,
-   "dist": 5.959964
+   "secs": 10.0,
+   "dist": 7.923088
   },
   {
    "off": [
     "enable_band_risk",
     "enable_soil_depletion"
    ],
-   "secs": 15.1,
-   "dist": 0.83466
+   "secs": 10.2,
+   "dist": 0.410492
   },
   {
    "off": [
     "enable_band_risk",
     "enable_rank_hierarchy"
    ],
-   "secs": 14.9,
-   "dist": 0.834658
+   "secs": 10.0,
+   "dist": 1.231142
   },
   {
    "off": [
     "enable_band_risk",
     "enable_condition"
    ],
-   "secs": 21.1,
-   "dist": 6.196267
+   "secs": 9.1,
+   "dist": 4.135155
   },
   {
    "off": [
     "enable_band_risk",
     "enable_material_inheritance"
    ],
-   "secs": 16.1,
-   "dist": 0.799297
+   "secs": 7.2,
+   "dist": 6.163653
   },
   {
    "off": [
     "enable_band_risk",
     "enable_lineage_tribute"
    ],
-   "secs": 14.0,
-   "dist": 0.700774
+   "secs": 10.4,
+   "dist": 2.227325
   },
   {
    "off": [
     "enable_band_risk",
     "enable_catchment_ceiling"
    ],
-   "secs": 14.8,
-   "dist": 1.539696
+   "secs": 13.5,
+   "dist": 8.311857
   },
   {
    "off": [
     "enable_provisioning",
     "enable_alluvial_renewal"
    ],
-   "secs": 16.8,
-   "dist": 0.346271
+   "secs": 9.7,
+   "dist": 3.053619
   },
   {
    "off": [
     "enable_provisioning",
     "enable_nutrition_synergy"
    ],
-   "secs": 22.1,
-   "dist": 4.96384
+   "secs": 9.6,
+   "dist": 2.408769
   },
   {
    "off": [
     "enable_provisioning",
     "enable_soil_depletion"
    ],
-   "secs": 15.8,
-   "dist": 0.346268
+   "secs": 9.6,
+   "dist": 3.053613
   },
   {
    "off": [
     "enable_provisioning",
     "enable_rank_hierarchy"
    ],
-   "secs": 16.1,
-   "dist": 0.34627
+   "secs": 10.0,
+   "dist": 3.101167
   },
   {
    "off": [
     "enable_provisioning",
     "enable_condition"
    ],
-   "secs": 22.3,
-   "dist": 6.707805
+   "secs": 10.3,
+   "dist": 1.764242
   },
   {
    "off": [
     "enable_provisioning",
     "enable_material_inheritance"
    ],
-   "secs": 16.1,
-   "dist": 1.728651
+   "secs": 9.7,
+   "dist": 0.421828
   },
   {
    "off": [
     "enable_provisioning",
     "enable_lineage_tribute"
    ],
-   "secs": 16.2,
-   "dist": 0.642944
+   "secs": 10.2,
+   "dist": 0.336202
   },
   {
    "off": [
     "enable_provisioning",
     "enable_catchment_ceiling"
    ],
-   "secs": 16.3,
-   "dist": 1.177192
+   "secs": 14.4,
+   "dist": 9.223737
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_nutrition_synergy"
    ],
-   "secs": 21.3,
-   "dist": 5.838714
+   "secs": 10.9,
+   "dist": 5.668138
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_soil_depletion"
    ],
-   "secs": 16.4,
-   "dist": 2e-06
+   "secs": 10.6,
+   "dist": 5e-06
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_rank_hierarchy"
    ],
-   "secs": 16.1,
-   "dist": 1e-06
+   "secs": 10.5,
+   "dist": 1.2e-05
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_condition"
    ],
-   "secs": 21.8,
-   "dist": 5.357125
+   "secs": 10.8,
+   "dist": 5.81506
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_material_inheritance"
    ],
-   "secs": 17.8,
-   "dist": 1.251795
+   "secs": 9.5,
+   "dist": 4.275536
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_lineage_tribute"
    ],
-   "secs": 16.8,
-   "dist": 1.077531
+   "secs": 10.3,
+   "dist": 2.611003
   },
   {
    "off": [
     "enable_alluvial_renewal",
     "enable_catchment_ceiling"
    ],
-   "secs": 16.9,
-   "dist": 2.717896
+   "secs": 13.6,
+   "dist": 7.649817
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_soil_depletion"
    ],
-   "secs": 23.3,
-   "dist": 5.838716
+   "secs": 11.5,
+   "dist": 6.316507
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_rank_hierarchy"
    ],
-   "secs": 23.8,
-   "dist": 5.231764
+   "secs": 10.9,
+   "dist": 7.317743
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_condition"
    ],
-   "secs": 23.3,
-   "dist": 5.838715
+   "secs": 11.8,
+   "dist": 6.316502
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_material_inheritance"
    ],
-   "secs": 23.1,
-   "dist": 5.43479
+   "secs": 9.6,
+   "dist": 4.345969
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_lineage_tribute"
    ],
-   "secs": 23.0,
-   "dist": 6.433847
+   "secs": 10.1,
+   "dist": 3.785362
   },
   {
    "off": [
     "enable_nutrition_synergy",
     "enable_catchment_ceiling"
-   ],
-   "secs": 22.0,
-   "dist": 7.071908
-  },
-  {
-   "off": [
-    "enable_soil_depletion",
-    "enable_rank_hierarchy"
-   ],
-   "secs": 16.8,
-   "dist": 2e-06
-  },
-  {
-   "off": [
-    "enable_soil_depletion",
-    "enable_condition"
-   ],
-   "secs": 22.4,
-   "dist": 5.357128
-  },
-  {
-   "off": [
-    "enable_soil_depletion",
-    "enable_material_inheritance"
-   ],
-   "secs": 17.4,
-   "dist": 0.929702
-  },
-  {
-   "off": [
-    "enable_soil_depletion",
-    "enable_lineage_tribute"
-   ],
-   "secs": 17.6,
-   "dist": 1.077534
-  },
-  {
-   "off": [
-    "enable_soil_depletion",
-    "enable_catchment_ceiling"
-   ],
-   "secs": 17.4,
-   "dist": 2.072142
-  },
-  {
-   "off": [
-    "enable_rank_hierarchy",
-    "enable_condition"
-   ],
-   "secs": 21.3,
-   "dist": 5.357126
-  },
-  {
-   "off": [
-    "enable_rank_hierarchy",
-    "enable_material_inheritance"
-   ],
-   "secs": 16.5,
-   "dist": 0.82453
-  },
-  {
-   "off": [
-    "enable_rank_hierarchy",
-    "enable_lineage_tribute"
    ],
    "secs": 17.0,
-   "dist": 1.077532
+   "dist": 24.874474
+  },
+  {
+   "off": [
+    "enable_soil_depletion",
+    "enable_rank_hierarchy"
+   ],
+   "secs": 11.2,
+   "dist": 5e-06
+  },
+  {
+   "off": [
+    "enable_soil_depletion",
+    "enable_condition"
+   ],
+   "secs": 11.9,
+   "dist": 7.017627
+  },
+  {
+   "off": [
+    "enable_soil_depletion",
+    "enable_material_inheritance"
+   ],
+   "secs": 10.1,
+   "dist": 4.275534
+  },
+  {
+   "off": [
+    "enable_soil_depletion",
+    "enable_lineage_tribute"
+   ],
+   "secs": 10.6,
+   "dist": 2.611018
+  },
+  {
+   "off": [
+    "enable_soil_depletion",
+    "enable_catchment_ceiling"
+   ],
+   "secs": 13.1,
+   "dist": 8.150224
+  },
+  {
+   "off": [
+    "enable_rank_hierarchy",
+    "enable_condition"
+   ],
+   "secs": 11.9,
+   "dist": 7.093795
+  },
+  {
+   "off": [
+    "enable_rank_hierarchy",
+    "enable_material_inheritance"
+   ],
+   "secs": 9.2,
+   "dist": 4.536483
+  },
+  {
+   "off": [
+    "enable_rank_hierarchy",
+    "enable_lineage_tribute"
+   ],
+   "secs": 10.6,
+   "dist": 1.511017
   },
   {
    "off": [
     "enable_rank_hierarchy",
     "enable_catchment_ceiling"
    ],
-   "secs": 17.2,
-   "dist": 2.739597
+   "secs": 14.1,
+   "dist": 8.923526
   },
   {
    "off": [
     "enable_condition",
     "enable_material_inheritance"
    ],
-   "secs": 21.4,
-   "dist": 4.913899
+   "secs": 9.7,
+   "dist": 3.854643
   },
   {
    "off": [
     "enable_condition",
     "enable_lineage_tribute"
    ],
-   "secs": 23.1,
-   "dist": 6.433847
+   "secs": 11.3,
+   "dist": 5.010721
   },
   {
    "off": [
     "enable_condition",
     "enable_catchment_ceiling"
    ],
-   "secs": 22.6,
-   "dist": 7.629432
+   "secs": 18.2,
+   "dist": 27.308932
   },
   {
    "off": [
     "enable_material_inheritance",
     "enable_lineage_tribute"
    ],
-   "secs": 17.7,
-   "dist": 0.742511
+   "secs": 9.4,
+   "dist": 4.787463
   },
   {
    "off": [
     "enable_material_inheritance",
     "enable_catchment_ceiling"
    ],
-   "secs": 15.2,
-   "dist": 1.175183
+   "secs": 11.4,
+   "dist": 4.505442
   },
   {
    "off": [
     "enable_lineage_tribute",
     "enable_catchment_ceiling"
    ],
-   "secs": 14.7,
-   "dist": 1.643311
+   "secs": 13.0,
+   "dist": 9.852606
   }
  ],
  "masked": [],

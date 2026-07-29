@@ -161,10 +161,12 @@ class DemographyConfig(BaseModel):
 
     # --- mortality: Siler, FIXED from Gurven & Kaplan 2007 (both-sexes; M-1) ---
     siler_a1: float = 0.157
-    siler_b1: float = 0.721
+    siler_b1: float = Field(0.721, gt=0.0)   # DIVISOR in the Siler cumulative hazard, (a1/b1)(1-exp(-b1*t)):
+    #   zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every parameter
+    #   at its declared bounds and discovered this one had NO declared bounds at all.
     siler_a2: float = 0.013
     siler_a3: float = 4.80e-5
-    siler_b3: float = 0.103
+    siler_b3: float = Field(0.103, gt=0.0)   # DIVISOR in (a3/b3)(exp(b3*t)-1); same finding as siler_b1
     # M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood)
     childhood_ratio_mf: float = Field(0.71, gt=0.0)
     adult_ratio_mf: float = Field(1.47, gt=0.0)

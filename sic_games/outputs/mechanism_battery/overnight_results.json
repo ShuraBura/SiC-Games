@@ -1,0 +1,180 @@
+{
+ "A1_survivors": [],
+ "A1_n_seeds": 5,
+ "A2": [
+  {
+   "legit_threshold": 0.15,
+   "ascribed_frac": 0.07725,
+   "lineage_lift": 2.4395,
+   "in_EA_band": true,
+   "elite_survives": true,
+   "PASS": true
+  },
+  {
+   "legit_threshold": 0.25,
+   "ascribed_frac": 0.07725,
+   "lineage_lift": 2.4395,
+   "in_EA_band": true,
+   "elite_survives": true,
+   "PASS": true
+  },
+  {
+   "legit_threshold": 0.4,
+   "ascribed_frac": 0.07775,
+   "lineage_lift": 2.42975,
+   "in_EA_band": true,
+   "elite_survives": true,
+   "PASS": true
+  },
+  {
+   "legit_threshold": 0.6,
+   "ascribed_frac": 0.07775,
+   "lineage_lift": 2.42975,
+   "in_EA_band": true,
+   "elite_survives": true,
+   "PASS": true
+  }
+ ],
+ "B": {
+  "P_flat_boreal_bud0": {
+   "pop": 1217.0,
+   "band_med": 19.75,
+   "settle_med": 0.0,
+   "settle_max": 0.0,
+   "n_settle": 0.0,
+   "connubium_med": 32.5,
+   "lineage_size_gini": 0.506,
+   "lin_top_share": 0.0665,
+   "ascribed_frac": 0.38,
+   "pct_stratified": 0.0,
+   "gini_cred": 0.206,
+   "noble_lineage_size_lift": 2.5975
+  },
+  "P_flat_boreal_bud1": {
+   "pop": 1217.0,
+   "band_med": 19.75,
+   "settle_med": 0.0,
+   "settle_max": 0.0,
+   "n_settle": 0.0,
+   "connubium_med": 32.5,
+   "lineage_size_gini": 0.506,
+   "lin_top_share": 0.0665,
+   "ascribed_frac": 0.38,
+   "pct_stratified": 0.0,
+   "gini_cred": 0.206,
+   "noble_lineage_size_lift": 2.5975
+  },
+  "P_flat_temperate_bud0": {
+   "pop": 11320.0,
+   "band_med": 29.75,
+   "settle_med": 94.5,
+   "settle_max": 265.0,
+   "n_settle": 58.5,
+   "connubium_med": 139.5,
+   "lineage_size_gini": 0.5435,
+   "lin_top_share": 0.089,
+   "ascribed_frac": 0.3245,
+   "pct_stratified": 3.2,
+   "gini_cred": 0.4105,
+   "noble_lineage_size_lift": 3.417
+  },
+  "P_flat_temperate_bud1": {
+   "pop": 16427.0,
+   "band_med": 32.0,
+   "settle_med": 30.75,
+   "settle_max": 155.75,
+   "n_settle": 426.25,
+   "connubium_med": 114.5,
+   "lineage_size_gini": 0.3735,
+   "lin_top_share": 0.0192,
+   "ascribed_frac": 0.0815,
+   "pct_stratified": 49.725,
+   "gini_cred": 0.555,
+   "noble_lineage_size_lift": 2.445
+  },
+  "P_flat_tropical_bud0": {
+   "pop": 3798.0,
+   "band_med": 23.5,
+   "settle_med": 87.5,
+   "settle_max": 160.0,
+   "n_settle": 18.0,
+   "connubium_med": 78.75,
+   "lineage_size_gini": 0.504,
+   "lin_top_share": 0.0565,
+   "ascribed_frac": 0.3195,
+   "pct_stratified": 1.15,
+   "gini_cred": 0.2415,
+   "noble_lineage_size_lift": 3.0955
+  },
+  "P_flat_tropical_bud1": {
+   "pop": 12870.25,
+   "band_med": 31.875,
+   "settle_med": 27.0,
+   "settle_max": 107.5,
+   "n_settle": 412.0,
+   "connubium_med": 107.25,
+   "lineage_size_gini": 0.3625,
+   "lin_top_share": 0.0217,
+   "ascribed_frac": 0.085,
+   "pct_stratified": 44.15,
+   "gini_cred": 0.4698,
+   "noble_lineage_size_lift": 2.3762
+  },
+  "S_hilly_temperate_bud0": {
+   "pop": 5840.0,
+   "band_med": 25.5,
+   "settle_med": 98.5,
+   "settle_max": 245.5,
+   "n_settle": 43.0,
+   "connubium_med": 71.75,
+   "lineage_size_gini": 0.548,
+   "lin_top_share": 0.078,
+   "ascribed_frac": 0.363,
+   "pct_stratified": 3.6,
+   "gini_cred": 0.372,
+   "noble_lineage_size_lift": 3.496
+  },
+  "S_hilly_temperate_bud1": {
+   "pop": 7943.0,
+   "band_med": 29.25,
+   "settle_med": 28.75,
+   "settle_max": 149.25,
+   "n_settle": 207.5,
+   "connubium_med": 87.25,
+   "lineage_size_gini": 0.4285,
+   "lin_top_share": 0.046,
+   "ascribed_frac": 0.1615,
+   "pct_stratified": 46.45,
+   "gini_cred": 0.623,
+   "noble_lineage_size_lift": 2.6712
+  },
+  "S_coastal_temp_bud0": {
+   "pop": 9254.5,
+   "band_med": 30.0,
+   "settle_med": 104.0,
+   "settle_max": 256.5,
+   "n_settle": 80.5,
+   "connubium_med": 79.0,
+   "lineage_size_gini": 0.463,
+   "lin_top_share": 0.073,
+   "ascribed_frac": 0.1975,
+   "pct_stratified": 6.5,
+   "gini_cred": 0.302,
+   "noble_lineage_size_lift": 2.901
+  },
+  "S_coastal_temp_bud1": {
+   "pop": 15854.5,
+   "band_med": 32.0,
+   "settle_med": 21.0,
+   "settle_max": 137.25,
+   "n_settle": 530.25,
+   "connubium_med": 110.5,
+   "lineage_size_gini": 0.3592,
+   "lin_top_share": 0.016,
+   "ascribed_frac": 0.0755,
+   "pct_stratified": 49.625,
+   "gini_cred": 0.5767,
+   "noble_lineage_size_lift": 2.4183
+  }
+ }
+}

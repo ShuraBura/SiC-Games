@@ -1,0 +1,39 @@
+BATTERY 6 — STRESS | 250 steps | 7 workers
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  C1 NULL full-live twice -> IDENTICAL (PASS) [9.1s/run, pop 783]
+
+S2 EXTREMES — 170 parameters x 2 bounds
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+   !! bud_steps_per_year                 @min=0.0          CRASH ZeroDivisionError: division by zero
+   !! catchment_ceiling_mult             @min=0.0          EXTINCT 
+   !! mobility_base_radius               @max=10           EXTINCT 
+   !! mobility_npp_ref                   @max=9000.0       EXTINCT 
+   !! repulsion_width                    @min=0.0          CRASH ZeroDivisionError: division by zero
+C:\Users\syatom\Projects\SiC Games\sic_games\src\sic_games\phase1_model.py:3057: RuntimeWarning: divide by zero encountered in scalar divide
+  r = self._band_resentment.get(bid, 0.0) + priv / ytr
+   !! resent_years_to_revolt             @min=0.0          CRASH ZeroDivisionError: division by zero
+   !! settlement_ss_width                @min=0.0          CRASH ZeroDivisionError: division by zero
+   !! siler_b1                           @min=0.0          CRASH ZeroDivisionError: division by zero
+   !! siler_b3                           @min=0.0          CRASH ZeroDivisionError: division by zero
+   !! siler_b3                           @max=1.03         EXTINCT 
+  S2: 330/340 OK | 122 parameter(s) have NO declared range
+
+======================================================================
+CRASH         6  bud_steps_per_year, repulsion_width, resent_years_to_revolt, settlement_ss_width, siler_b1, siler_b3
+EXTINCT       4  catchment_ceiling_mult, mobility_base_radius, mobility_npp_ref, siler_b3
+
+817s -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery6_results.json
