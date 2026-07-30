@@ -302,6 +302,20 @@ All B0–B5 are LHS-feasible. Target working grid for Stage 5.x: 100×100.
 
 ## Session management
 
+**Model recommendation, per new task.** At the start of each distinct new task within a
+conversation, state which Claude model fits it best, one line, before starting work:
+- Sonnet (default) — standard implementation, debugging, most day-to-day dev/analysis work.
+- Opus — architecture-level decisions, highly ambiguous or open-ended reasoning, work where
+  getting the approach wrong is expensive to unwind (e.g. a mechanism redesign, not a bugfix).
+- Haiku — cheap, narrow, mechanical lookups where quality is not the constraint.
+Skip the note if the task obviously continues the same kind of work as the one before it.
+
+**Conversation length.** Once a conversation has accumulated a long history — several
+multi-step diagnostic investigations, many background-run round-trips, or context
+compression has already happened once — say so explicitly and recommend starting a fresh
+session for the next stage: long-running context degrades recall of exact measurements and
+raises the odds of re-deriving or contradicting something already established this session.
+
 After completing each full stage or major task, state:
 
 > "Task complete. Recommended: start a fresh Claude Code session for the

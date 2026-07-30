@@ -3002,6 +3002,47 @@ number with no anchor at all — adopting either on the strength of a sweep woul
 particularly since the deficit threshold (0.588) is itself set by the ~1.7× surplus that is the defect.
 **Revisit once the abundance is fixed**, when the required curvature can be derived rather than swept.
 
+**ADDENDUM 3 — METHODOLOGY CORRECTION: the "world is 99% empty" figure compared occupancy against an
+UNREACHABLE denominator (2026-07-30, caught by supervisor question).** Every diagnostic in this entry that
+measured world-scale land use (`diag_field.py`, the S~n^γ fit, the Malthusian positive control) built its
+world through `battery1_liveness._build()` — a helper designed for FAST, BOUNDED liveness/ablation tests, not
+world-scale questions. It passes `patch=24` into `NPPCapacityField`, which **zeroes harvest capacity outside a
+576-cell (24×24) window** (`capacity.py`: `E[~mask] = 0.0`). But `_forage_cap_field()`, used to compute "94.1%
+of cells habitable," reads `self._fields.forage_kcal` — the **raw, unpatched** terrain field for the full
+10,000-cell grid, a **different object** than `self._harvest_field`. So "88 occupied cells" was divided by a
+10,000-cell count that included ~9,000 cells the harness had already made unreachable. **Corrected: within the
+576 cells actually reachable, occupancy was 88/576 = 15.3%,** not 88/10,000 = 0.9%.
+
+**Re-run on the TRUE unconfined grid (`patch=None`, all ~9,600 habitable cells genuinely reachable), testing
+the supervisor's proposed fix directly — seed agents spread across the whole map instead of clustered:**
+
+| seeding | pop | occupied cells | % of 9604 habitable | mean occ/cell |
+|---|---|---|---|---|
+| clustered (old patch window) | 3189 | 335 | 3.5% | 9.5 |
+| **spread across the full grid** | **6299** | **230** | **2.4%** | **27.4** |
+
+**Spreading the seed made concentration WORSE, not better** — fewer cells used, ~3× the density per cell, and
+a larger total population. This DISPROVES "just seed them further apart" as a fix and rules out plain seed-
+position artefact as the driver. Wherever agents start, the dynamics pull them back into a small number of
+dense cells — which points at the mechanism ITSELF (the crowding/agglomeration bonus, or band cohesion
+resisting split) outweighing whatever pull the empty richer-per-capita land should exert, rather than at
+movement range or initial placement.
+
+**What this does and does not overturn.** The core R-106 chain is unaffected — intake/burn ratios, the S~n^γ
+elasticity fit, and the cycle positive control all compare cells or years AGAINST EACH OTHER within the same
+world, so they do not depend on the 10,000-cell denominator. What changes is the FRAMING of "obstacle 2": the
+unused-land fraction is a real and now CONFIRMED-NOT-A-SEED-ARTEFACT phenomenon, but its magnitude was
+overstated (≥85% of reachable land unused, not ~99% of the world), and the mechanism is now narrowed to
+agglomeration/cohesion rather than left as an open field-vs-terrain question.
+
+**STANDING WARNING for future diagnostics:** `battery1_liveness._build()` defaults to a small `patch` window
+built for cheap ablation checks. **Do not reuse it for any question about world-scale land use, dispersal, or
+carrying capacity without passing `patch=None`** and checking what `NPPCapacityField.patch` actually masks.
+
+**NEXT to finish diagnosing this:** compare, per agent, food where they stand against the best EMPTY reachable
+cell, and measure actual movement distances — to isolate whether the pull is the agglomeration bonus
+specifically or band-cohesion resistance to fissioning, before proposing a fix.
+
 **Origin:** `sic_games/src/sic_games/{demography,phase1_model,config,soa_tier1}.py`,
 `agents/base.py`, `tests/test_intake_fertility.py` (11 tests);
 diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,

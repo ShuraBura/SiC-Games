@@ -214,8 +214,14 @@ response), so births cannot respond and mortality does all the regulating, forci
 `enable_intake_fertility` (flux, not level; FAO/IOM-anchored thresholds) closes 26–40% of the gap and moves
 regulation from deaths to births (population CV 7.9% → 1.9%). Cycles remain absent and now have a NAMED
 obstacle: every feedback in the model is fast, and cycles need a DELAYED one. Two further obstacles open — the
-world is 99% empty though 94% habitable, and the density gradient is flattened ~5× (elasticity −0.195 vs −1.06).
-Code: `src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py`; branches
+gradient is flattened ~5× (elasticity −0.195 vs −1.06), and agents CONCENTRATE onto a small fraction of
+reachable land (≥85%, corrected from an initial mismeasured ~99%/94% claim — see R-106 Addendum 3) REGARDLESS
+of seeding (spreading agents across the full map made concentration WORSE, not better — a real, seed-
+independent pull toward crowding, not a movement or placement artefact). Also: Kaplan-convex juvenile
+production (mechanism fixed; dependent load and provisioning both unblocked) barely moved the demography
+further — the remaining gap is not explained by juvenile production. Code:
+`src/sic_games/{demography,phase1_model,config,soa_tier1}.py`, `agents/base.py`,
+`tests/test_intake_fertility.py`; branches
 `diag/intake-instrumentation`, `demog/intake-fertility-brake`. Methods: PARAMETERS §21.10; MECHANISMS §17.4b;
 falsified hypotheses: DEAD_ENDS DE-22.
 
