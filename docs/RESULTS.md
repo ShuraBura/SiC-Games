@@ -2941,7 +2941,34 @@ her own maintenance, which is the anchored driver of forager birth spacing (Blur
 close more of the gap without tuning; (2) find a SLOW variable for lagged feedback (soil degradation under
 settlement; accumulated structural load) - the cycles question, now well-posed; (3) the clumping.
 
-**Origin:** `sic_games/src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py` (6 tests);
+**ADDENDUM (same day) — step (1) is BLOCKED, and the blocker is a bigger finding than the feature.**
+`enable_dependent_load` was built as planned: a mother's requirement widens by her juveniles' UNMET need, so a
+child who increasingly feeds itself costs her less with no explicit weaning schedule. It is **wired correctly
+and finds nothing**, because there are no dependents to find:
+
+| measured (village/elite preset, 300 steps) | value |
+|---|---|
+| life-history active | **yes** (`eta_min` 0.2, `cons_min` 0.3, auto-built) |
+| juveniles with a living mother-link | 91% |
+| juvenile `eta` (production) | median **0.529** |
+| juvenile `consumption_factor` (need) | median **0.588** |
+| juvenile deficit | median **−1.24 burn units** |
+| juveniles running ANY deficit | **1.0%** |
+
+**Children in this model are net food PRODUCERS**, clearing roughly 1.5× their own requirement. This
+contradicts **Kaplan 2000** — the net child deficit cited in `consumption_factor()`'s own docstring, and the
+anchor beneath human life-history theory (the long juvenile period, provisioning, grandmothering all exist
+*because* children run a deficit until ~18–20 yr). It is the same root cause as the fertility brake: at ~1.7×
+surplus intake **everyone** over-produces, including seven-year-olds.
+
+**Consequence:** the mechanism stays default-OFF and bit-exact, with the materiality test marked `xfail(strict)`
+so it TRIPS the moment children become dependent. **Unblock by recalibrating the juvenile `eta` ramp against
+Kaplan's production/consumption curves — not by tuning the load.** The current ramp is linear from `eta_min`
+over 0→180 months, giving a 7.5-yr-old eta ≈ 0.5, where Kaplan's foragers produce a small fraction of what
+they eat at that age. This also plausibly bears on the age structure directly: children who feed themselves
+neither die as dependents nor constrain their mothers.
+
+**Origin:** `sic_games/src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py` (11 tests);
 diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,
 `eval_feedback`). Branches `diag/intake-instrumentation` (305b2ba, 8c921c9 - diagnostic-only) and
 `demog/intake-fertility-brake` (f2e839e). Suite 1019 passed / 1 xfailed. Default OFF, bit-exact when off.

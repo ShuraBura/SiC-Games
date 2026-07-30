@@ -250,6 +250,23 @@ class DemographyConfig(BaseModel):
     enable_intake_fertility: bool = False
     intake_ema_alpha: float = Field(0.04, gt=0.0, le=1.0)  # half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr:
     #   slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze
+    # DEPENDENT LOAD (requires enable_intake_fertility). A mother's energy budget is not her own maintenance —
+    # she must also cover what her juveniles cannot produce. Counting only her own needs understates the cost of
+    # a further birth for a woman who already has dependents, which is the anchored driver of forager birth
+    # spacing (Blurton Jones, Hadza; Kaplan's provisioning model). Denominator becomes own requirement + the sum
+    # of her living juveniles' UNMET need (their requirement minus what they gathered themselves), so a child who
+    # increasingly feeds itself costs her less — the load falls as they age, without any explicit schedule.
+    # BUILT BUT CURRENTLY INERT — and the reason is a finding, not a wiring bug (2026-07-30, R-106).
+    # Life-history IS on in the village/elite presets (eta_min 0.2, cons_min 0.3, mother-links 91%), yet only
+    # 1.0% of juveniles run any deficit: measured juvenile eta med 0.529 against consumption_factor med 0.588,
+    # and with adults harvesting ~1.7x their own burn a juvenile still gathers ~1.5x its requirement. So
+    # CHILDREN IN THIS MODEL ARE NET FOOD PRODUCERS, which contradicts the Kaplan 2000 net-deficit anchor that
+    # `consumption_factor` itself cites — the anchor human life-history theory rests on (long juvenile period,
+    # provisioning, grandmothering). There are no dependents to load. Same root cause as the fertility brake:
+    # at ~1.7x surplus intake everyone over-produces, including seven-year-olds.
+    # UNBLOCK BY: recalibrating the juvenile eta ramp against Kaplan's production/consumption curves (foragers
+    # do not break even until ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
+    enable_dependent_load: bool = False
     intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
     intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
     #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)

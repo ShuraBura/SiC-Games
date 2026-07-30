@@ -1985,12 +1985,26 @@ class TerrainWorld(mesa.Model):
         intake_fert_on = demog is not None and getattr(demog, "enable_intake_fertility", False)
         i_alpha = demog.intake_ema_alpha if intake_fert_on else 0.0
         i_menarche = demog.menarche_months if intake_fert_on else 0
+        dep_load = {}
+        if intake_fert_on and getattr(demog, "enable_dependent_load", False):
+            # A mother's real energy budget covers her juveniles' UNMET need, not just her own maintenance.
+            # Using the child's own gathered intake makes the load fall as it learns to feed itself — no
+            # explicit weaning schedule is imposed. (Blurton Jones; Kaplan provisioning.)
+            for c in self.agent_list:
+                if not c.is_juvenile():
+                    continue
+                m = getattr(c, "_mother", None)
+                if m is None or not m.alive:
+                    continue
+                _deficit = self._burn * c.consumption_factor() - c._last_intake
+                if _deficit > 0.0:
+                    dep_load[m] = dep_load.get(m, 0.0) + _deficit
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
             if intake_fert_on and a.age >= i_menarche:
                 # Energy FLUX, not stored reserve (Ellison). Gathered intake over this step's own maintenance
                 # requirement; the reserve level cannot carry this because it re-saturates at the cap.
-                _req = self._burn * a.consumption_factor()
+                _req = self._burn * a.consumption_factor() + dep_load.get(a, 0.0)
                 _ratio = (a._last_intake / _req) if _req > 0.0 else 1.0
                 a._intake_ema = (1.0 - i_alpha) * a._intake_ema + i_alpha * _ratio
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)

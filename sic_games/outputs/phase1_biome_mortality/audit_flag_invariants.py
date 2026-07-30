@@ -54,6 +54,7 @@ TYPES = {
     "enable_leader_office": "A", "enable_leader_coherence": "A", "enable_band_family_knobs": "A",
     "enable_orphan_mortality": "N", "enable_energetic_fertility": "N", "enable_sedentism_fertility": "N",
     "enable_intake_fertility": "N",   # same vital-rate type as the reserve-based branch it supersedes
+    "enable_dependent_load": "N",     # widens the intake-fertility denominator by the juveniles' unmet need
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
     "enable_band_risk": "N", "enable_infanticide": "N",

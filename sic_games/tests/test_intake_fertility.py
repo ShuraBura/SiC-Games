@@ -89,6 +89,106 @@ def test_the_ema_actually_varies_unlike_the_reserve():
         f"still cannot discriminate hungry from well-fed agents")
 
 
+def test_dependent_load_defaults_off_and_needs_its_parent_flag():
+    assert DemographyConfig().enable_dependent_load is False, "must be opt-in and independently ablatable"
+
+
+@pytest.mark.slow
+def test_children_are_net_producers_which_is_WHY_dependent_load_is_inert():
+    """THE BLOCKER, pinned as a fact about the model rather than as a passing feature.
+
+    Life-history IS on in these presets (eta_min 0.2, cons_min 0.3) and mother-links resolve for ~91% of
+    juveniles — so the dependent-load mechanism is wired correctly. It still finds nothing, because juveniles
+    GATHER MORE THAN THEY NEED: measured eta med 0.529 vs consumption_factor med 0.588, and with adults taking
+    ~1.7x their own burn a child still clears ~1.5x its requirement. Only ~1% run any deficit.
+
+    That contradicts Kaplan 2000 — the net child deficit cited by `consumption_factor()`'s own docstring, and
+    the anchor under human life-history theory (long juvenile period, provisioning, grandmothering).
+
+    THIS TEST SHOULD START FAILING once the juvenile eta ramp is recalibrated against Kaplan's curves
+    (foragers do not break even until ~18-20 yr). When it does, flip it and enable dependent-load.
+    """
+    import battery1_liveness as B1
+    w = B1._build(dict(enable_intake_fertility=True, enable_dependent_load=True), **WORLD)
+    for _ in range(300):
+        w.step()
+        if not w.agent_list:
+            break
+    juv = [a for a in w.agent_list if a.is_juvenile()]
+    assert len(juv) > 30, "too few juveniles to judge"
+    in_deficit = sum(1 for a in juv
+                     if w._burn * a.consumption_factor() - a._last_intake > 0.0) / len(juv)
+    assert in_deficit < 0.10, (
+        f"{in_deficit*100:.1f}% of juveniles now run a deficit (was 1.0%) — children may have become net "
+        f"CONSUMERS as Kaplan describes. If so this blocker is cleared: enable dependent-load, re-run the "
+        f"materiality check, and update R-106.")
+
+
+@pytest.mark.slow
+def test_dependent_load_is_bit_exact_when_off():
+    import battery1_liveness as B1
+    a, _, _ = B1.signature(dict(enable_intake_fertility=True), steps=120, **WORLD)
+    b, _, _ = B1.signature(dict(enable_intake_fertility=True, enable_dependent_load=False), steps=120, **WORLD)
+    assert a == b, "explicitly disabling dependent-load changed the world"
+
+
+@pytest.mark.slow
+def test_dependent_load_does_nothing_without_intake_fertility():
+    """It widens the intake-fertility denominator, so it must be inert on its own — not a silent second path."""
+    import battery1_liveness as B1
+    off, _, _ = B1.signature({}, steps=120, **WORLD)
+    alone, _, _ = B1.signature(dict(enable_dependent_load=True), steps=120, **WORLD)
+    assert off == alone, "dependent-load acted without its parent flag"
+
+
+@pytest.mark.xfail(reason="BLOCKED: children are net producers in this model (only ~1% of juveniles run a "
+                          "deficit), so there is no dependent load to find. See the Kaplan 2000 blocker test "
+                          "above and R-106. Unblocks when the juvenile eta ramp is recalibrated.",
+                   strict=True)
+@pytest.mark.slow
+def test_dependent_load_reaches_the_denominator_and_is_material():
+    """The mechanism proper, tested DIRECTLY rather than by comparing mothers against childless women.
+
+    That comparison is confounded and was tried first: high-intake women are exactly the ones who succeed in
+    conceiving, so mothers read a HIGHER EMA than childless women (measured 4.11 vs 1.82) — which is the brake
+    working as designed, and it swamps the load effect entirely. Selection, not mechanism.
+
+    So: recompute the load the way the model does and assert (a) it reaches a material share of mothers and
+    (b) it is big enough to move the denominator, rather than being a rounding error.
+    """
+    import statistics
+
+    import battery1_liveness as B1
+    w = B1._build(dict(enable_intake_fertility=True, enable_dependent_load=True,
+                       enable_life_history=True), **WORLD)
+    for _ in range(300):
+        w.step()
+        if not w.agent_list:
+            break
+    cfg = w._demog
+    load = {}
+    for c in w.agent_list:
+        if not c.is_juvenile():
+            continue
+        m = getattr(c, "_mother", None)
+        if m is None or not m.alive:
+            continue
+        d = w._burn * c.consumption_factor() - c._last_intake
+        if d > 0.0:
+            load[m] = load.get(m, 0.0) + d
+    women = [a for a in w.agent_list
+             if a.sex == "female" and cfg.menarche_months <= a.age <= cfg.menopause_months]
+    assert women, "no fertile women"
+    carrying = [a for a in women if load.get(a, 0.0) > 0.0]
+    assert len(carrying) / len(women) > 0.05, (
+        f"only {len(carrying)}/{len(women)} fertile women carry any dependent load — the mother-link or the "
+        f"juvenile deficit is not being found")
+    rel = [load[a] / (w._burn * a.consumption_factor()) for a in carrying]
+    assert statistics.median(rel) > 0.10, (
+        f"median dependent load is {statistics.median(rel)*100:.1f}% of own maintenance — too small to move the "
+        f"denominator, so the mechanism is on but immaterial")
+
+
 @pytest.mark.slow
 def test_juveniles_do_not_accumulate_a_penalty():
     """A child's GATHERED intake understates what it EATS, because juveniles are provisioned. The EMA must

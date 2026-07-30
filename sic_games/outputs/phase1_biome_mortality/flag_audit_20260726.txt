@@ -1,0 +1,124 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  1/75 enable_adaptive_connubium              [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+  2/75 enable_aggl_ceiling                    [P] -> *** NO CHANGE ***
+  3/75 enable_agglomeration                   [P] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+  4/75 enable_aggregation_sedentism           [A] -> *** NO CHANGE ***
+  5/75 enable_agriculture                     [P] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+  6/75 enable_alluvial_renewal                [P] -> *** NO CHANGE ***
+  7/75 enable_ascribed_mate_choice            [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+  8/75 enable_band_affiliation                [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+  9/75 enable_band_family_knobs               [A] -> band_sig,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 10/75 enable_band_risk                       [N] -> *** NO CHANGE ***
+ 11/75 enable_bonded_mating                   [A] -> *** NO CHANGE ***
+ 12/75 enable_catchment_ceiling               [P] -> *** NO CHANGE ***
+ 13/75 enable_condition                       [N] -> *** NO CHANGE ***
+ 14/75 enable_cred_renorm                     [GAUGE] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 15/75 enable_cred_status                     [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 16/75 enable_delegitimation                  [C] -> *** NO CHANGE ***
+ 17/75 enable_density_disease                 [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 18/75 enable_dynamic_bands                   [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 19/75 enable_economic_defensibility          [A] -> *** NO CHANGE ***
+ 20/75 enable_emergent_abandonment            [T] -> *** NO CHANGE ***
+ 21/75 enable_emergent_band_size              [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 22/75 enable_energetic_fertility             [N] -> *** NO CHANGE ***
+ 23/75 enable_exogamy                         [A] -> *** NO CHANGE ***
+ 24/75 enable_forage_cap                      [P] -> band_sig,births,deaths,final_pop,pop_traj,pos_hash,tot_material,tot_wealth
+ 25/75 enable_game                            [P] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 26/75 enable_genealogy_log                   [O] -> *** NO CHANGE ***
+ 27/75 enable_genome                          [H] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 28/75 enable_improved_land                   [P] -> *** NO CHANGE ***
+ 29/75 enable_infanticide                     [N] -> *** NO CHANGE ***
+ 30/75 enable_landscape_packing               [T] -> *** NO CHANGE ***
+ 31/75 enable_leader_coherence                [A] -> *** NO CHANGE ***
+ 32/75 enable_leader_office                   [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 33/75 enable_leader_share                    [X] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 34/75 enable_legitimacy                      [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 35/75 enable_leveling                        [X] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 36/75 enable_life_history                    [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 37/75 enable_lineage_branching               [H] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 38/75 enable_lineage_split                   [A] -> *** NO CHANGE ***
+ 39/75 enable_lineage_tribute                 [X] -> tot_material
+ 40/75 enable_local_ascription                [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 41/75 enable_malnutrition_fission            [A] -> band_sig,births,deaths,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 42/75 enable_marriage_aggregation            [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 43/75 enable_material_capture                [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 44/75 enable_material_inheritance            [X] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 45/75 enable_morph                           [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 46/75 enable_noble_leveling_exemption        [X] -> band_sig,births,deaths,n_bonds,pos_hash,tot_material,tot_wealth
+ 47/75 enable_nutrition_synergy               [N] -> *** NO CHANGE ***
+ 48/75 enable_orphan_mortality                [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 49/75 enable_pair_bonds                      [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 50/75 enable_paternity                       [H] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 51/75 enable_productivity_mobility           [T] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 52/75 enable_provisioning                    [X] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 53/75 enable_prowess_facet                   [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 54/75 enable_rank_hierarchy                  [C] -> *** NO CHANGE ***
+ 55/75 enable_relative_legitimacy             [C] -> band_sig,births,deaths,final_pop,pop_traj,pos_hash,tot_material,tot_wealth
+ 56/75 enable_relative_resentment             [C] -> *** NO CHANGE ***
+ 57/75 enable_resentment_accumulator          [C] -> *** NO CHANGE ***
+ 58/75 enable_resource_directed_fusion        [A] -> band_sig,births,deaths,final_pop,pop_traj,pos_hash,tot_material,tot_wealth
+ 59/75 enable_resource_storability            [P] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 60/75 enable_sedentism_fertility             [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 61/75 enable_settlement_scalar_stress        [A] -> *** NO CHANGE ***
+ 62/75 enable_site_appraisal                  [T] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 63/75 enable_size_repulsion                  [A] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 64/75 enable_soil_depletion                  [D] -> *** NO CHANGE ***
+ 65/75 enable_standing                        [C] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 66/75 enable_storage                         [X] -> band_sig,deaths,final_pop,pop_traj,pos_hash,tot_material,tot_wealth
+ 67/75 enable_store_anchor                    [X] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 68/75 enable_stratification_inequality_gate  [C] -> *** NO CHANGE ***
+ 69/75 enable_terrain_move_cost               [T] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 70/75 enable_terrain_pathogen                [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 71/75 enable_terrain_risk                    [N] -> band_sig,births,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 72/75 enable_tier2_shock                     [F] -> band_sig,deaths,final_pop,n_bonds,pop_traj,pos_hash,tot_material,tot_wealth
+ 73/75 enable_village_budding                 [A] -> *** NO CHANGE ***
+ 74/75 enable_village_resentment              [C] -> *** NO CHANGE ***
+ 75/75 enable_village_scaling                 [A] -> *** NO CHANGE ***
+
+==============================================================================
+VERDICTS (charter §3 invariants)
+==============================================================================
+  enable_adaptive_connubium              [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_aggl_ceiling                    [P] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_aggregation_sedentism           [A] baseline_on=True  :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_alluvial_renewal                [P] baseline_on=False :: no-change BUT PREREQ UNMET ['enable_soil_depletion'] — uninformative, not a defect
+  enable_band_affiliation                [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_band_family_knobs               [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_band_risk                       [N] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_bonded_mating                   [A] baseline_on=True  :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_catchment_ceiling               [P] baseline_on=True  :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_condition                       [N] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_cred_renorm                     [GAUGE] baseline_on=True  :: GAUGE-VIOLATION — changed an observable
+  enable_delegitimation                  [C] baseline_on=True  :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_dynamic_bands                   [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_economic_defensibility          [A] baseline_on=True  :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_emergent_abandonment            [T] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_emergent_band_size              [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_energetic_fertility             [N] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_exogamy                         [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_genealogy_log                   [O] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_improved_land                   [P] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_infanticide                     [N] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_landscape_packing               [T] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_leader_coherence                [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_leader_office                   [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_lineage_split                   [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_malnutrition_fission            [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_marriage_aggregation            [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_morph                           [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_nutrition_synergy               [N] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_pair_bonds                      [A] baseline_on=True  :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_rank_hierarchy                  [C] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_relative_resentment             [C] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_resentment_accumulator          [C] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_resource_directed_fusion        [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_settlement_scalar_stress        [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_size_repulsion                  [A] baseline_on=False :: A-VIOLATION — moved conserved quantity: ['births', 'deaths', 'final_pop', 'pop_traj', 'tot_material', 'tot_wealth']
+  enable_soil_depletion                  [D] baseline_on=False :: no-change BUT PREREQ UNMET ['enable_agriculture'] — uninformative, not a defect
+  enable_stratification_inequality_gate  [C] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_village_budding                 [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_village_resentment              [C] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+  enable_village_scaling                 [A] baseline_on=False :: VACUOUS — spec bug (DE-19) unless gauge
+
+Wrote C:\Users\syatom\Projects\SiC Games\sic_games\outputs\phase1_biome_mortality\flag_audit.json
