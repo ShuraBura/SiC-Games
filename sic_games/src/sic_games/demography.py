@@ -799,6 +799,31 @@ class DemographyConfig(BaseModel):
     bud_w_mate_competition: float = Field(1.0, ge=0.0, le=1.0)
     bud_w_rivalry: float = Field(1.0, ge=0.0, le=1.0)
     bud_w_grievance: float = Field(1.0, ge=0.0, le=1.0)
+    # ── WEALTH → OBLIGATION → PRODUCTION (2026-07-27) ───────────────────────────────────────────
+    # TYPE **C (Conversion)** · UNIT **agent pair** · INVARIANT **DEBITED** (the grant SPENDS material) ·
+    # ANCHOR [Sahlins 1963, VERIFIED, already filed in LITERATURE.md].
+    #
+    # THE DIAGNOSIS THIS FIXES. Material never concentrated in the elite - noble_material_lift 0.87-1.04 -
+    # and it survived every explanation tried: not decay (zeroing it changed nothing), not leveling (off
+    # changed nothing), not elite breadth (narrowing 51% -> 16% doubled the PEOPLE lift and left material at
+    # 0.99). The cause is structural: `material` is a TERMINAL STOCK. It is produced from hunting, it sits,
+    # it decays, and it cannot buy anything. A stock with no investment channel cannot compound, so
+    # per-capita concentration stays flat however well it is protected. That is also why the model's elite is
+    # in PEOPLE - followers are the only asset that compounds, so they are the only elite we ever see.
+    #
+    # Sahlins on the Melanesian big-man: "Deploying his resources carefully, the emerging leader USES WEALTH
+    # TO PLACE OTHERS IN HIS DEBT ... he constructs a following whose production may be harnassed to his
+    # ambition." Wealth's function is conversion - into obligation, and obligation into others' production.
+    #
+    # MECHANISM: a creditor spends `material` to feed a band-mate in deficit (the grant is debited from the
+    # creditor and arrives as kcal, which is what a hungry agent can use). In return he holds a claim on that
+    # agent's future durable output until the debt is discharged. Conversion rate is NOT invented: it is the
+    # inverse of the model's own production relation, material = material_hide_frac x meat kcal.
+    enable_wealth_obligation: bool = False        # default OFF ⇒ bit-exact
+    obligation_grant_frac: float = Field(0.10, ge=0.0, le=1.0)    # share of the creditor's stock per grant
+    obligation_return_frac: float = Field(0.25, ge=0.0, le=1.0)   # share of a debtor's output redirected
+    obligation_premium: float = Field(1.2, ge=1.0)                # claim per unit granted (>1 = the gift binds)
+    obligation_min_ratio: float = Field(2.0, ge=1.0)              # creditor needs this multiple of band-mean
     village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at

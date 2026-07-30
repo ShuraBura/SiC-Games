@@ -290,6 +290,7 @@ class TerrainWorld(mesa.Model):
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._band_cred_gini: dict[int, float] = {}            # R-103 per-band cred Gini (inequality gate; empty unless on)
+        self.obligation_grants = 0                             # CUMULATIVE wealth->obligation grants
         self.bud_events = 0                                    # CUMULATIVE village fissions (not per-step): the
         #   realised rate, to be compared back against Bandy's 2-5e-3 per large-village-year
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
@@ -491,6 +492,8 @@ class TerrainWorld(mesa.Model):
         agent.aggrandizer = 1.0 if (_af > 0.0 and self.random.random() < _af) else 0.0
         agent._use_prowess = (agent.use_cred_status and getattr(self._demog, "enable_prowess_facet", False))
         agent._founder_store = 0.0                 # founder mobile-reserve (set for founders in _init_agents); 0 for newborns
+        agent._creditor = None                     # C: standing obligation — who holds a claim on his output
+        agent._debt = 0.0                          #    remaining claim, in material units
         agent._partner = None                      # F.3a: a FEMALE's husband link (None = unpaired). Males use _wives.
         agent._wives = set()                       # F.3a: a MALE's wives (≥1 ⇒ married; >1 ⇒ polygynous)
         agent._group = GroupVector()               # F.3c collective-identity vector (band_id assigned below / inherited)
@@ -605,6 +608,7 @@ class TerrainWorld(mesa.Model):
                 if getattr(self._demog, "enable_village_budding", False):
                     self._maintain_village_budding()   # Bandy 2004: large village sheds a rival-led daughter (relocates)
             self._maintain_leader_office()        # R-84: tenure the office; Boehm deposition (9) / desertion (17)
+            self._do_obligations()                # C: wealth -> obligation -> a claim on production (Sahlins)
             self._do_births_ibi()
             self._do_lineage_split()   # R-92: named lines SEGMENT into sub-clades (after births, so newborns
                                        # are already placed in their father's line and can be carried by a split)
@@ -1685,12 +1689,12 @@ class TerrainWorld(mesa.Model):
                         take = mat_frac * pool          # the aggrandizers' claim on the group's durable output
                         for a, wi in zip(occ, aw):
                             if wi > 0.0:
-                                a.material += take * (wi / asum)
+                                self._credit_material(a, take * (wi / asum))
                         for a, h in zip(occ, hides):    # the remainder stays with whoever produced it
-                            a.material += (1.0 - mat_frac) * h
+                            self._credit_material(a, (1.0 - mat_frac) * h)
                     else:
                         for a, h in zip(occ, hides):
-                            a.material += h
+                            self._credit_material(a, h)
                     if lead_share > 0.0:                    # R-83: record this step's output for the band levy
                         for a, h in zip(occ, hides):
                             self._hides_this_step[a] = self._hides_this_step.get(a, 0.0) + h
@@ -3922,6 +3926,97 @@ class TerrainWorld(mesa.Model):
             for a in ms:
                 if side(a):
                     a._group.band_id = new_id
+
+    def _credit_material(self, a, amt: float) -> None:
+        """Route new durable output through any standing OBLIGATION before it reaches its producer.
+
+        TYPE C (Conversion) · INVARIANT: material is CONSERVED here — what the debtor does not keep, the
+        creditor receives. Off ⇒ `a.material += amt`, i.e. bit-exact with the previous behaviour.
+
+        This is the repayment half of Sahlins' loop: the creditor's earlier grant bought a claim on the
+        debtor's production, so the debtor's hides pay it down until the debt is discharged."""
+        if amt <= 0.0:
+            a.material += amt
+            return
+        cfg = self._demog
+        if cfg is not None and getattr(cfg, "enable_wealth_obligation", False):
+            cr = getattr(a, "_creditor", None)
+            debt = getattr(a, "_debt", 0.0)
+            if cr is not None and debt > 0.0:
+                if not getattr(cr, "alive", False):
+                    a._creditor, a._debt = None, 0.0        # a debt dies with the creditor; it is personal
+                else:
+                    take = min(amt * cfg.obligation_return_frac, debt)
+                    cr.material += take
+                    a._debt = debt - take
+                    amt -= take
+                    if a._debt <= 1e-9:
+                        a._creditor, a._debt = None, 0.0
+        a.material += amt
+
+    def _do_obligations(self) -> None:
+        """WEALTH → OBLIGATION. A man with a durable surplus feeds a hungry band-mate and thereby acquires a
+        claim on his production (Sahlins 1963: "uses wealth to place others in his debt ... he constructs a
+        following whose production may be harnassed to his ambition").
+
+        TYPE C (Conversion) · UNIT agent pair · INVARIANT DEBITED — the grant SPENDS the creditor's material.
+
+        Why this exists: `material` was a terminal stock with no investment channel, so it could not compound
+        and never concentrated (noble lift 0.87–1.04 under every other remedy tried). The conversion rate is
+        the inverse of the model's OWN production relation (material = material_hide_frac × meat kcal), so no
+        new exchange rate is invented. Off ⇒ returns before any state change or RNG draw ⇒ bit-exact."""
+        cfg = self._demog
+        if cfg is None or not getattr(cfg, "enable_wealth_obligation", False):
+            return
+        hide = getattr(cfg, "material_hide_frac", 0.0)
+        if hide <= 0.0:
+            return                                          # no material economy ⇒ nothing to lend
+        kcal_per_material = 1.0 / hide
+        bands: dict = {}
+        for a in self.agent_list:
+            bands.setdefault(a._group.band_id, []).append(a)
+        for ms in bands.values():
+            if len(ms) < 3:
+                continue
+            mean_mat = sum(getattr(a, "material", 0.0) for a in ms) / len(ms)
+            if mean_mat <= 0.0:
+                continue
+            # CREDITORS: a durable surplus well above the band's own mean. DEBTORS: in food deficit and not
+            # already bound — Sahlins' recipient is someone who needs what the creditor can give.
+            floor = None
+            creditors = [a for a in ms
+                         if getattr(a, "material", 0.0) >= cfg.obligation_min_ratio * mean_mat]
+            if not creditors:
+                continue
+            # DEBTORS ARE RELATIVELY, NOT ABSOLUTELY, NEEDY. The first version required `wealth < reserve
+            # floor` and NEVER FIRED: measured 0 of 1515 agents below the floor, with wealth/floor at p01
+            # 2.68, p10 2.72, median 2.74 — the whole population sits ~2.7x the floor with a 2% spread. This
+            # model has almost no subsistence inequality, so absolute destitution does not exist and a
+            # mechanism keyed to it cannot act. Sahlins' client is not starving either; he is someone for whom
+            # a patron's help is worth an obligation. Relative position within his own band is the faithful
+            # criterion — and it keeps the mechanism honest, since it can only ever bind the poorer half.
+            free = [a for a in ms
+                    if getattr(a, "_creditor", None) is None and getattr(a, "_debt", 0.0) <= 0.0]
+            if not free:
+                continue
+            _w = sorted(a.wealth for a in free)
+            med_w = _w[len(_w) // 2]
+            debtors = [a for a in free if a.wealth < med_w]
+            if not debtors:
+                continue
+            creditors.sort(key=lambda x: (-x.material, x.unique_id))     # deterministic
+            debtors.sort(key=lambda x: (x.wealth, x.unique_id))
+            for cr, db in zip(creditors, debtors):
+                if cr is db:
+                    continue
+                grant = cr.material * cfg.obligation_grant_frac
+                if grant <= 0.0:
+                    continue
+                cr.material -= grant                                     # DEBITED
+                db.wealth += grant * kcal_per_material                   # arrives as food, which he can use
+                db._creditor = cr
+                db._debt = grant * cfg.obligation_premium                # the gift binds: claim > grant
+                self.obligation_grants += 1
 
     @staticmethod
     def _kin_affinity(a, b) -> float:
