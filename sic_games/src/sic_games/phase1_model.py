@@ -4050,8 +4050,41 @@ class TerrainWorld(mesa.Model):
                 # institutions that manage conflict make fissioning "not necessary".
                 _soc = str(self._band_society.get(bids.most_common(1)[0][0], ""))
                 integration = 1.0 if "stratified" in _soc else (0.5 if "complex" in _soc else 0.0)
-                haz = (p_size * ceil_step
-                       * ((1.0 - cfg.bud_w_depletion) + cfg.bud_w_depletion * depletion)
+                # ── POLARIZATION: Bandy's "high level of internal conflict", the half that was missing ──
+                # MATE COMPETITION (Alvard/Chagnon: villages splinter over women). Share of adult men with no
+                # wife — the pool of men with a reason to force a split.
+                _adult_m = [a for a in village if a.sex == "male" and a.age >= cfg.menarche_months]
+                mate_comp = ((sum(1 for a in _adult_m if not getattr(a, "_wives", ()))
+                              / len(_adult_m)) if _adult_m else 0.0)
+                # LEADERSHIP RIVALRY (Chagnon: competing headmen). How close the rival stands to the
+                # incumbent, using the pair the cleavage already picked. 1 = two equals, 0 = uncontested.
+                _mh = getattr(head, "cred", 0.0) * getattr(head, "prowess", 1.0)
+                _mr = getattr(rival, "cred", 0.0) * getattr(rival, "prowess", 1.0)
+                rivalry = (_mr / _mh) if _mh > 0 else 0.0
+                rivalry = 0.0 if rivalry < 0.0 else (1.0 if rivalry > 1.0 else rivalry)
+                # GRIEVANCE: the existing resentment stock, which measures privilege as an EFFECT SIZE and is
+                # therefore a gap rather than a level. Normalised by the reversion threshold it feeds.
+                _thr = getattr(cfg, "resent_threshold", 0.5) or 0.5
+                # KEY THE GRUDGE THE WAY THE GRUDGE IS KEYED. Under `enable_village_resentment` (R-95) the
+                # stock is held per SETTLEMENT SITE as ("v", site) — "the place remembers while its members
+                # churn" — not per band. The first version of this looked it up by band_id and read 0.0000 for
+                # every village while `_band_resentment` held 51 live entries peaking at 0.637, so the whole
+                # grievance driver was silently dead. Same class of error as reading `_lineage_ascribed`
+                # directly instead of through `_rank_keys()`: the structure is polymorphic, so the consumer
+                # must use the same key the producer used.
+                if getattr(cfg, "enable_village_resentment", False):
+                    _res = self._band_resentment.get(("v", (sx, sy)), 0.0)
+                else:
+                    _res = (sum(self._band_resentment.get(b, 0.0) * n for b, n in bids.items()) / _tot
+                            if _tot else 0.0)
+                grievance = min(1.0, max(0.0, _res / _thr))
+                # ALTERNATIVE SUFFICIENT CAUSES ⇒ MAX, not product. Multiplying would mean that adding a
+                # second reason to fission makes fission RARER, which is backwards.
+                drive = max(cfg.bud_w_depletion * depletion,
+                            cfg.bud_w_mate_competition * mate_comp,
+                            cfg.bud_w_rivalry * rivalry,
+                            cfg.bud_w_grievance * grievance)
+                haz = (p_size * ceil_step * drive
                        * ((1.0 - cfg.bud_w_capital) + cfg.bud_w_capital * (1.0 - capital))
                        * ((1.0 - cfg.bud_w_integration) + cfg.bud_w_integration * (1.0 - integration))
                        # CIRCUMSCRIPTION (discourages) — same anchored gain as the legacy threshold-rise

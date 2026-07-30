@@ -778,6 +778,27 @@ class DemographyConfig(BaseModel):
     bud_w_depletion: float = Field(1.0, ge=0.0, le=1.0)       # granaries empty ⇒ fission (favours)
     bud_w_capital: float = Field(1.0, ge=0.0, le=1.0)         # owned/improved land ⇒ stay (discourages)
     bud_w_integration: float = Field(1.0, ge=0.0, le=1.0)     # complex/stratified ⇒ stay (Bandy's branch 2)
+    # ── POLARIZATION (2026-07-27) ───────────────────────────────────────────────────────────────
+    # Bandy's factors FAVOURING fission are "resource depletion AND A HIGH LEVEL OF INTERNAL CONFLICT". Only
+    # depletion was wired; conflict was left out although the model already carries the grievance state. These
+    # add the conflict side, from the sources that name each driver:
+    #   MATE COMPETITION  Alvard 2009 on the Yanomamö: villages "splinter for reasons often related to mate
+    #                     competition", and the axe fight itself began in a dispute over a woman.
+    #   LEADERSHIP RIVALRY Chagnon: a large village "develops SEVERAL competing headmen and cleaves between
+    #                     them". Measured as how close the rival is to the incumbent — one dominant man is a
+    #                     settled village, two near-equals is one about to split. Uses the SAME pair the
+    #                     cleavage already identifies, so it costs nothing extra.
+    #   GRIEVANCE         the existing per-band resentment stock (privilege measured as an effect size, so it
+    #                     is a wealth/status GAP rather than a level — the supervisor's point).
+    # COMBINATION RULE — these are ALTERNATIVE SUFFICIENT CAUSES in Bandy, not joint requirements: a village
+    # splits because it is hungry OR riven OR led by two rivals. They therefore combine as a MAX, not a
+    # product. Multiplying them (as the first version did with depletion alone) would drive the hazard toward
+    # zero as factors were added, i.e. adding causes of fission would make fission rarer. The DISCOURAGING
+    # factors stay multiplicative, since each genuinely damps whatever the cause. [DESIGN — Bandy names the
+    # directions, not the coefficients.]
+    bud_w_mate_competition: float = Field(1.0, ge=0.0, le=1.0)
+    bud_w_rivalry: float = Field(1.0, ge=0.0, le=1.0)
+    bud_w_grievance: float = Field(1.0, ge=0.0, le=1.0)
     village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
