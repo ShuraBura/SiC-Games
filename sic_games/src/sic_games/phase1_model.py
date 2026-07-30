@@ -2759,6 +2759,20 @@ class TerrainWorld(mesa.Model):
         ff = cfg.legit_feast_frac
         if ff <= 0.0:
             return
+        # A FEAST IS AN EVENT, NOT A CONTINUOUS BLEED (2026-07-27). This spent `legit_feast_frac` of every
+        # lineage's material EVERY STEP: at 0.25 that is ~97% of the durable stock per year. Measured over 900
+        # steps the sacrifice drain was 740 BILLION against a tribute return of 1.1 billion — 673:1 — and a
+        # standing stock of only 3.2 billion. The elite was therefore, by construction, the set of agents who
+        # had burned their wealth to buy rank, which is why `noble_material_lift` sat at ~1.0 under every
+        # other remedy tried (zero decay, no leveling, narrowed elite, return-on-capital).
+        # The status side does NOT depend on the rate: legitimacy is an EMA of a lineage's SHARE of its band's
+        # feasting, and a share is invariant to scaling everyone's spend. So the frequency was free for status
+        # and decisive for wealth. Feasts are gatherings — sacrifices happen AT them — so the spend now fires
+        # on the gathering cadence. Same class as R-75's divorce-rate bug: a per-event rate applied per step.
+        # `feast_every` = 0 restores the old per-step behaviour for comparison.
+        _fe = getattr(cfg, "feast_every", 0) or 0
+        if _fe > 0 and (self.step_count % _fe) != 0:
+            return
         # R-96: feasting, and the standing it buys, are reckoned WITHIN a community — the same community that
         # can later revoke the rank. Grouping and revocation must share a unit or a lineage can be ennobled by
         # one body and stripped by another.

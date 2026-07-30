@@ -819,6 +819,12 @@ class DemographyConfig(BaseModel):
     # creditor and arrives as kcal, which is what a hungry agent can use). In return he holds a claim on that
     # agent's future durable output until the debt is discharged. Conversion rate is NOT invented: it is the
     # inverse of the model's own production relation, material = material_hide_frac x meat kcal.
+    # FEAST CADENCE (2026-07-27). Sacrifices are events at gatherings, not a per-step bleed. Applying
+    # `legit_feast_frac` every step drained ~97%/yr of the durable stock and made the elite the set of agents
+    # who had spent their wealth on rank (measured: 673:1 against tribute). Legitimacy is a SHARE of band
+    # feasting, so scaling everyone's spend leaves the status outcome alone — the cadence was free for status
+    # and decisive for wealth. 12 = annual, matching `aggregation_period`. 0 = the old per-step behaviour.
+    feast_every: int = Field(12, ge=0)
     enable_wealth_obligation: bool = False        # default OFF ⇒ bit-exact
     obligation_grant_frac: float = Field(0.10, ge=0.0, le=1.0)    # share of the creditor's stock per grant
     obligation_return_frac: float = Field(0.25, ge=0.0, le=1.0)   # share of a debtor's output redirected

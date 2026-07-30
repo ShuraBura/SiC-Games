@@ -32,7 +32,15 @@ from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world, world_lottery_climate
 
 
-def _world(n=260, legit=False, feast=0.25, cg=10.0, thr=0.15, seed=0):
+def _world(n=260, legit=False, feast=0.25, cg=10.0, thr=0.15, seed=0, feast_every=0):
+    """`feast_every=0` keeps the feast firing EVERY step, which is what these unit tests need.
+
+    The model default is 12 (sacrifices happen at the annual gathering, not continuously — see
+    `feast_every` in DemographyConfig). These tests step only a handful of times to isolate the legitimacy
+    LOGIC — conservation, the ratchet, the cred gain — so under the annual cadence no feast would fire at all
+    and every one of them would assert on an empty world. They all failed with "the test would be vacuous",
+    which is the right complaint. The CADENCE itself is pinned separately by
+    `test_feast_cadence_is_annual_by_default` below, so neither concern goes untested."""
     k = world_lottery_climate(seed, terrain="coastal", climate="temperate")
     f = generate_world(k, mode="climate")
     hf = NPPCapacityField(f, 75000.0, patch=(20, 20, 60), mode="tallavaara", aquatic=True, enable_depletion=True)
@@ -44,7 +52,8 @@ def _world(n=260, legit=False, feast=0.25, cg=10.0, thr=0.15, seed=0):
                          enable_game=True, game_meat_frac=0.55,
                          enable_material_capture=True, material_hide_frac=0.07, material_decay=0.0,
                          enable_legitimacy=legit, legit_feast_frac=feast,
-                         legit_cred_gain=cg, legit_threshold=thr, legit_decay=0.02)
+                         legit_cred_gain=cg, legit_threshold=thr, legit_decay=0.02,
+                         feast_every=feast_every)
     return TerrainWorld(n_agents=n, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=seed,
                         carbon_cfg=CarbonConfig(kappa=1.5),
                         substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -266,3 +275,28 @@ def test_gumsa_state_diagnostic():
     assert g["n_bands"] > 0
     assert 0.0 <= g["frac_gumsa"] <= 1.0
     assert g["max_resentment"] >= g["mean_resentment"] >= 0.0
+
+
+def test_feast_cadence_is_annual_by_default():
+    """THE CADENCE, pinned separately from the logic the other tests exercise.
+
+    `legit_feast_frac` used to be spent EVERY STEP. At 0.25 that is ~97% of the durable stock per year:
+    measured over 900 steps the sacrifice drain reached 740 BILLION against 1.1 billion of tribute (673:1)
+    on a standing stock of 3.2 billion, so the elite was by construction whoever had burned their wealth
+    buying rank — which is why noble material lift sat at ~1.0 under every other remedy tried.
+    Legitimacy is an EMA of a lineage's SHARE of its band's feasting, and a share is invariant to scaling
+    everyone's spend, so the cadence was free for status and decisive for wealth."""
+    from sic_games.demography import DemographyConfig
+    assert DemographyConfig().feast_every == 12, "sacrifices happen at the annual gathering, not every step"
+
+    w = _world(legit=True, feast=0.25, feast_every=12)
+    spends = []
+    for _ in range(26):                       # >2 years, so a feast step must fall inside the window
+        w.step()
+        if not w.agent_list:
+            break
+        spends.append(w.feast_spend_this_step)
+    fired = [i for i, v in enumerate(spends) if v > 0.0]
+    assert fired, "no feast fired in two model years"
+    assert len(fired) < len(spends) / 2, (
+        f"feasting fired on {len(fired)}/{len(spends)} steps — it is meant to be an EVENT, not a bleed")
