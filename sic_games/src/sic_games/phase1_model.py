@@ -307,6 +307,7 @@ class TerrainWorld(mesa.Model):
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
+        self._diag_pool = None                                    # DIAGNOSTIC: set to {} to record per-cell (S, occupancy) each harvest; None ⇒ off
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
         self._orphan_e_cache = None                               # R-74: endogenous E[mult] divisor (per-step cache)
@@ -1629,6 +1630,8 @@ class TerrainWorld(mesa.Model):
                 aggl_on and aggl_R is not None and getattr(self._demog, "enable_aggl_ceiling", False))
             if ceiling_on and _cap_here:
                 S = min(S, self._settlement_carrying_capacity((cx, cy)))         # R-63: a village can't out-produce its catchment
+            if self._diag_pool is not None:      # DIAGNOSTIC ONLY (no behaviour): S after every bonus + the
+                self._diag_pool[(cx, cy)] = (S, len(occ))   # ceiling, vs occupancy — is dS/dn super- or sub-linear?
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's
             # meat pool + store draw; the detector below updates it for next step. Per-band (F.3c-2) reads the
             # cell-occupants' band society; else per-cell (the original S.4).
