@@ -238,6 +238,21 @@ class DemographyConfig(BaseModel):
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
+    # INTAKE-based energetic fertility (supersedes the reserve-based branch above when ON). Measured
+    # 2026-07-30: the reserve-based version is INERT by construction. Burn is ~68% of the floor-to-full span
+    # per step, so an agent either re-saturates at the cap or dies within a step; there is no persistent
+    # intermediate state. Post-harvest reserve reads 0.996 of full and the post-burn trough 0.318, each with
+    # spread ~0.002 and ZERO response across a 5x density range, so the factor returns ~0.995 always and
+    # fertility cannot respond to scarcity. Regulation therefore falls entirely on mortality (CDR +59% while
+    # CBR moves 3%), which forces e0 = 1/CDR ~ 20.7 yr, median age 13 and 8-11% motherless.
+    # INTAKE is the live signal the reserve level cannot be: p10 0.93 to p90 4.26 of requirement. Ellison's
+    # energetics is the mechanism — fecundity tracks energy FLUX, not stored reserve.
+    enable_intake_fertility: bool = False
+    intake_ema_alpha: float = Field(0.04, gt=0.0, le=1.0)  # half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr:
+    #   slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze
+    intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
+    intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
+    #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
     # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
     # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
     # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning

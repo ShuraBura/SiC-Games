@@ -511,6 +511,11 @@ class TerrainWorld(mesa.Model):
         agent._standing = (self._demog.standing_floor if agent._use_standing else 0.0)
         agent._standing_band = None               # band the standing was built in (change ⇒ outsider penalty)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
+        agent._last_intake = 0.0                  # this step's gathered kcal (set during harvest)
+        # Intake-based energetic fertility: slow EMA of intake/requirement. Starts NEUTRAL (at `intake_fert_hi`
+        # ⇒ factor 1.0) so founders carry no startup penalty, and it only accumulates from menarche — before
+        # that a child's GATHERED intake understates what it EATS, because juveniles are provisioned.
+        agent._intake_ema = (self._demog.intake_fert_hi if self._demog is not None else 1.0)
         agent._fed_reserve = self._reserve_full   # post-harvest reserve = nutritional status; synergy /
         #   energetic-fertility read THIS, not the post-burn trough (= reserve_full − burn for any fed agent)
         return agent
@@ -1977,8 +1982,17 @@ class TerrainWorld(mesa.Model):
         demog = self._demog
         cond_on = demog is not None and demog.enable_condition
         c_alpha = demog.condition_alpha if cond_on else 0.0
+        intake_fert_on = demog is not None and getattr(demog, "enable_intake_fertility", False)
+        i_alpha = demog.intake_ema_alpha if intake_fert_on else 0.0
+        i_menarche = demog.menarche_months if intake_fert_on else 0
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
+            if intake_fert_on and a.age >= i_menarche:
+                # Energy FLUX, not stored reserve (Ellison). Gathered intake over this step's own maintenance
+                # requirement; the reserve level cannot carry this because it re-saturates at the cap.
+                _req = self._burn * a.consumption_factor()
+                _ratio = (a._last_intake / _req) if _req > 0.0 else 1.0
+                a._intake_ema = (1.0 - i_alpha) * a._intake_ema + i_alpha * _ratio
             a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
             if mcf is not None and getattr(a, "_moved_this_step", False):
                 a.wealth -= float(mcf[a.pos[1], a.pos[0]])     # Stage 1b: realized terrain move cost (drain movers)
@@ -2249,7 +2263,14 @@ class TerrainWorld(mesa.Model):
             elif bonded and not _has_band_mate(a):
                 continue   # F.1/F.2: no co-resident non-son adult male in the band ⇒ no mate ⇒ no birth
             p_birth = cfg.fecundability
-            if cfg.enable_energetic_fertility:                 # births scale with NUTRITIONAL status (post-harvest)
+            if getattr(cfg, "enable_intake_fertility", False):
+                # SUPERSEDES the reserve branch: births scale with sustained energy BALANCE, not stored reserve
+                # (which re-saturates at the cap for ~99% of agents and so carries no signal). 0 at maintenance,
+                # full at maintenance + the lactation increment.
+                _sp = cfg.intake_fert_hi - cfg.intake_fert_lo
+                _f = 1.0 if _sp <= 0.0 else (a._intake_ema - cfg.intake_fert_lo) / _sp
+                p_birth *= 0.0 if _f < 0.0 else (1.0 if _f > 1.0 else _f)
+            elif cfg.enable_energetic_fertility:               # births scale with NUTRITIONAL status (post-harvest)
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
                 p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs)
             if a.random.random() < p_birth:
