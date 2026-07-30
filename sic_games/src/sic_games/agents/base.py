@@ -23,6 +23,11 @@ class BaseAgent(mesa.Agent):
       lh_config -- LifeHistoryConfig; if provided, eta(a) ramp is active.
     """
 
+    # Class-level default so `eta()` is safe on every construction path, including the Si fission-offspring
+    # route that turns `_use_eta` on without going through the lh_config branch. 1.0 = the original linear
+    # juvenile ramp; instances built from an lh_config override it.
+    _eta_juv_exp: float = 1.0
+
     def __init__(
         self,
         model: mesa.Model,
