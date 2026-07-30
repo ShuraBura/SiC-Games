@@ -53,6 +53,7 @@ BREADTH = [("flat_tropical", "flat", "tropical"), ("hilly_temperate", "hilly", "
            ("flat_boreal", "flat", "boreal")]
 
 STEP_RE = re.compile(r"\[\s*(\d+)/")
+_HEAD = ""   # set in __main__ once git is available
 
 
 def log(m):
@@ -77,15 +78,34 @@ def arm_step(tag):
         return 0
 
 
+def _head_sha():
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True).stdout.strip()
+    except Exception:
+        return ""
+
+
 def done(tag):
+    """An arm counts as complete only if it was produced by THE CURRENT CODE.
+
+    Existence is not enough. A run killed mid-way was resumed against trajectories written before three
+    branches landed (markers, polarization, obligation), which would have silently mixed two different
+    stacks into one scorecard. The campaign already records its build in `meta.sha`, so the resume check
+    compares it against HEAD and re-runs anything stale."""
     p = os.path.join(CAMP, f"campaign_trajectory{tag}.json")
     if not os.path.exists(p):
         return None
     try:
         d = json.load(open(p, encoding="utf-8"))
-        return d if d.get("traj") else None
     except Exception:
         return None
+    if not d.get("traj"):
+        return None
+    sha = (d.get("meta") or {}).get("sha", "")
+    if _HEAD and sha and not sha.startswith(_HEAD) and not _HEAD.startswith(sha):
+        return None                      # produced by a different build ⇒ not reusable
+    return d
 
 
 def sustained(t, key, frac=0.5):
@@ -137,10 +157,11 @@ def run(arms):
 
 
 if __name__ == "__main__":
+    globals()["_HEAD"] = _head_sha()
     open(PROG, "a", encoding="utf-8").close()
     t0 = time.time()
     log("=" * 70)
-    log("MARKER MATRIX on the POLYGYNY-CORRECTED stack (Marlowe 4.2%, was 60.2%)")
+    log(f"MARKER MATRIX — build {_HEAD} | polygyny corrected, markers wired, polarization + obligation in")
     log(f"  depth {[d[0] for d in DEPTH]} x {len(SEEDS)} seeds | breadth {[b[0] for b in BREADTH]} x 2 seeds")
     log(f"  watchdog: kill an arm after {STALL_MIN:.0f}m without a step; heartbeat every {HEARTBEAT_MIN:.0f}m")
 
