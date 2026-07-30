@@ -116,7 +116,23 @@ The elite layer is therefore **necessary-but-not-sufficient**. The mechanism of 
 each keep their own grudge and revolt on their own clock, and uncoupled oscillators sum to a flat aggregate.
 What is missing is a **superordinate polity** — Turchin's cycles are a property of STATES (taxation, standing
 armies, elite overproduction competing for finite OFFICES), and this model tops out at autonomous villages.
-**We built the Kachin; Turchin was writing about kingdoms.** The standing instruction is unchanged for the
+**We built the Kachin; Turchin was writing about kingdoms.**
+
+**REVISION 2026-07-30 (R-106) — a FIFTH negative, and a mechanism-level reason that is not about scale.** Asking
+why Malthusian dynamics never appear produced a structural answer that applies at ANY scale: **every feedback in
+this model is fast.** Instantaneous density-dependence yields a stable equilibrium; **only DELAYED**
+density-dependence oscillates. `enable_intake_fertility` demonstrates both halves — it is the first working
+density-dependent fertility response in the model, and it *reduced* population variability (CV 7.9% → 1.9%),
+because a 1.4-yr feedback damps deviations rather than overshooting them. Two further obstacles were measured:
+the population never approaches the resource base (agents occupy ~1% of a 94%-habitable world, and the clumping
+persists with agglomeration AND sedentism off), and the per-capita gradient is flattened ~5× (elasticity −0.195
+vs −1.062 with mechanisms off). A positive control at all three gradients produced **no oscillation at any of
+them** — so steepening scarcity is not the lever either. **The standing instruction extends: do not seek cycles
+by increasing the STRENGTH of any feedback. Seek a SLOW variable** (soil degradation under settlement,
+accumulated structural load) that introduces a LAG. *(That control used an ad-hoc periodogram rather than
+`probe_hcycles.period_of`; the negative is PROVISIONAL until re-run on the approved detector — see R-106.)*
+
+The standing instruction is unchanged for the
 subsistence side, and now extends: **do not attempt a fifth route to cycles at VILLAGE scale either.** The next
 legitimate attempt is at the supra-village rung (ROADMAP already records this as a prerequisite).
 
@@ -201,6 +217,43 @@ Deep ancestry exists only in the offline genealogy CSV stream, never in memory.
 which is, conveniently, exactly what a Y-haplogroup label is. **Revive only if** per-agent ancestry is ever
 retained in memory; note that was presumably avoided deliberately, since retaining the full ancestry graph over
 a 45,000-step run is unbounded.
+
+---
+
+## DE-22 - Fertility keyed to RESERVE LEVEL, and the four demography hypotheses it took to kill it (2026-07-30, R-106)
+
+**What it was:** `enable_energetic_fertility` — birth probability scaling with the mother's stored reserve,
+0 at the starvation floor → 1 at the cap. The intent was right; the state variable cannot carry it.
+
+**Why it can never work, and it is a fact about the ECONOMY rather than the rule:** burn is ~68% of the
+floor-to-full span **per step**, so an agent either re-saturates at the cap or dies within a step. The trough
+margin is **0.46 burn-steps** — nobody survives one missed harvest, so there is no persistent intermediate
+state for a reserve reading to detect. Measured across a 5× density range: post-harvest reserve **0.996** of
+full, post-burn trough **0.318**, both with spread ~0.002 and **zero** density response. The factor returns
+~0.995 always. Any rule reading reserve LEVEL is dead on arrival — which is the same finding §21.9 reached for
+`enable_condition` on the mortality side. **Superseded by** `enable_intake_fertility` (flux, not level).
+
+**FOUR HYPOTHESES FALSIFIED EN ROUTE**, filed so they are not re-run:
+1. **"Young population = a GROWTH artefact."** Starts of 3k/12k/20k converge on the same ~4.8k with the same age
+   structure; dense starts crash. It is the equilibrium demography.
+2. **"Everyone is pinned at the reserve cap."** Only 0.6–0.8% are. *(The metric that suggested otherwise divided
+   by `reserve_scale()`, which scales with wealth — the normalisation manufactured the flatness. Hidden-denominator
+   class again.)*
+3. **"Mortality MULTIPLIERS are stacking."** Ablating density-disease / terrain-risk / orphan-mortality each moves
+   e₀ by <0.5 yr; `a2_cap` never binds (0 hits).
+4. **"Agglomeration inverts the SIGN of density-dependence."** Fitting S ~ n^γ gives γ = 0.805 — decreasing
+   returns. Crowding does not pay. *(The real problem is that the gradient is FLATTENED ~5×, not inverted.)*
+
+**TWO MEASUREMENTS THAT COULD NOT ANSWER THEIR QUESTION** (design faults, not results):
+- **Starting density as a density contrast.** n=3000 vs n=15000 both converge to ~4.7–4.9k, so starting density
+  washes out entirely. Population must be the VARYING quantity (within-run), never a starting condition.
+- **Deaths per CELL as a spatial risk measure.** Population is concentrated by agglomeration, so the top cells
+  hold most deaths regardless. Normalised by agent-step exposure, the worst 5% of cells carry 10.7–29.6× the
+  world-mean rate but only 0.2–0.5% of exposure — far too little to be the main driver.
+
+**Revive only if** the metabolic step is ever made fine-grained relative to the reserve (so a graded, persistent
+hunger state can exist), or the reserve span is enlarged — but note the span is anchored (110k kcal usable ≈ 44
+days total starvation, Cahill 1970) and step length is LOCKED at one month (ARCH §9.3), so both are closed.
 
 ---
 

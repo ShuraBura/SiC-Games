@@ -2845,4 +2845,107 @@ the elite layer is necessary-but-not-sufficient. See the dated revision there.
 
 ---
 
+### R-106 - The demography and the missing Malthus are ONE defect: nothing in this model can be HUNGRY (2026-07-30)
+
+**The question.** Two standing complaints: the population is far too young (median age 13 vs ~20) with too many
+motherless children (8-11% vs Ache ~2%), and no Malthusian/secular cycles ever emerge. Asked to fix the
+demography as an EMERGENT property, not by forcing a rate.
+
+**FOUR OF MY OWN HYPOTHESES WERE FALSIFIED BEFORE THE REAL ONE SURVIVED.** Recorded because each was plausible
+and each cost a measurement:
+1. *"It is a GROWTH artefact - the population is still climbing."* NO. Starts of 3k/12k/20k all converge on the
+   same ~4.8k with the same age structure; the dense starts CRASH. This is the equilibrium demography.
+2. *"Everyone is pinned at the reserve cap."* NO. Only 0.6-0.8% are at the cap. (My `wealth/floor` metric had
+   divided by `reserve_scale()`, which scales with wealth - the normalisation manufactured the flatness.)
+3. *"Mortality MULTIPLIERS are stacking."* NO. Ablating density-disease, terrain-risk or orphan-mortality each
+   moves e0 by <0.5 yr, and `a2_cap` never binds (0 hits).
+4. *"Agglomeration gives INCREASING returns, so density-dependence has the wrong SIGN."* NO. Fitting S ~ n^gamma
+   gives gamma 0.805 - decreasing returns. Crowding does not pay.
+
+**THE CHAIN, every link measured (coastal/temperate, 900-1200 steps, 5x density range):**
+1. Burn is ~68% of the floor-to-full reserve span per step, so an agent either re-saturates at the cap or dies
+   within a step. Margin at the trough: **0.46 burn-steps** - nobody survives one missed harvest.
+2. Both fertility-brake candidates are therefore CONSTANTS: post-harvest reserve 0.996 of full, post-burn trough
+   (`_condition`) 0.318, each with spread ~0.002 and ZERO density response.
+3. So `energetic_fertility_factor` returns ~0.995 always. The brake is inert BY CONSTRUCTION.
+4. Births cannot respond: CBR 53.8 -> 52.0 across 5x density (-3%).
+5. Regulation falls entirely on mortality: CDR 48.5 -> 77.0 (+59%), starvation 46% -> 61% of deaths.
+6. A stationary population has e0 = 1/CDR, hence **e0 20.7**, median age 13, motherless 8-11%.
+7. The young population and the orphan rate are ONE symptom with ONE cause, seven links upstream.
+
+Deaths before age 1 are 11.5% of deaths (~= q(0) in a stationary population), MATCHING the Ache ~12%. The excess
+is in ages 1-5 (29.7% vs ~20%) and it is not in the multipliers - it is the mortality-only regulation.
+
+**This partially re-derives R-12/R-13 ("starvation-dominated, unrealistically strong") from the fertility side,
+and it is consistent with R-16/R-17:** at r=0 e0 is FERTILITY-pinned, with a documented stationary e0 ~28. Our
+20.7 sits ~7 yr below even that, and the fact that mortality does 100% of the regulating is the defect.
+
+**WHY NO MALTHUS - two independent obstacles.**
+- **The world is 99% EMPTY.** 4.8k agents occupy **88-100 of 10,000 cells** while **94.1% of cells could feed at
+  least one forager** (median cell cv = 1.62x burn). The population never approaches the resource base, so
+  aggregate scarcity is impossible. This clumping PERSISTS with agglomeration AND sedentism both off (109
+  cells), so band co-residence drives it independently. **OPEN.**
+- **The gradient is flattened ~5x.** Per-capita elasticity: full stack **-0.195**, aggl off -0.387, aggl+sedentism
+  off **-1.062** (textbook sharing). Doubling a cell's population costs each occupant only 13%. The third arm
+  doubles as a SELECTION CONTROL - with no mechanism adding S, gamma ~ 0 shows richer cells are not drawing
+  proportionally larger crowds, so the cross-sectional fit is not badly confounded.
+
+Regulation is **distributional, not Malthusian**: in crowded cells the MEAN occupant gets 2.10x subsistence
+while 11-15% fall below it. The average agent never experiences scarcity.
+
+**POSITIVE CONTROL (gradient is NOT the lever).** Ran 500 model-yr at all three elasticities. No oscillation at
+any of them; population CV non-monotonic (10.9 / 4.5 / 16.1%); deaths out-swung births in ALL arms (CV ratio
+0.56 / 0.46 / 0.45). Steepening scarcity does not move regulation to the birth side - it just kills more people
+(equilibrium 5258 -> 763 -> 261).
+> **INSTRUMENT CAVEAT - this result is PROVISIONAL.** I wrote an ad-hoc periodogram instead of reusing
+> `probe_hcycles.period_of`, the detector fixed and approved in R-87c/d, and hit the failure it was fixed for:
+> mean-only detrending, so drift loaded onto the lowest scanned frequency and two arms reported a "period" of
+> exactly window/2. Re-running with linear detrend still pegged all three arms at the scan floor (=> red noise,
+> no characteristic timescale; 36-49 turning points = ~8-10 yr noise; residual CV 3.7-8.3% vs the 30-50% swings
+> of real secular cycles). **Must be re-run against `period_of` and its calibrated null floor (ac_peak p95
+> 0.13) before the negative is filed as firm.**
+
+**THE FIX - `enable_intake_fertility` (MECHANISMS; PARAMETERS §21.10).** Fertility reads a slow EMA of
+intake/requirement instead of a reserve level that cannot vary. Intake IS the live signal (p10 0.93 to p90 4.26
+of requirement) and is the biologically correct one - Ellison: fecundity tracks energy FLUX, not stored reserve.
+Thresholds ANCHORED, not tuned: 0 at maintenance, full at maintenance + the lactation increment (~+500 kcal/d on
+~2500, FAO/IOM => 1.2x). Accumulates only from menarche, because a juvenile's GATHERED intake understates what
+it EATS (juveniles are provisioned).
+
+**WHAT IT BOUGHT** (off -> on):
+
+| | n=3000 | n=15000 |
+|---|---|---|
+| e0 | 18.5 -> 20.5 | 19.1 -> **21.4** |
+| median age | 13.6 -> 15.2 | 13.4 -> **15.2** |
+| child frac | 53.6 -> 49.5% | 54.5 -> **49.6%** |
+| motherless | 6.1 -> 7.2% | 11.8 -> **7.9%** |
+| CBR | 54.3 -> 48.9 | 52.3 -> 47.1 |
+| CDR | 50.0 -> 44.5 | 73.6 -> 68.7 |
+
+**26-40% of the gap to the anchors closed**, and regulation MOVED from deaths to births: population CV over
+400 yr **7.9% -> 1.9%**. Births fall, deaths fall to match - the stationary identity working as predicted.
+
+**WHAT IT DID NOT BUY, and why.** No cycles. A working negative feedback with a **1.4-yr half-life is
+effectively instantaneous** on demographic timescales, so it DAMPS deviations (hence the CV collapse) rather
+than overshooting them. Standard population dynamics: instantaneous density-dependence => stable equilibrium;
+**DELAYED** density-dependence => oscillation. **Every feedback in this model is fast.** That is a sharper
+statement of R-97's negative: cycles need a SLOW variable, not merely an elite layer.
+
+**A DENSITY TEST THAT COULD NOT WORK, recorded so it is not repeated.** Comparing n=3000 vs n=15000 for a
+density response is void: both converge to the SAME equilibrium (~4.7-4.9k), so starting density washes out and
+there is no contrast to measure. Population must be the VARYING quantity (within-run), not a starting condition.
+
+**NEXT (agreed order):** (1) count DEPENDENTS in the requirement - a mother provisioning 3 children needs 2-3x
+her own maintenance, which is the anchored driver of forager birth spacing (Blurton Jones, Hadza) and should
+close more of the gap without tuning; (2) find a SLOW variable for lagged feedback (soil degradation under
+settlement; accumulated structural load) - the cycles question, now well-posed; (3) the clumping.
+
+**Origin:** `sic_games/src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py` (6 tests);
+diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,
+`eval_feedback`). Branches `diag/intake-instrumentation` (305b2ba, 8c921c9 - diagnostic-only) and
+`demog/intake-fertility-brake` (f2e839e). Suite 1019 passed / 1 xfailed. Default OFF, bit-exact when off.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

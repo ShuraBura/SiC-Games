@@ -206,6 +206,19 @@ extraction (the §6 second half) — interim home remains the CLAUDE.md locked-p
 
 **EFC/GD-1 code:** `sic_games/src/sic_games/terrain.py` (C1–C7: `miami_npp`, `whittaker_biome`, `aquatic_food_field`, `world_lottery_climate`, `generate_world(…, mode="climate")`); `sic_games/src/sic_games/capacity.py` (C8 aquatic subsidy + GD-1 `NPPCapacityField(aquatic=…, enable_depletion=…)`, `deplete_and_regrow`); hook in `sic_games/src/sic_games/phase1_model.py::_step_rivalrous`. Methods: MODEL_SPEC §4.3.4–§4.3.11; findings: RESULTS R-49/R-50/R-51.
 
+**Demography / Malthus diagnosis + intake fertility brake (2026-07-30, RESULTS R-106).** Question: fix the young
+age structure and orphan rate as EMERGENT properties, and find why no Malthusian cycles emerge. Answer: **one
+defect, not two** — burn is ~68% of the floor-to-full reserve span per step, so nothing in the model can be
+persistently HUNGRY; both fertility-brake inputs are constants (0.996 / 0.318, spread ~0.002, zero density
+response), so births cannot respond and mortality does all the regulating, forcing e₀ = 1/CDR ≈ 20.7. Fix
+`enable_intake_fertility` (flux, not level; FAO/IOM-anchored thresholds) closes 26–40% of the gap and moves
+regulation from deaths to births (population CV 7.9% → 1.9%). Cycles remain absent and now have a NAMED
+obstacle: every feedback in the model is fast, and cycles need a DELAYED one. Two further obstacles open — the
+world is 99% empty though 94% habitable, and the density gradient is flattened ~5× (elasticity −0.195 vs −1.06).
+Code: `src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py`; branches
+`diag/intake-instrumentation`, `demog/intake-fertility-brake`. Methods: PARAMETERS §21.10; MECHANISMS §17.4b;
+falsified hypotheses: DEAD_ENDS DE-22.
+
 ---
 
 *End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14; resource-ecology + biome-mortality + scale-resolution arc (R-5…R-14) 2026-06-20; Carbon → emergent bands → full social stack (R-18…R-27) 2026-06-29.*

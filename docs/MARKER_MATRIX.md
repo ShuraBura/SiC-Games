@@ -64,6 +64,23 @@ before scoring, or the verdict is chosen after the fact.
 excess polygyny. With polygyny corrected the expectation was ~+0.019; a first short run reads 0.117. Needs a
 full-length run before it means anything.
 
+**#4/#5 the AGE-STRUCTURE markers had a single upstream cause (R-106, 2026-07-30).** `median_age_yr` ~13 and
+`frac_motherless` 8–11% were not two failures but one: the fertility brake read a reserve level that cannot
+vary, so births could not respond to crowding and **mortality did 100% of the regulating**. In a stationary
+population e₀ = 1/CDR, so a CDR of ~50–77/1000 forces e₀ ≈ 20.7, a median age of 13 and a high orphan rate.
+`enable_intake_fertility` closes **26–40%** of the gap on all four demographic markers at once:
+
+| marker | before | after | anchor |
+|---|---|---|---|
+| e₀ (yr) | 19.1 | **21.4** | ~28 stationary (R-16) |
+| `median_age_yr` | 13.4 | **15.2** | ~20 (Aché) |
+| `frac_child` | 54.5% | **49.6%** | ~40% |
+| `frac_motherless` | 11.8% | **7.9%** | ~2% (Hill & Hurtado) |
+
+**Score these four TOGETHER, never singly** — they share a denominator in the vital-rate identity, so moving one
+without the others is a sign of forcing rather than a fix. Still short of every anchor; next lever is counting
+dependents in the fertility requirement (PARAMETERS §21.10).
+
 **#14 is the live open question.** Material does not concentrate in the elite (`noble_material_lift` 0.87–1.04)
 even with inheritance, tribute, noble exemption, zero decay and a narrow elite. Diagnosed as **no return on
 capital**: `material` is a terminal stock that cannot buy anything, whereas Sahlins' big-man "uses wealth to

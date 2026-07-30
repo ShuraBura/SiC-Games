@@ -689,6 +689,38 @@ there is no chronic-malnutrition state to detect. The branch applies a near-unif
 761) rather than discriminating. **Recommendation: leave `enable_condition` OFF** until S0 is reworked to
 measure shortfall FREQUENCY rather than reserve LEVEL.
 
+### §21.10 — Intake-based energetic fertility (`enable_intake_fertility`; R-106, 2026-07-30)
+
+§21.9 recommended reworking S0 to read shortfall **flux** rather than reserve **level**. This is that move,
+applied to fertility rather than to mortality — and it is the same defect one layer over.
+
+**Why the reserve cannot work.** Burn is ~68% of the floor-to-full span per step, so an agent either
+re-saturates at the cap or dies within a step; the margin at the trough is **0.46 burn-steps**. Both candidate
+inputs are therefore constants — post-harvest reserve **0.996** of full, post-burn trough **0.318** — each with
+spread ~0.002 and **zero response across a 5× density range**. `energetic_fertility_factor` returned ~0.995
+always, so births could not respond to crowding (CBR −3% while CDR +59%) and mortality did **all** the
+regulating, forcing e₀ = 1/CDR ≈ 20.7. See R-106.
+
+| Parameter | Value | Status | Anchor |
+|---|---|---|---|
+| `enable_intake_fertility` | False | **OPT-IN**, bit-exact when off | supersedes the `enable_energetic_fertility` branch when ON |
+| `intake_ema_alpha` | **0.04** | DERIVED | half-life = ln2/−ln(1−α) ≈ **17 steps ≈ 1.4 yr** — slow enough that one bad month cannot stop births, fast enough to track a multi-year squeeze |
+| `intake_fert_lo` | **1.00** | ANCHORED | intake = maintenance ⇒ **no surplus** to gestate or lactate ⇒ factor 0 |
+| `intake_fert_hi` | **1.20** | ANCHORED | maintenance + the **lactation increment** (~+500 kcal/d on ~2500 ⇒ +20%; pregnancy ~+285 ⇒ +11%) — FAO/IOM |
+
+Mechanism: Ellison's energetics — fecundity tracks energy **flux**, not stored reserve. The EMA accumulates only
+from `menarche_months`, because a juvenile's **gathered** intake understates what it **eats** (juveniles are
+provisioned), so girls would otherwise reach fertility pre-penalised.
+
+**Measured effect** (R-106): e₀ 19.1 → 21.4, median age 13.4 → 15.2, child 54.5 → 49.6%, motherless 11.8 → 7.9%
+(n=15000); **26–40% of the gap to the anchors closed**, and population CV over 400 yr **7.9% → 1.9%** — i.e.
+regulation moved from deaths to births.
+
+**KNOWN LIMITATION.** It does **not** produce Malthusian cycles, and cannot: a 1.4-yr feedback is effectively
+instantaneous on demographic timescales, so it **damps** deviations (hence the CV collapse) rather than
+overshooting them. Cycles require **delayed** density-dependence. Do not attempt to buy cycles by enlarging
+`intake_fert_hi` — the threshold is anchored, and the missing ingredient is a **lag**, not a gain.
+
 ---
 
 *PARAMETERS.md extracted 2026-06-08. Supersedes interim locked-param tables in `sic_games/CLAUDE.md`
