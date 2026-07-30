@@ -1717,6 +1717,9 @@ class TerrainWorld(mesa.Model):
             for a, sh, m in zip(occ, shares, msh):
                 intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
                 a._meat_intake = a.eta() * m   # B+ step 2: per-agent meat intake → the prowess (reputation) signal
+                a._last_intake = intake        # DIAGNOSTIC ONLY (no behaviour): the reserve cap below discards
+                #   surplus, so post-harvest wealth cannot reveal how far intake EXCEEDED burn. Measured: ~99%
+                #   of agents re-saturate at the cap every step, i.e. intake ≥ burn, with the excess invisible.
                 if sex_div > 0.0:
                     a._prod_credit = a.eta() * (male_credit if a.sex == "male" else female_credit)
                 total = a.wealth + intake
