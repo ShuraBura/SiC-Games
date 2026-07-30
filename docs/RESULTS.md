@@ -2968,7 +2968,42 @@ over 0→180 months, giving a 7.5-yr-old eta ≈ 0.5, where Kaplan's foragers pr
 they eat at that age. This also plausibly bears on the age structure directly: children who feed themselves
 neither die as dependents nor constrain their mothers.
 
-**Origin:** `sic_games/src/sic_games/{demography,phase1_model}.py`, `tests/test_intake_fertility.py` (11 tests);
+**ADDENDUM 2 — the Kaplan recalibration: mechanism FIXED, demography barely moves (2026-07-30).**
+The blocker above was diagnosed as the juvenile production ramp. It is LINEAR (η 0.2→1.0 over 0→180 months)
+against a linear consumption ramp (0.3→1.0), so η/c runs **0.67→1.0** — a *relative* deficit at every juvenile
+age, exactly as `consumption_factor()`'s docstring claims. But an ABSOLUTE deficit needs η/c < **0.588** at
+~1.7× cell shares, so the ratio never gets there. Kaplan's curves are **convex** (production near zero to ~10 yr,
+then steep); the model's are straight lines. Added `LifeHistoryConfig.eta_juvenile_exponent` (1.0 = the original
+linear ramp, **bit-exact default**), mirrored in the vectorised `soa_tier1.eta`.
+
+| arm (coastal/temperate, 1200 steps, brake ON) | pop | e₀ | deaths <5yr | med age | child | mless |
+|---|---|---|---|---|---|---|
+| linear (baseline) | 4688 | 20.5 | 27.8% | 15.2 | 49.5% | 7.2% |
+| convex exp=2 | 4779 | 19.3 | — | 14.6 | 51.0% | 6.1% |
+| convex exp=3 | 4326 | 19.0 | — | 14.6 | 50.9% | 7.0% |
+| convex exp=3 + dependent load | 4375 | 19.6 | 30.6% | **15.7** | **48.1%** | 7.0% |
+| + `provision_self_keep` 0.7 | 4038 | 20.3 | 28.7% | **15.7** | 48.6% | 8.0% |
+| + `provision_self_keep` 0.5 | 4804 | **21.0** | **27.6%** | 15.3 | 49.1% | **6.0%** |
+
+1. **Convexity DOES create dependency** — juveniles running a deficit rise **10% → 35%** as η@7.5yr falls
+   0.60 → 0.30. The Kaplan net-consumer anchor is met, and `enable_dependent_load` UNBLOCKS and works.
+2. **But it first made things worse** (e₀ 20.5 → 19.0): children who cannot feed themselves simply died. The
+   cause is that `enable_provisioning` was already ON with its load-bearing half OFF — `provision_self_keep`
+   defaults to **1.0**, so a mother gives only overflow she would have wasted and never draws on her own
+   reserve. **Provisioning was "on but dead" for the SAME root reason as everything else in R-106: no child
+   ever ran a deficit to provision.** Restoring tier 2 recovers e₀ 19.6 → 21.0 and under-5 deaths 30.6 → 27.6%.
+3. **Net against the linear baseline: e₀ +0.5 yr, motherless −1.2 pts, median age +0.1.** Mechanically the
+   model is now correct — real dependants, live provisioning, working dependent load — but **the remaining gap
+   to the anchors is NOT explained by juvenile production.** It is still the abundance/regulation problem.
+
+**NOT ADOPTED AS DEFAULTS.** `eta_juvenile_exponent` stays 1.0 and `provision_self_keep` stays 1.0. The
+exponent has a SHAPE anchor (Kaplan convexity) but no published value, and 0.5 for self-keep is a swept
+number with no anchor at all — adopting either on the strength of a sweep would be fitting to our own artefact,
+particularly since the deficit threshold (0.588) is itself set by the ~1.7× surplus that is the defect.
+**Revisit once the abundance is fixed**, when the required curvature can be derived rather than swept.
+
+**Origin:** `sic_games/src/sic_games/{demography,phase1_model,config,soa_tier1}.py`,
+`agents/base.py`, `tests/test_intake_fertility.py` (11 tests);
 diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,
 `eval_feedback`). Branches `diag/intake-instrumentation` (305b2ba, 8c921c9 - diagnostic-only) and
 `demog/intake-fertility-brake` (f2e839e). Suite 1019 passed / 1 xfailed. Default OFF, bit-exact when off.

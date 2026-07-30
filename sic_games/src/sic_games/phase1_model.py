@@ -276,7 +276,12 @@ class TerrainWorld(mesa.Model):
         # Newborn→adult life-history: if enable_life_history and no explicit lh_cfg, auto-build the MONTH-scaled
         # canonical (the class defaults are legacy YEARS — forage_age_min=15 would ramp childhood over 15 months).
         if self._lh_cfg is None and demography_cfg is not None and getattr(demography_cfg, "enable_life_history", False):
-            self._lh_cfg = LifeHistoryConfig(forage_age_min=180, forage_age_max_offset=120)
+            # `lh_eta_juvenile_exponent` is a PASSTHROUGH only — the value's home is LifeHistoryConfig; this is
+            # the sole route to reach the auto-built one, since callers that set `enable_life_history` never
+            # construct an lh_cfg themselves.
+            self._lh_cfg = LifeHistoryConfig(
+                forage_age_min=180, forage_age_max_offset=120,
+                eta_juvenile_exponent=getattr(demography_cfg, "lh_eta_juvenile_exponent", 1.0))
         self._carbon_cfg = carbon_cfg
         self._placement_positions = placement_positions
         self._founder_buffer_steps = founder_buffer_steps

@@ -267,6 +267,10 @@ class DemographyConfig(BaseModel):
     # UNBLOCK BY: recalibrating the juvenile eta ramp against Kaplan's production/consumption curves (foragers
     # do not break even until ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
     enable_dependent_load: bool = False
+    # PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig
+    # .eta_juvenile_exponent` — see config.py; do not document the anchor twice). 1.0 = the original linear
+    # juvenile production ramp, bit-exact. >1 bends it toward Kaplan 2000's convex curve.
+    lh_eta_juvenile_exponent: float = Field(1.0, gt=0.0)
     intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
     intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
     #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)

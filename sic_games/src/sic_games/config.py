@@ -256,6 +256,14 @@ class LifeHistoryConfig(BaseModel):
     forage_age_min: int = Field(15, ge=0)           # active foraging window start
     forage_age_max_offset: int = Field(10, ge=0)    # a_forage_max = tau_max - offset
     eta_min: float = Field(0.2, ge=0.0, le=1.0)     # juvenile efficiency at birth
+    # CURVATURE of the juvenile production ramp: η = eta_min + (1−eta_min)·(a/a_min)**exponent.
+    # 1.0 = the original LINEAR ramp (bit-exact default). Kaplan/Hill/Lancaster/Hurtado 2000 describe a CONVEX
+    # curve — forager children produce very little until ~10 yr, then rise steeply, and are net energy consumers
+    # until ~15–18 yr. A linear ramp makes a 7.5-yr-old half as productive as an adult, which measured out as
+    # children being net food PRODUCERS (only 1.0% of juveniles ran any deficit): with cell shares at ~1.7× burn
+    # a child needs η/c < 0.588 to run an absolute deficit, but the linear ramp never takes η/c below 0.67.
+    # See R-106 addendum. >1 bends the curve toward Kaplan's shape.
+    eta_juvenile_exponent: float = Field(1.0, gt=0.0)
     eta_old: float = Field(0.4, ge=0.0, le=1.0)     # elder efficiency at max_age
     # Stage 4.3: Si fission offspring start fully capable (no juvenile ramp)
     eta_fission_offspring: float = Field(1.0, ge=0.0, le=1.0)

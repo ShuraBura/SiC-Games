@@ -57,6 +57,7 @@ class BaseAgent(mesa.Agent):
             self._forage_age_min: int = lh_config.forage_age_min
             self._forage_age_max_offset: int = lh_config.forage_age_max_offset
             self._eta_min: float = lh_config.eta_min
+            self._eta_juv_exp: float = getattr(lh_config, "eta_juvenile_exponent", 1.0)
             self._eta_old: float = lh_config.eta_old
             self._cons_min: float = getattr(lh_config, "cons_min", 0.3)
             self._reserve_min: float = getattr(lh_config, "reserve_min", 0.1)
@@ -146,7 +147,10 @@ class BaseAgent(mesa.Agent):
         if a < a_min:
             if a_min == 0:
                 return 1.0
-            return self._eta_min + (1.0 - self._eta_min) * a / a_min
+            _t = a / a_min
+            if self._eta_juv_exp != 1.0:     # Kaplan-convex ramp; 1.0 keeps the original linear form bit-exact
+                _t = _t ** self._eta_juv_exp
+            return self._eta_min + (1.0 - self._eta_min) * _t
         elif a <= a_max:
             return 1.0
         else:
