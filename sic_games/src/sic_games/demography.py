@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -1039,6 +1040,20 @@ class DemographyConfig(BaseModel):
     mobility_npp_ref: float = Field(900.0, gt=0.0)           # forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL
     mobility_npp_floor: float = Field(50.0, gt=0.0)          # denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL
     mobility_exponent: float = Field(1.0, ge=0.0)            # Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket)
+    # PRESSURE-AWARE MOBILITY (R-106 Addendum 6, 2026-07-31): the NPP-driven stride above is STATIC/geographic —
+    # a cell packed with 40+ occupants still reads as "rich" (raw local_npp unchanged), so `mobility_radius`
+    # never expands for an agent stuck in a crowded cluster (measured 2026-07-30: r_used==1 in 100% of
+    # equilibrium decisions, Addendum 4). Kelly/Binford's actual packing claim is density-dependent — mobility
+    # responds to REALIZED pressure, not nominal biome fertility. `source="intake"` swaps the driving variable
+    # to the agent's own `_intake_ema` (the SAME live intake/requirement EMA `enable_intake_fertility` computes,
+    # R-106 — reused, not duplicated), which is occupancy-diluted by construction. Auto-enables the EMA update
+    # loop even when `enable_intake_fertility` itself is off (`phase1_model.py`), so the two mechanisms stay
+    # independently ablatable while sharing one signal. `source="npp"` (default) is the ORIGINAL formula,
+    # bit-exact — this is a pure additive mode, not a replacement.
+    mobility_pressure_source: Literal["npp", "intake"] = "npp"
+    mobility_intake_ref: float = Field(1.00, gt=0.0)         # ratio at/above which stride=base; reuses the
+    #   maintenance anchor `intake_fert_lo` already carries (§21.10) rather than inventing a new number
+    mobility_intake_floor: float = Field(0.15, gt=0.0)       # denom floor so a near-starving ratio doesn't → ∞ range
     # CENTRAL-PLACE FORAGING fixes (blueprint …_CoMovementCentralPlace; R-41): family co-movement snaps the whole
     # family onto the mother's (root's) single cell → she extracts S/(n+family) not S/(n+1) → energetic-fertility
     # collapse in marginal biomes. Real foragers CO-RESIDE but forage DISPERSED and SHARE (Isaac 1978 central-place;
@@ -1465,18 +1480,29 @@ def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: 
     return gain * repulsion_society_factor(society) * logistic
 
 
-def mobility_radius(local_npp: float, cfg) -> int:
+def mobility_radius(value: float, cfg) -> int:
     """Productivity-scaled movement STRIDE (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
 
-    r = clamp(round(base · (npp_ref / max(local_npp, npp_floor))**exponent), base, r_max).
-    Low local NPP → long stride (spread over sparse land); high NPP → r=base (=1 by default, bit-exact).
+    r = clamp(round(base · (ref / max(value, floor))**exponent), base, r_max).
+    Low `value` → long stride (spread out); high `value` → r=base (=1 by default, bit-exact).
     Returns `base` unconditionally when the flag is off. `cfg` is a DemographyConfig (or any object with the
-    mobility_* fields). Calibration (ref/exp/max) PROVISIONAL pending supervisor sign-off."""
+    mobility_* fields).
+
+    `cfg.mobility_pressure_source` selects what `value` MEANS (R-106 Addendum 6):
+      - "npp" (default, bit-exact): `value` = static geographic local NPP (§4.8.19 original). ref/floor =
+        `mobility_npp_ref`/`mobility_npp_floor`. Calibration PROVISIONAL pending supervisor sign-off.
+      - "intake": `value` = the agent's own live intake/requirement EMA (`_intake_ema`, R-106) — density-aware,
+        since a crowded cell dilutes it regardless of the cell's nominal fertility. ref/floor =
+        `mobility_intake_ref`/`mobility_intake_floor`. Caller is responsible for passing the right `value`."""
     base = cfg.mobility_base_radius
     if not cfg.enable_productivity_mobility:
         return base
-    denom = max(local_npp, cfg.mobility_npp_floor)
-    ratio = cfg.mobility_npp_ref / denom
+    if getattr(cfg, "mobility_pressure_source", "npp") == "intake":
+        ref, floor = cfg.mobility_intake_ref, cfg.mobility_intake_floor
+    else:
+        ref, floor = cfg.mobility_npp_ref, cfg.mobility_npp_floor
+    denom = max(value, floor)
+    ratio = ref / denom
     r = base * (ratio ** cfg.mobility_exponent)
     return int(max(base, min(cfg.mobility_max_radius, round(r))))
 

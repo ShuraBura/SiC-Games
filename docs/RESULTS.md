@@ -3043,11 +3043,529 @@ carrying capacity without passing `patch=None`** and checking what `NPPCapacityF
 cell, and measure actual movement distances — to isolate whether the pull is the agglomeration bonus
 specifically or band-cohesion resistance to fissioning, before proposing a fix.
 
-**Origin:** `sic_games/src/sic_games/{demography,phase1_model,config,soa_tier1}.py`,
+**ADDENDUM 4 — the crowding pull IS the agglomeration bonus, not band cohesion; and it is compounded by a
+second, independent search-horizon defect (2026-07-30).** Ran the comparison Addendum 3 called for, on the
+TRUE unconfined world (`patch=None`, per the STANDING WARNING above): monkeypatched the live
+`diffusion_select_target` with a read-only replica that logs its full per-candidate breakdown (no RNG draws,
+so the model's dynamics and determinism are untouched), plus a whole-world scan for the best EMPTY habitable
+cell, at two regimes — early growth (step ~50-60, mean **5** occupants/cell) and true equilibrium (step
+700-900, mean **32-47** occupants/cell, population 5,030 → 6,511).
+
+1. **SEARCH HORIZON (structural, independent of any bonus).** `mobility_radius()` scales the movement stride
+   with the standing cell's RAW local NPP, not the agent's REALIZED per-capita share — so a cell packed with
+   40+ people still reads as "rich" and the radius never expands past the `enable_productivity_mobility`
+   floor. Measured: **`r_used == 1` in 143/143 (100%) of equilibrium decisions.** The world's actual best
+   empty cell sits a mean **33.6 cells away** and was inside an agent's evaluated candidate set **0/143 times
+   (0%)**. No mechanism downstream of perception can fix this — the opportunity is invisible, full stop.
+2. **LOCAL RETENTION (the agglomeration bonus, not cohesion).** Even when a genuinely empty cell sits directly
+   adjacent — true in 75.5% of equilibrium decisions — it still loses to staying crowded in 67.6% of those.
+   Decomposed by term (mean advantage of the crowded HERE cell over the losing empty candidate):
+
+   | term | early growth (n≈5) | equilibrium (n≈32) |
+   |---|---|---|
+   | raw per-capita split (pre-bonus) | +5,818 | **−35,810** |
+   | **agglomeration bonus** (`aggl_beta`, point mode) | **+103,375** | **+387,290** |
+   | band cohesion | +3,977 | +383 |
+   | site appraisal | +723 | +779 |
+
+   At equilibrium the raw food math already FAVORS the empty cell (crowding dilutes the split more than the
+   empty cell's lower absolute yield costs) — the agglomeration term alone overturns that by >10x and is
+   effectively the entire reason agents stay. **Band cohesion is not a meaningful lever here**: at equilibrium
+   its contribution is ~0.1% the size of the agglomeration term, well within noise of the other minor terms.
+
+**What this resolves.** Addendum 3 narrowed the mechanism to "agglomeration/cohesion or band-cohesion
+resistance to fissioning" and left it open. This closes it: **the fix, if pursued, targets the agglomeration
+bonus's functional form** (currently point-mode `S ~ n^β`, β=1.15, unbounded in local occupancy n) — band
+cohesion and fission thresholds were not implicated and are not where the leverage is. The search-horizon
+defect is separate and additive: a corrected agglomeration term alone cannot make agents discover land 30+
+cells away; `mobility_radius` reading raw NPP instead of realized crowding needs its own fix.
+
+**NOT YET ACTED ON.** This is measurement only — no code changed, no default flipped. Two candidate next
+moves identified, neither started: (a) bound/reshape the point-mode agglomeration bonus so it saturates
+instead of rewarding co-location indefinitely; (b) make `mobility_radius` respond to local occupancy pressure
+(e.g. per-capita share vs. requirement) rather than raw cell NPP. Which to do first, and how, is undecided.
+
+**Origin:** diagnostic-only, `diag_crowding.py` (scratchpad; monkeypatches
+`sic_games.phase1_model.diffusion_select_target` with a read-only instrumented replica of
+`substrate.diffusion_select_target`, built on the corrected `patch=None` world construction from Addendum 3).
+No source files changed, no tests added. Raw per-decision log: `diag_crowding_log.json` (scratchpad).
+
+**Origin (R-106 core):** `sic_games/src/sic_games/{demography,phase1_model,config,soa_tier1}.py`,
 `agents/base.py`, `tests/test_intake_fertility.py` (11 tests);
 diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,
 `eval_feedback`). Branches `diag/intake-instrumentation` (305b2ba, 8c921c9 - diagnostic-only) and
-`demog/intake-fertility-brake` (f2e839e). Suite 1019 passed / 1 xfailed. Default OFF, bit-exact when off.
+`demog/intake-fertility-brake` (f2e839e…b15017e). Suite 1,024 passed / 2 xfailed (one strict, intentional).
+Default OFF, bit-exact when off.
+
+**ADDENDUM 5 — village budding (Bandy 2004) exists, was off in every measurement to date, and measurably
+changes the picture; `bud_events` was silently blind to it; and dispersed pre-settlement newborns range much
+closer to the ethnographic envelope than settled agents do (2026-07-30).**
+
+**1. A directed relocation mechanism already exists and was never engaged.** `_maintain_village_budding`
+(`phase1_model.py:4103`), grounded in Bandy 2004/Chagnon 1975: a village past `village_fission_threshold`
+(170) sheds its rival kinship faction, searches up to `village_bud_search_radius` (8 cells, "~a day's
+relocation range") for the nearest open storable site, and **teleports** the faction there (`a.pos = best`) —
+a real "go find a new place" behaviour, categorically different from the ordinary band split
+(`_maintain_bands`, size 45), which is a pure in-place relabel that moves nobody. `enable_village_budding`
+defaults **OFF** and was OFF in the entire R-106 chain and in Addendum 4's crowding diagnostic — every
+measurement of "the world is mostly empty" to date was made with this mechanism dormant.
+
+**2. Ablation (same seed/preset/world otherwise, N=3000, 900 steps, `patch=None`):**
+
+| | budding OFF (R-106 preset) | budding ON |
+|---|---|---|
+| population (step 900) | 6,511 | **7,836** (+20%) |
+| occupied cells | 277 / 9,449 (2.93%) | 382 / 9,449 (4.04%) |
+| settlements (villages) | 81 | **319** (+294%) |
+| mean village size | 607.8 | 291.8 |
+| `bud_events` (relocations) | 0 | **733** |
+
+Budding quadruples the number of villages and lifts population ~20% (plausibly less local-crowding mortality
+when spread across more, smaller settlements — not independently isolated here), but only modestly expands the
+footprint (2.9% → 4.0%). **Why it can't do more:** its own search radius (8 cells) is itself far short of the
+~34-cell average distance to the world's best truly unclaimed land (Addendum 4). It relieves local crowding by
+founding nearby daughter villages, not by reaching the rich, empty far side of the map.
+
+**3. `bud_events` was silently blind to the path actually used.** The counter only incremented inside the
+`enable_bud_hazard` branch (unused here); the legacy threshold path — the one `enable_village_budding=True`
+alone exercises — relocated factions without ever counting them, so the counter read 0 in the table above
+before the fix even though 733 relocations demonstrably occurred (inferred from the settlement-count/population
+divergence, since the mechanism is deterministic and RNG-neutral when truly inert — confirmed directly once
+fixed). **FIXED:** moved the increment to the shared relocation code so both paths count
+(`phase1_model.py`, `_maintain_village_budding`). Full suite re-run clean: 1,024 passed / 2 xfailed, no
+regressions.
+
+**4. An instrument flaw in the diagnostics themselves, caught and fixed before trusting the numbers.** The
+travel-distance tracking scripts (this addendum and Addendum 4's would-be follow-up) originally keyed tracked
+agents by Python `id()`. CPython recycles a garbage-collected object's `id()`, so a tracked agent's death
+followed by an unrelated birth landing at the same address would silently splice two different agents'
+histories together — exactly the kind of instrument bug [[feedback_validate_the_instrument]] warns about.
+Switched to the model's own stable `unique_id`. Re-running the travel-distance measurement below with the
+fix produced **identical numbers to the unfixed version** — the flaw didn't happen to bite this particular
+run — but it was a real risk, not a hypothetical one, and the fix is now in place for future use.
+
+**5. Post-settlement residual travel** (300 agents sampled live at step 700, tracked to step 900 = 200
+steps/16.7 yr; `unique_id`-based): baseline mean cumulative path 34.1 cells (~341 km, ~20 km/yr) but mean *net*
+displacement only 3.2 cells — once settled, agents shuffle locally and go nowhere. Budding ON: even less
+churn (mean 8.4 cells / ~84 km, ~5 km/yr) — smaller villages apparently have less internal crowding pressure
+to escape. Both are far below the Binford/Kelly ethnographic ~150-175 km/yr total annual travel (external
+literature search, not yet filed in LITERATURE.md) — consistent with the project's own R-8 finding
+(0.93 moves/yr vs Binford's ~10-40/yr envelope) that the model is under-mobile independent of anything else
+in this investigation.
+
+**6. Pre-settlement travel — the real answer to "how far do dispersed bands travel before settling."**
+Tracked newborns from birth (steps 100-700 warmup+run), but only those born OUTSIDE any settlement's
+`settle_radius` (i.e. genuinely dispersed at birth — most are not: 77-80% of all newborns are already born to
+an already-settled mother and never face this question):
+
+| (of 300 dispersed-at-birth newborns tracked) | budding OFF | budding ON |
+|---|---|---|
+| eventually settled | 144 (48.0%) | 161 (53.7%) |
+| died before ever settling | 123 (41.0%) | 116 (38.7%) |
+| still unsettled at run end | 33 (11.0%) | 23 (7.7%) |
+| *of those that settled:* time from birth to settling | mean 159 mo (~13.3 yr) | mean 180.5 mo (~15 yr) |
+| *of those that settled:* cumulative path traveled | mean 130.2 cells (~1,302 km) | mean 147.9 cells (~1,479 km) |
+| *of those that settled:* net displacement, birth→settling | mean 10.0 cells (~100 km) | mean 8.6 cells (~86 km) |
+
+**This is the real mobility signal, and it's much closer to the ethnographic envelope than #5 above:** ~1,300
+km over ~13 years ≈ **~98 km/yr** while dispersed — not the ~20 km/yr of post-settlement churn. The model
+isn't uniformly under-mobile; it's specifically *settled* agents who go nearly stationary (matching real
+ethnography reasonably well — people who've found their village mostly stop wandering), while *dispersed*
+agents genuinely range, just via an undirected, backtracking radius-1 random walk (net displacement is only
+~8% of cumulative path) rather than anything resembling directed exploration.
+
+**A new, unflagged connection to the R-106 demography gap:** 39-41% of dispersed newborns **die before ever
+settling** — a large, previously unmeasured mortality channel tied specifically to dispersal status, not
+age/orphaning/starvation-multiplier as measured so far. Whether this is a meaningful piece of the e0 gap
+(~21 vs anchor ~28) is untested — flagged, not chased, this session.
+
+**NOT YET ACTED ON.** No default changed. `enable_village_budding` remains OFF; whether to adopt it, and
+whether to also address the search-horizon/agglomeration findings from Addendum 4, is undecided.
+
+**Origin:** diagnostic-only additions this session — `diag_bands_travel.py`, `diag_birth_cohort.py`
+(scratchpad, both reused the Addendum 3/4 `patch=None` world construction). One source fix:
+`phase1_model.py::_maintain_village_budding` (`bud_events` counter, ~2 lines). No new tests added; existing
+suite re-verified green (1,024 passed / 2 xfailed) from the repo root after the fix.
+
+**ADDENDUM 6 — pressure-aware mobility BUILT and tested; calibration MISSES the Binford/Kelly moves/yr target
+honestly; combined with budding it breaks the historical population ceiling (unvalidated); the cycle test is
+INCONCLUSIVE, not negative, because the world never reached stationarity (2026-07-31, overnight session).**
+
+**1. The mechanism, as scoped in conversation.** `mobility_radius()`'s NPP-driven stride (§4.8.19) is
+static/geographic — a cell packed with 40+ occupants still reads as "rich," so it never expands (Addendum 4:
+`r_used==1` in 100% of equilibrium decisions). New `mobility_pressure_source: Literal["npp","intake"]="npp"`
+(pure additive mode, `"npp"` is bit-exact with the original). `source="intake"` drives the SAME formula off the
+agent's own `_intake_ema` (R-106's live intake/requirement EMA) instead of raw NPP — density-aware by
+construction, and reusing an existing signal rather than adding a new one. `_intake_ema`'s update loop is now
+gated by `intake_fert_on OR mobility_wants_intake` (`phase1_model.py`) so the two mechanisms share the
+computation while staying independently ablatable (flip either flag alone; verified by test). New fields
+`mobility_intake_ref` (default 1.00, reuses the already-anchored `intake_fert_lo` maintenance threshold — not
+a new number) and `mobility_intake_floor` (0.15, a pure numerical clamp, same role as `mobility_npp_floor`).
+14 new tests (`tests/test_pressure_mobility.py`): shape parity with the NPP-mode tests, bit-exactness when off
+or at the default source, and the EMA-liveness/independent-ablatability guarantees. Full suite: 1,038 passed
+(1,024 + 14) / 2 xfailed, no regressions.
+
+**2. Calibration sweep 1 (exponent, ref fixed at 1.0) — a mathematically GUARANTEED null, confirmed
+empirically.** N=3000, 900 steps, `patch=None`, budding ON, exponent ∈ {0.5,1.0,1.5,2.0,3.0}: moves/yr never
+exceeds 1.62, km/yr never exceeds 20 — no trend. This is not noise: when `intake_ema >= ref`, `ratio<=1` for
+any exponent ≥0, and `max(base,...)` floors the radius back to `base` regardless of the exponent's value. Since
+R-106/Addendum 4 already established crowded occupants average 2.1x subsistence, most of the tracked population
+sits above `ref=1.0` most of the time, so the exponent literally cannot matter there. **The real lever is the
+threshold, not the response steepness** — diagnosed from the formula's structure before spending the full sweep
+budget confirming it.
+
+**3. Calibration sweep 2 (ref, exponent fixed at 1.5) — an honest MISS against the target.** ref ∈
+{1.0,1.2,1.5,1.7,2.0,2.5}: best result **ref=1.7 → moves/yr=1.45, km/yr=18.5** — roughly **7-27x short** of the
+Binford/Kelly band (10-40 moves/yr, 150-175 km/yr), and the sweep is noisy/non-monotonic across both dimensions
+(0.79-1.62 moves/yr, no clean curve), not a smooth calibration surface with an obvious better setting further
+out.
+
+| ref | pop | moves/yr | km/yr | occ% | settlements | bud_events |
+|---|---|---|---|---|---|---|
+| 1.00 | 7051 | 1.10 | 12.5 | 3.80% | 269 | 480 |
+| 1.20 | 7385 | 1.06 | 13.0 | 3.45% | 292 | 527 |
+| 1.50 | 7519 | 0.79 | 11.0 | 4.13% | 386 | 1043 |
+| **1.70** | 7273 | **1.45** | **18.5** | 3.73% | 247 | 312 |
+| 2.00 | 6951 | 1.19 | 14.7 | 4.18% | 213 | 315 |
+| 2.50 | 7482 | 0.81 | 12.4 | 3.06% | 170 | 123 |
+
+**Why, diagnosed rather than shrugged off:** the mechanism correctly targets the food-STRESSED minority (real
+forager logic — you don't relocate camp because you're comfortable), but Binford/Kelly's ~10-40 moves/yr is a
+POPULATION-WIDE ethnographic average that includes plenty of well-fed foragers moving for reasons this
+mechanism was never built to capture (seasonal rounds, social visiting, camp rotation independent of current
+hunger). Addendum 4's own finding applies again here: "the average agent never experiences scarcity" — so an
+average taken across the whole tracked population is diluted by the majority who are fine. **Not pursued
+further tonight:** pushing `ref` past 2.5 to force more of the population below threshold would fit the
+benchmark by construction, exactly the kind of ad hoc tuning the project rejects (cf. Addendum 2's refusal to
+adopt an unanchored `provision_self_keep`=0.5). Closing this gap for real needs either a second, non-hunger
+mobility driver, or accepting the ethnographic moves/yr figure doesn't transfer cleanly onto this specific
+mechanism's scope. **`ref=1.7` carried forward as the best-available setting, not a validated calibration.**
+
+**4. The unplanned, MUCH bigger result: combined with budding, the historical population ceiling breaks —
+unvalidated.** Full run: N=3000, ref=1.7, exponent=1.5, budding ON, 1500 steps (125 yr):
+
+| | Addendum 5 baseline (900 steps) | this run (1500 steps) |
+|---|---|---|
+| population | 6,511 (budding off) / 7,836 (budding only) | **15,947** |
+| occupied cells | 277/9449 (2.93%) / 382/9449 (4.04%) | **848/9449 (8.97%)** |
+| settlements | 81 / 319 | **809** |
+| moves/yr | — | 0.47 (LOWER, see below) |
+
+Every prior R-106 measurement found population converging to the SAME ~4.7-4.9k equilibrium regardless of
+starting size (Addendum to R-106 core: "starting density washes out"). Here, at step 1500, population is
+**3x that historical ceiling and still accelerating** — growth increments per 200 steps (467→977→1750→2396→
+2711→3111) are still rising, though their SECOND difference is shrinking (+510,+773,+646,+315,+400,+107),
+consistent with early-stage logistic growth approaching, not yet at, an inflection — not confirmed. Occupied
+land nearly TRIPLED and settlement count went **10x**. **This is flagged as a major but UNVALIDATED finding**:
+it could be a genuine unlock of previously-inaccessible carrying capacity (more land finally reachable via
+budding's 8-cell site search + the intake-driven radius bump), or it could indicate `enable_village_budding`'s
+relocation is now firing too permissively once combined with a second mobility mechanism — no time tonight to
+check this population against an independent density/carrying-capacity anchor. **Do not adopt either mechanism
+as a default on the strength of this run alone.**
+
+**Moves/yr going DOWN (1.45→0.47) despite MORE spreading is not a contradiction**, it's the mechanism working
+as intended interacting with the averaging methodology: budding minted 809 settlements by step 1500 (vs 247 at
+900 steps in the sweep), so a much larger share of the tracked population is freshly settled at any snapshot —
+and post-settlement agents barely move (Addendum 5). Success at settling more people mechanically lowers the
+population-wide average mobility, the same dilution effect noted in §3.
+
+**5. The Malthusian-cycle stretch goal: INCONCLUSIVE, not negative — the world never reached stationarity.**
+Ran `probe_hcycles.period_of` (the canonical, validated instrument — R-97's own detector, not an ad-hoc
+periodogram) on population, occupied-cell-count, and mean-per-capita-wealth series (sampled every 4 steps,
+matching R-87/R-97 convention) over the full 1500-step run. **All three: `ac_peak=0.000`, no period found** —
+the autocorrelation never even crosses negative, which `period_of` reports specifically when a series is
+monotonically drifting rather than oscillating. **This is not a valid cycle test.** With population still
+accelerating at step 1500 (see §4), the world hasn't reached anything resembling stationarity — R-87/R-97's own
+cycle tests were run on populations that had already stabilized or were fluctuating around a mean, not ones in
+unresolved exponential-ish growth. Testing for oscillation before there's an equilibrium to oscillate around is
+a category error, not a finding. **Consistent with, and does not update, R-97's standing diagnosis** that a
+delayed feedback needs to out-govern the substrate's own churn timescale — and today's budding-driven explosion
+in settlement count (81→809) plausibly SHORTENS that churn timescale further, working against rather than
+toward the cycle goal, if anything.
+
+**NOT YET ACTED ON.** `enable_village_budding` and `mobility_pressure_source="intake"` both remain OFF as
+defaults. Nothing here should be adopted without: (a) validating the step-1500 population against an
+independent carrying-capacity anchor, (b) a much longer run (several thousand steps) to see whether growth
+ever plateaus, and (c) a decision on the calibration miss in §3 (accept it, find a second mobility driver, or
+re-scope the target).
+
+**Origin:** `sic_games/src/sic_games/demography.py` (`mobility_pressure_source`, `mobility_intake_ref`,
+`mobility_intake_floor` fields; `mobility_radius()` signature `local_npp`→`value`, source-dispatch),  
+`sic_games/src/sic_games/phase1_model.py` (`mobility_source` at the movement call site; `intake_signal_on`
+gating). New: `sic_games/tests/test_pressure_mobility.py` (14 tests). Diagnostics in scratchpad:
+`diag_calibrate_mobility.py` (exponent + ref sweeps), `diag_final_combined.py` (long-run validation + cycle
+test, reuses `probe_hcycles.period_of`). Suite 1,038 passed / 2 xfailed. Both new knobs default OFF/`"npp"`,
+bit-exact when off.
+
+**ADDENDUM 7 — CORRECTION to Addendum 6 §3: the mobility "7-27x miss" was mostly a HIDDEN-DENOMINATOR error.
+The model's MOBILE foragers move at 8.4 moves/yr against a hard structural ceiling of 12. The real defects are
+a stride collapse, a residence pin that bypasses the mover entirely, and a saturated-but-BLOCKED push
+(2026-07-31).**
+
+**What prompted it.** Two of this session's own measurements contradicted each other and I had not reconciled
+them: `diag_crowding.py` found **75% of agents MOVED per decision** at equilibrium (~9/yr if that were
+population-wide), while `diag_calibrate_mobility.py` reported **0.47-1.45 moves/yr**. Both were correct
+measurements *of different populations*.
+
+**The mechanism.** `phase1_model.py:1435` pins any agent within `settle_radius` of an active settlement:
+`_toward(pos, site)` returns `pos` unchanged once the agent stands ON the site (line 754), and the movement
+loop `continue`s **before `diffusion_select_target` is ever called**. A settled agent on its site is therefore
+structurally FROZEN — zero moves, permanently, independent of hunger, depletion, or any mobility knob. The
+crowding wrapper only ever observed the *unsettled remainder*; the calibration averaged that remainder together
+with a pinned majority.
+
+**Measured (N=2000, 700 steps, 120-step window, `patch=None`, budding ON, mobility-intake ON, ref=1.7;
+per-agent per-step state attribution so each transition is credited to the state it began in):**
+
+| | moves/yr | km/yr |
+|---|---|---|
+| POPULATION-WIDE (what Addendum 6 §3 reported) | 1.76 | 19.6 |
+| **MOBILE steps — Binford's own denominator** | **8.39** | **86.3** |
+| settled steps | 0.74 | — |
+| of which fully pinned ON-SITE | 0.47 | — |
+
+agent-steps: 245,378 total; **212,782 settled (86.7%)**, of which **207,511 (84.6%) fully on-site**; 32,596
+mobile (13.3%). Per-agent settled fraction: mean 0.867, **median 1.000**; 1,714/2,062 agents *always* settled,
+240/2,062 *never*.
+
+**1. The denominator was wrong, and the benchmark's own scope says so.** Binford's mobility dataset covers
+"all groups that move at least once per year" (n=314) — MOBILE foragers by construction; sedentary groups are
+excluded from his denominator. Averaging our ~87% pinned villagers into that comparison is the
+**HIDDEN-DENOMINATOR bug class already on this project's record** (R-97 et al.: any ratio compared against a
+benchmark has a validity domain and fails silently when the denominator drifts). Corrected, the model's mobile
+foragers sit at **8.39 moves/yr vs a reachable band of 10-12** — near-validation, not a 7-27x failure.
+
+**2. A STRUCTURAL CEILING nobody had stated: 12 moves/yr, by construction.** Diffusion movement resolves once
+per model step and 1 step = 1 month, so no configuration can exceed 12 residential moves/yr. (Village budding
+can add rare extra relocations, so 12 is an approximate rather than strict bound.) **Binford's upper range —
+40/yr, i.e. relocating every ~9 days — is unreachable without a sub-monthly timestep.** Every prior framing of
+this benchmark, including R-8's original "0.93 vs ~10-40/yr" and Addendum 5's, compared against a band whose
+top ~70% the architecture cannot reach. The honest target is **10-12**.
+
+**3. The real remaining gap is DISTANCE, and it appears only as the world fills.** Mobile agents average
+86.3 km/yr = **10.3 km per move ≈ 1.03 cells** — the `r>1` glide is not firing, exactly matching Addendum 4's
+`r_used==1` in 100% of equilibrium decisions. But in an early, uncrowded world (N=400, 80 steps, zero
+settlements formed) the same configuration gives **9.16 moves/yr and 179.8 km/yr — at the Kelly anchor**, with
+~2 cells per move. **Stride collapses as the world fills.** That is the tractable mechanism defect, and the
+intake-pressure mode of Addendum 6 does not fix it because the agents who would need a long stride are not
+hungry enough to trigger one.
+
+**4. The PUSH driver is NOT missing — it saturates where it matters and is BLOCKED from acting.** Depletion has
+a deterministic equilibrium `B* = 1 − 0.5·(occ/K)` (`capacity.py`, `DEPLETE_FRAC=0.5`), so measured B pins
+occupancy exactly. Occupied cells (n=218): mean B 0.905, **median 0.974**, p10 0.723, **min 0.05 (the
+`B_FLOOR`)**; unoccupied 0.999; 8/218 below B=0.5.
+- median B 0.974 ⇒ pressure ≈ 0.052 ⇒ **~1.3 agents on a cell of K≈25** — most "occupied" cells hold a single
+  forager on pristine land;
+- B at the 0.05 floor ⇒ pressure ≥ 1.9 ⇒ those cells are **hunted out at ≥1.9x carrying capacity**.
+
+So the landscape is bimodal, precisely as Addendum 4's concentration finding predicts. **Patch depletion — the
+ethnographic prime mover of forager residential mobility (MVT) — is present and firing hard in exactly the
+cells that are overcrowded.** Its output simply cannot reach the movement decision: those agents are either
+settlement-pinned (never call the scorer) or held by the agglomeration bonus (Addendum 4: +387,290 vs a
+−35,810 raw-food disadvantage). **The failure is a disconnected response, not an absent stimulus.**
+
+**5. Carrying capacity is NOT inflated** (checked because a mis-scaled K would have made depletion dormant by
+construction): land-cell `K_persons` median **24.7/cell = 0.247 persons/km²**, p10 7.1, p90 51.5, max 116.9 —
+inside the Tallavaara ethnographic band (0.1-0.5/km²), with 80.1% of land above Binford packing (0.091/km²) as
+the aquatic-subsidy design intends. My first estimate of "K≈236/cell" was inferred from B and was wrong;
+measured directly, K is sound.
+
+**WHAT IS GENUINELY MISSING (drivers, as opposed to the blockers above) — all already documented as deferred
+seams in this project's own spec, none of them the binding constraint:**
+- **Seasonal transhumance.** §4.8.19 (MODEL_SPEC line 1706) states the stride reads STATIC `npp_gm2` by design
+  "so the *range* doesn't oscillate with the season; transhumance is a deferred extension."
+- **Game/herd-following.** §4.1.8 wires `game_mobility` as a parameter with the **MECHANIC DEFERRED**
+  (`GRASS/steppe 1.0` = Nunamiut caribou / plains bison logistical herd-following).
+- **Logistical (collector) mobility.** The model has residential moves only; Binford's forager↔collector
+  continuum has collectors *reducing* residential moves while running long logistical forays.
+- **Social/scheduling relocation** (death in camp, disputes, vermin/sanitation) — routine relocation triggers
+  in the ethnography (e.g. Amazonian villages relocating every few years), with no analogue in the model.
+
+**Adding any of these on top of a blocked response would produce motion without meaning.** Order of work
+implied: (a) report mobility conditioned on mobile state — free, and turns a reported failure into a
+near-validation; (b) test whether the **86.7% sedentary fraction** is itself the defect — plausible for
+coastal/temperate (NW-Coast storage foragers really were largely sedentary) but this is exactly the
+[[feedback_check_biome_dependence]] case: if flat_boreal / savanna / desert also come out ~87% sedentary, then
+sedentism is biome-independent and THAT is the bug; (c) fix the equilibrium stride collapse; (d) only then
+consider new drivers.
+
+**INSTRUMENT NOTE.** The diagnostic's own per-agent settled-fraction line initially read
+`sum(1 for (_, s, _) in h)` (missing the `if s`), reporting "always-settled 329/329" while the agent-step
+counter directly beneath it read 0% settled. Caught because the two disagreed, fixed before any number here was
+used — the same class of self-check that [[feedback_validate_the_instrument]] exists for.
+
+**Origin:** diagnostic-only; `diag_mobility_denominator.py` (scratchpad) + a direct `K_persons` percentile
+check. No source files changed by this addendum. Numbers above supersede Addendum 6 §3's population-wide
+framing; Addendum 6's mechanism, tests and §4 population-ceiling finding are unaffected.
+
+**ADDENDUM 8 — BIOME BATTERY: sedentism IS biome-dependent (the bug tested for is NOT present), but mobile
+mobility is biome-INVARIANT — the model reproduces the ethnographic MAGNITUDE while failing to produce the
+ethnographic LAW, and the monthly timestep makes that law unrepresentable through move frequency at all
+(2026-07-31).**
+
+**The test.** Addendum 7's 86.7%-sedentary baseline was measured on ONE world (coastal/temperate). Per
+[[feedback_check_biome_dependence]] — a mechanism validated in one world is a claim about that world — six
+biomes were run identically (N=1500, 600 steps, 120-step window, `patch=None`, plain village/elite preset:
+budding OFF, mobility-intake OFF, so this is the CANONICAL stack, not Addendum 6's experimental one).
+Prediction if sedentism were correctly biome-gated: coastal/temperate high (NW-Coast storage foragers),
+flat/boreal low (Nunamiut caribou-followers), tropical/interior low-moderate.
+
+| biome | pop | settled % | moves/yr (pop) | moves/yr (MOBILE) | km/yr (MOBILE) | settlements | mean NPP | med K/cell |
+|---|---|---|---|---|---|---|---|---|
+| mountainous/boreal | 223 | **66.3%** | 4.23 | 9.31 | 115.3 | 2 | **458** | **3.2** |
+| coastal/temperate | 1584 | 64.1% | 3.31 | 8.63 | 92.2 | 30 | 1004 | 24.7 |
+| flat/temperate | 695 | 48.5% | 5.15 | 9.41 | 101.1 | 8 | 1083 | 28.6 |
+| hilly/temperate | 832 | 24.9% | 7.17 | 9.35 | 99.3 | 9 | 1002 | 21.4 |
+| flat/tropical | 1472 | 0.9% | 9.16 | 9.22 | 110.2 | 1 | **2291** | 35.5 |
+| flat/boreal | 3693 | **0.0%** | 9.74 | 9.74 | 106.7 | 0 | 795 | 11.4 |
+
+**1. VERDICT ON THE TESTED HYPOTHESIS: NEGATIVE — sedentism is NOT biome-independent.** Spread **0.0% → 66.3%
+(sd 27.4 pts)**, correlation with mean aquatic food **+0.616** (`AQUATIC_R_PER_YR=0.80` is `capacity.py`'s
+documented "sedentism enabler"). So **Addendum 7's coastal baseline stands as a legitimately coastal-specific
+result**, and its central claim survives: the mobility "miss" is a COMPOSITION artifact, not a broken mobility
+mechanism. (The exact figure differs — 64.1% here vs 86.7% in Addendum 7 — because that run used
+budding+mobility-intake at N=2000/700 steps; within-battery comparisons are apples-to-apples.)
+
+**2. BUT THE GRADIENT'S ORDER IS PARTLY BACKWARDS.** `mountainous/boreal` — the POOREST world on every measure
+(mean NPP 458, median K 3.2/cell, total K 74,697, all lowest by a wide margin) — is the **MOST sedentary
+(66.3%)**. Kelly/Binford have mobility ∝ 1/productivity, so the most marginal environment should be the most
+MOBILE. **Circumscription is ruled out as the explanation**: all six worlds have 9,449–9,994 habitable cells,
+i.e. land is not scarce anywhere. The apparent mechanism is that poverty makes the few viable cells the ONLY
+viable cells, population concentrates onto them, the settlement threshold is met, and the residence pin
+(Addendum 7) then freezes everyone — **poverty producing nucleation instead of dispersal.** With pop 223 this
+is also the noisiest cell in the battery; worth re-running at larger N before treating the inversion as firm.
+
+**3. THE SHARPER FINDING — MOBILE MOBILITY IS BIOME-INVARIANT.** Across a **5x productivity range** (NPP
+458→2291, median K 3.2→35.5), mobile-agent mobility is **flat: 8.63–9.74 moves/yr (12% spread) and 92–115
+km/yr**. `enable_productivity_mobility` is ON in this preset and exists precisely to implement Kelly 1995 /
+Binford 2001's ∝1/productivity law (§4.8.19) — **it produces no realized gradient whatsoever.** This is the
+same defect Addendum 4 found from the other side (`r_used==1` in 100% of equilibrium decisions): the stride
+never expands, so the biome gradient encoded in the stride formula never reaches behaviour. R-40 already
+recorded this mechanism as "NOT the biome→society fix" and retained it for "its own uses (mobility
+gradients)" — this measures that those uses are also not being served.
+
+**So the model reproduces the ethnographic MAGNITUDE and fails to reproduce the ethnographic LAW.** ~9.3
+moves/yr and ~100 km/yr sit close to the anchors (Binford 158 / Kelly 174 km/yr; reachable move band 10-12,
+per Addendum 7's ceiling) — but the anchor is not only a number, it is a SLOPE, and we produce a flat line.
+
+**4. THE CEILING MAKES THE LAW UNREPRESENTABLE THROUGH MOVE FREQUENCY.** Addendum 7 established a hard 12
+moves/yr ceiling (one movement resolution per monthly step). Tropical foragers already sit at **9.22/yr = 77%
+of that ceiling**. Kelly's law anchored there would put mountainous/boreal at ~46 moves/yr — nearly 4x above
+what the architecture can express. **Even a perfectly working productivity-mobility mechanism could not fit the
+ethnographic gradient into move COUNT.** The only channel with headroom is **distance per move (stride)**,
+which is currently also flat (~10 km/move ≈ 1 cell everywhere, Addendum 7 §3). **Conclusion: the
+productivity-mobility law must be delivered through stride, and stride is exactly the thing that is broken.**
+That converges with Addendum 4's search-horizon finding and Addendum 7 §3's stride-collapse finding from a
+third independent direction.
+
+**5. AN INCIDENTAL, CONFOUNDED OBSERVATION (flagged, not established).** Population as a fraction of nominal
+total K is 0.24–0.6% in every biome EXCEPT `flat/boreal` — the one world where **zero settlements formed** —
+which reaches 2.6%, ~5x the others, and the largest absolute population (3,693) despite only the 4th-highest
+total K. Consistent with R-106's chain (settlement/agglomeration concentrate people, and concentration kills),
+but **confounded**: these are 600-step runs and not all arms are at equilibrium (some grew, some shrank), so
+this is a hypothesis for a controlled test, not a result. Separately, every biome running at **<3% of nominal
+carrying capacity** re-confirms R-106's "nobody can be hungry" root cause as biome-general rather than
+coastal-specific.
+
+**Origin:** diagnostic-only; `diag_biome_sedentism.py` + a direct per-biome land/NPP/K check (scratchpad). No
+source files changed. Supersedes nothing; extends Addendum 7 §3's stride diagnosis with the biome-gradient
+evidence and adds the dynamic-range argument.
+
+**ADDENDUM 9 — TWO SUPERVISOR CHALLENGES ANSWERED: the biome stride is INERT BY CALIBRATION (not broken);
+depletion is CORRECT TO SPEC and too gentle to evict anyone; and a genuine dimensional bug — the settlement
+tier-2 food layer contributes 0.005% of cell food (2026-07-31).**
+
+**Challenge (A): "the biome-adapted stride was lit-sourced and built — did it not happen? did it break?"**
+It happened, it is ON, and it is not broken. `enable_productivity_mobility=True` in the canonical preset;
+`mobility_radius` computes correctly. It is **inert by CALIBRATION**:
+`r = clamp(round(base·(npp_ref/max(npp,floor))^exp), base, r_max)` with `npp_ref=900, exp=1.0, base=1` requires
+`900/npp ≥ 1.5`, i.e. **npp ≤ 600 g/m²/yr, before r even reaches 2**. Measured on coastal/temperate:
+
+| | value |
+|---|---|
+| land-cell NPP | mean 1004, median 1054 |
+| NPP where agents actually are | mean **769** |
+| fraction of LAND below the r≥2 threshold (600) | **3.2%** |
+| fraction of AGENTS below it | **0.9%** |
+| stride actually computed for agents | **r=1: 1570, r=2: 14 (99.1% at r=1)** |
+
+`npp_ref=900` is documented as the Tallavaara forager-median NPP, but this project's canonical worlds average
+**1004–2291** (only mountainous/boreal 458 and flat/boreal 795 sit below it), so the reference lands beneath
+the landscape and the mechanism returns base almost everywhere. **The source itself flags
+`ref/exp/max` as "PROVISIONAL — locking the scaling law for canonical runs needs supervisor sign-off"
+(§4.8.19). That sign-off never happened, yet `emergent_village_demog()` turns the flag ON** — so it ships as
+if adopted while being calibrated into inertness. This is the direct mechanical cause of Addendum 4's
+`r_used==1` and Addendum 8's flat biome gradient.
+
+**MY OWN HYPOTHESIS FALSIFIED (recorded per the R-106 house rule).** I proposed that agents *self-select into
+high-NPP cells*, so a cell-keyed law would cancel itself. **Measured: agents sit at NPP 769 vs a landscape mean
+of 1004 — 0.77x, i.e. POORER than average, the opposite of my prediction.** The self-selection story is dead;
+the parameter-range story is the whole explanation. (The separate *scope* critique — that Kelly/Binford's law
+is regional while the model applies it per-cell — remains untested and is now unsupported by any measurement.)
+
+**Challenge (B): "populations survive and grow sourcing the same cell for a long time — the cell resource is
+not depleting correctly."** The intuition is right about the OUTCOME and wrong about the CAUSE, and **my own
+proposed cause was also wrong.**
+
+**FALSIFIED (mine, from the same session):** I claimed the residence pin puts *every* villager on the single
+site cell, so pressure lands on 1 cell while food is drawn from 9 — "a village hunts out its plaza while its
+fields stay pristine." **Measured: catchment-ring occupancy is 148.8 vs 35.3 on the site cell.** Villagers are
+spread across the catchment; foraging pressure does reach the ring. The story is dead.
+
+**What is actually happening (30 settlements, coastal/temperate, 600 steps):**
+
+| | site cell | catchment ring |
+|---|---|---|
+| stock fraction B | mean 0.805, median 0.789, **min 0.535** | mean 0.895, min 0.813 |
+| occupancy | mean 35.3, max 85 | mean 148.8 total |
+| K at the cell | **87.5 persons** | — |
+| sites hunted below B=0.2 | **0/30** | — |
+
+**Depletion is working exactly as specified.** The spec is `B* = 1 − DEPLETE_FRAC·(occ/K)` with
+`DEPLETE_FRAC=0.5`; measured pressure is 35.3/87.5 = **0.403**, predicting B* = **0.799** against a **measured
+0.805**. The model is not failing to run its own equation. Two structural facts explain why the resource never
+runs out:
+1. **The law caps drawdown at 50% by construction.** Even at FULL carrying capacity (occ = K) the stock only
+   falls to B=0.5 — half the pristine yield. **A patch can never be hunted out at any realistic occupancy.**
+   Real forager mobility is driven by returns falling far enough to beat the cost of moving (MVT); this law
+   cannot produce that.
+2. **Villages sit on the richest cells, whose assumed capacity is ~10x Binford packing.** Settlement sites have
+   **K = 87.5 persons/cell = 0.875 persons/km²** (vs landscape median 0.247, Tallavaara band 0.1–0.5, Binford
+   packing 0.091). That is the aquatic subsidy working as designed (`AQUATIC_DENSITY_MAX=80`, MODEL_SPEC:
+   the super-density "that lets a concentrated band cross Binford packing") plus site-appraisal selecting the
+   best cells. **So 35 people on a cell rated for 87 is a 40% load, and a 20% yield haircut is the *correct*
+   answer to that load.** The village persists indefinitely because the model believes that cell can feed
+   87 people.
+
+**A GENUINE BUG FOUND — the settlement tier-2 food layer is dimensionally inert.**
+`_settlement_catchment_yield = settle_tier2_yield · Σ_catchment S_pot`, where `S_pot = max(aquatic_food,
+cultivability)` is a **normalized 0–1 static field** and `settle_tier2_yield = 40.0`. Measured at settlement
+cells: **tier-2 = 2.68e2 kcal against tier-1 = 5.28e6 kcal — 0.0051%.** The entire Layer-2 "settlement unlocks
+intensive food" mechanism — the thing that is supposed to make being a village pay — contributes five
+thousandths of one percent of the cell's food. Villages in this configuration are fed **essentially entirely by
+ordinary depletable tier-1 forage**. Whether `settle_tier2_yield=40` was calibrated against a differently
+scaled tier-1 (the `burn=75000` normalisation sets tier-1's magnitude) is not established here; what is
+measured is that in the CURRENT canonical configuration the layer does nothing. **This needs a unit audit
+before any settlement/agriculture conclusion that assumed tier-2 was load-bearing is trusted.**
+
+The R-63 ceiling (`_settlement_carrying_capacity`, the one path that *does* read the depletable field) **binds
+in 8/28 = 28.6% of settlement cells** (S/cap mean 0.621, max 1.002), so depletion does throttle villages some
+of the time — via the cap, not via the tier-2 term.
+
+**NOTE ON A CONFIG DIFFERENCE.** Addendum 7 reported min occupied-cell B = 0.05 (the hunted-out floor); here no
+settlement site falls below 0.535. Different configurations (Addendum 7: budding + mobility-intake ON,
+N=2000/700 steps; here: plain canonical preset, N=1500/600) — the floor-hitting cells in Addendum 7 were not
+necessarily settlement sites. Not reconciled; flagged.
+
+**IMPLICATION FOR THE MOBILITY WORK.** Addendum 8 concluded the productivity gradient must be carried by
+stride. Addendum 9 says the stride mechanism *already exists and is simply calibrated below its own operating
+range* — so the first move is a **calibration decision on `npp_ref`/`exponent`/`r_max` against the Kelly/Binford
+range data (the sign-off §4.8.19 has been waiting for), not new mechanism.** Separately, `DEPLETE_FRAC=0.5`
+capping drawdown at 50% is the reason no amount of mobility tuning will produce eviction-driven movement.
+
+**Origin:** diagnostic-only; `diag_depletion_catchment.py` (scratchpad), reading `_diag_pool`, `capacity._B`,
+`_K_persons`, and the model's own `_settlement_catchment_yield`/`_settlement_carrying_capacity`. No source
+files changed. Two of my own hypotheses falsified by this run and recorded above.
 
 ---
 

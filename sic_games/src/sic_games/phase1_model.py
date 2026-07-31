@@ -1389,9 +1389,12 @@ class TerrainWorld(mesa.Model):
                 h = self._family_head(a)
                 if h is not None:
                     followers_by_root[h] = followers_by_root.get(h, 0) + 1
-        # §4.8.19 productivity-scaled mobility: per-agent STRIDE from the STATIC local NPP (Kelly/Binford ∝1/NPP).
+        # §4.8.19 productivity-scaled mobility: per-agent STRIDE from the STATIC local NPP (Kelly/Binford ∝1/NPP),
+        # or (R-106 Addendum 6) from the agent's own live intake/requirement EMA when `mobility_pressure_source
+        # ="intake"` — density-aware, since a crowded cell dilutes it regardless of nominal fertility.
         mobility_on = self._demog is not None and getattr(self._demog, "enable_productivity_mobility", False)
-        npp_gm2 = getattr(self._fields, "npp_gm2", None) if mobility_on else None
+        mobility_source = getattr(self._demog, "mobility_pressure_source", "npp") if mobility_on else "npp"
+        npp_gm2 = getattr(self._fields, "npp_gm2", None) if (mobility_on and mobility_source != "intake") else None
         water_mask = self._fields.isWater if mobility_on else None
         # F.3c-1 band cohesion: pull each mover (family-root / unpaired adult) toward its band's centroid.
         coh_str = (self._demog.band_cohesion if (self._demog is not None
@@ -1455,8 +1458,11 @@ class TerrainWorld(mesa.Model):
             agent_coh = coh_str
             mr = 1
             if mobility_on:
-                local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
-                mr = mobility_radius(local_npp, self._demog)
+                if mobility_source == "intake":
+                    mr = mobility_radius(getattr(agent, "_intake_ema", 1.0), self._demog)
+                else:
+                    local_npp = float(npp_gm2[old[1], old[0]]) if npp_gm2 is not None else 0.0
+                    mr = mobility_radius(local_npp, self._demog)
             extra = followers_by_root.get(agent, 0) if anticipate else 0
             hcells, fmult = None, 1.0
             if standing_on or store_on:
@@ -1988,8 +1994,14 @@ class TerrainWorld(mesa.Model):
         cond_on = demog is not None and demog.enable_condition
         c_alpha = demog.condition_alpha if cond_on else 0.0
         intake_fert_on = demog is not None and getattr(demog, "enable_intake_fertility", False)
-        i_alpha = demog.intake_ema_alpha if intake_fert_on else 0.0
-        i_menarche = demog.menarche_months if intake_fert_on else 0
+        # R-106 Addendum 6: mobility-pressure mode reads the SAME `_intake_ema` fertility computes, so keep the
+        # EMA live for it too even when the fertility mechanism itself is off — the two stay independently
+        # ablatable (flip either flag alone) while sharing one signal, not two parallel computations of it.
+        mobility_wants_intake = (demog is not None and getattr(demog, "enable_productivity_mobility", False)
+                                  and getattr(demog, "mobility_pressure_source", "npp") == "intake")
+        intake_signal_on = intake_fert_on or mobility_wants_intake
+        i_alpha = demog.intake_ema_alpha if intake_signal_on else 0.0
+        i_menarche = demog.menarche_months if intake_signal_on else 0
         dep_load = {}
         if intake_fert_on and getattr(demog, "enable_dependent_load", False):
             # A mother's real energy budget covers her juveniles' UNMET need, not just her own maintenance.
@@ -2006,7 +2018,7 @@ class TerrainWorld(mesa.Model):
                     dep_load[m] = dep_load.get(m, 0.0) + _deficit
         for a in self.agent_list:
             a._fed_reserve = a.wealth        # post-harvest reserve = nutritional status (synergy/fertility read THIS)
-            if intake_fert_on and a.age >= i_menarche:
+            if intake_signal_on and a.age >= i_menarche:
                 # Energy FLUX, not stored reserve (Ellison). Gathered intake over this step's own maintenance
                 # requirement; the reserve level cannot carry this because it re-saturates at the cap.
                 _req = self._burn * a.consumption_factor() + dep_load.get(a, 0.0)
@@ -4247,7 +4259,6 @@ class TerrainWorld(mesa.Model):
                        / (1.0 + circ_gain * bestd / R))
                 if _u >= haz:
                     continue
-                self.bud_events += 1
             else:
                 # Bandy fission COST: the threshold RISES with relocation distance — base → ~+60% circumscribed
                 if len(village) <= thr_base * (1.0 + circ_gain * bestd / R):
@@ -4256,6 +4267,7 @@ class TerrainWorld(mesa.Model):
             for a in faction:
                 a._group.band_id = new_id; a.pos = best
             self._settlement_sites[best] = cfg.settle_release_steps
+            self.bud_events += 1               # counts BOTH paths (was hazard-only — legacy-path budding read 0 always)
 
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell
