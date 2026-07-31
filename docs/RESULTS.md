@@ -3567,6 +3567,87 @@ capping drawdown at 50% is the reason no amount of mobility tuning will produce 
 `_K_persons`, and the model's own `_settlement_catchment_yield`/`_settlement_carrying_capacity`. No source
 files changed. Two of my own hypotheses falsified by this run and recorded above.
 
+**ADDENDUM 10 — THE DENSITY MISS AND THE SPATIAL CONCENTRATION ARE ONE DEFECT; FOUR CANDIDATE CAUSES
+FALSIFIED BY MEASUREMENT (three of them mine, two INVERTED); and the agglomeration term is structurally
+entangled — it is the concentrator AND the food supply at once (2026-07-31).**
+
+**How the question changed.** Under the supervisor directive *"generally the anchor wins, but practically it
+means something else is missing or not working, so it would have to be found — everything is on but the pop
+is not moving,"* the investigation moved off mobility and onto the DENSITY anchor, which is the larger miss:
+
+| | measured (ALL-ON preset) | anchor |
+|---|---|---|
+| population density | **0.0018 persons/km²** | Tallavaara **0.1–0.5**; Binford packing 0.091 |
+| population vs the landscape's own K | **0.65%** of 253,887 | — |
+
+**THE ARITHMETIC THAT REFRAMES IT.** density = (crowding-limited population per OCCUPIED cell) × (fraction of
+land occupied). Measured: 1657 agents on 254 of 9449 habitable cells = **6.5/cell over 2.69% of the land**.
+Spread that SAME per-cell density over all habitable land: 6.5 × 9449 / 944,900 km² = **0.065 persons/km²** —
+essentially the Binford packing anchor. **So the density shortfall is not a separate problem from the
+concentration; it is the arithmetic consequence of it.** Population sits at its crowding-limited equilibrium
+*for the tiny area it actually uses*.
+
+**FOUR CANDIDATES FALSIFIED (all measured on the ALL-ON preset, coastal/temperate, N=1500, 600 steps):**
+
+1. **Dark mechanisms — NO.** A full audit found 27 of 79 `enable_*` flags off in the canonical preset; 23 were
+   turned on (4 excluded with stated reasons: an unimplemented stub, an observer, a mutually-exclusive
+   alternate path, and R-103's known-wrong criterion). Per-flag liveness ablating FROM all-on: **20/23 LIVE**,
+   3 inert (`band_risk`, `malnutrition_fission`, `terrain_pathogen`). The mechanisms work — and all-on moved
+   land use only **2.62% → 2.69%**.
+2. **The contest split — NO, and INVERTED.** Removing status-weighted sharing makes it *worse*:
+   κ=1.5→0 gives pop ×0.81 (1657→1341) and agents below maintenance **7.0% → 15.3%**. Inequality is
+   PROTECTIVE at the population level here — an even split spreads the shortage across everybody instead of
+   keeping some agents robustly above the floor. My hypothesis (a permanently-starved underclass sets the
+   death rate) is not merely falsified, its sign is backwards.
+3. **Food limitation — NO.** Median realized intake is **2.47–4.41× requirement**; only 3–15% of agents fall
+   below maintenance in any arm. The population is not subsistence-limited. This re-confirms R-106's core
+   finding from a new direction.
+4. **The forage cap — REAL BUT MINOR.** Clean ablation: pop ×1.23, land 2.69% → **4.09%** (+52% more cells,
+   the single largest land-use effect measured). It is the main *dispersal* blocker — a lone agent on a rich
+   empty cell perceives only `cv`, exactly what a crowded cell still delivers, so there is no gradient to
+   disperse along — but it is nowhere near sufficient.
+   **CONFOUND RECORDED:** the `forage_cap_hours ×5/×20` arms must NOT be cited as cap tests. `cv_ref =
+   forage_kcal · forage_cap_hours` (`phase1_model` 1078/1098) ALSO sets the agglomeration base scale, so those
+   arms were 5×/20× agglomeration subsidies. That is why "cap OFF" (2046) came out BELOW "hours ×20" (3674).
+
+**THE AGGLOMERATION ABLATION — INVERTED TOO, AND IT EXPOSES A DESIGN ENTANGLEMENT.**
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² |
+|---|---|---|---|---|---|---|
+| aggl ON, cap ON (shipped) | 1657 | 254 | 2.69 | 6.5 | **159** | 0.0018 |
+| **aggl OFF**, cap ON | **331 (×0.20)** | 141 | 1.49 | 2.3 | 21 | 0.0004 |
+| aggl ON, cap OFF | 2046 (×1.23) | **386** | **4.09** | 5.3 | 158 | 0.0022 |
+| aggl OFF, cap OFF | 742 (×0.45) | 285 | 3.02 | 2.6 | **10** | 0.0008 |
+| aggl β=1.0, cap OFF | 742 | 285 | 3.02 | 2.6 | 10 | 0.0008 |
+
+Agglomeration IS the concentrator — max cell occupancy **10 → 159** — exactly as Addendum 4's decomposition
+predicted (+387,290 premium against a −35,810 raw-food disadvantage). **But turning it off COLLAPSES the
+population (×0.20 to ×0.45)**, because the premium is not merely perceptual: it is realized in the harvest as
+`S += aggl_R·(n^β − n)` (`phase1_model` 1633-1641), i.e. it is a genuine production subsidy supplying over
+half the economy's output. **The same term does two jobs — spatial attraction and food creation — so it cannot
+be tuned for one without wrecking the other.** Any future attempt to fix concentration by weakening
+agglomeration will crash the population; the two functions must be separated first.
+(*Instrument check passed:* the β=1.0 arm reproduced the OFF arm bit-identically, as the algebra requires
+since `n^(β−1) − 1 → 0`.)
+
+**WHERE THIS LEAVES THE DENSITY GAP — no single cause, and still short.** Best measured arm (aggl ON, cap OFF)
+reaches 0.0022/km², **46× below the low anchor**. Its projected density at FULL land occupancy is **0.053/km²**
+— within ~2× of Binford packing but still under the Tallavaara band. So even perfect spreading does not close
+the gap alone: it needs BOTH ~full land occupancy AND ~10 agents/cell (against a median cell K of 24.7, i.e.
+40% load — comfortably feasible). The system is in a **low-level trap**: agents harvest only the cells they
+stand on, so realized food ≈ (occupied cells) × (per-cell yield); few agents ⇒ few cells harvested ⇒ little
+food ⇒ few agents. The capacity field's 253,887-person K is unreachable because 97% of it is never touched.
+
+**MARKER-MATRIX GAP (flagged).** `docs/MARKER_MATRIX.md` scores 16 markers and **has no population-density
+marker**, despite density having a documented band (Tallavaara 0.1–0.5/km², MODEL_SPEC §4.3.1) and being the
+single largest quantitative miss in the model. Nothing has ever been looking at it — the same failure mode
+that let polygyny sit 15× off Marlowe unnoticed (MARKER_MATRIX's own note). **Proposed as marker #17.**
+
+**Origin:** diagnostic-only; `diag_forage_cap.py`, `diag_pop_suppressor.py`, `diag_agglomeration_ablation.py`,
+`diag_liveness_allon.py`, `diag_all_on.py` (scratchpad). No source files changed by this addendum. Three of my
+own hypotheses falsified here (contest split, agglomeration-as-suppressor, and earlier the self-selection
+story), two of them with the sign inverted — recorded per the R-106 house rule.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
