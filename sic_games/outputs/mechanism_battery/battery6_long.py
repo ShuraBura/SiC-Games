@@ -37,6 +37,11 @@ OUT = os.path.join(HERE, "battery6_long_results.json")
 STEPS_S4 = os.environ.get("L_STEPS", "3000")
 SEEDS = [s for s in os.environ.get("L_SEEDS", "0,1,2,3,4").split(",") if s]
 PAR = int(os.environ.get("L_PAR", "6"))
+# L_TAGSUF: suffix on every arm tag. The resume logic skips an arm whose campaign trajectory already exists,
+# so re-running the battery under a DIFFERENT configuration (e.g. C_ALLON=1) against the tags of a previous
+# run would silently skip every arm and re-report the OLD numbers as if they were the new config's. Set a
+# suffix to give a new configuration its own namespace. Default "" ⇒ the historical tags, unchanged.
+TAGSUF = os.environ.get("L_TAGSUF", "")
 MAXMIN = os.environ.get("L_MAXMIN", "90")
 
 STACK = dict(C_ELITE="1", C_BRANCH="0.05", C_SPLIT="0.00003", C_SPLITMIN="8",
@@ -154,7 +159,7 @@ def stage_s4(R):
         log(f"    SKIPPED benchmark '{b[0]}' ({b[4]}): {why}")
     R["S4_skipped"] = [dict(key=b[0], source=b[4], reason=w) for (b, w) in skipped]
 
-    arms = [(f"_b6_{nm}_s{sd}", dict(C_TERR=terr, C_CLIM=clim, C_SEED=sd))
+    arms = [(f"_b6{TAGSUF}_{nm}_s{sd}", dict(C_TERR=terr, C_CLIM=clim, C_SEED=sd))
             for (nm, terr, clim) in WORLDS for sd in SEEDS]
     run_arms(arms, PAR, STEPS_S4, MAXMIN)
 
@@ -230,11 +235,11 @@ def stage_s4(R):
 
 def stage_s6(R, budget):
     log(f"S6 — LONG-HORIZON DRIFT (30k steps, budget {budget}m/arm)")
-    arms = [(f"_b6_drift_s{sd}", dict(C_TERR="coastal", C_CLIM="temperate", C_SEED=sd)) for sd in ("0", "1")]
+    arms = [(f"_b6{TAGSUF}_drift_s{sd}", dict(C_TERR="coastal", C_CLIM="temperate", C_SEED=sd)) for sd in ("0", "1")]
     run_arms(arms, 2, 30000, budget, logevery="100")
     out = {}
     for sd in ("0", "1"):
-        d = traj(f"_b6_drift_s{sd}")
+        d = traj(f"_b6{TAGSUF}_drift_s{sd}")
         if not d:
             continue
         t = d["traj"]

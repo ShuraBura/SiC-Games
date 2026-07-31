@@ -434,6 +434,34 @@ def main():
         # dict would silently pin every non-elite run to the preset default.
         **({"aggregation_residence": RESIDENCE} if RESIDENCE else {}),
         **ELITE_KW))
+    # C_ALLON (R-106 Addendum 12, 2026-07-31): the supervisor rule is that every BUILT mechanism runs unless it
+    # is off for an ablation. An audit found 27 of 79 `enable_*` flags dark in the canonical preset, and only
+    # ~10 of them have a C_* knob here, so a campaign could not exercise the rest at all. C_ALLON=1 turns on
+    # every remaining built mechanism EXCEPT four with stated reasons; it is applied LAST so an explicit C_*
+    # knob above always wins. Default off => byte-identical to every prior campaign.
+    if os.environ.get("C_ALLON", "0") == "1":
+        _skip = {
+            "enable_infanticide",                    # documented UNIMPLEMENTED STUB (no logic reads it)
+            "enable_genealogy_log",                  # observer/logging, not a dynamic; costly
+            "enable_bud_hazard",                     # mutually-exclusive alternate to the legacy budding path
+            "enable_stratification_inequality_gate", # R-103: criterion known wrong, parked for supervisor call
+        }
+        # Flags a C_* knob above already decides. `model_fields_set` cannot be used for this: the preset
+        # itself is built with model_copy(), so 74 fields are already "set" and the guard would swallow
+        # nearly everything. This list is explicit and auditable instead -- an ablation (e.g. C_SOIL=0)
+        # must not be silently re-enabled by C_ALLON.
+        _knob_controlled = {
+            "enable_sedentism_fertility", "enable_aggl_ceiling", "enable_economic_defensibility",
+            "enable_ascribed_mate_choice", "enable_material_inheritance", "enable_noble_leveling_exemption",
+            "enable_lineage_tribute", "enable_adaptive_connubium", "enable_exogamy",
+            "enable_village_budding", "enable_improved_land", "enable_soil_depletion",
+            "enable_alluvial_renewal", "enable_emergent_abandonment", "enable_genome",
+            "enable_lineage_branching", "enable_lineage_split",
+        }
+        demog = demog.model_copy(update={
+            f: True for f in type(demog).model_fields
+            if f.startswith("enable_") and f not in _skip and f not in _knob_controlled
+            and not getattr(demog, f)})
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
