@@ -3700,6 +3700,81 @@ food supply that does not exist.
 (a false claim, not a calibration change). No source files changed. Fourth of my own hypotheses falsified by
 measurement today.
 
+**ADDENDUM 12 — "ALL MECHANISMS ON" SCORES MATERIALLY WORSE AGAINST THE MARKER MATRIX than the curated
+preset (run-length-matched, 5 worlds × 5 seeds); plus a direct confirmation of Addendum 10's density
+arithmetic, and no long-horizon runaway (2026-07-31).**
+
+**Why this run.** The supervisor rule is that every BUILT mechanism runs unless deliberately off for an
+ablation. An audit found **27 of 79 `enable_*` flags dark** in the canonical preset (`emergent_village_demog`
++ VILLAGE + ELITE), and `run_campaign.py` exposed a `C_*` knob for only ~10 of them, so a campaign could not
+exercise the rest at all. Added `C_ALLON` (enables every remaining built mechanism except four, each with a
+stated reason) and `L_TAGSUF` (a tag namespace, see the instrument note below), then ran the canonical
+`battery6_long` S4 envelope — the project's own harness, with its runtime anchor guard — at 5 worlds × 5 seeds
+× 2000 steps. `ascribed_frac` was correctly SKIPPED by the anchor guard as undocumented.
+
+**TWO INSTRUMENT FAULTS CAUGHT, ONE OF THEM MINE.**
+1. **My own tag bug.** `L_TAGSUF` was applied to arm CONSTRUCTION but not to the four places that
+   re-derive tags during SCORING (`battery6_long` lines 169/198/199/218). The battery therefore *ran* 25 new
+   all-on arms (5.3 h of compute, files written correctly) and then **scored the 25 pre-existing baseline
+   trajectories** — reporting numbers identical to those already in MARKER_MATRIX.md. Caught only because six
+   markers matching the recorded values to four decimal places (0.2515, 0.296) is not plausible. Fixed; the
+   all-on arms were rescored from disk at zero compute cost. **This is the same silent-no-op class as the
+   `bud_events` counter and the `battery1_liveness` patch window — the third such fault this arc.**
+2. **A run-length confound.** The historical baseline arms on disk ran **3000** steps; the all-on arms ran
+   **2000**. `sustained()` medians over the LAST 50%, so baseline covered steps 1500-3000 and all-on
+   1000-2000. `connubium_med`, `lineage_size_gini` and `lin_top_share` are structure-ACCUMULATION markers that
+   grow with time, so the shorter run scores lower for free. Corrected by TRUNCATING every baseline trajectory
+   to step ≤ 2000 and rescoring with identical `sustained()` semantics — no re-simulation. The uncorrected
+   comparison would have overstated the degradation (baseline connubium reads 15/25 at 3000 steps, 13/25 at
+   2000; lineage Gini 17/25 → 12/25).
+
+**PAIRED RESULT (both arms at an identical 2000-step horizon, 25 arms each):**
+
+| marker | band | baseline | ALL-ON | delta |
+|---|---|---|---|---|
+| `band_med` | [18–35] | 23/25 | **20/25** | −12% |
+| `settle_med` | [50–150] Bar-Yosef | 21/25 | 21/25 | 0 |
+| `settle_med` | [50–250] Alvard | 21/25 | 21/25 | 0 |
+| `connubium_med` | [79–332] | 13/25 | **3/25** | **−40%** |
+| `lineage_size_gini` | [0.51–0.68] | 12/25 | **3/25** | **−36%** |
+| `lin_top_share` | [0.08–0.30] | 1/25 | 2/25 | +4% |
+| T-7 hierarchy ordering | 3 proxies | 2 of 3 hold | **0 of 3** | — |
+
+**Turning on all built mechanisms makes the model fit the ethnographic record substantially WORSE on three of
+six markers, with two unchanged and one (the weakest, already 1/25) marginally better.** `band_med`'s observed
+range widens 15.5–32 → 8–37, i.e. band sizes become more variable in both directions, which points at the
+band-size/fission group (`enable_emergent_band_size`, `enable_malnutrition_fission`,
+`enable_resource_directed_fusion`) as candidate culprits — **not yet bisected; 23 flags cannot be attributed
+from one contrast.**
+
+**INTERPRETATION, stated carefully.** This does NOT show the dark mechanisms are wrong, and it does not settle
+whether they should be on. It shows that the canonical preset's curation is load-bearing for the current
+marker scores, and that "everything on" is a materially different model that has never been calibrated. The
+honest options are (a) keep the curated preset as canonical and treat all-on as a research configuration,
+(b) bisect the degradation, fix or re-calibrate the offending mechanisms, and then adopt all-on, or (c) accept
+worse marker fit in exchange for mechanistic completeness. **(b) is the only one that does not discard
+information; it is the recommended next step and is not yet done.**
+
+**DENSITY — ADDENDUM 10'S ARITHMETIC CONFIRMED.** The campaign harness runs a capacity sub-window, so these
+worlds have **1584 habitable cells** (not 9449). Final coastal/temperate population **7909 on 1584 cells =
+4.99 agents/cell ⇒ 0.0499 persons/km²**. Addendum 10 projected **0.053/km²** for full land occupancy from the
+per-cell equilibrium — measured 0.0499. **The density decomposition holds**: when agents occupy essentially
+all of the available land, density lands where the arithmetic said it would. It remains **~2× below Binford
+packing (0.091)** and 2–10× below the Tallavaara band, so a residual per-cell deficit survives the spatial
+one — the two deficits are separable and both real.
+
+**S6 LONG-HORIZON DRIFT — NO RUNAWAY.** Two 30k-step-budget arms reached 15,402 and 11,708 steps: population
+×1.73/×1.76 with **late-acceleration 0.833/0.745 (decelerating)**, settlements ×2.26/×2.20 (late-accel
+0.745/0.719), `mean_material` flat (×0.913/×0.992), `gini_cred` stable. R-105's late-onset runaway does not
+recur under all-on. **Fission rate 5.0e-4/settlement-yr against Bandy's 2–5e-3 — out of band (≈10× low)**,
+where MARKER_MATRIX previously recorded 5.6e-3 ✓; whether that is the all-on config or the shorter horizon is
+not established.
+
+**Origin:** `sic_games/outputs/mechanism_battery/battery6_long.py` (`L_TAGSUF` + the four scoring-tag fixes),
+`sic_games/outputs/substrate_run/run_campaign.py` (`C_ALLON`), both default-off/no-op; paired rescoring via
+`score_paired.py` (scratchpad). Results: `battery6_long_results.json` (all-on), baseline arms rescored from
+their existing trajectories.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

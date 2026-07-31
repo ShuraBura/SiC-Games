@@ -166,7 +166,7 @@ def stage_s4(R):
     vals = {}
     for (nm, terr, clim) in WORLDS:
         for sd in SEEDS:
-            d = traj(f"_b6_{nm}_s{sd}")
+            d = traj(f"_b6{TAGSUF}_{nm}_s{sd}")
             if not d:
                 continue
             for (b, _) in live:
@@ -195,8 +195,8 @@ def stage_s4(R):
 
     # T-7 ORDERING: structure must move hierarchy more than productivity does.
     def rng(names, key):
-        v = [sustained(traj(f"_b6_{n}_s{sd}")["traj"], key)
-             for n in names for sd in SEEDS if traj(f"_b6_{n}_s{sd}")]
+        v = [sustained(traj(f"_b6{TAGSUF}_{n}_s{sd}")["traj"], key)
+             for n in names for sd in SEEDS if traj(f"_b6{TAGSUF}_{n}_s{sd}")]
         v = [x for x in v if x is not None]
         return (max(v) - min(v)) if len(v) > 1 else None
     prod = ["flat_boreal", "flat_temperate", "flat_tropical"]        # productivity axis, structure held
@@ -215,7 +215,7 @@ def stage_s4(R):
     rates = []
     for (nm, _, _) in WORLDS:
         for sd in SEEDS:
-            d = traj(f"_b6_{nm}_s{sd}")
+            d = traj(f"_b6{TAGSUF}_{nm}_s{sd}")
             if not d:
                 continue
             last = d["traj"][-1]
