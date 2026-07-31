@@ -3648,6 +3648,58 @@ that let polygyny sit 15× off Marlowe unnoticed (MARKER_MATRIX's own note). **P
 own hypotheses falsified here (contest split, agglomeration-as-suppressor, and earlier the self-selection
 story), two of them with the sign inverted — recorded per the R-106 house rule.
 
+**ADDENDUM 11 — `settle_tier2_yield` IS dimensionally inert, but the settlement economy is CEILING-GOVERNED,
+so correcting it changes almost nothing — and R-63's Bar-Yosef village benchmark SURVIVES the correction
+(2026-07-31).**
+
+**The bug, confirmed.** At settlement cells (coastal/temperate, ALL-ON preset):
+`tier-2 = settle_tier2_yield · Σ_catchment S_pot = 40 × ~6.7 ≈ 2.7e2 kcal` against
+`tier-1 = tf.level(site) ≈ 5.3e6 kcal` — **0.012% of the cell's food.** To supply ~1× a village's own need
+(100 people × 75,000 kcal) against Σ S_pot ≈ 6.7 needs `settle_tier2_yield ≈ 1.1e6`; the "~7×" claimed in
+PARAMETERS.md needs ≈ 7.8e6. The shipped value is **40** — four to six orders of magnitude short.
+
+**PROVENANCE CONFLICT RESOLVED.** PARAMETERS.md §517 claimed 40 = "~7× a village's need ⇒ fisheries never
+food-stressed (R-53)". R-63 §836 separately measured `settle_tier2_yield ∈ {1,2,5}` as **byte-identical** and
+attributed that to `S_pot = max(aquatic, cultivability) ≈ 0` on the forest cells where villages formed. Both
+cannot hold here: on coastal/temperate settlement cells S_pot ≈ 0.75/cell, so the term is **not** gated to
+zero — on this biome the cause is purely SCALE. R-63's explanation was correct for its own (forest) regime;
+the PARAMETERS.md claim is false at this value and has been corrected in place.
+
+**THE PREDICTION I MADE WAS WRONG.** I expected a dimensionally-correct tier-2 to blow village size through
+the Bar-Yosef band, which would have meant R-63's headline ("village size lands EXACTLY at Bar-Yosef 50–150,
+median 88, 100% in band, with no fitting") passed only because the mechanism was dead. Swept instead:
+
+| `settle_tier2_yield` | tier2/tier1 | pop | %land | sites | village med | in 50–150 | in 50–250 |
+|---|---|---|---|---|---|---|---|
+| **40** (shipped) | 0.012% | 1657 | 2.69 | 17 | 63 | 52.9% | 64.7% |
+| 4e3 | 1.30% | 1659 | 2.68 | 28 | 104 | 75.0% | 96.4% |
+| 4e4 | 33.5% | 1498 | 2.68 | 8 | 94 | 62.5% | 87.5% |
+| 4e5 | 224% | 1608 | 2.78 | 6 | 108 | 50.0% | 66.7% |
+| 1.1e6 (~1× need) | 819% | 1557 | 2.55 | 15 | 75 | **80.0%** | 86.7% |
+| 7.8e6 (claimed 7×) | **4673%** | 1407 | 1.96 | 14 | 118 | 78.6% | **100%** |
+
+**Across a 200,000× change in the parameter, village median moves only 63 → 118 and population 1657 → 1407.**
+The in-band score *improves* (52.9% → ~78-80%). **R-63's benchmark is not an artefact of the dead mechanism —
+it survives the correction.**
+
+**WHY — the settlement economy is CEILING-GOVERNED, not tier-2-governed.** `phase1_model` line 1648 applies
+`S = min(S, self._settlement_carrying_capacity((cx, cy)))` — the R-63 catchment ceiling, which reads the
+DEPLETABLE harvest field over the catchment. However large the (static, un-depletable) tier-2 term becomes, the
+realized cell pool is clamped to what the catchment can actually yield. That is why `tier2/tier1` can reach
+4673% with almost no behavioural consequence, and why `settle_tier2_yield` reads as a **dead parameter over
+five-plus orders of magnitude**. It also means the ceiling — not the tier-2 term — is the load-bearing piece of
+the settlement economy, and the one that carries depletion into village food (Addendum 9 measured it binding in
+28.6% of settlement cells).
+
+**NOT ADOPTED.** Raising the value mildly improves the Bar-Yosef in-band score, but that is a single seed with
+only 14–17 villages, and MARKER_MATRIX binding rule 3 ("seeds must beat the variance") forbids adopting on it.
+Queued for the multi-seed battery. The DOCUMENTATION error is corrected regardless, since it was asserting a
+food supply that does not exist.
+
+**Origin:** diagnostic-only; `diag_tier2_scale.py` (scratchpad). `docs/PARAMETERS.md` §517 corrected in place
+(a false claim, not a calibration change). No source files changed. Fourth of my own hypotheses falsified by
+measurement today.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
