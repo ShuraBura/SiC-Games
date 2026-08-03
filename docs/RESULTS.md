@@ -3775,6 +3775,72 @@ not established.
 `score_paired.py` (scratchpad). Results: `battery6_long_results.json` (all-on), baseline arms rescored from
 their existing trajectories.
 
+**ADDENDUM 13 — THE ATTRACTION/PRODUCTION SPLIT IS BUILT AND THE HYPOTHESIS BEHIND IT IS FALSIFIED: the
+concentration comes from REAL superlinear production, not from perception. Agents are behaving correctly; the
+economics they read are what concentrate them (2026-07-31).**
+
+**What was built.** `aggl_attraction_weight` (default 1.0, bit-exact) scales the PERCEIVED co-location premium
+in `substrate.diffusion_select_target` alone, leaving realized harvest production untouched. Motivated by
+Addendum 10's entanglement finding: one term, `aggl_R·(n^β − n)`, both ATTRACTS movers and FEEDS them, so
+ablating it broke the concentration (max cell occupancy 159 → 10) while cutting population to ×0.20–0.45.
+The weight was supposed to let those be tuned separately. 7 unit tests, including a quantitative one that
+reads the premium back out of the scorer by bisecting the balancing move cost and confirms it equals
+`wt·R·(n^(β−1) − 1)` to 2%.
+
+**THE PREDICTION: a lowered weight should give aggl-OFF's DISPERSAL while keeping aggl-ON's POPULATION.
+FALSIFIED.** (ALL-ON preset, coastal/temperate, N=1500, 600 steps, `patch=None`.)
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² | intake<1× |
+|---|---|---|---|---|---|---|---|
+| attract 1.0 (shipped) | 1657 | 254 | 2.69 | 6.5 | 159 | 0.0018 | 7.0% |
+| attract 0.5 | 1463 | 223 | 2.36 | 6.6 | 205 | 0.0015 | 13.1% |
+| attract 0.25 | 1508 | 223 | 2.36 | 6.8 | 191 | 0.0016 | 9.5% |
+| attract 0.1 | 1413 | 227 | 2.40 | 6.2 | 86 | 0.0015 | 7.4% |
+| **attract 0.0** | 1379 | **199** | **2.11** | **6.9** | 128 | 0.0015 | 7.5% |
+| **agglomeration fully OFF** | **331** | 141 | 1.49 | **2.3** | **21** | 0.0004 | 7.9% |
+
+**Zeroing the perceived premium does essentially nothing to the concentration.** Mean occupancy is flat at
+**6.2–6.9 across every weight** — and 2.3 only when agglomeration is fully off. Occupied cells go DOWN
+(254 → 199), not up. `max_occ` is non-monotone (159/205/191/86/128), i.e. noise. Population falls modestly
+(×0.83), so the knob is not perfectly inert, but it is nowhere near the lever.
+
+**WHAT THIS MEANS — Addendum 4's decomposition was right and my reading of it was wrong.** Addendum 4 measured
+the perceived agglomeration premium at **+387,290** against a **−35,810** raw-food disadvantage, and I treated
+that as agents being *lured* into crowding against their interest. They are not. That premium is a FAITHFUL
+signal of a genuine production advantage: `S += aggl_R·(n^β − n)` puts real food on crowded cells, so
+per-capita yield really does rise with n. **The ideal-free distribution is working correctly — it sends agents
+where the returns actually are.** The perception was never the driver; the economics are. My fix targeted the
+messenger.
+
+**SO THE LEVER IS THE PRODUCTION FUNCTION, AND THE ANCHOR BEHIND IT IS ALREADY FLAGGED AS BORROWED.** With
+`aggl_beta = 1.15` (point mode) per-capita output rises with n **without bound**, which makes unlimited
+crowding economically optimal; concentration is then the correct answer to the economics, not a defect in the
+movement rule. MODEL_SPEC §4.8.21 already records the provenance caveat verbatim: β≈1.15 is **Bettencourt
+2013, measured on MODERN CITIES (socioeconomic output)** — "an explicit cross-domain borrowing... subsistence
+returns-to-co-location (weirs/terraces/defense/storage) may be sharper — **a *testable prediction*, not a
+fit**." This is that test, and it reads against the borrowing: unbounded urban superlinearity applied to
+forager subsistence produces a landscape 97% empty with everyone stacked on 2.7% of it.
+
+**Consistent with R-63**, which found villages land exactly at Bar-Yosef 50–150 with agglomeration OFF and
+become mega-villages with it ON. Same cause, seen from the settlement side.
+
+**THE REMAINING TENSION, stated honestly.** Agglomeration OFF gives good village size and correct dispersal
+(mean occupancy 2.3) but a population of 331 — far too small. Agglomeration ON gives a viable population and
+untenable concentration. Neither is right, and no setting of the new weight bridges them, because the weight
+does not touch the term that matters. **The next test is the SHAPE of the production function**: an unbounded
+`n^β` versus a SATURATING one (returns to co-location that rise then level off, which is what a real catchment
+does — you cannot keep gaining from crowding forever). The `catchment` mode (`L(n) = n^α/(n^α + half^α)`)
+already implements a saturating form and is retired as DEAD_ENDS DE-11, but it was retired for a different
+question and is worth re-testing against this one.
+
+**KEPT ANYWAY, at default 1.0.** The split is retained because it is correct, tested and bit-exact, and it
+now carries a measured answer — "perception is not the concentrator" — that the codebase previously only
+assumed. It is not adopted as a non-default value.
+
+**Origin:** `sic_games/src/sic_games/{demography,substrate,phase1_model}.py`,
+`sic_games/tests/test_aggl_attraction_split.py` (7 tests), commit 7506828; sweep
+`diag_aggl_split.py` (scratchpad). Seventh of my own hypotheses falsified in this arc.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
