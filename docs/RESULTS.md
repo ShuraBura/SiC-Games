@@ -4031,6 +4031,63 @@ negatively and does not need supervisor time.**
 run-length-truncated canonical baseline. Supersedes Addendum 14's adoption case; Addendum 14's measurements
 themselves stand.
 
+**ADDENDUM 17 — BISECTION, PROPERLY POWERED: `band_med`'s degradation IS attributable (band/fission group,
++14% band size in 6/6 pairs). The connubium and lineage-Gini degradations are NOT — their per-pair variance
+dwarfs any group effect. Plus a fifth instance of the silent-resume bug, this one mine (2026-07-31).**
+
+**INSTRUMENT FAULT FIRST (the fifth in this arc, third of them mine).** The first re-run of the bisection at
+2000 steps produced output **byte-identical** to the 1200-step pass. It had not run: `diag_bisect_allon.py`
+tagged arms `_bx_{group}_{world}_s{seed}` with **no horizon in the tag**, so its resume check
+(`traj(tag) is None`) matched the existing 1200-step trajectories and skipped all 30 arms, re-scoring stale
+files. Identical to `battery6_long`'s un-suffixed scoring tags (Addendum 12) and the missing `C_EXTRA_ON`
+knob. Fixed by putting the step count in the tag. **Every one of these five faults produced a clean,
+plausible, wrong answer; the only reason any was caught is that the results were suspiciously consistent.**
+(Arms then wall-clocked at **1800** steps against the 2000 requested — the analysis below is at 1800.)
+
+**SECOND METHOD FIX — pass fractions were the wrong statistic.** Scoring 6 arms as a pass fraction discards
+nearly all the information: baseline sits at 1/6 on both degraded markers, so a real drop has nowhere to
+appear (floor effect), and 6 Bernoulli trials cannot resolve a 40-point change. Re-analysed the SAME
+trajectories as **paired continuous deltas** — each group arm against the baseline arm of the same world and
+seed, so world/seed variation (R-65: up to 30×) cancels exactly. Sign test over the 6 pairs.
+
+| group | marker | median Δ | pairs down | rel. | reading |
+|---|---|---|---|---|---|
+| **G1 band/fission** | `band_med` | **+3.75** | **0/6** | **+14%** | **consistent, all pairs up** |
+| G1 band/fission | `pop` | +425 | 0/6 | +6% | consistent |
+| G1 band/fission | `lineage_size_gini` | −0.023 | 5/6 | −5% | small, consistent |
+| G2 social/resid | `pop` | +1008 | 1/6 | +14% | consistent |
+| G3 demography | `pop` | −1200 | 4/6 | −16% | real, some spread |
+| G3 demography | `lineage_size_gini` | −0.013 | 5/6 | −3% | small, consistent |
+| G4 environment | `settle_med` | −4.25 | 5/6 | −4% | small, consistent |
+| G4 environment | `band_med` | +1.50 | 0/6 | +6% | consistent |
+| *all four groups* | `connubium_med` | −15 … +10.5 | 1–3/6 | — | **NOISE** (per-pair −49 … +62) |
+
+**ATTRIBUTED: the `band_med` degradation.** `G1_band_fission` (`emergent_band_size`,
+`malnutrition_fission`, `resource_directed_fusion`, `band_risk`) raises band size **+14% in 6 of 6 pairs** —
+the most consistent effect in the whole table. Baseline bands run 23.5–31.5 against a [18–35] band, so a
+uniform +14% pushes the upper arms out the top. That is precisely Addendum 12's `band_med` 23/25 → 20/25, and
+it matches the observed range widening to 8..37 there. **`G4_environment` adds a smaller +6% in the same
+direction.** Which of G1's four flags carries it is not resolved (the group was not split further).
+
+**NOT ATTRIBUTED — and the reason is measurement, not absence.** `connubium_med` per-pair deltas swing from
+**−49 to +62** with no group showing a consistent direction; at that variance a 6-pair design cannot resolve
+anything, and no group comes close to explaining Addendum 12's 13/25 → 3/25. `lineage_size_gini` shows small
+consistent negatives for G1 (−5%) and G3 (−3%) which together are nowhere near its 12/25 → 3/25 collapse.
+**So the two large degradations are either INTERACTIVE across groups, or driven by the knob-controlled flags
+`C_ALLON` deliberately does not touch** (`enable_exogamy`, `enable_adaptive_connubium`,
+`enable_economic_defensibility`, `enable_village_budding`, `enable_soil_depletion`, `enable_genome`, the
+lineage branch/split rates — several of which bear directly on connubium reach and lineage structure).
+Resolving it needs either a full 5×5 envelope per group (5 × 25 = 125 arms) or a design that varies the
+knob-controlled set, and **is left OPEN rather than forced.**
+
+**INCIDENTAL, worth recording:** the population effects are the clearest signals here — G2 social/residence
+**+14%**, G1 band/fission **+6%**, G3 demography **−16%**. The demography group (which includes
+`enable_intake_fertility`, this arc's own addition) costs population, consistent with R-106's finding that the
+intake brake moves regulation from deaths to births and lowers the equilibrium.
+
+**Origin:** diagnostic-only; `diag_bisect_allon.py` (horizon-tagged) + `score_bisect_paired.py` (scratchpad,
+re-analysis of the same trajectories, no new simulation). 3 worlds × 2 seeds, 1800 steps. No source changed.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
