@@ -1313,6 +1313,9 @@ class TerrainWorld(mesa.Model):
         aggl_R = (self._aggl_point_base_field() if aggl_mode == "point" else self._aggl_R_field()) if aggl_on else None
         aggl_a = (self._demog.aggl_beta if aggl_mode == "point" else self._demog.aggl_alpha) if aggl_on else 1.15
         aggl_h = self._demog.aggl_half if aggl_on else 100.0
+        # R-106 Addendum 13: scales the PERCEIVED co-location premium only; realized production (the harvest-side
+        # `S += aggl_R·(n^β − n)`) is untouched, so attraction and subsistence are independently tunable. 1.0 ⇒ bit-exact.
+        aggl_at = getattr(self._demog, "aggl_attraction_weight", 1.0) if aggl_on else 1.0
         # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
         cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
         fcap = self._forage_cap_field() if cap_on else None
@@ -1478,7 +1481,8 @@ class TerrainWorld(mesa.Model):
                                              owner_exclusion=def_excl, owner_tether=def_teth,
                                              band_primary=band_primary,
                                              R_field=aggl_R, aggl_alpha=aggl_a, aggl_half=aggl_h,
-                                             aggl_mode=aggl_mode, forage_cap=fcap, move_cost_field=mcf,
+                                             aggl_mode=aggl_mode, aggl_attract=aggl_at,
+                                             forage_cap=fcap, move_cost_field=mcf,
                                              site_field=sfield, band_opt_field=band_opt,
                                              home_cells=hcells, foreign_status_mult=fmult,
                                              store_field=st_field, store_gain=st_gain, store_horizon=st_hor)

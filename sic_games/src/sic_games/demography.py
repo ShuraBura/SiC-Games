@@ -1034,6 +1034,15 @@ class DemographyConfig(BaseModel):
     # r = clamp(round(base·(npp_ref/max(local_npp, npp_floor))**exp), base, r_max). Default OFF / base=1 ⇒ bit-exact.
     # Calibration (ref/exp/max) PROVISIONAL — mechanism ships ablatable; locking the law for canonical runs needs
     # supervisor sign-off. (§4.8.19; R-39.)
+    # AGGLOMERATION ATTRACTION/PRODUCTION SPLIT (R-106 Addendum 13, 2026-07-31). The point-superlinear
+    # agglomeration term is applied TWICE from one parameter set: as a per-capita premium in the movement
+    # scorer (`substrate.diffusion_select_target`, it ATTRACTS) and as realized output in the harvest
+    # (`phase1_model`, `S += aggl_R·(n^β − n)`, it FEEDS). Addendum 10 measured the consequence: ablating
+    # agglomeration drops population to x0.20–0.45 because it supplies over half the economy, while max cell
+    # occupancy falls 159 → 10 — so the concentration defect could not be addressed without destroying
+    # subsistence. This weight scales the PERCEIVED premium alone, leaving realized production untouched, so
+    # the two functions become independently tunable. 1.0 ⇒ bit-exact (the shipped behaviour).
+    aggl_attraction_weight: float = Field(1.0, ge=0.0)
     enable_productivity_mobility: bool = False
     mobility_base_radius: int = Field(1, ge=1)               # stride at/above npp_ref
     mobility_max_radius: int = Field(6, ge=1)                # cap on stride (bounds cost + jump-over risk); PROVISIONAL

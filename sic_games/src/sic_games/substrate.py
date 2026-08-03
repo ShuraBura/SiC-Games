@@ -85,6 +85,7 @@ def diffusion_select_target(
     aggl_alpha: float = 1.15,
     aggl_half: float = 100.0,
     aggl_mode: str = "point",
+    aggl_attract: float = 1.0,
     forage_cap=None,
     move_cost_field=None,
     site_field=None,
@@ -203,15 +204,22 @@ def diffusion_select_target(
         #    super-linearly (O=A·n^β), so per-capita RISES with n (β>1) and REINFORCES packing. aggl_alpha carries β here.
         #  CATCHMENT (falsified): R·L(n)/n, L=n^α/(n^α+half^α) — a shared saturating pot ⇒ per-capita PEAKS then congests
         #    (areal-dispersive; DEAD_ENDS). Kept for comparison.
+        # `aggl_attract` scales the PERCEIVED premium ONLY (R-106 Addendum 13). The same agglomeration term
+        # does two jobs: here it ATTRACTS movers, and in the harvest (`phase1_model`) it CREATES food. R-106
+        # Addendum 10 measured that entanglement — ablating agglomeration cut population to x0.20-0.45 because
+        # it supplies over half the economy's output, while max cell occupancy fell 159 -> 10. So concentration
+        # could not be tuned without wrecking subsistence. This weight decouples them: at 0 an agent perceives
+        # no co-location premium (it distributes by food alone, IFD) yet still RECEIVES the realized production
+        # bonus. 1.0 ⇒ bit-exact with every prior run.
         if R_field is not None:
             n_grp = (n_cell if is_cur else n_cell + 1) + extra_occupants
             Rv = float(R_field[cy, cx])
             if Rv > 0.0 and n_grp > 0:
                 if aggl_mode == "point":
-                    ypc += Rv * (n_grp ** (aggl_alpha - 1.0) - 1.0)         # co-location PREMIUM: 0 at n=1, rises with n
+                    ypc += aggl_attract * Rv * (n_grp ** (aggl_alpha - 1.0) - 1.0)   # co-location PREMIUM: 0 at n=1
                 else:
                     na = n_grp ** aggl_alpha
-                    ypc += Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
+                    ypc += aggl_attract * Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
         # Stage 1c CATCHMENT SITE-APPRAISAL: a static central-place suitability bonus (occupancy-INDEPENDENT) — the
         # anticipated value of the SITE (rich, cheap-to-work catchment). A global gradient agents climb toward prime
         # real-estate (assembly) + tightens onto catchment cores. site_field=None ⇒ off, bit-exact.
