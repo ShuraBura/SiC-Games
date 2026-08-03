@@ -474,6 +474,24 @@ def main():
             raise SystemExit(f"C_EXTRA_ON: unknown config field(s) {_bad}")
         demog = demog.model_copy(update={f: True for f in _extra})
         print(f"campaign: C_EXTRA_ON enabled {len(_extra)} flag(s): {','.join(_extra)}", flush=True)
+    # AGGLOMERATION SHAPE knobs (R-106 Addendum 14). The production form is the measured driver of the spatial
+    # concentration, so it must be sweepable from a campaign to confirm a single-seed result on the full
+    # worlds x seeds envelope (MARKER_MATRIX binding rule 3). Unset => untouched/bit-exact.
+    #   C_AGGLMODE  "point" (Bettencourt, per-capita rises without bound) | "catchment" (congestible common-
+    #               pool, per-capita peaks then falls ~1/n; DEAD_ENDS DE-11, kept for comparison)
+    #   C_AGGLHALF  the catchment saturation scale; C_AGGLBETA the point-mode exponent.
+    _agmode = os.environ.get("C_AGGLMODE", "")
+    if _agmode:
+        if _agmode not in ("point", "catchment"):
+            raise SystemExit(f"C_AGGLMODE: expected 'point' or 'catchment', got {_agmode!r}")
+        demog = demog.model_copy(update=dict(aggl_mode=_agmode))
+    if os.environ.get("C_AGGLHALF"):
+        demog = demog.model_copy(update=dict(aggl_half=float(os.environ["C_AGGLHALF"])))
+    if os.environ.get("C_AGGLBETA"):
+        demog = demog.model_copy(update=dict(aggl_beta=float(os.environ["C_AGGLBETA"])))
+    if _agmode or os.environ.get("C_AGGLHALF") or os.environ.get("C_AGGLBETA"):
+        print(f"campaign: agglomeration shape mode={demog.aggl_mode} beta={demog.aggl_beta} "
+              f"half={demog.aggl_half}", flush=True)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
