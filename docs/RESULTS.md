@@ -3906,6 +3906,72 @@ revive a DEAD_ENDS entry — which needs the supervisor, since it reverses a doc
 exists and is kept "for comparison only" per DE-11). Reads against DEAD_ENDS DE-11's retirement and against
 MODEL_SPEC §4.8.21's own flagged caveat.
 
+**ADDENDUM 15 — THE MOBILITY THREAD CLOSES: nothing is miscalibrated. The world set matches the forager
+anchor (+18%), and the missing gradient is a DISCRETIZATION limit — the model cannot represent a move shorter
+than 10 km or more often than monthly. Plus: the group bisection was UNDERPOWERED and its null is not
+evidence (2026-07-31).**
+
+**PART 1 — the mobility question, answered under the anchor-wins directive.** The supervisor rule is that when
+a lit anchor blocks a benchmark the anchor stands and something else must be broken. Addendum 9 found
+`mobility_npp_ref = 900` sits BELOW the landscape mean (1004), so 99.1% of agents get `r=1` and the
+Kelly/Binford productivity gradient never reaches behaviour. Two candidate culprits: the anchor, or the worlds.
+**Measured: it is neither.**
+
+| world | mean NPP | median NPP | p10 | p90 | r at median |
+|---|---|---|---|---|---|
+| coastal/temperate | 1004 | 1054 | 694 | 1280 | 1 |
+| flat/boreal | 795 | 859 | 497 | 987 | 1 |
+| flat/tropical | 2291 | 2410 | 1806 | 2508 | 1 |
+| flat/temperate | 1083 | 1109 | 720 | 1406 | 1 |
+| hilly/temperate | 1002 | 1067 | 688 | 1232 | 1 |
+| mountainous/boreal | 458 | 440 | 316 | 624 | **2** |
+
+Median NPP across the six worlds is **1061 against the 900 anchor — +18%**. That is not a systematic bias;
+foragers occupy habitats spanning roughly 150–2500 g/m²/yr and this world set sits comfortably inside it.
+**World generation is not the defect, and `npp_ref=900` (the Tallavaara forager median) does not need moving.**
+
+**THE ACTUAL CONSTRAINT IS THE GRID.** `mobility_radius` returns an INTEGER stride with a floor of 1, and one
+cell is **10 km**. So the shortest move the model can represent is 10 km — while Binford/Kelly's *mean*
+residential move is **~4–16 km** (158 km/yr spread over 10–40 moves). In rich habitat Kelly's ∝1/productivity
+law calls for moves SHORTER than one cell, which is unrepresentable; the stride can only floor at 1. The
+gradient therefore survives only at the poor end (mountainous/boreal, r=2) and is mathematically erased
+everywhere above ~600 g/m²/yr. **`r=1` in a rich biome is not a calibration failure — it is the model
+correctly saturating at its own spatial resolution, at a value (10 km) that is already a realistic
+residential move.**
+
+**COMBINED WITH THE TEMPORAL LIMIT (Addendum 7), THE ENVELOPE IS BOUNDED.** Movement resolves once per monthly
+step ⇒ ≤12 moves/yr; each move is ≥10 km ⇒ the representable maximum is **12 × 10 = 120 km/yr**, against
+Binford **158** and Kelly **174**. **The discretization caps achievable annual travel just BELOW the
+ethnographic anchor, and only if every agent moves every step.** Measured mobile-agent travel is 86–115 km/yr
+(Addenda 7/8), i.e. **72–96% of the model's own representable ceiling.** The model is close to the most it can
+express. Closing the remaining gap is an architectural question (sub-cell movement, a finer grid, or a
+sub-monthly step), not a parameter one. This retires the "calibrate `mobility_npp_ref`" task: there is nothing
+to calibrate.
+
+**PART 2 — THE GROUP BISECTION IS INCONCLUSIVE, AND ITS NULL MUST NOT BE READ AS A RESULT.** Addendum 12's
+degradation (connubium 13/25→3/25, lineage Gini 12/25→3/25) was bisected by adding flag groups one at a time
+on top of the canonical baseline (3 worlds × 2 seeds × 1200 steps):
+
+| arm | band_med | connubium_med | lineage_size_gini | settle_med |
+|---|---|---|---|---|
+| baseline | 6/6 | **1/6** | **0/6** | 6/6 |
+| G1 band/fission | 6/6 | 0/6 | 0/6 | 6/6 |
+| G2 social/residence | 6/6 | 2/6 | 0/6 | 6/6 |
+| G3 demography | 6/6 | 0/6 | 0/6 | 6/6 |
+| G4 environment | 6/6 | 1/6 | 0/6 | 6/6 |
+
+No group reproduces the degradation — **but the test had no power to detect one.** The two markers that
+degraded are ALREADY FLOORED AT BASELINE at this horizon (connubium 1/6, lineage Gini 0/6), because both are
+structure-ACCUMULATION markers and 1200 steps is too short for them to reach their bands at all; at 2000 steps
+the same baseline reaches 13/25 and 12/25, which is where the headroom to detect a drop exists. `band_med` is
+6/6 in every arm, so it carries no signal either. **I chose 1200 steps for speed and destroyed the very
+contrast the test was built to measure.** Reporting "no group is responsible" would be a false negative
+manufactured by the instrument — the same class of error as the un-suffixed scoring tags and the missing
+`C_EXTRA_ON` knob. **The bisection must be re-run at ≥2000 steps; until then the attribution is OPEN.**
+
+**Origin:** diagnostic-only; a direct world-NPP/stride computation and `diag_bisect_allon.py` (scratchpad).
+No source changed. Retires the mobility-calibration task; leaves the Addendum 12 attribution open.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
