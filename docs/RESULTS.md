@@ -3972,6 +3972,65 @@ manufactured by the instrument — the same class of error as the un-suffixed sc
 **Origin:** diagnostic-only; a direct world-NPP/stride computation and `diag_bisect_allon.py` (scratchpad).
 No source changed. Retires the mobility-calibration task; leaves the Addendum 12 attribution open.
 
+**ADDENDUM 16 — ADDENDUM 14'S POSITIVE DOES NOT SURVIVE THE FULL ENVELOPE. The congestible form buys
+dispersal by destroying villages: `settle_med` 21/25 → 12/25. The tradeoff was not broken, it was RELOCATED —
+and that identifies superlinear co-location as what MAKES villages (2026-07-31).**
+
+**The confirmation required by binding rule 3.** Addendum 14 reported a single-seed positive: the congestible
+`catchment` production form kept 95% of the population while cutting mean cell occupancy 40% and expanding
+land use 57%. It flagged the risk that village median had fallen 63 → 49, just under the Bar-Yosef floor.
+The full 5 worlds × 5 seeds × 2000 steps envelope was run to settle it (`C_AGGLMODE=catchment`,
+`C_AGGLHALF=25`, tags `_b6_catch_*`). **The flagged risk is what happened.** All three columns at a matched
+2000-step horizon:
+
+| marker | band | baseline | ALL-ON (point β=1.15) | ALL-ON (catchment half=25) |
+|---|---|---|---|---|
+| `band_med` | [18–35] | 23/25 | 20/25 | **22/25** |
+| `settle_med` | [50–150] Bar-Yosef | 21/25 | 21/25 | **12/25** |
+| `settle_med` | [50–250] Alvard | 21/25 | 21/25 | **12/25** |
+| `connubium_med` | [79–332] | 13/25 | 3/25 | **1/25** |
+| `lineage_size_gini` | [0.51–0.68] | 12/25 | 3/25 | 3/25 |
+| `lin_top_share` | [0.08–0.30] | 1/25 | 2/25 | 2/25 |
+| T-7 ordering | 3 proxies | 2 of 3 | 0 of 3 | 1 of 3 |
+
+**Village formation collapses.** `settle_med` falls **21/25 → 12/25** on both the Bar-Yosef and Alvard bands,
+with observed values **0..83** — villages never exceed 83 anywhere, and in several arms fail to form at all
+(the 0s). Band size improves marginally (20→22/25) but its observed range widens to 3..38. Connubium degrades
+further (3/25 → 1/25). Only T-7 recovers slightly (0 → 1 of 3 proxies).
+
+**SO THE TRADEOFF WAS NOT BROKEN — IT MOVED.** Addendum 14 measured the congestible form paying no price in
+POPULATION and concluded the population/concentration tension was resolved. It was not: the price is paid in
+VILLAGE SIZE instead. Dispersal works so well that nucleation stops happening. **Addendum 14's headline is
+hereby superseded: it was a real effect measured on too narrow a slice, and the marker it broke was not among
+the four that sweep scored.** The single-seed sweep tracked village median but not the pass fraction across
+worlds, which is precisely what binding rule 3 exists to catch.
+
+**WHAT THIS BUYS US ANYWAY — a mechanistic identification.** Point-mode superlinearity (per-capita output
+rising without bound with n) is what MAKES villages in this model. Replace it with a congestible common-pool
+(per-capita peaking then falling ∝1/n) and villages stop reaching Bar-Yosef size. So the same term is doing a
+THIRD job on top of the two Addendum 10 identified: it attracts movers, it feeds the economy, **and it is the
+engine of village nucleation.** That is why every attempt to soften it costs something elsewhere — population
+(Addendum 13), or villages (here). **The concentration is not a bug bolted onto village formation; it is the
+same mechanism seen from the other side.**
+
+**IMPLICATION FOR THE DENSITY PROGRAMME.** There is now no known setting of the agglomeration production
+function that gives dispersed settlement AND viable population AND Bar-Yosef villages simultaneously. Either
+the three are genuinely in tension under any single co-location term — in which case villages and dispersal
+need SEPARATE mechanisms (nucleation from something other than unbounded returns, e.g. defensibility, storage
+tethering or site appraisal, with co-location returns left congestible) — or the resolution lies outside this
+term entirely. Addendum 10's arithmetic still stands and is untouched by this: density = per-cell occupancy ×
+fraction of land occupied, and the shortfall is dominated by the 2.7% land-use term.
+
+**NOTHING ADOPTED. `aggl_mode` stays `"point"`**, and DEAD_ENDS **DE-11** stands — its retirement of the
+catchment form is now supported by a second, independent line of evidence (village collapse), on top of the
+"areal-dispersive" reason it originally gave. The revival question raised in Addendum 14 is **answered
+negatively and does not need supervisor time.**
+
+**Origin:** `battery6_long` 5×5 envelope, tags `_b6_catch_*`, via the `C_AGGLMODE`/`C_AGGLHALF` knobs
+(d359054). Compared at a matched 2000-step horizon against the ALL-ON point-mode arms (Addendum 12) and the
+run-length-truncated canonical baseline. Supersedes Addendum 14's adoption case; Addendum 14's measurements
+themselves stand.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
