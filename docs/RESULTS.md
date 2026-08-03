@@ -3841,6 +3841,71 @@ assumed. It is not adopted as a non-default value.
 `sic_games/tests/test_aggl_attraction_split.py` (7 tests), commit 7506828; sweep
 `diag_aggl_split.py` (scratchpad). Seventh of my own hypotheses falsified in this arc.
 
+**ADDENDUM 14 — A POSITIVE RESULT: a CONGESTIBLE production form breaks the population/concentration
+tradeoff (pop ×0.95, land use +57%, mean occupancy −40%). It does NOT fix the density gap, and the mechanism
+that does it is one this project already retired — for exactly the property we now want (2026-07-31).**
+
+**Setup.** Addendum 13 established the concentration is produced by REAL superlinear output
+(`S += aggl_R·(n^β − n)`, β=1.15, per-capita rising without bound), not by perception. This sweeps the
+production SHAPE at the bit-exact default attraction weight: point mode β ∈ {1.15, 1.10, 1.05, 1.00} and the
+`catchment` form `L(n) = n^α/(n^α + half^α)` over `aggl_half` ∈ {25, 50, 100, 200}, plus an agglomeration-OFF
+reference. Coastal/temperate, ALL-ON, N=1500, 600 steps, `patch=None`.
+
+**INSTRUMENT CHECK PASSED:** `point β=1.00` reproduced the agglomeration-OFF arm **exactly** (331 / 141 cells /
+occ 2.3 / max 21 / 0.0004), as the algebra requires since both `n^(β−1) − 1` and `n^β − n` vanish at β=1.
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² | village med |
+|---|---|---|---|---|---|---|---|
+| point β=1.15 (shipped) | 1657 | 254 | 2.69 | 6.5 | 159 | 0.0018 | 63 |
+| point β=1.10 | 1044 | 167 | 1.77 | 6.3 | 179 | 0.0011 | 110 |
+| point β=1.05 | 795 | 226 | 2.39 | 3.5 | 167 | 0.0008 | 134 |
+| point β=1.00 | 331 | 141 | 1.49 | 2.3 | 21 | 0.0004 | — |
+| **catchment half=25** | **1569** | **398** | **4.21** | **3.9** | **89** | 0.0017 | **49** |
+| catchment half=50 | 938 | 298 | 3.15 | 3.1 | 49 | 0.0010 | 50 |
+| catchment half=100 | 626 | 200 | 2.12 | 3.1 | 51 | 0.0007 | 51 |
+| catchment half=200 | 540 | 200 | 2.12 | 2.7 | 44 | 0.0006 | 51 |
+| agglomeration OFF | 331 | 141 | 1.49 | 2.3 | 21 | 0.0004 | — |
+
+**THE POSITIVE.** `catchment half=25` keeps **95% of the shipped population** (1569 vs 1657) while cutting
+mean cell occupancy **6.5 → 3.9 (−40%)**, max occupancy **159 → 89 (−44%)**, and expanding land use
+**2.69% → 4.21% (+57%)**. Lowering β in point mode cannot do this — β=1.10/1.05 shed 37%/52% of the population
+for little dispersal, and β=1.00 is just agglomeration off. **This is the first arm in the arc that improves
+the spatial pathology without paying for it in population.**
+
+**WHAT IT DOES NOT DO — stated plainly. It does not fix the density gap.** Realized density is
+**0.0017 vs the shipped 0.0018** — unchanged, still ~55× below the Tallavaara low anchor. Density is
+population ÷ total land, and population is essentially the same; dispersal redistributes the same people over
+more cells. Worse for the projection: since `proj = mean_occ/100`, the full-occupancy projection FALLS
+(0.0652 → 0.0394), because dispersal trades per-cell density for coverage. **The population ceiling and the
+concentration are separable problems, and this addresses only the second.** Village median 49 also sits just
+under Bar-Yosef's 50 floor (from 63), and under-maintenance intake rises 7.0% → 10.8%.
+
+**THE MECHANISM IS RETIRED, AND DE-11 CALLED THIS EXACTLY RIGHT.** `aggl_mode="catchment"` is DEAD_ENDS
+**DE-11** (2026-07-06). Its stated reason is not that the mechanism misbehaves — it is that `L(n)` saturates
+so per-capita `R·L(n)/n` **peaks then falls ∝1/n**, making the term "**areal-dispersive**", with the measured
+signature that cranking it "**monotonically reduces packing (26→21→15%)**". **This sweep reproduces that
+direction precisely** (mean occupancy 3.9 → 3.1 → 3.1 → 2.7 as `half` rises 25 → 200). DE-11 retired it for
+failing to produce nucleation, because nucleation was the goal in July. **We now measure over-nucleation as
+the defect. The mechanism has not changed; the objective inverted.**
+
+**BUT DO NOT CALL IT "SATURATING AGGLOMERATION" — DE-11 is right that it is a different economic object.**
+Bettencourt's form has per-capita rising without bound (an agglomeration economy); the catchment form has
+per-capita peaking then declining (a **congestible common-pool**). So the real modelling question this
+exposes is: *which is correct for FORAGER subsistence?* MODEL_SPEC §4.8.21 already flags β≈1.15 as measured on
+**modern cities** and labels the transfer "a *testable prediction*, not a fit". A weir, a drive hunt, a shellfish
+bed or a catchment is congestible — past some crew size more bodies add nothing and then subtract. Unbounded
+increasing returns may well be right for later urbanism and wrong here. **That is a substantive claim about
+the model's economics, and it is now supported by a measurement rather than asserted.**
+
+**NOT ADOPTED.** One seed, one world. MARKER_MATRIX binding rule 3 ("seeds must beat the variance", with R-65's
+30× seed variance on record) forbids adopting on this. Required before any adoption: the full 5×5 envelope on
+`battery6_long`, a check that village size stays inside Bar-Yosef, and an explicit decision on whether to
+revive a DEAD_ENDS entry — which needs the supervisor, since it reverses a documented retirement.
+
+**Origin:** diagnostic-only; `diag_aggl_shape.py` (scratchpad). No source changed (the catchment path already
+exists and is kept "for comparison only" per DE-11). Reads against DEAD_ENDS DE-11's retirement and against
+MODEL_SPEC §4.8.21's own flagged caveat.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
