@@ -3744,8 +3744,22 @@ class TerrainWorld(mesa.Model):
             if len(sites) >= 40:
                 break
         rad = cfg.settle_radius
+        # PERF (R-106 Addendum 18): cell → occupancy ONCE, then sum each candidate's neighbourhood, instead of
+        # a torus-distance scan of EVERY agent for EVERY candidate site. The old form was O(agents · sites) —
+        # up to 40 sites × ~9k agents = 360k distance calls per invocation. Profiled at pop 9k it cost ~5% of
+        # step time (`_torus_cheby` 730k calls over 15 steps; the genexpr 0.68 s self), and both dropped out of
+        # the top-28 after this change. It is worth fixing because it grows with population, NOT because it
+        # dominated — the step is led by `_step_rivalrous` and `diffusion_select_target`.
+        # `_maintain_settlements` already carries this exact optimisation with the same comment; this
+        # site-founding path was simply missed.
+        # BIT-EXACT: a Chebyshev ball of radius `rad` on the torus is precisely the (2·rad+1)² wrapped cells,
+        # so the count is identical — only the way of computing it changes.
+        occ_cnt: dict = {}
+        for a in self.agent_list:
+            occ_cnt[a.pos] = occ_cnt.get(a.pos, 0) + 1
         for (sx, sy) in sites:
-            near = sum(1 for a in self.agent_list if self._torus_cheby(a.pos[0], a.pos[1], sx, sy) <= rad)
+            near = sum(occ_cnt.get(((sx + dx) % N, (sy + dy) % N), 0)
+                       for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
             if near >= cfg.settle_min_pool:
                 self._settlement_sites[(sx, sy)] = cfg.settle_release_steps
 
