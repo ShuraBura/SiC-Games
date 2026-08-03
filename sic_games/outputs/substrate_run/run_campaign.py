@@ -462,6 +462,18 @@ def main():
             f: True for f in type(demog).model_fields
             if f.startswith("enable_") and f not in _skip and f not in _knob_controlled
             and not getattr(demog, f)})
+    # C_EXTRA_ON: comma-separated `enable_*` names to turn on, for ATTRIBUTING an all-on effect to a subset.
+    # Addendum 12 measured all-on scoring worse on 3 of 6 markers, and 23 flags cannot be attributed from one
+    # contrast; this enables group bisection (one group added on top of the baseline at a time). UNKNOWN NAMES
+    # RAISE rather than being ignored -- a typo here would silently run the baseline and read as a clean null,
+    # which is the exact failure mode this arc has already hit three times. Default unset => no-op.
+    _extra = [s.strip() for s in os.environ.get("C_EXTRA_ON", "").split(",") if s.strip()]
+    if _extra:
+        _bad = [f for f in _extra if f not in type(demog).model_fields]
+        if _bad:
+            raise SystemExit(f"C_EXTRA_ON: unknown config field(s) {_bad}")
+        demog = demog.model_copy(update={f: True for f in _extra})
+        print(f"campaign: C_EXTRA_ON enabled {len(_extra)} flag(s): {','.join(_extra)}", flush=True)
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
