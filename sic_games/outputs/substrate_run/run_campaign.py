@@ -474,6 +474,18 @@ def main():
             raise SystemExit(f"C_EXTRA_ON: unknown config field(s) {_bad}")
         demog = demog.model_copy(update={f: True for f in _extra})
         print(f"campaign: C_EXTRA_ON enabled {len(_extra)} flag(s): {','.join(_extra)}", flush=True)
+    # C_EXTRA_OFF: the mirror of C_EXTRA_ON, applied AFTER it — turn named `enable_*` flags OFF. This is what
+    # a mechanism AUDIT needs: ablate one flag OUT of the full stack and see whether the world changes, which
+    # is the only way to tell a LIVE mechanism from an INERT one in the context it actually runs in. Unknown
+    # names RAISE for the same reason as C_EXTRA_ON: a typo would silently leave the full stack intact and
+    # every mechanism would score INERT — a clean, wrong, and very convincinganswer.
+    _off = [s.strip() for s in os.environ.get("C_EXTRA_OFF", "").split(",") if s.strip()]
+    if _off:
+        _bad = [f for f in _off if f not in type(demog).model_fields]
+        if _bad:
+            raise SystemExit(f"C_EXTRA_OFF: unknown config field(s) {_bad}")
+        demog = demog.model_copy(update={f: False for f in _off})
+        print(f"campaign: C_EXTRA_OFF disabled {len(_off)} flag(s): {','.join(_off)}", flush=True)
     # AGGLOMERATION SHAPE knobs (R-106 Addendum 14). The production form is the measured driver of the spatial
     # concentration, so it must be sweepable from a campaign to confirm a single-seed result on the full
     # worlds x seeds envelope (MARKER_MATRIX binding rule 3). Unset => untouched/bit-exact.
