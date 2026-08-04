@@ -486,6 +486,30 @@ def main():
             raise SystemExit(f"C_EXTRA_OFF: unknown config field(s) {_bad}")
         demog = demog.model_copy(update={f: False for f in _off})
         print(f"campaign: C_EXTRA_OFF disabled {len(_off)} flag(s): {','.join(_off)}", flush=True)
+    # C_PARAM: "field=value,field=value" for NUMERIC calibration, the counterpart of C_EXTRA_ON/OFF for the
+    # 231 non-flag parameters. Needed because re-fitting a calibrated constant (e.g. `cv_safe`, documented as
+    # "the ONE fitted scale") against its own anchor is ordinary work, and adding a bespoke C_* knob per
+    # parameter is how the configuration became unreadable in the first place. Unknown fields RAISE, values
+    # are parsed to the field's declared type, and the whole set is ECHOED so a swept run cannot be mistaken
+    # for a default one. Unset => no-op.
+    _pv = [s.strip() for s in os.environ.get("C_PARAM", "").split(",") if s.strip()]
+    if _pv:
+        _upd = {}
+        for item in _pv:
+            if "=" not in item:
+                raise SystemExit(f"C_PARAM: expected field=value, got {item!r}")
+            k, v = item.split("=", 1)
+            k = k.strip()
+            if k not in type(demog).model_fields:
+                raise SystemExit(f"C_PARAM: unknown config field {k!r}")
+            ann = type(demog).model_fields[k].annotation
+            try:
+                _upd[k] = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(
+                    ann, str)(v.strip())
+            except Exception as _e:
+                raise SystemExit(f"C_PARAM: cannot parse {v!r} for {k} ({ann}): {_e}")
+        demog = demog.model_copy(update=_upd)
+        print("campaign: C_PARAM " + ", ".join(f"{k}={v}" for k, v in _upd.items()), flush=True)
     # AGGLOMERATION SHAPE knobs (R-106 Addendum 14). The production form is the measured driver of the spatial
     # concentration, so it must be sweepable from a campaign to confirm a single-seed result on the full
     # worlds x seeds envelope (MARKER_MATRIX binding rule 3). Unset => untouched/bit-exact.
