@@ -106,15 +106,42 @@ def anchor_live(probe, text):
                    f"retired; not scored until the band is re-derived")
 
 
+def _head_sha():
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True).stdout.strip()
+    except Exception:
+        return ""
+
+
+_HEAD = _head_sha()
+
+
 def traj(tag):
+    """An arm counts as complete only if it was produced by THE CURRENT BUILD.
+
+    PORTED FROM `run_matrix.py` (R-106 Addendum 19). Existence is not enough, and this battery learned it the
+    expensive way: its `_b6_*` baseline trajectories were written 2026-07-29 and were still being used as the
+    control for arms run on 2026-07-31, with a demography overhaul and a wealth fix committed in between. Two
+    conclusions were drawn from that comparison — "ALL-ON scores worse on 3 of 6 markers" and a claimed move on
+    MARKER_MATRIX #14 — and both were measuring CODE DRIFT rather than the flags under test. `run_matrix` had
+    already solved this ("Existence is not enough"); this harness simply never adopted it.
+
+    The campaign records its build in `meta.sha`, so compare against HEAD and treat anything stale as absent,
+    which forces a re-run instead of a silent cross-build comparison."""
     p = os.path.join(CAMP, f"campaign_trajectory{tag}.json")
     if not os.path.exists(p):
         return None
     try:
         d = json.load(open(p, encoding="utf-8"))
-        return d if d.get("traj") else None
     except Exception:
         return None
+    if not d.get("traj"):
+        return None
+    sha = (d.get("meta") or {}).get("sha", "")
+    if _HEAD and sha and not sha.startswith(_HEAD) and not _HEAD.startswith(sha):
+        return None                      # produced by a different build ⇒ not reusable
+    return d
 
 
 def sustained(t, key, frac=0.5):
