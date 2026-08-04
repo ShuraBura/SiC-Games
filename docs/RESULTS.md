@@ -4206,6 +4206,70 @@ compared before any cross-run claim.
 (scratchpad), provenance by file mtime and `git log --since`. No source changed. Retracts one claim made
 earlier this session and qualifies Addendum 12.
 
+**ADDENDUM 20 — BATTERY 7 (controlled): the full stack's ONLY large effect is band size +22%, and at long
+horizon that pushes `band_med` OUT of its ethnographic band. connubium, lineage-Gini and top-share fail in
+the CONTROL TOO, so they were never flag-caused. 7 mechanisms are genuinely inert (2026-08-04).**
+
+**The instrument.** `battery7_controlled.py`, built after Addendum 19's retraction, enforces: same build (arms
+carry `meta.sha`, a stage refuses to score if they disagree), same session (the control is produced here, never
+read from a previous run), paired by (world, seed), matched horizon, and fail-loud on unknown flags. Run with
+`C_SOIL=1 C_ABANDON=1` so the soil stack — the only slow variable, and absent from every previous battery
+because `C_SOIL` defaults to 0 — is exercised for the first time.
+
+**S1 — CONTROL vs FULL STACK (3 worlds × 2 seeds, 1200 steps, paired):**
+
+| marker | control | full stack | delta | pairs up |
+|---|---|---|---|---|
+| **`band_med`** | 31.5 | **38.5** | **+22%** | **6/6** |
+| `settle_med` | 58.5 | 53 | −9% | 3/6 |
+| `connubium_med` | 66.25 | 52.75 | **−20%** | 1/6 (i.e. 5/6 DOWN) |
+| `lineage_size_gini` | 0.4165 | 0.4035 | −3% | 3/6 |
+| `lin_top_share` | 0.0105 | 0.010 | −5% | 1/6 |
+
+**S3 — LONG (2500 steps requested; arms wall-clocked, common horizon 1625):**
+
+| marker | band | CONTROL | FULL STACK |
+|---|---|---|---|
+| `band_med` | [18–35] | **2/2** (31..33) | **0/2 (37..38)** |
+| `settle_med` | [50–150] | 2/2 (64..86) | 2/2 (80..95) |
+| `connubium_med` | [79–332] | **0/2** (43..68) | 0/2 (70..77) |
+| `lineage_size_gini` | [0.51–0.68] | **0/2** (0.385..0.42) | 0/2 (0.384..0.407) |
+| `lin_top_share` | [0.08–0.30] | **0/2** (0.013..0.018) | 0/2 (0.011..0.016) |
+
+**1. THE FLAGS BREAK EXACTLY ONE MARKER, AND IT IS `band_med`.** +22% in every pair at 1200 steps, and at the
+long horizon that carries band size to **37–38 against Johnson's [18–35]** — inside the band under the control,
+outside it under the full stack. This is the third independent measurement of the same effect (Addendum 17's
+band/fission group at +14%, 6/6 pairs; battery7's first S1 at +23%, 6/6), now with a clean control and a
+consequence: it is not a curiosity, it is a benchmark failure the mechanisms cause.
+
+**2. connubium, lineage-Gini and top-share FAIL IN THE CONTROL.** All three score 0/2 with the canonical preset
+alone. **They are baseline failures of the model, not costs of enabling mechanisms.** This finally closes the
+question Addendum 12 opened and Addendum 19 qualified: Addendum 12 attributed a collapse in those markers to
+the dark flags; the flags are not responsible, and never were. (The full stack even *improves* connubium's
+range at long horizon, 43–68 → 70–77, moving toward the 79 floor without reaching it.)
+
+**3. SEVEN MECHANISMS ARE GENUINELY INERT** — on, in the stack, and removing them changes nothing:
+`enable_band_risk`, `enable_bonded_mating`, `enable_energetic_fertility`, `enable_malnutrition_fission`,
+`enable_relative_resentment`, `enable_resentment_accumulator`, `enable_terrain_pathogen`. `energetic_fertility`
+is expected and confirmatory — R-106 established it is inert by construction, superseded by
+`enable_intake_fertility`. The other six are open defects. Four more (`adaptive_connubium`,
+`ascribed_mate_choice`, `exogamy`, `improved_land`) were correctly reported NOT IN STACK rather than inert,
+after the first S2 run scored 7 such verdicts invalid by ablating already-off flags.
+
+**4. THE SOIL STACK IS LIVE.** With `C_SOIL=1`, both `enable_soil_depletion` and `enable_alluvial_renewal` read
+LIVE. Previous batteries never tested them: `C_SOIL` defaults to 0, so the model's only slow variable had never
+been in a battery stack at all. Addendum 18's Malthus runs did enable it (via a different harness), so its
+measurements stand, but no benchmark result before this one exercised soil.
+
+**INCOMPLETE:** S3 finished only 4 of 12 arms within the 25-minute-per-arm budget, so the long-horizon scores
+above are coastal/temperate × 2 seeds only, at horizon 1625 rather than the requested 2500. The
+control-vs-full contrast on `band_med` is consistent with S1's six pairs, but the pass fractions are
+under-powered and the other two worlds are unmeasured. **Needs a re-run with a larger wall-clock budget before
+the S3 numbers are quoted as an envelope.**
+
+**Origin:** `sic_games/outputs/mechanism_battery/battery7_controlled.py` (commits e83c0c7, fde3e52),
+`C_EXTRA_OFF` in `run_campaign.py`, build fde3e52. Supersedes Addendum 12's attribution entirely.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
