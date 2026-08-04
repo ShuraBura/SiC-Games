@@ -4392,6 +4392,107 @@ exclusion, `meta.tree_dirty`), `battery1_liveness.py` (`divorce_rate`), `battery
 tests that pin every claim above. Suite 1065 pass / 2 xfail. Qualifies Addendum 20 on `connubium_med` and on
 one of its seven inert verdicts; supersedes nothing.
 
+**ADDENDUM 22 — THE COHESION BUDGET HAS NO HEADROOM. `cohesion_frac` clamps at 1.0 for every band that has a
+leader, so the band-fission threshold is EXACTLY `band_split_size`, and four mechanisms that feed it —
+emergent band size, dynamic bands/assabiyah, size repulsion, malnutrition fission — cannot act on band size at
+all. R-72's emergent band size is structurally inert, not mis-calibrated (2026-08-04).**
+
+**WHAT WAS BEING FIXED.** Addendum 20 measured the full stack pushing `band_med` to 37–38 against Johnson's
+[18–35], attributed additively to `enable_emergent_band_size` (+11.9%) and `enable_resource_directed_fusion`
+(+9.7%). `cv_safe` is documented as *"the ONE fitted scale ... calibrated — but ONLY to place the MEAN band at
+Hill 2011's ~25–30 (mean RETURN_CV 1.017 / 27.5 = 0.037)"*, and it was fitted for emergent band size ALONE.
+Re-fitting it to its own anchor with the current stack looked like ordinary calibration maintenance.
+
+**IT IS NOT, AND THE SWEEP SAID SO.** Four values, full stack, 3 worlds × 2 seeds, 1200 steps (common horizon
+1020), paired by (world, seed), same build `77151e4`, same session:
+
+| `cv_safe` | vs default | `band_med` median | range | paired Δ | in Johnson [18–35] |
+|---|---|---|---|---|---|
+| 0.037 (default) | — | 35.00 | 34.0–38.0 | control | 4/6 |
+| 0.045 | +22% | 33.50 | 31.0–43.0 | −1.9%, 4/6 down | 4/6 |
+| 0.052 | +41% | 34.50 | 32.0–36.5 | −3.5%, **6/6 down** | 5/6 |
+| 0.060 | +62% | 33.00 | 31.0–34.0 | −8.4%, **6/6 down** | 6/6 |
+
+The mechanism's own law is `g* = CV/cv_safe`, so band size should scale as `1/cv_safe`: **elasticity −1.0**.
+Measured elasticity is **−0.14** — a seventh of the law, consistently signed but nearly inert. Reaching Hill's
+27.5 at that elasticity would need `cv_safe ≈ 0.22`, a SIX-FOLD move in a constant the model calls calibrated.
+That is not maintaining a calibration; that is fitting the model to the benchmark. **The re-fit is dropped.**
+
+**WHY — measured, not inferred.** Instrumenting the model's own stored per-band state (`_band_assabiyah`,
+`_band_leader_term`, `_band_repulsion`, `_band_malnutrition`) over 94 bands after 400 steps on the village +
+elite stack:
+
+```
+  band size        min 10.0  p25 27.0  med 34.0  p75 47.0  max 98.0
+  g* = CV/cv_safe  min 29.2  p25 37.5  med 38.2  p75 38.2  max 38.2
+  split_thr        min 45.0  p25 45.0  med 45.0  p75 45.0  max 45.0     <- sd 0.00
+  cohesion_frac    min 1.000 p25 1.000 med 1.000 p75 1.000 max 1.000    <- 94/94 pinned
+    assabiyah      min 0.955 p25 1.000 med 1.000 p75 1.000 max 1.000
+    leader term    min 0.409 p25 0.670 med 0.783 p75 1.255 max 1.641
+    repulsion      min 0.001 p25 0.017 med 0.044 p75 0.075 max 0.150
+    malnutrition   min 0.000 p25 0.000 med 0.000 p75 0.000 max 0.000
+  raw (unclamped)  min 1.329 p25 1.576 med 1.718 p75 2.214 max 2.621
+```
+
+The threshold is `split_thr = g* + max(0, cap − g*) · cohesion_frac`, `cohesion_frac = clamp01(assabiyah +
+leader − repulsion − malnutrition)`, `cap = band_split_size = 45`. Two independent causes each suffice to pin
+it:
+
+**(a) Assabiyah saturates BY CONSTRUCTION.** Its update is `a += gain·surplus − decay`, clamped to [0,1], so
+its fixed point is `surplus_frac = decay/gain = 0.02/0.05 = 0.40`. Measured band `surplus_frac` runs
+0.35–0.99, **median 0.69**, and **90 of 94 bands (95.7%) sit above the fixed point** — so assabiyah is not a
+state variable at all, it is the constant 1.0. F.3c-3's premise (*"a rich, high-solidarity band STAYS TOGETHER
+larger; a poor one fissions at the base"*) requires the band to be able to be poor; in this economy it cannot.
+
+**(b) The leader term alone would do it.** It runs 0.409–1.641 with median 0.783, and it is ADDED on top of a
+saturated assabiyah. The unclamped sum is 1.33–2.62 for every band — **33% to 162% above the clamp**.
+
+**THE RULE, checked across horizons and two world scales.** The share of bands pinned tracks the share that
+has acquired a leader, and at every checkpoint the unpinned bands are EXACTLY the leaderless ones: 0% pinned
+at step 50 (no leaders yet), 68%/86% at 100, 88%/99% at 200, 96%/100% at 400 (n=1200 patch=30 / n=2500
+patch=40). Assabiyah's median reaches exactly 1.000 by step 100 in both and never comes down. So the general
+statement is *a leader term on top of a saturated assabiyah always exceeds the clamp* — the 100% figure above
+is that rule evaluated in a mature world where every band has a leader, not a coincidence of one run.
+
+**THE CONSEQUENCE.** With `cohesion_frac ≡ 1`, the threshold reduces to `max(g*, band_split_size)`. Measured
+`g*` spans 29.2–38.2 and **0 of 94 bands have g* > 45**, so `split_thr` is exactly 45 for every band, sd 0.00.
+`corr(g*, realized band size) = −0.077`. R-72 built v3 specifically because v1/v2 measured −0.22 and *"a
+ceiling cannot pull a band together"*; v3 replaced the ceiling with a per-band centre and the correlation is
+still −0.08. **Realized `band_med` ≈ 34 ≈ 0.75 × cap** — the sawtooth of grow-then-halve against a threshold
+that is the same constant everywhere. That, and not the CV, is what sets band size.
+
+**FOUR MECHANISMS FEED ONE SATURATED EXPRESSION.** `_band_repulsion` and `_band_leader_term` are stored but
+read nowhere else (both are commented "diagnostic"), and `_band_assabiyah` is read only to update itself. So
+`cohesion_frac` is the ONLY consumer of the repulsion, leader, malnutrition and assabiyah terms — and it is
+clamped for every band. `enable_size_repulsion` (Johnson scalar stress), `enable_dynamic_bands`,
+`enable_malnutrition_fission` and the Stage-1 leader-coherence term are therefore all structurally inert with
+respect to band size, whatever their magnitudes.
+
+This gives a QUANTITATIVE floor for the ones still awaiting anchors: **a malnutrition term must exceed 0.718 —
+the median headroom — before it changes a single median band's threshold**, and 1.62 before it reaches the
+largest. `malnutrition_fission_gain` is documented as a "max dispersion" scale and is currently 0.0; any
+plausible small value calibrated in isolation would still read INERT here, and Addendum 20's inert verdict for
+it would be reproduced by a correctly-calibrated mechanism. The same arithmetic applies to `band_risk_penalty`
+(already excluded as a dead end, Addendum 21) and to `repulsion_gain`.
+
+**WHAT THIS DOES NOT SAY.** It does not say `band_split_size = 45` is wrong — that constant is the Johnson
+"upper community rung" and lowering it to land `band_med` on an anchor would be exactly the benchmark-fitting
+refused above. It says the model currently has ONE lever where it was designed to have five, and that the
+four dead ones are dead for a stated, measurable reason. The design question — whether assabiyah's clamp, its
+`decay/gain` fixed point, or the leader term's scale is the thing to change so the budget regains headroom —
+is a supervisor call, not a calibration.
+
+**Incidentally, `band_med` improved on its own.** On the fixed stack of Addendum 21 the control reads 35.0
+(4/6 arms in Johnson's band), against 38.5 on Addendum 20's stack. Turning the previously-dark mechanisms on
+moved it about a third of the way back inside the band without touching a calibrated constant.
+
+**Origin:** `sic_games/outputs/mechanism_battery/diag_param_sweep.py` and `diag_band_size_terms.py`, build
+`77151e4`, 24 campaign arms plus in-process instrumented worlds (n=1200 patch=30 and n=2500 patch=40,
+village+elite stack). Pinned as `sic_games/tests/test_cohesion_headroom.py` (5 blocker tests that FAIL when
+the headroom is restored). No model source changed — this is a diagnosis, and the fix it implies is a design
+decision. Supersedes the `cv_safe` re-fit proposed after Addendum 20; explains, mechanically, several of
+Addendum 20's inert verdicts.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
