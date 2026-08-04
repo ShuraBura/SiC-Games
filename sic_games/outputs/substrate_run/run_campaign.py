@@ -67,7 +67,13 @@ DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibilit
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
 MSTAR     = int(os.environ.get("C_MSTAR", "50"))         # Cut-2 mate-search pool m* (probe: m*=50 → median reach 496 ≈ Wobst)
-ELITE     = os.environ.get("C_ELITE", "0") == "1"        # T-9: the R-82...R-87 elite/legitimacy stack — see module docstring
+ALLON     = os.environ.get("C_ALLON", "0") == "1"        # every BUILT mechanism runs unless explicitly ablated
+# T-9: the R-82...R-87 elite/legitimacy stack — see module docstring. C_ALLON implies it when C_ELITE is not
+# set, because the elite FLAGS alone are not the elite layer: their magnitudes (leveling_strength,
+# material_hide_frac, leader_share_frac, legit_cred_gain/feast_frac, ...) live in ELITE_KW and default to 0.0.
+# Before this, `C_ALLON=1` on its own switched ~10 elite mechanisms ON at ZERO STRENGTH — live in the config
+# dump, dead in the world, and INERT in any ablation. Battery 7's full-stack arms were exactly that run.
+ELITE     = os.environ.get("C_ELITE", "0") == "1" or (ALLON and "C_ELITE" not in os.environ)
 BRANCH    = float(os.environ.get("C_BRANCH", "0"))       # R-90/R-92 per-birth SUB-BRANCH tag rate (0 = off, bit-exact)
 SPLIT     = float(os.environ.get("C_SPLIT", "0"))        # R-92 per-member per-step lineage SEGMENTATION hazard
 SPLITMIN  = int(os.environ.get("C_SPLITMIN", "8"))       # R-92 minimum viable segment (both sides)
@@ -394,11 +400,22 @@ def main():
     open(PROG, "w").close()
     if os.path.exists(GENEA):
         os.remove(GENEA)                                 # fresh genealogy stream per run
+    # PROVENANCE. Addendum 19 retracted two conclusions because a control had been produced by a different
+    # build, and the fix was to record `meta.sha` and gate on it. But HEAD alone does not identify a build when
+    # the tree is DIRTY: a run started from uncommitted edits records the parent commit, so a sha gate accepts
+    # it as the same build as a run of the committed code. That is the same hole, one level down. Record the
+    # dirty bit too, and say so loudly — a swept arm from a dirty tree is not reproducible from its sha.
+    _repo = os.path.join(HERE, "..", "..", "..")
     try:
-        sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"],
-                                      cwd=os.path.join(HERE, "..", "..", "..")).decode().strip()
+        sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=_repo).decode().strip()
+        dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"],
+                                             cwd=_repo).decode().strip())
     except Exception:
-        sha = "?"
+        sha, dirty = "?", True
+    if dirty:
+        print(f"campaign: !! WORKING TREE DIRTY at {sha} -- this arm is NOT identified by its sha and must "
+              f"not be paired against an arm from a clean tree. Commit before running a comparison.",
+              flush=True)
     k = world_lottery_climate(SEED, terrain=TERR, climate=CLIM)
     f = generate_world(k, mode="climate")
     _patch = (X0, Y0, PATCHSZ if PATCHSZ > 0 else PATCH)     # R-103i: shrink ⇒ circumscription
@@ -445,23 +462,86 @@ def main():
             "enable_genealogy_log",                  # observer/logging, not a dynamic; costly
             "enable_bud_hazard",                     # mutually-exclusive alternate to the legacy budding path
             "enable_stratification_inequality_gate", # R-103: criterion known wrong, parked for supervisor call
+            # A MEASURED DEAD END, not an oversight. demography.py's own comment on this field: loner-mortality
+            # does not produce an optimal band size, it culls -- "pop 281->64, mean band 56->5 ... a DEATH
+            # SPIRAL, not a stabilizing optimum (F.2 prototype, run_3i) -- KEEP OFF". Its only magnitude,
+            # `band_risk_penalty`, is 0.0 and the code is guarded by `> 0.0`, so C_ALLON was switching it on
+            # into a no-op: "on" in the config dump, INERT in every ablation, and a death spiral at any value
+            # that would make it live. Excluded rather than enabled-at-zero, which is the honest state.
+            "enable_band_risk",
         }
-        # Flags a C_* knob above already decides. `model_fields_set` cannot be used for this: the preset
-        # itself is built with model_copy(), so 74 fields are already "set" and the guard would swallow
-        # nearly everything. This list is explicit and auditable instead -- an ablation (e.g. C_SOIL=0)
-        # must not be silently re-enabled by C_ALLON.
+        # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
+        # parameters that have to move with the flag for it to mean anything.
+        #
+        # THE BUG THIS REPLACES (2026-08-04). The first version was a flat set of names that C_ALLON skipped
+        # UNCONDITIONALLY, so a knob's DEFAULT silently overrode "everything on". `C_ALLON=1` on its own left
+        # ten mechanisms dark — adaptive_connubium, exogamy, ascribed_mate_choice, material_inheritance,
+        # noble_leveling_exemption, lineage_tribute, lineage_branching, lineage_split, improved_land,
+        # emergent_abandonment — because their knobs default to off. Battery 7's "full stack" arms passed only
+        # C_ALLON=1, so that is the stack its results describe; `connubium_med` failed there with the adaptive
+        # connubium switched OFF. The rule now is the intended one: an EXPLICITLY SET knob wins (an ablation is
+        # respected), an UNSET knob does not (a default is not an ablation).
+        #
+        # `model_fields_set` cannot be used for this: the preset is itself built with model_copy(), so 74
+        # fields are already "set" and the guard would swallow nearly everything. This table is explicit.
         _knob_controlled = {
-            "enable_sedentism_fertility", "enable_aggl_ceiling", "enable_economic_defensibility",
-            "enable_ascribed_mate_choice", "enable_material_inheritance", "enable_noble_leveling_exemption",
-            "enable_lineage_tribute", "enable_adaptive_connubium", "enable_exogamy",
-            "enable_village_budding", "enable_improved_land", "enable_soil_depletion",
-            "enable_alluvial_renewal", "enable_emergent_abandonment", "enable_genome",
-            "enable_lineage_branching", "enable_lineage_split",
+            "enable_sedentism_fertility":      (("C_SEDFERT",), {}),
+            "enable_aggl_ceiling":             (("C_AGGLCEIL",), {}),
+            "enable_economic_defensibility":   (("C_DEFEND",), {}),
+            "enable_genome":                   (("C_GENOME",), {}),
+            "enable_village_budding":          (("C_BUD",), {}),
+            "enable_material_inheritance":     (("C_MATINHERIT",), {}),
+            "enable_noble_leveling_exemption": (("C_NOBLEXEMPT",), {}),
+            "enable_lineage_tribute":          (("C_LINTRIBUTE",), {}),
+            "enable_soil_depletion":           (("C_SOIL",), {}),
+            "enable_alluvial_renewal":         (("C_SOIL",), {}),
+            # Abandonment is the swidden half of soil: without it soil depletes and villages never relocate
+            # (R-71's frozen-settlement case), so it follows C_SOIL as well as its own knob.
+            "enable_emergent_abandonment":     (("C_SOIL", "C_ABANDON"), {}),
+            # Improved land needs defensibility to claim worked cells (the guard below already warns).
+            "enable_improved_land":            (("C_IMPROVED",), {}),
+            # COMPANION PARAMETERS. A flag whose scale stays at its off-value is ON-but-dead — the exact
+            # defect class this arc keeps finding — so C_ALLON supplies each one's validated value:
+            #   ascribed_mate_strength  C_ENDOG_A's default (R-103b)
+            #   mate_search_min_eligible  Cut-2's m*=50 (probe: median reach 496 ≈ Wobst 475)
+            #   lineage_branch/split rates  the R-90/R-92 elite-stack values; their knob defaults are 0.0,
+            #                               i.e. "off", so inheriting the default would enable a dead flag.
+            "enable_ascribed_mate_choice":     (("C_ENDOGAMY",), {"ascribed_mate_strength": ENDOG_A}),
+            "enable_adaptive_connubium":       (("C_CONNUBIUM",), {"mate_search_min_eligible": MSTAR}),
+            "enable_exogamy":                  (("C_CONNUBIUM",), {"exogamy_degree": "lineage"}),
+            "enable_lineage_branching":        (("C_BRANCH",), {"lineage_branch_rate": 0.05}),
+            "enable_lineage_split":            (("C_SPLIT",), {"lineage_split_rate": 0.00003,
+                                                               "lineage_split_min_segment": 8}),
         }
-        demog = demog.model_copy(update={
-            f: True for f in type(demog).model_fields
-            if f.startswith("enable_") and f not in _skip and f not in _knob_controlled
-            and not getattr(demog, f)})
+        # The T-9 elite layer is governed as a BLOCK by C_ELITE, because its magnitudes live together in
+        # ELITE_KW. C_ALLON implies C_ELITE (see the ELITE definition above), so these are already True by the
+        # time this runs; listing them here is what makes an explicit `C_ELITE=0` a real ABLATION — without
+        # it C_ALLON would switch each flag back on at its 0.0 default, i.e. on-but-dead, which is worse than
+        # either state.
+        for _ef in ("enable_material_capture", "enable_leader_share", "enable_leveling",
+                    "enable_leader_office", "enable_legitimacy", "enable_delegitimation",
+                    "enable_relative_legitimacy", "enable_relative_resentment",
+                    "enable_resentment_accumulator", "enable_village_resentment",
+                    "enable_local_ascription", "enable_rank_hierarchy"):
+            _knob_controlled[_ef] = (("C_ELITE",), {})
+        _on: dict = {}
+        for _flag in type(demog).model_fields:
+            if not _flag.startswith("enable_") or _flag in _skip or getattr(demog, _flag):
+                continue
+            _envs, _companions = _knob_controlled.get(_flag, ((), {}))
+            if any(e in os.environ for e in _envs):
+                continue                       # an explicitly set knob is an ablation; C_ALLON respects it
+            _on[_flag] = True
+            _on.update(_companions)
+        if _on:
+            demog = demog.model_copy(update=_on)
+        _newflags = sorted(f for f in _on if f.startswith("enable_"))
+        print(f"campaign: C_ALLON enabled {len(_newflags)} mechanism(s): "
+              f"{','.join(f.replace('enable_', '') for f in _newflags)}", flush=True)
+        _still_off = sorted(f for f in type(demog).model_fields
+                            if f.startswith("enable_") and not getattr(demog, f))
+        print(f"campaign: C_ALLON left {len(_still_off)} OFF: "
+              f"{','.join(f.replace('enable_', '') for f in _still_off)}", flush=True)
     # C_EXTRA_ON: comma-separated `enable_*` names to turn on, for ATTRIBUTING an all-on effect to a subset.
     # Addendum 12 measured all-on scoring worse on 3 of 6 markers, and 23 flags cannot be attributed from one
     # contrast; this enables group bisection (one group added on top of the baseline at a time). UNKNOWN NAMES
@@ -495,21 +575,27 @@ def main():
     _pv = [s.strip() for s in os.environ.get("C_PARAM", "").split(",") if s.strip()]
     if _pv:
         _upd = {}
-        for item in _pv:
-            if "=" not in item:
-                raise SystemExit(f"C_PARAM: expected field=value, got {item!r}")
-            k, v = item.split("=", 1)
-            k = k.strip()
-            if k not in type(demog).model_fields:
-                raise SystemExit(f"C_PARAM: unknown config field {k!r}")
-            ann = type(demog).model_fields[k].annotation
+        # NB the underscore names: this loop runs INSIDE `main()`, where `k` is already bound to the terrain
+        # knob dict (line ~402) and `f` to the generated WorldFields. The first version used `k, v = ...`,
+        # which rebound the terrain knobs to the string "cv_safe" — and since `k` is not read again until the
+        # TerrainWorld constructor 30 lines later, every C_PARAM run died there with a bare
+        # `'str' object has no attribute 'get'`, 24 arms deep into a sweep. Loop variables in a long function
+        # body are not free.
+        for _item in _pv:
+            if "=" not in _item:
+                raise SystemExit(f"C_PARAM: expected field=value, got {_item!r}")
+            _key, _val = _item.split("=", 1)
+            _key = _key.strip()
+            if _key not in type(demog).model_fields:
+                raise SystemExit(f"C_PARAM: unknown config field {_key!r}")
+            ann = type(demog).model_fields[_key].annotation
             try:
-                _upd[k] = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(
-                    ann, str)(v.strip())
+                _upd[_key] = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(
+                    ann, str)(_val.strip())
             except Exception as _e:
-                raise SystemExit(f"C_PARAM: cannot parse {v!r} for {k} ({ann}): {_e}")
+                raise SystemExit(f"C_PARAM: cannot parse {_val!r} for {_key} ({ann}): {_e}")
         demog = demog.model_copy(update=_upd)
-        print("campaign: C_PARAM " + ", ".join(f"{k}={v}" for k, v in _upd.items()), flush=True)
+        print("campaign: C_PARAM " + ", ".join(f"{a}={b}" for a, b in _upd.items()), flush=True)
     # AGGLOMERATION SHAPE knobs (R-106 Addendum 14). The production form is the measured driver of the spatial
     # concentration, so it must be sweepable from a campaign to confirm a single-seed result on the full
     # worlds x seeds envelope (MARKER_MATRIX binding rule 3). Unset => untouched/bit-exact.
@@ -543,7 +629,7 @@ def main():
     except Exception:
         _full_cfg = {k: getattr(demog, k) for k in dir(demog) if not k.startswith("_")}
     _full_cfg = {k: v for k, v in _full_cfg.items() if isinstance(v, (int, float, str, bool, type(None)))}
-    meta = dict(sha=sha, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
+    meta = dict(sha=sha, tree_dirty=dirty, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 terrain=TERR, climate=CLIM, patch_size=(PATCHSZ if PATCHSZ > 0 else PATCH),
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
                 genome=GENOME, genea_csv=os.path.basename(GENEA), genealogy_on=GENEALOG,

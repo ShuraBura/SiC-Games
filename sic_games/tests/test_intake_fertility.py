@@ -62,10 +62,19 @@ def test_off_is_bit_exact():
 
 @pytest.mark.slow
 def test_on_changes_the_world():
-    """Liveness: if switching it on is bit-identical, the mechanism is on and doing nothing."""
+    """Liveness: if switching it on is bit-identical, the mechanism is on and doing nothing.
+
+    HORIZON, and why it is 300 rather than 120 (2026-08-04). This ran at 120 steps and was a COIN FLIP: a
+    0.001 change in `divorce_rate`, in a different overlay entirely, flipped it from pass to fail. The cause
+    is not the mechanism. The brake only bites below `intake_fert_hi` (1.20), and in this world the share of
+    fertile women under that gate is measured at 0.0% by step 60, **2.2% (three women) at step 120**, 7.3% at
+    180 and 13.1% at 300 — so at 120 steps the verdict turned on whether one of three women happened to be
+    drawn for a birth. 300 steps is the horizon at which the gate demonstrably binds, and is what the sibling
+    EMA-spread test below already uses. The population GROWS through this window (757 → 867), which is the
+    root of it: a fertility brake needs scarcity, and this small test world is rich."""
     import battery1_liveness as B1
-    off, _, _ = B1.signature({}, steps=120, **WORLD)
-    on, _, _ = B1.signature(dict(enable_intake_fertility=True), steps=120, **WORLD)
+    off, _, _ = B1.signature({}, steps=300, **WORLD)
+    on, _, _ = B1.signature(dict(enable_intake_fertility=True), steps=300, **WORLD)
     assert on != off, "enabling intake-fertility is bit-identical — the new branch is dead"
 
 

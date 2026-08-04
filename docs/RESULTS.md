@@ -4270,6 +4270,128 @@ the S3 numbers are quoted as an envelope.**
 **Origin:** `sic_games/outputs/mechanism_battery/battery7_controlled.py` (commits e83c0c7, fde3e52),
 `C_EXTRA_OFF` in `run_campaign.py`, build fde3e52. Supersedes Addendum 12's attribution entirely.
 
+**ADDENDUM 21 — SEVEN CONFIGURATION DEFECTS, found by pointing the knobs at themselves. One killed a 24-arm
+sweep silently; one means `C_ALLON=1` alone was never "all on"; one is a hole underneath the sha gate
+Addendum 19 built; and one shows two liveness verdicts were coin flips (2026-08-04).**
+
+None of these is an analysis error. Every one is a *"what was actually on?"* error — the class this arc keeps
+paying for, and the reason `config/*.toml` exists. They are grouped here because they were all found the same
+way: by asserting, in a test, what a knob claims to do.
+
+**1. `C_PARAM` SHADOWED THE TERRAIN KNOBS.** The knob added yesterday parsed its arguments with
+
+```python
+for item in _pv:
+    k, v = item.split("=", 1)
+```
+
+inside `main()`, where `k` had been bound 90 lines earlier to the terrain-knob dict. Every `C_PARAM` run
+therefore died in the `TerrainWorld` constructor with a bare `'str' object has no attribute 'get'`. It was
+found 24 arms into a `cv_safe` sweep whose every arm was dead — and the harness, which discarded stdout to
+`/dev/null` and treated a missing trajectory as "no arms", **printed a tidy empty table instead of an error**.
+Two fixes: the loop variables are renamed and commented, and the harness now raises with the failing arm's log
+tail rather than reporting a sweep with missing arms as a result. `tests/test_campaign_knobs.py` (9 tests) now
+drives the actual script as a subprocess and asserts the process EXITS 0 as well as that the value lands — the
+original smoke test checked only that the value parsed, which is exactly what a run that dies 90 lines later
+still does.
+
+**2. `C_ALLON=1` ALONE WAS NEVER "ALL ON": ten mechanisms stayed dark behind their knobs' OFF defaults.**
+`C_ALLON` skipped every flag that has a `C_*` knob, unconditionally, so a knob's *default* silently overrode
+the supervisor rule. A bare `C_ALLON=1` left `adaptive_connubium`, `exogamy`, `ascribed_mate_choice`,
+`material_inheritance`, `noble_leveling_exemption`, `lineage_tribute`, `lineage_branching`, `lineage_split`,
+`improved_land` and `emergent_abandonment` off. The rule is now the intended one: **an explicitly set knob
+wins (an ablation is respected), an unset knob does not (a default is not an ablation)**. A bare `C_ALLON=1`
+goes from 28 to 38 enabled mechanisms and leaves exactly five off, and the campaign now ECHOES both lists at
+launch. Flags whose magnitude knob defaults to zero (`lineage_branch_rate`, `lineage_split_rate`,
+`ascribed_mate_strength`, `mate_search_min_eligible`) carry their validated value with them, so `C_ALLON`
+cannot enable a mechanism into a no-op.
+
+**3. `C_ALLON` ALSO SWITCHED THE ELITE LAYER ON AT ZERO STRENGTH.** The elite *flags* are not the elite layer:
+its magnitudes live in `ELITE_KW`, which is empty unless `C_ELITE=1`. A bare `C_ALLON=1` therefore switched on
+all twelve elite flags while a config dump from the same environment reads `leveling_strength=0.0`,
+`leveling_share=0.0`, `material_hide_frac=0.0`, `material_decay=0.0`, `aggrandizer_frac=0.0`,
+`leader_share_frac=0.0`, `legit_cred_gain=0.0`, `legit_feast_frac=0.0` — material capture, leader share,
+leveling and legitimacy were on and completely dead. `C_ALLON` now implies `C_ELITE` unless `C_ELITE` is set,
+and the elite block is governed as a unit so that `C_ELITE=0` is a REAL ablation (flags off) rather than a half
+one (flags on, magnitudes 0) — the worst of both states, since the dump says the mechanism ran and the world
+says it did nothing.
+
+**Battery 7 was NOT affected by (2) or (3), and this was checked rather than assumed.** Its `STACK` sets
+`C_ELITE=1` and fourteen other knobs explicitly. Read back from
+`campaign_trajectory_b7_full_coastal_temperate_s0.json` (`meta.sha` `fde3e52`): **72 flags ON, 7 OFF**, with
+`leveling_strength=0.79`, `material_hide_frac=0.07`, `legit_cred_gain=10.0`. Addendum 20's stack is what it
+said it was. **What does change for it:** `C_ALLON` now enables `adaptive_connubium`, `exogamy` and
+`ascribed_mate_choice`, three of the four mechanisms Addendum 20 correctly reported as NOT IN STACK — and
+`connubium_med` failed there 3/25 **with the adaptive connubium switched off**. That marker must be
+re-measured on the fixed stack before Addendum 20's connubium reading stands.
+
+**4. `enable_band_risk` IS A MEASURED DEAD END AND WAS BEING SWITCHED ON AT GAIN ZERO.** `demography.py`'s own
+comment records the F.2 prototype result — loner-mortality does not produce an optimal band size, it culls:
+*"pop 281→64, mean band 56→5 ... a DEATH SPIRAL, not a stabilizing optimum ... KEEP OFF"*. Its only magnitude
+`band_risk_penalty` is 0.0 and the code is guarded on `> 0.0`, so `C_ALLON` was enabling a no-op: "on" in the
+dump, INERT in every ablation, and a death spiral at any value that would make it live. It is now excluded by
+name, with the reason. **One of Addendum 20's seven "genuinely inert" verdicts is resolved as
+correctly-excluded rather than defective.**
+
+**5. THE SHA GATE HAD A HOLE UNDERNEATH IT: a DIRTY tree records the PARENT commit.** Addendum 19's fix was to
+record `meta.sha` and refuse to score arms whose builds disagree. But `git rev-parse HEAD` does not identify a
+build when the working tree has uncommitted edits — a run started from a dirty tree records the parent commit,
+so the gate happily pairs it with a run of the committed code and calls them the same build. That is the same
+failure, one level down. The campaign now records `meta.tree_dirty`, prints a loud banner when it is set, and
+`battery6_long`, `battery7_controlled` and the sweep harness all treat a dirty arm as ABSENT, forcing a re-run.
+
+**6. `divorce_rate` WAS UN-CALIBRATED IN THE BATTERY OVERLAY.** R-78 (`b8501ea`, 2026-07-17) calibrated it to
+**0.005** against Hill & Hurtado Tab. 13.1, explicitly on both pairing paths (*"base 0.140 / village 0.149"*).
+The `VILLAGE` overlay written ten days later (`46eb0c9`) listed `divorce_rate=0.004` with no rationale,
+silently overriding the calibration for `battery1_liveness` and `battery6_stress` — and, because
+`config/parameters.toml` is generated from that overlay, putting the wrong number in the authoritative file
+while every campaign ran 0.005. Removed; the calibrated value stands and the files are regenerated.
+
+**7. AND THE `divorce_rate` FIX EXPOSED A SEVENTH: two liveness tests were coin flips.** Changing
+`divorce_rate` by 0.001, in an unrelated overlay, flipped
+`test_intake_fertility.py::test_on_changes_the_world` from pass to fail — the intake-fertility branch became
+*bit-identical*, i.e. it never fired at all. The mechanism is fine; the test's horizon was not. The brake only
+bites below `intake_fert_hi = 1.20`, and the share of fertile women under that gate in the liveness world
+measures **0.0% at step 60, 2.2% (three women) at 120, 7.3% at 180, 13.1% at 300** — so at the 120-step
+horizon the verdict turned on whether one of three women happened to be drawn for a birth. The population
+GROWS through that window (757 → 867), which is the root of it: a fertility brake needs scarcity, and the
+small liveness world is rich. Both tests now run at 300 steps, the horizon at which the gate demonstrably
+binds and the one the sibling EMA-spread test already used. **A liveness test whose verdict a 0.001 change
+elsewhere can reverse is not evidence that a mechanism is live** — and this arc has been reading exactly such
+verdicts.
+
+**A ZERO-PARAMETER AUDIT, since (2)–(4) are all the same shape.** Under a bare `C_ALLON=1`, fifteen numeric
+parameters are exactly 0. Six are INTENTIONAL and documented as such in their own provenance comments —
+`maternal_mortality_per_birth` (folded into the all-cause female Siler by construction), `assortative_strength`
+(R-80, prototyped and REVERTED as structurally inert), `pathogen_npp_ref` (0 ⇒ use the terrain mean),
+`genome_mutation` (0 ⇒ pure drift / infinite-allele), `comove_footprint` (0 ⇒ exact snap),
+`aggregation_rank_homogamy` (0 ⇒ directional only). The rest are open, and three of them are why a mechanism
+reads INERT:
+
+| parameter | flag it silences | status in its own provenance |
+|---|---|---|
+| `malnutrition_fission_gain` | `enable_malnutrition_fission` | "UNANCHORED" |
+| `pathogen_gamma` | `enable_terrain_pathogen` | "0 = OFF/flat. **Sweep low/mid/high**" |
+| `material_capture_frac` | the aggrandizer-capture half of `enable_material_capture` | no note — see below |
+| `shock_rho` | the REGIME half of `enable_tier2_shock` | "[PROVISIONAL — sweep]" |
+| `paternal_provision_frac` | the paternal channel of `enable_paternity` | "0 = pure B (no paternal feeding)" |
+| `wife_quality_strength` | R-77's status→RS channel | built, never switched on |
+
+`material_capture_frac` is the sharpest of these. Material production from hides is live
+(`material_hide_frac=0.07`), but the branch that lets aggrandizers claim a share of the GROUP's durable output
+— Hayden's actual move — is gated on `mat_frac > 0.0` and never fires, while `aggrandizer_frac=0.15` IS set.
+So the elite runs have an aggrandizer population that captures nothing, and every noble/commoner material
+gap in this arc was produced by inheritance, tribute and the leveling exemption alone. **This bears directly on
+MARKER_MATRIX #14 (`noble_material_lift`)** and is recorded here as an open question, not fixed: no value for
+it is anchored, and inventing one is not a calibration.
+
+**Origin:** `run_campaign.py` (C_PARAM shadowing, C_ALLON knob table, C_ELITE implication, `band_risk`
+exclusion, `meta.tree_dirty`), `battery1_liveness.py` (`divorce_rate`), `battery6_long.py` and
+`battery7_controlled.py` (dirty gate), `test_intake_fertility.py` and `test_pressure_mobility.py` (horizon),
+`config/parameters.toml` regenerated, and `sic_games/tests/test_campaign_knobs.py` — 9 new subprocess-level
+tests that pin every claim above. Suite 1065 pass / 2 xfail. Qualifies Addendum 20 on `connubium_med` and on
+one of its seven inert verdicts; supersedes nothing.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

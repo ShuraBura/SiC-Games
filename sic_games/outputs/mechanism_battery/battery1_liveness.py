@@ -60,7 +60,13 @@ VILLAGE = dict(enable_marriage_aggregation=True, enable_aggregation_sedentism=Tr
                enable_catchment_ceiling=True, enable_aggl_ceiling=True, settle_catchment_radius=1,
                enable_settlement_scalar_stress=True, enable_landscape_packing=True,
                enable_cred_status=True, cred_seed_sigma=0.5, cred_inherit_sigma=0.1,
-               enable_paternity=True, divorce_rate=0.004, enable_morph=True)
+               enable_paternity=True, enable_morph=True)
+# `divorce_rate` was listed here as 0.004 when this dict was written (46eb0c9, 2026-07-27). It is not a
+# village-stack value: R-78 (b8501ea, 2026-07-17) CALIBRATED it to 0.005 against Hill & Hurtado Tab. 13.1,
+# explicitly on BOTH pairing paths ("base 0.140 / village 0.149"), and the preset carries that number. The
+# 0.004 here silently un-calibrated divorce for this battery and for battery6_stress, and — because the
+# run-configuration files are generated from this overlay — put the wrong number in `config/parameters.toml`
+# too, where the campaigns (which never load this dict) run 0.005. Removed so the calibrated value stands.
 ELITE = dict(
     enable_material_capture=True, material_hide_frac=0.07, material_decay=0.002, aggrandizer_frac=0.15,
     enable_leader_share=True, leader_share_frac=0.20,

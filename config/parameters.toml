@@ -610,7 +610,7 @@ type  = "bool"
 # enable_band_affiliation.
 
 [divorce_rate]
-value = 0.004
+value = 0.005
 owner = "DemographyConfig"
 type  = "float"
 # PER-STEP bond dissolution probability, applied in `_do_divorce` every step on all pairing paths (R-78 —

@@ -138,7 +138,12 @@ def traj(tag):
         return None
     if not d.get("traj"):
         return None
-    sha = (d.get("meta") or {}).get("sha", "")
+    meta = d.get("meta") or {}
+    # A DIRTY tree records the PARENT commit, so sha alone would pair an arm run from uncommitted edits with
+    # one run from the committed code and call them the same build — the same hole, one level down.
+    if meta.get("tree_dirty"):
+        return None
+    sha = meta.get("sha", "")
     if _HEAD and sha and not sha.startswith(_HEAD) and not _HEAD.startswith(sha):
         return None                      # produced by a different build ⇒ not reusable
     return d

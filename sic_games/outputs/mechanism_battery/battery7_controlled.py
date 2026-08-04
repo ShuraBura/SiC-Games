@@ -112,7 +112,11 @@ HEAD = head_sha()
 
 
 def load(tag):
-    """R1: a trajectory is usable only if it was produced by THE CURRENT BUILD."""
+    """R1: a trajectory is usable only if it was produced by THE CURRENT BUILD.
+
+    `meta.tree_dirty` closes the hole under the sha gate: a run started from uncommitted edits records the
+    PARENT commit, so sha alone would pair it with a run of the committed code and call them the same build.
+    A dirty arm is not identified by its sha, so it is never reusable — it is re-run instead."""
     p = os.path.join(CAMP, f"campaign_trajectory{tag}.json")
     if not os.path.exists(p):
         return None
@@ -122,7 +126,10 @@ def load(tag):
         return None
     if not d.get("traj"):
         return None
-    sha = (d.get("meta") or {}).get("sha", "")
+    meta = d.get("meta") or {}
+    if meta.get("tree_dirty"):
+        return None
+    sha = meta.get("sha", "")
     if HEAD and sha and not sha.startswith(HEAD) and not HEAD.startswith(sha):
         return None
     return d

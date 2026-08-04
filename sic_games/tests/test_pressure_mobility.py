@@ -159,12 +159,17 @@ def test_intake_ema_stays_live_without_fertility_flag():
 def test_fertility_and_mobility_intake_modes_are_independently_ablatable():
     """Flipping enable_intake_fertility ON TOP of mobility-intake mode must further change the world (the
     fertility branch reads the same EMA but is gated separately) — proof the two flags are not silently the
-    same mechanism wearing two names."""
+    same mechanism wearing two names.
+
+    300 steps, not 120, for the reason measured in `test_intake_fertility.test_on_changes_the_world`: the
+    fertility gate binds on only 2.2% of fertile women by step 120 in this world and 13.1% by step 300, so at
+    120 the comparison was decided by whether one of three gated women was drawn for a birth — a coin flip
+    that an unrelated 0.001 change in `divorce_rate` was enough to turn over."""
     import battery1_liveness as B1
     mobility_only, _, _ = B1.signature(dict(enable_productivity_mobility=True,
                                              mobility_pressure_source="intake",
-                                             enable_intake_fertility=False), steps=120, **WORLD)
+                                             enable_intake_fertility=False), steps=300, **WORLD)
     both, _, _ = B1.signature(dict(enable_productivity_mobility=True,
                                     mobility_pressure_source="intake",
-                                    enable_intake_fertility=True), steps=120, **WORLD)
+                                    enable_intake_fertility=True), steps=300, **WORLD)
     assert mobility_only != both
