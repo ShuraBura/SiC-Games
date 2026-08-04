@@ -147,8 +147,11 @@ def run_arms(arms, steps):
     while todo or running:
         while todo and len(running) < PAR:
             tag, over = todo.pop(0)
+            # ~20 snapshots per arm regardless of horizon. `sustained()` medians the LAST HALF, so a coarse
+            # cadence leaves 2-3 points to median and the statistic becomes a coin flip; the smoke test at
+            # C_LOGEVERY=400 over 60 steps produced a single snapshot and a "common horizon" of 1 step.
             env = dict(os.environ, **STACK, C_TAG=tag, C_FOUNDERS="3000", C_STEPS=str(steps),
-                       C_MAXMIN=MAXMIN, C_LOGEVERY="400", **over)
+                       C_MAXMIN=MAXMIN, C_LOGEVERY=str(max(25, int(steps) // 20)), **over)
             out = open(os.path.join(HERE, f"b7_stdout{tag}.txt"), "w", encoding="utf-8")
             running.append((tag, subprocess.Popen(
                 [sys.executable, "-u", os.path.join(CAMP, "run_campaign.py")],
