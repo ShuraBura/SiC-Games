@@ -146,25 +146,41 @@ def emit(path, title, sources, note, entries):
 
 
 def resolved_canonical():
-    """The values a CANONICAL run actually uses, not the bare class defaults.
+    """The values a CANONICAL run actually uses — obtained by RUNNING one, not by re-deriving it.
 
-    This matters more than it sounds. The class default for most `enable_*` fields is False, but a real run
-    layers `emergent_village_demog()` + the VILLAGE and ELITE overlays on top, which turn ~50 of them on. A
-    file that reported the class defaults would say `enable_agglomeration = false` while every campaign runs
-    it true — worse than no file. Emitting the RESOLVED stack is also what makes the dark mechanisms visible
-    at a glance, which is the entire reason these files exist.
+    This matters more than it sounds, and the first version got it subtly wrong. The class default for most
+    `enable_*` fields is False, but a real run layers a preset and several overlays on top, so a file
+    reporting class defaults would say `enable_agglomeration = false` while every campaign runs it true —
+    worse than no file. The first version therefore emitted `emergent_village_demog() + VILLAGE + ELITE`,
+    battery1's overlay stack. That was still a RE-DERIVATION of the configuration rather than the
+    configuration itself, and it drifted: the overlay carried `divorce_rate = 0.004` over R-78's calibrated
+    0.005, so the authoritative file stated a number no campaign has ever run (R-106 Addendum 21).
+
+    So the generator now asks the campaign. `run_campaign.py` dumps its FULL resolved `DemographyConfig` into
+    `meta.demography_config` (R-101), so a two-step run with `C_ALLON=1` — every built mechanism on, which is
+    the standing rule — yields exactly what a canonical run uses, by construction, with no second copy of the
+    resolution logic to fall out of step. It costs a few seconds when regenerating.
     """
-    sys.path.insert(0, os.path.join(ROOT, "sic_games", "src"))
-    sys.path.insert(0, os.path.join(ROOT, "sic_games", "outputs", "phase1_social_evolution"))
-    sys.path.insert(0, os.path.join(ROOT, "sic_games", "outputs", "mechanism_battery"))
-    try:
-        from battery1_liveness import ELITE, VILLAGE
-        from run_se0_controlled_climate import emergent_village_demog
-        d = emergent_village_demog().model_copy(update=VILLAGE).model_copy(update=ELITE)
-        return {k: getattr(d, k) for k in type(d).model_fields}
-    except Exception as e:                      # never silently fall back to defaults
-        raise SystemExit(f"could not resolve the canonical preset ({type(e).__name__}: {e}) — refusing to "
-                         f"emit class defaults, which would misreport what a run does")
+    import json
+    import subprocess
+    import tempfile
+
+    camp = os.path.join(ROOT, "sic_games", "outputs", "substrate_run", "run_campaign.py")
+    tag = "_genconfig_probe"
+    out = os.path.join(os.path.dirname(camp), f"campaign_trajectory{tag}.json")
+    env = dict(os.environ, C_ALLON="1", C_TAG=tag, C_STEPS="2", C_FOUNDERS="150", C_MAXMIN="5",
+               C_LOGEVERY="600", C_GENEA="0")
+    with tempfile.TemporaryFile() as devnull:
+        p = subprocess.run([sys.executable, "-u", camp], cwd=ROOT, env=env,
+                           stdout=devnull, stderr=subprocess.PIPE, text=True)
+    if p.returncode != 0 or not os.path.exists(out):
+        raise SystemExit(f"could not run the canonical campaign to resolve its configuration "
+                         f"(rc={p.returncode}) — refusing to emit a re-derived stack, which is what put a "
+                         f"number no run has ever used into the authoritative file.\n{p.stderr[-2000:]}")
+    with open(out, encoding="utf-8") as fh:
+        cfg = json.load(fh)["meta"]["demography_config"]
+    os.remove(out)
+    return cfg
 
 
 def main():

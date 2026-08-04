@@ -7,9 +7,11 @@
      that does not exist. Otherwise a new mechanism could be added in code and silently never appear in the
      file a human reads before launching, which is the failure the files were built to end.
 
-  2. FIDELITY — building from the files reproduces the canonical preset (`emergent_village_demog` + VILLAGE +
-     ELITE) field for field. The files were GENERATED from that stack, so any difference means the generator,
-     the loader or the preset has moved and the two have drifted apart.
+  2. FIDELITY — building from the files reproduces, field for field, the configuration a CANONICAL RUN
+     actually uses: `run_campaign.py` with `C_ALLON=1`, read back from its own `meta.demography_config`.
+     Comparing against a re-derived preset instead is what let `divorce_rate` drift — the file asserted
+     0.004 while every campaign ran R-78's calibrated 0.005, and this test passed throughout (Addendum 21).
+     The check is only worth anything if both sides come from the same place a result comes from.
 
 If this test fails after adding a field, regenerate: `py -3 tools/gen_runconfig.py`.
 """
@@ -31,9 +33,32 @@ OWNERS = ["DemographyConfig", "SubstrateConfig", "CarbonConfig", "KcalEconomyCon
 
 
 def _canonical():
-    from battery1_liveness import ELITE, VILLAGE
-    from run_se0_controlled_climate import emergent_village_demog
-    return emergent_village_demog().model_copy(update=VILLAGE).model_copy(update=ELITE)
+    """The configuration a CANONICAL run actually uses, read back from a run — not re-derived.
+
+    This used to be `emergent_village_demog() + VILLAGE + ELITE`, battery1's overlay stack, and the fidelity
+    check therefore compared the files against a SECOND copy of the configuration rather than against the
+    configuration itself. The two drifted, exactly as a second copy does: the overlay carried
+    `divorce_rate = 0.004` over R-78's calibrated 0.005, so the authoritative file asserted a number no
+    campaign has ever run, and this test passed the whole time (R-106 Addendum 21).
+
+    So it asks the campaign, the same way `tools/gen_runconfig.py` does — a two-step run with `C_ALLON=1`,
+    whose dumped `meta.demography_config` is what a canonical run uses by construction.
+    """
+    import json
+    import subprocess
+    import tempfile
+    camp = os.path.join(ROOT, "sic_games", "outputs", "substrate_run", "run_campaign.py")
+    tag = "_t_runconfig_fidelity"
+    out = os.path.join(os.path.dirname(camp), f"campaign_trajectory{tag}.json")
+    env = dict(os.environ, C_ALLON="1", C_TAG=tag, C_STEPS="2", C_FOUNDERS="150", C_MAXMIN="5",
+               C_LOGEVERY="600", C_GENEA="0")
+    with tempfile.TemporaryFile() as devnull:
+        p = subprocess.run([sys.executable, "-u", camp], cwd=ROOT, env=env,
+                           stdout=devnull, stderr=subprocess.PIPE, text=True, timeout=600)
+    assert p.returncode == 0 and os.path.exists(out), \
+        f"the canonical campaign would not run, so fidelity cannot be checked:\n{p.stderr[-2000:]}"
+    with open(out, encoding="utf-8") as fh:
+        return json.load(fh)["meta"]["demography_config"]
 
 
 def test_files_exist_and_parse():
@@ -71,17 +96,30 @@ def test_owner_classes_build_from_the_files(owner):
     assert obj is not None
 
 
-def test_building_from_files_reproduces_the_canonical_stack_exactly():
+@pytest.mark.slow
+def test_building_from_files_reproduces_the_canonical_run_exactly():
     """FIDELITY: the whole safety argument. If this drifts, a run no longer does what the file says."""
     from_files = runconfig.build("DemographyConfig")
     canon = _canonical()
-    diffs = {f: (getattr(canon, f), getattr(from_files, f))
+    diffs = {f: (canon[f], getattr(from_files, f))
              for f in DemographyConfig.model_fields
-             if getattr(canon, f) != getattr(from_files, f)}
+             if f in canon and canon[f] != getattr(from_files, f)}
     assert not diffs, (
-        f"{len(diffs)} field(s) differ between the canonical preset and the config files "
-        f"(preset, file): { {k: v for k, v in list(diffs.items())[:10]} }\n"
+        f"{len(diffs)} field(s) differ between what a canonical run uses and what the files say "
+        f"(run, file): { {k: v for k, v in list(diffs.items())[:10]} }\n"
         f"Regenerate with: py -3 tools/gen_runconfig.py")
+
+
+@pytest.mark.slow
+def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
+    """The standing rule is that every BUILT mechanism runs unless it is off for an ablation, so the
+    authoritative file must show only the documented exclusions dark. A file that quietly listed 27 dark
+    mechanisms is the situation these files were created to end."""
+    canon = _canonical()
+    off = {k for k, v in canon.items() if k.startswith("enable_") and v is not True}
+    allowed = {"enable_infanticide", "enable_genealogy_log", "enable_bud_hazard",
+               "enable_stratification_inequality_gate", "enable_band_risk"}
+    assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 
 def test_overrides_are_validated_and_visible():

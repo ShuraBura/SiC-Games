@@ -655,10 +655,21 @@ def main():
             "(the stock resets on band fission ~10yr but needs ~50yr to mature). Set C_RESVIL=1.")
     if IMPROVED and not DEFEND:
         log("  !! CONFIG: C_IMPROVED=1 needs C_DEFEND=1 -- worked land cannot be claimed without defensibility.")
+    # THE BANNER READS OFF `demog`, NOT OFF THE ENV VARS. It used to print CONNUBIUM/BUD/ELITE/IMPROVED —
+    # the env-derived variables — which was fine while a knob was the only way to set those flags. C_ALLON can
+    # now enable a mechanism whose knob is unset, so the banner was reporting "budding=False connubium=cut1"
+    # on runs whose config had `enable_village_budding=True` and `enable_adaptive_connubium=True`. The one
+    # line a human reads before a run must not be able to disagree with the config that run uses.
+    _adaptive = getattr(demog, "enable_adaptive_connubium", False)
+    _budding = getattr(demog, "enable_village_budding", False)
     log(f"campaign: sha={sha} world={TERR}-{CLIM} founders={FOUNDERS} steps={STEPS} "
-        f"habitable={len(land)} connubium={CONNUBIUM}{'(m*='+str(MSTAR)+')' if cut2 else ''} "
-        f"defend={DEFEND} improved={IMPROVED} budding={BUD}{'(thr'+str(BUD_THR)+')' if BUD else ''} "
-        f"elite={ELITE} genome={GENOME} genealogy={'ON' if GENEALOG else 'OFF'} flush/{FLUSHEVERY}")
+        f"habitable={len(land)} "
+        f"connubium={'cut2(m*=' + str(demog.mate_search_min_eligible) + ')' if _adaptive else 'cut1'} "
+        f"defend={demog.enable_economic_defensibility} improved={demog.enable_improved_land} "
+        f"budding={_budding}{'(thr' + str(demog.village_fission_threshold) + ')' if _budding else ''} "
+        f"elite={demog.enable_legitimacy} soil={demog.enable_soil_depletion} "
+        f"genome={demog.enable_genome} genealogy={'ON' if demog.enable_genealogy_log else 'OFF'} "
+        f"flush/{FLUSHEVERY}")
     traj = []
     prev_leaders: dict = {}
     last_con: dict = {}

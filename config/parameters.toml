@@ -780,7 +780,7 @@ type  = "float"
 # headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep)
 
 [village_fission_threshold]
-value = 170
+value = 150
 owner = "DemographyConfig"
 type  = "int"
 # BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index
@@ -976,7 +976,7 @@ type  = "float"
 # kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest].
 
 [ascribed_mate_strength]
-value = 2.5
+value = 1.5
 owner = "DemographyConfig"
 type  = "float"
 # global scale `a` of the ascribed(cred) mating exponent; UNANCHORED
@@ -1019,7 +1019,7 @@ type  = "float"
 # 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient
 
 [genome_loci]
-value = 32
+value = 48
 owner = "DemographyConfig"
 type  = "int"
 # number of neutral loci (relatedness resolution ~1/L)
@@ -1085,7 +1085,7 @@ type  = "float"
 # r* first-cousin threshold for the "cousin" degree (needs enable_genome)
 
 [mate_search_min_eligible]
-value = 3
+value = 50
 owner = "DemographyConfig"
 type  = "int"
 # m*: eligible-mate famine-safety margin (the connubium's cv_safe)
@@ -1275,7 +1275,7 @@ type  = "str"
 # none|primogeniture|partible_equal|patrilineal_sons
 
 [material_heir_by_status]
-value = true
+value = false
 owner = "DemographyConfig"
 type  = "bool"
 # primogeniture → whole estate to the ELDEST surviving child (concentrates; the extensive-agri pattern)

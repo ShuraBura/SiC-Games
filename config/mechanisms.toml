@@ -25,13 +25,13 @@ type  = "bool"
 # (no provenance comment in source — UNDOCUMENTED, worth filling in)
 
 [enable_terrain_pathogen]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # (no provenance comment in source — UNDOCUMENTED, worth filling in)
 
 [enable_nutrition_synergy]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # (no provenance comment in source — UNDOCUMENTED, worth filling in)
@@ -77,7 +77,7 @@ type  = "bool"
 # 2b prerequisite)
 
 [enable_intake_fertility]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # INTAKE-based energetic fertility (supersedes the reserve-based branch above when ON). Measured
@@ -91,7 +91,7 @@ type  = "bool"
 # mechanism — fecundity tracks energy FLUX, not stored reserve.
 
 [enable_dependent_load]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze DEPENDENT
@@ -113,7 +113,7 @@ type  = "bool"
 # ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
 
 [enable_sedentism_fertility]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
@@ -126,7 +126,7 @@ type  = "bool"
 # stays on top). Default OFF ⇒ uniform IBI (bit-exact).
 
 [enable_standing]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── SOCIAL CAPITAL / STANDING — the village anchor with a REAL payoff (P6). Wiessner 1977 (!Kung
@@ -139,7 +139,7 @@ type  = "bool"
 # (low-standing juniors leave; established/elite stay). Default OFF ⇒ facet absent, bit-exact.
 
 [enable_store_anchor]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── STORE ANCHOR (P1). The cell granary is a REAL payoff (allocate_store_draw already prevents
@@ -171,7 +171,7 @@ type  = "bool"
 # penalty.
 
 [enable_condition]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease
@@ -263,7 +263,7 @@ type  = "bool"
 # global config.)
 
 [enable_economic_defensibility]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── ECONOMIC DEFENSIBILITY / OWNED-PATCH (blueprint …_EconomicDefensibility; Dyson-Hudson & Smith 1978):
@@ -279,7 +279,7 @@ type  = "bool"
 # None ⇒ movement/split bit-exact.
 
 [enable_improved_land]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # IMPROVED-LAND (agriculture): cultivable land becomes DEFENSIBLE/claimable where it is actively WORKED —
@@ -330,7 +330,7 @@ type  = "bool"
 # scalar stress weakens → village grows toward the ceiling. Default OFF.
 
 [enable_tier2_shock]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews —
@@ -352,7 +352,7 @@ type  = "bool"
 # S_pot = aquatic_food only ⇒ bit-exact.
 
 [enable_soil_depletion]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # AGRICULTURE TIER Layer B1 — SOIL DEPLETION (the bust driver fisheries lack). A FARM settlement
@@ -363,7 +363,7 @@ type  = "bool"
 # (relocation = Layer B3). Default OFF ⇒ soil≡1 ⇒ bit-exact.
 
 [enable_alluvial_renewal]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ALLUVIAL RENEWAL — soil renewal is TERRAIN-dependent, not uniform. The annual FLOOD re-deposits nutrient
@@ -377,7 +377,7 @@ type  = "bool"
 # every farm depletes (bit-exact).
 
 [enable_emergent_abandonment]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # EMERGENT ABANDONMENT — a settlement's HOLD on its people is not permanent; it erodes when the village's
@@ -485,7 +485,7 @@ type  = "bool"
 # = bit-exact back-compat.
 
 [enable_emergent_band_size]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # EMERGENT BAND SIZE v3 (blueprint …_EmergentBandSize; R-72). Band size = the argmax of {risk-pooling −
@@ -563,7 +563,7 @@ type  = "bool"
 # documentation tidiness at the cost of re-validating R-54…R-64.
 
 [enable_malnutrition_fission]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # Resource-response redesign (blueprint …_ResourceResponse_Scoping): M2 — MALNUTRITION FISSION: a band
@@ -578,7 +578,7 @@ type  = "bool"
 # fission (small bands just shrink/die). Default OFF.
 
 [enable_resource_directed_fusion]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # F — RESOURCE-DIRECTED FUSION: a band below band_merge_size joins the RICHEST nearby neighbour (highest
@@ -600,7 +600,7 @@ type  = "bool"
 # leadership (Johnson/Testart). Default OFF ⇒ hard cap, bit-exact.
 
 [enable_village_budding]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # VILLAGE BUDDING (Bandy 2004; Chagnon 1975) — the ethnographic settlement-SPREAD/recovery mode. A village
@@ -627,7 +627,7 @@ type  = "bool"
 # size-threshold path, bit-exact
 
 [enable_wealth_obligation]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # default OFF ⇒ bit-exact
@@ -693,7 +693,7 @@ type  = "bool"
 # the persistent pair-bond year-round. Default OFF ⇒ daily within-band pairing, bit-exact.
 
 [enable_genome]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── Neutral-marker GENOME (population genetics: relatedness, inbreeding, effective pop size Nₑ, drift). A
@@ -824,7 +824,7 @@ type  = "bool"
 # (no provenance comment in source — UNDOCUMENTED, worth filling in)
 
 [enable_exogamy]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the
@@ -833,7 +833,7 @@ type  = "bool"
 # blueprint …_Connubium. Default OFF ⇒ only the historical parent-child avoidance applies (bit-exact).
 
 [enable_adaptive_connubium]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # Cut 2 — ADAPTIVE connubium: replace the fixed aggregation_radius with a per-seeker expanding-ring search
