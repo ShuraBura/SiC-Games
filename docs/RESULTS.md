@@ -4147,6 +4147,65 @@ that uncertainty.
 `probe_hcycles.period_of` (the R-87c/d validated detector: linear detrend, reject periods beyond window/3,
 require a genuine local ACF maximum). Seed 0 incomplete. No source changed.
 
+**ADDENDUM 19 — RETRACTION AND QUALIFICATION: the baseline trajectories used as a control were TWO DAYS
+OLDER than the arms compared against them, so Addendum 12's headline and today's MARKER_MATRIX #14 claim both
+measured CODE DRIFT, not the flags. Sixth instrument fault of the arc, fourth of them mine (2026-08-03).**
+
+**How it was caught.** A solo ablation of `enable_wealth_obligation` was run to attribute the apparent
+MARKER_MATRIX #14 movement. It came back NEGATIVE (`noble_material_lift` 1.248 → 1.183, −5%, 2/6 pairs up;
+`leader_material_lift` 0/6 pairs up). But its BASELINE read **1.248**, where the battery6 baseline used an hour
+earlier read **1.059** for the nominally identical configuration. That discrepancy — not the ablation result —
+is the finding.
+
+**PROVENANCE (checked by file mtime):**
+
+| trajectory set | written |
+|---|---|
+| battery6 BASELINE `_b6_*` (used as the control all day) | **2026-07-29 00:21** |
+| battery6 ALL-ON `_b6_allon_*` | 2026-07-31 10:30 |
+| bisect baseline `_bx2000_base_*` (same-session control) | 2026-08-03 13:55 |
+
+**Commits that landed between the control and the arms compared to it** include, verbatim from the log:
+`4980344` **"THE WEALTH FIX: a feast is an EVENT, not a per-step bleed — and the elite now accrues wealth"**;
+`4c1c90a` "Marker matrix: wire 14 markers that were computed every step and never recorded";
+`ed8cb11` "Adopt the Marlowe polygyny calibration"; the entire 2026-07-30 R-106 demography arc
+(`f2e839e` intake fertility, `3db3532` dependent load, `13bcb5b` Kaplan convex ramp, `676f37d`, `b15017e`);
+and this session's own `a3e0b64`…`5204d75`.
+
+**1. RETRACTED — the MARKER_MATRIX #14 claim.** Earlier today I reported `noble_material_lift` 1.059 → 1.228
+(+16%, 24/25 pairs up) and called the project's "live open question" moved for the first time. **It is not.**
+The same-code control run in this session gives baseline **1.248** against all-on **1.228** — no material
+difference. The +16% is almost certainly commit `4980344`, whose own message states the elite now accrues
+wealth. The marker moved because of a fix made on 2026-07-29, not because of the dark flags.
+
+**2. QUALIFIED — Addendum 12's headline is NOT established.** "ALL-ON scores materially worse on 3 of 6
+markers (connubium 13→3/25, lineage Gini 12→3/25, band 23→20/25)" compared the 07-29 baseline against the
+07-31 all-on arms. Two days of substantive model change sit between them, including a demography overhaul that
+directly touches fertility, mortality and lineage formation — precisely the quantities those markers measure.
+**The comparison cannot separate flags from code drift, so the conclusion "the preset's curation is
+load-bearing" is unsupported as stated.** Addendum 12's *method* corrections (the run-length truncation, the
+tag fix) stand; its headline does not. Note the same-session bisect baseline (`band_med` 6/6, `connubium_med`
+1/6, `lineage_size_gini` 1/6, `settle_med` 6/6) with groups added on top showed NO large degradation, which is
+consistent with the flags being far less harmful than Addendum 12 claimed.
+
+**3. CONFIRMED, and it agrees with the project's own prior finding.** The solo `enable_wealth_obligation`
+ablation shows it does not concentrate durable wealth (−4 to −5% across three markers, 0–2 of 6 pairs up).
+Commit `605000b` (2026-07-29) already recorded exactly this: *"Wealth → obligation → production (Sahlins), and
+the finding that it is NOT sufficient."* An independent reproduction of a known negative — which is the one
+clean thing to come out of this.
+
+**THE LESSON, and it is the general one.** **Pre-existing trajectory files are not a control.** They carry no
+record of the code that produced them, so any A/B that reuses them silently compares two different models. This
+is the same failure as Addendum 12's un-suffixed scoring tags (which also silently read old files) and as the
+bisect tags without a horizon — three variants of one mistake: *trusting a file's name instead of its
+provenance*. **Any future A/B must run BOTH arms with the same commit, in the same session**, or verify the
+commit that produced each trajectory. The campaign banner already prints `sha=` — that should be read back and
+compared before any cross-run claim.
+
+**Origin:** solo ablation via `B_SOLO` (`diag_bisect_allon.py`), material scoring via `score_material.py`
+(scratchpad), provenance by file mtime and `git log --since`. No source changed. Retracts one claim made
+earlier this session and qualifies Addendum 12.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
