@@ -239,10 +239,24 @@ def stage_s2(R):
     if ref is None:
         log("S2 skipped — no full-stack reference arm on this build")
         return
-    testable = [f for f in flags if f not in SKIP]
-    log(f"S2 MECHANISM AUDIT — ablate each of {len(testable)} flags OUT of the full stack ({w0} s{sd})")
+    # R6 (added after the first S2 run scored 7 invalid verdicts): only ablate a flag that is actually ON in
+    # the reference stack. Setting an already-False flag to False is a no-op, so it reads INERT trivially —
+    # "the mechanism does nothing" and "the mechanism was never running" are different claims and the first
+    # one is a finding. The campaign records the resolved config in `meta.demography_config`, so read it.
+    cfg = (ref.get("meta") or {}).get("demography_config") or {}
+    if not isinstance(cfg, dict):
+        cfg = {}
+    in_stack = [f for f in flags if f not in SKIP and cfg.get(f) is True]
+    not_in_stack = [f for f in flags if f not in SKIP and cfg.get(f) is not True]
+    log(f"S2 MECHANISM AUDIT — ablate each of {len(in_stack)} ON flags OUT of the full stack ({w0} s{sd})")
     for f, why in SKIP.items():
         log(f"    SKIP {f}: {why}")
+    if not_in_stack:
+        log(f"    NOT IN STACK ({len(not_in_stack)}) — off in the reference build, so NOT TESTED (ablating an "
+            f"already-off flag is a no-op and would read INERT for free):")
+        for f in not_in_stack:
+            log(f"      {f}")
+    testable = in_stack
     arms = [(f"_b7_abl_{f.replace('enable_','')}_{w0}_s{sd}",
              dict(C_TERR=terr, C_CLIM=clim, C_SEED=sd, C_ALLON="1", C_EXTRA_OFF=f)) for f in testable]
     run_arms(arms, STEPS)
