@@ -4088,6 +4088,65 @@ intake brake moves regulation from deaths to births and lowers the equilibrium.
 **Origin:** diagnostic-only; `diag_bisect_allon.py` (horizon-tagged) + `score_bisect_paired.py` (scratchpad,
 re-analysis of the same trajectories, no new simulation). 3 worlds × 2 seeds, 1800 steps. No source changed.
 
+**ADDENDUM 18 — MALTHUS RETEST ON A TRACTABLE WORLD: NO CYCLES. Population does not oscillate, it DECLINES
+in every completed seed — the slow variable (soil) DRAGS carrying capacity down rather than driving
+oscillation. And the equilibrium-seeding trick failed for an instructive reason (2026-07-31).**
+
+**Design, and why it is the first tractable attempt.** Every prior cycle test in this arc was uninterpretable
+because the population never reached stationarity (Addendum 6). Two changes fixed the tractability: a SMALL
+world (`patch=32` ⇒ 708–1008 habitable cells, so equilibrium is reached in hundreds of steps rather than
+thousands) and **seeding AT the measured equilibrium** rather than growing into it (R-106: starts of 3k/12k/20k
+converge on the same attractor). ALL-ON, 6000 steps, sampled every 4 (1500 samples ⇒ `period_of` accepts
+periods to window/3 = 2000 steps = 167 yr, covering the 60–100 yr anchor), 3 seeds. Founders tuned to
+6200/6000/4400 after a first attempt at 10,000 proved ~60% too high and cost 2.2 s/step.
+
+| series | seed 1 | seed 2 | verdict |
+|---|---|---|---|
+| population | trend **−11.4%**/1000 steps, ratio 0.805 → **DRIFTING** | **−13.0%**/1000, ratio 0.690 → **DRIFTING** | **uninterpretable** |
+| occupied cells | stationary; period 1368, ac_peak **−0.003** | stationary; period 784 (65 yr), ac_peak **+0.042** | **NO CYCLE** (both ≤ null p95 0.13) |
+| mean wealth | stationary; period **144 (12.0 yr)**, ac_peak **+0.312**, CV 0.101 | stationary; period **240 (20.0 yr)**, ac_peak **+0.176**, CV 0.134 | see below |
+
+(Seed 0 incomplete at 3000/6000 steps; its trajectory 6200 → 10522 → **12054** → 11926 → 9982 → 8301 → 8001
+shows clear OVERSHOOT then decline.)
+
+**1. NO MALTHUSIAN CYCLES — and this time the negative is INTERPRETABLE.** `occupied_cells` is stationary in
+both completed seeds and its autocorrelation peak is **−0.003 and +0.042**, at or below R-87d's calibrated
+null floor (p95 = 0.13). That is a genuine negative on a stationary series — **the first one this arc has been
+entitled to state**, since every previous attempt failed the stationarity gate.
+
+**2. THE ONE REPRODUCIBLE POSITIVE IS NOT A SECULAR CYCLE.** `mean_wealth` clears the null floor in BOTH seeds
+(+0.312, +0.176). But it fails on three counts: the **periods disagree by 1.7×** (12.0 vs 20.0 yr — two seeds
+agreeing that *a* peak exists while disagreeing on *where* is not a period); both are far below the **60–100 yr**
+ethnographic anchor; and the detrended CV is **10–13%** against the **30–50%** swings real secular cycles show.
+It is also a per-capita STOCK, not the Malthusian population variable. **Plausible mechanical origin, offered
+as a hypothesis and not a finding:** `soil_regrow_per_yr ≈ 0.06` gives a ~17 yr time constant, squarely in the
+12–20 yr band — i.e. this may simply be the soil depletion/regrowth relaxation showing up in wealth, not a
+population dynamic at all.
+
+**3. THE REAL FINDING — THE SLOW VARIABLE DRAGS, IT DOES NOT CYCLE.** R-106 and R-97 concluded that cycles
+need a SLOW variable and that the model had none. `enable_soil_depletion` supplies one (~17 yr). With it live,
+population does not oscillate around a level — **it falls monotonically in both completed seeds** (−11.4%,
+−13.0% per 1000 steps) and, in seed 0, overshoots to 12,054 and then falls a third to 8,001. Progressive
+capacity degradation moves the attractor DOWNWARD instead of creating a delayed restoring force. **A slow
+variable is necessary for cycles but is evidently not sufficient; a degrading one produces decline, not
+oscillation.**
+
+**4. THE EQUILIBRIUM-SEEDING TRICK FAILED, INSTRUCTIVELY.** It was meant to deliver stationarity by starting
+at the attractor. It could not, because **under soil depletion there is no stationary state to start at** —
+carrying capacity itself is falling, so any seeded level is transient by construction. Future cycle tests face
+a fork: ablate soil depletion (removing the only slow variable, and with it any hope of a delayed feedback), or
+accept a declining baseline and detrend hard enough to test for oscillation *about the trend* — which
+`period_of` already does via its linear detrend, and which is what makes the `occupied_cells` negative usable.
+
+**5. A CAUTION ON SINGLE-SEED DENSITY CLAIMS.** The three seeds settle at very different densities — seed 0
+~0.120/km² (after overshoot), seed 1 ~0.062, seed 2 ~0.035 and falling — a **3× spread** on worlds differing
+only in the terrain lottery. Any density statement from one seed, including several made earlier today, carries
+that uncertainty.
+
+**Origin:** diagnostic-only; `diag_malthus_stationarity.py` (scratchpad), `patch=(30,30,32)`, ALL-ON,
+`probe_hcycles.period_of` (the R-87c/d validated detector: linear detrend, reject periods beyond window/3,
+require a genuine local ACF maximum). Seed 0 incomplete. No source changed.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
