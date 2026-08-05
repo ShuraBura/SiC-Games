@@ -4647,6 +4647,77 @@ worlds are trusted as representative.
 Addendum 21's qualification that `connubium_med` had to be re-measured with the adaptive connubium switched
 on — it was, and it overshoots.
 
+**ADDENDUM 25 — CORRECTION to Addendum 24, twice over. There is no anchor conflict in the connubium (R-67
+retracted the 475 three weeks ago and the CODE NEVER FOLLOWED), and `connubium_med` is TWO DIFFERENT
+STATISTICS reported under one name — so Addendum 24's control-vs-full comparison put a pool-of-adults count
+beside a population-within-reach count (2026-08-04).**
+
+**PART 1 — THE PROPAGATION FAILURE.** Addendum 24 read the connubium overshoot as a conflict between two
+anchors: *"m* = 50 was calibrated to Wobst's ~475 reach … and both cannot be met at once."* **Wrong on both
+halves.** `LITERATURE.md` (2026-07-13) and RESULTS **R-67** had already settled it:
+
+> Wobst's **Minimum Equilibrium Size** … his 40 simulation runs returned **MES = 79–332** — the commonly cited
+> **175–475 is an *extrapolation*** … The earlier `mate_search_min_eligible` calibration to reach ~475
+> (m* = 50) anchored to the contested max-dispersal extrapolation … **re-anchored to MVP (m* ≈ 15)**.
+
+Wobst's real MES **is** the MARKER_MATRIX band, and White's MVP ~150 sits inside it. The anchors agree.
+
+The defect is that the re-anchoring never reached the code. `run_campaign.py` kept
+`MSTAR = int(os.environ.get("C_MSTAR", "50"))  # probe: m*=50 → median reach 496 ≈ Wobst` — the retired value,
+with the RETRACTED anchor quoted in its own comment as justification, for three weeks. Fixed: default → 15,
+with the retraction recorded at the point of use. Fourth instance of one shape; now **MECHANISM_CHARTER §11,
+the propagation discipline**.
+
+**PART 2 — AND THE MARKER IS TWO STATISTICS.** Prompted by the supervisor's question — *is the lit anchor
+biome-specific, so could the model legitimately differ?* Wobst's MES is indeed density-dependent, but the
+dominant effect is that `self._connubium_sizes` is appended from two places with two different quantities:
+
+    phase1_model:3642   (Cut-1, gathering)   append(pool_n)      # distinct adults in the mating pool
+    phase1_model:3719   (Cut-2, adaptive)    append(reach_pop)   # TOTAL POPULATION within the realized reach
+
+`reach_pop` increments once for **every agent** in every cell of the expanding search ring — all ages, both
+sexes. That is exactly Wobst's quantity, *"persons living in the intervening distance between two marriage
+partners"*. `pool_n` is not. The class attribute declares only the first meaning
+(*"distinct-adult size of each mating pool"*), so the name and the comment describe the Cut-1 statistic while
+Cut-2 silently reports another.
+
+**Consequences for Addendum 24, precisely:**
+- the FULL-stack numbers (440–2387) ARE in the anchor's units and DO overshoot [79, 332] by 1.3–7×. **That
+  finding stands.**
+- the CONTROL numbers (8–89) are a pool-of-adults count and are **not comparable to the band at all**. Scoring
+  them "1/8 in [79–332]" was a category error, and so was the conclusion that the band *"lies strictly between
+  the two arms"* — the two arms are not measuring the same thing, so nothing was bracketed.
+
+**WHY THE POOL REACHES 75% OF THE WORLD.** The ring expands until `len(eligible) >= m_star`, where eligible
+means adult male, non-kin, exogamy-passing and not already at `max_wives`. Those are a small minority, so
+finding 50 of them requires sweeping a large area, and `reach_pop` counts everyone swept. In `flat_savanna_s0`
+(pop 1563, dispersed) that is 1168 people — 75% of everyone alive. Full-stack `connubium_med / pop` across the
+eight long arms: 0.75, 0.73, 0.33, 0.17, 0.17, 0.13, 0.11, 0.11. **A mate-search catchment holding 11–75% of a
+population is not a catchment**, and at m* = 50 it was guaranteed by arithmetic rather than by any biology.
+With the default now 15 the reach should fall by roughly the same factor; that is measured, not assumed, and
+is not yet done.
+
+**AN OPEN TENSION, stated rather than resolved.** Wobst is explicit that the MES **SHRINKS as residential
+units aggregate** — "a large village already contains the pool". Measured on the full-stack arms, where
+`connubium_med` genuinely is the MES: `corr(connubium_med, density_per_km2) = +0.544`,
+`corr(…, n_villages) = +0.572`. The model's reach RISES with aggregation. This is confounded — `n_villages`
+also tracks total population, and `reach_pop` scales with the area that had to be swept — so it is not yet a
+finding. Disentangling it needs a same-population, different-aggregation pair.
+
+**WHAT IS NOW OPEN.** (a) Split the two statistics — a Cut-1 pool size and a Cut-2 reach are both worth having,
+under different names, and only the second is scoreable against Wobst. (b) `MARKER_MATRIX` row 4 must say
+which quantity it scores, since White's demographic pool and Wobst's spatial reach are different numbers with
+different dependencies. (c) Re-measure the reach at m* = 15 before treating the re-anchor as verified.
+
+**A PLANNED SWEEP WAS STOPPED BECAUSE OF THIS.** m* over 50/25/15/8 was running when the two-statistics
+problem was found. It was killed rather than completed: half its arms would have reported `pool_n` and half
+`reach_pop`, scored against one band. Reporting that would have been a D3/D4 failure dressed as a calibration.
+
+**Origin:** `LITERATURE.md` 2026-07-13, RESULTS R-67, `MARKER_MATRIX.md` row 4,
+`phase1_model.connubium()` and lines 3642/3719, and Addendum 24's 16 long arms re-read for composition and
+density. Corrects Addendum 24's anchor-conflict reading AND its control-vs-full bracketing. `C_MSTAR` default
+50 → 15 committed as the documented re-anchor; whether 15 is right is now OPEN, not closed.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

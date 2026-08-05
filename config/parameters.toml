@@ -1093,7 +1093,7 @@ type  = "float"
 # r* first-cousin threshold for the "cousin" degree (needs enable_genome)
 
 [mate_search_min_eligible]
-value = 50
+value = 15
 owner = "DemographyConfig"
 type  = "int"
 # m*: eligible-mate famine-safety margin (the connubium's cv_safe)

@@ -454,6 +454,75 @@ And ask the second question (D16): **in which world is this true?** A result car
 in. Ten results from one biome are one result.
 
 
+## 11. THE PROPAGATION DISCIPLINE — rules for the second copy
+
+**Adopted 2026-08-04 after four defects in one arc turned out to be the same failure: a value was corrected in
+one place and the other copy was never updated.** §3 governs what a MECHANISM must declare; §10 what a
+MEASUREMENT must declare. This section governs what a CALIBRATION must do when it changes.
+
+**The single sentence that unifies them:** *every calibrated value exists in at least two places — the code
+that uses it and the document that justifies it — and nothing checks that they agree.* None of these were
+careless. Each correction was made carefully, written up properly, and then simply did not travel.
+
+### The four failures these rules are derived from
+
+| # | Failure | What actually happened | Rule |
+|---|---|---|---|
+| R-78 / Add. 21 | `divorce_rate` | calibrated to 0.005 against Hill & Hurtado; a `VILLAGE` overlay written ten days later said 0.004; `config/parameters.toml` is generated from that overlay, so the AUTHORITATIVE file stated a number no campaign has ever run — and the fidelity test passed, because it compared the file against the same wrong copy | **P1 P4** |
+| R-85c / Add. 24 | audit `MAGNITUDE` table | test magnitudes ("turn it on hard enough to see it") described in the table's own docstring as *"the live ones used by `emergent_village_demog()`"*; three disagreed with the canonical run, including two mechanisms scored INERT because they run at 0.0 | **P1 P4** |
+| R-67 / Add. 25 | `C_MSTAR` | the 475 connubium anchor was RETRACTED and re-anchored to m*≈15 on 2026-07-13 in `LITERATURE.md` and `MARKER_MATRIX.md`; the code default stayed at the retired 50 **with the retracted anchor quoted in its own comment as justification**, for three weeks | **P2 P3** |
+| Add. 12 | `settle_tier2_yield` | `PARAMETERS.md` described it as "~7× a village's need"; measured, it was 0.012% of tier-1 — false by four orders of magnitude, and it survived because the sentence was never a checkable statement | **P5** |
+
+### The rules (binding on any calibration change)
+
+**P1 — ONE SOURCE OF TRUTH PER VALUE; DOCS CITE, THEY DO NOT RESTATE.** The value lives in the config field.
+A document that needs to mention it names the FIELD alongside the number, so the pair can be checked:
+`mate_search_min_eligible = 15`, not "m*≈15". A number in prose with no field name cannot be verified and will
+rot. *(`divorce_rate` and the `MAGNITUDE` table were both second copies that drifted silently.)*
+
+**P2 — A RE-ANCHORING IS NOT DONE UNTIL THE DEFAULT MOVES.** Changing an anchor in `LITERATURE.md`,
+`MARKER_MATRIX.md` or `PARAMETERS.md` is half of the change. The same commit must change the parameter, or say
+in the commit message why it does not and leave a task. A doc-only re-anchor is a claim the model does not
+honour. *(R-67 re-anchored the connubium and every Cut-2 run for three weeks used the retired number.)*
+
+**P3 — A RETRACTED ANCHOR IS EDITED AT THE POINT OF USE, IN THE SAME COMMIT.** Retracting a number in the
+literature file does not retract the comment that cites it as justification next to the code. Delete or mark
+that comment, and say what replaced it — a stale justification is worse than none, because the next reader
+takes it as authority. *(`C_MSTAR`'s comment read "probe: m*=50 → median reach 496 ≈ Wobst" for three weeks
+after Wobst's actual result was shown to be 79–332.)*
+
+**P4 — A SECOND COPY IS TESTED OR IT IS DELETED.** Where a value genuinely must appear twice — a test
+magnitude, a harness overlay, a preset — a test asserts the two agree, or DECLARES the disagreement with its
+reason. There is no third option, and "they are obviously the same" is how both of the drifts above began.
+*(`test_mechanism_audit_coverage.py` and `test_runconfig_sync.py` now pin two of these; each was written after
+the drift, not before.)*
+
+**P5 — A DOC CLAIM ABOUT A MEASURABLE QUANTITY NAMES ITS MEASUREMENT.** "≈7× a village's need", "the live
+ones", "median reach 496" — each was a quantitative assertion with no run behind it and no way to fail. State
+the number, the run that produced it, and the date; or write that it is unmeasured. *(`settle_tier2_yield`'s
+description was wrong by four orders of magnitude and read as authoritative for months.)*
+
+### What makes this enforceable rather than remembered
+
+A rule that depends on someone remembering it is the same class of thing as the drift it prevents. P1's field-
+naming convention exists so the doc↔code pair is MACHINE-CHECKABLE: a value written beside its config field
+name can be parsed out of the document and compared against `config/parameters.toml` by a test, exactly as
+`test_runconfig_sync.py` compares the config files against a real run and `test_mechanism_audit_coverage.py`
+compares the audit table against the canonical stack.
+
+Until that test exists, P1–P5 are honour-system rules and should be treated as the weakest part of this
+charter. **The test is the deliverable; the rules are its specification.**
+
+### The habit these encode
+
+Before closing a calibration change, ask: **where else does this number live?** Grep for the value, and for the
+anchor's name, and for the field's name. If the answer is "nowhere", say so in the commit. If it is anywhere,
+that copy is now part of the change.
+
+And the second question, which is what all four failures share: **would anything have failed if I had only
+done half of this?** If the answer is no, the half you skipped is the one that rots.
+
+
 ---
 
-*Charter adopted 2026-07-18. Amend by dated note; classifications in §4 are append/update, not rewrite.*
+*Charter adopted 2026-07-18; §11 added 2026-08-04. Amend by dated note; classifications in §4 are append/update, not rewrite.*
