@@ -4589,6 +4589,64 @@ than scaling it by a free parameter, is the obvious candidate to try next. That 
 `DemographyConfig`, both default-off. Corrects Addendum 22's closing inference; every measurement in
 Addendum 22 stands.
 
+**ADDENDUM 24 — THE LONG-HORIZON ENVELOPE, complete for the first time: 16/16 arms at 2500 steps on the fixed
+build. The full stack is NOT uniformly worse than the control — it FIXES two markers and BREAKS two — and the
+connubium is now BRACKETED between the two arms, which makes it a calibration with an anchor on both sides
+rather than an open failure (2026-08-04).**
+
+**THE INSTRUMENT.** Battery 7 stages S1 and S3 on build `f77be6a` — the build carrying Addendum 21's
+configuration fixes (`C_ALLON` reaching 38 mechanisms rather than 28, `C_ELITE` implied, the `tree_dirty`
+gate), Addendum 23's corrections, the wired climate layer, and the savanna world. Four worlds
+(coastal/flat/hilly temperate + **flat savanna**) × 2 seeds, paired, same build, same session. **All 16 arms
+reached the full 2500 steps** — Addendum 20's attempt lost 8 of 12 to the wall-clock cap and its S3 numbers
+were withdrawn as under-powered, so this is the first time the envelope has actually been measured.
+
+| marker | band | CONTROL | FULL STACK |
+|---|---|---|---|
+| `band_med` | Johnson 18–35 | **7/8** (17.5–33) | 5/8 (19–39) |
+| `settle_med` | Bar-Yosef 50–150 | 6/8 (21–122) | 6/8 (52–154) |
+| `settle_med` | Alvard 50–250 | 6/8 | **8/8** |
+| `connubium_med` | White MVP 79–332 | 1/8 (**8–89**) | 0/8 (**440–2387**) |
+| `lineage_size_gini` | BHM 0.51–0.68 | 1/8 (0.411–0.532) | **8/8** (0.522–0.600) |
+| `lin_top_share` | Karmin 0.08–0.30 | 1/8 (0.024–0.085) | 1/8 (0.011–0.124) |
+
+**1. THE FULL STACK IS NOT A NET LOSS, which is a change from Addendum 20's reading.** It takes
+`lineage_size_gini` from 1/8 to **8/8** — every arm inside BHM 2009's band, range 0.522–0.600 against a band
+of 0.51–0.68 — and `settle_med` from 6/8 to 8/8 on Alvard's wider village band. Those are the two markers the
+lineage and settlement layers exist to produce, and with the previously-dark mechanisms switched on they land.
+
+**2. THE CONNUBIUM IS NOW BRACKETED, and that is the most useful single number here.** With the adaptive
+connubium OFF (the control, `m* = 3`) the reach is **8–89**, below White's MVP band. With it ON at `m* = 50`
+the reach is **440–2387**, overshooting by up to 7×. The band [79, 332] lies strictly between the two arms, so
+`mate_search_min_eligible` has an anchor on BOTH sides — a genuine interpolation rather than an open failure.
+This also surfaces an anchor conflict worth settling: `m* = 50` was calibrated to **Wobst's ~475 reach**,
+which is a different quantity from White's minimum viable population, and both cannot be met at once.
+
+**3. `lin_top_share` FAILS IN BOTH ARMS** — 1/8 either way, 0.011–0.124 against Karmin's 0.08–0.30, i.e. short
+by roughly an order of magnitude at the low end. It is a BASELINE failure and was never flag-caused. Whatever
+concentrates Y-lineages in Karmin 2015 is not in this model, and no configuration change in this arc has
+touched it. That is the one marker with no route currently visible.
+
+**4. `band_med` gets worse, and it is the cohesion clamp.** 7/8 → 5/8, the full stack reaching 39 against
+Johnson's ceiling of 35, with the misses in coastal- and flat-temperate. This is the same +40% Addendum 22
+attributed and Addendum 23 diagnosed: with `cohesion_frac` pinned, `split_thr` is the constant
+`band_split_size = 45` and the realised median sits at ~0.75 of it. The measured candidate fix
+(`enable_leaky_assabiyah` + a leader weight) puts `band_med` back to 26.8–29.0 in-process but is NOT adopted,
+because the leader weight is an unanchored constant (Addendum 23).
+
+**5. THE SAVANNA WORLD BEHAVES DIFFERENTLY, and it is the control's only `settle_med` miss** (21, far below
+Bar-Yosef's floor of 50) and its only `band_med` miss. This is the first time the Hadza-anchored biome has
+been in a battery at all — it was an explicit-only preset no harness had ever requested — so a divergence
+there is expected and unexamined rather than a defect. It deserves its own look: most of the ethnographic
+anchors in this project (Hadza band size, Hadza intercept hunting, the savanna return rates) come from
+exactly this biome, so a world that fails `settle_med` there is worth understanding before the temperate
+worlds are trusted as representative.
+
+**Origin:** `battery7_controlled.py` stages S1+S3, build `f77be6a`, `B7_WORLDS` including `flat_savanna`,
+133 min wall clock, 16/16 arms at horizon 2500. Supersedes Addendum 20's withdrawn S3 numbers. Confirms
+Addendum 21's qualification that `connubium_med` had to be re-measured with the adaptive connubium switched
+on — it was, and it overshoots.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
