@@ -118,7 +118,11 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
     canon = _canonical()
     off = {k for k, v in canon.items() if k.startswith("enable_") and v is not True}
     allowed = {"enable_infanticide", "enable_genealogy_log", "enable_bud_hazard",
-               "enable_stratification_inequality_gate", "enable_band_risk"}
+               "enable_stratification_inequality_gate", "enable_band_risk",
+               # A CANDIDATE under evaluation rather than a built mechanism awaiting activation — a
+               # structural change to assabiyah that is measured and defensible but NOT adopted (Addendum
+               # 23). C_ALLON must not adopt a model change by side effect.
+               "enable_leaky_assabiyah"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

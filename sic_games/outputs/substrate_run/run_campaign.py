@@ -504,6 +504,14 @@ def main():
             # into a no-op: "on" in the config dump, INERT in every ablation, and a death spiral at any value
             # that would make it live. Excluded rather than enabled-at-zero, which is the honest state.
             "enable_band_risk",
+            # A CANDIDATE UNDER EVALUATION, not a built mechanism awaiting activation. `enable_leaky_assabiyah`
+            # changes assabiyah from a constant-leak integrator (no interior fixed point — bang-bang by
+            # construction) to a leaky one whose fixed point tracks surplus. It is measured and defensible
+            # (RESULTS Addendum 23) but NOT adopted, and it only restores the cohesion headroom in company
+            # with an unanchored `cohesion_leader_weight`. C_ALLON turning it on would have adopted a
+            # structural model change by side effect — which is the exact class of accident this whole audit
+            # has been about. Remove this line when the supervisor adopts it.
+            "enable_leaky_assabiyah",
         }
         # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
         # parameters that have to move with the flag for it to mean anything.

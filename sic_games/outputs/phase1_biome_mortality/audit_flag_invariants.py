@@ -49,6 +49,11 @@ TYPES = {
     "enable_exogamy": "A", "enable_adaptive_connubium": "A", "enable_band_affiliation": "A",
     "enable_dynamic_bands": "A", "enable_emergent_band_size": "A", "enable_size_repulsion": "A",
     "enable_malnutrition_fission": "A", "enable_resource_directed_fusion": "A",
+    # R-106 Addendum 23: changes assabiyah from a constant-leak integrator (no interior fixed point — it is
+    # bang-bang by construction) to a leaky one whose fixed point tracks band surplus. Type A because what it
+    # governs is the fission/fusion threshold, i.e. the band graph. A CANDIDATE, default-off and excluded
+    # from C_ALLON until adopted.
+    "enable_leaky_assabiyah": "A",
     "enable_aggregation_sedentism": "A", "enable_settlement_scalar_stress": "A", "enable_village_scaling": "A",
     "enable_village_budding": "A", "enable_morph": "A", "enable_economic_defensibility": "A",
     "enable_leader_office": "A", "enable_leader_coherence": "A", "enable_band_family_knobs": "A",
@@ -176,6 +181,8 @@ PREREQ = {
     "enable_adaptive_connubium": ("enable_pair_bonds",), "enable_marriage_aggregation": ("enable_pair_bonds",),
     "enable_bonded_mating": ("enable_pair_bonds",), "enable_exogamy": ("enable_band_affiliation",),
     "enable_emergent_band_size": ("enable_band_affiliation",), "enable_dynamic_bands": ("enable_band_affiliation",),
+    # Leaky assabiyah rewrites the assabiyah update, which only runs inside the dynamic-bands block.
+    "enable_leaky_assabiyah": ("enable_band_affiliation", "enable_dynamic_bands"),
     "enable_band_family_knobs": ("enable_band_affiliation",), "enable_size_repulsion": ("enable_band_affiliation",),
     "enable_malnutrition_fission": ("enable_band_affiliation",),
     "enable_resource_directed_fusion": ("enable_band_affiliation",),

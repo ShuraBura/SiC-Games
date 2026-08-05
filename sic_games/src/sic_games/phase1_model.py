@@ -3901,7 +3901,15 @@ class TerrainWorld(mesa.Model):
             for bid, ms in members.items():
                 surplus = self._band_surplus.get(bid, 0.0)
                 a_prev = self._band_assabiyah.get(bid, 0.0)
-                a_new = min(1.0, max(0.0, a_prev + cfg.assabiyah_gain * surplus - cfg.assabiyah_decay))
+                # LEAKY form (R-106): the leak is proportional to the LEVEL, so the fixed point
+                # a* = gain·s/(gain·s + decay) sits strictly inside (0,1) and tracks surplus. The default
+                # constant-leak form has no interior fixed point and saturates at a bound whatever the
+                # parameters — see `enable_leaky_assabiyah`. Off ⇒ bit-exact.
+                if getattr(cfg, "enable_leaky_assabiyah", False):
+                    a_new = min(1.0, max(0.0, a_prev + cfg.assabiyah_gain * surplus * (1.0 - a_prev)
+                                         - cfg.assabiyah_decay * a_prev))
+                else:
+                    a_new = min(1.0, max(0.0, a_prev + cfg.assabiyah_gain * surplus - cfg.assabiyah_decay))
                 new_assab[bid] = a_new
                 for a in ms:                                   # mirror onto the collective-identity vector
                     a._group.assabiyah = a_new
@@ -3967,7 +3975,11 @@ class TerrainWorld(mesa.Model):
                 # assabiyah+leader to stay whole; the [0,1] clamp keeps band_split_size the hard cap and can't push
                 # tolerable below base_tolerable (the Wobst floor) — so malnutrition fissions ONLY bands > base
                 # (large ones), small bands untouched. Off ⇒ repulsion+malnutrition 0 ⇒ min(1, a+l), bit-exact.
-                cohesion_frac = min(1.0, max(0.0, a_new + leader_term - repulsion - malnutrition))
+                # `cohesion_leader_weight` scales the leader's share of the [0,1] budget. At the default 1.0
+                # this is the historical expression, bit-exact; below 1.0 it stops the leader term (measured
+                # 0.41–1.64, median 0.78) from saturating the sum on its own — see `enable_leaky_assabiyah`.
+                cohesion_frac = min(1.0, max(0.0, a_new + cfg.cohesion_leader_weight * leader_term
+                                             - repulsion - malnutrition))
                 base_b = g_star if g_star is not None else base      # emergent base = the risk-pooling optimum
                 # `max(0, ...)`: guards the degenerate case g* > cap (a mis-set cv_safe) from inverting the
                 # headroom's sign. It is NOT a clamp on g* — with the anchored RETURN_CV, g* spans 19–38 < cap.

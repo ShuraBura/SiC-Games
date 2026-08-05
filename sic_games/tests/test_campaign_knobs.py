@@ -95,7 +95,11 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                "enable_genealogy_log",                   # observer, and C_GENEA=0 here
                "enable_bud_hazard",                      # alternate path to the legacy budding one
                "enable_stratification_inequality_gate",  # R-103, criterion known wrong
-               "enable_band_risk"}                       # measured DEAD END (F.2 run_3i death spiral)
+               "enable_band_risk",                       # measured DEAD END (F.2 run_3i death spiral)
+               # A CANDIDATE under evaluation, not a built mechanism awaiting activation: a structural
+               # change to assabiyah, measured and defensible but NOT adopted (Addendum 23). C_ALLON must
+               # not adopt a model change by side effect.
+               "enable_leaky_assabiyah"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

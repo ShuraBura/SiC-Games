@@ -723,6 +723,14 @@ owner = "DemographyConfig"
 type  = "float"
 # baseline solidarity decay per step (luxury/turnover erosion)
 
+[cohesion_leader_weight]
+value = 1.0
+owner = "DemographyConfig"
+type  = "float"
+# (2) LEADER WEIGHT. Even an ungraded assabiyah leaves the leader term (0.41–1.64, median 0.78) ADDED on
+# top, which re-saturates the sum on its own. This scales the leader's contribution INTO the budget
+# without touching `leader_gain`, which the diagnostics report separately. 1.0 = today, bit-exact.
+
 [leader_coherence_gain]
 value = 2.0
 owner = "DemographyConfig"

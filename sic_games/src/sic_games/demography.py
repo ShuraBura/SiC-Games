@@ -695,6 +695,29 @@ class DemographyConfig(BaseModel):
     band_base_tolerable: int = Field(25, ge=2)           # tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline)
     assabiyah_gain: float = Field(0.05, ge=0.0)          # solidarity gained per step per unit band surplus
     assabiyah_decay: float = Field(0.02, ge=0.0)         # baseline solidarity decay per step (luxury/turnover erosion)
+    # ── THE COHESION BUDGET HAS NO HEADROOM (R-106 Addendum 22) — two flagged candidates ──────────────
+    # MEASURED: `cohesion_frac = clamp01(assabiyah + leader − repulsion − malnutrition)` is pinned at 1.0 for
+    # every band that has a leader, so `split_thr` collapses to the constant `band_split_size` and g* (hence
+    # `cv_safe`) drops out. corr(g*, band size) = −0.077; a cv_safe sweep over +22/+41/+62% moved `band_med`
+    # by −1.9/−3.5/−8.4%, an elasticity of −0.14 against the law's −1.0. Four mechanisms feed that one
+    # saturated expression — emergent band size, dynamic bands, size repulsion, malnutrition fission — and
+    # are structurally inert at ANY magnitude.
+    #
+    # (1) LEAKY ASSABIYAH. The update above is `a += gain·s − decay`: a pure integrator with a CONSTANT leak,
+    #     so it has no interior fixed point at all. If `gain·s > decay` it climbs to the clamp and stays;
+    #     otherwise it falls to 0. It is bang-bang BY CONSTRUCTION, and no choice of gain/decay makes it
+    #     graded — only the share of bands at each end changes. Measured: 95.7% of bands sit above the
+    #     switchover `s = decay/gain = 0.40` (band surplus runs 0.35–0.99, median 0.69), and assabiyah's
+    #     median is exactly 1.000 from step 100 onward.
+    #     Making the leak proportional to the level — `a += gain·s·(1−a) − decay·a` — gives the interior
+    #     fixed point `a* = gain·s / (gain·s + decay)`, which TRACKS surplus: 0.47 at s=0.35, 0.63 at the
+    #     median 0.69, 0.71 at s=0.99. That is what F.3c-3's premise needs ("a rich, high-solidarity band
+    #     STAYS TOGETHER larger; a poor one fissions at the base") — the band has to be able to be poor.
+    enable_leaky_assabiyah: bool = False
+    # (2) LEADER WEIGHT. Even an ungraded assabiyah leaves the leader term (0.41–1.64, median 0.78) ADDED on
+    #     top, which re-saturates the sum on its own. This scales the leader's contribution INTO the budget
+    #     without touching `leader_gain`, which the diagnostics report separately. 1.0 = today, bit-exact.
+    cohesion_leader_weight: float = Field(1.0, ge=0.0)
     # (RETIRED 2026-07-01, DE-7: `season_aggregation` coupled tolerable_size to seasonal abundance → lean-season
     # fission. Mis-signed (moderate lean should not fission) + inert (dormant threshold, R-31). Superseded by M2
     # malnutrition fission. Field removed; configs that set it will now error — intended, it is retired.)

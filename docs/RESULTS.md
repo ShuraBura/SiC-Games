@@ -4493,6 +4493,102 @@ the headroom is restored). No model source changed — this is a diagnosis, and 
 decision. Supersedes the `cv_safe` re-fit proposed after Addendum 20; explains, mechanically, several of
 Addendum 20's inert verdicts.
 
+**ADDENDUM 23 — CORRECTION to Addendum 22, and the fix measured. The clamp does NOT make four mechanisms
+inert; it kills the CONDITION-DEPENDENCE for the 91–100% of bands that have a leader, while the mechanisms
+stay live on the unled remainder. An ablation therefore reads LIVE while the mechanism is swallowed for the
+bands that matter — which is why the ablation audit could never have found this (2026-08-04).**
+
+**THE CORRECTION.** Addendum 22 ended: *"`enable_size_repulsion`, `enable_dynamic_bands`,
+`enable_malnutrition_fission` and the Stage-1 leader term are therefore all structurally inert with respect to
+band size, whatever their magnitudes."* **That is wrong, and it is wrong in the direction of overstatement.**
+Ablated one at a time out of the live stack, 2 seeds, 300 steps, 1500 agents:
+
+| ablated | under the baseline | under the candidate fix |
+|---|---|---|
+| `size_repulsion` | **LIVE 2/2** | LIVE 2/2 |
+| `dynamic_bands` | **LIVE 2/2** | LIVE 2/2 |
+| `emergent_band_size` | **LIVE 2/2** | LIVE 2/2 |
+| `malnutrition_fission` | inert 0/2 | inert 0/2 |
+
+`malnutrition_fission` is the negative control — its gain is 0.0, so it must read inert under both, and it
+does. The instrument is sound; the earlier claim was not.
+
+**WHY THEY ARE STILL LIVE, AND WHAT IS ACTUALLY DEAD.** The clamp binds only where the leader term is
+present. Measured share of multi-member bands that have a leader: **91.4% at step 150, 100% at step 300,
+93.3% at step 500**. For those, `cohesion_frac ≡ 1`, `split_thr ≡ band_split_size` (sd 0.00), and the
+repulsion, malnutrition and leader terms cannot move the threshold at all. On the unled 0–9% remainder,
+cohesion is genuinely below 1 and every term acts — and `dynamic_bands` additionally gates the whole block
+while `emergent_band_size` sets the threshold's base, so ablating either changes the world through those
+paths regardless.
+
+So Addendum 22's measurements all stand — the pinning, the sd 0.00, the assabiyah saturation, `corr(g*, band
+size) = −0.077`, the `cv_safe` elasticity of −0.14. What was wrong was the inference from them.
+
+**AND THE CORRECTED VERSION IS THE SHARPER METHODOLOGICAL POINT.** A mechanism can be LIVE by ablation and
+still be swallowed where it was supposed to act. "Turn it off and see if the world changes" cannot
+distinguish *"acts on 9% of bands"* from *"acts on all of them"*, so it certifies a mechanism that has lost
+the population it was written for. This is the same shape as C.5 intercept hunting, which computes a correct
++28% boost on cells no agent stands on.
+
+**A STRUCTURAL FINDING ABOUT ASSABIYAH, which Addendum 22 missed.** Its update is
+
+    a += gain·surplus − decay          (clamped to [0,1])
+
+— a pure integrator with a CONSTANT leak. That has **no interior fixed point at all**: if `gain·s > decay` it
+climbs to the clamp and stays; otherwise it falls to 0. It is bang-bang *by construction*, and no choice of
+gain or decay makes it graded — only the share of bands at each end changes. F.3c-3's premise ("a rich,
+high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base") needs a band to be able to be
+poor, and this form cannot deliver that at any calibration.
+
+Making the leak proportional to the level, `a += gain·s·(1−a) − decay·a`, gives the interior fixed point
+`a* = gain·s/(gain·s + decay)`, which tracks surplus: 0.47 at s=0.35, 0.63 at the measured median 0.69, 0.71
+at s=0.99.
+
+**THE CANDIDATES, MEASURED.** Two flags, both default-off and bit-exact: `enable_leaky_assabiyah` and
+`cohesion_leader_weight` (scales the leader's share of the budget; 1.0 = today). Coastal-temperate, 1500
+agents, 300 steps, 2 seeds:
+
+| candidate | headroom | median assabiyah | thr spread | corr(g*, n) | `band_med` |
+|---|---|---|---|---|---|
+| baseline | 0.0% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leaky | 3.4% | 0.607 | 3.4% | +0.124 | 25.8 ✓Hill |
+| leader weight 0.5 | 0.0% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leader weight 0.25 | 0.9% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leaky + weight 0.5 | 64.8% | 0.603 | 1.8% | −0.058 | 29.0 ✓Hill |
+| leaky + weight 0.25 | **100.0%** | 0.602 | 2.5% | −0.089 | 28.2 ✓Hill |
+| leaky + weight 0.1 | 100.0% | 0.604 | 1.8% | −0.070 | 26.8 ✓Hill |
+
+*headroom* = share of LED bands with `cohesion_frac` below the clamp. Three readings:
+
+**1. The leader weight alone does nothing** (0.0% / 0.9%). Assabiyah is already at the clamp on its own, so
+scaling the leader changes nothing until assabiyah is graded. Saturation is assabiyah's, not the leader's.
+
+**2. Leaky alone is not enough either** (3.4%) — it makes assabiyah a state variable again (median 1.000 →
+0.607) but the leader term then saturates the sum by itself. **Both are needed**, and that is a fact about
+the expression rather than a tuning preference.
+
+**3. It does NOT restore R-72's gradient.** `corr(g*, band size)` stays at −0.089 with the headroom fully
+restored, against −0.22 for v1/v2 and −0.077 for v3. The clamp was not the only thing decoupling the CV from
+realized band size: with cohesion at ~0.6, `split_thr = g* + (cap − g*)·0.6` gives g* only 40% weight, and the
+grow-then-halve sawtooth around the threshold swamps what is left. **Restoring the headroom is not the same
+as making band size emergent from the CV**, and the second still has no mechanism.
+
+`band_med` incidentally improves — 30.2 → 26.8–29.0, i.e. from "inside Johnson" to "inside Hill 25–30" — but
+that is a by-product, and adopting a fix *because* a marker moved is the benchmark-fitting refused throughout
+this arc.
+
+**NOTHING IS ADOPTED.** Both flags stay default-off and bit-exact. `enable_leaky_assabiyah` is a structural
+correction with a stated rationale and is defensible on its own terms; `cohesion_leader_weight` is an
+UNANCHORED fitted constant, and inventing one is what this arc has spent itself refusing to do. There is an
+in-code precedent for the principled alternative — `rank_w` is already normalised to [0,1] by
+`resent_effect_threshold` before it is combined — so normalising the leader term to its own reference, rather
+than scaling it by a free parameter, is the obvious candidate to try next. That is a supervisor call.
+
+**Origin:** `diag_cohesion_candidates.py` and `diag_cohesion_unlocks.py`
+(`sic_games/outputs/mechanism_battery/`), build 5b91d2b, in-process instrumented worlds. Two new flags in
+`DemographyConfig`, both default-off. Corrects Addendum 22's closing inference; every measurement in
+Addendum 22 stands.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
