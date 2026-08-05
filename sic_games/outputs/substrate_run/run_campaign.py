@@ -66,7 +66,14 @@ SOIL      = os.environ.get("C_SOIL", "0") == "1"         # Layer-B1 soil depleti
 DEFEND    = os.environ.get("C_DEFEND", "1") == "1"       # economic defensibility (Dyson-Hudson & Smith) → instability
                                                           #   signal. NOT in the R-64 validation; toggle off to match it.
 CONNUBIUM = os.environ.get("C_CONNUBIUM", "cut1")        # cut1 = fixed-radius seasonal gathering; cut2 = adaptive reach + patriclan exogamy → Wobst ~475
-MSTAR     = int(os.environ.get("C_MSTAR", "50"))         # Cut-2 mate-search pool m* (probe: m*=50 → median reach 496 ≈ Wobst)
+# Cut-2 mate-search pool m*. WAS 50, "probe: m*=50 → median reach 496 ≈ Wobst" — and that anchor was
+# RETRACTED by R-67 on 2026-07-13: Wobst 1974's Minimum Equilibrium Size from his own 40 runs is 79–332, and
+# the cited 175–475 is an EXTRAPOLATION to 1–2 hex tiers. LITERATURE.md recorded the correction and the
+# re-anchor — "re-anchored to MVP (m*≈15)", a ~150-person breeding pool holding ~15 eligible males at φ≈0.1 —
+# and MARKER_MATRIX row 4 carries the band as 150 [79–332]. THE CODE NEVER FOLLOWED: this default stayed at
+# the retired value for three weeks, so every Cut-2 run since has used the contested number, and battery 7
+# measured the consequence (connubium_med 440–2387 against a band of [79, 332], 0/8 arms).
+MSTAR     = int(os.environ.get("C_MSTAR", "15"))
 ALLON     = os.environ.get("C_ALLON", "0") == "1"        # every BUILT mechanism runs unless explicitly ablated
 # T-9: the R-82...R-87 elite/legitimacy stack — see module docstring. C_ALLON implies it when C_ELITE is not
 # set, because the elite FLAGS alone are not the elite layer: their magnitudes (leveling_strength,
