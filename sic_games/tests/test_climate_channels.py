@@ -39,12 +39,20 @@ class _Flat:
 
 
 class _Fields:
-    """Minimal WorldFields stand-in: a grass_subtype grid with one steppe and one llanos cell."""
+    """Minimal WorldFields stand-in.
+
+    It carries `biome` and `wateracc` as well as `grass_subtype` because C.5 intercept hunting needs those
+    two, and `build_climate_field` refuses to run the layer without them. That refusal is the point — an
+    intercept layer with no masks short-circuits to 1.0 and is inert, which is exactly how it went unnoticed
+    in every run — so the stub gains the fields rather than the guard losing its teeth."""
     def __init__(self, steppe=(1, 1), llanos=(2, 2)):
-        from sic_games.terrain import GRASS_LLANOS, GRASS_STEPPE
+        from sic_games.terrain import BIOME_SAVANNA, GRASS_LLANOS, GRASS_STEPPE
         self.grass_subtype = np.zeros((8, 8), dtype=np.uint8)
         self.grass_subtype[steppe[1], steppe[0]] = GRASS_STEPPE
         self.grass_subtype[llanos[1], llanos[0]] = GRASS_LLANOS
+        self.biome = np.full((8, 8), BIOME_SAVANNA, dtype=np.uint8)
+        self.wateracc = np.zeros((8, 8), dtype=np.float64)      # dry ⇒ no intercept boost anywhere,
+        self.wateracc[3, 3] = 1.0                               # except this one waterhole
 
 
 def _series(field, n, x=0, y=0):
@@ -203,6 +211,45 @@ def test_llanos_without_a_clock_is_refused():
 def test_caribou_without_masks_is_refused():
     """Without `grass_subtype` the mask is None and C.4b is inert at any amplitude — the exact failure this
     whole exercise exists to stop."""
-    cfg = ClimateConfig(enable_caribou_swing=True, caribou_amp=0.871, caribou_period=600)
+    # Intercept hunting is off here so the caribou mask is the FIRST thing missing — otherwise the intercept
+    # guard fires first and this test would pass for the wrong reason.
+    cfg = ClimateConfig(enable_caribou_swing=True, caribou_amp=0.871, caribou_period=600,
+                        enable_intercept_hunting=False)
     with pytest.raises(ValueError, match="grass_subtype|mask"):
+        build_climate_field(_Flat(), cfg, fields=None, seed=0)
+
+
+def test_intercept_hunting_is_actually_plumbed():
+    """C.5 short-circuits to 1.0 the moment `agg_mask` or `water_weight` is None, and those were passed only
+    by unit tests — so intercept hunting had never been in a run either. The campaign-scale check found that
+    turning it OFF changed nothing at all, which is what an unplumbed layer looks like from the outside."""
+    import numpy as np
+
+    from sic_games.capacity import NPPCapacityField
+    from sic_games.terrain import generate_world, world_lottery_climate
+    f = generate_world(world_lottery_climate(0, terrain="flat", climate="tropical"), mode="climate")
+    base = NPPCapacityField(f, 60000.0, patch=(20, 20, 60), mode="tallavaara", aquatic=True,
+                            enable_depletion=True)
+    cf = build_climate_field(base, ClimateConfig(), fields=f, seed=0)
+    assert cf._agg_mask is not None and cf._water_weight is not None
+    assert cf._agg_mask.sum() > 0, "no aggregation-biome cells — the layer cannot act in this world"
+
+    ys, xs = np.where(cf._agg_mask & (f.wateracc > 0.5))
+    assert len(ys), "no aggregation cell near water to test the boost on"
+    x, y = int(xs[0]), int(ys[0])
+    vals = [(_set(cf, t), cf.meat_factor(x, y))[1] for t in range(12)]
+    assert max(vals) > 1.0, "the intercept boost never fires across a full year"
+    assert min(vals) == pytest.approx(1.0), "the boost must be OFF outside the late dry window"
+    # Hawkes 745/518: +44% AT the waterhole, tapering with water proximity.
+    assert max(vals) - 1.0 == pytest.approx(0.439 * float(f.wateracc[y, x]), rel=0.02)
+    assert 1 <= sum(1 for v in vals if v > 1.0) <= 6, "the dry window is not a late-dry-season slice"
+
+
+def _set(field, t):
+    field.set_step(t)
+
+
+def test_intercept_without_its_masks_is_refused():
+    cfg = ClimateConfig(enable_intercept_hunting=True)
+    with pytest.raises(ValueError, match="wateracc|biome"):
         build_climate_field(_Flat(), cfg, fields=None, seed=0)

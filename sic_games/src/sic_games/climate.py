@@ -547,6 +547,25 @@ def build_climate_field(base, cfg: "ClimateConfig | None" = None, fields=None, s
         return True
 
     kw: dict = dict(intercept_on=cfg.enable_intercept_hunting)
+    if cfg.enable_intercept_hunting:
+        # C.5 needs BOTH an aggregation-biome mask and a water weight; `_intercept_factor` returns 1.0 on the
+        # spot if either is None. They were passed only by unit tests, so intercept hunting had never been in
+        # a run either — the campaign-scale check found turning it OFF changed nothing at all. The mask is the
+        # savanna + llanos aggregation biomes of the docstring (llanos = the tropical GRASS sub-biome, so the
+        # steppe half of GRASS is deliberately excluded); the weight is `wateracc`, already normalised to
+        # [0,1] by the generator.
+        from sic_games.terrain import BIOME_SAVANNA
+        biome = getattr(fields, "biome", None) if fields is not None else None
+        wacc = getattr(fields, "wateracc", None) if fields is not None else None
+        if biome is None or wacc is None:
+            raise ValueError("ClimateConfig.enable_intercept_hunting needs the world's `biome` and "
+                             "`wateracc` fields; pass `fields=` to build_climate_field(). Without them "
+                             "`_intercept_factor` short-circuits to 1.0 and the layer is inert.")
+        gs = getattr(fields, "grass_subtype", None)
+        agg = (biome == BIOME_SAVANNA)
+        if gs is not None:
+            agg = agg | (gs == GRASS_LLANOS)
+        kw.update(agg_mask=agg, water_weight=wacc)
     kw["a_seas"] = val("a_seas") if need("enable_seasonality", "a_seas") else 0.0
     kw["mean_factor"] = val("mean_factor") if need("enable_eccentricity_mean", "mean_factor") else 1.0
 
