@@ -50,9 +50,17 @@ sys.path.insert(0, os.path.join(ROOT, "sic_games", "outputs", "phase1_social_evo
 sys.path.insert(0, os.path.join(ROOT, "sic_games", "src"))
 
 STAGES = [s.strip() for s in os.environ.get("B7_STAGES", "s1,s2,s3").split(",") if s.strip()]
+# SAVANNA joined the menu in R-106. `terrain.py` has carried a `savanna` CLIMATE_PRESET since 2026-07-08
+# ("Koppen Aw ... the human-evolution biome (Hadza)"), deliberately left OUT of CLIMATE_ORDER so the
+# seed->climate lottery stays bit-exact — which made it explicit-only, and nothing ever asked for it. The
+# consequence was measured: every campaign world was forest, forest or desert, so savanna is 0-0.6% of the
+# capacity patch and every savanna-keyed mechanism (C.5 intercept hunting, C.4c llanos flood) was
+# structurally unreachable. In a savanna world it is 52-67%. It stays out of CLIMATE_ORDER — adding it there
+# would renumber every existing seed->climate mapping — and goes in the harness menus instead.
 WORLD_MAP = {"coastal_temperate": ("coastal", "temperate"), "flat_temperate": ("flat", "temperate"),
              "flat_boreal": ("flat", "boreal"), "flat_tropical": ("flat", "tropical"),
-             "hilly_temperate": ("hilly", "temperate")}
+             "hilly_temperate": ("hilly", "temperate"),
+             "flat_savanna": ("flat", "savanna"), "coastal_savanna": ("coastal", "savanna")}
 WORLDS = [w for w in os.environ.get("B7_WORLDS", "coastal_temperate,flat_temperate,hilly_temperate").split(",") if w]
 SEEDS = [s for s in os.environ.get("B7_SEEDS", "0,1").split(",") if s]
 STEPS = os.environ.get("B7_STEPS", "1200")

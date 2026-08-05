@@ -46,7 +46,9 @@ TAG = os.environ.get("R_TAG", FIELD[:6])
 
 WORLD_MAP = {"coastal_temperate": ("coastal", "temperate"), "flat_temperate": ("flat", "temperate"),
              "hilly_temperate": ("hilly", "temperate"), "flat_boreal": ("flat", "boreal"),
-             "flat_tropical": ("flat", "tropical")}
+             "flat_tropical": ("flat", "tropical"),
+             # R-106: savanna (Koppen Aw, the Hadza biome) — an existing preset no harness had ever used.
+             "flat_savanna": ("flat", "savanna"), "coastal_savanna": ("coastal", "savanna")}
 WORLDS = [w for w in os.environ.get(
     "R_WORLDS", "coastal_temperate,flat_temperate,hilly_temperate").split(",") if w]
 SEEDS = [s for s in os.environ.get("R_SEEDS", "0,1").split(",") if s]

@@ -1086,11 +1086,25 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
     #  under mode="climate"; see the "Climate fields (C1/C2)" block above the NPP section. `temperature`,
     #  `temp_seas_amp`, `precip_mm` are already in scope here.)
     humidity = np.full((N, N), MEAN_REL_HUMIDITY, dtype=np.float64)
-    # grass_subtype: split BIOME_GRASS by the tropical isotherm (warm → llanos, cool → steppe); 0 elsewhere.
+    # grass_subtype: the two GRASS-channel sub-biomes the climate layer keys on — GRASS_STEPPE for C.4b
+    # (caribou herd swing on meat) and GRASS_LLANOS for C.4c (two-sided flood on forage).
+    #
+    # THE FIX (R-106, 2026-08-04). This read `_is_grass & (temperature >= 18)` for llanos, which is EMPTY FOR
+    # EVERY POSSIBLE WORLD: `whittaker_biome` sends warm grass-zone cells to BIOME_SAVANNA, so the only routes
+    # to BIOME_GRASS are the cool grass zone (T < 18) and the tundra cap (T < −5). Verified exhaustively over
+    # a 451k-point (T,P) grid: zero cells are BIOME_GRASS at T ≥ 18. The whole C.4c layer — its Sarmiento /
+    # Castello / Hamilton anchors and its two-sided form — had therefore never been able to act.
+    #
+    # The classifier was right and the SPLITTER was reading the wrong parent. The Orinoco llanos is warm
+    # SEASONALLY-FLOODED grassland, which Whittaker calls savanna — so llanos is a savanna sub-type, not a
+    # grass one. But not all savanna floods (the Hadza savanna this biome is anchored to does not), so the
+    # llanos is savanna carrying the WETLAND GEOMETRY: within `dist <= 2` cells of water and `slope < 0.12`.
+    # Those are the wetland test's own constants, reused rather than a new threshold invented — and because
+    # BIOME_WETLAND has already claimed the cells that ALSO clear `npp > 0.45`, what is left is exactly the
+    # drier, seasonally-inundated floodplain the llanos is: wetland geometry, sub-wetland productivity.
     grass_subtype = np.zeros((N, N), dtype=np.uint8)
-    _is_grass = (biome == BIOME_GRASS)
-    grass_subtype[_is_grass & (temperature >= GRASS_TROPICAL_THRESHOLD_C)] = GRASS_LLANOS
-    grass_subtype[_is_grass & (temperature <  GRASS_TROPICAL_THRESHOLD_C)] = GRASS_STEPPE
+    grass_subtype[(biome == BIOME_SAVANNA) & (dist <= 2) & (slope < 0.12)] = GRASS_LLANOS
+    grass_subtype[biome == BIOME_GRASS] = GRASS_STEPPE
 
     # ── Freeze all arrays ──────────────────────────────────────────────
     for arr in (elev, slope, slopeDeg, wateracc, isWater, isRiver,

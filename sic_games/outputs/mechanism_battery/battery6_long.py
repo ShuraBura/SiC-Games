@@ -53,7 +53,12 @@ STACK = dict(C_ELITE="1", C_BRANCH="0.05", C_SPLIT="0.00003", C_SPLITMIN="8",
 
 WORLDS = [("flat_boreal", "flat", "boreal"), ("flat_temperate", "flat", "temperate"),
           ("flat_tropical", "flat", "tropical"), ("hilly_temperate", "hilly", "temperate"),
-          ("coastal_temperate", "coastal", "temperate")]
+          ("coastal_temperate", "coastal", "temperate"),
+          # R-106: the `savanna` preset (Koppen Aw, the Hadza biome) has existed since 2026-07-08 and was
+          # explicit-only, so no battery had ever run one. Every world here was forest or desert, which made
+          # the savanna-keyed climate mechanisms structurally unreachable — 0-0.6% of the capacity patch
+          # against 52-67% in a savanna world.
+          ("flat_savanna", "flat", "savanna")]
 
 # key, target, lo, hi, source, ANCHOR PROBE (substring that must still be live in docs/)
 BENCH = [
