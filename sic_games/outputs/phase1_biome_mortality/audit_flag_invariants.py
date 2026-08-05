@@ -123,8 +123,19 @@ ENRICH.update(
 # MAGNITUDES. **A BOOLEAN FLIP IS NOT ENABLING A MECHANISM.** Most flags are paired with a gain that DEFAULTS TO
 # ZERO, so flipping the flag True while leaving the gain at 0 produces no change — and reads as a dead mechanism.
 # The first version of this harness did exactly that and produced a spurious "7 dead knobs" finding (retracted;
-# see RESULTS R-85c). Values below are the live ones used by `emergent_village_demog()` and the stage harnesses,
-# so a flag turned ON here is turned on the way the project actually runs it.
+# see RESULTS R-85c).
+#
+# WHAT THESE VALUES ARE, corrected R-106. This block used to claim they were "the live ones used by
+# `emergent_village_demog()` and the stage harnesses, so a flag turned ON here is turned on the way the
+# project actually runs it." That is NOT true of all of them, and the claim hid a drift of exactly the kind
+# that put an uncalibrated `divorce_rate` into the authoritative config file. Measured against the canonical
+# run: `malnutrition_fission_gain` is 2.0 here and 0.0 there, `pathogen_gamma` 1.0 here and 0.0 there,
+# `ascribed_mate_strength` 2.5 here and 1.5 there.
+#
+# They are TEST magnitudes — "turn it on hard enough that the audit can see it" — NOT calibrated anchors, and
+# the two that read 0.0 canonically are documented in `demography.py` as UNANCHORED
+# (`malnutrition_fission_gain`) and as awaiting a low/mid/high sweep (`pathogen_gamma`). So a value here is
+# not authority to adopt it; `test_mechanism_audit_coverage.py` pins the disagreement so it cannot rot.
 MAGNITUDE = {
     "enable_leader_coherence": {"leader_coherence_gain": 2.0},
     "enable_size_repulsion": {"repulsion_gain": 0.3},

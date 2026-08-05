@@ -76,3 +76,55 @@ def test_zero_defaulting_gain_has_a_live_magnitude(flag):
         pytest.fail(
             f"{flag} has no MAGNITUDE entry but every matching gain defaults to 0 ({gains}) — flipping the flag "
             f"alone leaves it inert, which is exactly the false 'dead knob' verdict retracted in R-85c.")
+
+
+def test_audit_test_magnitudes_that_disagree_with_the_canonical_run_are_declared():
+    """The audit's MAGNITUDE table and the canonical run are two copies of the same numbers, and two copies
+    drift — that is exactly how `divorce_rate` came to be 0.004 in the authoritative config file while every
+    campaign ran R-78's calibrated 0.005 (R-106 Addendum 21).
+
+    The table's values are TEST magnitudes ("turn it on hard enough for the audit to see it"), not anchors,
+    so they are ALLOWED to differ — but every difference must be declared here with its reason, so that a
+    mechanism running at zero in the canonical stack can never again be mistaken for one the project has
+    decided about.
+
+    WHEN THIS FAILS: either a new disagreement appeared (declare it, or fix the canonical value), or one was
+    resolved (drop it from the list)."""
+    import tomllib
+
+    root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    mech = tomllib.load(open(os.path.join(root, "config", "mechanisms.toml"), "rb"))
+    par = tomllib.load(open(os.path.join(root, "config", "parameters.toml"), "rb"))
+
+    # flag -> {magnitude: why the canonical run differs}
+    DECLARED = {
+        "enable_malnutrition_fission": {
+            "malnutrition_fission_gain": "demography.py calls it UNANCHORED; and Addendum 23 shows it could "
+                                         "not act on a led band anyway, since the cohesion clamp swallows "
+                                         "any dispersion term below the median headroom of 0.718"},
+        "enable_terrain_pathogen": {
+            "pathogen_gamma": "demography.py: '0 = OFF/flat. Sweep low/mid/high' — the sweep the doc asks "
+                              "for has not been run, so 0.0 is deliberate-pending rather than a choice"},
+        "enable_ascribed_mate_choice": {
+            "ascribed_mate_strength": "1.5 is C_ENDOG_A's default, 2.5 is battery1's ELITE overlay — two "
+                                      "harness copies, neither anchored; the campaign's own knob wins"},
+    }
+    found = {}
+    for flag, mags in audit.MAGNITUDE.items():
+        if mech.get(flag, {}).get("value") is not True:
+            continue
+        for key, want in mags.items():
+            cur = par.get(key, {}).get("value")
+            if isinstance(cur, (int, float)) and isinstance(want, (int, float)) and cur < want:
+                found.setdefault(flag, {})[key] = (cur, want)
+
+    undeclared = {f: v for f, v in found.items()
+                  if f not in DECLARED or set(v) - set(DECLARED[f])}
+    assert not undeclared, (
+        "the audit table's test magnitude exceeds the canonical run's, undeclared:\n  "
+        + "\n  ".join(f"{f}.{k}: canonical {a} < audit {b}"
+                      for f, v in undeclared.items() for k, (a, b) in v.items())
+        + "\n\nDeclare it in DECLARED above with the reason, or fix the canonical value.")
+    resolved = [f for f in DECLARED if f not in found]
+    assert not resolved, (
+        f"these disagreements are gone — drop them from DECLARED: {resolved}")
