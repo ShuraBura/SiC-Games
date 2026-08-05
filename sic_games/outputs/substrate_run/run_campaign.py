@@ -42,7 +42,7 @@ from sic_games.config import KcalEconomyConfig, SubstrateConfig, CarbonConfig
 from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world, world_lottery_climate
 from sic_games.capacity import NPPCapacityField
-from sic_games.climate import ClimateField
+from sic_games.climate import ClimateConfig, build_climate_field
 from sic_games.invariants import check as invariant_check
 
 FOUNDERS  = int(os.environ.get("C_FOUNDERS", "3000"))
@@ -422,7 +422,42 @@ def main():
     base = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     base0 = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
-    cap = ClimateField(base, a_seas=0.4, regime_driver=None)      # seasonal, NO regime forcing (endogenous only)
+    # CLIMATE (R-106). This line used to be `ClimateField(base, a_seas=0.4, regime_driver=None)`, which took
+    # the constructor's 0.0 default for every other channel — so the ENSO interannual, the regime telegraph,
+    # the caribou herd swing and the llanos flood were built, unit-tested, and NEVER IN A RUN. Every result
+    # this project has produced had a fixed seasonal sine and white noise, and no multi-year environmental
+    # variability at any timescale, which is why the no-cycles findings need the narrower reading.
+    #   C_CLIMATE=1   turn on the per-world lottery AND every climate channel (the C_ALLON of climate)
+    #   C_CLIM_ON / C_CLIM_OFF   comma-separated channel names, for testing one at a time
+    #   C_CLIMPARAM   field=value for the climate values, like C_PARAM for demography
+    # Unset ⇒ ClimateConfig's defaults, which reproduce the old call exactly.
+    clim = ClimateConfig()
+    if os.environ.get("C_CLIMATE", "0") == "1":
+        clim = clim.model_copy(update={f: True for f in type(clim).model_fields if f.startswith("enable_")})
+    for _var, _on in (("C_CLIM_ON", True), ("C_CLIM_OFF", False)):
+        _names = [s.strip() for s in os.environ.get(_var, "").split(",") if s.strip()]
+        if _names:
+            _bad = [f for f in _names if f not in type(clim).model_fields]
+            if _bad:
+                raise SystemExit(f"{_var}: unknown climate field(s) {_bad}")
+            clim = clim.model_copy(update={f: _on for f in _names})
+            print(f"campaign: {_var} {'enabled' if _on else 'disabled'} {','.join(_names)}", flush=True)
+    _cp = [s.strip() for s in os.environ.get("C_CLIMPARAM", "").split(",") if s.strip()]
+    if _cp:
+        _cu = {}
+        for _item in _cp:
+            _key, _val = _item.split("=", 1)
+            _key = _key.strip()
+            if _key not in type(clim).model_fields:
+                raise SystemExit(f"C_CLIMPARAM: unknown climate field {_key!r}")
+            _ann = type(clim).model_fields[_key].annotation
+            _cu[_key] = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(
+                _ann, str)(_val.strip())
+        clim = clim.model_copy(update=_cu)
+        print("campaign: C_CLIMPARAM " + ", ".join(f"{a}={b}" for a, b in _cu.items()), flush=True)
+    # `fields=f` supplies the GRASS sub-biome masks C.4b/C.4c need; without them those layers are inert at
+    # any amplitude, and `build_climate_field` raises rather than running them dead.
+    cap = build_climate_field(base, clim, fields=f, seed=SEED)
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
     cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
@@ -629,7 +664,8 @@ def main():
     except Exception:
         _full_cfg = {k: getattr(demog, k) for k in dir(demog) if not k.startswith("_")}
     _full_cfg = {k: v for k, v in _full_cfg.items() if isinstance(v, (int, float, str, bool, type(None)))}
-    meta = dict(sha=sha, tree_dirty=dirty, seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
+    meta = dict(sha=sha, tree_dirty=dirty, climate_config=clim.model_dump(),
+                seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 terrain=TERR, climate=CLIM, patch_size=(PATCHSZ if PATCHSZ > 0 else PATCH),
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,
                 genome=GENOME, genea_csv=os.path.basename(GENEA), genealogy_on=GENEALOG,
@@ -670,6 +706,12 @@ def main():
         f"elite={demog.enable_legitimacy} soil={demog.enable_soil_depletion} "
         f"genome={demog.enable_genome} genealogy={'ON' if demog.enable_genealogy_log else 'OFF'} "
         f"flush/{FLUSHEVERY}")
+    _cl_on = sorted(f.replace("enable_", "") for f in type(clim).model_fields
+                    if f.startswith("enable_") and getattr(clim, f))
+    log(f"campaign: climate a_seas={cap.a_seas:.3f} ENSO(amp={cap.interannual_amp:.2f},"
+        f"per={cap.interannual_period}) regime(amp={cap.regime_amp:.2f},dur={cap.regime_duration},"
+        f"rec={cap.regime_recurrence}) caribou(amp={cap.caribou_amp:.2f},per={cap.caribou_period}) "
+        f"llanos={cap.llanos_flood_amp:.2f} | on: {','.join(_cl_on)}")
     traj = []
     prev_leaders: dict = {}
     last_con: dict = {}

@@ -8,6 +8,10 @@ isolation). Later steps (C.2–C.4) fold interannual / regime-shift / catastroph
 """
 from __future__ import annotations
 import math
+import random
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 OBLIQUITY_EARTH_DEG = 23.4            # Earth axial tilt
 OBLIQUITY_HABITABLE_MAX_DEG = 60.0    # conservative habitable envelope (Spiegel 2009: broad band, no clean
@@ -254,6 +258,86 @@ class ClimateDriver:
         return cls(f, f"piecewise({len(bps)}bp)")
 
 
+class ClimateConfig(BaseModel):
+    """Every climate channel as a switch and a value, on the same footing as `DemographyConfig`.
+
+    WHY THIS EXISTS (R-106, 2026-08-04). `draw_world_climate()` above produces a full per-world climate
+    lottery — orbital seasonality, eccentricity mean factor, ENSO interannual, the regime telegraph, caribou
+    herd swings, llanos floods, temperature from stellar flux. It is unit-tested. **Its only callers were
+    those tests.** Every `ClimateField` in the project, including `run_campaign.py`, was built as
+    `ClimateField(base, a_seas=0.4, regime_driver=None)` and took the constructor default — 0.0 — for every
+    other channel. So every experiment this project has run had a fixed seasonal sine and white noise, and no
+    multi-year environmental variability at any timescale.
+
+    That is material for the repeated no-cycles findings: Malthusian and secular dynamics were looked for in a
+    world with no slow environmental variable. Those results are not wrong, but they say "no endogenous cycles
+    under a flat climate", which is narrower than how they were recorded. It probably began as a deliberate
+    control (`run_se0_controlled_climate`) that became the permanent default.
+
+    DEFAULTS REPRODUCE THE OLD BEHAVIOUR EXACTLY — `a_seas = 0.4`, every variability channel off — so adopting
+    this config changes no prior result. Each channel is INDEPENDENTLY ablatable, so a channel can be turned
+    on and checked on its own, which is the whole point.
+    """
+    # ── MASTER ───────────────────────────────────────────────────────────────────────────────────────
+    # Draw the per-world parameters from `draw_world_climate()` (the orbital + ENSO + regime + herd lottery)
+    # instead of using the fixed values below. A drawn value is applied ONLY if its own channel flag is also
+    # on, so the lottery never silently switches a layer on.
+    enable_climate_lottery: bool = False
+    # Which biome's Earth reference amplitude the obliquity draw is scaled against (A_SEAS_EARTH). The world
+    # is a mix of biomes and `a_seas` is a scalar, so this names the reference explicitly rather than picking
+    # one implicitly. "savanna" (0.40) is the Hadza mid-range and matches the fixed default below.
+    lottery_a_earth_biome: Literal["forest", "savanna", "llanos"] = "savanna"
+
+    # ── C.1 SEASONALITY (validated: R-6 run_2d form) ─────────────────────────────────────────────────
+    enable_seasonality: bool = True
+    # Peak-normalised seasonal amplitude A_seas = 1 - s_min. 0.40 = Hadza savanna [LIT, A_SEAS_EARTH]; it is
+    # the value every campaign has used. Under the lottery this is drawn from obliquity instead.
+    a_seas: float = Field(0.40, ge=0.0, le=1.0)
+
+    # ── C.2a ECCENTRICITY annual-mean brightening ────────────────────────────────────────────────────
+    # A scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no effect. [Spiegel 2010 envelope]
+    enable_eccentricity_mean: bool = False
+    mean_factor: float = Field(1.0, ge=1.0)
+
+    # ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ───────────────────────────
+    # [Timmermann 2018] amplitude 0.20-0.40 of CC in marginal biomes; period 2-7 yr. This is the FAST
+    # environmental variability the model has never had.
+    enable_interannual: bool = False
+    interannual_amp: float = Field(0.0, ge=0.0, le=1.0)
+    interannual_period: int = Field(0, ge=0)        # steps (yr x 12); 0 = off
+    interannual_phase: float = 0.0
+
+    # ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ───────────
+    # [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; excursion DURATION 100-500 yr (LIA ~500)
+    # is distinct from RECURRENCE 1000-2000 yr (Bond ~1500; Mayewski RCC). This is the SLOW variable a
+    # secular-cycle test needs, and it has been off in every run.
+    enable_regime_shift: bool = False
+    regime_amp: float = Field(0.0, ge=0.0, le=1.0)
+    regime_duration: int = Field(0, ge=0)          # mean excursion length in steps; P(end) = 1/duration
+    regime_recurrence: int = Field(0, ge=0)        # mean onset spacing in steps; P(onset) = 1/recurrence
+
+    # ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ────────────────
+    # [St. John 2022, 43-herd database] amplitude 0.871 about the mean (peak 1.871x / trough 0.129x), median
+    # period 40.5 yr over 40-90. Needs `steppe_mask`; without it the layer is inert whatever the amplitude.
+    enable_caribou_swing: bool = False
+    caribou_amp: float = Field(0.0, ge=0.0)
+    caribou_period: int = Field(0, ge=0)
+    caribou_phase: float = 0.0
+
+    # ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ───────────
+    # [Sarmiento 2004 / Castello 2015] 0.15-0.45; both a failed flood and an over-flood hurt the forager, so
+    # the form is `1 - amp*|sin theta|`. Rides the C.2b clock (the flood IS the llanos ENSO), so it needs
+    # `enable_interannual` for a period. Needs `llanos_mask`.
+    enable_llanos_flood: bool = False
+    llanos_flood_amp: float = Field(0.0, ge=0.0, le=1.0)
+
+    # ── C.5 INTERCEPT HUNTING — late-dry-season game boost at water ──────────────────────────────────
+    # [Hawkes 1991] Hadza water-blind intercept ~745 vs encounter ~518 kcal/hr => +44% at the waterhole,
+    # switching on only when normalised dryness >= 0.75. ClimateField's own default is ON, so this default
+    # keeps it on and bit-exact.
+    enable_intercept_hunting: bool = True
+
+
 class ClimateField:
     """Wrap a base carrying-capacity field (any object exposing `.level(x,y)`; width/height/consume/etc. are
     delegated) with the time-varying climate multiplier M(t). **C.1 = the seasonal layer only:**
@@ -416,3 +500,83 @@ class ClimateField:
         if name.startswith("_"):
             raise AttributeError(name)
         return getattr(self._base, name)   # delegate width / height / consume / ...
+
+
+def build_climate_field(base, cfg: "ClimateConfig | None" = None, fields=None, seed: int = 0):
+    """Construct a `ClimateField` from a `ClimateConfig` — the ONE place a run's climate is assembled.
+
+    Before this existed every harness hand-wrote `ClimateField(base, a_seas=0.4, regime_driver=None)` and
+    silently took the 0.0 default for every other channel, so the ENSO / regime / herd / flood layers were
+    built, tested, and never once in a run (R-106). Assembling it from a config means the channels appear in
+    `config/mechanisms.toml` alongside the social ones and can be ablated one at a time.
+
+    `fields` is a `WorldFields` (for the GRASS sub-biome masks C.4b/C.4c need); `seed` makes both the lottery
+    draw and the regime telegraph deterministic per world.
+
+    Defaults reproduce the historical call exactly: `a_seas=0.4`, everything else off.
+    """
+    # Imported here, not at module scope: terrain.py does not import climate.py today, but a module-level
+    # import would create the cycle the moment it does, and the sub-biome codes are needed only on the two
+    # GRASS paths.
+    from sic_games.terrain import GRASS_LLANOS, GRASS_STEPPE
+
+    cfg = cfg or ClimateConfig()
+    drawn: dict = {}
+    if cfg.enable_climate_lottery:
+        drawn = draw_world_climate(random.Random(seed), A_SEAS_EARTH[cfg.lottery_a_earth_biome])
+
+    def val(name):
+        """The drawn value when the lottery is on, else the configured one."""
+        return drawn[name] if name in drawn else getattr(cfg, name)
+
+    # A CHANNEL ON WITH A ZERO MAGNITUDE IS THE DEFECT THIS PROJECT KEEPS FINDING — it reads as live in the
+    # config dump and does nothing in the world, and every ablation of it scores INERT. Refuse it.
+    # A channel's NEUTRAL value is not always 0: `mean_factor` is a multiplier whose no-op is 1.0, so a bare
+    # `if not value` check would wave it through as configured while it did nothing.
+    neutral = {"mean_factor": 1.0}
+
+    def need(flag, *names):
+        if not getattr(cfg, flag):
+            return False
+        dead = [n for n in names if val(n) == neutral.get(n, 0)]
+        if dead:
+            raise ValueError(
+                f"ClimateConfig.{flag} is on but {', '.join(dead)} is at its neutral value — the channel "
+                f"would run and do nothing. Set the value(s), or turn on enable_climate_lottery to draw "
+                f"them.")
+        return True
+
+    kw: dict = dict(intercept_on=cfg.enable_intercept_hunting)
+    kw["a_seas"] = val("a_seas") if need("enable_seasonality", "a_seas") else 0.0
+    kw["mean_factor"] = val("mean_factor") if need("enable_eccentricity_mean", "mean_factor") else 1.0
+
+    if need("enable_interannual", "interannual_amp", "interannual_period"):
+        kw.update(interannual_amp=val("interannual_amp"),
+                  interannual_period=int(val("interannual_period")),
+                  interannual_phase=val("interannual_phase"))
+    if need("enable_regime_shift", "regime_amp", "regime_duration", "regime_recurrence"):
+        kw.update(regime_amp=val("regime_amp"), regime_duration=int(val("regime_duration")),
+                  regime_recurrence=int(val("regime_recurrence")),
+                  rng=random.Random(seed ^ 0x5EED))       # the telegraph needs its own stream
+    if need("enable_caribou_swing", "caribou_amp", "caribou_period"):
+        kw.update(caribou_amp=val("caribou_amp"), caribou_period=int(val("caribou_period")),
+                  caribou_phase=val("caribou_phase"),
+                  steppe_mask=_grass_mask(fields, GRASS_STEPPE, "enable_caribou_swing"))
+    if need("enable_llanos_flood", "llanos_flood_amp"):
+        # The llanos flood rides the C.2b clock — it IS the llanos ENSO, not a parallel process — so without
+        # an interannual period it has no clock and would be inert.
+        if not kw.get("interannual_period"):
+            raise ValueError("ClimateConfig.enable_llanos_flood needs enable_interannual for its clock — the "
+                             "flood rides the ENSO period rather than having one of its own.")
+        kw.update(llanos_flood_amp=val("llanos_flood_amp"),
+                  llanos_mask=_grass_mask(fields, GRASS_LLANOS, "enable_llanos_flood"))
+    return ClimateField(base, **kw)
+
+
+def _grass_mask(fields, subtype: int, flag: str):
+    """(N,N) bool mask of a GRASS sub-biome, from `WorldFields.grass_subtype`."""
+    gs = getattr(fields, "grass_subtype", None) if fields is not None else None
+    if gs is None:
+        raise ValueError(f"ClimateConfig.{flag} needs the world's `grass_subtype` field to build its mask; "
+                         f"pass `fields=` to build_climate_field(). Without it the layer is inert.")
+    return gs == subtype

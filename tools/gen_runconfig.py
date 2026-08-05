@@ -30,8 +30,12 @@ SRC = os.path.join(ROOT, "sic_games", "src", "sic_games")
 OUTDIR = os.path.join(ROOT, "config")
 
 # (module, class) pairs whose fields become run configuration.
-TARGETS = [("demography.py", "DemographyConfig"), ("config.py", "SubstrateConfig"),
-           ("config.py", "CarbonConfig"), ("config.py", "KcalEconomyConfig")]
+# ClimateConfig joined in R-106: the climate channels were invisible here because they were `ClimateField`
+# constructor kwargs rather than a config class, which is precisely how the whole variability apparatus
+# (ENSO, regime telegraph, caribou, llanos) stayed switched off in every run without anyone noticing.
+TARGETS = [("demography.py", "DemographyConfig"), ("climate.py", "ClimateConfig"),
+           ("config.py", "SubstrateConfig"), ("config.py", "CarbonConfig"),
+           ("config.py", "KcalEconomyConfig")]
 
 
 def harvest(path, clsname):
@@ -178,9 +182,12 @@ def resolved_canonical():
                          f"(rc={p.returncode}) — refusing to emit a re-derived stack, which is what put a "
                          f"number no run has ever used into the authoritative file.\n{p.stderr[-2000:]}")
     with open(out, encoding="utf-8") as fh:
-        cfg = json.load(fh)["meta"]["demography_config"]
+        meta = json.load(fh)["meta"]
     os.remove(out)
-    return cfg
+    # Keyed by owner class rather than flattened: two config classes may legitimately share a field name, and
+    # a flat dict would let one silently overwrite the other's value in the authoritative file.
+    return {"DemographyConfig": meta["demography_config"],
+            "ClimateConfig": meta.get("climate_config", {})}
 
 
 def main():
@@ -189,7 +196,7 @@ def main():
     flags, params, skipped = [], [], []
     for mod, cls in TARGETS:
         for (name, default_src, typ, doc) in harvest(os.path.join(SRC, mod), cls):
-            val = canon.get(name, literal_default(default_src))
+            val = canon.get(cls, {}).get(name, literal_default(default_src))
             if val is None:
                 skipped.append(f"{cls}.{name} = {default_src}")
                 continue

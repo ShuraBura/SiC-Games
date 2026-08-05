@@ -83,9 +83,10 @@ def docs(field: str) -> str:
 
 def build(owner: str = "DemographyConfig", overrides: dict | None = None):
     """Construct a validated config object of `owner` from the files, plus explicit overrides."""
+    from sic_games import climate as _clim
     from sic_games import config as _cfgmod
     from sic_games import demography as _demog
-    cls = getattr(_demog, owner, None) or getattr(_cfgmod, owner, None)
+    cls = getattr(_demog, owner, None) or getattr(_cfgmod, owner, None) or getattr(_clim, owner, None)
     if cls is None:
         raise SystemExit(f"runconfig.build: unknown config class {owner!r}")
     values = dict(load().get(owner, {}))

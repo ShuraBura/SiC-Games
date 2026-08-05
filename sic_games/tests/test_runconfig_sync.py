@@ -29,7 +29,7 @@ for p in (os.path.join(ROOT, "sic_games", "outputs", "phase1_social_evolution"),
 from sic_games import runconfig  # noqa: E402
 from sic_games.demography import DemographyConfig  # noqa: E402
 
-OWNERS = ["DemographyConfig", "SubstrateConfig", "CarbonConfig", "KcalEconomyConfig"]
+OWNERS = ["DemographyConfig", "ClimateConfig", "SubstrateConfig", "CarbonConfig", "KcalEconomyConfig"]
 
 
 def _canonical():
@@ -134,3 +134,30 @@ def test_manifest_reports_the_dark_set():
     m = runconfig.manifest("DemographyConfig")
     assert "mechanisms ON" in m and "mechanisms OFF" in m
     assert "OFF:" in m, "the manifest must name the mechanisms that will NOT run"
+
+
+def test_every_climate_channel_is_in_the_files():
+    """The climate channels were `ClimateField` constructor kwargs rather than config fields, which is exactly
+    how the whole variability apparatus — ENSO, the regime telegraph, caribou, llanos — stayed switched off in
+    every run this project has done without anyone noticing (R-106). They are configuration now, so they must
+    appear in the file a human reads before launching, on the same footing as the social mechanisms."""
+    from sic_games.climate import ClimateConfig
+    data = runconfig.load(refresh=True).get("ClimateConfig", {})
+    missing = sorted(set(ClimateConfig.model_fields) - set(data))
+    assert not missing, (f"climate field(s) absent from config/*.toml: {missing}\n"
+                         f"Regenerate with: py -3 tools/gen_runconfig.py")
+    for ch in ("enable_interannual", "enable_regime_shift", "enable_caribou_swing",
+               "enable_llanos_flood", "enable_eccentricity_mean"):
+        assert ch in data, f"{ch} must be individually listed so it can be checked on its own"
+
+
+def test_climate_defaults_reproduce_the_historical_field():
+    """Adopting ClimateConfig must not silently change any prior result. Its defaults have to rebuild the
+    hand-written `ClimateField(base, a_seas=0.4, regime_driver=None)` that every campaign used."""
+    from sic_games.climate import ClimateConfig
+    c = ClimateConfig()
+    assert c.a_seas == 0.40 and c.enable_seasonality is True
+    assert c.enable_climate_lottery is False
+    for ch, val in (("interannual_amp", 0.0), ("regime_amp", 0.0), ("caribou_amp", 0.0),
+                    ("llanos_flood_amp", 0.0), ("mean_factor", 1.0)):
+        assert getattr(c, ch) == val, f"{ch} default changed — prior runs are no longer reproducible"
