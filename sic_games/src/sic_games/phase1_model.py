@@ -2676,7 +2676,88 @@ class TerrainWorld(mesa.Model):
             # Hayden 1995 Fig. 6 (p.77) density bands — the stratification-stage benchmark
             "density_per_km2": _dens,
             "hayden_stage": self._hayden_stage(_dens) if _dens == _dens else "n/a",
+            **self._age_structure(pop, males, females, adult),
         }
+
+    #: Age-pyramid classes in YEARS, [lo, hi). Finer than the child/adult/elder split above because the
+    #: SHAPE is the signal — a growing population is broad-based and a declining one is not, and the coarse
+    #: three-class view cannot tell those apart. The 0–4 / 5–14 split follows Hill & Hurtado's Aché classes
+    #: (Table 5.1: 0–3 / 4–14 / 15–59 / 60+); 15–29 / 30–44 / 45–59 splits the reproductive span so the
+    #: female cohorts that actually bear can be seen separately from those aging out of it.
+    _PYRAMID = ((0, 5), (5, 15), (15, 30), (30, 45), (45, 60), (60, 200))
+
+    @classmethod
+    def _age_structure(cls, pop: list, males: list, females: list, adult: list) -> dict:
+        """The age pyramid, the mating-suitability ratios, and the growth-regime call.
+
+        WHY (R-106, supervisor request 2026-08-04). The existing markers carry `median_age_yr`,
+        `sex_ratio_m_f` and a coarse child/adult/elder split, which is enough to notice that something is
+        wrong and not enough to say what. Three things were missing and each cost time this arc:
+
+        * **the pyramid itself** — the shape is what distinguishes a growing from a declining population, and
+          three classes cannot show it;
+        * **mating suitability** — `frac_unpaired_adult` is the φ that `LITERATURE.md` assumes is ≈0.1 when it
+          derives `mate_search_min_eligible ≈ 15` from White's ~150-person MVP. Nothing measured it, so the
+          assumption went unchecked for three weeks (Addendum 25);
+        * **the operational sex ratio** — the ratio of mate-seeking males to receptive females is what sets
+          how far the connubium search has to reach, and the reach was 11–75% of the whole population.
+
+        `sex_ratio_m_f` above is over the WHOLE population including children; the mating-relevant ratios are
+        adult-only, which is why they are separate keys rather than a refinement of that one.
+        """
+        nan = float("nan")
+        n = len(pop)
+        if n == 0:
+            return {}
+        M = MONTHS_PER_YEAR
+        out: dict = {}
+        for lo, hi in cls._PYRAMID:
+            k = f"age_{lo}_{hi if hi < 200 else 'plus'}"
+            out[k] = sum(1 for a in pop if lo * M <= a.age < hi * M) / n
+
+        adult_m = [a for a in males if a.age >= cls._AGE_CHILD_YR * M]
+        adult_f = [a for a in females if a.age >= cls._AGE_CHILD_YR * M]
+        unpaired_m = [a for a in adult_m if not getattr(a, "_wives", ())]
+        unpaired_f = [a for a in adult_f if getattr(a, "_partner", None) is None]
+        out["adult_sex_ratio"] = (len(adult_m) / len(adult_f)) if adult_f else nan
+        # φ — the share of the WHOLE population that is an unpaired adult. This is the conversion factor
+        # between a mate-search pool counted in eligible partners and one counted in persons.
+        out["frac_unpaired_adult"] = (len(unpaired_m) + len(unpaired_f)) / n
+        out["frac_unpaired_adult_m"] = (len(unpaired_m) / len(adult_m)) if adult_m else nan
+        # OSR (operational sex ratio): mate-SEEKING males per receptive female. >1 ⇒ males compete and the
+        # search must reach further; the classic driver of mating-system structure.
+        out["operational_sex_ratio"] = (len(unpaired_m) / len(unpaired_f)) if unpaired_f else nan
+
+        # The pyramid's own shape ratio: the under-15 base against the 15–44 reproductive middle. Broad base
+        # ⇒ expansive. Reported RAW beside the label so the label is never the load-bearing thing.
+        base = out["age_0_5"] + out["age_5_15"]
+        mid = out["age_15_30"] + out["age_30_45"]
+        out["pyramid_base_ratio"] = (base / mid) if mid > 0 else nan
+        out["growth_regime"] = cls._growth_regime(out["pyramid_base_ratio"],
+                                                   len(adult) and (len(pop) - len(adult)) / len(adult))
+        return out
+
+    @staticmethod
+    def _growth_regime(base_ratio: float, dep: float) -> str:
+        """Classify the pyramid as expansive / stationary / constrictive, in `_hayden_stage`'s pattern.
+
+        The base/reproductive-middle ratio is the standard shape statistic: a stationary population with flat
+        mortality across the reproductive span has roughly as many people in its 15-yr child classes as in the
+        30-yr middle, so the ratio sits near 1; a broad-based growing pyramid runs well above it, a
+        narrow-based ageing one well below.
+
+        **[PROVISIONAL] cut-offs 0.8 / 1.5** — conventional pyramid shape classes, NOT lit-anchored to a
+        forager series. They are reported alongside the raw ratio precisely so the label can be ignored. The
+        project's own age-structure anchors are `median_age_yr` ≈ 20 (Aché) and `frac_child` ≈ 40%
+        (MARKER_MATRIX #4/#5), and those — not this label — are what a run should be scored on.
+        """
+        if base_ratio != base_ratio:
+            return "n/a"
+        if base_ratio >= 1.5:
+            return "expansive"
+        if base_ratio >= 0.8:
+            return "stationary"
+        return "constrictive"
 
     @staticmethod
     def _hayden_stage(dens: float) -> str:

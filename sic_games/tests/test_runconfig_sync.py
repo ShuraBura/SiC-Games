@@ -48,7 +48,10 @@ def _canonical():
     import subprocess
     import tempfile
     camp = os.path.join(ROOT, "sic_games", "outputs", "substrate_run", "run_campaign.py")
-    tag = "_t_runconfig_fidelity"
+    # PID-SUFFIXED. A fixed tag means two concurrent pytest runs write and read the same trajectory file and
+    # clobber each other — observed as two spurious failures here that passed in isolation. The campaign's
+    # output path is derived from C_TAG, so making the tag unique per process is the whole fix.
+    tag = f"_t_runconfig_fidelity_{os.getpid()}"
     out = os.path.join(os.path.dirname(camp), f"campaign_trajectory{tag}.json")
     env = dict(os.environ, C_ALLON="1", C_TAG=tag, C_STEPS="2", C_FOUNDERS="150", C_MAXMIN="5",
                C_LOGEVERY="600", C_GENEA="0")
@@ -57,8 +60,15 @@ def _canonical():
                            stdout=devnull, stderr=subprocess.PIPE, text=True, timeout=600)
     assert p.returncode == 0 and os.path.exists(out), \
         f"the canonical campaign would not run, so fidelity cannot be checked:\n{p.stderr[-2000:]}"
-    with open(out, encoding="utf-8") as fh:
-        return json.load(fh)["meta"]["demography_config"]
+    try:
+        with open(out, encoding="utf-8") as fh:
+            return json.load(fh)["meta"]["demography_config"]
+    finally:
+        for f in (out, out.replace("trajectory", "progress").replace(".json", ".txt")):
+            try:
+                os.remove(f)
+            except OSError:
+                pass
 
 
 def test_files_exist_and_parse():

@@ -360,6 +360,24 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         frac_child=round(_dg.get("frac_child", 0.0), 3),
         frac_motherless=round(_dg.get("frac_motherless", 0.0), 4),       # Aché ~0.02 (Hill & Hurtado)
         frac_fatherless=round(_dg.get("frac_fatherless", 0.0), 4),
+        # AGE PYRAMID + MATING SUITABILITY (R-106, 2026-08-04). The SHAPE distinguishes a growing from a
+        # declining population and the coarse child/adult/elder split cannot; and `frac_unpaired_adult` is
+        # the φ that `LITERATURE.md` assumes is ≈0.1 when it derives `mate_search_min_eligible ≈ 15` from
+        # White's ~150-person MVP. Nothing measured it — it is 0.012 — so the derivation went unchecked
+        # (Addendum 25). These travel on every row so a marker is never read without the structure that
+        # produced it.
+        age_0_5=round(_dg.get("age_0_5", 0.0), 4),
+        age_5_15=round(_dg.get("age_5_15", 0.0), 4),
+        age_15_30=round(_dg.get("age_15_30", 0.0), 4),
+        age_30_45=round(_dg.get("age_30_45", 0.0), 4),
+        age_45_60=round(_dg.get("age_45_60", 0.0), 4),
+        age_60_plus=round(_dg.get("age_60_plus", 0.0), 4),
+        pyramid_base_ratio=round(_dg.get("pyramid_base_ratio", 0.0), 3),
+        growth_regime=_dg.get("growth_regime", "n/a"),
+        adult_sex_ratio=round(_dg.get("adult_sex_ratio", 0.0), 3),
+        frac_unpaired_adult=round(_dg.get("frac_unpaired_adult", 0.0), 4),
+        frac_unpaired_adult_m=round(_dg.get("frac_unpaired_adult_m", 0.0), 4),
+        operational_sex_ratio=round(_dg.get("operational_sex_ratio", 0.0), 3),
         # WEALTH CONCENTRATION — the direct test of "does material accrue to the elite"
         material_gini=round(_dg.get("material_gini", 0.0), 4),
         material_top10_share=round(_dg.get("material_top10_share", 0.0), 4),
