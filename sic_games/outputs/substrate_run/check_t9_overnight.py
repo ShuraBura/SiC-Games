@@ -75,7 +75,7 @@ def main():
         cut = tr[-1]["step"] * 2 // 3
         v = [r["pct_stratified"] for r in tr if r["step"] >= cut]
         m = sum(v) / len(v)
-        vm = tr[-1]["village_med"]
+        vm = tr[-1].get("bigband_med", tr[-1].get("village_med"))
         ok_s = "IN BAND" if R64_STRAT[0] <= m <= R64_STRAT[1] else ("HIGH" if m > R64_STRAT[1] else "LOW")
         try:
             ok_v = "in range" if BARYOSEF[0] <= float(vm) <= BARYOSEF[1] else "OUT OF RANGE"

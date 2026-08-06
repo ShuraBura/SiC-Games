@@ -1,42 +1,15 @@
-# ── SiC-Games .gitignore (reorg baseline, 2026-06-05) ──
-# Principle: track docs + code + reports; never track backups, caches, or raw run binaries.
+# Run artifacts. These are OUTPUTS of a harness, not source — a campaign writes a trajectory, a progress
+# file and a stdout log per arm, and a single battery produces hundreds. Committing them once swept 1281
+# files into a source commit (R-106, 2026-08-04); this stops it recurring.
+sic_games/outputs/**/campaign_trajectory*.json
+sic_games/outputs/**/campaign_progress*.txt
+sic_games/outputs/**/campaign_genealogy*.csv
+sic_games/outputs/**/b6l_stdout*.txt
+sic_games/outputs/**/b7_stdout*.txt
+sic_games/outputs/**/*_results.json
+sic_games/outputs/**/*_progress.txt
 
-# Backups & litter (never tracked) ----------------------------------------
-*.bak*
-# The supervisor's full manual mirror (recursive copy of the whole project)
-/backup 06.05.2026 2.37 pm/
-
-# Python caches -----------------------------------------------------------
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 .pytest_cache/
-*.egg-info/
-.ipynb_checkpoints/
-
-# Raw run data (reports = .html/.md ARE tracked; heavy binaries/caches are not) -
-*.parquet
-*.pkl
-*.npy
-*.npz
-*.prof
-# per-config / per-run logs under outputs
-sic_games/outputs/**/*.log
-sic_games/outputs/**/logs/
-
-# Literature reference library (never tracked) ---------------------------
-# Supervisor's local source PDFs — given for CC to read, not for versioning.
-# Binaries would permanently bloat the repo; citations live in docs/LITERATURE.md.
-literature/*.pdf
-literature/*.epub
-literature/*.djvu
-# D-PLACE Ethnographic Atlas coded data (14MB, re-obtainable from github.com/D-PLACE; cross-tabs live in docs/LITERATURE.md)
-literature/dplace_ea/
-
-# OS / editor -------------------------------------------------------------
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# campaign genealogy dumps: 100MB+ per run, regenerable from run_campaign.py
-sic_games/outputs/**/*genealogy*.csv

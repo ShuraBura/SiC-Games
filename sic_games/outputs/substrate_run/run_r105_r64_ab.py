@@ -28,7 +28,7 @@ BASE = dict(C_TERR="coastal", C_CLIM="temperate", C_IMPROVED="0", C_FOUNDERS="30
 
 PROG = os.path.join(HERE, "r105_r64_ab_progress.txt")
 # R-64's four headline claims + the capacity diagnostics that localise the bug.
-KEYS = ("pop", "pct_stratified", "village_med", "village_max", "n_villages",
+KEYS = ("pop", "pct_stratified", "bigband_med", "bigband_max", "n_bigbands",
         "n_settle", "settle_max", "surplus_med", "deaths_starv", "gini_cred")
 
 

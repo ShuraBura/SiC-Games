@@ -67,7 +67,7 @@ DEFAULT_FLAGS = ["enable_band_risk", "enable_provisioning", "enable_alluvial_ren
 FLAGS = [f for f in os.environ.get("B4_FLAGS", "").split(",") if f] or DEFAULT_FLAGS
 
 NUMERIC = ("final_pop", "tot_wealth", "tot_material", "tot_cred", "bonds", "n_settlements",
-           "n_ascribed", "n_villages", "n_lineages", "births", "deaths")
+           "n_ascribed", "n_bigbands", "n_lineages", "births", "deaths")
 
 
 def dist(base, sig):

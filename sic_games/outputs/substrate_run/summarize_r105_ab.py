@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # (45), which is NOT R-64's village — R-64's "village median ~100 / max ~241" was SITE-CELL OCCUPANCY, i.e. this
 # harness's `settle_*`. Compare settle_med/settle_max against R-64, not village_med.
 KEYS = ("pop", "pct_stratified", "gini_cred", "settle_med", "settle_max", "n_settle",
-        "village_med", "village_max", "n_villages", "surplus_med", "deaths_starv")
+        "bigband_med", "bigband_max", "n_bigbands", "surplus_med", "deaths_starv")
 
 
 def arms():
@@ -73,7 +73,7 @@ if __name__ == "__main__":
                 continue
             r = A[(s, c)][1][-1]
             print(f"  seed {s} ceil{c}: step {r['step']} pop {r['pop']} strat {r['pct_stratified']}% "
-                  f"giniC {r['gini_cred']} vil_med {r['village_med']} vil_max {r['village_max']} "
+                  f"giniC {r['gini_cred']} bigbd_med {r['bigband_med']} bigbd_max {r['bigband_max']} "
                   f"n_vil {r['n_villages']} n_set {r['n_settle']} surplus {r['surplus_med']}")
 
     print("\nDOES THE GAP-OPEN ARM STILL REPRODUCE R-64? (pop ~7200, strat 9-16 sustained)")

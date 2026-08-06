@@ -58,7 +58,7 @@ ENVELOPE = [
 ]
 
 QUANT = ("final_pop", "tot_wealth", "tot_material", "tot_cred", "bonds", "n_settlements",
-         "n_ascribed", "n_villages", "n_lineages", "births", "deaths", "n_owned", "n_claims")
+         "n_ascribed", "n_bigbands", "n_lineages", "births", "deaths", "n_owned", "n_claims")
 
 
 def s5_check(sig):

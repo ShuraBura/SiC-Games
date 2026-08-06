@@ -59,11 +59,11 @@ if __name__ == "__main__":
             log(f"      steps={m['meta'].get('steps_completed')} pop={row['pop']} "
                 f"noble_matl_lift={row.get('noble_material_lift')} leader_matl_lift={row.get('leader_material_lift')} "
                 f"gini_matl={row.get('gini_material')} village_gap_d={row.get('village_gap_d_med')} "
-                f"frac_broken={row.get('frac_villages_broken')}")
+                f"frac_broken={row.get('frac_bands_broken', row.get('frac_villages_broken'))}")
         except Exception as e:
             log(f"      (readback failed: {e})")
     log(f"\nR-103d DONE in {(time.time()-t0)/60:.0f} min")
     log("SUMMARY — does the LINEAGE hold a heritable estate? (noble_material_lift > 1 = chief signal)")
     for cell, row in done:
         log(f"   {cell:18s} noble_matl={row.get('noble_material_lift')}  gap_d={row.get('village_gap_d_med')}  "
-            f"broken={row.get('frac_villages_broken')}  strat={row.get('pct_stratified')}%")
+            f"broken={row.get('frac_bands_broken', row.get('frac_villages_broken'))}  strat={row.get('pct_stratified')}%")

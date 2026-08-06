@@ -224,7 +224,7 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     # measure, WITHIN each village, the noble/commoner cred separation as Cohen's d (reusing R-99's privilege
     # effect idea). d≈0 = one continuum (rank); d large = two separated strata (a real break). The mechanism that
     # should CUT the gap is class endogamy (enable_ascribed_mate_choice); this diagnostic runs regardless so ON/OFF
-    # can be compared. `frac_villages_broken` = share of villages whose nobles stand a LARGE effect above commoners.
+    # can be compared. `frac_bands_broken` = share of BANDS whose nobles stand a LARGE effect above commoners.
     _rk = w._rank_keys() if hasattr(w, "_rank_keys") else {}
     _asc = getattr(w, "_lineage_ascribed", set())
     _band_noble: dict = {}; _band_comm: dict = {}
@@ -290,8 +290,12 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         juv_frac=round(sum(1 for x in ages if x < 180) / pop, 3) if pop else 0,   # <15 yr (dependency proxy)
         mean_age_yr=round(statistics.mean(ages) / 12.0, 1) if pop else 0,
         n_bands=len(sizes), band_med=statistics.median(szv) if szv else 0, band_max=max(szv) if szv else 0,
-        n_villages=len(villages), village_med=round(statistics.median(villages), 1) if villages else 0,
-        village_max=max(villages) if villages else 0,
+        # RENAMED from n_villages/village_med/village_max (R-106, 2026-08-04). These count BANDS with more
+        # than `BAND_SPLIT` members — a social unit of any spatial extent — NOT settlements. `settle_med`
+        # below is the settlement-site measure, and it is what MARKER_MATRIX scores against Bar-Yosef
+        # 50-150. Two files already carried comments warning about the mix-up rather than fixing the name.
+        n_bigbands=len(villages), bigband_med=round(statistics.median(villages), 1) if villages else 0,
+        bigband_max=max(villages) if villages else 0,
         pct_complex=round(100 * socs.get("complex_forager", 0) / pop, 1) if pop else 0,
         pct_stratified=round(100 * socs.get("stratified_chiefdom", 0) / pop, 1) if pop else 0,
         # R-101: the THIRD rung was only ever implied by subtraction, which makes a cross-tab impossible
@@ -305,9 +309,12 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         n_strat_bands=len(_strat_bg),
         between_band_gini=round(_between_gini, 3),      # R-103: inequality ACROSS bands (the real discriminator?)
         strat_lift=_strat_lift,                         # stratified-band mean cred / other-band mean cred (>1 = real)
-        village_gap_d_med=_village_gap_d_med,           # R-103b Flannery: median noble/commoner Cohen's d per village
-        frac_villages_broken=_frac_villages_broken,     #   share of villages with a LARGE (d>=0.8) noble/commoner break
-        n_villages_gapd=len(_dvals),
+        # RENAMED from village_gap_d_med/frac_villages_broken/n_villages_gapd (R-106): the loop that builds
+        # `_dvals` iterates over BANDS with >=5 members, not settlements. R-103b's Flannery claim about "the
+        # share of villages with a noble/commoner break" is a per-BAND statistic.
+        band_gap_d_med=_village_gap_d_med,              # R-103b Flannery: median noble/commoner Cohen's d per BAND
+        frac_bands_broken=_frac_villages_broken,        #   share of BANDS with a LARGE (d>=0.8) noble/commoner break
+        n_bands_gapd=len(_dvals),
         # R-103c elite currency breakdown — LINEAGE (ascribed) lift vs OFFICE (leader) lift, per currency
         noble_cred_lift=_lift(_nob, _com, "cred"), noble_material_lift=_lift(_nob, _com, "material"),
         noble_food_lift=_lift(_nob, _com, "wealth"),
@@ -793,8 +800,8 @@ def main():
                         f"tenure={row['leader_tenure_yr']}y levy={row['leader_levy']} "
                         f"resent(mean/max)={row['mean_resentment']}/{row['max_resentment']} "
                         f"revs={row['cum_reversions']}") if ELITE else ""
-            log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} vil={row['n_villages']}"
-                f"(med{row['village_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
+            log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bd={row['n_bands']:4d} bigbd={row['n_bigbands']}"
+                f"(med{row['bigband_med']}) strat={row['pct_stratified']}% giniC={row['gini_cred']} "
                 f"dyn:eff={row['eff_lineages']} top={row['lin_top_share']} nlin={row['n_lineages']} "
                 f"lpb={row['lineages_per_band']}/dom={row['dom_lineage_share']} mRSg={row['male_rs_gini']} "
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "

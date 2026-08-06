@@ -97,7 +97,7 @@ PRECOND = {
     "ascribed": ("n_ascribed", "no agent was ever ascribed (no noble stratum)"),
     "deaths": ("deaths", "nobody died (a death-triggered mechanism cannot fire)"),
     "births": ("births", "nobody was born (a birth-triggered mechanism cannot fire)"),
-    "villages": ("n_villages", "no band ever exceeded the village threshold"),
+    "villages": ("n_bigbands", "no band ever exceeded the band-split threshold"),
     "lineages": ("n_lineages", "only one lineage exists (no lineage structure to act on)"),
     # A mechanism with a SIZE gate needs a unit that reached that size. Measured 2026-07-27: village budding
     # read INERT in this regime purely because the 600-agent world never grows a village to the fission
@@ -220,7 +220,7 @@ def signature(update, steps=STEPS, **world):
         n_settlements=len(getattr(w, "_settlement_sites", []) or []),
         n_ascribed=sum(1 for a in al if getattr(a, "_lineage", None) in asc_lin),
         n_ascribed_lineages=len(asc_lin),
-        n_villages=sum(1 for v in bands.values() if v > getattr(w._demog, "band_split_size", 45)),
+        n_bigbands=sum(1 for v in bands.values() if v > getattr(w._demog, "band_split_size", 45)),
         n_lineages=len(lin),
         # LAND TENURE (added 2026-07-27). The signature had 13 fields and none of them was ownership, so a
         # mechanism whose whole job is to change who owns which cell — `enable_improved_land`,
@@ -232,7 +232,7 @@ def signature(update, steps=STEPS, **world):
     )
     probes = dict(max_settlements=max_settle, bonds=sig["bonds"], tot_material=sig["tot_material"],
                   n_ascribed=sig["n_ascribed"] or sig["n_ascribed_lineages"], deaths=deaths, births=births,
-                  n_villages=sig["n_villages"], n_lineages=sig["n_lineages"],
+                  n_bigbands=sig["n_bigbands"], n_lineages=sig["n_lineages"],
                   max_village=(max_village if max_village >= getattr(w._demog, "village_fission_threshold", 170)
                                else 0))
     return sig, probes, round(time.time() - t0, 1)
