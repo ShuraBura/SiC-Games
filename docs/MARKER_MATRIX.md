@@ -22,15 +22,15 @@ validated, however long it ran.
 
 | # | marker | field | band | source | status |
 |---|---|---|---|---|---|
-| 1 | band size | `band_med` | 25 [18–35] | Johnson scalar stress; R-72 | **23/25** |
-| 2 | settlement size | `settle_med` | 100 [50–150] | Bar-Yosef; R-63/R-64 | **21/25** |
-| 3 | village size | `settle_med` | [50–250] | Alvard 2009 | **21/25** |
+| 1 | band size | `band_med` | 25 [18–35] — **provenance flagged** | ~~Johnson~~ Wobst/Kelly/Hill; Johnson's own !Kung range is **22–40** | **23/25**, but against a band not in the cited paper |
+| 2 | settlement size | `settle_med` | 100 [50–150] | Bar-Yosef — **NOT IN `literature/`** | **21/25**, unverifiable from this repo |
+| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **21/25** |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
-| 6 | lineage top share | `lin_top_share` | 0.16 [0.08–0.30] | T-9 Karmin 2015 | **7/25 — weakest** |
+| 6 | lineage top share | `lin_top_share` | 0.16 [0.08–0.30] — **MIS-CITED** | 0.16 = **Yan 2014** Oα; 0.08 = **Zerjal 2003**; Karmin has neither | **7/25** — and both sources are post-Neolithic/state-scale |
 | 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
-| 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 | 2 of 3 proxies — unstable |
+| 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **NOT IN `literature/`** | 2 of 3 proxies — unstable, unverifiable |
 | 10 | **polygyny** | `frac_polygynous_m` | **~0.04** | Marlowe, *The Hadza* | **was 15× off; now 1.0×** |
 | 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
 | 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **never previously scored**; first read −0.98 |
@@ -38,6 +38,16 @@ validated, however long it ran.
 | 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
 | 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
 | 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | sanity/context | — | context for 1–15 |
+
+**ANCHOR-PROVENANCE SWEEP (2026-08-04, RESULTS Addendum 27).** Every cited source was located in
+`literature/` and searched for its number. Of nine rows with a numeric band and a named paper: **2 verify**
+(#3 Alvard verbatim, #14 BHM Table S5), **2 are mis-attributed** with the real numbers elsewhere in the folder
+(#1, #6), **1 is withdrawn** (#5), **2 have no source in the repo at all** (#2, #9), and 2 name their
+derivation well enough to trust (#8 Bandy, #15 Hill & Hurtado Table 13.1).
+
+**The rows that survived are the ones whose citation named a table, a page or a sentence. Every row that
+failed cited only an author and a year.** Charter §11 P5 as an acceptance criterion: **an anchor names its
+table, or it is not an anchor.**
 
 **#5's ANCHOR IS WITHDRAWN — BHM 2009 contains no lineage-size Gini (2026-08-04, the paper read).**
 `literature/borgerhoff-mulder.som.pdf` is the SOM for *Intergenerational Wealth Transmission and the Dynamics

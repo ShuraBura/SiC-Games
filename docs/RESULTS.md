@@ -4786,6 +4786,80 @@ quantity names its measurement**, and "BHM 2009" is not a measurement.
 Addendum 24 re-read for `material_gini`, `wealth_gini`, `lineage_size_gini` and `lin_size_gini`.
 MARKER_MATRIX row 5 marked NOT SCOREABLE; row 14 given its real band and the measured value.
 
+**ADDENDUM 27 — THE ANCHOR-PROVENANCE SWEEP. Every marker's cited source checked against the actual paper in
+`literature/`. Two sources are NOT IN THE FOLDER AT ALL (one of them scores 21/25), two bands are traceable
+to a DIFFERENT paper than the one cited, one was withdrawn yesterday, and two verify verbatim (2026-08-04).**
+
+**WHY.** Addendum 26 withdrew marker #5 after ten minutes with the actual PDF: BHM 2009's Ginis are wealth
+Ginis and the band had been borrowed from its material-wealth column. The obvious question was how many of
+the other fifteen rows cite a source without naming a table, a column or a quantity. This is that sweep — the
+source PDF located in `literature/`, opened, and searched for the number.
+
+| # | marker | band | cited source | verdict |
+|---|---|---|---|---|
+| 1 | `band_med` | 25 [18–35] | Johnson scalar stress | **MIS-ATTRIBUTED** |
+| 2 | `settle_med` | 100 [50–150] | Bar-Yosef | **SOURCE NOT IN `literature/`** |
+| 3 | `settle_med` | [50–250] | Alvard 2009 | **VERIFIED VERBATIM** |
+| 4 | `connubium_med` | 150 [79–332] | White 2017 / Wobst MES | verified (R-67 already corrected it from the paper) |
+| 5 | `lineage_size_gini` | [0.51–0.68] | BHM 2009 | **WITHDRAWN** (Addendum 26) |
+| 6 | `lin_top_share` | 0.16 [0.08–0.30] | Karmin 2015 | **MIS-CITED — numbers are from two OTHER papers** |
+| 8 | `bud_events` | 2–5×10⁻³ | Bandy 2004 | citation NAMES its derivation — the best-documented row |
+| 9 | T-7 ordering | structure > productivity | Smith & Codding 2021 | **SOURCE NOT IN `literature/`** |
+| 14 | `material_gini` | HG 0.36 … | BHM 2009 Table S5 | **VERIFIED** (Addendum 26) |
+
+**#3 IS EXACTLY RIGHT, and shows what a good citation looks like.** `AlvardPaper2.pdf`: *"Yanomamö villages are
+small compared to Lamalera, ranging from **50** or so up to **250** individuals."* The band is the sentence.
+
+**#6 — THE NUMBERS ARE REAL AND THE CITATION IS WRONG.** Karmin 2015 is *"A recent bottleneck of Y chromosome
+diversity coincides with a global change in culture"*; its quantities are Y-chromosome **effective population
+sizes** and **coalescence dates** — "0.16", "0.08" and "0.30" appear nowhere in it. The band's numbers are in
+the folder, in two other papers:
+
+- **Yan 2014** (`yan2014_three_neolithic_super_grandfathers_PLoSONE.pdf`): the three star-like Neolithic
+  clades *"encompass more than 40% of the present Han Chinese in total (estimated **16%** for Oα, 11% for Oβ,
+  and 14% for Oγ)"*. **0.16 is Oα, exactly the marker's point value.**
+- **Zerjal 2003** (`Zerjal et al. - 2003 - The Genetic Legacy of the Mongols.pdf`): the star cluster *"was
+  present at high frequency: ∼**8%** of the men in this region carry it"*. **That is the 0.08 floor.**
+
+So the band was assembled from Yan and Zerjal and filed under Karmin. **And it matters beyond the citation:**
+both sources are POST-NEOLITHIC EXPANSIONS — an agricultural expansion in Neolithic China and the Mongol
+empire. R-97 already concluded that Turchin's cycles are a state-scale phenomenon and *"we built the Kachin"*.
+Marker #6 has been asking a forager/Kachin-scale model to reproduce the Y-lineage concentration of an empire,
+and its 7/25 — the matrix's own "weakest" — is what that should look like. The 0.30 ceiling is traceable to
+neither paper and remains unaccounted for.
+
+**#1 — THE BEST-SCORING MARKER IS MIS-ATTRIBUTED.** `SiC_Games_D2_Johnson1982_OrgStructureScalarStress.pdf`
+reports *"average camp size was 30.9 people, the range over the 28 days was **22-40** (SD = 5.4)"* for the
+!Kung, and an organisational threshold *"in groups of approximately six individuals"*. It does not contain
+[18–35] or a band-size band of any kind — Johnson's contribution is the scalar-stress curve, which is what
+`repulsion_width` and the logistic FORM were taken from. `LITERATURE.md` says so itself: the ~25 *"rest[s] on
+Wobst/Kelly/Hill"*, and the famous band ≈ 25 is Birdsell's 1968 *Man the Hunter* chapter. So #1's band comes
+from real sources — just not the one on the row. Johnson's own **22–40** would be a defensible and better-
+traced alternative, and the model scores differently against it (2500-step arms: control 17.5–33, full 19–39).
+
+**#2 AND #9 CANNOT BE CHECKED AT ALL.** Neither Bar-Yosef nor Smith & Codding 2021 is in `literature/`. #2 is
+not a minor row: `settle_med` against [50–150] scores **21/25** and is one of the two markers Addendum 24
+reported the full stack fixing. Its band is currently unverifiable from anything in this repository.
+
+**WHAT THE SWEEP SAYS ABOUT THE MATRIX AS A WHOLE.** Of nine rows with a numeric band and a named paper:
+2 verify, 2 are mis-attributed with the real numbers elsewhere in the folder, 1 is withdrawn, 2 have no source
+present, and 2 (#8 Bandy, #15 Hill & Hurtado) name their derivation well enough to be trusted without
+re-reading. **The rows that survived are the ones whose citation named a table, a page or a sentence.** Every
+row that failed cited only an author and a year.
+
+That is charter §11 P5 turned into an acceptance criterion: **an anchor names its table, or it is not an
+anchor.** A number with an author-year beside it has, on this evidence, about a one-in-three chance of coming
+from that author.
+
+**NOT RE-CHECKED HERE:** #10 (Marlowe polygyny — the PDF's page extracts as a garbled table; the marker was
+already corrected once, 15× → 1.0×), #11 (von Rueden, verified during R-77/R-80), #15 (Hill & Hurtado, cites
+Table 13.1 explicitly), #7 (`ascribed_frac`, band never documented, not scored), #12/#13 (Johnson rank-size —
+conceptual, ≈−1.0 and ≈1 are definitions rather than measurements).
+
+**Origin:** `literature/` read directly — AlvardPaper2, Genome Res.-2015-Karmin, yan2014_three_neolithic_
+super_grandfathers, Zerjal et al. 2003, SiC_Games_D2_Johnson1982, borgerhoff-mulder.som — against
+`MARKER_MATRIX.md`. No model code touched.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
