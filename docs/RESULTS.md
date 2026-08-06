@@ -4860,6 +4860,79 @@ conceptual, ≈−1.0 and ≈1 are definitions rather than measurements).
 super_grandfathers, Zerjal et al. 2003, SiC_Games_D2_Johnson1982, borgerhoff-mulder.som — against
 `MARKER_MATRIX.md`. No model code touched.
 
+**ADDENDUM 28 — THE THREE FETCHED PAPERS, READ. Smith & Codding verifies verbatim. Hill 2011 contains NO
+LINEAGE DATA, which retracts the replacement anchor proposed for #6 one turn earlier. And Hill's real number
+— band size in ADULTS — shows the model's bands hold 11.8 adults against 28.2, failing 16/16, while
+`band_med` "passes" 23/25 because it counts children the model has too many of (2026-08-04).**
+
+**#9 SMITH & CODDING 2021 — VERIFIED VERBATIM.** *"among the 17 CAL groups with maximum fish harvest scores …
+the correlation between HI and RI was nearly as high (**r = 0.766, n = 17**) as for the full sample
+(**r = 0.881, n = 89**)"*. Exactly as `LITERATURE.md` recorded it. The `[VERIFIED]` tag was honest; only the
+PDF was missing. #9's source is now filed and confirmed.
+
+**#6's PROPOSED REPLACEMENT ANCHOR IS RETRACTED — Hill 2011 has no lineages in it.** One turn ago this log
+recommended retargeting #6 from whole-population `lin_top_share` to band-level `dom_lineage_share`, anchored
+to *"Hill 2011: dominant-lineage share 0.38, ~7 lineages/band"* as carried by `MODEL_SPEC` §4.8.8, `TARGETS`
+and `PARAMETERS` (where `rank_hierarchy_frac = 0.15` is DERIVED as ~1/7 from it). The paper is now in the
+folder and **the string "lineage" occurs ZERO times in it**. Its unit is the co-residence of *primary kin* —
+brothers, sisters, parents, offspring — not descent groups. The three occurrences of "0.38" are cells in
+Table 1: the Nunamuit and Hadza co-residence values, and a column average. **There is no dominant-lineage
+share and no ~7-lineages-per-band in Hill et al. 2011.**
+
+That is the fourth mis-attribution this sweep has found, it was recommended in this log as the *fix* for the
+third, and it propagates further than the others — `rank_hierarchy_frac = 0.15` rests on the 1/7.
+
+**WHAT HILL 2011 ACTUALLY GIVES, verified:** 32 societies, and
+
+> mean experienced band size = **28.2 adults** … the mean total number of co-resident adult primary kin per
+> band is only **1.8** … most individuals in residential groups are **genetically unrelated**
+
+**AND THAT NUMBER BREAKS MARKER #1, in the units it is stated in.** Hill's 28.2 is **ADULTS**. The model's
+`band_med` counts everyone. Converting across the 16 long arms of Addendum 24 with each arm's own
+`frac_child`:
+
+| | model band_med (all ages) | frac_child | **adults per band** | vs Hill 28.2 |
+|---|---|---|---|---|
+| control, median | 26.0 | 0.60 | **10.7** | 0.38× |
+| full stack, median | 32.5 | 0.59 | **13.3** | 0.47× |
+| **all 16 arms, median** | | | **11.8** | **0.42×** |
+
+Range across arms 0.29×–0.58×. **Not one arm reaches even 60% of Hill's figure.** Meanwhile `band_med` scores
+**23/25** against [18–35] — the matrix's best row — because it is an all-ages count measured against a band
+whose provenance Addendum 27 already showed is not Johnson's.
+
+**The two findings are one finding.** MARKER #4/#5 records the demographic engine as running far too young:
+`frac_child` **0.59** against the ~0.40 anchor, median age 12.8 against ~20, e₀ 21.4 against ~28. A band of 27
+people that is 60% children holds 11 adults. **The band-size pass is being carried by the excess children.**
+Fix the demography and `band_med` falls out of [18–35] from below unless adult band size roughly doubles.
+
+So #1 should be scored on **adults**, against Hill 2011's 28.2 — a traceable, in-folder, 32-society figure —
+and on that basis the model fails it 16/16 rather than passing it 23/25.
+
+**#2 BAR-YOSEF 1998 — STILL NOT VERIFIED, now for a better reason.** The PDF is filed and read. Its treatment
+of size is archaeological and comparative: sections titled *"Site Size and Settlement Pattern"* and *"Site
+Size, Intrasite Variability, and Settlement Pattern"*, and the one quantitative statement in the extracted
+text is relative — *"The largest Neolithic sites … are at least **three to eight times larger** than the
+largest Natufian sites."* **No population figure appears anywhere in the extracted text**: no "100–150", no
+"dozens", and a regex for "N to M people/persons/inhabitants" matches nothing. `LITERATURE.md` had already
+conceded the position — *"Status: SEARCH-VERIFIED (PDF not filed)"* — and its own note derives the band's
+floor from the project rather than the paper: *"should let villages LAND in ~50–150 — checked in run A, not
+pre-tuned"*.
+
+**CAVEAT, stated because it is the honest limit of this check:** PDF text extraction does not recover figures
+or embedded tables, and this is a 19-page review article. A site-size figure may exist that this method cannot
+see. #2's band should be treated as UNVERIFIED — not disproven — until someone reads the figures.
+
+**THE SWEEP'S TALLY, after three fetches.** Of the markers with a numeric band and a named paper: **3 verify**
+(#3 Alvard, #9 Smith & Codding, #14 BHM), **4 are mis-attributed** (#1, #5, #6, and #6's proposed replacement),
+**1 remains unverified with the PDF in hand** (#2). Every verified one cites a sentence or a table. Every
+failed one cites an author and a year.
+
+**Origin:** `literature/hill2011.pdf`, `literature/baryosef.pdf`,
+`literature/smith-codding-2021-....pdf` (all added by the supervisor 2026-08-06), read directly; the 16 long
+arms of Addendum 24 re-read for `band_med` × `frac_child`. Retracts this log's own prior recommendation for
+#6. No model code touched.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
