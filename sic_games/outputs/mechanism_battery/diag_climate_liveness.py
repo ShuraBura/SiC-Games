@@ -88,7 +88,7 @@ def sig(d):
     t = d["traj"]
     return dict(pop=[r["pop"] for r in t],
                 markers={k: statistics.median([r[k] for r in t[len(t) // 2:] if r.get(k) is not None] or [0])
-                         for k in ("band_med", "n_bands", "deaths_starv", "density_per_km2")})
+                         for k in ("band_med", "n_bands", "deaths_starv", "density_regional_per_km2")})
 
 
 def run(arms):

@@ -33,7 +33,7 @@ def run(lev, seed, steps=700, n=500):
         if not w.agent_list: return None
         lev_ev += w.leveling_events_this_step
     m = w.demography()
-    return m["material_gini"], m["corr_aggr_material"], m["material_top10_share"], lev_ev, m["density_per_km2"], m["hayden_stage"], m["n"]
+    return m["material_gini"], m["corr_aggr_material"], m["material_top10_share"], lev_ev, m["density_occupied_per_km2"], m["hayden_stage_occupied"], m["n"]
 
 print("R-82 STAGE A COMPLETE: aggrandizer capture vs Boehm leveling (boreal, 3 seeds x 700)")
 print(f"{'leveling':>10} {'mat_GINI':>9} {'corr(aggr,mat)':>15} {'top10%':>8} {'sanctions':>10} {'dens/km2':>9} {'stage':>13}")

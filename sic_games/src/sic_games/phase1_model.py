@@ -2673,9 +2673,16 @@ class TerrainWorld(mesa.Model):
             # capture must key on the AGGRANDIZER trait, not inherited cred (R-82 spec fix)
             "frac_aggrandizer": sum(1 for a in _aggr if a > 0.0) / n,
             "corr_aggr_material": _corr(_aggr, _mat),
-            # Hayden 1995 Fig. 6 (p.77) density bands — the stratification-stage benchmark
-            "density_per_km2": _dens,
-            "hayden_stage": self._hayden_stage(_dens) if _dens == _dens else "n/a",
+            # LOCAL CROWDING — population over the cells that are OCCUPIED, i.e. mean occupancy per settled
+            # cell. RENAMED from `density_per_km2` (R-106, 2026-08-04) because it was being compared against
+            # Hayden 1995 Fig. 6, Binford packing (0.091/km²) and Tallavaara (0.1-0.5), all of which are
+            # REGIONAL densities over territory. Measured on eight long arms, this measure runs 1.7-20x
+            # (median 2.3x) above the regional one and moved the Hayden band in 6 of 8. It is the right
+            # measure for a per-band or per-village view — those have no territory — and the wrong one to
+            # score an ethnographic density anchor with. The campaign row carries
+            # `density_regional_per_km2` beside it, and scores `hayden_stage` on THAT.
+            "density_occupied_per_km2": _dens,
+            "hayden_stage_occupied": self._hayden_stage(_dens) if _dens == _dens else "n/a",
             **self._age_structure(pop, males, females, adult),
         }
 

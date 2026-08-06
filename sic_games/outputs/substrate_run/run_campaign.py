@@ -284,6 +284,10 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     _lin_of = lambda a: _lin_size.get(_rk.get(a), 1)                 # size of the agent's lineage (corporate following)
     _wives_of = lambda a: len(getattr(a, "_wives", ()))
     _kids_of = lambda a: getattr(a, "_n_fathered", 0)
+    # Regional density needs the HABITABLE area, which is the capacity patch's land — not the grid. The
+    # campaign stashes it on the world at construction so the snapshot can reach it.
+    _hab = getattr(w, "_habitable_cells", 0)
+    _regional_dens = (pop / (_hab * 100.0)) if _hab else 0.0
     row = dict(
         step=step, pop=pop, births=w.births_this_step, deaths_starv=w.deaths_starv_this_step,
         mean_reserve=round(statistics.mean(wealth) / w._reserve_full, 3) if pop else 0,
@@ -390,7 +394,16 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         material_top10_share=round(_dg.get("material_top10_share", 0.0), 4),
         wealth_gini=round(_dg.get("wealth_gini", 0.0), 4),
         corr_cred_material=round(_dg.get("corr_cred_material", 0.0), 4),
-        density_per_km2=round(_dg.get("density_per_km2", 0.0), 5),
+        # TWO densities, because they answer different questions and only one is scoreable against the
+        # ethnographic anchors. `occupied` is mean occupancy per SETTLED cell (local crowding); `regional`
+        # is population over the HABITABLE LAND, which is what Hayden Fig. 6, Binford packing (0.091/km²)
+        # and Tallavaara (0.1-0.5) all measure. The occupied measure runs a median 2.3x higher (up to 20x in
+        # a dispersed savanna world) and moved the Hayden band in 6 of 8 long arms, so `hayden_stage` is
+        # scored on the regional one.
+        density_occupied_per_km2=round(_dg.get("density_occupied_per_km2", 0.0), 5),
+        density_regional_per_km2=round(_regional_dens, 5),
+        hayden_stage=w._hayden_stage(_regional_dens) if _regional_dens > 0 else "n/a",
+        hayden_stage_occupied=_dg.get("hayden_stage_occupied", "n/a"),
     )
     # STATUS -> REPRODUCTIVE SUCCESS (von Rueden & Jaeggi: r ~= 0.19 cross-system, ~0.15 monogamous).
     # R-77 showed the model's old +0.170 was an ARTIFACT of 6x excess polygyny, so this must be
@@ -454,6 +467,7 @@ def main():
     base = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     base0 = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
+
     # CLIMATE (R-106). This line used to be `ClimateField(base, a_seas=0.4, regime_driver=None)`, which took
     # the constructor's 0.0 default for every other channel — so the ENSO interannual, the regime telegraph,
     # the caribou herd swing and the llanos flood were built, unit-tested, and NEVER IN A RUN. Every result
@@ -694,6 +708,7 @@ def main():
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
                                                    contest_exponent=1.5, move_cost_flat=0.0, **GRP),
                      harvest_field=cap, placement_positions=pos, demography_cfg=demog)
+    w._habitable_cells = len(land)   # the denominator for regional density (read by snapshot)
     menarche = demog.menarche_months
     # R-101: dump the FULL demography config, not a curated subset. A finished run must carry enough to answer
     # questions nobody asked before it started — the previous 16 hand-picked keys omitted residence,

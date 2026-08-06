@@ -31,7 +31,7 @@ def run(mat, inv_min, seed, steps=700, n=500):
         if not w.agent_list: return None
     m = w.demography()
     return (m["material_gini"], m["corr_aggr_material"], m["corr_cred_material"],
-            m["wealth_gini"], m["frac_aggrandizer"], m["density_per_km2"], m["hayden_stage"], m["n"])
+            m["wealth_gini"], m["frac_aggrandizer"], m["density_occupied_per_km2"], m["hayden_stage_occupied"], m["n"])
 
 print("R-82 STAGE A (fixed): aggrandizer trait held at 0.15; vary the invulnerability GATE. boreal, 3 seeds x 700.")
 print(f"{'arm':>26} {'mat_GINI':>9} {'corr(aggr,mat)':>15} {'corr(cred,mat)':>15} {'wealth_g':>9} {'dens/km2':>9} {'stage':>14}")
