@@ -4718,6 +4718,74 @@ problem was found. It was killed rather than completed: half its arms would have
 density. Corrects Addendum 24's anchor-conflict reading AND its control-vs-full bracketing. `C_MSTAR` default
 50 → 15 committed as the documented re-anchor; whether 15 is right is now OPEN, not closed.
 
+**ADDENDUM 26 — MARKER #5's ANCHOR IS WITHDRAWN. The paper was read: BHM 2009 contains no lineage-size Gini.
+[0.51–0.68] is its MATERIAL-WEALTH band, applied to a lineage-size distribution — the wrong QUANTITY, not
+merely the wrong unit. And the quantity it does belong to, #14, reads about half the anchor (2026-08-04).**
+
+**THE CHECK.** On the supervisor's instruction — *check the actual paper in the lit folder* —
+`literature/borgerhoff-mulder.som.pdf` was read. It is the Supporting Online Material for Borgerhoff Mulder
+et al., *Intergenerational Wealth Transmission and the Dynamics of Inequality in Small-Scale Societies*,
+Science 326:682 (2009). Every Gini in it is a **wealth** Gini:
+
+> Population- and wealth-type-specific Gini coefficients were calculated using the maximal sample of
+> individuals … for whom **wealth** and age data were available … The Ginis were age-adjusted by regressing
+> the raw data against a quadratic in age.
+
+Forty-three **wealth types** across four economic systems. **Table S5**, the α-weighted averages:
+
+| economic system | embodied | relational | **material** | α-weighted |
+|---|---|---|---|---|
+| hunter-gatherer | 0.21 | 0.24 | **0.36** | 0.25 |
+| horticultural | 0.20 | 0.23 | **0.52** | 0.27 |
+| pastoral | 0.20 | na | **0.51** | 0.42 |
+| agricultural | 0.28 | 0.46 | **0.57** | 0.48 |
+
+**There is no lineage-size Gini anywhere in the paper.** The band [0.51–0.68] is the MATERIAL column for the
+stratified systems — 0.51 pastoral, 0.52 horticultural, 0.57 agricultural. It was borrowed onto a
+lineage-size distribution, which is a different quantity, not a different unit of the same one.
+`ELITE_STRATIFICATION_ROADMAP` also quotes two incompatible BHM ranges for this same marker — "0.51–0.68
+(BHM stratified range)" at line 173 and "0.4–0.6" at line 190 — which is the tell that neither was traced to
+the table.
+
+**WHERE THE BAND ACTUALLY BELONGS — and it was already there.** MARKER_MATRIX **#14** reads *"wealth
+concentration | `material_gini`, `material_top10_share` | BHM by society type | BHM 2009 (T-5)"*. So BHM was
+cited for two markers and only #14 is the right one. Scored properly, against the **hunter-gatherer** row a
+forager model has to answer to (material Gini **0.36**), the model reads:
+
+    material_gini   median 0.162   range 0.131-0.185   (16 long arms, control and full)
+
+**About half the anchor.** #14 was already flagged as "the live open question" — this puts a number on it and
+identifies the correct band, which is 0.36 and not the stratified 0.51–0.68 that a mis-assigned row had been
+suggesting. Note the model's `wealth_gini` (0.17 control → 0.30–0.46 full) is a *different* stock and is not
+BHM's material class.
+
+**AND #5 HAS A SEPARATE UNIT PROBLEM.** `lineage_size_gini` is a Gini over `_rank_keys()`, which under
+`enable_local_ascription` — ON in the canonical stack — returns **(community, lineage) pairs**, so one
+patriline fragments into one unit per community. `lin_size_gini`, in the same trajectory row, is the Gini over
+`_lineage` itself. They differ in **16/16** long arms and the sign of the difference flips between arms:
+
+| unit | control in the old band | full in the old band |
+|---|---|---|
+| rank-key (what was scored) | 1/8 | 8/8 |
+| patriline | 6/8 | 4/8 |
+
+So Addendum 24's "the full stack takes `lineage_size_gini` from 1/8 to 8/8" held only on the fragmented unit
+and against a band that does not belong to the marker. **Both halves of that headline are withdrawn.**
+
+**WHAT #5 NEEDS BEFORE IT IS SCORED AGAIN:** a decision on the quantity (is a lineage-size Gini a marker this
+project wants at all, and against what source), and on the unit (patriline, or lineage-within-community).
+Neither is inferable from the code, and neither should be settled by whichever choice scores better.
+
+**THE GENERAL LESSON, which is charter §11 P5 with teeth.** The band survived because it was written as a
+number with a citation and never as a traceable claim — no table, no column, no quantity. Reading the paper
+took ten minutes and settled a marker that had been scored 17/25 for months. **A doc claim about a measurable
+quantity names its measurement**, and "BHM 2009" is not a measurement.
+
+**Origin:** `literature/borgerhoff-mulder.som.pdf` Table S5 and the Gini methods section, against
+`MARKER_MATRIX.md` rows 5 and 14, `ELITE_STRATIFICATION_ROADMAP.md` lines 173/190, and the 16 long arms of
+Addendum 24 re-read for `material_gini`, `wealth_gini`, `lineage_size_gini` and `lin_size_gini`.
+MARKER_MATRIX row 5 marked NOT SCOREABLE; row 14 given its real band and the measured value.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

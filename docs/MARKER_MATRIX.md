@@ -26,7 +26,7 @@ validated, however long it ran.
 | 2 | settlement size | `settle_med` | 100 [50–150] | Bar-Yosef; R-63/R-64 | **21/25** |
 | 3 | village size | `settle_med` | [50–250] | Alvard 2009 | **21/25** |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
-| 5 | lineage size Gini | `lineage_size_gini` | [0.51–0.68] | BHM 2009 | 17/25 |
+| 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
 | 6 | lineage top share | `lin_top_share` | 0.16 [0.08–0.30] | T-9 Karmin 2015 | **7/25 — weakest** |
 | 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
@@ -35,9 +35,30 @@ validated, however long it ran.
 | 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
 | 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **never previously scored**; first read −0.98 |
 | 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **never previously scored** |
-| 14 | **wealth concentration** | `material_gini`, `material_top10_share` | BHM by society type | BHM 2009 (T-5) | low — the open question |
+| 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
 | 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
 | 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | sanity/context | — | context for 1–15 |
+
+**#5's ANCHOR IS WITHDRAWN — BHM 2009 contains no lineage-size Gini (2026-08-04, the paper read).**
+`literature/borgerhoff-mulder.som.pdf` is the SOM for *Intergenerational Wealth Transmission and the Dynamics
+of Inequality in Small-Scale Societies* (Science 326:682). Every Gini in it is a **wealth** Gini: *"Population-
+and wealth-type-specific Gini coefficients were calculated using the maximal sample of individuals … for whom
+**wealth** and age data were available"*, age-adjusted against a quadratic in age, over 43 **wealth types**.
+Table S5's material-wealth column reads pastoral **0.51**, horticultural **0.52**, agricultural **0.57** —
+which is where [0.51–0.68] came from. It was a MATERIAL-WEALTH band applied to a LINEAGE-SIZE distribution,
+i.e. the wrong quantity, not merely the wrong unit. (`ELITE_STRATIFICATION_ROADMAP` also quotes two
+incompatible BHM ranges for this same marker, "0.51–0.68" at line 173 and "0.4–0.6" at line 190.)
+
+BHM's band belongs on **#14**, where the project had already put it — and scored there against the
+hunter-gatherer row (material Gini **0.36**) the model reads **0.162**, about half. #5's apparent 17/25 was a
+pass against a borrowed band.
+
+**#5 also has a UNIT problem, independent of the anchor.** `lineage_size_gini` is a Gini over `_rank_keys()`,
+which under `enable_local_ascription` (ON in the canonical stack) returns **(community, lineage) pairs** — so
+one patriline fragments into one unit per community. `lin_size_gini`, in the same row, is the Gini over
+`_lineage` itself. They differ in 16/16 long arms and the sign of the difference flips between arms, which
+reverses the reading: on the rank-key unit the full stack goes 1/8 → 8/8 in the old band; on the patriline it
+goes 6/8 → 4/8. Both the quantity and the unit need deciding before #5 is scored again.
 
 Markers **10–14 and 16 were wired on 2026-07-27**; before that they were computed by `demography()` every step
 and never carried into a campaign trajectory, so **no long run in this project's history has ever scored them.**
