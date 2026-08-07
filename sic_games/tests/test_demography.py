@@ -99,8 +99,8 @@ def test_config_siler_roundtrip_and_flags_default_off():
     p = cfg.siler()
     assert (p.a1, p.b1, p.a2, p.a3, p.b3) == (0.157, 0.721, 0.013, 4.80e-5, 0.103)
     assert not any([cfg.enable_terrain_risk, cfg.enable_density_disease,
-                    cfg.enable_terrain_pathogen, cfg.enable_nutrition_synergy,
-                    cfg.enable_infanticide])
+                    cfg.enable_terrain_pathogen, cfg.enable_nutrition_synergy])
+    # `cfg.enable_infanticide` was the fifth item here; the flag is deleted (2026-08-06, dead stub).
 
 
 # --- M-3 sex split (Hill & Hurtado 1996 forest-period ratios) ---

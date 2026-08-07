@@ -48,6 +48,8 @@ def harvest(path, clsname):
     if cls is None:
         return []
     out = []
+    section = ""        # the last comment block seen; see SECTION INHERITANCE below
+    cls_doc = " ".join((ast.get_docstring(cls) or "").split())
     for node in cls.body:
         if not isinstance(node, ast.AnnAssign) or not isinstance(node.target, ast.Name):
             continue
@@ -66,6 +68,37 @@ def harvest(path, clsname):
         seg = "\n".join(lines[i0:node.end_lineno])
         inline = [m.group(1).strip() for m in re.finditer(r"#\s*(.+)$", seg, re.M)]
         doc = " ".join(above + inline).strip()
+
+        # SECTION INHERITANCE (added 2026-08-06, Addendum 29). The config classes are written in CHANNEL
+        # blocks — one comment carrying the anchor, then the flag and its two or three companion parameters:
+        #
+        #     # [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; duration 100-500 yr ...
+        #     enable_regime_shift: bool = False
+        #     regime_amp: float = Field(0.0, ge=0.0, le=1.0)      <- inherits the anchor to a human reader
+        #     regime_duration: int = Field(0, ge=0)               <- and to this one, now
+        #
+        # Only the FLAG sat directly under the comment, so only the flag harvested it and the parameters the
+        # anchor actually constrains were emitted "UNDOCUMENTED". That made 25 of 244 parameters look
+        # unprovenanced when 18 of them were documented in the line above their own. Duplicating the comment
+        # onto each field would violate P1 (one source of truth); inheriting it here does not. Tagged so a
+        # reader can still tell a field-specific note from a channel-level one.
+        if above:
+            section = " ".join(above).strip()
+        elif section and not doc:
+            doc = f"(channel note, inherited) {section}"
+        elif section and doc:
+            doc = f"{doc} — (channel note, inherited) {section}"
+
+        # DOCSTRING FALLBACK, narrow on purpose. Some fields are documented in the CLASS docstring rather than
+        # in a comment (`SubstrateConfig.enabled` is described there in full). Falling back for every field
+        # would be wrong — it would dress an undocumented field in its neighbours' prose and hide a real gap.
+        # So the docstring only counts when it NAMES THE FIELD, which is the difference between "this class
+        # explains this parameter" and "this class has a preamble".
+        if not doc and cls_doc and re.search(rf"\b{re.escape(name)}\b", cls_doc):
+            first = next((s.strip() for s in re.split(r"(?<=[.])\s", cls_doc)
+                          if re.search(rf"\b{re.escape(name)}\b", s)), "")
+            doc = f"(from the {clsname} docstring) {first}"
+
         default = ast.get_source_segment(src, node.value) if node.value is not None else ""
         typ = ast.get_source_segment(src, node.annotation) or ""
         out.append((name, default, typ, doc))

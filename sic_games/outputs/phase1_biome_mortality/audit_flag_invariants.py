@@ -62,7 +62,7 @@ TYPES = {
     "enable_dependent_load": "N",     # widens the intake-fertility denominator by the juveniles' unmet need
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
-    "enable_band_risk": "N", "enable_infanticide": "N",
+    # enable_band_risk / enable_infanticide deleted 2026-08-06 (death spiral; dead stub)
     "enable_genome": "H", "enable_paternity": "H",
     "enable_tier2_shock": "F",
     "enable_genealogy_log": "O",

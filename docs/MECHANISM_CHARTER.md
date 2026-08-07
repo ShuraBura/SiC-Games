@@ -491,6 +491,18 @@ that comment, and say what replaced it — a stale justification is worse than n
 takes it as authority. *(`C_MSTAR`'s comment read "probe: m*=50 → median reach 496 ≈ Wobst" for three weeks
 after Wobst's actual result was shown to be 79–332.)*
 
+**P3 IS NOW ENFORCED — `sic_games/tests/test_retraction_propagation.py`.** Prose was not enough: P3 was
+written on 2026-08-04 in response to the Addendum-28 retractions, and **those same retractions were violating
+it at the moment it was written**. Three live parameters in `demography.py` went on citing Hill 2011's
+nonexistent "~7 lineages per band" for two days, one of them (`rank_hierarchy_frac` = 0.15) presenting itself
+as DERIVED from the number that does not exist. It was found by an audit looking for something else
+(Addendum 30). The test registers each retracted claim and fails if any source file mentions it without the
+retraction alongside. **The claim may remain — the surrounding reasoning is usually still sound and deleting
+it would lose the history — but it may not stand unqualified.**
+
+Registering a retraction there is now part of retracting it. A retraction recorded only in `RESULTS.md` is a
+note, not a correction: the next reader opens the parameter, not the log.
+
 **P4 — A SECOND COPY IS TESTED OR IT IS DELETED.** Where a value genuinely must appear twice — a test
 magnitude, a harness overlay, a preset — a test asserts the two agree, or DECLARES the disagreement with its
 reason. There is no third option, and "they are obviously the same" is how both of the drifts above began.
@@ -525,4 +537,44 @@ done half of this?** If the answer is no, the half you skipped is the one that r
 
 ---
 
-*Charter adopted 2026-07-18; §11 added 2026-08-04. Amend by dated note; classifications in §4 are append/update, not rewrite.*
+## 12. THE DEFAULT-STATE DISCIPLINE — nothing stays off by accident
+
+**Supervisor directive, 2026-08-06: "NOTHING STAYS OFF, unless it is tested as control or explicitly not
+needed."**
+
+A mechanism that is off has to earn it. There are exactly **four** admissible reasons, and a flag that is off
+for none of them is a defect regardless of how well its comment explains itself:
+
+| reason | what it requires | example |
+|---|---|---|
+| **CONTROL** | a named arm it is the control *for*, reachable by a switch | `C_CLIMATE=0`, the flat-climate world |
+| **NOT NEEDED** | a measured negative result, or a pure observer | `enable_genealogy_log` — a logger, not a dynamic |
+| **UNVERIFIABLE** | its magnitude has no filed source | `enable_caribou_swing` — no PDF (Addendum 29) |
+| **UNDER EVALUATION** | built, measured, awaiting an adoption decision | `enable_leaky_assabiyah` (Addendum 23) |
+
+**"It was off by default and nobody revisited it" is not on the list, and it is how the entire climate
+variability layer sat out every experiment this project ran** — including four searches for Malthusian and
+secular cycles conducted with the slow environmental driver switched off. **A control must be CHOSEN, not
+inherited.** If the default is the control, nobody ever ran the treatment.
+
+**A flag with no live setting is DELETED, not documented.** `enable_infanticide` had no code behind it and
+three separate audits each re-derived that and wrote "UNIMPLEMENTED STUB" beside it. `enable_band_risk` had
+two reachable states — inert at its default, and a population death spiral at any value that made it live —
+and passed a whole ablation battery as a fake positive. **An explanation is not a substitute for removing a
+knob that cannot work.** Both deleted 2026-08-06; findings kept where the fields were, code recoverable from
+git.
+
+**Deleting a config field is UNSAFE unless the config rejects unknown keys.** Pydantic's default is to ignore
+them silently, so removing a field turns every stale call site into a no-op that still reports success. Found
+while doing exactly that. `extra="forbid"` is now set on `DemographyConfig` and `ClimateConfig`; set it on any
+new config class before it acquires callers.
+
+**An "on" flag is not a running mechanism.** §10's diagnostic discipline applies: a channel can be on and
+unreachable (empty mask), or on and never-fired (the run is shorter than its own clock). Both read as ON in
+every config dump. `ClimateField.health()` is the reference pattern — per-channel reach, activity and measured
+extremes, carried in every checkpoint at a cost of a few scalars per step. Wire the equivalent for any
+mechanism whose effect is conditional on a mask or a clock.
+
+---
+
+*Charter adopted 2026-07-18; §11 added 2026-08-04; §12 added 2026-08-06. Amend by dated note; classifications in §4 are append/update, not rewrite.*

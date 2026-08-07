@@ -468,18 +468,32 @@ def main():
     base0 = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
 
+    # EMPTY, AND THAT IS THE POINT. `enable_caribou_swing` sat here from 2026-08-06 morning as the one channel
+    # excluded for being UNVERIFIABLE — its amplitude and period were credited to a thesis nobody could open.
+    # The supervisor filed it the same afternoon, it was read, and it VERIFIED the amplitude while FALSIFYING
+    # the period band (we carried 40–90 yr; the observed range is 23–67). Corrected and switched on the same
+    # day (Addendum 32). Any future entry here needs a reason from MECHANISM_CHARTER §12's list of four.
+    _CLIMATE_UNSOURCED: set = set()
+
     # CLIMATE (R-106). This line used to be `ClimateField(base, a_seas=0.4, regime_driver=None)`, which took
     # the constructor's 0.0 default for every other channel — so the ENSO interannual, the regime telegraph,
     # the caribou herd swing and the llanos flood were built, unit-tested, and NEVER IN A RUN. Every result
     # this project has produced had a fixed seasonal sine and white noise, and no multi-year environmental
     # variability at any timescale, which is why the no-cycles findings need the narrower reading.
-    #   C_CLIMATE=1   turn on the per-world lottery AND every climate channel (the C_ALLON of climate)
+    #   C_CLIMATE=0   the FLAT-CLIMATE CONTROL: fixed seasonal sine, no interannual variability at any
+    #                 timescale. This is what every run before 2026-08-06 used, so it is the arm that
+    #                 reproduces the historical results and the one a climate ablation compares against.
     #   C_CLIM_ON / C_CLIM_OFF   comma-separated channel names, for testing one at a time
     #   C_CLIMPARAM   field=value for the climate values, like C_PARAM for demography
-    # Unset ⇒ ClimateConfig's defaults, which reproduce the old call exactly.
+    #
+    # DEFAULT FLIPPED 2026-08-06: climate is now ON unless explicitly controlled off. The old default was the
+    # flat world, which meant the entire variability layer sat out every experiment this project ran while
+    # reading as "built" — including four separate searches for Malthusian and secular cycles conducted with
+    # the slow environmental driver switched off. A control has to be CHOSEN, not inherited by default.
     clim = ClimateConfig()
-    if os.environ.get("C_CLIMATE", "0") == "1":
-        clim = clim.model_copy(update={f: True for f in type(clim).model_fields if f.startswith("enable_")})
+    if os.environ.get("C_CLIMATE", "1") == "1":
+        clim = clim.model_copy(update={f: True for f in type(clim).model_fields
+                                       if f.startswith("enable_") and f not in _CLIMATE_UNSOURCED})
     for _var, _on in (("C_CLIM_ON", True), ("C_CLIM_OFF", False)):
         _names = [s.strip() for s in os.environ.get(_var, "").split(",") if s.strip()]
         if _names:
@@ -539,17 +553,27 @@ def main():
     # knob above always wins. Default off => byte-identical to every prior campaign.
     if os.environ.get("C_ALLON", "0") == "1":
         _skip = {
-            "enable_infanticide",                    # documented UNIMPLEMENTED STUB (no logic reads it)
+            # `enable_infanticide` used to be skipped here as a "documented UNIMPLEMENTED STUB". The flag is
+            # DELETED (2026-08-06) — it needed no special case once it stopped existing.
             "enable_genealogy_log",                  # observer/logging, not a dynamic; costly
+            # §12 UNDER EVALUATION — added 2026-08-06 by the ON-but-dead gate, which caught C_ALLON turning
+            # both of these ON while their magnitudes sat at 0.0. They had been reading as live mechanisms in
+            # every config dump since the audit began. Neither gets an invented value here:
+            #   pathogen_gamma          has a real anchor (Cashdan 2014 biome disease-ecology) and its own
+            #                           comment says "sweep low/mid/high". The sweep has never been run;
+            #                           picking a number without it is the exact sin this arc documents.
+            #   malnutrition_fission_gain  was deliberately zeroed to serve as the R-106 NEGATIVE CONTROL, and
+            #                           behaved correctly as one. The flag should have been off, not the gain.
+            "enable_terrain_pathogen",
+            "enable_malnutrition_fission",
             "enable_bud_hazard",                     # mutually-exclusive alternate to the legacy budding path
             "enable_stratification_inequality_gate", # R-103: criterion known wrong, parked for supervisor call
-            # A MEASURED DEAD END, not an oversight. demography.py's own comment on this field: loner-mortality
-            # does not produce an optimal band size, it culls -- "pop 281->64, mean band 56->5 ... a DEATH
-            # SPIRAL, not a stabilizing optimum (F.2 prototype, run_3i) -- KEEP OFF". Its only magnitude,
-            # `band_risk_penalty`, is 0.0 and the code is guarded by `> 0.0`, so C_ALLON was switching it on
-            # into a no-op: "on" in the config dump, INERT in every ablation, and a death spiral at any value
-            # that would make it live. Excluded rather than enabled-at-zero, which is the honest state.
-            "enable_band_risk",
+            # `enable_band_risk` used to be skipped here as a MEASURED DEAD END: loner-mortality does not
+            # produce an optimal band size, it culls (pop 281->64, mean band 56->5 -- a death spiral, F.2
+            # prototype run_3i). Its magnitude defaulted to 0.0 behind a `> 0.0` guard, so C_ALLON was turning
+            # it ON into a no-op -- "on" in the dump, inert in every ablation. DELETED 2026-08-06: a flag whose
+            # only two states are "does nothing" and "kills the population" is not a flag. The finding is kept
+            # in DemographyConfig where the fields used to be.
             # A CANDIDATE UNDER EVALUATION, not a built mechanism awaiting activation. `enable_leaky_assabiyah`
             # changes assabiyah from a constant-leak integrator (no interior fixed point — bang-bang by
             # construction) to a leaky one whose fixed point tracks surplus. It is measured and defensible
@@ -631,6 +655,30 @@ def main():
                             if f.startswith("enable_") and not getattr(demog, f))
         print(f"campaign: C_ALLON left {len(_still_off)} OFF: "
               f"{','.join(f.replace('enable_', '') for f in _still_off)}", flush=True)
+    # ── C_CFGSRC — THE FILES AS THE SOURCE OF TRUTH (R-106 step B, 2026-08-06) ────────────────────────────
+    # Until now `config/*.toml` MIRRORED a run: `tools/gen_runconfig.py` executes this script with C_ALLON=1
+    # and records the resolved `meta.demography_config`. The files were authoritative to READ and powerless to
+    # SET, so "edit the file, get that run" was not actually true.
+    #
+    #   C_CFGSRC=files   the run's base config is LOADED from config/*.toml; C_PARAM / C_EXTRA_ON /
+    #                    C_EXTRA_OFF still apply on top, so an ablation is still expressible
+    #   C_CFGSRC=preset  (default) the historical Python-preset path, bit-exact
+    #
+    # MEASURED EQUIVALENCE: the file and a `C_ALLON=1` run agree on **all 279 fields, zero differences**, so
+    # loading the file reproduces the canonical arm exactly. `test_config_is_load_bearing.py` pins that.
+    #
+    # WHY `preset` IS STILL THE DEFAULT, and this is a decision for the supervisor rather than a technical
+    # gap: a PLAIN run and the canonical file differ in **52 fields** — the whole elite layer, village budding,
+    # soil depletion, intake fertility and ~30 other flags are off in a plain run and on in the file. Flipping
+    # the default would silently convert every ad-hoc run, probe and quick check into the full canonical stack.
+    # That is arguably what "nothing stays off" implies, but it changes what every existing invocation does,
+    # which is a scientific call and not a refactor.
+    if os.environ.get("C_CFGSRC", "preset") == "files":
+        from sic_games import runconfig as _rc0
+        demog = _rc0.build("DemographyConfig")
+        print(f"campaign: C_CFGSRC=files — base config LOADED from {_rc0.CONFIG_DIR} "
+              f"(C_PARAM/C_EXTRA_* still apply on top)", flush=True)
+
     # C_EXTRA_ON: comma-separated `enable_*` names to turn on, for ATTRIBUTING an all-on effect to a subset.
     # Addendum 12 measured all-on scoring worse on 3 of 6 markers, and 23 flags cannot be attributed from one
     # contrast; this enables group bisection (one group added on top of the baseline at a time). UNKNOWN NAMES
@@ -703,6 +751,17 @@ def main():
     if _agmode or os.environ.get("C_AGGLHALF") or os.environ.get("C_AGGLBETA"):
         print(f"campaign: agglomeration shape mode={demog.aggl_mode} beta={demog.aggl_beta} "
               f"half={demog.aggl_half}", flush=True)
+    # ON-BUT-DEAD GATE (2026-08-06, MECHANISM_CHARTER §12). The config is now FINAL — check it before a single
+    # step runs. A flag that is on while the magnitude it acts through sits at neutral reads as a live
+    # mechanism in the dump and does nothing in the world; it produced 3 of battery 7's 6 "inert" verdicts and
+    # cost R-85 a whole follow-up study. Ablate by turning the FLAG off, never by zeroing the magnitude.
+    from sic_games import runconfig as _rc
+    _dead = _rc.dead_flags({_f: getattr(demog, _f) for _f in type(demog).model_fields},
+                           set(type(demog).model_fields))
+    if _dead:
+        raise SystemExit("campaign: ON-but-dead mechanism(s) in the final config:\n  " + "\n  ".join(_dead)
+                         + "\n  Turn the flag off to ablate, or give the magnitude a value.")
+
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
@@ -772,6 +831,7 @@ def main():
     last_con: dict = {}
     genea_rows = 0
     seen_violations: set = set()          # R-91: log each contradiction once, on first appearance
+    _last_sick: dict = {}                 # climate-health complaints, logged only when the set changes
     cum_reversions = 0                                   # R-89: summed every step, not just at LOGEVERY —
     t0 = time.time()                                      # a reversion can fire and re-ascribe within one gap
     # SLEEP-AWARE BUDGET (2026-07-22). The budget must meter COMPUTE, not wall-clock: the machine suspended
@@ -807,6 +867,11 @@ def main():
                 if v.code not in seen_violations:
                     seen_violations.add(v.code)
                     log(f"  !! [{step}] {v}")
+            # CLIMATE HEALTH, carried in every checkpoint (2026-08-06). Not "was the channel configured on"
+            # — the banner already says that, and saying it was how four channels stayed inert while reading
+            # as live — but whether each one ACTUALLY MOVED THE FIELD in this run, and how hard. Verdicts:
+            # OFF / UNREACHABLE (mask empty) / NEVER-FIRED (clock never came round) / RARE / LIVE.
+            meta["climate_health"] = cap.health() if hasattr(cap, "health") else None
             with open(OUT, "w", encoding="utf-8") as fh:
                 json.dump(dict(meta=meta, traj=traj), fh)     # crash-safe trajectory checkpoint
             el = time.time() - t0
@@ -822,6 +887,15 @@ def main():
                 f"set={row['n_settle']}(mx{row['settle_max']},prim{row['primate_ratio']}) "
                 f"con={row['connubium_med']} inst={row['claim_events']} ldT={row['leader_turnover']}"
                 f"{elite_str} | {el/60:.1f}m eta{eta/60:.0f}m")
+            # Only the channels that are NOT healthy get printed, and only when the set of complaints changes.
+            # A diagnostic that prints "all fine" every snapshot is one nobody reads by step 500.
+            _ch = meta.get("climate_health") or {}
+            _sick = {c: v["verdict"] for c, v in _ch.items()
+                     if v.get("verdict") in ("UNREACHABLE", "NEVER-FIRED", "RARE")}
+            if _sick and _sick != _last_sick:
+                _last_sick = _sick
+                log("  ~~ climate: " + ", ".join(f"{c}={v}" for c, v in sorted(_sick.items()))
+                    + "  (configured ON but not moving the field)")
         # ── BUDGET, metered EVERY STEP (R-105 fix) ──────────────────────────────────────────────────
         # This block used to live inside the snapshot branch, so it could only fire once per LOGEVERY
         # steps. With C_LOGEVERY=250 (every overnight campaign) a single block can cost HOURS at high

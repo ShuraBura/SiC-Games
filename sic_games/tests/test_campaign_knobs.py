@@ -72,11 +72,12 @@ def test_c_param_rejects_an_unknown_field():
 
 
 def test_c_extra_on_and_off_reach_the_config():
-    p, out = _run("_t_knob_extra", C_EXTRA_ON="enable_band_risk",
+    # was `enable_band_risk`, deleted 2026-08-06; any live flag exercises the same C_EXTRA_ON path
+    p, out = _run("_t_knob_extra", C_EXTRA_ON="enable_bud_hazard",
                   C_EXTRA_OFF="enable_landscape_packing")
     assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
     cfg = _config(out)
-    assert cfg["enable_band_risk"] is True
+    assert cfg["enable_bud_hazard"] is True
     assert cfg["enable_landscape_packing"] is False
 
 
@@ -91,11 +92,16 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
     assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
     cfg = _config(out)
     off = {k for k, v in cfg.items() if k.startswith("enable_") and v is not True}
-    allowed = {"enable_infanticide",                     # documented UNIMPLEMENTED STUB
-               "enable_genealogy_log",                   # observer, and C_GENEA=0 here
+    # `enable_infanticide` (dead stub) and `enable_band_risk` (measured death spiral, inert at its default)
+    # were both on this list and are now DELETED — the exclusion list shrank by deletion, not by exception.
+    allowed = {"enable_genealogy_log",                   # observer, and C_GENEA=0 here
                "enable_bud_hazard",                      # alternate path to the legacy budding one
                "enable_stratification_inequality_gate",  # R-103, criterion known wrong
-               "enable_band_risk",                       # measured DEAD END (F.2 run_3i death spiral)
+               # Added 2026-08-06 by the ON-but-dead gate: C_ALLON was turning both ON at magnitude 0.0.
+               # pathogen_gamma awaits its Cashdan sweep; malnutrition_fission_gain was the R-106 negative
+               # control and its FLAG should have been off rather than its gain zeroed.
+               "enable_terrain_pathogen",
+               "enable_malnutrition_fission",
                # A CANDIDATE under evaluation, not a built mechanism awaiting activation: a structural
                # change to assabiyah, measured and defensible but NOT adopted (Addendum 23). C_ALLON must
                # not adopt a model change by side effect.
@@ -158,3 +164,53 @@ def test_an_explicitly_set_knob_still_beats_c_allon():
     assert cfg["enable_soil_depletion"] is False
     assert cfg["enable_alluvial_renewal"] is False
     assert cfg["enable_village_budding"] is False
+
+
+def _health(out):
+    with open(out, encoding="utf-8") as fh:
+        return json.load(fh)["meta"]["climate_health"]
+
+
+def test_climate_runs_by_default_and_reports_its_own_health():
+    """DEFAULT FLIPPED 2026-08-06. Climate variability used to be off unless `C_CLIMATE=1`, which meant the
+    whole layer sat out every experiment this project ran while reading as built — including four searches
+    for Malthusian and secular cycles conducted with the slow driver switched off.
+
+    A campaign must now run climate unless asked not to, AND report per-channel whether each one actually
+    moved the field. `season` is the one channel guaranteed live on any world, so it is the assertion that
+    fails loudly if the layer is ever silently unplugged again."""
+    p, out = _run("_t_clim_default")
+    assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
+    h = _health(out)
+    assert h, "the run carried no climate_health block"
+    assert h["season"]["verdict"] == "LIVE"
+    assert h["interannual"]["verdict"] in ("LIVE", "RARE"), h["interannual"]
+    assert h["season"]["min"] < 1.0, "a live seasonal channel must depress the field somewhere"
+
+
+def test_the_caribou_channel_is_on_now_that_its_thesis_is_filed():
+    """This assertion was `== "OFF"` for one morning (2026-08-06). The caribou amplitude and period were
+    credited to a thesis nobody could open, so the channel was excluded by name while everything else ran.
+
+    The supervisor filed it the same afternoon. Reading it CONFIRMED the amplitude (.871, the median of the 19
+    cyclic herds among 43 collected) and FALSIFIED the period band we had carried — 40–90 yr, credited to a
+    Bergerud who is not cited in the thesis at all, against an observed 23–67. Corrected and switched on.
+
+    Asserted as "not OFF" rather than "LIVE" because the channel is steppe-masked: on a world with no steppe
+    the honest verdict is UNREACHABLE, and that is a property of the world, not a regression."""
+    p, out = _run("_t_clim_caribou")
+    assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
+    assert _health(out)["caribou"]["verdict"] != "OFF", (
+        "caribou was switched on when its source was filed; OFF means it got unplugged again")
+
+
+def test_the_flat_climate_control_is_still_reachable():
+    """A control has to be CHOOSABLE. `C_CLIMATE=0` reproduces the pre-2026-08-06 world — fixed seasonal
+    sine, no interannual variability at any timescale — which is the arm every historical result used and
+    the one a climate ablation compares against."""
+    p, out = _run("_t_clim_control", C_CLIMATE="0")
+    assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
+    h = _health(out)
+    assert h["interannual"]["verdict"] == "OFF"
+    assert h["regime"]["verdict"] == "OFF"
+    assert h["eccentricity"]["verdict"] == "OFF"

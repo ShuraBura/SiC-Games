@@ -3563,8 +3563,10 @@ class TerrainWorld(mesa.Model):
                                         else getattr(a, "_n_fathered", 0) for a in ms])), 2),
                 relatedness=(round(mean_pairwise_relatedness(gs, self._diag_rng, sample_pairs), 3)
                              if len(gs) >= 2 else None)))
-        # R-90: the PER-BAND lineage composition — the direct read-out for the FILED Hill 2011 target
-        # (~7 lineages/band, dominant-lineage share 0.38) that R-25 passed and R-89's lineage collapse broke.
+        # R-90: the PER-BAND lineage composition. It was described as the read-out for a "FILED Hill 2011
+        # target (~7 lineages/band, dominant-lineage share 0.38)" — **RETRACTED 2026-08-06: Hill et al.
+        # 2011 contains no lineage data whatsoever** (Addendum 28). The DIAGNOSTIC is fine and still
+        # measured on the right unit; it simply has no anchor to be scored against.
         # UNIT: the AFFILIATION band (`_group.band_id`), the same unit R-25 validated on — NOT the spatial
         # `bands()` partition (D6: the unit is part of the statistic). Bands of 1 are excluded from the
         # dominant-share mean, where the share is trivially 1.0 and would bias it upward.
@@ -4423,16 +4425,8 @@ class TerrainWorld(mesa.Model):
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
-        if cfg.enable_band_risk and cfg.band_risk_penalty > 0.0:
-            # F.2 band risk-dilution: a sub-band group faces elevated biome (accident/predation) risk, scaled by
-            # the cell's own incident rate; a full band (g ≥ band_risk_size) → factor 1 (anchored baseline).
-            x0, y0 = a.pos
-            r = cfg.bonded_mate_radius
-            g = sum(occ_count.get((x0 + dx, y0 + dy), 0)
-                    for dx in range(-r, r + 1) for dy in range(-r, r + 1))   # band size (mate-gate neighbourhood)
-            biome_risk = (float(self._fields.risk[y0, x0]) / self._risk_ref) if self._risk_ref > 0.0 else 1.0
-            loner = max(0.0, 1.0 - g / cfg.band_risk_size)
-            m *= 1.0 + cfg.band_risk_penalty * biome_risk * loner
+        # (F.2 band risk-dilution was a fourth multiplier here; deleted 2026-08-06 — a death spiral at any live
+        # setting and inert at its default. See DemographyConfig, where the finding is kept.)
         if cfg.enable_terrain_pathogen:                        # S2 biome disease-ecology (Cashdan; NPP proxy)
             m *= pathogen_mult(float(self._fields.npp[a.pos[1], a.pos[0]]), self._pathogen_npp_ref,
                                cfg.pathogen_gamma, cfg.pathogen_cap)

@@ -127,7 +127,7 @@ NEEDS = {
     "enable_rank_hierarchy": "ascribed", "enable_stratification_inequality_gate": "villages",
     # descent-gated
     "enable_lineage_split": "lineages", "enable_lineage_branching": "births",
-    "enable_orphan_mortality": "deaths", "enable_infanticide": "births",
+    "enable_orphan_mortality": "deaths",   # enable_infanticide deleted 2026-08-06 (dead stub)
 }
 
 POSITIVE_CONTROL = "enable_game"     # measured live in every regime tried; flipping it must move the signature

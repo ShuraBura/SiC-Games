@@ -22,8 +22,8 @@ from run_se0_controlled_climate import realistic_forager_demog  # noqa: E402
 # Flags whose inertness in THIS regime is already explained in the docs — not defects.
 EXPLAINED = {
     "enable_genealogy_log": "CORRECT — [O] observer; invariance is the requirement, not a defect",
-    "enable_infanticide": "KNOWN STUB — declared but no logic reads it (charter §6; config audit 2026-07-15)",
-    "enable_band_risk": "SHELVED — DE-4 (risk-dilution as mortality; death spiral), default-OFF by design",
+    # enable_infanticide (KNOWN STUB) and enable_band_risk (SHELVED, death spiral) were both explained here
+    # for a year. DELETED 2026-08-06 -- an explanation is not a substitute for removing a knob that cannot work.
     "enable_economic_defensibility": "REGIME-GATED — DE-10: the claim gate (>=3 same-band on a defensible cell) "
                                      "never fires on unsaturated land; 300 agents on 100x100 is that regime",
     "enable_improved_land": "DOWNSTREAM of economic_defensibility, which is itself regime-gated here (R-70 "

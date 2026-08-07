@@ -23,8 +23,8 @@ validated, however long it ran.
 | # | marker | field | band | source | status |
 |---|---|---|---|---|---|
 | 1 | band size | `band_med` | **28.2 ADULTS** (Hill 2011, 32 societies) — the all-ages [18–35] is mis-attributed | Hill et al. 2011 `[VERIFIED, PDF read]`; ~~Johnson~~ | **FAILS 16/16 on adults** — model 11.8 adults/band = 0.42×. The 23/25 all-ages pass is carried by excess children |
-| 2 | settlement size | `settle_med` | 100 [50–150] — **UNVERIFIED** | Bar-Yosef 1998, PDF now filed and read: gives site size comparatively ("three to eight times larger"), no population figure in the text | **21/25** against an unverified band; figures not machine-readable — needs a human read |
-| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **21/25** |
+| 2 | ~~settlement size~~ | ~~`settle_med`~~ | **RETIRED 2026-08-06** | Bar-Yosef 1998: PDF filed, read, and confirmed by the supervisor to be maps and burial sites — no village-population figure exists in the text to find | **Retired at zero cost to coverage:** it was a second, unverifiable band on the *same field* as #3, whose band is verified. Nothing was being measured here that #3 does not measure |
+| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **46/52 arms PASS** (2026-08-06 re-score over every trajectory on disk; median of arm medians **97.5**) |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
 | 6 | lineage top share | `lin_top_share` | 0.16 [0.08–0.30] — **MIS-CITED, no replacement found** | 0.16 = **Yan 2014** Oα; 0.08 = **Zerjal 2003**; Karmin has neither. Hill 2011 was proposed as a forager-scale replacement and is NOT viable — it contains no lineage data at all | **7/25** — both sources are post-Neolithic/state-scale |
@@ -38,6 +38,7 @@ validated, however long it ran.
 | 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
 | 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
 | 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | sanity/context | — | context for 1–15 |
+| 17 | **fission ceiling** | `settle_max` | communities should not persist far past **158 [147–170]** (max scalar stress) and effectively never past **250** (ethnographic maximum) | Alberti 2014 `[VERIFIED VERBATIM]` + Alvard 2009 `[VERIFIED VERBATIM]`; Hamilton 2007 periodic aggregation **165.32 [152.25–181.00]** independently lands on the same scale `[VERIFIED VERBATIM]` | **MISSES — screen only.** Over 52 trajectories the median `settle_max` is **220**; **39/52 exceed 158** and **18/52 exceed 250**. The typical village is right (#3) while the largest one over-runs the size at which both sources say communities break up |
 
 **HILL 2011 IS NOT A LINEAGE SOURCE (2026-08-06, PDF read).** `MODEL_SPEC` §4.8.8, `TARGETS` and `PARAMETERS`
 all carry *"dominant-lineage share 0.38, ~7 lineages/band (Hill et al. 2011)"*. **The word "lineage" occurs
@@ -56,6 +57,23 @@ derivation well enough to trust (#8 Bandy, #15 Hill & Hurtado Table 13.1).
 **The rows that survived are the ones whose citation named a table, a page or a sentence. Every row that
 failed cited only an author and a year.** Charter §11 P5 as an acceptance criterion: **an anchor names its
 table, or it is not an anchor.**
+
+**SWEEP CLOSED 2026-08-06 (RESULTS Addendum 29).** The three papers the supervisor fetched settled the two
+open rows and the sweep was then extended to the climate layer wired on 2026-08-04, which had never been
+checked at all.
+- **#2 retired.** Bar-Yosef holds no village-population figure — confirmed by the supervisor's own read. It
+  was a duplicate band on #3's field, so retiring it costs no coverage.
+- **#17 added.** Alberti 2014 and Hamilton 2007 both verified verbatim and both land on ~160 for the
+  aggregation ceiling, giving `settle_max` a two-source anchor where it had none.
+- **#6 stays unanchored.** Smith & Codding 2021 was fetched and verified, but for #9's ordering claim, not for
+  a lineage share. No forager-scale lineage-concentration source exists in the folder; #6 remains mis-cited
+  with no replacement, and the honest options are retire or leave visibly broken.
+- **Climate, first check ever:** Sarmiento, Wanner, Hawkes and Timmermann's *period* all verify (Hawkes via a
+  documented conversion that reproduces 518/745 to the unit); **Timmermann's amplitude does not exist in the
+  paper** and is now tagged INTERPRETIVE; **St. John 2022 has no PDF** and its channel is default-OFF.
+- **The checker is now code:** `tools/verify_anchor.py --list` re-reads every PDF and
+  `sic_games/tests/test_anchor_provenance.py` fails the suite if any wired number stops being findable in its
+  own source. Prose could drift; this cannot.
 
 **#5's ANCHOR IS WITHDRAWN — BHM 2009 contains no lineage-size Gini (2026-08-04, the paper read).**
 `literature/borgerhoff-mulder.som.pdf` is the SOM for *Intergenerational Wealth Transmission and the Dynamics
@@ -85,6 +103,26 @@ That is how polygyny sat 15× off Marlowe unnoticed: nothing was looking.
 ---
 
 ## Notes that must travel with specific markers
+
+**#17 — ALBERTI'S 127 IS A THRESHOLD, NOT A CENTRAL BAND. Scoring it as one was nearly the fourth instance of
+this project's unit-mismatch bug class (2026-08-06).** Alberti 2014 verified verbatim: *"a critical scalar
+stress threshold at community size 127 (95% CI: 122–132), while the maximum probability of critical scale
+stress is predicted at size 158 (95% CI: 147–170)."* Those CIs are tight and tempting, and the obvious move —
+add `settle_med ∈ [122, 132]` as a row — is **wrong**, and would have scored **0/52**. 127 is the size at
+which a community *starts to come apart*; a population whose median village sat there would be a population
+permanently mid-fission. The quantity Alberti bounds is the **ceiling**, so the field is `settle_max` and the
+test is one-sided. Same family as the three that came before it: `hayden_stage` on occupied vs regional
+density, `lineage_size_gini` on rank-keys vs patrilines, `connubium_med` on `pool_n` vs `reach_pop`. **Every
+one of them was a real number read against the wrong denominator, unit, or statistic — never a wrong number.**
+
+**#17's status is a SCREEN, not a score.** The 52 trajectories were run for other purposes across different
+worlds, run lengths and flag stacks, several predating R-105/R-106 fixes. They establish the *direction* and
+that the marker is worth wiring; they do not give a calibrated figure. It needs a proper campaign before the
+miss is sized.
+
+**#3 and #17 come from the same field and must be read together.** `settle_med` passing while `settle_max`
+over-runs is not a contradiction — it is the diagnosis: fission fires, but not hard enough at the top of the
+distribution. A single "village size" verdict would have averaged these into a meaningless pass.
 
 **#4 connubium is density-dependent — do not score it pooled.** Measured corr(density, connubium) = **+0.55**
 across 25 arms: sparse boreal worlds give 7.5–48, dense worlds give 85–173, straddling the ~150 anchor. A

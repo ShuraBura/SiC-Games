@@ -1,6 +1,28 @@
 # SiC Games — working instructions
 
-## THE FIRST RULE: VALIDATE THE DIAGNOSTIC AGAINST A CONSTRUCTED GROUND TRUTH
+## THE FIRST RULE: **CTB — CONSTRUCTED-TRUTH BENCHMARK**
+
+> **Build a world whose answer you already know. Measure it with the real diagnostic. Verify the measurement
+> returns what you built.**
+
+**Named 2026-08-06 at supervisor request** ("we need an acronym for this procedure, I am tired of typing it").
+CTB is the name for the rule below — use it in commit messages, RESULTS entries, test docstrings and chat.
+*"CTB'd the village diagnostic"* means all three steps were done. It is a verb.
+
+Three rules travel with it:
+- **Measure with the REAL diagnostic**, never a reimplementation of it in the test. A test that reimplements
+  the thing it checks proves only that you can write the same bug twice.
+- **Construct the NEGATIVE too.** A benchmark with only positive cases cannot tell a working instrument from
+  one that always says yes. Build the case that must read "nothing here" and check that it does.
+- **A verdict about the CONFIG is read from the config, not from the observation.** "You never switched it on"
+  and "you switched it on and it never fired" are different findings and must never collapse into one.
+
+Reference implementation: `sic_games/tests/test_climate_health_ctb.py`, which constructs all four health
+verdicts explicitly. On the day it was written it caught **three defects in the instrument it was benchmarking**
+and none in the model (RESULTS Addendum 31).
+
+
+### The rule in full
 
 **Adopted 2026-08-04 by the supervisor, after a single day in which interpretations of the same measurement
 were revised three times — each revision caused by the INSTRUMENT, never by the model.**

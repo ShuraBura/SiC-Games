@@ -261,8 +261,12 @@ targeted identical cells. **C.4a (BUILT, `terrain.py`):** the dormant `temperatu
 nothing read it) becomes a **latitudinal gradient** (equator `TEMP_EQUATOR_C=27 °C` → high-lat
 `TEMP_HIGHLAT_C=1 °C`, 14 °C area-mean preserved); a new per-cell `grass_subtype` splits GRASS by the
 `GRASS_TROPICAL_THRESHOLD_C=18 °C` Köppen isotherm → `GRASS_LLANOS` (warm) / `GRASS_STEPPE` (cool). Gate:
-non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (BUILT):** a 40–90 yr caribou
-quasi-cycle (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration)
+non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (BUILT, ON since 2026-08-06):** a
+**23–67 yr** caribou quasi-cycle (St. John 2022 — median period 40.5, observed range 23–67 over the **19 cyclic
+herds of 43 collected**; amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration only,
+and still not filed). **This read "40–90 yr" until the thesis was filed and read — see Addendum 32; the old band
+excluded everything below the median and ran past the longest cycle measured.** St. John is an UNDERGRADUATE
+thesis, not peer-reviewed: the weakest anchor in the climate layer.)
 on `GRASS_STEPPE` **meat only** (supervisor choice B). ClimateField exposes `meat_factor(x,y)` =
 `(1+a·cos(2πt/P+φ))/(1+a)` (peak-pinned, trough ≈0.069), masked to steppe cells; the economy applies it as
 `meat_pool *= tf.meat_factor(cx,cy)` (phase1_model.py:354) — the forage slice `(1−meat_frac)·S` is untouched,

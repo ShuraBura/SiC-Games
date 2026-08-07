@@ -298,7 +298,7 @@ compared two frozen end-states rather than two live dynamics.
 
 Three fixes later (R-90 branching -> R-92 segmentation -> R-93 relative legitimacy) the substrate now sustains
 diversity: eff_lineages 3.4 -> **18.1**, top_share 0.422 -> **0.154**, lineages_per_band 2.14 -> **6.66**
-against the FILED Hill 2011 ~7. **T-9 is now runnable in principle.**
+against the ~~FILED Hill 2011 ~7~~. **[RETRACTED 2026-08-06 — Hill et al. 2011 contains NO lineage data; the word does not occur in it. There is no ~7-lineages-per-band target and no 0.38 dominant share. Addenda 28/30/32.]** **T-9 is now runnable in principle.**
 
 **Two things to settle before running it:**
 1. `resent_privilege_ref` must be re-anchored for the minority-elite regime, or the stratified arm has no

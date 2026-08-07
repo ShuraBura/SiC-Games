@@ -139,8 +139,20 @@ def test_orphan_penalty_survives_normalisation():
     assert c.orphan_mult_father_dead / c.orphan_e_mult > 2.0      # ~2.0×
 
 
-def test_infanticide_flag_is_superseded_and_still_inert():
-    """`enable_infanticide` was scoped as birth-spacing/sex-biased infanticide. Table 5.1 shows parental
-    infanticide is 5.3% of infant deaths and infancy is near sex-SYMMETRIC (38% M / 41% F) — the sex bias
-    is at 4–14 and comes from grave accompaniment. Superseded; still read by no logic."""
-    assert DemographyConfig().enable_infanticide is False
+def test_infanticide_flag_is_deleted_and_orphan_mortality_is_what_carries_the_channel():
+    """`enable_infanticide` is GONE (2026-08-06). It was a declared switch that no line of code ever read, and
+    asserting it was merely "off" is what let it survive three audits — each of which had to re-derive that it
+    was a stub.
+
+    The science is unchanged and lives in R-74's mechanism instead: baseline infanticide is already inside the
+    Siler infant curve (fit to observed Aché deaths, "infanticide KEPT"); Table 5.1 puts parental infanticide at
+    5.3% of infant deaths with infancy near sex-SYMMETRIC (38% M / 41% F); the sex bias is at ages 4–14 and
+    comes from grave accompaniment. Orphan-conditioned mortality is the real channel — and it is ON."""
+    assert "enable_infanticide" not in DemographyConfig.model_fields
+    # The successor must be live in a CANONICAL RUN, which is not the same as the class default -- the class
+    # default is False (Step-1 calibration world, all modulators off) and the campaign turns it on. Asserting
+    # the bare default here would have tested the wrong object; `config/mechanisms.toml` is generated from an
+    # actual C_ALLON run and is the thing that says what a run does.
+    from sic_games import runconfig
+    assert runconfig.build("DemographyConfig").enable_orphan_mortality is True, (
+        "deleting the stub only makes sense because the mechanism that supersedes it is live in a real run")

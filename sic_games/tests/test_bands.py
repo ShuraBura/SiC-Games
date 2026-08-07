@@ -6,6 +6,7 @@ from __future__ import annotations
 from collections import Counter
 
 import pytest
+from pydantic import ValidationError
 
 from sic_games.config import KcalEconomyConfig, SubstrateConfig
 from sic_games.demography import DemographyConfig, LEADER_SOCIETY_WEIGHT, REPULSION_SOCIETY_FACTOR, size_repulsion
@@ -173,9 +174,18 @@ def test_bands_method_connected_components():
     assert sorted(len(b) for b in w.bands(radius=0)) == [1, 1, 1, 1, 1]  # r=0 (per-cell): the pairs are on separate cells
 
 
-def test_band_risk_shelved_off_by_default():
-    # F.2 risk-dilution mortality was shelved (death spiral, run_3i) — the flag must stay OFF by default.
-    assert DemographyConfig().enable_band_risk is False
+def test_band_risk_is_deleted_not_merely_shelved():
+    """F.2 risk-dilution mortality is GONE (2026-08-06), not off.
+
+    It used to be asserted OFF-by-default, which was the weaker claim and the one that let it linger: its gain
+    defaulted to 0.0 behind a `> 0.0` guard, so the flag could read ON in a config dump while the mechanism did
+    nothing, and it passed a whole ablation battery as a fake positive. Its only two reachable states were
+    "inert" and "death spiral" (run_3i: pop 281→64, mean band 56→5). Asserting ABSENCE is what stops it coming
+    back; `extra="forbid"` makes any stale call site raise rather than silently drop the setting."""
+    for gone in ("enable_band_risk", "band_risk_penalty", "band_risk_size"):
+        assert gone not in DemographyConfig.model_fields
+    with pytest.raises(ValidationError):
+        DemographyConfig(band_risk_penalty=0.05)
 
 
 def test_pair_bonds_form_and_are_monogamous():

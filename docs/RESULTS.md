@@ -4935,4 +4935,521 @@ arms of Addendum 24 re-read for `band_med` × `frac_child`. Retracts this log's 
 
 ---
 
+**ADDENDUM 29 — THE ANCHOR SWEEP EXTENDED TO THE CLIMATE LAYER AND TO THE CONFIG ITSELF. Four climate anchors
+opened for the first time: three verify, one does not exist in the paper it is credited to. Village sizes turn
+out to be well anchored after all — the row that looked unanchored was the redundant one — and the LARGEST
+village is the marker that actually misses. And the parameter-provenance gap reported one turn ago was mostly
+an artefact of the generator that reports it (2026-08-06).**
+
+Prompted by the supervisor's read of Bar-Yosef ("mostly maps and burial sites") and the two questions it
+raised: is there a village anchor at all, and what else has never been checked. Worked in three tiers.
+
+---
+
+### TIER 1a — the climate anchors, checked against the PDFs for the first time
+
+The C.2–C.5 channels were wired on 2026-08-04 and every number in them was transcribed from a code comment or
+a web survey. `tools/verify_anchor.py` now extracts each source PDF and searches it for the number the code
+claims. Four sources were in the folder; a fifth is not.
+
+| anchor | verdict |
+|---|---|
+| **Sarmiento 2004** — llanos flood-year ANPP | **VERIFIED VERBATIM.** The table reads `Total ANPP (*) 236±36 265±38 428±71 601±58` / `(**) 352±45 418±43 601±82 659±68` for grazed/ungrazed 1996 vs 1997. The ungrazed ratios 265/601 and 418/659 give **−56%** and **−37%** — exactly the range the code quotes. Arithmetic reproduced, not just the digits |
+| **Wanner 2008** — regime amplitude | **VERIFIED VERBATIM:** EMICs *"simulate relatively modest changes during the period AD 1000-1850, with peak to peak variations in the order of 0.5 C"*. Note that is **peak-to-peak over the millennium**, not an LIA-vs-baseline anomaly. The °C→CC% step was already tagged interpretive in `LITERATURE.md` and now is in the code too |
+| **Hawkes 1991** — intercept hunting | **VERIFIED VIA A DOCUMENTED CONVERSION.** 745 and 518 are *not in the paper* — it reports **mass**. Table 2's kg/hr column gives encounter/scavenge all-seasons **0.71** and night intercept **1.02**, with footnote a fixing the denominator: *"mean number of hours spent by adult men in day-time foraging was about 4.5 hours … We use this number to calculate an hourly rate."* The return-rate table's LOCKED constants (0.50 × 1460 = 730) convert them to **518.3** and **744.6**. Exact to the unit |
+| **Timmermann 2018** — ENSO **period** | **VERIFIED, as a SYNTHESIS of two printed bands.** EOF1 is *"quasi-quadrennial timescales (3-7 years)"*; EOF2 is quasi-biennial, and the eigenmode section pins the pair at *"timescales of approximately four and two years, respectively"*. So our [2, 7] is the union of the two observed modes — defensible, but a union and not a quotation, and now labelled one |
+| **Timmermann 2018** — ENSO **amplitude** | **RETRACTED. THE NUMBER IS NOT IN THE PAPER** |
+| **St. John 2022** — caribou swing | **UNSOURCED. NO PDF EXISTS IN `literature/`** |
+
+**THE ENSO AMPLITUDE WAS NEVER TIMMERMANN'S.** `LITERATURE.md` recorded *"±20–40% CC swing in marginal biomes
+→ `interannual_amp`"* and `climate.py` carried `ENSO_AMP_MIN, ENSO_AMP_MAX = 0.20, 0.40  # Timmermann 2018`.
+Timmermann 2018 is an **SST-dynamics review**. It discusses ENSO amplitude only qualitatively — skewness,
+*"a wide range of amplitudes"* in palaeo-reconstructions — and states **no production or carrying-capacity
+amplitude anywhere in the text**. This is the Bar-Yosef pattern reproduced exactly, in code two days old,
+written after the sweep that found Bar-Yosef.
+
+The value is retained and **retagged `[INTERPRETIVE]`**, which is the treatment its sibling `REGIME_AMP`
+(Wanner's ±10–15%) has carried since it was written. It is **bounded, not anchored**: Sarmiento measures
+−37…−56% in an *exceptional* flood year, and an ordinary interannual excursion must be milder than an
+exceptional one, so [0.20, 0.40] sitting below [0.37, 0.56] is coherent. That is an argument for the bracket,
+not a source for the number, and the code now says so.
+
+**ST. JOHN 2022 IS THE BAR-YOSEF CASE AGAIN, WITHOUT THE PAPER.** The caribou amplitude 0.871 and the 40–90 yr
+period rest on an M.Sc. thesis that is **not in the folder**. The only caribou paper we hold is Usher 2022,
+which `LITERATURE.md`'s own entry explicitly *rejects* for this purpose as a category error. The channel is
+default-OFF in both `ClimateConfig` and `mechanisms.toml`, so nothing in the canonical stack rides on it, and
+`test_anchor_provenance.py` now **fails if it is ever defaulted ON while the row reports UNSOURCED**.
+
+**Also corrected, a P5 drift in my own week-old work:** `LITERATURE.md`'s St. John entry said *"C.4b, NOT yet
+wired"*. C.4b was wired on 2026-08-04, by me, and tested live. The doc had not moved with the code.
+
+---
+
+### TIER 1b — village sizes ARE anchored. The unanchored-looking row was the redundant one
+
+The supervisor's finding on Bar-Yosef closes marker **#2**, and closing it costs nothing:
+
+- **#2 RETIRED.** 100 [50–150] on `settle_med`, sourced to a paper with no village-population figure in it.
+  It was a **second band on the same field as #3**, whose band is verified. Retiring it removes an
+  unverifiable number and loses no measurement.
+- **#3 STANDS and re-scores well.** Alvard 2009 [50–250], verified verbatim. Re-scored over every trajectory
+  on disk (52 arms): **46/52 pass**, median of arm medians **97.5**.
+
+Two further sources were verified verbatim and both land on the same scale:
+
+- **Alberti 2014:** *"a critical scalar stress threshold at community size 127 (95% CI: 122–132), while the
+  maximum probability of critical scale stress is predicted at size 158 (95% CI: 147–170)"*
+- **Hamilton 2007:** aggregated group **53.66 [49.86–58.29]** (n=297), periodic aggregation
+  **165.32 [152.25–181.00]** (n=213)
+
+**AND SCORING ALBERTI AS A BAND WOULD HAVE BEEN THE FOURTH INSTANCE OF THIS PROJECT'S UNIT-MISMATCH BUG.**
+The tempting move — add `settle_med ∈ [122, 132]`, the CI is beautifully tight — is wrong, and would have
+scored **0/52**. **127 is the size at which a community starts to come apart.** A population whose *median*
+village sat there would be permanently mid-fission. What Alberti bounds is the **ceiling**, so the field is
+`settle_max` and the test is one-sided. Same family as `hayden_stage` on occupied-vs-regional density,
+`lineage_size_gini` on rank-keys-vs-patrilines, and `connubium_med` on `pool_n`-vs-`reach_pop`. **All four
+were real numbers read against the wrong denominator, unit or statistic — never wrong numbers.**
+
+**NEW MARKER #17 — THE FISSION CEILING, AND IT MISSES.** Scored correctly against `settle_max` over the same
+52 trajectories:
+
+| | median `settle_max` | arms over Alberti's 158 | arms over Alvard's 250 |
+|---|---|---|---|
+| 52 trajectories | **220** | **39/52** | **18/52** |
+
+**The typical village is right and the largest one is not.** `settle_med` ≈ 98 sits comfortably inside the
+ethnographic band while `settle_max` ≈ 220 routinely exceeds the size at which both Alberti (scalar stress)
+and Alvard (ethnographic maximum) say communities break up. That is not a contradiction between #3 and #17 —
+it is the diagnosis: **fission fires, but not hard enough at the top of the distribution.** A single "village
+size" verdict would have averaged the two into a meaningless pass.
+
+**#17 is a SCREEN, not a score.** The 52 arms were run for other purposes, across different worlds, lengths
+and flag stacks, several predating the R-105 and R-106 fixes. They establish direction and that the marker is
+worth wiring; they do not size the miss. That needs a proper campaign.
+
+**#6 remains unanchored.** Smith & Codding was fetched and verifies, but for #9's ordering claim, not for a
+lineage share. No forager-scale lineage-concentration source exists in the folder. Retire or leave visibly
+broken — the supervisor's call.
+
+---
+
+### TIER 2 — the provenance gap was mostly the generator, not the parameters
+
+One turn ago this log reported *"245 parameters, 26 PROVISIONAL, 18 ANCHORED, ~200 with no provenance tag at
+all"*. **That number was wrong, and wrong in the direction that flatters nobody: it overstated the gap.** Two
+measurement defects, both in the instrument rather than the model:
+
+**(1) `gen_runconfig.py` harvested only the comment TOUCHING each field.** The config classes are written in
+channel blocks — one comment carrying the anchor, then the flag and the two or three parameters it governs:
+
+```
+# [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; duration 100-500 yr ...
+enable_regime_shift: bool = False
+regime_amp: float = Field(0.0, ...)          <- documented to a human, "UNDOCUMENTED" to the generator
+regime_duration: int = Field(0, ...)         <- same
+```
+
+Only the flag sat directly under the comment, so only the flag inherited it. **18 of the 25 "undocumented"
+parameters were documented in the line above their own.** The generator now inherits the channel note
+(tagged, so a field-specific note is still distinguishable) and falls back to the class docstring **only when
+the docstring names the field** — a blanket fallback would dress an undocumented field in its neighbours'
+prose and hide a real gap.
+
+**(2) The audit's own classifier tested `ANCHORED` before `UNANCHORED`.** One string contains the other, so
+16 parameters that **honestly declare they have no literature source** were counted as anchored. The first
+corrected run read 31 ANCHORED; the true figure is 15. A clean sweep produced by a substring.
+
+Both bugs are now constructed-truth tests in `test_provenance_coverage.py`. CLAUDE.md's first rule applies to
+an audit exactly as it applies to a diagnostic.
+
+**The corrected picture, 244 parameters:**
+
+| class | n | % |
+|---|---|---|
+| ANCHORED | 15 | 6% |
+| PROVISIONAL | 25 | 10% |
+| UNANCHORED (explicitly declared) | 16 | 7% |
+| CITES-A-YEAR, untagged | 88 | 36% |
+| COMMENTED, no source | 100 | 41% |
+| **UNDOCUMENTED** | **0** | **0%** |
+
+**59% now declare a source or declare that they have none**, and nothing is silent. The actionable backlog is
+the **88 that name a paper-and-year but carry no tag** — they are the cheap expansion of the
+`verify_anchor.py` registry, because the citation is already there and only the tag is missing.
+
+**The one real gap was `CarbonConfig` — and reachability answered it better than provenance would have.**
+9 of its 10 fields had no comment anywhere, and none of the names appear in `PARAMETERS.md` either. Before
+writing provenance, the reachability was checked: **`phase1_model.py` imports neither `oracle.py` nor
+`joint_task.py`**, so **five of the nine cannot be reached from any campaign run** — `cred_decay` and
+`velocity_tau` (Oracle only), `matthew_alpha`, `epsilon` and `cred_bonus_per_participant` (joint-task only).
+Chasing literature anchors for those would have been effort spent on the wrong five. Each field is now
+labelled LIVE or DEAD at its point of use, and the generated config carries the label.
+
+---
+
+### TIER 3 — all six named open parameters are INERT, and that is the finding
+
+`pathogen_gamma`, `shock_rho`, `material_capture_frac`, `paternal_provision_frac`, `wife_quality_strength`
+and `cohesion_leader_weight` were checked against their neutral values:
+
+```
+pathogen_gamma           0.0   neutral 0.0    INERT
+shock_rho                0.0   neutral 0.0    INERT
+material_capture_frac    0.0   neutral 0.0    INERT
+paternal_provision_frac  0.0   neutral 0.0    INERT
+wife_quality_strength    0.0   neutral 0.0    INERT
+cohesion_leader_weight   1.0   neutral 1.0    INERT   (bit-exact today)
+```
+
+**Every one sits at its no-op value, so none has ever affected a campaign.** That reframes the backlog: it is
+not a correctness risk to the current stack, it is a set of unexercised mechanisms. It also separates two
+things that had been filed together — `wife_quality_strength` **already has a lit anchor** (von Rueden &
+Jaeggi, r = 0.19, cited in full at its point of use). Its gap is **adoption**, not anchoring. Only
+`pathogen_gamma` (Cashdan 2014, comment reads "Sweep low/mid/high") and `shock_rho` ([PROVISIONAL — sweep])
+are genuinely waiting on a run.
+
+---
+
+### WHAT IS NOW CODE RATHER THAN PROSE
+
+- **`tools/verify_anchor.py`** — extracts each source PDF and searches it for the number the code claims.
+  Three honest states: VERIFIED, INTERPRETIVE (our judgement, informed by the paper but not printed in it),
+  UNSOURCED (no PDF). 12 rows registered, 0 unaccounted for.
+- **`tools/audit_provenance.py`** — provenance coverage over the generated config, with the class order that
+  the substring bug made load-bearing.
+- **`sic_games/tests/test_anchor_provenance.py`** (17 tests) — fails the suite if any wired number stops being
+  findable in its own source; pins the ENSO retraction; reproduces the Hawkes conversion from the paper's own
+  kg/hr; constructs the per-session-vs-per-hour unit error the Hawkes table invites; and keeps the caribou
+  channel OFF while its source is unfilebound.
+- **`sic_games/tests/test_provenance_coverage.py`** — a ratchet. Coverage may rise and may not fall, and both
+  audit bugs are constructed cases.
+
+**The rule this arc keeps re-learning, now in three places:** a citation that names an author and a year is a
+promise, not a provenance. Every row that survived a check named a table, a page or a sentence. Every row that
+failed named only an author and a year — Bar-Yosef, BHM, Hill 2011, Timmermann's amplitude, St. John.
+
+---
+
+**ADDENDUM 30 — ADDENDUM 28's RETRACTION NEVER REACHED THE CODE. Three live parameters were still citing Hill
+2011's nonexistent lineage target two days after it was retracted, and one of them derives its value from it.
+Found by the provenance audit of Addendum 29, which was not looking for it (2026-08-06).**
+
+Charter **P3** — *a retracted anchor is edited at its point of use* — was written on 2026-08-04 in response to
+the Addendum-28 retractions. It was being violated by those same retractions at the moment it was written.
+
+**HOW IT SURFACED.** The Tier-2 audit grouped the 88 untagged-but-citing parameters by cited source, purely to
+size the registry backlog. **`Hill 2011` came back with five hits.** Addendum 28 had established two days
+earlier that the word *"lineage"* occurs **zero times** in Hill et al. 2011. Opening the five showed the
+retraction had been written into `RESULTS.md` and `MARKER_MATRIX.md` and nowhere else.
+
+**WHAT WAS STILL STANDING IN `demography.py`:**
+
+| parameter | what the comment still said |
+|---|---|
+| `lineage_branch_rate` | *"breaks the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage share 0.38 that R-25 already passed"* |
+| `rank_hierarchy_frac` = **0.15** | *"0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band … tied to a target the model already carries rather than picked freely"* |
+| `legit_threshold` = 0.15 (R-93 note) | *"that boundary is 6.67, against a Hill 2011 target of ~7 — a FIVE PERCENT margin"* |
+
+**`rank_hierarchy_frac` is the one that bites.** Its comment presents 0.15 as **derived** — the reader is told
+it was *"tied to a target the model already carries rather than picked freely."* There is no ~7. It is a free
+parameter that has been reading as a derived one for as long as the comment has existed, and R-93's "five
+percent margin" argument is a margin against nothing.
+
+**A SECOND, DIFFERENT FAMILY in the same five.** `band_cohesion` / `band_split_size` / `band_merge_size` and
+`cv_safe` cite Hill 2011 for band size **~25 all-ages**. That number *does* have a paper behind it, but the
+paper's quantity is **28.2 ADULTS** — the all-ages reading is the mis-attribution Addendum 28 identified.
+`cv_safe` is explicitly *"calibrated … ONLY to place the MEAN band at Hill 2011's ~25–30"*, i.e. **fitted to a
+quantity in the wrong unit.** The R-106 re-fit against the corrected adults target was attempted earlier in
+this arc and **falsified** — the mechanism cannot reach 28.2 adults from this direction — so the fit is left
+standing and the target is now labelled. An honest, documented mismatch beats a second fit to a wrong unit.
+
+**NOTHING WAS RE-VALUED.** Every one of these is left at its current number and labelled `[UNANCHORED]` with
+the reason. Re-deriving `rank_hierarchy_frac` or `legit_threshold` is a calibration decision requiring runs and
+a supervisor call, not a documentation fix, and `enable_rank_hierarchy` is default-OFF in any case. The
+R-90/R-92/R-93 *reasoning* is untouched by the retraction and stays: an absorbing lineage process really does
+fixate at probability 1, and a threshold on a share really does have a hidden denominator. Only the **number
+those arguments were aimed at** turns out not to be a literature target.
+
+**NOW ENFORCED — `sic_games/tests/test_retraction_propagation.py`.** For each retracted claim, any source file
+still mentioning it must also carry the retraction marker. The claim may stay (the surrounding reasoning is
+usually sound and deleting it would lose the history); it may not stand unqualified. Registered: Hill 2011 as
+a lineage source, Timmermann 2018 as the ENSO amplitude source, St. John 2022 as a filed source. The guard
+includes a constructed violation, because a check that can only pass is not a check — and on its first run it
+caught a defect in **itself**, splitting on the bare parameter name and landing in the new warning block
+instead of the field declaration.
+
+**THE PATTERN, STATED PLAINLY.** Every retraction this arc has produced was recorded in the log that produced
+it and left live at the point of use. Bar-Yosef, BHM, Hill 2011, Timmermann's amplitude. **A retraction that
+lives only in RESULTS.md is a note, not a correction** — the next person to read the parameter reads the
+comment, not the log. The docs are downstream of the code, and the code is what runs.
+
+---
+
+**ADDENDUM 31 — TWO DEAD KNOBS DELETED, THE CLIMATE LAYER SWITCHED ON BY DEFAULT, AND A PER-CHANNEL HEALTH
+DIAGNOSTIC THAT FOUND THREE DARK CHANNELS ON ITS FIRST REAL RUN. Also: the regime telegraph is correctly
+anchored and STRUCTURALLY UNABLE TO ACT at our run lengths — it fires in ~13% of a standard campaign
+(2026-08-06).**
+
+Supervisor directive: *"kill all dead knobs, turn on the climate channels — wire them with diagnostics of
+healthy functioning and benchmark on a well characterized case."* The procedure now has a name — **CTB
+(Constructed-Truth Benchmark)** — defined at the end of this entry.
+
+---
+
+### 1. THE DEAD KNOBS ARE DELETED, AND THE DELETION EXPOSED A WORSE BUG
+
+**`enable_infanticide`** — a declared flag that **no line of code ever read**. Three separate audits had to
+re-discover that and write "UNIMPLEMENTED STUB" beside it; `C_ALLON` carried a special case to skip it; two
+mechanism batteries carried an entry explaining it. A switch that does nothing is not documentation, it is a
+standing invitation to believe the mechanism exists. The science it encoded is unchanged and lives in R-74's
+`enable_orphan_mortality`, which is built, anchored and ON.
+
+**`enable_band_risk` + `band_risk_penalty` + `band_risk_size`** — not a stub; a **measured dead end** with real
+implemented code. Loner-mortality does not produce an optimal band size, it culls: fewer people → lower density
+→ smaller bands → more loners → more penalty (run_3i: penalty 0→6 took pop 281→64 and mean band 56→5). Its gain
+defaulted to 0.0 behind a `> 0.0` guard, so **the flag could read ON in a config dump while the mechanism was
+inert — it passed a whole ablation battery as a fake positive.** Its only two reachable states were "does
+nothing" and "kills the population". Recoverable at commit `daa7194`; the `run_3i` prototype went with it,
+because a script that can no longer run is the same kind of lie as a flag that does nothing.
+
+**THE BUG THE DELETION FOUND, WHICH IS BIGGER THAN EITHER KNOB.** `DemographyConfig` **silently ignored unknown
+keyword arguments** — pydantic's default. So deleting `band_risk_penalty` would have made every harness that
+still passed it run happily *without* it: the run succeeds, the manifest looks right, the setting is absent.
+That is precisely the failure this entire audit arc has been chasing, sitting one line away from being
+impossible, and **the cleanup itself would have been the trap.**
+
+`model_config = ConfigDict(extra="forbid")` on `DemographyConfig` and `ClimateConfig`. A stale or mistyped field
+now raises. Three harnesses were passing the deleted fields and were repaired rather than left to no-op.
+
+---
+
+### 2. CLIMATE IS ON BY DEFAULT. THE CONTROL IS NOW A CHOICE, NOT AN INHERITANCE
+
+`C_CLIMATE` flipped from opt-in to opt-out. Five channels run by default — seasonality, eccentricity mean,
+ENSO interannual, the regime telegraph, the llanos flood — plus the lottery that draws their per-world values.
+`C_CLIMATE=0` still reproduces the pre-2026-08-06 flat world exactly, and that arm is now what a climate
+ablation compares against. **A control has to be chosen, not inherited by default**, and the old default meant
+the entire variability layer sat out every experiment this project ran while reading as built.
+
+**One channel stays off, by name and with a reason: `enable_caribou_swing`.** Its amplitude (0.871) and period
+(40–90 yr) are credited to an M.Sc. thesis that is not in `literature/` (Addendum 29). Not a control and not
+"not needed" — **unverifiable**. Turning it on would put an unsourced number into every result. File the thesis
+and delete one line.
+
+---
+
+### 3. THE HEALTH DIAGNOSTIC, AND WHAT IT FOUND IMMEDIATELY
+
+A climate channel fails in three ways that are **indistinguishable in a config dump**:
+
+| | what it looks like | what it is |
+|---|---|---|
+| `OFF` | flag false | not asked to act |
+| `UNREACHABLE` | flag true, **mask empty** | cannot touch a cell at any amplitude |
+| `NEVER-FIRED` | flag true, mask populated, **run shorter than the channel's clock** | asked to act, never got the chance |
+
+The third is the one nothing in this project could previously see. `ClimateField.health()` now reports, per
+channel, its reach in cells, how often it actually moved the field, and its measured extremes — **seven scalar
+evaluations per STEP, not per cell**, carried in every checkpoint and printed to the run log only when the set
+of complaints changes.
+
+**First real run (coastal-temperate, the campaign default), step 25:**
+
+```
+~~ climate: intercept=UNREACHABLE, llanos=UNREACHABLE, regime=NEVER-FIRED
+```
+
+**Three of six channels dark on the default world.** llanos and intercept are UNREACHABLE because a temperate
+coastal world contains neither llanos nor savanna — biome-dependence, exactly as the standing rule says: *a
+mechanism validated in one world is a claim about that world.* On a **savanna** world both come alive
+(llanos reach 200 cells, intercept 4499), which is the correct behaviour and confirms the masks are wired.
+
+**THE MEASURED EXTREMES EQUAL THE CONFIGURED AMPLITUDES — the diagnostic and the seeding align:**
+
+| channel | verdict | reach | measured extreme | expected from the config |
+|---|---|---|---|---|
+| season | LIVE | global | min **0.221** | 1 − a_seas(0.779) = 0.221 ✓ |
+| eccentricity | LIVE | global | **1.1228** flat | the drawn mean_factor ✓ |
+| interannual | LIVE | global | min **0.7484** | 1 − ENSO amp(0.25) = 0.75 ✓ |
+| llanos | LIVE | 200 cells | min **0.6989**, active **100%** | 1 − 0.30 = 0.70, two-sided ✓ |
+| intercept | LIVE | 4499 cells | max **1.4382**, active **33.5%** | **745/518 = 1.4382** exactly, late-dry only ✓ |
+| caribou | OFF | 0 | — | excluded, unsourced ✓ |
+| regime | **NEVER-FIRED** | global | — | see below |
+
+The intercept row is worth pausing on: **the Hawkes anchor verified from the PDF this morning is now measured
+coming out of a live run, to four decimal places.**
+
+---
+
+### 4. THE REGIME TELEGRAPH IS ANCHORED CORRECTLY AND CANNOT ACT AT OUR RUN LENGTHS
+
+Not a bug — a **structural mismatch between the literature's timescale and ours**. The recurrence is anchored to
+Bond ~1500 yr (Mayewski RCC), drawn over 1000–2000 yr. A standard campaign is 2500 steps = **208 years**.
+
+| run | years | P(≥1 regime onset) at 1000 / 1500 / 2000 yr recurrence |
+|---|---|---|
+| 400 | 33 | 3.3% / 2.2% / 1.7% |
+| **2500** | **208** | **18.8% / 13.0% / 9.9%** |
+| 5000 | 417 | 34.1% / 24.3% / 18.8% |
+| 12000 | 1000 | 63.2% / 48.7% / 39.3% |
+| 30000 | 2500 | 91.8% / 81.1% / 71.3% |
+
+**A standard campaign sees the slow driver about one run in eight.** Reaching a coin-flip needs ~12,500 steps
+(1,040 yr); reaching 90% needs ~41,000 (3,450 yr).
+
+This matters directly for the cycles question. Turning the regime channel on does **not** by itself put a slow
+environmental variable into a secular-cycle test — at 2500 steps it mostly puts a *flag* into one. The three
+honest options are (a) run 5–16× longer, (b) drive it deterministically with the `regime_driver` /
+`ClimateDriver` hook that §4.1.9 already built for exactly this, or (c) accept it as a rare-event driver and
+say so. **(b) is the right instrument for a controlled test** and costs nothing to adopt.
+
+Shortening the recurrence to make it fire is the one thing that must not happen: it is the anchored number.
+
+---
+
+### 5. **CTB — CONSTRUCTED-TRUTH BENCHMARK.** The procedure, now named
+
+> **Build a world whose answer you already know. Measure it with the real diagnostic. Verify the measurement
+> returns what you built.**
+
+Named at supervisor request. It is CLAUDE.md's first rule with a handle, and it applies to a mechanism, a
+diagnostic, a map, a population, or an audit — anything where a measurement could be believed without being
+checked. `sic_games/tests/test_climate_health_ctb.py` is the reference implementation: each of the four
+verdicts is constructed explicitly, so the instrument is shown to distinguish them rather than assumed to.
+
+**THE CTB EARNED ITSELF THREE TIMES IN ONE SITTING, ALL THREE DEFECTS IN THE INSTRUMENT:**
+
+1. **`OFF` was decided from the observation, not the config** — so "you never switched it on" and "you switched
+   it on and it never fired" collapsed into one verdict, the exact distinction the diagnostic exists to draw.
+   Caught within a minute of the instrument being written.
+2. **A brightening channel reported a value it never took.** min/max were seeded at the neutral 1.0, so
+   `eccentricity` — always ~1.12 — reported `min 1.0`. Depressions hid the bug because for them 1.0 genuinely
+   is the ceiling. Found by *reading a real run's output*, then constructed as a test.
+3. **An unreachable channel reported a fictional magnitude.** On the temperate world the block read
+   `llanos: verdict UNREACHABLE, reach 0, active_frac 1.0, min 0.699` — the verdict right, and the numbers
+   underneath describing a depression applied to **zero cells**. Detail that looks like corroboration is worse
+   than a bare wrong answer, because it invites someone to quote the 0.699.
+
+**Every one was a defect in the measuring instrument, not the model** — which is the entire argument for the
+procedure. A diagnostic is not a neutral window onto a run; it is code, and it is wrong until it is checked
+against something whose answer is already known.
+
+---
+
+**ADDENDUM 32 — THE CARIBOU THESIS ARRIVED AND FALSIFIED HALF OF WHAT WE HAD CREDITED TO IT. Plus: the
+ON-but-dead gate, which caught two more flags advertising mechanisms that could not act; and the config files
+can now SET a run instead of only describing one (2026-08-06).**
+
+---
+
+### 1. THE CARIBOU ANCHOR — one confirmation, three corrections
+
+`[UNSOURCED]` for one morning (Addendum 29); the supervisor filed it the same afternoon. **Reading it was not
+a formality.**
+
+**St. John, Jack R. (2022), "Understanding Caribou Population Cycles", University of Montana ScholarWorks.**
+
+| | what we carried | what the thesis says |
+|---|---|---|
+| **amplitude** | 0.871 about the mean | ✅ **CONFIRMED** verbatim — *"the amplitude, standardized about the mean population size, was .871"* |
+| **period band** | **40–90 yr**, credited to Bergerud | ❌ **FALSIFIED.** Figure 9: `Min=23, Q1=33, Median=40.5, Q3=50, Max=67`. **Bergerud is not cited in the thesis at all** (zero occurrences) |
+| **sample** | "43-herd database" of cycles | ❌ **OVERSTATED.** *"of the 43 herds, I only 19 were deemed cyclic via periodogram analysis"* — **56% of the database is not cyclic** |
+| **status** | M.Sc. thesis | ❌ **UNDERGRADUATE thesis** (ScholarWorks: *Undergraduate Theses, Professional Papers, and Capstone Artifacts*). Not peer-reviewed |
+
+**The period band was wrong on BOTH ends.** It excluded everything below the median (Min 23, Q1 33) and ran 23
+years past the longest cycle ever measured, so nearly every drawn world got a period longer than the median
+herd. **Corrected to the observed 23–67**, and the correction is pinned by a test so a future edit back toward
+40–90 fails.
+
+**Both figures are MEDIANS of wide distributions**, not constants:
+```
+period     Min=23   Q1=33    Median=40.5  Q3=50     Max=67      (years)
+amplitude  Min=.406 Q1=.700  Median=.871  Q3=1.126  Max=1.570
+```
+
+**⚠ A HAZARD THE DISTRIBUTION EXPOSES, found before anyone could hit it.** `_caribou_factor` is peak-pinned
+`(1 + a·cos)/(1 + a)`, whose trough is `(1−a)/(1+a)` — **negative for a > 1**. The thesis's Q3 (1.126) and Max
+(1.570) are both above 1, so **half the observed herds sit above the value at which our form breaks**. Pinning
+the median is safe; a per-world draw from this distribution would silently produce negative meat. Constructed
+as a CTB case so the clamp is a known requirement rather than a future bug report.
+
+**Channel switched ON** (boreal world: reach 4794 steppe cells, drawn period 584 steps = 48.7 yr, inside the
+corrected band). The campaign's `_CLIMATE_UNSOURCED` exclusion set is now **empty**, which was the point of
+naming it.
+
+**The general lesson, third instance today: fetching the paper is not a rubber stamp.** Bar-Yosef had nothing.
+Timmermann had the period and not the amplitude. St. John had the amplitude and not the period band. **In every
+case the number that survived was the one someone had actually read, and the number that failed was the one
+that came with an author-and-year and no page.**
+
+---
+
+### 2. THE ON-BUT-DEAD GATE — two more flags advertising mechanisms that cannot act
+
+**Closing R-85's residual (task #23).** R-85b explained all six inert flags on 2026-07-18 and left a decision
+list of seven zero-magnitude knobs. **Five have since been given values** (`leader_coherence_gain` 2.0,
+`repulsion_gain` 0.3, `village_gain` 5.0, `move_cost_kcal` 750, `site_gain` 0.3). Two had not:
+
+| flag | magnitude | status |
+|---|---|---|
+| `enable_terrain_pathogen` | `pathogen_gamma = 0.0` | **ON-but-dead in the canonical config** |
+| `enable_malnutrition_fission` | `malnutrition_fission_gain = 0.0` | **ON-but-dead in the canonical config** |
+
+Both read as live mechanisms in every config dump throughout this entire audit arc.
+
+**`enable_condition` is NO LONGER dead-downstream** — R-85b found its only consumer was the zeroed pathogen
+term, but `enable_nutrition_synergy` is now ON and reads `a._condition` directly. That chained finding is
+resolved.
+
+**Neither got an invented value.** `pathogen_gamma` has a real anchor (Cashdan 2014) and its own comment says
+*"sweep low/mid/high"* — the sweep has never been run, and picking a number without it is the exact sin this
+arc documents. `malnutrition_fission_gain` was **deliberately** zeroed as the R-106 negative control and
+behaved correctly as one; the mistake was leaving the FLAG on rather than the gain at zero. Both are now
+excluded by name in `C_ALLON` under §12 **UNDER EVALUATION**.
+
+**Now structural, not an audit finding.** `runconfig.dead_flags()` generalises `climate.py`'s `need()` refusal
+to demography, and `run_campaign.py` checks the FINAL config before a single step runs:
+
+```
+campaign: ON-but-dead mechanism(s) in the final config:
+  enable_terrain_pathogen is ON but pathogen_gamma=0.0 — the mechanism cannot act
+  Turn the flag off to ablate, or give the magnitude a value.
+```
+
+**You ablate by turning the FLAG off, never by zeroing the magnitude** — zeroing leaves the flag advertising a
+mechanism that is not running. This bug class produced 3 of battery 7's 6 "inert" verdicts, cost R-85 an entire
+follow-up study, and let `enable_band_risk` pass a whole ablation battery as a fake positive before it was
+deleted this morning. It is now a run-halting error.
+
+---
+
+### 3. THE CONFIG FILES CAN NOW SET A RUN (task #24, step B)
+
+**The asymmetry that existed until today.** `tools/gen_runconfig.py` produces `config/*.toml` by *executing*
+`run_campaign.py` with `C_ALLON=1` and recording the resolved config. So the files were a faithful **record**
+of a run with no power to **cause** one — "edit the file and you get that run" was not true, and nothing told
+a reader otherwise.
+
+`C_CFGSRC=files` makes the file the base configuration, with `C_PARAM` / `C_EXTRA_ON` / `C_EXTRA_OFF` still
+applying on top so ablations stay expressible.
+
+**MEASURED EQUIVALENCE, which is what makes it safe: the file and a `C_ALLON=1` run agree on all 279 fields,
+zero differences.** Loading the file reproduces the canonical arm exactly rather than approximately, and a
+test pins it.
+
+**WHAT WAS DELIBERATELY NOT DONE, and why it is the supervisor's call.** `preset` remains the default. A
+**plain** run and the file differ in **52 fields** — the entire elite layer (leveling, legitimacy, leader
+share, material capture, rank hierarchy, resentment), village budding, soil depletion, improved land, intake
+fertility, adaptive connubium, lineage branching and split, and ~30 others are OFF in a plain run and ON in the
+file. Flipping the default would silently convert every ad-hoc run, probe and quick check into the full
+canonical stack.
+
+That is arguably what "nothing stays off" implies, and it may well be right — but it changes what every
+existing invocation of the script does, which is a scientific decision rather than a refactor. The gap is
+pinned as a measurement (`test_the_default_is_still_the_preset_path_and_differs_from_the_file`) so it cannot
+drift unnoticed, and that test is the one to invert when the call is made.
+
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

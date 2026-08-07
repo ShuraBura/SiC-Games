@@ -41,15 +41,34 @@ class DecisionConfig(BaseModel):
 
 
 class CarbonConfig(BaseModel):
+    """Carbon-agent (Si Cred) parameters — the last block in the run config with no provenance at all.
+
+    AUDITED 2026-08-06 (Addendum 29). This class was 9-of-10 undocumented, the worst block in
+    `config/parameters.toml`, and none of these names appear in `PARAMETERS.md` either — so the values had no
+    home anywhere. Before writing provenance, the reachability was checked, and it changes the answer: FIVE OF
+    THE NINE CANNOT BE REACHED FROM A CAMPAIGN RUN. `phase1_model.py` (the campaign engine) imports neither
+    `oracle.py` nor `joint_task.py`, so the fields only those two read are dead in every substrate run.
+
+    That is the project's recurring "validated in one stack, dead in another" class, and it means the useful
+    fact to record here is WHERE EACH FIELD IS LIVE, not a literature citation the value never had. Chasing an
+    anchor for a parameter no campaign can read would be effort spent on the wrong five.
+
+    Fill in the anchors for the four LIVE ones when Si Cred is next touched; the dead five need a decision
+    (keep for the Oracle engine, or delete) before they are worth documenting at all.
+    """
+    # Field order is UNCHANGED by the 2026-08-06 audit — only comments were added. Reordering a pydantic model
+    # changes serialization order, and run manifests are diffed between runs.
+    # [UNANCHORED, LIVE] Si Cred exploration temperature + its Cred coupling; locked by scan, not by literature
+    # (Stage 5.1 redesign, k_cred_band=1.0). Read at phase1_model.py:452-458.
     sigma_base: float = Field(0.5, gt=0.0)
-    kappa: float = Field(2.0, ge=0.0)
-    cred_scale: float = Field(10.0, gt=0.0)
-    cred_decay: float = Field(0.01, gt=0.0, lt=1.0)
-    matthew_alpha: float = Field(2.0, gt=0.0)
-    epsilon: float = Field(0.01, gt=0.0)
-    cred_bonus_per_participant: float = Field(1.0, ge=0.0)
-    velocity_tau: int = Field(10, ge=0)
-    velocity_scale: float = Field(1.0, gt=0.0)
+    kappa: float = Field(2.0, ge=0.0)                   # [UNANCHORED, LIVE] the only one with real traffic
+    cred_scale: float = Field(10.0, gt=0.0)             # [UNANCHORED, LIVE]
+    cred_decay: float = Field(0.01, gt=0.0, lt=1.0)     # [UNANCHORED, DEAD in campaign — oracle.py:135 only]
+    matthew_alpha: float = Field(2.0, gt=0.0)           # [UNANCHORED, DEAD in campaign — joint_task.py:21,150]
+    epsilon: float = Field(0.01, gt=0.0)                # [UNANCHORED, DEAD in campaign — joint_task.py:21]
+    cred_bonus_per_participant: float = Field(1.0, ge=0.0)  # [UNANCHORED, DEAD — joint_task.py:174]
+    velocity_tau: int = Field(10, ge=0)                 # [UNANCHORED, DEAD in campaign — oracle.py:136,730]
+    velocity_scale: float = Field(1.0, gt=0.0)          # [UNANCHORED, LIVE] phase1_model.py:458
     f_C: float = Field(0.25, ge=0.0, le=1.0)  # newborn Cred endowment fraction
     status_amplification_beta: float = Field(0.0, ge=0.0)  # β — Stage 3.2
 

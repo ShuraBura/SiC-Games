@@ -127,8 +127,12 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
     mechanisms is the situation these files were created to end."""
     canon = _canonical()
     off = {k for k, v in canon.items() if k.startswith("enable_") and v is not True}
-    allowed = {"enable_infanticide", "enable_genealogy_log", "enable_bud_hazard",
-               "enable_stratification_inequality_gate", "enable_band_risk",
+    # enable_infanticide + enable_band_risk were on this list and are now DELETED (2026-08-06): the
+    # exclusion list shrank by deletion rather than by a longer excuse.
+    allowed = {"enable_genealogy_log", "enable_bud_hazard",
+               "enable_stratification_inequality_gate",
+               # ON-but-dead at magnitude 0.0 until their calibration lands (2026-08-06, Charter §12)
+               "enable_terrain_pathogen", "enable_malnutrition_fission",
                # A CANDIDATE under evaluation rather than a built mechanism awaiting activation — a
                # structural change to assabiyah that is measured and defensible but NOT adopted (Addendum
                # 23). C_ALLON must not adopt a model change by side effect.

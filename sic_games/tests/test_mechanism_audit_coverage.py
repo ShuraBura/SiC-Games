@@ -98,13 +98,14 @@ def test_audit_test_magnitudes_that_disagree_with_the_canonical_run_are_declared
 
     # flag -> {magnitude: why the canonical run differs}
     DECLARED = {
-        "enable_malnutrition_fission": {
-            "malnutrition_fission_gain": "demography.py calls it UNANCHORED; and Addendum 23 shows it could "
-                                         "not act on a led band anyway, since the cohesion clamp swallows "
-                                         "any dispersion term below the median headroom of 0.718"},
-        "enable_terrain_pathogen": {
-            "pathogen_gamma": "demography.py: '0 = OFF/flat. Sweep low/mid/high' — the sweep the doc asks "
-                              "for has not been run, so 0.0 is deliberate-pending rather than a choice"},
+        # `enable_malnutrition_fission` and `enable_terrain_pathogen` were declared here, each as a flag ON in
+        # the canonical run with a magnitude of 0.0. RESOLVED 2026-08-06 (Addendum 32) by turning the FLAGS
+        # OFF rather than by continuing to explain the zeros: an ON-but-dead flag reads as a live mechanism in
+        # every config dump and as inert in every ablation, and `runconfig.dead_flags()` now halts a run that
+        # contains one. The underlying questions are unchanged and still open — `pathogen_gamma` awaits the
+        # Cashdan sweep its own comment asks for, and `malnutrition_fission_gain` was the R-106 negative
+        # control — but they are now recorded as OFF-pending rather than as on-and-explained.
+        # This test asked for the cleanup itself: it fails when a DECLARED disagreement disappears.
         "enable_ascribed_mate_choice": {
             "ascribed_mate_strength": "1.5 is C_ENDOG_A's default, 2.5 is battery1's ELITE overlay — two "
                                       "harness copies, neither anchored; the campaign's own knob wins"},

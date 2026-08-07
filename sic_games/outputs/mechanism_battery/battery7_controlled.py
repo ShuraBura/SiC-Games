@@ -86,7 +86,6 @@ BENCH = [("band_med", 18, 35, "Johnson scalar stress / R-72", "repulsion_midpoin
 
 # Mechanisms whose ablation is meaningless or already adjudicated — each with the reason, never a bare skip.
 SKIP = {
-    "enable_infanticide": "documented UNIMPLEMENTED STUB - no logic reads it",
     "enable_genealogy_log": "observer/logging, not a dynamic",
     "enable_bud_hazard": "mutually-exclusive alternate to the legacy budding path",
     "enable_stratification_inequality_gate": "R-103: criterion known wrong, parked for supervisor call",

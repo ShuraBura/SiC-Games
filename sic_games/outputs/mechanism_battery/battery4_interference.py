@@ -47,7 +47,6 @@ WORKERS = int(os.environ.get("B4_WORKERS", "7"))
 # the soil/land/nutrition mechanisms have something to act on and the ascription gate can open. This is the
 # configuration in which all the mechanisms under test are simultaneously live.
 FULL = dict(
-    band_risk_penalty=0.05,                 # was 0.0 -> band_risk inert
     provision_self_keep=0.6,                # was 1.0 -> provisioning inert
     legit_threshold=0.08,                   # was 0.15 -> the rank gate never opened
     enable_agriculture=True,
@@ -56,11 +55,10 @@ FULL = dict(
     enable_nutrition_synergy=True,
     enable_condition=True,
     enable_economic_defensibility=True,
-    enable_band_risk=True,
 )
 WORLD = dict(n=1000, patch=24, terr="flat", clim="temperate")
 
-DEFAULT_FLAGS = ["enable_band_risk", "enable_provisioning", "enable_alluvial_renewal",
+DEFAULT_FLAGS = ["enable_provisioning", "enable_alluvial_renewal",   # enable_band_risk deleted 2026-08-06
                  "enable_nutrition_synergy", "enable_soil_depletion", "enable_rank_hierarchy",
                  "enable_condition", "enable_material_inheritance", "enable_lineage_tribute",
                  "enable_catchment_ceiling"]

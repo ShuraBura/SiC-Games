@@ -22,19 +22,19 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) --- modulator flags (Step-2; neutral/off in Step-1 calibration) ---
 
 [enable_terrain_pathogen]
-value = true
+value = false
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) --- modulator flags (Step-2; neutral/off in Step-1 calibration) ---
 
 [enable_nutrition_synergy]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) --- modulator flags (Step-2; neutral/off in Step-1 calibration) ---
 
 [enable_orphan_mortality]
 value = true
@@ -54,27 +54,22 @@ type  = "bool"
 # sacrificed-with-adult 11, left-behind 5, parental infanticide only 7 of 131 = 5.3%). Effects are
 # age-PROPORTIONAL (no significant age interaction).
 
-[enable_infanticide]
-value = false
-owner = "DemographyConfig"
-type  = "bool"
-# SUPERSEDED by enable_orphan_mortality (R-74) — never implemented; no logic reads it. Scoped in the Siler
-# blueprint §4.1 as birth-spacing/sex-biased infanticide, but Table 5.1 shows parental infanticide is only
-# 5.3% of Aché infant deaths, and infancy is nearly sex-SYMMETRIC (38% of male vs 41% of female infant
-# deaths are homicide/neglect) — the sex bias is at ages 4–14 (28% F vs 6% M) and comes from grave
-# accompaniment (80% of children buried with a deceased adult are female), not from infanticide.
-# [UNIMPLEMENTED STUB — no logic reads this.] Baseline infanticide is ALREADY
-
 [enable_energetic_fertility]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# folded into the Siler infant-mortality curve (fit to observed HG infant deaths — "infanticide KEPT"). An
-# explicit mechanism would only add CONDITIONAL infanticide (birth-spacing enforcement / sex-selective);
-# the resource-stress channel overlaps enable_energetic_fertility, sex-selection is a separate future
-# scoping. Documented stub, not built. economy-fix (Tier-0): births scale with maternal reserve, capping
-# the population BEFORE reserves drain to the starvation floor → realistic equilibrium reserve (red-team
-# 2b prerequisite)
+# `enable_infanticide` WAS HERE AND IS DELETED (2026-08-06). It was a declared flag that no line of code
+# ever read — three separate audits had to re-discover that and write "UNIMPLEMENTED STUB" next to it, and
+# `C_ALLON` had to carry a special case to skip it. A switch that does nothing is not documentation, it is
+# a standing invitation to believe the mechanism exists. THE SCIENCE IT ENCODED, KEPT: baseline
+# infanticide is ALREADY inside the Siler infant curve, which was fit to observed Aché deaths with
+# "infanticide KEPT". An explicit mechanism would only add CONDITIONAL infanticide, and Table 5.1 says
+# parental infanticide is 5.3% of Aché infant deaths while infancy is nearly sex-SYMMETRIC (38% of male vs
+# 41% of female infant deaths are homicide/neglect). The sex bias is at ages 4-14 (28% F vs 6% M) and
+# comes from grave accompaniment, not infanticide. R-74's `enable_orphan_mortality` is the mechanism that
+# actually carries this channel, and it is built, anchored and ON. economy-fix (Tier-0): births scale with
+# maternal reserve, capping the population BEFORE reserves drain to the starvation floor → realistic
+# equilibrium reserve (red-team 2b prerequisite)
 
 [enable_intake_fertility]
 value = true
@@ -235,7 +230,20 @@ type  = "bool"
 value = false
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band
+# "stratified" on high MEAN surplus (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of
+# surplus, not affluence — Testart's own chain is storage → wealth DIFFERENTIALS → heritable rank, and the
+# level-only test skipped the differentials step. Diagnosed 2026-07-22: a uniformly-affluent packed world
+# (flat-tropical) read 45% stratified while having the LOWEST cred-Gini of any arm (0.29) — the label ran
+# OPPOSITE to inequality. When ON, a would-be stratified band must also show within-band cred
+# concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact. R-105 BUGFIX TOGGLE — the
+# AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR occupancy bonus (n**aggl_a - n)
+# to ANY occupied cell, but the R-63 carrying-capacity ceiling was gated on `(cx,cy) in
+# _settlement_sites`. So a NON-settlement cell got unbounded increasing returns: more crowding →
+# superlinearly more food → more people. Diagnosed R-104: a run sat at pop ~3000 for 1750 steps, then
+# surplus_med saturated at 1.0 and pop went 3259→97551 with ZERO starvation at 61 agents/cell. ON ⇒ the
+# ceiling also applies wherever the agglomeration bonus is applied. Default OFF ⇒ bit-exact with every
+# pre-R-105 result (which were all run with the gap open).
 
 [enable_landscape_packing]
 value = true
@@ -441,48 +449,52 @@ type  = "bool"
 # population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only
 # (R-18/19).
 
-[enable_band_risk]
-value = false
-owner = "DemographyConfig"
-type  = "bool"
-# F.2 band risk-dilution (safety-in-numbers on the EXOGENOUS biome hazard). The lit biome
-# accident/incident rate (the terrain-risk channel, anchored on people LIVING IN BANDS —
-# Hill/Hurtado/Walker 2007) is the band-level baseline; a SUB-band group loses that mitigation → elevated
-# a2 mortality, SCALED by the biome's own incident rate (being alone is dangerous in a risky biome,
-# ~harmless in a safe one — Hamilton 1971 selfish-herd / domain-of-danger). A full band (size ≥
-# band_risk_size, summed over bonded_mate_radius) faces the anchored baseline (factor → 1, so the
-# validated biome-mortality calibration is unchanged). With density-disease (which RISES with crowding)
-# this was hypothesized to give an emergent OPTIMAL band size. ⚠ CAVEAT (F.2 prototype, run_3i, 2026-06-29
-# — KEEP OFF): it does NOT. Mortality doesn't cause aggregation (that is the E.1 movement safety-drive's
-# job); a loner-mortality penalty just CULLS the population, which lowers density → smaller bands → more
-# loners → more penalty = a DEATH SPIRAL, not a stabilizing optimum (penalty 0→6: pop 281→64, mean band
-# 56→5). Risk-dilution is properly expressed in MOVEMENT (E.1), and banding already has fitness teeth via
-# the F.1 mate-gate. Left in (default OFF) for future experiments only.
-
 [enable_pair_bonds]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# F.3a/b PERSISTENT FAMILIES (the deferred "C"; core of FD-1). `enable_pair_bonds`: a female forms a
-# DURABLE monogamous bond with a band male (prowess-weighted by mate_choice_strength), persisting across
-# births (vs the per-conception lottery); births default to the living co-resident partner; the bond
-# dissolves on partner death (→ widow re-pairs = serial monogamy) or at `divorce_rate`/step. The NUCLEAR
-# FAMILY — mother + bonded father + dependent children (age < `family_maturity_months`) — MOVES AS A UNIT
-# (co-locates to the mother each step); children DETACH at maturity → exogamous dispersal. Builds stable
-# family-cored bands (Hill et al. 2011; Marlowe monogamy). Uses bonded_mate_radius as the band extent.
-# Default OFF = bit-exact back-compat.
+# `enable_band_risk` / `band_risk_penalty` / `band_risk_size` WERE HERE AND ARE DELETED (2026-08-06). F.2
+# band risk-dilution: a sub-band group loses the safety-in-numbers mitigation on the exogenous biome
+# hazard → elevated a2 mortality, scaled by the cell's own incident rate (Hamilton 1971 selfish-herd).
+# With density-disease rising in crowding, this was hypothesised to produce an emergent OPTIMAL band size.
+# ⚠ THE FINDING, WHICH IS THE POINT AND IS KEPT: **it does not, and it cannot.** Mortality does not cause
+# aggregation — that is the E.1 movement safety-drive's job. A loner-mortality penalty just CULLS: fewer
+# people → lower density → smaller bands → more loners → more penalty. A DEATH SPIRAL, not a stabilising
+# optimum (F.2 prototype run_3i, 2026-06-29; penalty 0→6 took pop 281→64 and mean band 56→5). WHY DELETED
+# RATHER THAN LEFT OFF: the gain defaulted to 0.0 and the code was guarded by `> 0.0`, so the flag could
+# read ON in a config dump while the mechanism was INERT — it survived a whole ablation battery as a fake
+# positive. The only two states available were "does nothing" and "kills the population", and a knob with
+# no useful setting is not a knob. Risk-dilution belongs in MOVEMENT (E.1); banding already has fitness
+# teeth via the F.1 mate-gate. RECOVERY: the mechanism, and the `run_3i_band_risk_proto.py` sweep that
+# killed it, are both at commit daa7194 ("F.2: risk-dilution mortality SHELVED (negative result) + band
+# life-cycle diagnostics"). The prototype was deleted with the fields — it could not have run again, and a
+# script that cannot run is the same kind of lie as a flag that does nothing. F.3a/b PERSISTENT FAMILIES
+# (the deferred "C"; core of FD-1). `enable_pair_bonds`: a female forms a DURABLE monogamous bond with a
+# band male (prowess-weighted by mate_choice_strength), persisting across births (vs the per-conception
+# lottery); births default to the living co-resident partner; the bond dissolves on partner death (→ widow
+# re-pairs = serial monogamy) or at `divorce_rate`/step. The NUCLEAR FAMILY — mother + bonded father +
+# dependent children (age < `family_maturity_months`) — MOVES AS A UNIT (co-locates to the mother each
+# step); children DETACH at maturity → exogamous dispersal. Builds stable family-cored bands (Hill et al.
+# 2011; Marlowe monogamy). Uses bonded_mate_radius as the band extent. Default OFF = bit-exact
+# back-compat.
 
 [enable_band_affiliation]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership
-# that families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle
-# per-band society attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS
-# the larger/richer band (FLEXIBLE/multilocal — keeps bands non-kin). A band-cohesion movement drive pulls
-# family-roots toward their band's centroid (food stays dominant); emergent fission (> band_split_size) /
-# fusion (< band_merge_size) with hysteresis bound band size ~25. Requires enable_pair_bonds. Default OFF
-# = bit-exact back-compat.
+# ⚠ UNIT WARNING on the "~25, Hill 2011" below (Addendum 28; propagated here 2026-08-06, Addendum 29).
+# Hill et al. 2011's verified number is **28.2 ADULTS** per band (32 societies). The all-ages ~25 (and the
+# [18–35] band this project scored for years) is a MIS-ATTRIBUTION of it. That matters because the model
+# carries too many children: on the adults unit `band_med` reads 11.8 against 28.2 and FAILS 16/16, while
+# the all-ages reading "passes" 23/25 on the strength of the surplus children. Birdsell's ~25 stands on
+# its own; Hill's does not support an all-ages 25. Treat the split/merge sizes below as tuned to Birdsell,
+# not to Hill, until `band_med` is re-scored on adults. F.3c-1 BAND AFFILIATION (the collective-identity
+# vector's band_id cell). A persistent band membership that families AFFILIATE into → multi-family bands
+# (~25, Hill 2011 / Birdsell), the stable handle per-band society attaches to. Newborns inherit the
+# mother's band; at marriage the incoming spouse JOINS the larger/richer band (FLEXIBLE/multilocal — keeps
+# bands non-kin). A band-cohesion movement drive pulls family-roots toward their band's centroid (food
+# stays dominant); emergent fission (> band_split_size) / fusion (< band_merge_size) with hysteresis bound
+# band size ~25. Requires enable_pair_bonds. Default OFF = bit-exact back-compat.
 
 [enable_emergent_band_size]
 value = true
@@ -584,7 +596,7 @@ type  = "bool"
 # documentation tidiness at the cost of re-validating R-54…R-64.
 
 [enable_malnutrition_fission]
-value = true
+value = false
 owner = "DemographyConfig"
 type  = "bool"
 # Resource-response redesign (blueprint …_ResourceResponse_Scoping): M2 — MALNUTRITION FISSION: a band
@@ -651,7 +663,28 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# default OFF ⇒ bit-exact
+# default OFF ⇒ bit-exact — (channel note, inherited) ── WEALTH → OBLIGATION → PRODUCTION (2026-07-27)
+# ─────────────────────────────────────────── TYPE **C (Conversion)** · UNIT **agent pair** · INVARIANT
+# **DEBITED** (the grant SPENDS material) · ANCHOR [Sahlins 1963, VERIFIED, already filed in
+# LITERATURE.md]. THE DIAGNOSIS THIS FIXES. Material never concentrated in the elite - noble_material_lift
+# 0.87-1.04 - and it survived every explanation tried: not decay (zeroing it changed nothing), not
+# leveling (off changed nothing), not elite breadth (narrowing 51% -> 16% doubled the PEOPLE lift and left
+# material at 0.99). The cause is structural: `material` is a TERMINAL STOCK. It is produced from hunting,
+# it sits, it decays, and it cannot buy anything. A stock with no investment channel cannot compound, so
+# per-capita concentration stays flat however well it is protected. That is also why the model's elite is
+# in PEOPLE - followers are the only asset that compounds, so they are the only elite we ever see. Sahlins
+# on the Melanesian big-man: "Deploying his resources carefully, the emerging leader USES WEALTH TO PLACE
+# OTHERS IN HIS DEBT ... he constructs a following whose production may be harnassed to his ambition."
+# Wealth's function is conversion - into obligation, and obligation into others' production. MECHANISM: a
+# creditor spends `material` to feed a band-mate in deficit (the grant is debited from the creditor and
+# arrives as kcal, which is what a hungry agent can use). In return he holds a claim on that agent's
+# future durable output until the debt is discharged. Conversion rate is NOT invented: it is the inverse
+# of the model's own production relation, material = material_hide_frac x meat kcal. FEAST CADENCE
+# (2026-07-27). Sacrifices are events at gatherings, not a per-step bleed. Applying `legit_feast_frac`
+# every step drained ~97%/yr of the durable stock and made the elite the set of agents who had spent their
+# wealth on rank (measured: 673:1 against tribute). Legitimacy is a SHARE of band feasting, so scaling
+# everyone's spend leaves the status outcome alone — the cadence was free for status and decisive for
+# wealth. 12 = annual, matching `aggregation_period`. 0 = the old per-step behaviour.
 
 [enable_site_appraisal]
 value = true
@@ -676,7 +709,20 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by
+# terrain difficulty (the terrain `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost =
+# move_cost_kcal·cost[dest] DRAINED at metabolism (moving repeatedly depletes reserve → selection for
+# sedentism) AND PERCEIVED in the IFD utility (agents prefer to stay / take cheap-terrain steps →
+# central-place foraging, prime real-estate valued). Locomotion was previously FREE (move_cost_flat=0,
+# fixed per-step BURN). Default OFF ⇒ no move cost, bit-exact. Stage 1c — CATCHMENT SITE-APPRAISAL
+# (Kennett-Winterhalder IFD-suitability + Vita-Finzi catchment + Orians-Pearson central place): a static
+# per-cell SITE-VALUE field = Σ_{catchment} S_pot(c')·exp(−λ·dist·(0.5+cost(c'))) — the resource potential
+# of the surrounding catchment DISCOUNTED by cost-distance (rugged/far cells contribute less). Normalized
+# [0,1], scaled by site_gain·BURN, PERCEIVED in the IFD utility (occupancy-independent). This gives a
+# GLOBAL gradient that agents climb toward prime central places → solves the ASSEMBLY problem (converge on
+# best catchment, not coordinate) + values prime real-estate + tightens communities onto catchment cores.
+# Perceived-only (anticipation) — actual food is still forage cap + point-superlinear + storage (no
+# double-count). Default OFF ⇒ bit-exact.
 
 [enable_genealogy_log]
 value = false
@@ -726,12 +772,22 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# ── LINEAGE BRANCHING (R-90). `_lineage` (the named patriline/patriclan — the exogamy unit AND the
-# dynasty unit) was founder-seeded and only ever LOST by extinction, never created: an ABSORBING process
-# that fixates with probability 1. Measured (R-89): 3000 founding lines drifted to 5 by step 1950 and
-# stuck there, which (a) breaks the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage share
-# 0.38 that R-25 already passed, and (b) freezes the elite layer, since with no non-ascribed lineage left
-# the gumsa→gumlao reversion cannot fire. Real named descent groups both die AND branch. Same
+# ⚠ THE "~7 LINEAGES/BAND, DOMINANT SHARE 0.38" TARGET CITED BELOW DOES NOT EXIST (retracted 2026-08-04,
+# RESULTS Addendum 28; propagated to the point of use 2026-08-06, Addendum 29 — Charter P3). The string
+# "lineage" occurs ZERO times in Hill et al. 2011. Its unit is co-residence of PRIMARY KIN (brothers,
+# sisters, parents, offspring); the three "0.38"s are Table 1 cells (Nunamuit, Hadza, a column average).
+# The R-90/R-92/R-93 REASONING below is untouched by this — an absorbing lineage process really does
+# fixate, and a share really does have a hidden denominator — but the NUMBER those arguments are aimed at
+# is not a literature target, so nothing here is calibrated and none of it should be scored.
+# `legit_threshold` = 0.15 and `rank_hierarchy_frac` = 0.15 were both DERIVED as ~1/7 from it and are
+# therefore UNANCHORED until a real forager lineage-concentration source is found (MARKER_MATRIX #6 — none
+# exists in the folder). Values deliberately left as they are: re-deriving them is a calibration decision,
+# not a doc fix. ── LINEAGE BRANCHING (R-90). `_lineage` (the named patriline/patriclan — the exogamy unit
+# AND the dynasty unit) was founder-seeded and only ever LOST by extinction, never created: an ABSORBING
+# process that fixates with probability 1. Measured (R-89): 3000 founding lines drifted to 5 by step 1950
+# and stuck there, which (a) breaks the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage
+# share 0.38 that R-25 already passed, and (b) freezes the elite layer, since with no non-ascribed lineage
+# left the gumsa→gumlao reversion cannot fire. Real named descent groups both die AND branch. Same
 # INFINITE-ALLELE device genome_mutation already uses. Deliberately NOT size-triggered segmentation:
 # capping lineage size would make `top_share` an artifact of the cap, destroying the very statistic T-9
 # measures against Zerjal/Yan. Rate 0.0 ⇒ no RNG draw ⇒ bit-exact.
@@ -809,15 +865,25 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# 0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among them is
-# ≈0.14 of heads. The threshold therefore means "at least one lineage here is ranked", tied to a target
-# the model already carries rather than picked freely.
+# ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill
+# 2011 target is ~7 lineages per band, so one ranked lineage among them is ~0.14 of heads … tied to a
+# target the model already carries rather than picked freely." **Hill et al. 2011 contains no lineage data
+# at all** — the word does not appear in it — so there is no ~7, and 0.15 was not tied to anything. It is
+# a free parameter that has been reading as a derived one. Left at 0.15 (changing it is a calibration
+# decision, and `enable_rank_hierarchy` is default-OFF), but it must not be presented or scored as
+# anchored.
 
 [enable_resentment_accumulator]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15
+# is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among them is ~0.14
+# of heads … tied to a target the model already carries rather than picked freely." **Hill et al. 2011
+# contains no lineage data at all** — the word does not appear in it — so there is no ~7, and 0.15 was not
+# tied to anything. It is a free parameter that has been reading as a derived one. Left at 0.15 (changing
+# it is a calibration decision, and `enable_rank_hierarchy` is default-OFF), but it must not be presented
+# or scored as anchored.
 
 [enable_village_resentment]
 value = true
@@ -830,19 +896,22 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few
+# generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the time.
 
 [enable_relative_legitimacy]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few
+# generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the time.
 
 [enable_lineage_split]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few
+# generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the time.
 
 [enable_exogamy]
 value = true
@@ -866,7 +935,21 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the
+# diffusion step STRIDE scales inversely with STATIC local geographic productivity (Kelly 1995 / Binford
+# 2001: mobility ∝ 1/productivity). Low-NPP (savanna/desert) → longer stride → agents spread over sparse
+# territory instead of piling on the few rich cells (the R-37/R-39 collapse root). High-NPP (forest) →
+# stride→base=1 → dense-forest dynamics unchanged. r = clamp(round(base·(npp_ref/max(local_npp,
+# npp_floor))**exp), base, r_max). Default OFF / base=1 ⇒ bit-exact. Calibration (ref/exp/max) PROVISIONAL
+# — mechanism ships ablatable; locking the law for canonical runs needs supervisor sign-off. (§4.8.19;
+# R-39.) AGGLOMERATION ATTRACTION/PRODUCTION SPLIT (R-106 Addendum 13, 2026-07-31). The point-superlinear
+# agglomeration term is applied TWICE from one parameter set: as a per-capita premium in the movement
+# scorer (`substrate.diffusion_select_target`, it ATTRACTS) and as realized output in the harvest
+# (`phase1_model`, `S += aggl_R·(n^β − n)`, it FEEDS). Addendum 10 measured the consequence: ablating
+# agglomeration drops population to x0.20–0.45 because it supplies over half the economy, while max cell
+# occupancy falls 159 → 10 — so the concentration defect could not be addressed without destroying
+# subsistence. This weight scales the PERCEIVED premium alone, leaving realized production untouched, so
+# the two functions become independently tunable. 1.0 ⇒ bit-exact (the shipped behaviour).
 
 [enable_band_family_knobs]
 value = true
@@ -1007,7 +1090,39 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (no provenance comment in source — UNDOCUMENTED, worth filling in)
+# (channel note, inherited) ── LEVELING — the counter-force [Boehm 1993 VERIFIED]
+# ────────────────────────────────────────── R-82's first working cut had capture with NO opposition and
+# ran to material Gini 0.909 while sitting in Hayden's EGALITARIAN density band — chiefdom inequality at
+# forager density, the opposite of his Fig. 6. Hayden's thesis needs BOTH: aggrandizers push, the group
+# pushes back, and ABUNDANCE decides who wins. Boehm: egalitarian societies run a "reverse dominance
+# hierarchy" — the rank and file act as a coalition to suppress upstarts. Of ~47 sanctioned behaviours he
+# tabulates, "lack of generosity or MONOPOLIZING RESOURCES" is an explicit trigger (5); the majority
+# involve dominance/self-assertion. The recurring sanction against a monopolizer is DESERTION and forced
+# disgorging — the Chaco desert a chief "who was stingy", the Nambicuara leave one "too exacting", and
+# "often it is in fact the entire group that leaves". MECHANISM: a co-resident coalition sanctions whoever
+# holds conspicuously more material than the local norm, forcing him to redistribute the excess to his
+# cell-mates (Boehm's sanction executed as Hayden's competitive feast — the two authors' mechanisms are
+# the same act seen from either side). NOTE the deliberate asymmetry with capture: leveling is NOT
+# abundance-gated. Capture is (it needs an invulnerable surplus); leveling always operates. So abundance
+# alone decides the balance — under scarcity capture is gated off while leveling still bites
+# (egalitarian); under abundance capture outruns it (stratified). That emergent competition IS Hayden's
+# thesis, and it is what makes it falsifiable here. ── LEADER SHARE — "managerial rights" over CORPORATE
+# product (R-83, elite-layer step 1) ────────── THE MISSING RUNG between corporate property and personal
+# stratification. Cell ownership in this model is CORPORATE (`_cell_owner` maps a cell to a band_id), but
+# stratification needs PERSONS to differ. The bridge is not ownership — it is AUTHORITY OVER corporate
+# property. [Hayden 1995 VERIFIED]: on the NW Coast aggrandizers "control access to spatially restricted
+# resource locations or productive facilities (fishing rocks, weirs, boats, deer fences, drying sheds)";
+# that class "had MANAGERIAL RIGHTS over the resource locations and facilities of the group". Managerial
+# rights, not title — the Big-Man/chiefly position. WHY BAND-LEVEL: R-82b's aggrandizer capture was
+# applied per CELL, where 1–2 agents sit, so there was no group to skim and the effect was 1.14×. Bands
+# are ~25 agents and already tracked (`band_id`), so the corporate unit is the band. Wrong level, not
+# wrong mechanism. NOT HEREDITARY, and that is anchored [Boehm 1993 VERIFIED]: leaders are DEPOSABLE —
+# Iroquois sachems were, and among the Yokuts even "a HEREDITARY chief ... suspected of too much
+# self-aggrandizement was ... ignored in favor of another chief". Councils of elders act as the brake
+# (Navajo, Fox, Yokuts, Tupinamba, Cuna). So the office is held on CONTINGENT merit: `band_leaders()`
+# recomputes it each step from cred·prowess, and Boehm leveling still bites the holder. Hereditary
+# succession is a LATER rung, and Hayden says it appears only where resource locations are spatially
+# restricted (NW Coast) — not where land is ubiquitous (New Guinea).
 
 [enable_leader_office]
 value = true
@@ -1107,7 +1222,7 @@ type  = "bool"
 # only sets WHO fathers / how lineage propagates).
 
 [enable_climate_lottery]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
 # ── MASTER ─────────────────────────────────────────────────────────────────────────────────────── Draw
@@ -1122,22 +1237,27 @@ type  = "bool"
 # ── C.1 SEASONALITY (validated: R-6 run_2d form) ─────────────────────────────────────────────────
 
 [enable_eccentricity_mean]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A
 # scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no effect. [Spiegel 2010 envelope]
 
 [enable_interannual]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
-# ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ───────────────────────────
-# [Timmermann 2018] amplitude 0.20-0.40 of CC in marginal biomes; period 2-7 yr. This is the FAST
-# environmental variability the model has never had.
+# ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── PERIOD
+# 2-7 yr [Timmermann 2018, SYNTHESIS]: the union of EOF1 "quasi-quadrennial (3-7 years)" and EOF2
+# quasi-biennial (~2 yr) — verified against the PDF 2026-08-06. AMPLITUDE 0.20-0.40 of CC [INTERPRETIVE —
+# NOT Timmermann; attribution RETRACTED 2026-08-06, Addendum 29]. The paper is an SST-dynamics review and
+# states no production or carrying-capacity amplitude. The value is a modelling judgement, bounded above
+# by Sarmiento 2004's measured -37..-56% exceptional-flood-year ANPP drop (an ordinary bad year must be
+# milder than an exceptional one). See ENSO_AMP_MIN/MAX. This is the FAST environmental variability the
+# model has never had.
 
 [enable_regime_shift]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ───────────
@@ -1146,15 +1266,18 @@ type  = "bool"
 # secular-cycle test needs, and it has been off in every run.
 
 [enable_caribou_swing]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── [St.
-# John 2022, 43-herd database] amplitude 0.871 about the mean (peak 1.871x / trough 0.129x), median period
-# 40.5 yr over 40-90. Needs `steppe_mask`; without it the layer is inert whatever the amplitude.
+# John 2022 — thesis FILED AND READ 2026-08-06; verified verbatim] amplitude 0.871 about the mean (peak
+# 1.871x / trough 0.129x), median period 40.5 yr over an observed 23-67. Both are MEDIANS over the 19
+# herds of 43 that were actually cyclic. The old 40-90 period band was wrong on both ends and is
+# corrected; see CARIBOU_PERIOD_MIN_YR. Undergraduate thesis, not peer-reviewed — the weakest anchor here.
+# Needs `steppe_mask`; without it the layer is inert whatever the amplitude.
 
 [enable_llanos_flood]
-value = false
+value = true
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ───────────

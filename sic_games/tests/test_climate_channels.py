@@ -104,7 +104,10 @@ def test_the_lottery_draws_every_channel_inside_its_published_band():
         assert 100 * 12 <= f.regime_duration <= 500 * 12
         assert 1000 * 12 <= f.regime_recurrence <= 2000 * 12
         assert f.caribou_amp == pytest.approx(CARIBOU_AMP_ABOUT_MEAN)
-        assert 40 * 12 <= f.caribou_period <= 90 * 12
+        # 23-67 yr, the OBSERVED range in St. John's Figure 9. This assertion read `40 * 12 <= ... <= 90 * 12`
+        # until the thesis was filed and read (2026-08-06): the 40-90 band excluded everything below the
+        # median and ran past the longest cycle ever measured. Corrected with the source in hand.
+        assert 23 * 12 <= f.caribou_period <= 67 * 12
         assert f.mean_factor >= 1.0
 
 

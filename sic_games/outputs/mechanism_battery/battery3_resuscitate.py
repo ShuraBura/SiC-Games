@@ -44,7 +44,6 @@ RECIPES = {
     "enable_genealogy_log": ("BY-DESIGN: charter type O (Observer) - zero mutation IS its invariant", None, None),
 
     # 2 — zero-default gain
-    "enable_band_risk": ("zero-default gain: band_risk_penalty=0.0", dict(band_risk_penalty=0.05), None),
     "enable_provisioning": ("provision_self_keep=1.0 -> the mother keeps everything, so nothing is provisioned",
                             dict(provision_self_keep=0.6), None),
 
@@ -79,8 +78,8 @@ RECIPES = {
                              dict(enable_pair_bonds=False), BIG),
     # demography.py:232 - "[UNIMPLEMENTED STUB - no logic reads this]". Inert is the CORRECT verdict; the
     # battery rediscovered a documented stub independently, which is a check on the battery.
-    "enable_infanticide": ("BY-DESIGN: documented UNIMPLEMENTED STUB (demography.py:232) - no logic reads it",
-                           None, None),
+    # "enable_infanticide" was here as "BY-DESIGN: documented UNIMPLEMENTED STUB". The flag is DELETED
+    # (2026-08-06) -- the battery no longer has to rediscover a stub that no longer exists.
 }
 
 

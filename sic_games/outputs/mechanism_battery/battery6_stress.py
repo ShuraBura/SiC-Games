@@ -40,9 +40,9 @@ ONLY = [s for s in os.environ.get("S_ONLY", "").split(",") if s]
 # fails is failing on its own account and not for want of a world.
 FULL = dict(B1.VILLAGE)
 FULL.update(B1.ELITE)
-FULL.update(band_risk_penalty=0.05, provision_self_keep=0.6, enable_agriculture=True,
+FULL.update(provision_self_keep=0.6, enable_agriculture=True,
             enable_soil_depletion=True, enable_alluvial_renewal=True, enable_economic_defensibility=True,
-            enable_band_risk=True, enable_village_budding=True, enable_bud_hazard=True)
+            enable_village_budding=True, enable_bud_hazard=True)
 WORLD = dict(n=800, patch=24, terr="flat", clim="temperate")
 
 # S3 — the operating envelope. Extinction is a VALID outcome here; an exception is not.

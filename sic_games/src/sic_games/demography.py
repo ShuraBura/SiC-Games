@@ -21,7 +21,7 @@ import math
 from dataclasses import dataclass
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 MONTHS_PER_YEAR = 12
 
@@ -158,7 +158,16 @@ class DemographyConfig(BaseModel):
 
     All modulator flags OFF → pure Aché schedule + IBI fertility (the Step-1 calibration world).
     Siler coefficients are FIXED constants from the published Aché fit (M-1) — NOT free knobs.
+
+    `extra="forbid"` (added 2026-08-06). Pydantic's default is to SILENTLY IGNORE an unknown keyword, which
+    means a harness can pass `band_risk_penalty=0.05` to a config that no longer has the field and run happily
+    with a setting that does nothing — the run reports success, the manifest looks right, and the mechanism is
+    absent. That is the precise failure this whole audit arc has been chasing, sitting one line from being
+    impossible. It was found while deleting two dead knobs: the deletion itself would have been the trap,
+    turning every stale call site into a silent no-op instead of an error.
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     # --- mortality: Siler, FIXED from Gurven & Kaplan 2007 (both-sexes; M-1) ---
     siler_a1: float = 0.157
@@ -227,15 +236,16 @@ class DemographyConfig(BaseModel):
     # "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our
     # sample" — an unweaned infant cannot survive its mother's loss. Small n; kept flaggable.
     orphan_infant_mother_lethal: bool = True
-    # SUPERSEDED by enable_orphan_mortality (R-74) — never implemented; no logic reads it. Scoped in the Siler
-    # blueprint §4.1 as birth-spacing/sex-biased infanticide, but Table 5.1 shows parental infanticide is only
-    # 5.3% of Aché infant deaths, and infancy is nearly sex-SYMMETRIC (38% of male vs 41% of female infant
-    # deaths are homicide/neglect) — the sex bias is at ages 4–14 (28% F vs 6% M) and comes from grave
-    # accompaniment (80% of children buried with a deceased adult are female), not from infanticide.
-    enable_infanticide: bool = False    # [UNIMPLEMENTED STUB — no logic reads this.] Baseline infanticide is ALREADY
-    # folded into the Siler infant-mortality curve (fit to observed HG infant deaths — "infanticide KEPT"). An explicit
-    # mechanism would only add CONDITIONAL infanticide (birth-spacing enforcement / sex-selective); the resource-stress
-    # channel overlaps enable_energetic_fertility, sex-selection is a separate future scoping. Documented stub, not built.
+    # `enable_infanticide` WAS HERE AND IS DELETED (2026-08-06). It was a declared flag that no line of code
+    # ever read — three separate audits had to re-discover that and write "UNIMPLEMENTED STUB" next to it, and
+    # `C_ALLON` had to carry a special case to skip it. A switch that does nothing is not documentation, it is a
+    # standing invitation to believe the mechanism exists.
+    # THE SCIENCE IT ENCODED, KEPT: baseline infanticide is ALREADY inside the Siler infant curve, which was fit
+    # to observed Aché deaths with "infanticide KEPT". An explicit mechanism would only add CONDITIONAL
+    # infanticide, and Table 5.1 says parental infanticide is 5.3% of Aché infant deaths while infancy is nearly
+    # sex-SYMMETRIC (38% of male vs 41% of female infant deaths are homicide/neglect). The sex bias is at ages
+    # 4-14 (28% F vs 6% M) and comes from grave accompaniment, not infanticide. R-74's `enable_orphan_mortality`
+    # is the mechanism that actually carries this channel, and it is built, anchored and ON.
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
@@ -579,21 +589,23 @@ class DemographyConfig(BaseModel):
     # rarely on the mother's EXACT cell. radius=0 = the original per-cell gate (a loner with no neighbours can't
     # reproduce); radius≥1 = an unrelated adult male anywhere within the band territory (Chebyshev r) qualifies.
     bonded_mate_radius: int = Field(0, ge=0)
-    # F.2 band risk-dilution (safety-in-numbers on the EXOGENOUS biome hazard). The lit biome accident/incident
-    # rate (the terrain-risk channel, anchored on people LIVING IN BANDS — Hill/Hurtado/Walker 2007) is the
-    # band-level baseline; a SUB-band group loses that mitigation → elevated a2 mortality, SCALED by the biome's
-    # own incident rate (being alone is dangerous in a risky biome, ~harmless in a safe one — Hamilton 1971
-    # selfish-herd / domain-of-danger). A full band (size ≥ band_risk_size, summed over bonded_mate_radius)
-    # faces the anchored baseline (factor → 1, so the validated biome-mortality calibration is unchanged). With
-    # density-disease (which RISES with crowding) this was hypothesized to give an emergent OPTIMAL band size.
-    # ⚠ CAVEAT (F.2 prototype, run_3i, 2026-06-29 — KEEP OFF): it does NOT. Mortality doesn't cause aggregation
-    # (that is the E.1 movement safety-drive's job); a loner-mortality penalty just CULLS the population, which
-    # lowers density → smaller bands → more loners → more penalty = a DEATH SPIRAL, not a stabilizing optimum
-    # (penalty 0→6: pop 281→64, mean band 56→5). Risk-dilution is properly expressed in MOVEMENT (E.1), and
-    # banding already has fitness teeth via the F.1 mate-gate. Left in (default OFF) for future experiments only.
-    enable_band_risk: bool = False
-    band_risk_penalty: float = Field(0.0, ge=0.0)   # max extra a2 multiplier for a LONER in a mean-risk biome
-    band_risk_size: int = Field(25, ge=1)           # band size at which the biome risk is fully mitigated (Wobst ~25)
+    # `enable_band_risk` / `band_risk_penalty` / `band_risk_size` WERE HERE AND ARE DELETED (2026-08-06).
+    # F.2 band risk-dilution: a sub-band group loses the safety-in-numbers mitigation on the exogenous biome
+    # hazard → elevated a2 mortality, scaled by the cell's own incident rate (Hamilton 1971 selfish-herd). With
+    # density-disease rising in crowding, this was hypothesised to produce an emergent OPTIMAL band size.
+    # ⚠ THE FINDING, WHICH IS THE POINT AND IS KEPT: **it does not, and it cannot.** Mortality does not cause
+    # aggregation — that is the E.1 movement safety-drive's job. A loner-mortality penalty just CULLS: fewer
+    # people → lower density → smaller bands → more loners → more penalty. A DEATH SPIRAL, not a stabilising
+    # optimum (F.2 prototype run_3i, 2026-06-29; penalty 0→6 took pop 281→64 and mean band 56→5).
+    # WHY DELETED RATHER THAN LEFT OFF: the gain defaulted to 0.0 and the code was guarded by `> 0.0`, so the
+    # flag could read ON in a config dump while the mechanism was INERT — it survived a whole ablation battery
+    # as a fake positive. The only two states available were "does nothing" and "kills the population", and a
+    # knob with no useful setting is not a knob. Risk-dilution belongs in MOVEMENT (E.1); banding already has
+    # fitness teeth via the F.1 mate-gate.
+    # RECOVERY: the mechanism, and the `run_3i_band_risk_proto.py` sweep that killed it, are both at commit
+    # daa7194 ("F.2: risk-dilution mortality SHELVED (negative result) + band life-cycle diagnostics"). The
+    # prototype was deleted with the fields — it could not have run again, and a script that cannot run is the
+    # same kind of lie as a flag that does nothing.
     # F.3a/b PERSISTENT FAMILIES (the deferred "C"; core of FD-1). `enable_pair_bonds`: a female forms a DURABLE
     # monogamous bond with a band male (prowess-weighted by mate_choice_strength), persisting across births (vs the
     # per-conception lottery); births default to the living co-resident partner; the bond dissolves on partner
@@ -651,6 +663,13 @@ class DemographyConfig(BaseModel):
     # men. The status↔wife-youth assortment EMERGES from mutual choice rather than being imposed as a
     # correlation. 0 = random pairing order (bit-exact).
     wife_quality_strength: float = Field(0.0, ge=0.0)
+    # ⚠ UNIT WARNING on the "~25, Hill 2011" below (Addendum 28; propagated here 2026-08-06, Addendum 29).
+    # Hill et al. 2011's verified number is **28.2 ADULTS** per band (32 societies). The all-ages ~25 (and the
+    # [18–35] band this project scored for years) is a MIS-ATTRIBUTION of it. That matters because the model
+    # carries too many children: on the adults unit `band_med` reads 11.8 against 28.2 and FAILS 16/16, while
+    # the all-ages reading "passes" 23/25 on the strength of the surplus children. Birdsell's ~25 stands on its
+    # own; Hill's does not support an all-ages 25. Treat the split/merge sizes below as tuned to Birdsell, not
+    # to Hill, until `band_med` is re-scored on adults.
     # F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership that
     # families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle per-band society
     # attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS the larger/richer band
@@ -684,6 +703,11 @@ class DemographyConfig(BaseModel):
     # independently anchored, so it is calibrated — but ONLY to place the MEAN band at Hill 2011's ~25–30
     # (mean RETURN_CV 1.017 / 27.5 = 0.037), never the spread. Predicted g*: wetland 19, mountain 23,
     # savanna 25, desert 28, forest 33, grass 38 (mean 27.5, spread 2.0× = Marlowe's 25–50). [CALIBRATED]
+    # ⚠ CALIBRATED TO AN ALL-AGES TARGET THAT IS A MIS-READING (Addendum 28; noted here 2026-08-06). Hill 2011
+    # gives **28.2 ADULTS**, not an all-ages 25–30, so the 27.5 this was fitted to is not the paper's quantity.
+    # The R-106 re-fit against the corrected target was attempted and FALSIFIED (the mechanism cannot reach it
+    # from this direction), so the fit is left standing and the target is left labelled — an honest mismatch
+    # beats a second fit to a number that is still the wrong unit. See the band-affiliation note above.
     cv_safe: float = Field(0.037, gt=0.0)
     # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
     # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
@@ -943,6 +967,16 @@ class DemographyConfig(BaseModel):
     enable_genome: bool = False
     genome_loci: int = Field(32, ge=1)                    # number of neutral loci (relatedness resolution ~1/L)
     genome_mutation: float = Field(0.0, ge=0.0, le=1.0)   # per-locus per-birth mutation prob (0 = pure drift / infinite-allele)
+    # ⚠ THE "~7 LINEAGES/BAND, DOMINANT SHARE 0.38" TARGET CITED BELOW DOES NOT EXIST (retracted 2026-08-04,
+    # RESULTS Addendum 28; propagated to the point of use 2026-08-06, Addendum 29 — Charter P3). The string
+    # "lineage" occurs ZERO times in Hill et al. 2011. Its unit is co-residence of PRIMARY KIN (brothers,
+    # sisters, parents, offspring); the three "0.38"s are Table 1 cells (Nunamuit, Hadza, a column average).
+    # The R-90/R-92/R-93 REASONING below is untouched by this — an absorbing lineage process really does
+    # fixate, and a share really does have a hidden denominator — but the NUMBER those arguments are aimed at
+    # is not a literature target, so nothing here is calibrated and none of it should be scored. `legit_threshold`
+    # = 0.15 and `rank_hierarchy_frac` = 0.15 were both DERIVED as ~1/7 from it and are therefore UNANCHORED
+    # until a real forager lineage-concentration source is found (MARKER_MATRIX #6 — none exists in the folder).
+    # Values deliberately left as they are: re-deriving them is a calibration decision, not a doc fix.
     # ── LINEAGE BRANCHING (R-90). `_lineage` (the named patriline/patriclan — the exogamy unit AND the dynasty unit)
     # was founder-seeded and only ever LOST by extinction, never created: an ABSORBING process that fixates with
     # probability 1. Measured (R-89): 3000 founding lines drifted to 5 by step 1950 and stuck there, which (a) breaks
@@ -962,13 +996,18 @@ class DemographyConfig(BaseModel):
     # that inherit real membership. So: pick a living member as the apical ancestor and split off ALL of its
     # live patrilineal descendants as a new named line. Both halves are viable and both stay spread across
     # bands, which is what lifts per-band diversity toward the Hill 2011 target.
+    # [RETRACTED 2026-08-06 — there is no Hill 2011 lineage target; the paper has no lineage data at all
+    # (Addendum 28). The SEGMENTATION MECHANISM is unaffected and still correct; only the number it was
+    # aimed at is void, so this is not calibrated to anything and must not be scored.]
     # NB this is NOT the size-CAPPED segmentation rejected in R-90: hazard scales with size (a Yule process,
     # which is what generates realistic skewed haplogroup distributions) but nothing bounds a lineage's size,
     # so `top_share` stays a free measurement rather than an artifact of a threshold.
     # ── RELATIVE legitimacy (R-93) — `legit_threshold` compares a lineage's SHARE of its band's feasting to a
     # CONSTANT, and a share has a hidden denominator: the mean share is 1/lineages_per_band, so the test only
     # discriminates while lineages_per_band > 1/legit_threshold. At the campaign's 0.15 that boundary is 6.67,
-    # against a Hill 2011 target of ~7 — a FIVE PERCENT margin. Nobody changed the parameter; the substrate
+    # against a ~~Hill 2011 target of ~7~~ — a FIVE PERCENT margin against NOTHING: the target does not
+    # exist (RETRACTED 2026-08-06, Addendum 28). The hidden-denominator ARGUMENT stands on its own; the
+    # 6.67-vs-7 coincidence that made it look calibrated does not. Nobody changed the parameter; the substrate
     # drifted under it (measured lpb 2.14-3.69), at which point the AVERAGE lineage clears the bar and
     # "nobility" becomes universal by arithmetic rather than by competition. R-92 confirmed a healthier
     # substrate does NOT rescue it: the DOMAIN violation still fires at step ~650 with segmentation on.
@@ -1021,9 +1060,12 @@ class DemographyConfig(BaseModel):
     # opens the route, it does not hand out chiefdoms.
     enable_rank_hierarchy: bool = False
     rank_hierarchy_frac: float = Field(0.15, ge=0.0, le=1.0)   # ascribed head-count share that counts as "ranked"
-    # 0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among them is
-    # ≈0.14 of heads. The threshold therefore means "at least one lineage here is ranked", tied to a target the
-    # model already carries rather than picked freely.
+    # ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011
+    # target is ~7 lineages per band, so one ranked lineage among them is ~0.14 of heads … tied to a target the
+    # model already carries rather than picked freely." **Hill et al. 2011 contains no lineage data at all** —
+    # the word does not appear in it — so there is no ~7, and 0.15 was not tied to anything. It is a free
+    # parameter that has been reading as a derived one. Left at 0.15 (changing it is a calibration decision, and
+    # `enable_rank_hierarchy` is default-OFF), but it must not be presented or scored as anchored.
     enable_local_ascription: bool = False
     enable_resentment_accumulator: bool = False
     resent_years_to_revolt: float = Field(80.0, gt=0.0)   # yr to revolt at UNIT privilege (effect size 1.0);
