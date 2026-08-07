@@ -205,8 +205,12 @@ def resolved_canonical():
     camp = os.path.join(ROOT, "sic_games", "outputs", "substrate_run", "run_campaign.py")
     tag = "_genconfig_probe"
     out = os.path.join(os.path.dirname(camp), f"campaign_trajectory{tag}.json")
-    env = dict(os.environ, C_ALLON="1", C_TAG=tag, C_STEPS="2", C_FOUNDERS="150", C_MAXMIN="5",
-               C_LOGEVERY="600", C_GENEA="0")
+    # C_CFGSRC=preset BREAKS THE CIRCLE, and is mandatory now that the campaign defaults to reading the files.
+    # This generator's whole job is to DERIVE the files from the code; if the probe run read the files instead,
+    # it would re-emit its own previous output and the pair would agree forever while both drifted away from
+    # the config classes. The preset path is the only source of truth that is upstream of the files.
+    env = dict(os.environ, C_ALLON="1", C_CFGSRC="preset", C_TAG=tag, C_STEPS="2", C_FOUNDERS="150",
+               C_MAXMIN="5", C_LOGEVERY="600", C_GENEA="0")
     with tempfile.TemporaryFile() as devnull:
         p = subprocess.run([sys.executable, "-u", camp], cwd=ROOT, env=env,
                            stdout=devnull, stderr=subprocess.PIPE, text=True)

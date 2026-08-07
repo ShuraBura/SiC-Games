@@ -2050,61 +2050,66 @@ type  = "float"
 # trees do not sprout singletons at the tip; an existing line SEGMENTS into sub-clades that inherit real
 # membership. So: pick a living member as the apical ancestor and split off ALL of its live patrilineal
 # descendants as a new named line. Both halves are viable and both stay spread across bands, which is what
-# lifts per-band diversity toward the Hill 2011 target. NB this is NOT the size-CAPPED segmentation
-# rejected in R-90: hazard scales with size (a Yule process, which is what generates realistic skewed
-# haplogroup distributions) but nothing bounds a lineage's size, so `top_share` stays a free measurement
-# rather than an artifact of a threshold. ── RELATIVE legitimacy (R-93) — `legit_threshold` compares a
-# lineage's SHARE of its band's feasting to a CONSTANT, and a share has a hidden denominator: the mean
-# share is 1/lineages_per_band, so the test only discriminates while lineages_per_band >
-# 1/legit_threshold. At the campaign's 0.15 that boundary is 6.67, against a Hill 2011 target of ~7 — a
-# FIVE PERCENT margin. Nobody changed the parameter; the substrate drifted under it (measured lpb
-# 2.14-3.69), at which point the AVERAGE lineage clears the bar and "nobility" becomes universal by
-# arithmetic rather than by competition. R-92 confirmed a healthier substrate does NOT rescue it: the
-# DOMAIN violation still fires at step ~650 with segmentation on. Fix: normalise the share by the number
-# of lineages actually competing in that band, so the stored stock is a RELATIVE share where 1.0 means
-# "exactly an average lineage" — scale-free, and Friedman's logic anyway ("one lineage convinces all the
-# others" is about standing out from your neighbours, not clearing a fixed bar). ── SCALE-FREE resentment
-# (R-94) — the SAME bug class as legit_threshold, one layer down. Privilege was `(mean_cred_ascribed −
-# mean_cred_other)/mean_cred_other ÷ resent_privilege_ref`, with ref=10.0 chosen while ascription was
-# UNIVERSAL and cred saturated toward 1+legit_cred_gain=11. Once R-93 made nobility a real 6% minority the
-# gap shrank, privilege peaked at 0.166 against a 0.5 threshold, and reversions NEVER fired (0 vs 5,741).
-# The reverse mechanism had been tuned against the BROKEN forward mechanism, so repairing the forward one
-# moved the regime out from under it. Per charter D15, the fix is a scale-free measure rather than a
-# re-tuned constant: privilege becomes an EFFECT SIZE — the noble/commoner cred gap divided by the band's
-# own pooled spread — which has no denominator left to drift AND lets the threshold be anchored on Cohen's
-# conventions (0.2 small / 0.5 medium / 0.8 large) instead of invented. ── RESENTMENT AS A TRUE
-# ACCUMULATOR, HELD BY THE VILLAGE (R-95). Two flags, separable but ENTANGLED — neither works alone, and
-# there is a test asserting exactly that. (a) ACCUMULATOR. `_do_delegitimation`'s own docstring says in
-# capitals that resentment ACCUMULATES, after Leach — *"prestige-seeking only increased their followers'
-# resentment and hastened their overthrow"*. The code implemented an EMA, which does not accumulate: it
-# TRACKS, converging to whatever it is fed. So a threshold at or above the typical privilege can NEVER be
-# crossed at any horizon. Measured (R-94): the grudge rose to 0.796 against a threshold of 0.800 and
-# stopped — 1 revolt in 3000 years. Accumulating instead makes the TIME-TO-REVOLT the anchored quantity,
-# which is what Leach actually claims, and removes the threshold as a free parameter (it is fixed at 1.0
-# by construction). (b) VILLAGE UNIT. R-88 measured band lifetime at 10.2 yr median / 17.5 mean, while the
-# grudge needed 700-1600 yr to mature — the memory outlived its container by ~40-100x, and band fission
-# resets it to zero. Leach's gumlao premises describe VILLAGES ("villages autonomous", headmen, councils
-# of elders), not 25-person residential bands, so the settlement is both the lit-correct unit AND the one
-# that persists. Follows R-71's per-SITE precedent exactly: the place remembers, the members churn. ──
-# LOCAL ascription (R-96). `_lineage_ascribed` was a GLOBAL set while every mechanism acting on it is
-# LOCAL, so one village's revolt de-ranked that lineage in EVERY other village at once. Measured (R-95):
-# ~7% of all lineages stripped per revolt, and nobility went from 82% of villages to 3% — annihilated
-# rather than cycled. It contradicts the anchor directly: Leach's observation is that communities sit in
-# DIFFERENT states simultaneously ("shifting back and forth"), which a single global set cannot represent.
-# With this on, rank is held per (community, lineage): a lineage is noble IN A PLACE, and a revolt touches
-# only the community that revolted. The community is the settlement when village resentment is on, else
-# the band. Rank is NOT portable — a family that moves must earn standing where it arrives, which is what
-# "villages autonomous" implies. ── RANK UNLOCKS HIERARCHY (R-98). `society_from_character(density,
-# surplus_frac)` decides a band's society from CROWDING and SURPLUS only — it never asks whether anyone is
-# actually ranked. So a village where every lineage is hereditary nobility is still labelled
-# `egalitarian_forager` if it is sparse and poor, and since LEADER_SOCIETY_WEIGHT is 0.0 there, its
-# nobility has NO structural consequence: it cannot grow past the band cap, sheds no scalar stress, and
-# the whole elite layer is decorative with respect to settlement size. The model has surplus→hierarchy but
-# not rank→hierarchy. THE ANCHOR SAYS RANK CAN COME FIRST. Leach's gumsa were rain-fed SWIDDEN HILL
-# FARMERS without a storable glut — no aquatic gate, no great surplus — yet had ranked lineages, chiefs,
-# tribute, and "all settlements under one chief". Testart's preconditions are one route to hierarchy, not
-# the only one. So a band holding ranked lineages is promoted ONE rung on the ladder, and deliberately
-# only one: this opens the route, it does not hand out chiefdoms.
+# lifts per-band diversity toward the Hill 2011 target. [RETRACTED 2026-08-06 — there is no Hill 2011
+# lineage target; the paper has no lineage data at all (Addendum 28). The SEGMENTATION MECHANISM is
+# unaffected and still correct; only the number it was aimed at is void, so this is not calibrated to
+# anything and must not be scored.] NB this is NOT the size-CAPPED segmentation rejected in R-90: hazard
+# scales with size (a Yule process, which is what generates realistic skewed haplogroup distributions) but
+# nothing bounds a lineage's size, so `top_share` stays a free measurement rather than an artifact of a
+# threshold. ── RELATIVE legitimacy (R-93) — `legit_threshold` compares a lineage's SHARE of its band's
+# feasting to a CONSTANT, and a share has a hidden denominator: the mean share is 1/lineages_per_band, so
+# the test only discriminates while lineages_per_band > 1/legit_threshold. At the campaign's 0.15 that
+# boundary is 6.67, against a ~~Hill 2011 target of ~7~~ — a FIVE PERCENT margin against NOTHING: the
+# target does not exist (RETRACTED 2026-08-06, Addendum 28). The hidden-denominator ARGUMENT stands on its
+# own; the 6.67-vs-7 coincidence that made it look calibrated does not. Nobody changed the parameter; the
+# substrate drifted under it (measured lpb 2.14-3.69), at which point the AVERAGE lineage clears the bar
+# and "nobility" becomes universal by arithmetic rather than by competition. R-92 confirmed a healthier
+# substrate does NOT rescue it: the DOMAIN violation still fires at step ~650 with segmentation on. Fix:
+# normalise the share by the number of lineages actually competing in that band, so the stored stock is a
+# RELATIVE share where 1.0 means "exactly an average lineage" — scale-free, and Friedman's logic anyway
+# ("one lineage convinces all the others" is about standing out from your neighbours, not clearing a fixed
+# bar). ── SCALE-FREE resentment (R-94) — the SAME bug class as legit_threshold, one layer down. Privilege
+# was `(mean_cred_ascribed − mean_cred_other)/mean_cred_other ÷ resent_privilege_ref`, with ref=10.0
+# chosen while ascription was UNIVERSAL and cred saturated toward 1+legit_cred_gain=11. Once R-93 made
+# nobility a real 6% minority the gap shrank, privilege peaked at 0.166 against a 0.5 threshold, and
+# reversions NEVER fired (0 vs 5,741). The reverse mechanism had been tuned against the BROKEN forward
+# mechanism, so repairing the forward one moved the regime out from under it. Per charter D15, the fix is
+# a scale-free measure rather than a re-tuned constant: privilege becomes an EFFECT SIZE — the
+# noble/commoner cred gap divided by the band's own pooled spread — which has no denominator left to drift
+# AND lets the threshold be anchored on Cohen's conventions (0.2 small / 0.5 medium / 0.8 large) instead
+# of invented. ── RESENTMENT AS A TRUE ACCUMULATOR, HELD BY THE VILLAGE (R-95). Two flags, separable but
+# ENTANGLED — neither works alone, and there is a test asserting exactly that. (a) ACCUMULATOR.
+# `_do_delegitimation`'s own docstring says in capitals that resentment ACCUMULATES, after Leach —
+# *"prestige-seeking only increased their followers' resentment and hastened their overthrow"*. The code
+# implemented an EMA, which does not accumulate: it TRACKS, converging to whatever it is fed. So a
+# threshold at or above the typical privilege can NEVER be crossed at any horizon. Measured (R-94): the
+# grudge rose to 0.796 against a threshold of 0.800 and stopped — 1 revolt in 3000 years. Accumulating
+# instead makes the TIME-TO-REVOLT the anchored quantity, which is what Leach actually claims, and removes
+# the threshold as a free parameter (it is fixed at 1.0 by construction). (b) VILLAGE UNIT. R-88 measured
+# band lifetime at 10.2 yr median / 17.5 mean, while the grudge needed 700-1600 yr to mature — the memory
+# outlived its container by ~40-100x, and band fission resets it to zero. Leach's gumlao premises describe
+# VILLAGES ("villages autonomous", headmen, councils of elders), not 25-person residential bands, so the
+# settlement is both the lit-correct unit AND the one that persists. Follows R-71's per-SITE precedent
+# exactly: the place remembers, the members churn. ── LOCAL ascription (R-96). `_lineage_ascribed` was a
+# GLOBAL set while every mechanism acting on it is LOCAL, so one village's revolt de-ranked that lineage
+# in EVERY other village at once. Measured (R-95): ~7% of all lineages stripped per revolt, and nobility
+# went from 82% of villages to 3% — annihilated rather than cycled. It contradicts the anchor directly:
+# Leach's observation is that communities sit in DIFFERENT states simultaneously ("shifting back and
+# forth"), which a single global set cannot represent. With this on, rank is held per (community,
+# lineage): a lineage is noble IN A PLACE, and a revolt touches only the community that revolted. The
+# community is the settlement when village resentment is on, else the band. Rank is NOT portable — a
+# family that moves must earn standing where it arrives, which is what "villages autonomous" implies. ──
+# RANK UNLOCKS HIERARCHY (R-98). `society_from_character(density, surplus_frac)` decides a band's society
+# from CROWDING and SURPLUS only — it never asks whether anyone is actually ranked. So a village where
+# every lineage is hereditary nobility is still labelled `egalitarian_forager` if it is sparse and poor,
+# and since LEADER_SOCIETY_WEIGHT is 0.0 there, its nobility has NO structural consequence: it cannot grow
+# past the band cap, sheds no scalar stress, and the whole elite layer is decorative with respect to
+# settlement size. The model has surplus→hierarchy but not rank→hierarchy. THE ANCHOR SAYS RANK CAN COME
+# FIRST. Leach's gumsa were rain-fed SWIDDEN HILL FARMERS without a storable glut — no aquatic gate, no
+# great surplus — yet had ranked lineages, chiefs, tribute, and "all settlements under one chief".
+# Testart's preconditions are one route to hierarchy, not the only one. So a band holding ranked lineages
+# is promoted ONE rung on the ladder, and deliberately only one: this opens the route, it does not hand
+# out chiefdoms.
 
 [resent_years_to_revolt]
 value = 80.0

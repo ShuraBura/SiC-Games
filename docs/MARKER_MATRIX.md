@@ -27,7 +27,7 @@ validated, however long it ran.
 | 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **46/52 arms PASS** (2026-08-06 re-score over every trajectory on disk; median of arm medians **97.5**) |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
-| 6 | lineage top share | `lin_top_share` | 0.16 [0.08–0.30] — **MIS-CITED, no replacement found** | 0.16 = **Yan 2014** Oα; 0.08 = **Zerjal 2003**; Karmin has neither. Hill 2011 was proposed as a forager-scale replacement and is NOT viable — it contains no lineage data at all | **7/25** — both sources are post-Neolithic/state-scale |
+| 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
 | 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
 | 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
@@ -65,9 +65,15 @@ checked at all.
   was a duplicate band on #3's field, so retiring it costs no coverage.
 - **#17 added.** Alberti 2014 and Hamilton 2007 both verified verbatim and both land on ~160 for the
   aggregation ceiling, giving `settle_max` a two-source anchor where it had none.
-- **#6 stays unanchored.** Smith & Codding 2021 was fetched and verified, but for #9's ordering claim, not for
-  a lineage share. No forager-scale lineage-concentration source exists in the folder; #6 remains mis-cited
-  with no replacement, and the honest options are retire or leave visibly broken.
+- **#6 RETIRED 2026-08-07 (supervisor decision).** Smith & Codding 2021 was fetched and verified, but for
+  #9's ordering claim, not for a lineage share, and no forager-scale lineage-concentration source exists
+  in the folder. Its band came from **Yan 2014** (Neolithic Chinese super-grandfather haplogroups) and
+  **Zerjal 2003** (the Genghis Khan haplogroup) — both measure Y-chromosome dominance in large,
+  post-Neolithic, state-scale populations where one man's descendants could out-reproduce everyone for
+  forty generations. **A forager band of 20–60 with a mate-gate and high mortality cannot structurally
+  reach that concentration**, so the 7/25 was never evidence about the model. Retired rather than left
+  visibly broken, because a marker that fails permanently for a reason everyone has to re-learn is a
+  warning that trains people to ignore warnings. **The diagnostic is unchanged and still reported.**
 - **Climate, first check ever:** Sarmiento, Wanner, Hawkes and Timmermann's *period* all verify (Hawkes via a
   documented conversion that reproduces 518/745 to the unit); **Timmermann's amplitude does not exist in the
   paper** and is now tagged INTERPRETIVE; **St. John 2022 has no PDF** and its channel is default-OFF.
