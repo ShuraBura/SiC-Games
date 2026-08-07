@@ -121,6 +121,25 @@ test is one-sided. Same family as the three that came before it: `hayden_stage` 
 density, `lineage_size_gini` on rank-keys vs patrilines, `connubium_med` on `pool_n` vs `reach_pop`. **Every
 one of them was a real number read against the wrong denominator, unit, or statistic — never a wrong number.**
 
+**#14 AND #17 SURVIVED THEIR OWN CONFOUND TESTS (2026-08-07, `test_marker_diagnostics_ctb.py`).** Both
+were reported as failures while the diagnostics computing them had **no test anywhere**, which by CLAUDE.md's
+first rule made them claims about the instrument rather than about the model. Both were then CTB'd, and both
+held:
+
+- **#14 `material_gini`.** The measured vector runs over the WHOLE population, children included, and children
+  hold nothing. Adding zero-holders can only push a Gini **UP** — so the child confound cannot explain a
+  reading that is 2× BELOW the anchor; correcting for it widens the gap. Separately, BHM's 0.36 is
+  **age-adjusted** (a quadratic in age, removing the life-cycle component), which *lowers* their figure, while
+  ours is raw. So we compare a raw-inflated 0.162 against an adjusted-reduced 0.36 and are still 2× under.
+  **The miss is real and, if anything, understated.** The methodological mismatch should travel with the
+  number.
+- **#17 `settle_max`.** A MAXIMUM grows with sample size at a fixed distribution — verified on constructed
+  normal draws, where E[max] rises by >15 units from n=5 to n=50 — so an arm with more settlements could
+  report a larger `settle_max` without its settlements being any bigger. **Measured across the 52 arms:
+  corr(n_settle, settle_max) = +0.024** — essentially nil, against corr(n_settle, settle_med) = −0.328. The
+  confound is real in principle and **not operating in this data**, so #17's over-run is not an artefact of
+  settlement count.
+
 **#17's status is a SCREEN, not a score.** The 52 trajectories were run for other purposes across different
 worlds, run lengths and flag stacks, several predating R-105/R-106 fixes. They establish the *direction* and
 that the marker is worth wiring; they do not give a calibrated figure. It needs a proper campaign before the
