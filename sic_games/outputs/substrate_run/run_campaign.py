@@ -44,6 +44,47 @@ from sic_games.terrain import generate_world, world_lottery_climate
 from sic_games.capacity import NPPCapacityField
 from sic_games.climate import ClimateConfig, build_climate_field
 from sic_games.invariants import check as invariant_check
+from sic_games import runspec as _runspec
+
+# ── A RUN IS A FILE (2026-08-07) ──────────────────────────────────────────────────────────────────────────
+#     py -3 run_campaign.py --config config/runs/full_campaign.toml [--seed N]
+#
+# The file states EVERYTHING — how long, which world, every mechanism, every parameter. Nothing else decides
+# what happened, and a run needing a reduction or adjustment gets its OWN file, discussed and written first.
+#
+# HOW IT ATTACHES, and why this way. The 61 `C_*` reads below run at import. Rather than rewrite 61 call sites
+# (and risk missing one silently — the defect class this whole change exists to end), the spec's `[run]`
+# section is injected into `os.environ` FIRST, so every existing read resolves to the file's value unchanged.
+# The env vars stop being a user interface and become an internal detail. `[mechanisms]`/`[parameters]` are
+# applied later, at the one place the config object is finalised.
+#
+# MIXING IS REFUSED, NOT MERGED. If a model-config knob is set alongside `--config`, the run STOPS. Merging is
+# what broke the first attempt at this on 2026-08-06: the file replaced a config the knobs had already
+# resolved, and `C_SOIL=0` silently came back True. There is no correct precedence here — a run configured two
+# ways is a run nobody can describe afterwards.
+_SPEC = None
+if "--config" in sys.argv:
+    _i = sys.argv.index("--config")
+    _seed_over = None
+    if "--seed" in sys.argv:
+        _seed_over = int(sys.argv[sys.argv.index("--seed") + 1])
+    _SPEC = _runspec.load(sys.argv[_i + 1], seed=_seed_over)
+
+    # Model configuration may come from the file or from the knobs, never both.
+    _MODEL_KNOBS = [k for k in os.environ if k.startswith("C_") and k not in (
+        "C_TAG",)]          # C_TAG alone is harmless labelling and several harnesses set it globally
+    if _MODEL_KNOBS:
+        raise SystemExit(
+            "--config was given AND these C_* knobs are set: " + ", ".join(sorted(_MODEL_KNOBS))
+            + "\nA run is configured ONE way. Put the setting in the file, or drop --config.")
+
+    _ENV_FROM_RUN = {"steps": "C_STEPS", "seed": "C_SEED", "founders": "C_FOUNDERS", "terrain": "C_TERR",
+                     "climate": "C_CLIM", "patch": "C_PATCH", "tag": "C_TAG", "max_minutes": "C_MAXMIN",
+                     "log_every": "C_LOGEVERY", "gen_every": "C_GENEVERY", "flush_every": "C_FLUSHEVERY",
+                     "genealogy": "C_GENEA", "genome": "C_GENOME"}
+    for _k, _env in _ENV_FROM_RUN.items():
+        _v = _SPEC.run[_k]
+        os.environ[_env] = ("1" if _v else "0") if isinstance(_v, bool) else str(_v)
 
 FOUNDERS  = int(os.environ.get("C_FOUNDERS", "3000"))
 STEPS     = int(os.environ.get("C_STEPS", "15000"))
@@ -751,6 +792,25 @@ def main():
     if _agmode or os.environ.get("C_AGGLHALF") or os.environ.get("C_AGGLBETA"):
         print(f"campaign: agglomeration shape mode={demog.aggl_mode} beta={demog.aggl_beta} "
               f"half={demog.aggl_half}", flush=True)
+    # ── THE RUN FILE SUPPLIES THE MODEL, WHOLE ─────────────────────────────────────────────────────────────
+    # Applied at the END, and it REPLACES rather than merges. Everything above — the preset, C_ALLON, the
+    # C_EXTRA/C_PARAM overlays — is the layered path, and it cannot have contributed anything here because
+    # mixing was refused at import. So this is not "the file wins a precedence contest"; it is the only
+    # source that ran. `runspec.build` re-applies the ON-but-dead check, so a file cannot express an inert
+    # mechanism that the knob path would have refused.
+    if _SPEC is not None:
+        demog = _runspec.build(_SPEC, "DemographyConfig")
+        clim = _runspec.build(_SPEC, "ClimateConfig")
+        _missing = _runspec.coverage(_SPEC)
+        if _missing:
+            raise SystemExit(f"{_SPEC.path.name} does not state {len(_missing)} field(s): {_missing[:8]} — "
+                             f"a resolved run file lists EVERY field, or the run silently takes a code "
+                             f"default for the rest. Regenerate with tools/make_runconfig.py.")
+        cap = build_climate_field(base, clim, fields=f, seed=SEED)
+        print(f"campaign: CONFIG = {_SPEC.path} ({_SPEC.name}) — "
+              f"{len(_SPEC.mechanisms)} mechanisms, {len(_SPEC.parameters)} parameters, "
+              f"0 unstated", flush=True)
+
     # ON-BUT-DEAD GATE (2026-08-06, MECHANISM_CHARTER §12). The config is now FINAL — check it before a single
     # step runs. A flag that is on while the magnitude it acts through sits at neutral reads as a live
     # mechanism in the dump and does nothing in the world; it produced 3 of battery 7's 6 "inert" verdicts and
@@ -787,7 +847,12 @@ def main():
                 rellegit=RELLEGIT, legit_threshold=ELITE_KW.get("legit_threshold"),
                 residence=getattr(demog, "aggregation_residence", None),
                 patriline_weight=getattr(demog, "patriline_weight", None),
-                demography_config=_full_cfg)
+                demography_config=_full_cfg,
+                # A FINISHED RUN CARRIES ITS OWN CONFIGURATION. Naming the repo file is not enough — the repo
+                # moves on and the run does not — so the resolved file is copied next to the output and its
+                # name recorded here. `run_config=None` marks a run from the legacy knob path.
+                run_config=(_SPEC.name if _SPEC else None),
+                run_config_archived=(os.path.basename(_SPEC.archive_to(HERE)) if _SPEC else None))
     # KNOWN-INERT COMBINATIONS. A flag switched on without its companion does nothing while LOOKING enabled --
     # R-85c's lesson ("distinguish 'does nothing when I turn it on' from 'does nothing'") and charter D4. This is
     # a mechanical guard rather than another rule to remember, because D4 already existed and was still missed:
