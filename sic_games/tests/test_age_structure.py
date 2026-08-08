@@ -104,7 +104,15 @@ def test_growth_regime_boundaries(ratio, expected):
 def test_the_model_is_currently_pathologically_young(markers):
     """A FACT ABOUT THE MODEL, pinned so it cannot rot — this is MARKER_MATRIX #4/#5's open failure seen in
     one view. Measured median age ~12.8 against the Aché anchor ~20, `frac_child` ~0.54 against ~0.40, and a
-    3x cliff between the 15-30 and 30-45 classes: people die in early adulthood.
+    3x cliff between the 15-30 and 30-45 classes.
+
+    ⚠ THE DIAGNOSIS IN THIS DOCSTRING WAS WRONG AND IS CORRECTED (2026-08-07, tier-3 CTB). It read "people
+    die in early adulthood", which implicated the mortality schedule. The schedule is FINE: integrated, the
+    Siler curve gives e₀ = 36.5 yr against the Aché ~37, and its survivorship shows no early-adult collapse
+    (S(30) = 0.54, S(45) = 0.43). What is actually happening, measured on the long run: births at 5.66 %/yr
+    (crude birth rate ~57/1000 against a forager norm of 40–45) and STARVATION deaths at 3.80 %/yr — larger
+    than the entire anchored life table, whose crude death rate here is ~2.7 %/yr. It is a HIGH-TURNOVER
+    regime, and turnover is what makes a pyramid young. See `test_tier3_demography_ctb.py`.
 
     WHEN THIS STARTS FAILING the demographic engine has improved — re-score e₀, `median_age_yr`,
     `frac_child` and `frac_motherless` TOGETHER, as MARKER_MATRIX requires, and update R-106."""
