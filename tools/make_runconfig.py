@@ -134,6 +134,8 @@ def main(argv=None) -> int:
     ap.add_argument("--steps", type=int)
     ap.add_argument("--seed", type=int)
     ap.add_argument("--founders", type=int)
+    ap.add_argument("--max-minutes", dest="max_minutes", type=int,
+                    help="wall-clock budget; the run stops cleanly at it. 0 = uncapped.")
     ap.add_argument("--terrain")
     ap.add_argument("--climate")
     ap.add_argument("--why", default="", help="why this run differs from the canonical stack")
@@ -141,7 +143,8 @@ def main(argv=None) -> int:
 
     run_over = {k: v for k, v in
                 (("steps", a.steps), ("seed", a.seed), ("founders", a.founders),
-                 ("terrain", a.terrain), ("climate", a.climate)) if v is not None}
+                 ("terrain", a.terrain), ("climate", a.climate),
+                 ("max_minutes", a.max_minutes)) if v is not None}
     text = build(a.name,
                  on=[s.strip() for s in a.on.split(",") if s.strip()],
                  off=[s.strip() for s in a.off.split(",") if s.strip()],
