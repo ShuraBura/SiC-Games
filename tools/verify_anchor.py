@@ -108,6 +108,16 @@ REGISTRY = [
     ("Marlowe, The Hadza - polygyny ~4% of MEN (not of married men), never more than two wives",
      "The Hadza- Hunter-Gatherers of Tanzania (Origins of Human -- Frank Marlowe, Frank Marlowe -- ( WeLib.org ).pdf",
      r"about 4% of men have 2 wives at any given time, but never more than two wives"),
+    # TIER 3 age-structure anchor, found 2026-08-08. The DEFINITION travels with the number in the prose,
+    # which is what makes it checkable -- and it differs from ours (they cut elders at 65, we cut at 60).
+    ("Ache precontact (1970) dependency ratio 0.79, defined as (<15 or >65) / (15-65)",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"0\.79 for 1970"),
+    # Table 4.4 (Age-sex Composition of Ache, !Kung and Yanomamo) has the sex ratios, and the scan's numbers
+    # are OCR-garbled -- the same state Bar-Yosef and Hayden Fig. 6 are in. NEEDS A HUMAN READ.
+    ("Ache/!Kung/Yanomamo age-sex composition (Table 4.4) - NOT machine-readable",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     None),
     ("Hayden 1995 Fig. 6 - transegalitarian density bands",
      "hayden1995.pdf",
      None),   # a FIGURE: the bands were read off the page image, which no text search can confirm
