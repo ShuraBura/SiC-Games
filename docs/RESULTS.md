@@ -5593,6 +5593,56 @@ failures from 2026-08-06 (#14 wealth, #17 fission ceiling) had already been CTB'
 Configuration is now a file per run (`--config`), so every arm above was launched from a named, fully-resolved
 config with a stated reason for differing.
 
+---
+
+**ADDENDUM 34 — THE REGIME TELEGRAPH FIRED. The overnight long-climate arm passed 844 model years and the slow
+environmental driver acted for the first time in this project's history; the health diagnostic tracked it
+through all three of its states, and both live channels reproduce their configured amplitudes to the fourth
+decimal (2026-08-07, overnight).**
+
+The arm: `config/runs/long_climate.toml`, 30,000 steps capped at 7 h, launched from a clean tree at `04d0724`
+under the new `--config` path — the first campaign in this project configured by a named file rather than by
+environment variables.
+
+### The telegraph fired, and the instrument caught the transition
+
+`ClimateField.health()` reported the regime channel in three successive states as the run advanced:
+
+| model years | verdict | what it means |
+|---|---|---|
+| ~30 | `NEVER-FIRED` | configured, reachable, clock never came round |
+| ~500 | `RARE` | fired, active on <1% of steps |
+| **844** | **`LIVE`** | active 2.0% of steps, trough **0.8608** |
+
+That is the diagnostic doing exactly what it was built for on 2026-08-06 — distinguishing "not switched on"
+from "switched on and never got a chance to act" — and it is the first time the distinction has been observed
+resolving in a live run rather than constructed in a test.
+
+**The prediction held.** Addendum 31 computed that at ~1500 yr recurrence the telegraph fires in ~13% of a
+standard 2500-step campaign and needs ~12,500 steps for a coin flip. It fired between step 2,500 and 10,000,
+which is the middle of that range.
+
+### Both live channels reproduce their configured amplitudes exactly
+
+| channel | configured | measured trough |
+|---|---|---|
+| regime | amp 0.14 → 0.860 | **0.8608** |
+| caribou | a = 0.871 → (1−a)/(1+a) = 0.0689 | **0.069** |
+
+The caribou figure is the anchor corrected yesterday when the supervisor filed the thesis — its peak-pinned
+form, reproduced in a live 844-year run on 5,474 steppe cells.
+
+### And the tier-2 finding is visible in the same block
+
+`intercept` and `llanos` remain **UNREACHABLE** at 844 years, on every checkpoint, for the reason tier 2
+established: `coastal-temperate` contains **no savanna**, so the sub-biome those channels need does not exist
+in this world. Not a defect, not a clock problem — an absent biome. A run of any length will report the same.
+
+### Status
+
+The arm is still running at ~10,200 of 30,000 steps and will stop at its 7 h cap. Full suite green at
+**1300 passed, 2 xfailed** across the whole night's work.
+
 
 ---
 
