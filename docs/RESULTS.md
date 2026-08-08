@@ -5643,6 +5643,82 @@ in this world. Not a defect, not a clock problem — an absent biome. A run of a
 The arm is still running at ~10,200 of 30,000 steps and will stop at its 7 h cap. Full suite green at
 **1300 passed, 2 xfailed** across the whole night's work.
 
+---
+
+**ADDENDUM 35 — THE CARIBOU HERD CYCLE PACES FORAGER POPULATION AT ITS OWN PERIOD. Attributed by ablation, not
+inferred from a coincidence: the oscillation signature vanishes when the channel is switched off, and the
+channel depresses mean population by 32%. The first environmental driver this project has attributed to a
+population response (2026-08-08).**
+
+### The observation
+
+`long_climate` (30,000 steps = 2,500 model years, completed in 86 min) showed population autocorrelation that
+**does not decay monotonically**. It dips to a trough and rises again to a local peak at **lag 23 = 47.9 yr**.
+The caribou period drawn for that world was **584 steps = 48.7 yr** — a 1.6% match.
+
+**That is a coincidence until tested.** A driver's period matching a response's periodicity is not evidence it
+caused it, and this project's recent history is mostly of such inferences failing.
+
+### The ablation
+
+`long_climate_no_caribou.toml` — identical in all 315 settings except `enable_caribou_swing = false`,
+authored by `tools/make_runconfig.py` with the reason recorded in its `[meta]`. This is the first experiment
+in the project where "identical except one thing" is a checkable property of two files rather than a claim.
+
+| lag (yr) | caribou **ON** | caribou **OFF** |
+|---|---|---|
+| 8.3 | +0.658 | +0.826 |
+| 20.8 | +0.344 | +0.739 |
+| **25.0** | **+0.314** ← trough | +0.721 |
+| 37.5 | +0.486 | +0.672 |
+| **47.9** | **+0.560** ← peak | +0.632 |
+| 62.5 | +0.383 | +0.585 |
+| 83.3 | +0.344 | +0.516 |
+
+**ON: a trough at 25 yr and a peak at 48 yr.** A trough at half the period and a peak at the period is the
+textbook autocorrelation signature of an oscillation, and 25.0 is half of 48.7 to within the checkpoint
+spacing.
+
+**OFF: smooth monotonic decay** from +0.83 to +0.52 across the same range. No trough, no local peak — ordinary
+persistence in a slowly drifting population.
+
+**The oscillation is the caribou channel.** Switch it off and the periodic structure disappears entirely.
+
+### THE LEVEL COMPARISON IS A TRAP, and it caught me first
+
+The autocorrelation at 48 yr is **higher in the no-caribou arm** (+0.632 vs +0.560), and read on its own that
+says the opposite — that removing caribou strengthened the 48-year signal. It does not. The whole
+autocorrelation function sits higher in the OFF arm because that population is more persistent; what matters
+is the **shape**, and only the ON arm has a local maximum. Comparing the level at one lag, rather than the
+curvature across lags, would have inverted the conclusion.
+
+### Magnitude
+
+Mean population **2,470 with caribou / 3,642 without — a 32% depression**, from a channel that applies a 93%
+peak-to-trough meat drawdown on 5,474 steppe cells. The herd swing is not a decoration; it is one of the
+largest single effects measured in this model.
+
+### Why one seed is defensible here and was NOT for the regime telegraph
+
+The caribou channel is **deterministic** — a cosine with a drawn period and phase — so its period is fixed
+once drawn and the response is reproducible. The regime telegraph is a **stochastic two-state chain**, and
+60-seed replication (same drawn parameters) gives an active fraction ranging **0.000 to 0.494 with 18% of
+seeds never firing at all in 2,500 years**. A single regime arm carries no information; a single caribou arm
+carries its period.
+
+**That distinction should govern how the climate layer is benchmarked**: deterministic channels can be read
+from one long arm, stochastic ones need seed replication. MARKER_MATRIX binding rule 3 ("seeds must beat the
+variance") applies to the climate layer, and nothing had said so.
+
+### Caveats, stated
+
+- One seed per arm. Defensible for the deterministic channel as above; the 32% level effect would still
+  benefit from replication.
+- `coastal-temperate` has no savanna, so `intercept` and `llanos` were UNREACHABLE in both arms (tier-2
+  finding). This is a claim about a steppe-bearing temperate world.
+- The caribou amplitude 0.871 is from an UNDERGRADUATE thesis (Addendum 32) — the weakest anchor in the
+  climate layer, and this result rests on it.
+
 
 ---
 
