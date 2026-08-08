@@ -113,11 +113,19 @@ REGISTRY = [
     ("Ache precontact (1970) dependency ratio 0.79, defined as (<15 or >65) / (15-65)",
      "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
      r"0\.79 for 1970"),
-    # Table 4.4 (Age-sex Composition of Ache, !Kung and Yanomamo) has the sex ratios, and the scan's numbers
-    # are OCR-garbled -- the same state Bar-Yosef and Hayden Fig. 6 are in. NEEDS A HUMAN READ.
-    ("Ache/!Kung/Yanomamo age-sex composition (Table 4.4) - NOT machine-readable",
+    # Table 4.4, p.141. I FIRST RECORDED THIS AS "OCR-garbled, not machine-readable" AND THAT WAS WRONG:
+    # searching for the string "Table 4.4" returned a context window that landed on a DIFFERENT, genuinely
+    # garbled table nearby, and I attributed its content to this one. The table itself extracts cleanly.
+    # Three societies on OUR EXACT age classes (0-15 / 15-60 / 60+), which is why no unit conversion is needed.
+    ("Ache 1970 precontact age-sex composition (Table 4.4 p.141): 229/288/30, M316 F231",
      "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
-     None),
+     r"Ache 1970 0-15 140 89 229"),
+    ("!Kung 1968 age-sex composition (Lee 1979:45, via Table 4.4): 131/286/40",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"Kung 1968\* - 0-15 58 73 131"),
+    ("Yanomamo 1960s age-sex composition (Neel & Weiss 1975:28, via Table 4.4): 1190/1405/27",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"0-15 682 508 1190"),
     ("Hayden 1995 Fig. 6 - transegalitarian density bands",
      "hayden1995.pdf",
      None),   # a FIGURE: the bands were read off the page image, which no text search can confirm
