@@ -1571,6 +1571,23 @@ def mobility_radius(value: float, cfg) -> int:
     base = cfg.mobility_base_radius
     if not cfg.enable_productivity_mobility:
         return base
+    # UNIT GUARD (2026-08-07, tier-4 CTB). The two sources live on scales three orders of magnitude apart —
+    # NPP is g/m²/yr in the hundreds, intake is a requirement RATIO around 1 — and the docstring put the
+    # burden of matching them on the caller. Both mismatches were SILENT and failed in opposite directions:
+    #   source="intake" fed an NPP value  -> ratio ~1/900 -> r pinned to `base`, the mechanism INERT while ON
+    #   source="npp"    fed an intake one -> ratio ~900/50 -> r pinned to `max`, every agent at full stride
+    #                                        regardless of productivity, i.e. Kelly/Binford exactly inverted
+    # ⚠ NOT GUARDABLE FROM THE VALUE, and two attempts to do so both failed against real data:
+    #     attempt 1 rejected small values under "npp"    -> broke 4 tests: an arid or near-water cell
+    #               genuinely has NPP below 20 g/m²/yr, which is exactly what `mobility_npp_floor` is for
+    #     attempt 2 rejected large values under "intake" -> broke 2 tests: a well-fed agent genuinely has an
+    #               intake ratio of 27, early in a run when few agents sit on rich land
+    # The two scales OVERLAP across their whole useful ranges, so no threshold separates them. The mismatch
+    # is real and silent in both directions — `source="intake"` fed NPP pins the stride to `base` (inert while
+    # reading ON); `source="npp"` fed an intake ratio pins it to `max` (Kelly/Binford inverted) — but it can
+    # only be caught at the CALL SITE, by passing the value the source names. `test_pressure_mobility.py`
+    # covers the call sites; `test_tier4_movement_ctb.py` documents the hazard.
+    # A guard that fires on legitimate input is worse than none: it gets switched off, and nothing replaces it.
     if getattr(cfg, "mobility_pressure_source", "npp") == "intake":
         ref, floor = cfg.mobility_intake_ref, cfg.mobility_intake_floor
     else:
