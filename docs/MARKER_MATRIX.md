@@ -31,7 +31,7 @@ validated, however long it ran.
 | 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
 | 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
-| 10 | **polygyny** | `frac_polygynous_m` | **~0.04** | Marlowe, *The Hadza* | **was 15× off; now 1.0×** |
+| 10 | **polygyny** | `frac_polygynous_m` | **~0.04 OF ALL MEN** — our field divides by MARRIED men | Marlowe, *The Hadza* — **VERIFIED VERBATIM 2026-08-07**: *"about 4% of men have 2 wives at any given time, but never more than two wives"* | **UNIT MISMATCH on a PASS.** 0.0362 on our denominator reads ~1.0×; on Marlowe's it is **0.0307 = 0.77×**. The gap IS the male marriage rate (0.847), so the bias MOVES between arms |
 | 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
 | 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **never previously scored**; first read −0.98 |
 | 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **never previously scored** |
@@ -120,6 +120,20 @@ permanently mid-fission. The quantity Alberti bounds is the **ceiling**, so the 
 test is one-sided. Same family as the three that came before it: `hayden_stage` on occupied vs regional
 density, `lineage_size_gini` on rank-keys vs patrilines, `connubium_med` on `pool_n` vs `reach_pop`. **Every
 one of them was a real number read against the wrong denominator, unit, or statistic — never a wrong number.**
+
+**#10's PASS IS ON THE WRONG DENOMINATOR (2026-08-07, `test_tier6_family_ctb.py`).** Every unit mismatch
+found so far turned a reported FAILURE into an artefact. This one runs the other way: #10 is reported as a
+PASS ("was 15× off; now 1.0×") and its denominator is not the anchor's.
+
+Marlowe's sentence — now verified verbatim and registered in `verify_anchor.py` — says **"about 4% of MEN have
+2 wives"**. `frac_polygynous_m` divides by **married** men, so the two differ by the male marriage rate.
+Measured: 84.7% of adult men married, giving 0.0362 on our unit (~1.0× the anchor) but **0.0307 on Marlowe's
+(0.77×)** — a 23% shortfall, not parity. **And because the discrepancy IS the marriage rate, its size moves
+between arms**, so the marker is not currently comparable across runs.
+
+A wrong unit is not more forgivable because the answer came out nice. The same sentence also carries a second,
+never-scored property — **"never more than two wives"** — which the diagnostic cannot check because it reports
+no maximum.
 
 **#14 AND #17 SURVIVED THEIR OWN CONFOUND TESTS (2026-08-07, `test_marker_diagnostics_ctb.py`).** Both
 were reported as failures while the diagnostics computing them had **no test anywhere**, which by CLAUDE.md's

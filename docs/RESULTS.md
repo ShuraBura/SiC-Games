@@ -5449,6 +5449,150 @@ existing invocation of the script does, which is a scientific decision rather th
 pinned as a measurement (`test_the_default_is_still_the_preset_path_and_differs_from_the_file`) so it cannot
 drift unnoticed, and that test is the one to invert when the call is made.
 
+---
+
+**ADDENDUM 33 — THE BENCHMARK LADDER, AND FOUR TIERS CLIMBED IN ONE NIGHT. The mortality curve is right and the
+turnover is not; marker #1 is two faults on two tiers; the canonical world contains no savanna, so the best-
+verified anchor in the project never enters a run. Three instrument defects found, two of them mine, one of
+them in the ladder itself (2026-08-07).**
+
+Supervisor principle: **benchmark behavioural groups in the order they appear in evolution**, not by size or
+novelty. Adopted as `docs/BENCHMARK_LADDER.md`. It changed a decision immediately — the `noble_*_lift` block
+had been proposed as the next CTB target because it was the largest uncovered one, and it is **tier 12, the
+top of the ladder**, while both known failures sit at tiers 3 and 5.
+
+---
+
+### TIER 2 — ENERGETICS. The anchors are right; the world does not contain one of them
+
+**What verifies.** Game return rates hit their anchored means exactly across seeds — forest 5,541 (Hill 1987),
+grass 3,001 (Hurtado & Hill 1987), desert 995. Forage needed a qualifier: it **overshoots** on any coastal
+world (desert reads 1332 against 1200) because the Bird 1997 shore bonus (1491.5, **additive**) is applied
+*after* the per-biome rescale. Measured off-shore the targets hold exactly.
+
+**THE FINDING: `coastal-temperate`, the campaign's default world, contains ZERO savanna cells.** So
+
+- **Hawkes 1991's savanna game rate, 518 kcal/hr** — verified against the PDF to the unit on 2026-08-06, one
+  of the best-provenanced numbers in the project — **never enters the canonical run**;
+- nor does the intercept-hunting boost (745/518), which is savanna+llanos gated.
+
+That is exactly why `ClimateField.health()` has been reporting `intercept=UNREACHABLE` and `llanos=UNREACHABLE`
+on every temperate run since it was built. **The channels are not broken. The world has no savanna in it.** On
+a savanna world the same anchor lands at 518 within 2%.
+
+**VERIFIED, IMPLEMENTED and REACHABLE are three separate claims**, and this is the first time the third has
+been measured. Which worlds can exercise the savanna layer is now pinned: savanna and tropical yes, temperate
+and boreal no.
+
+---
+
+### TIER 3 — DEMOGRAPHY. The standing diagnosis was wrong
+
+`test_age_structure.py` has said for weeks that the pyramid is young because *"people die in early
+adulthood"*, which implicates the Siler schedule. **It does not.** Integrated, that schedule gives
+**e₀ = 36.5 yr** against the Aché forest-period ~37, and its survivorship shows no early-adult collapse at all
+(S(30) = 0.54, S(45) = 0.43). The anchored life table is fine, and a fix aimed at it would have been aimed at
+the wrong thing.
+
+The stable age structure the model's **own** curve implies is a one-parameter family in the growth rate:
+
+| r (%/yr) | frac < 15 | median age |
+|---|---|---|
+| 0.0 | 0.307 | 26.5 |
+| 1.0 | 0.377 | 21.5 |
+| 2.0 | 0.446 | 17.5 |
+
+The Aché anchor (0.40 / ~20) sits at r ≈ 1.3 %/yr — so the target is internally consistent with the life
+table, which makes it a fair one.
+
+**Measured: r = +0.67 %/yr with frac_child = 0.571 and median age 12.3.** At that growth the curve implies
+~0.35 and ~23. **The model is outside the family its own mortality can produce**, and no forager growth rate
+closes it.
+
+**Where the difference lives.** Births run **5.66 %/yr** (crude birth rate ~57/1000 against a forager norm of
+40–45) and **starvation deaths alone run 3.80 %/yr — larger than the entire anchored life table**, whose crude
+death rate at this structure is ~2.7 %/yr. Starvation is outside the life table, so the realised mortality
+regime is the anchored one *plus a bigger unanchored one*. High births and high deaths together are a
+**high-turnover regime**, and turnover is what makes a pyramid young.
+
+This is the ladder's *"an anchor verified is not a mechanism validated"* corollary arriving as an empirical
+result.
+
+---
+
+### TIER 4 — MOVEMENT. A real hazard, and two failed attempts to guard it
+
+`mobility_radius` implements Kelly/Binford correctly: monotone in productivity, base stride at the reference,
+the closed form matching hand-computed points, the floor bounding an empty cell, and OFF returning base for
+every value (the bit-exactness guarantee every pre-R-39 result rests on).
+
+**The hazard.** It takes two pressure sources — NPP in g/m²/yr and an intake requirement RATIO — and its
+docstring put the burden of matching them on the caller. Both mismatches are silent and fail in **opposite**
+directions:
+
+- `source="intake"` fed an NPP value → stride pins to `base` → **inert while reading ON**
+- `source="npp"` fed an intake ratio → stride pins to `max` → **Kelly/Binford exactly inverted**
+
+**I tried to guard it twice and both guards were wrong.** Rejecting small values under `"npp"` broke four
+existing tests within a minute — an arid or near-water cell genuinely has NPP below 20 g/m²/yr, which is what
+`mobility_npp_floor` exists for. Rejecting large values under `"intake"` broke two more — a well-fed agent
+genuinely reads an intake ratio of 27. **The scales overlap across their whole useful ranges.** No threshold
+separates them.
+
+So the hazard is **documented, not fixed**. A guard that fires on legitimate input gets switched off and takes
+the sound half with it. The existing tests catching both bad guards is the CTB discipline working on my own
+change.
+
+---
+
+### TIER 5 — BANDS. Marker #1 is two faults on two tiers
+
+Applying the ladder's rule — *a failure at tier N is diagnosed at tier N or below* — to #1 (`band_med` fails
+16/16 on adults, 11.8 against Hill's 28.2):
+
+| | adults/band |
+|---|---|
+| measured (band 23.0 all-ages, frac_child 0.589) | **9.4** |
+| same band, Aché child fraction 0.40 → **tier 3 fixed** | **13.8** |
+| Hill 2011 anchor | **28.2** |
+
+**Fixing tier 3 closes about a quarter of the gap and no more.** The residual — 13.8 against 28.2 — is a
+genuine **tier 5** fault: the bands are too small. To hold 28.2 adults at the measured child fraction a band
+would need **69 people** against the 23 produced; even with a perfect Aché pyramid it would need **47**. Both
+tiers have to move, and neither is diagnosable at tier 9 or above, which is where most recent attention went.
+
+It also explains why #1 "passed" 23/25 on the all-ages unit for so long: **23 people sits inside Birdsell's
+~25 and Marlowe's 25–50**, so the body count looks right. It *is* right, as a count of bodies. Hill counts
+ADULTS, and the model reaches that total only by including children it should not have.
+
+---
+
+### THE THIRD INSTRUMENT DEFECT WAS IN THE LADDER
+
+Its **CTB column undercounts**. It is a filename heuristic (`*_ctb.py`, `*_ground_truth.py`), and genuine
+constructed-truth tests live in ordinarily-named files —
+`test_bands.py::test_bands_method_connected_components` hand-places five agents and asserts `bands()` returns
+the partition `[1, 2, 2]`, which is textbook CTB in a file the heuristic scores as zero.
+
+The error can only undercount and is roughly uniform across tiers, so the prescribed **ordering stands**. But
+no tier should be called "uncovered" on that column alone. It now reads *"has no dedicated CTB file"*.
+
+The ladder's tier membership had also drifted **before it was committed** — the first draft invented five
+flags that do not exist and missed eight that do, including `game` and `forage_cap`, which are tier 2, the
+very next thing to benchmark. A hand-maintained list of 86 names is a second copy, so Charter P4 applies and
+`test_benchmark_ladder.py` now checks it against the config classes.
+
+---
+
+### THE NIGHT'S SCORE ON INSTRUMENTS VS MODEL
+
+Three defects found in **instruments** (two unsound mobility guards, one ladder heuristic) and two genuine
+**model** faults located and decomposed (the turnover regime, the band-size shortfall). Both surviving marker
+failures from 2026-08-06 (#14 wealth, #17 fission ceiling) had already been CTB'd and held.
+
+Configuration is now a file per run (`--config`), so every arm above was launched from a named, fully-resolved
+config with a stated reason for differing.
+
 
 ---
 

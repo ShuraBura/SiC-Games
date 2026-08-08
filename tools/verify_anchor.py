@@ -102,6 +102,12 @@ REGISTRY = [
     ("Hamilton 2007 - aggregated group 53.66",
      "Hamilton et al. - 2007 - The complex structure of hunter–gatherer social networks.pdf",
      r"53\.66"),
+    # Cited in MARKER_MATRIX as "Marlowe, The Hadza" -- an author and a book, the citation shape that failed
+    # for Bar-Yosef, BHM, Hill 2011 and Timmermann. It survived only because the book is filed. Registered
+    # 2026-08-07 so the check is mechanical, and note what the sentence says the DENOMINATOR is: all MEN.
+    ("Marlowe, The Hadza - polygyny ~4% of MEN (not of married men), never more than two wives",
+     "The Hadza- Hunter-Gatherers of Tanzania (Origins of Human -- Frank Marlowe, Frank Marlowe -- ( WeLib.org ).pdf",
+     r"about 4% of men have 2 wives at any given time, but never more than two wives"),
     ("Hayden 1995 Fig. 6 - transegalitarian density bands",
      "hayden1995.pdf",
      None),   # a FIGURE: the bands were read off the page image, which no text search can confirm

@@ -131,16 +131,20 @@ list of 86 names is a second copy and Charter P4 gives second copies two options
 **Tier 1 is done** (2026-08-06): all six climate channels wired, health-instrumented and CTB'd; four anchors
 verified against their PDFs; one retracted; one corrected on the paper's arrival.
 
-**Tier 2 is next**, and is the base of everything above it — every demographic outcome, every band size, every
-surplus and every material Gini is downstream of whether kcal in and kcal out compute correctly. It has **zero
-CTB coverage**, and it is where the verified return-rate anchors are actually consumed.
+**Tiers 2–5 done** (2026-08-07 overnight, RESULTS Addendum 33). Summary of what each rung produced:
 
-**Then tier 3**, where one of the two real failures lives (the age structure carries too many children, which
-is what makes `band_med`'s all-ages reading "pass" while its adults reading fails 16/16).
+| tier | verdict |
+|---|---|
+| **2 energetics** | anchors land correctly (game exact; forage exact off-shore, the Bird shore bonus being additive on top). **But the canonical world contains NO SAVANNA**, so Hawkes' 518 kcal/hr — the best-verified anchor in the project — never enters a canonical run, and the intercept/llanos channels are `UNREACHABLE` for that reason and not because they are broken |
+| **3 demography** | the Siler schedule is CORRECT (e₀ = 36.5 vs Aché ~37, no early-adult collapse). The standing diagnosis "people die in early adulthood" was **wrong**. The pyramid is young because of a HIGH-TURNOVER regime: births 5.66 %/yr and starvation deaths 3.80 %/yr, the latter larger than the entire anchored life table |
+| **4 movement** | Kelly/Binford implemented correctly. A real unit hazard between the two pressure sources is **silent in both directions** and **cannot be guarded from the value** — two attempts both fired on legitimate data. Documented, not fixed |
+| **5 bands** | marker #1 decomposes into **two faults on two tiers**: fixing tier 3's age structure closes ~¼ of the gap (9.4 → 13.8 adults), and the residual to Hill's 28.2 is a genuine tier-5 band-size shortfall. A band would need 69 people to hold 28.2 adults at the measured child fraction; it produces 23 |
 
-**Tiers 9–12 wait.** Their markers include our two surviving failures (#14, #17) and both are quotable — they
-were CTB'd on 2026-08-07 and held — but *diagnosing* them means looking down the ladder, not measuring further
-up it.
+**Tier 6 (family) is next**, then 7 (kin/lineage).
+
+**Tiers 9–12 still wait.** Their markers include the two surviving failures (#14 wealth, #17 fission ceiling)
+and both are quotable — CTB'd on 2026-08-07 and held — but *diagnosing* them means looking down the ladder,
+and tier 5 has just shown what that produces.
 
 ---
 
