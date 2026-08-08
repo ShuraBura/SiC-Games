@@ -140,7 +140,10 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 | **4 movement** | Kelly/Binford implemented correctly. A real unit hazard between the two pressure sources is **silent in both directions** and **cannot be guarded from the value** — two attempts both fired on legitimate data. Documented, not fixed |
 | **5 bands** | marker #1 decomposes into **two faults on two tiers**: fixing tier 3's age structure closes ~¼ of the gap (9.4 → 13.8 adults), and the residual to Hill's 28.2 is a genuine tier-5 band-size shortfall. A band would need 69 people to hold 28.2 adults at the measured child fraction; it produces 23 |
 
-**Tier 6 (family) is next**, then 7 (kin/lineage).
+| **6 family** | Marlowe's polygyny sentence **verified verbatim**, and marker #10's reported PASS is on the **wrong denominator** — he counts *all men*, we divide by *married* men. 0.0362 reads ~1.0×; on his unit it is 0.0307 = **0.77×**, and because the bias IS the marriage rate it **moves between arms**. First unit mismatch here to turn a PASS rather than a failure into an artefact |
+| **7 kin & lineage** | **NO NEW CTB NEEDED — and no anchor to benchmark against.** Already covered by constructed-truth tests in ordinarily-named files: `test_lineage_ground_truth.py` (7 tests, including the rank-key vs patriline unit divergence) and `test_connubium.py::test_lineage_exogamy_rejects_sibling_and_clan_pairs_outsider`, which hand-builds kin relations and asserts the pairing. Its two markers are **#5 (anchor withdrawn)** and **#6 (retired 2026-08-07)**, so the tier has nothing scoreable. The gap here is a SOURCE, not a test |
+
+**Tier 8 (connubium) is next**, then 9.
 
 **Tiers 9–12 still wait.** Their markers include the two surviving failures (#14 wealth, #17 fission ceiling)
 and both are quotable — CTB'd on 2026-08-07 and held — but *diagnosing* them means looking down the ladder,
