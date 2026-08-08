@@ -509,6 +509,20 @@ def main():
     base0 = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and base0.level(x, y) > 0]
 
+    # ── THE TWO FOOD MODELS MUST AGREE (2026-08-08) ──────────────────────────────────────────────────────
+    # `base0` (NPP → Tallavaara density) sets what the population relaxes TOWARD; `forage_kcal`/`game_kcal`
+    # (the per-biome return-rate table) is what agents actually EAT. Nothing connected them, so a biome could
+    # be rich in one and poor in the other while every run looked sensible — the capacity field reporting a
+    # healthy world while agents starved in it.
+    # MEASURED across four worlds: forest 2.2, mountain 2.6, grass 2.7, desert 2.7 — a DEFINITIONAL offset
+    # (equilibrium density vs maximum harvest), not a defect. savanna 16.9 and wetland 14.0 are outliers, and
+    # both trace to gaps the return-rate table already documents. `world_savanna` settles at 9% of its
+    # trough capacity against 51%/69% for the other canonical worlds, because savanna is 48% of its land.
+    # Printed once at build and ONLY when a biome is out of band, so silence means something.
+    from sic_games import food_consistency as _fc
+    for _c in _fc.complaints(_fc.per_biome(f, base0, BURN)):
+        print(f"campaign: !! food models disagree — {_c}", flush=True)
+
     # EMPTY, AND THAT IS THE POINT. `enable_caribou_swing` sat here from 2026-08-06 morning as the one channel
     # excluded for being UNVERIFIABLE — its amplitude and period were credited to a thesis nobody could open.
     # The supervisor filed it the same afternoon, it was read, and it VERIFIED the amplitude while FALSIFYING
