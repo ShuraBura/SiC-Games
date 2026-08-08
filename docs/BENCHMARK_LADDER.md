@@ -37,8 +37,17 @@ Three corollaries, each earned:
 
 ## The ladder
 
-Coverage measured 2026-08-07. **"CTB"** counts mechanisms named in a constructed-truth test file; **"tested"**
-counts those named in any test at all.
+Coverage measured 2026-08-07. **"tested"** counts mechanisms named in any test; **"CTB"** counts those named
+in a file whose NAME marks it constructed-truth (`*_ctb.py`, `*_ground_truth.py`).
+
+**⚠ THE CTB COLUMN UNDERCOUNTS, and the error was found the same night it was written.** It is a filename
+heuristic, and genuine constructed-truth tests live in ordinarily-named files —
+`test_bands.py::test_bands_method_connected_components` hand-places five agents at known positions and asserts
+`bands()` returns the partition `[1, 2, 2]`, which is textbook CTB in a file the heuristic scores as zero.
+
+The direction of the error is known (it can only undercount) and it is roughly uniform across tiers, so the
+ORDERING the ladder prescribes is unaffected. But no tier should be called "uncovered" on this column alone —
+read it as "has no dedicated CTB file", not as "has never been checked against a constructed case".
 
 | # | tier | mechs | tested | CTB | primary anchors | markers scored here |
 |---|---|---|---|---|---|---|
