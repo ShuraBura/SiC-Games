@@ -199,10 +199,12 @@ owner = "DemographyConfig"
 type  = "bool"
 # PER-BIOME meat variance for the G.3 lognormal draw. Reads `terrain.MEAT_CV` (cchunts day-to-day CV:
 # forest/Aché 1.97, desert/Martu 2.92, savanna/Hadza-big-game 5.29), falling back to `terrain.HUNT_CV`
-# = 2.11 where no calibration people exists. This also retires the scalar 0.73 from live runs — R-72/R-73
-# showed 0.73 is a SPATIAL cross-cell spread used as a TEMPORAL per-step draw (forest 2.7× low). R-73
-# measured that error's blast radius as ZERO (the Cred effect is CV-insensitive), so this is a provenance
-# correction, not a results correction. Do not expect it to move a marker.
+# = 2.11 where no calibration people exists. This bypasses the scalar 0.73 for every biome that has a
+# calibration people — R-72/R-73 showed 0.73 is a SPATIAL cross-cell spread used as a TEMPORAL per-step draw
+# (forest 2.7× low). R-73 measured that error's blast radius as ZERO (the Cred effect is flat from CV 0.73 to
+# 5.29) and DELIBERATELY LEFT the scalar in place rather than spend compute reproducing the same numbers. So
+# this is a provenance improvement, not a bug fix, and it is not expected to move a marker. (Addendum 38
+# corrects Addendum 37, which mis-described that decision as an oversight.)
 
 [enable_storage]
 value = true

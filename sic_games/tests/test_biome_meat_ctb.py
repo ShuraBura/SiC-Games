@@ -140,10 +140,15 @@ def test_biomes_without_a_calibration_people_take_HUNT_CV(demog):
             assert np.allclose(fld[m], HUNT_CV)
 
 
-def test_the_new_cv_path_does_not_carry_the_RETRACTED_073(demog):
+def test_the_new_cv_path_does_not_carry_the_MIS_ANCHORED_073(demog):
     """R-72/R-73: 0.73 is `GAME_KCAL_STD/mean` for forest — a SPATIAL cross-cell spread fed to a TEMPORAL
-    per-step draw, 2.7× low. It is still the scalar in full_campaign.toml. The per-biome field must not
-    reproduce it anywhere."""
+    per-step draw, 2.7× low. The per-biome field must not reproduce it anywhere.
+
+    IT IS STILL THE SCALAR IN full_campaign.toml, AND THAT IS DELIBERATE, not an oversight (Addendum 38
+    corrects Addendum 37 on this). R-73 swept CV 0…5.29 and found the Cred effect flat across it, so at
+    forest's true 1.97 the result is statistically indistinguishable from the 0.73 the old arms ran at. Its
+    closing line: "Harness CVs left at 0.73 with the mis-anchoring documented, since … re-running them would be
+    compute spent to reproduce the same numbers." Do not "fix" the scalar on the strength of this test."""
     w = build(demog, enable_biome_meat_cv=True)
     assert not np.any(np.isclose(w._biome_meat_cv_field(), 0.73)), "the retired spatial anchor came back"
     assert demog.game_meat_cv == 0.73, "if the scalar changed, update this test's premise (see R-73)"

@@ -5913,4 +5913,61 @@ Pinned by `sic_games/tests/test_biome_meat_ctb.py` (12 tests, including per-cell
 
 ---
 
+**ADDENDUM 38 — CORRECTION TO ADDENDUM 37. I described a documented, reasoned decision as a lapse. R-73 did not
+forget to remove `game_meat_cv = 0.73`; it decided to leave it and wrote down why. Third time in two days that
+I have read a deliberate design decision as a defect (2026-08-08).**
+
+### What Addendum 37 got wrong
+
+Addendum 37 says the value *"outlived its own retraction by three weeks"*, that *"nobody removed it"*, and that
+it is *"the same class as Addendum 30"*. **All three are wrong.** R-73's closing paragraph states the decision
+in plain words:
+
+> *"Harness CVs left at 0.73 with the mis-anchoring documented, since (1) shows re-running them would be compute
+> spent to reproduce the same numbers."*
+
+That is a decision with a reason and a measurement behind it — R-73's own sweep showed the Cred effect is flat
+from CV 0.73 to 5.29, so at forest's true 1.97 the result is statistically indistinguishable from the arm that
+was actually run. Leaving the value was the *cheap* correct call. **It is the opposite of Addendum 30's case**,
+where a retraction reached RESULTS.md and never reached the code at all.
+
+What survives from Addendum 37 on this point: nothing, except the plain fact that the scalar is 0.73 and that
+`enable_biome_meat_cv` now bypasses it for every biome with a calibration people. That is a genuine improvement.
+It is not a rescue.
+
+### The instrument I built on the misreading, and did not ship
+
+I wrote `tools/retired_values.py` — a registry of values that a RESULTS addendum has withdrawn, plus a sweep of
+every config for one still live. It ran, and reported **24 live retired values across 8 config files**.
+
+**Every one was a false positive.** The two registry rows were `game_meat_cv = 0.73` (above) and
+`rank_hierarchy_frac = 0.15`, and Addendum 30 states the second in capitals: **"NOTHING WAS RE-VALUED."** Both
+values are deliberately kept and labelled `[UNANCHORED]` at their point of use. The tool's whole premise — that
+a retired value in a live config is an oversight — is false for exactly the cases that motivated it.
+
+**The tool is deleted, not fixed.** Two reasons. First, the check that actually matters is Charter P3 (*a
+retracted anchor is edited at its point of use*), and `tests/test_retraction_propagation.py` already enforces
+it — a second instrument over the same rule is a second copy, which Charter P4 forbids. Second, a diagnostic
+whose first run produces 24 confident false findings has not earned a place in the suite; the arc has shipped
+enough of those.
+
+### The pattern, since this is now the third instance
+
+| what I called it | what it was | where it was written down |
+|---|---|---|
+| two food models disagree (Addendum 36) | the capacity field's design rationale | `capacity.py` header, first paragraph |
+| wetland game 0 is a defect (Addendum 36) | a provenance guard, deliberately zero | `test_phase1_kcal.py`, the assertion message |
+| 0.73 outlived its retraction (Addendum 37) | a measured decision to leave it | R-73, closing paragraph |
+
+The common shape: **I found a value or a structure that looked wrong, and reported it before reading the place
+where the project had already reasoned about it.** In all three the explanation was one grep away, in the file
+or the log I was already working in. The CTB rules cover instruments. This is a reading failure upstream of any
+instrument — the fix is to search the record for the thing before calling it a defect, not to build a diagnostic
+that finds it again.
+
+Addendum 37's substance is otherwise unaffected: the per-biome wiring, the anchored dicts, the two fallbacks,
+the CTB that caught the σ bug, and the field measurements on the three canonical worlds all stand.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
