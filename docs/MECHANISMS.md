@@ -330,6 +330,15 @@ No new tunable threshold beyond the A-1 placeholders. Risk-sensitivity (variance
 
 ### 9a.5 forage_kcal and game_kcal computation (terrain.py)
 
+> **Load-bearing status first (measured by perturbation 2026-08-08 — Return-Rate Table §0, RESULTS Addendum 36,
+> `tests/test_field_load_bearing_ctb.py`).** These fields are **not** the food supply; `NPPCapacityField` is.
+> `forage_kcal` is live through exactly three surfaces — founder band placement, the per-person forage cap
+> (`enable_forage_cap`), and the agglomeration base (`enable_agglomeration`) — and is inert in-model with those
+> two flags off. **`game_kcal` is live through none**: zeroing it or multiplying it by 1000 leaves a campaign
+> bit-identical, because its only consumer (`game_level` ← `_step_agent`) needs the substrate disabled *and*
+> `game_stream=True`, which no harness sets. The construction rules below are correct; what they build is
+> currently consumed by placement and agglomeration, not by the harvest.
+
 Each biome's cell values are drawn from a **literature-anchored distribution** with a per-biome `(mean, std)`. Two regimes, by whether the std is anchored:
 
 **(a) std anchored in literature → terrain-coupled lognormal (the §9a.6 mechanic).**

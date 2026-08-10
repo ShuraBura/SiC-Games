@@ -776,6 +776,16 @@ gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by e
 **`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs; the per-biome
 `terrain.MEAT_FRAC` dict is the home for a future per-cell wiring.
 
+**WHERE THE MEAT COMES FROM, stated because it is easy to assume otherwise (measured 2026-08-08, Addendum 36).**
+The meat pool is `mf · S` where `S` is the **NPP capacity field** pool for the cell — it is **not** drawn from
+`terrain.game_kcal`, and the per-biome GAME return-rate table (Return-Rate Table §3) does not enter this or any
+other campaign path. `game_kcal` is reachable only through `TerrainField.game_level` ← `_step_agent`, i.e. only
+with the substrate disabled *and* `game_stream=True`, which no harness in the repository sets. Perturbation
+evidence and the exhaustive surface list: `tests/test_field_load_bearing_ctb.py`; status table: Return-Rate
+Table §0. Since `mf` is also a scalar, a campaign's meat is the **same fraction of capacity in every biome** —
+so "wire per-cell `MEAT_FRAC`" and "make `game_kcal` load-bearing" are the same piece of unbuilt work, not two.
+(`MEAT_FRAC` itself is not idle: it reaches the model via `terrain.RETURN_CV` → `enable_emergent_band_size`.)
+
 **DEFERRED (documented, not built):** (a) **meat not η-discounted** — currently η(age) multiplies the *summed*
 intake, so a child's received meat share is production-discounted; the lit-faithful refinement (band sharing
 feeds dependents regardless of their own production → meat share *not* η-scaled) would let meat-sharing buffer

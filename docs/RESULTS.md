@@ -5722,4 +5722,103 @@ variance") applies to the climate layer, and nothing had said so.
 
 ---
 
+**ADDENDUM 36 — A DIAGNOSTIC I BUILT, COMMITTED AND WIRED INTO EVERY CAMPAIGN COMPARED INCOMPATIBLE UNITS.
+Retracted in full. Measuring the question properly instead produced a real finding: the per-biome GAME
+return-rate table has never affected a single run, and `forage_kcal` is load-bearing through exactly three
+surfaces, none of them "food supply" (2026-08-08).**
+
+### The retraction
+
+`food_consistency.py` (commit `4f02e1d`, reverted `25df603`) divided a **cell capacity** (persons/cell, from the
+NPP-derived Tallavaara field) by a **per-person harvest multiple** (`forage_kcal × hours / burn`). Those are not
+the same kind of quantity. Everything downstream was void: the "savanna 16.9×, wetland 14.0×, cluster 2.2–2.7"
+result, the reading that savanna's rates were mis-scoped, and the wetland `game_kcal` 0 → 3,001 change made to
+fix it. None of it reached this file before the retraction; it was reported in chat and is recorded here so the
+reasoning is on the record rather than only the reversal.
+
+`capacity.py`'s own header states the design outright — *"a cell's extractable kcal/step is set by its
+NPP-derived forager density, NOT the bare `forage_kcal` rate ... the bare forage field (~1–8 persons/cell) is too
+poor to hold a band, while this field gives ~30–50 persons/cell."* The ~1–8 vs ~30–50 gap I reported as a defect
+**is the documented rationale for the capacity field existing**. There are not two competing food models; there
+is one supply and a return-rate table doing other jobs.
+
+The suite caught the second half unaided: `test_phase1_kcal.py::test_game_kcal_zeroed_at_wetland` asserts
+*"game_kcal must be 0 at wetland (UNANCHORED)"* — a deliberate provenance guard (Return-Rate Table §1.4) that an
+unanchored biome reads zero rather than carrying an invented number. I overrode a tested design rule on the
+strength of a diagnostic that was wrong.
+
+**The specific failure of discipline, since CTB is supposed to prevent exactly this.** I wrote ten CTB tests for
+that diagnostic and every one of them verified that the ratio was *computed as specified*. Not one asked whether
+the ratio *meant* anything. **A constructed truth for the arithmetic is not a constructed truth for the
+quantity** — the CTB has to be built on a world whose ANSWER is known, not on a formula whose STEPS are known.
+Sixth instrument defect of this arc, and the first that was committed and wired into every campaign before being
+caught.
+
+### The question that was actually open
+
+If the capacity field is the supply, what are `forage_kcal` and `game_kcal` doing? Answered by **perturbation,
+not inspection**: scale a field ×1000 or ×0, re-run, compare the trajectory. Reading call sites tells you where
+a name *appears*; only perturbation tells you whether the value *matters*. Config: `full_campaign.toml`
+(the config campaigns actually run), coastal-temperate, 200 founders, 10 steps.
+
+**The instrument's own first version was wrong, and the positive control is what caught it.**
+`TerrainWorld.__init__` line 267 does `self._fields = generate_world(knobs)` — the model **regenerates its own
+world** from the knobs and never reads the `WorldFields` the caller built for the capacity field. Perturbing the
+caller's copy changed nothing; every arm read "not load-bearing"; the answer was clean, plausible and
+meaningless. The tell was that `enable_forage_cap=True` with `forage_kcal ×0.001` should starve everyone and did
+not. The published version perturbs `w._fields` and **requires** a known-live field (`npp_gm2 ×0.5`) to change
+the run before any negative result is reported. Two instrument failures in one day on the same question, the
+first shipped and the second caught in ten minutes — by a control that costs one test.
+
+### The findings
+
+| Perturbation | Result |
+|---|---|
+| `npp_gm2 × 0.5` — POSITIVE CONTROL | pool_sum ×0.66, pop 106 → 104 (**changes, as required**) |
+| `game_kcal × 0` | **bit-identical** |
+| `game_kcal × 1000` | **bit-identical** |
+| `forage_kcal × 1000`, in-model | pool_sum ×3.24, pop 106 → 110 |
+| `forage_kcal × 0.001` at seeding | placement 67 → **175** distinct cells |
+| `forage_kcal × 1000` at seeding | placement 67 → **8** distinct cells |
+| `forage_kcal × 1000`, agglomeration + forage cap both OFF | **bit-identical** |
+
+**`game_kcal` is dead, and always has been.** It is read only by `TerrainField.game_level`, called from exactly
+one site (`_step_agent`), which executes only when the multi-occupancy substrate is **disabled** *and*
+`game_stream=True`. Every campaign is rivalrous and passes `game_stream=False`, and **no harness anywhere in the
+repository sets it True** — only `tests/test_phase1_kcal.py`. An anchored, curated, twice-corrected per-biome
+table (R-79 corrected desert game 730 → 995 as recently as 2026-07-17) has never entered a result.
+
+**Campaign meat is `game_meat_frac × S`** — and `game_meat_frac` is a **scalar** (0.55, the forest value), so the
+same fraction of the capacity pool in **every biome**. Whatever biome-to-biome variation in hunting the table
+encodes, the model does not have it. Two live things must not be swept in with this: the climate `meat_factor`
+(caribou swing, Addendum 35) modulates meat in *time* on GRASS_STEPPE, so **Addendum 35's finding is
+unaffected** — it runs through `meat_factor`, not `game_kcal`; and Cordain 2000's per-biome `terrain.MEAT_FRAC`
+does reach the model, by a different route (`terrain.RETURN_CV` → `enable_emergent_band_size`, on in
+`full_campaign.toml`). What is missing is a biome-varying **harvest split**, not every biome-varying diet term.
+
+**`forage_kcal` is live on three surfaces and no others:** founder **band placement** (outside the model, the
+largest effect), the per-person **forage cap**, and the **agglomeration base**
+`A_cell = aggl_tier2 · S_pot · (forage_kcal · forage_cap_hours)`. The exhaustiveness is itself a test: with
+`enable_agglomeration` and `enable_forage_cap` both off, `×1000` is bit-identical in-model, so those two flags
+carry **all** of its in-model influence and a third consumer added later will fail loudly.
+
+### What this dissolves, and what it does not
+
+The wetland/mountain `game_kcal` zeros — which I spent the preceding stretch trying to justify filling — **cost
+nothing at present**. They are honest gaps under the §1.4 UNANCHORED policy, and no run outcome depends on them.
+Anchoring them is a prerequisite for a two-stream economy, not a fix for a live defect. Rademaker 2014
+(Cuncaicha foragers at 4,480 m taking vicuña, guanaco and taruka) still shows the mountain zero is
+*ecologically* false; that stays a real gap in the table and a false one in the model's biology.
+
+**Still unexplained, and back to unknown:** `world_savanna` settles at **9%** of trough-limited capacity against
+51% and 69% for the other two canonical worlds. That measurement stands — it came from run trajectories, not
+from the retracted diagnostic — but the explanation offered for it was the retracted one. No replacement is
+offered here rather than a third guess.
+
+Pinned by `sic_games/tests/test_field_load_bearing_ctb.py` (12 tests, positive control first). Documented in
+Return-Rate Table §0. **The modelling decision — wire the two-stream economy so §3 becomes load-bearing, or
+retire §3 to a reference table and say so — is the supervisor's and is not taken here.**
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -6,6 +6,48 @@
 
 ---
 
+## §0 Load-bearing status — WHAT THESE NUMBERS ACTUALLY CONTROL (measured 2026-08-08)
+
+**Read this before using any value below to explain a run.** These fields are **not** the model's food supply.
+A cell's extractable kcal/step comes from the NPP-derived `NPPCapacityField` (`capacity.py`; Tallavaara 2018),
+which the campaign passes as `harvest_field`. The two return-rate fields are separate quantities with narrower
+jobs, established by **perturbation** (scale the field ×1000 or ×0, re-run, compare) rather than by reading call
+sites — see `sic_games/tests/test_field_load_bearing_ctb.py`, which pins every statement here.
+
+| Field | Live surfaces in a campaign run | Effect of ×1000 |
+|---|---|---|
+| `forage_kcal` (§2) | **(1)** founder **band placement** (`seed_band_positions*`, computed outside the model); **(2)** the per-person **forage cap** (`enable_forage_cap`); **(3)** the **agglomeration base** `A_cell = aggl_tier2 · S_pot · (forage_kcal · forage_cap_hours)` (`enable_agglomeration`) | placement collapses 67 → 8 distinct cells; harvest pool ×3.2 |
+| `game_kcal` (§3) | **none** | **bit-identical** |
+
+**`game_kcal` has never affected a run.** It is read only by `TerrainField.game_level`, called only from
+`_step_agent`, which executes only when the multi-occupancy substrate is **disabled** *and* `game_stream=True`.
+Every campaign is rivalrous and sets `game_stream=False`, and **no harness in the repository sets it True** —
+only `tests/test_phase1_kcal.py`. Zeroing the whole game field or multiplying it by a thousand leaves the
+trajectory bit-identical.
+
+Consequences, stated plainly because they change how §3 should be read:
+
+- **Meat in a campaign is `game_meat_frac × S`** — a **scalar** (0.55, the forest value), so the *same fraction
+  of the capacity pool in every biome* (`phase1_model.py`, the rivalrous harvest). The per-biome hunting
+  variation §3 encodes is **not in the model**. Two things that ARE still live and must not be swept in with
+  this: the climate `meat_factor` (caribou herd swing) modulates meat in *time* on GRASS_STEPPE, and Cordain's
+  per-biome `terrain.MEAT_FRAC` reaches the model by a different route — `terrain.RETURN_CV` →
+  `enable_emergent_band_size`, on in `full_campaign.toml`. What is missing is a biome-varying **harvest split**,
+  not every biome-varying diet term.
+- **The §3 UNANCHORED zeros (wetland, mountain) cost nothing at present.** They are honest gaps in the table
+  (§1.4) and `tests/test_phase1_kcal.py::test_game_kcal_zeroed_at_wetland` guards them, but no run outcome
+  currently depends on them. Anchoring them is a prerequisite for a two-stream economy, not a fix for a live
+  defect. *(A claim that the wetland zero causes a measurable failure was made on 2026-08-08 and retracted the
+  same day — see RESULTS Addendum, commit `25df603`.)*
+- **`forage_kcal`'s in-model influence is exhaustively two flags.** With `enable_agglomeration` and
+  `enable_forage_cap` both off it is inert in-model; only the placement surface remains. That exhaustiveness is
+  itself a test (`test_both_consumers_off_makes_it_inert`), so a third consumer added later fails loudly.
+
+**Open, and deliberately not decided here:** whether to wire the two-stream economy so §3 becomes load-bearing,
+or to retire §3 to a reference table and say so. That is a modelling decision for the supervisor.
+
+---
+
 ## §1 Shared methodology
 
 ### §1.1 Formula & constants
