@@ -67,6 +67,42 @@ aggregate is computable by hand.
 A diagnostic without a constructed-truth test is not evidence. If a result rests on one, say so in the same
 breath, and build the fixture before the result is written into `docs/RESULTS.md`.
 
+### CTB THE QUANTITY, NOT ONLY THE ARITHMETIC
+
+**Added 2026-08-08 after commit `4f02e1d`, the first defective instrument that got committed and wired into
+every campaign before it was caught.** It shipped with **ten** CTB tests. Every one of them verified that the
+ratio was *computed as specified*. Not one asked whether the ratio *meant* anything — it divided a cell capacity
+(persons per cell) by a per-person harvest multiple, two quantities that cannot be divided.
+
+So step 1 of CTB says *a world whose ANSWER you know*, and it means the answer, not the formula:
+
+- **Name the unit of every input and of the output, out loud, before writing the test.** If two inputs are
+  combined, they must be the same kind of quantity or the combination must be a documented conversion.
+- **A test that re-derives the formula proves only that you can write the same formula twice.** Construct a case
+  where the *answer* is known independently of the code under test.
+- **Before believing a headline ratio, check whether the code already documents it.** `capacity.py`'s header
+  stated the "~1–8 vs ~30–50 persons/cell" gap as its own design rationale. It was reported as a defect.
+
+### A "NO EFFECT" RESULT NEEDS A POSITIVE CONTROL THROUGH THE SAME PATH
+
+**Added the same day, after the second instrument failure on the same question.** A measurement claiming a
+mechanism is inert must first show a perturbation that **does** move the run, through the identical code path.
+
+The failure it prevents: `TerrainWorld.__init__` does `self._fields = generate_world(knobs)` — the model
+**regenerates its own world** and ignores the `WorldFields` the caller built. Perturbing the caller's copy
+changed nothing, every arm read "not load-bearing", and the answer was clean, plausible and empty.
+
+- **Perturb, do not read.** Reading call sites tells you where a name APPEARS. Scaling a field ×1000 and
+  re-running tells you whether the value MATTERS. Only the second is evidence.
+- **Check the run is alive.** A collapsed population is insensitive to everything and makes every field look
+  inert.
+- **A flag that is ON and changes nothing is a bug until proven otherwise.** The ON-but-dead gate checks the
+  CONFIG; a per-flag liveness test checks the RUN. Both are needed. The per-flag test is three lines, and it
+  caught a half-wired mechanism the same day it was added (Addendum 37).
+
+Pattern to copy: `sic_games/tests/test_field_load_bearing_ctb.py`, whose first test is the positive control and
+whose docstring states that every other test in the file is void if that control ever passes trivially.
+
 ---
 
 ## Process rules that already bind

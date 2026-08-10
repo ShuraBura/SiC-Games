@@ -364,6 +364,27 @@ class DemographyConfig(BaseModel):
     # — fresh every step, per cell. The old anchor understated forest 2.7× and desert 10×. Runs predating R-72
     # (R-18/19/20, society benchmark, paternal calib) hardcode 0.73 = the mis-anchored forest value.
     game_meat_cv: float = Field(0.0, ge=0.0)
+    # ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ────────────────────────────────
+    # Until this date both quantities above were SCALARS, so a campaign gave every biome the same diet split and
+    # the same meat variance. MODEL_SPEC §4.5.5 said so ("`mf` is a scalar config ... the per-biome
+    # `terrain.MEAT_FRAC` dict is the home for a future per-cell wiring"), and Addendum 36 measured the
+    # consequence: no biome signal reached the harvest at all, because `game_kcal` is not read either.
+    #
+    # Each flag reads the cell's biome from an ALREADY ANCHORED dict. Neither introduces a new number.
+    #   enable_biome_meat_frac → `terrain.MEAT_FRAC`  (Cordain 2000 Table 2, terrestrial-renormalized)
+    #   enable_biome_meat_cv   → `terrain.MEAT_CV`    (cchunts day-to-day CV; Hawkes 1991 for the Hadza)
+    #
+    # ABSENT BIOMES FALL BACK, AND THE FALLBACK DIFFERS BY DICT — because the two dicts document different
+    # reasons for absence. `MEAT_FRAC` omits WETLAND deliberately ("a gap, not a measured zero" — a 0.0 there
+    # would assert that wetland foragers eat no meat), so an absent biome takes the SCALAR `game_meat_frac`.
+    # `MEAT_CV` omits GRASS/MOUNTAIN/WETLAND for want of a calibration people, and terrain.py's own rule for
+    # that case is `HUNT_CV` = 2.11, the biome-INVARIANT measured hunting CV — so an absent biome takes it.
+    # Do not "fix" either fallback to 0.0; both zeros would be claims that no source supports.
+    #
+    # Both default False ⇒ every prior run stays bit-exact. `enable_game` and `game_meat_frac > 0` still gate
+    # the whole two-stream path, so the scalar remains the master switch as well as the fallback value.
+    enable_biome_meat_frac: bool = False
+    enable_biome_meat_cv: bool = False
     # ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982,
     # Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp ≤ storage_temp_threshold_c ≈ Binford's
     # Effective-Temperature 15.25 °C storage threshold) an agent banks a `storable_fraction` of its harvest

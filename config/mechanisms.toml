@@ -184,6 +184,26 @@ type  = "bool"
 # diet animal fraction by biome (Cordain 2000 Table 2, terrestrial-renormalized; terrain.MEAT_FRAC).
 # Energy-conserving: at κ=0 forage+meat == the single stream (exact back-compat; default 0 = forage-only).
 
+[enable_biome_meat_frac]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# PER-BIOME diet split. Reads `mf` per cell from `terrain.MEAT_FRAC` (Cordain 2000 Table 2) instead of the
+# scalar `game_meat_frac`. Turned on 2026-08-08: until then a campaign gave EVERY biome the forest value
+# 0.55, and Addendum 36 showed no biome signal reached the harvest at all (`game_kcal` is not read either).
+# WETLAND is absent from MEAT_FRAC by intent — "a gap, not a measured zero" — so it takes the scalar.
+
+[enable_biome_meat_cv]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# PER-BIOME meat variance for the G.3 lognormal draw. Reads `terrain.MEAT_CV` (cchunts day-to-day CV:
+# forest/Aché 1.97, desert/Martu 2.92, savanna/Hadza-big-game 5.29), falling back to `terrain.HUNT_CV`
+# = 2.11 where no calibration people exists. This also retires the scalar 0.73 from live runs — R-72/R-73
+# showed 0.73 is a SPATIAL cross-cell spread used as a TEMPORAL per-step draw (forest 2.7× low). R-73
+# measured that error's blast radius as ZERO (the Cred effect is CV-insensitive), so this is a provenance
+# correction, not a results correction. Do not expect it to move a marker.
+
 [enable_storage]
 value = true
 owner = "DemographyConfig"

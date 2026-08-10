@@ -37,6 +37,10 @@ TYPES = {
     "enable_productivity_mobility": "T", "enable_terrain_move_cost": "T", "enable_emergent_abandonment": "T",
     "enable_site_appraisal": "T", "enable_landscape_packing": "T",
     "enable_game": "P", "enable_agriculture": "P", "enable_agglomeration": "P", "enable_forage_cap": "P",
+    # Per-biome two-stream (Addendum 37). Both are PRODUCTION modifiers: they change the SPLIT of the cell pool
+    # and the variance of the meat half, not the size of the pool. Neither carries its own magnitude — each
+    # reads an anchored dict (terrain.MEAT_FRAC / terrain.MEAT_CV), so there is no knob to sit at neutral.
+    "enable_biome_meat_frac": "P", "enable_biome_meat_cv": "P",
     "enable_catchment_ceiling": "P", "enable_resource_storability": "P", "enable_improved_land": "P",
     "enable_alluvial_renewal": "P",
     "enable_soil_depletion": "D",

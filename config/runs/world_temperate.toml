@@ -37,6 +37,8 @@ enable_alluvial_renewal = true
 enable_ascribed_mate_choice = true
 enable_band_affiliation = true
 enable_band_family_knobs = true
+enable_biome_meat_cv = true
+enable_biome_meat_frac = true
 enable_bonded_mating = true
 enable_bud_hazard = false
 enable_caribou_swing = true
@@ -114,7 +116,6 @@ enable_village_budding = true
 enable_village_resentment = true
 enable_village_scaling = true
 enable_wealth_obligation = true
-
 [parameters]
 a2_cap = 5.0
 a_seas = 0.4

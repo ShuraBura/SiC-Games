@@ -142,14 +142,20 @@ def test_the_only_game_kcal_consumer_is_a_path_no_harness_takes(demog):
     assert "if self._game_stream:" in src
 
 
-def test_campaign_meat_is_a_flat_fraction_of_CAPACITY_not_a_biome_game_rate(demog):
-    """The consequence worth stating: with the game table dead, a campaign's meat is `game_meat_frac * S` — the
-    SAME fraction of the capacity pool in every biome. Whatever biome-to-biome variation in hunting the
-    return-rate table encodes, the model does not have it. (The climate `meat_factor` still modulates it in time
-    on GRASS_STEPPE; that is a temporal channel, not a biome-specific rate.)"""
+def test_campaign_meat_is_a_FRACTION_OF_CAPACITY_not_a_biome_game_rate(demog):
+    """The consequence worth stating: with the game table dead, a campaign's meat is a fraction of the CAPACITY
+    pool `S`, never a draw on `game_kcal`.
+
+    HISTORY, because this test's premise changed by design. Until 2026-08-08 the fraction was one scalar for
+    every biome, and this test asserted the literal line `meat_pool = meat_frac * S`. Addendum 37 wired
+    `enable_biome_meat_frac`, so the fraction is now per-cell (`mf_c`) from Cordain's `terrain.MEAT_FRAC`. What
+    the test defends is unchanged and is the part that matters: the meat pool is a SPLIT OF S. If `game_kcal`
+    ever becomes the source, that is a unit change (a rate where a pool belongs) and it must be deliberate."""
     assert demog.enable_game and demog.game_meat_frac > 0.0
     src = (_REPO / "sic_games" / "src" / "sic_games" / "phase1_model.py").read_text(encoding="utf-8")
-    assert "meat_pool = meat_frac * S" in src
+    assert "meat_pool = mf_c * S" in src, "the meat pool is no longer a split of the capacity pool"
+    assert "game_kcal" not in src.split("def _step_rivalrous")[1], \
+        "the rivalrous harvest now reads game_kcal — a RATE where a POOL belongs (see commit 4f02e1d)"
 
 
 # ── forage_kcal: live, on an exhaustively identified set of surfaces ──────────────────────────────────────

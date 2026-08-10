@@ -339,7 +339,9 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | humidity (climate seam) | **0.70** | PLACEHOLDER | " |
 | game_mobility | **FOREST 0, DESERT 0, SAVANNA 0.2, GRASS 1.0** | SEAM (mechanic deferred) | Binford 2001 / forager-collector; ≈0 in calibration biomes by construction. §4.1.8 |
 | enable_game | **False** (default) | OPT-IN | Two-stream forage+meat economy (G.1+G.2). Default off = forage-only back-compat. §4.5.5 |
-| game_meat_frac (mf) | **FOREST 0.55, DESERT 0.45, SAVANNA 0.38, GRASS 0.66** | LIT-ANCHORED (Cordain 2000 Table 2) | diet animal fraction = hunted/(plant+hunted), terrestrial-renormalized (fished dropped). `terrain.MEAT_FRAC`. §4.5.5 |
+| game_meat_frac (mf) | **FOREST 0.55, DESERT 0.45, SAVANNA 0.38, GRASS 0.66, MOUNTAIN 0.34** | LIT-ANCHORED (Cordain 2000 Table 2) | diet animal fraction = hunted/(plant+hunted), terrestrial-renormalized (fished dropped). `terrain.MEAT_FRAC`. §4.5.5 |
+| enable_biome_meat_frac | **False** (class) / **true** (campaign) | OPT-IN, LIT-ANCHORED | reads `mf` PER CELL from `terrain.MEAT_FRAC` instead of the scalar. Before 2026-08-08 every biome used 0.55, the forest value. Wetland is absent from the dict by intent → keeps the scalar, never 0.0. §4.5.5, Addendum 37 |
+| enable_biome_meat_cv | **False** (class) / **true** (campaign) | OPT-IN, LIT-ANCHORED | reads the G.3 draw's CV PER CELL from `terrain.MEAT_CV` (forest 1.97, desert 2.92, savanna 5.29); biomes with no calibration people fall back to `terrain.HUNT_CV` = 2.11. Retires the scalar 0.73, whose anchor R-72/R-73 falsified. §4.5.5, Addendum 37 |
 | meat sharing κ | = substrate `contest_exponent` | STRATEGY LEVER | meat split Cred-weighted (φ+ε)^κ for Carbon; forage forced κ=0. κ=0 ⇒ energy-conserving/inert (Silicon). §4.5.5 |
 
 > **§14–16 currency note (2026-06-20):** added to close the audit gap — PARAMETERS.md had not been updated

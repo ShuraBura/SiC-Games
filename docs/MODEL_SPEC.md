@@ -773,8 +773,11 @@ class-interval midpoints, **fished column dropped** (`terrain.MEAT_FRAC`):
 
 Cordain finding used: hunted-animal dependence is ~latitude-invariant (~26–35%, r=0.08 n.s.); the latitude
 gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by environment, not a latitude law.
-**`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs; the per-biome
-`terrain.MEAT_FRAC` dict is the home for a future per-cell wiring.
+**`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs. **The per-cell
+wiring exists as of 2026-08-08 (Addendum 37):** `enable_biome_meat_frac` reads `mf` per cell from
+`terrain.MEAT_FRAC`, and `enable_biome_meat_cv` reads the G.3 draw's CV per cell from `terrain.MEAT_CV`
+(fallback `terrain.HUNT_CV` = 2.11). Both default OFF in the class and ON in `config/mechanisms.toml`. A biome
+absent from `MEAT_FRAC` (wetland) keeps the scalar, never 0.0 — the omission is a gap, not a measured zero.
 
 **WHERE THE MEAT COMES FROM, stated because it is easy to assume otherwise (measured 2026-08-08, Addendum 36).**
 The meat pool is `mf · S` where `S` is the **NPP capacity field** pool for the cell — it is **not** drawn from

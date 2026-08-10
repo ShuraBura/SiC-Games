@@ -5821,4 +5821,96 @@ retire §3 to a reference table and say so — is the supervisor's and is not ta
 
 ---
 
+**ADDENDUM 37 — THE TWO-STREAM ECONOMY BECOMES PER-BIOME. Both new flags read dicts that were already anchored,
+so no new number enters the model. The CTB caught a bug in my own wiring on its first run (2026-08-08).**
+
+### What was already live, and what was not
+
+The supervisor's reaction to Addendum 36 was surprise that the two-stream economy was not live. The record needs
+a correction here, because **the split itself has run in every campaign since the Carbon build**: the cell pool
+`S` divides into a forage stream at a literal κ=0 and a meat stream at the substrate κ, band-pooled and
+Cred-weighted, with the G.3 stochastic meat draw on top. That mechanism was never dead.
+
+What was **scalar** is the split. One `game_meat_frac` = 0.55 — the FOREST value — for every biome on the map,
+and one `game_meat_cv` for every biome. Combined with Addendum 36 (`game_kcal` reaches nothing), a campaign
+carried **no biome signal in its diet at all**. MODEL_SPEC §4.5.5 had said so in one line since 2026-06-21:
+*"`mf` is a scalar config ... the per-biome `terrain.MEAT_FRAC` dict is the home for a future per-cell wiring."*
+
+### The wiring
+
+Two flags, each reading a dict that already exists and is already anchored. **Neither introduces a new number.**
+
+| Flag | Source | Values |
+|---|---|---|
+| `enable_biome_meat_frac` | `terrain.MEAT_FRAC` — Cordain 2000 Table 2, terrestrial-renormalized | forest 0.55, desert 0.45, savanna 0.38, grass 0.66, mountain 0.34 |
+| `enable_biome_meat_cv` | `terrain.MEAT_CV` — cchunts day-to-day CV; Hawkes 1991 for the Hadza | forest/Aché 1.97, desert/Martu 2.92, savanna/Hadza 5.29 |
+
+**The two fallbacks differ, and that is deliberate.** The dicts record different reasons for an absent biome.
+`MEAT_FRAC` omits WETLAND on purpose — terrain.py calls it *"a gap, not a measured zero"*, because 0.0 would
+assert that wetland foragers eat no meat — so an absent biome takes the configured **scalar**. `MEAT_CV` omits
+grass, mountain and wetland for want of a calibration people, and terrain.py's own rule for that case is
+**`HUNT_CV` = 2.11**, a measured biome-invariant value across ~15,600 trips. Both fallbacks are pinned by tests,
+so a later tidy-up to 0.0 fails loudly rather than quietly asserting two things no source supports.
+
+Class defaults are False (Charter §12, bit-exact). The **campaign** default is `true` in
+`config/mechanisms.toml`, per the supervisor's standing rule that nothing stays off without being a control.
+
+### What the wiring puts on each canonical world — FIELDS, not yet run results
+
+Measured on the three tier-2 worlds at their configured terrain × climate. This says what CHANGED, not what it
+DOES; the run comparison is a separate step and is not reported here.
+
+| world | land cells | biomes | mean `mf` (was 0.55 everywhere) | mean meat CV (was 0.73 everywhere) |
+|---|---|---|---|---|
+| `world_temperate` | 9,449 | forest 3399, grass 5474, desert 576 | **0.608** | **2.11** |
+| `world_savanna` | 9,453 | savanna 4499, desert 2896, forest 1717, grass 237, wetland 104 | **0.441** | **3.85** |
+| `world_montane` | 9,822 | grass 4325, forest 2285, desert 2113, savanna 654, mountain 367, wetland 78 | **0.558** | **2.46** |
+
+Two things stand out and neither is a claim yet:
+
+- **The change is not a uniform shift.** Temperate goes UP (grass-dominated, `mf` 0.66) and savanna goes DOWN
+  (`mf` 0.38). A flat 0.55 was not a neutral average of the three — it sat above savanna and below temperate.
+- **`world_savanna` moves most, on both axes at once**: the meat fraction falls 0.55 → 0.44 while the meat CV
+  rises 0.73 → 3.85, a **5.3×** more variable meat stream, because Hadza big-game hunting is the documented
+  extreme (Hawkes 1991, CV 5.29). Savanna is also the world with the unexplained 9%-of-capacity settling
+  (Addendum 36). **That is a coincidence of location, not evidence**, and it must be tested as a hypothesis with
+  the flags as the ablation — not adopted as the explanation this arc has already had two of.
+
+### A side effect worth naming: the retired 0.73 leaves live runs
+
+`game_meat_cv = 0.73` is still the scalar in `full_campaign.toml`. R-72/R-73 established that 0.73 is
+`GAME_KCAL_STD/mean` for forest — a **SPATIAL** cross-cell spread used as a **TEMPORAL** per-step draw, 2.7×
+low. R-73 then measured that error's blast radius as **zero** (the Cred effect is CV-insensitive), so the value
+was left in place and quietly outlived its own retraction by three weeks. The per-biome path does not reproduce
+it anywhere, and a test asserts that. **This is a provenance correction, not a results correction** — R-73 says
+not to expect a marker to move.
+
+That a retired anchor sat in the live config for three weeks is the same class as Addendum 30 ("Addendum 28's
+retraction never reached the code"). A sweep of every config value against the addenda that touched its anchor
+is now an open task.
+
+### The CTB caught a bug in my own wiring, first run
+
+`test_each_flag_is_live_on_its_own[enable_biome_meat_cv]` failed: the flag was on and the trajectory did not
+move. Cause — I replaced the guard `if meat_cv > 0.0` with `if cv_c > 0.0`, and left the line below it computing
+`sig = sqrt(log(1 + meat_cv²))` from the **scalar**. The per-cell CV gated the draw and then took no part in it.
+
+Worth recording plainly, because it is the *cheap* version of the failure that has cost this arc six
+instruments: the per-flag liveness test is three lines, and it is the only reason a half-wired mechanism did not
+ship reading "on". A flag that is on and changes nothing is exactly what the ON-but-dead gate exists for
+(Charter §12) — that gate checks the CONFIG, and this one needed a check on the RUN.
+
+### Not done, and why
+
+**The meat pool still does not come from `game_kcal`.** `game_kcal` is a RATE (kcal per forager-hour); `S` is a
+cell POOL (kcal per step). Feeding one into the other is the unit error of commit `4f02e1d`, one addendum ago.
+Total food already comes from the Tallavaara NPP capacity field, which integrates the whole subsistence base,
+and diet composition now comes from Cordain. **In the current architecture the game return-rate table has no
+remaining job.** The recommendation is to retire Return-Rate Table §3 to a reference table unless the separate
+depletable game stock (the GD-1/CC-1 seam) is built. That decision is the supervisor's; nothing is deleted.
+
+Pinned by `sic_games/tests/test_biome_meat_ctb.py` (12 tests, including per-cell energy conservation).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

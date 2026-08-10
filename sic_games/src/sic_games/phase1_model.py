@@ -312,6 +312,8 @@ class TerrainWorld(mesa.Model):
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
+        self._meat_frac_cache = None                              # per-cell diet meat fraction from terrain.MEAT_FRAC (absent ⇒ the scalar game_meat_frac)
+        self._meat_cv_cache = None                                # per-cell day-to-day meat CV from terrain.MEAT_CV (absent ⇒ terrain.HUNT_CV)
         self._diag_pool = None                                    # DIAGNOSTIC: set to {} to record per-cell (S, occupancy) each harvest; None ⇒ off
         self._move_cost_cache = None                              # Stage 1b terrain move cost field = move_cost_kcal · cost (absent ⇒ free movement)
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
@@ -796,6 +798,44 @@ class TerrainWorld(mesa.Model):
                 return None
             self._forage_cap_cache = fk * self._demog.forage_cap_hours
         return self._forage_cap_cache
+
+    def _biome_meat_frac_field(self):
+        """PER-CELL diet meat fraction `mf` from `terrain.MEAT_FRAC` (Cordain 2000 Table 2). Cached (static).
+        None if the flag is off or there is no biome field, in which case the caller keeps the scalar.
+
+        A biome ABSENT from MEAT_FRAC (wetland) takes the configured scalar `game_meat_frac`, NOT zero — the dict
+        omits wetland deliberately, and a 0.0 would assert that wetland foragers eat no meat. Water cells never
+        hold occupants, so their value is never read; they take the scalar too rather than a special case."""
+        if self._meat_frac_cache is None:
+            biome = getattr(self._fields, "biome", None)
+            if biome is None:
+                return None
+            import numpy as np
+            from sic_games.terrain import MEAT_FRAC
+            out = np.full(biome.shape, float(self._demog.game_meat_frac), dtype=float)
+            for b, m in MEAT_FRAC.items():
+                out[biome == b] = float(m)
+            self._meat_frac_cache = out
+        return self._meat_frac_cache
+
+    def _biome_meat_cv_field(self):
+        """PER-CELL day-to-day meat CV from `terrain.MEAT_CV` (cchunts; Hawkes 1991 for the Hadza). Cached.
+
+        A biome ABSENT from MEAT_CV (grass, mountain, wetland — no calibration people) takes `terrain.HUNT_CV`
+        = 2.11, which is terrain.py's own documented rule for that case and is a MEASURED biome-invariant value,
+        not a filler. It is not the scalar `game_meat_cv`, because that scalar's historical value (0.73) is the
+        anchor R-72/R-73 retired — a SPATIAL cross-cell spread used as a TEMPORAL per-step draw."""
+        if self._meat_cv_cache is None:
+            biome = getattr(self._fields, "biome", None)
+            if biome is None:
+                return None
+            import numpy as np
+            from sic_games.terrain import HUNT_CV, MEAT_CV
+            out = np.full(biome.shape, float(HUNT_CV), dtype=float)
+            for b, c in MEAT_CV.items():
+                out[biome == b] = float(c)
+            self._meat_cv_cache = out
+        return self._meat_cv_cache
 
     def _move_cost_field(self):
         """Stage 1b per-cell terrain MOVE COST (kcal) = move_cost_kcal · cost, where `cost` ∈[0.15,1] is the terrain
@@ -1554,6 +1594,12 @@ class TerrainWorld(mesa.Model):
         game_on = demog is not None and demog.enable_game and demog.game_meat_frac > 0.0
         meat_frac = demog.game_meat_frac if game_on else 0.0
         meat_cv = demog.game_meat_cv if game_on else 0.0
+        # PER-BIOME two-stream (Addendum 37): swap the two scalars above for per-cell fields read from the
+        # anchored dicts. Flags off ⇒ both fields are None ⇒ the scalars are used ⇒ bit-exact.
+        mf_field = (self._biome_meat_frac_field()
+                    if game_on and getattr(demog, "enable_biome_meat_frac", False) else None)
+        cv_field = (self._biome_meat_cv_field()
+                    if game_on and getattr(demog, "enable_biome_meat_cv", False) else None)
         sex_div = demog.sex_division if (demog is not None and game_on) else 0.0   # step 3: prowess-signal only
         # Storage (delayed-return): glut-capture params; gated on the overwintering zone (cell temp ≤ threshold).
         store_on = demog is not None and demog.enable_storage
@@ -1664,17 +1710,22 @@ class TerrainWorld(mesa.Model):
                 # band-pooled, Cred-weighted at κ>0 (the Carbon mechanism on high-variance game). Energy-
                 # conserving: at κ=0 forage+meat == single stream (exact back-compat + the inertness gate);
                 # at κ>0 meat redistributes toward high-Cred Carbon agents while forage stays equal.
-                meat_pool = meat_frac * S
+                # PER-BIOME (Addendum 37): the cell's own diet split and its own meat variance, where anchored.
+                mf_c = float(mf_field[cy, cx]) if mf_field is not None else meat_frac
+                cv_c = float(cv_field[cy, cx]) if cv_field is not None else meat_cv
+                meat_pool = mf_c * S
                 if hasattr(tf, "meat_factor"):
                     meat_pool *= tf.meat_factor(cx, cy)   # C.4b caribou herd-swing: meat-only depression on GRASS_STEPPE
-                if meat_cv > 0.0 and meat_pool > 0.0:
+                if cv_c > 0.0 and meat_pool > 0.0:
                     # G.3: band-level correlated stochastic meat — ONE mean-preserving lognormal draw per cell
                     # (shared by all occupants). Ordinary bad-streak variance; the regime where the share rule
                     # decides who crosses the floor (Carbon scoping). One model-RNG draw → deterministic.
-                    sig = math.sqrt(math.log(1.0 + meat_cv * meat_cv))
+                    sig = math.sqrt(math.log(1.0 + cv_c * cv_c))
                     meat_pool = math.exp(self.random.normalvariate(math.log(meat_pool) - 0.5 * sig * sig, sig))
-                f_sh = (_forage_excl(occ, (1.0 - meat_frac) * S, 0.0, excl_mask) if excl_mask
-                        else compute_harvest_shares(occ, (1.0 - meat_frac) * S, 0.0, phi_eps))
+                # ENERGY CONSERVATION: the forage stream is the COMPLEMENT of the same `mf_c` used for the meat
+                # pool. If these two ever read different fractions the cell silently creates or destroys kcal.
+                f_sh = (_forage_excl(occ, (1.0 - mf_c) * S, 0.0, excl_mask) if excl_mask
+                        else compute_harvest_shares(occ, (1.0 - mf_c) * S, 0.0, phi_eps))
                 m_sh = compute_harvest_shares(occ, meat_pool, kappa_cell, phi_eps)
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
