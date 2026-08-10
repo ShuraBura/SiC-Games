@@ -122,6 +122,17 @@ def load(path, seed: int | None = None) -> RunSpec:
         run["seed"] = int(seed)     # the ONE permitted override; a seed sweep is one experiment repeated
     if not run.get("tag"):
         run["tag"] = f"_{path.stem}"
+    if seed is not None and int(seed) != int(raw["run"].get("seed", RUN_DEFAULTS["seed"])):
+        # THE TAG MUST CARRY THE OVERRIDDEN SEED, or a seed sweep silently overwrites itself.
+        # Found 2026-08-08 by losing one. Every output path the harness builds is `<name><tag>.<ext>`, and the
+        # tag came only from the file — so `--seed 1..7` over one config wrote SEVEN runs to the SAME four
+        # files and left only the last. 28 completed runs, 4 surviving, no error anywhere. The comment two
+        # lines above calls this override "a seed sweep is one experiment repeated"; the code made a sweep
+        # impossible to keep. Intent and behaviour contradicted each other inside the module whose stated
+        # purpose is to stop silent failures.
+        # Suffix ONLY when the seed actually differs from the file's, so every existing run keeps its tag and
+        # its output filename exactly as before.
+        run["tag"] = f"{run['tag']}_s{int(seed)}"
 
     # EVERY KEY IS CHECKED AGAINST THE CONFIG CLASSES. Found by this module's own CTB: `build()` filters to
     # fields the class knows, so a typo like `cv_saef = 0.05` was silently DROPPED and the run used the

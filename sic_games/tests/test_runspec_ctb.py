@@ -172,3 +172,42 @@ def test_the_resolved_file_is_archived_next_to_the_run(tmp_path):
     dest = runspec.load(p).archive_to(out)
     assert dest.exists() and dest.name == "arm_x.resolved.toml"
     assert dest.read_text(encoding="utf-8") == p.read_text(encoding="utf-8")
+
+
+# ── the seed-sweep collision (found 2026-08-08 by losing a sweep) ─────────────────────────────────────────
+
+def _write_spec(tmp_path, seed=0, tag=None):
+    """A minimal but VALID run file, built from the real base configs so it states every field."""
+    import pathlib as _pl
+    import subprocess
+    import sys as _sys
+    repo = _pl.Path(__file__).resolve().parents[2]
+    subprocess.run([_sys.executable, str(repo / "tools" / "make_runconfig.py"), "ctb_seedtag",
+                    "--steps", "3", "--founders", "150", "--seed", str(seed),
+                    "--why", "CTB fixture: the seed-sweep tag collision"],
+                   cwd=repo, check=True, capture_output=True)
+    return repo / "config" / "runs" / "ctb_seedtag.toml"
+
+
+def test_overriding_the_seed_puts_the_seed_in_the_TAG(tmp_path):
+    """THE DEFECT. Every output path the harness builds is `<name><tag>.<ext>` and the tag came only from the
+    file, so `--seed 1..7` over one config wrote SEVEN runs to the SAME four files and left only the last.
+    28 completed runs, 4 surviving, and no error anywhere — the comment on the override itself calls it
+    "a seed sweep is one experiment repeated"."""
+    p = _write_spec(tmp_path, seed=0)
+    tags = {runspec.load(p, seed=s).run["tag"] for s in (1, 2, 3)}
+    assert len(tags) == 3, f"seeds collide on one tag: {tags} — a sweep would overwrite itself"
+    assert all(t.endswith(f"_s{s}") for s, t in zip((1, 2, 3), sorted(tags)))
+
+
+def test_NOT_overriding_the_seed_leaves_the_tag_untouched(tmp_path):
+    """The back-compat half, and the reason the suffix is conditional: every run that does not use `--seed`
+    must keep the exact filename it had before, or prior outputs stop matching their configs."""
+    p = _write_spec(tmp_path, seed=0)
+    assert runspec.load(p).run["tag"] == runspec.load(p, seed=0).run["tag"] == "_ctb_seedtag"
+
+
+def test_the_seed_itself_is_still_overridden(tmp_path):
+    """The tag change must not disturb what the override is FOR."""
+    p = _write_spec(tmp_path, seed=0)
+    assert runspec.load(p, seed=5).run["seed"] == 5
