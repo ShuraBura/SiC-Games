@@ -6112,4 +6112,86 @@ existing findings survive replication?"** That is a re-audit, not a study.
 
 ---
 
+**ADDENDUM 40 — THE VARIANCE IS THE WORLD LOTTERY, NOT THE DYNAMICS. Splitting the seed into its three roles
+attributes 73% of the population variance to the PLANET DRAW and under 1% each to the climate realisation and
+the stochastic path. But the marker that this project scores stratification on is the exception, and the rule
+that follows differs by marker (2026-08-11).**
+
+### The design
+
+Commit `fe00524` split `seed` into `world_seed` / `climate_seed` / `agent_seed`. Fifteen arms on
+coastal-savanna, 2,500 steps, current config; each arm varies ONE role over 0–4 and pins the other two at 0.
+
+**CONSISTENCY CHECK FIRST, and it is not decoration.** `var_P_a0`, `var_W_w0` and `var_C_c0` are the same run
+(0,0,0) authored three ways. All three settle at **105.2**, identically. If they had differed, the pinning would
+not work and every number below would be void. It cost nothing and it ran first.
+
+### The answer
+
+| source varied | n | CV | share of variance | share of CV |
+|---|---|---|---|---|
+| **all three** (an ordinary `seed` sweep) | 8 | **1.735** | 100% | 100% |
+| **world** — the planet draw | 5 | **1.487** | **73.5%** | 85.7% |
+| climate — the realisation on one planet | 5 | 0.200 | **1.3%** | 11.5% |
+| path — repeated trials of one planet | 5 | 0.149 | **0.7%** | 8.6% |
+
+Settled populations: path **105 · 96 · 99 · 72 · 108**; climate **105 · 148 · 99 · 92 · 125**; world
+**105 · 1,403 · 695 · 5,562 · EXTINCT**.
+
+**One planet in five goes extinct; no path and no climate realisation ever does.** The three named sources
+account for 76% of the variance; the remainder is interaction plus the different n.
+
+### Two expectations of mine were wrong
+
+**I predicted climate would be the smallest source.** It is not — it is larger than path, on every marker except
+`band_med` and `deaths_starv`. **And the 400-step probe put path CV at 0.27, but by step 2,500 it is 0.149**:
+early divergence partly re-converges rather than compounding. A short probe over-states path sensitivity, which
+is worth knowing before anyone uses one as a shortcut.
+
+### THE EXCEPTION, and it is the marker that matters most
+
+| marker | path | climate | **world** |
+|---|---|---|---|
+| `pop` | 0.151 | 0.199 | **1.487** |
+| `band_med` | 0.193 | 0.162 | **0.565** |
+| `gini_cred` | 0.188 | 0.145 | **0.529** |
+| **`pct_stratified`** | **0.404** | **0.546** | **0.947** |
+| **`deaths_starv`** | **1.465** | 0.573 | 1.245 |
+
+**`pct_stratified` carries a 3–5× spread on ONE IDENTICAL PLANET.** And `deaths_starv` is the one marker where
+PATH variance EXCEEDS world variance — which makes sense, since a starvation count is an event tally driven by
+bad draws, not by how much land there is.
+
+So "fix the world and one run is enough" is true for population and false for the two markers this project most
+often argues from.
+
+### The rule this produces, and it is per-marker
+
+- **A population or capacity claim** — pin the world. Path noise is ~15% CV, so one run per world is adequate
+  and the comparison should be ACROSS worlds, replicated.
+- **A stratification, inequality or mortality claim** — replicate the PATH on a fixed world. Multiple worlds do
+  not substitute: `pct_stratified` moves 3× and `deaths_starv` moves more from the path alone than from the
+  planet.
+- **MARKER_MATRIX binding rule 3** says *"seeds must beat the variance"* and cites R-65's 30× seed variance in
+  `%stratified`. That rule is right and its stated basis was imprecise: until `fe00524`, "seed variance" could
+  only mean WORLD variance, because one integer drew the planet. It should now distinguish the two, because the
+  answer differs by marker and for `%stratified` BOTH bars are large.
+
+### What this settles about Addendum 39
+
+The 46.7× savanna spread is **the planet lottery**, not model chaos. `world_lottery_climate(seed)` draws relief,
+roughness, water fraction, latitude and aridity from the preset ranges, and one draw in five gives a world that
+cannot hold a population at all. The model is not unstable; the world set is wide. That is a defensible design —
+but it means a "seed sweep" has always been a sweep over planets, and a result quoted from one is a result about
+one planet.
+
+### One more hidden denominator, in my own reporting
+
+The first version of the decomposition table printed a spread of **6×10⁸** for `deaths_starv`, because one arm
+reached ~0 and the ratio divided by it. Fixed: the ratio is suppressed when the floor is near zero and CV carries
+the comparison. Same bug class as the settled-fraction denominator in Addendum 39, two entries apart, in code I
+wrote to investigate the first one.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

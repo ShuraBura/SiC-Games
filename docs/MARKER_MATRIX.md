@@ -11,8 +11,17 @@ validated, however long it ran.
    had retired two weeks earlier, manufacturing a defect that did not exist.
 2. **A marker with no documented band is not scored.** `ascribed_frac` has been reported as a headline failure
    for weeks against a 3.6–7.8% band that appears nowhere in `docs/`. Unverifiable is not the same as failing.
-3. **Seeds must beat the variance.** R-65 documented 30× seed variance in `%stratified`. Single-point verdicts
-   on high-variance markers are not evidence.
+3. **Seeds must beat the variance — and WHICH variance depends on the marker.** R-65 documented 30× seed
+   variance in `%stratified`. Addendum 40 split the seed into its three roles (`world_seed` / `climate_seed` /
+   `agent_seed`) and found the answer is not one number:
+   - **`pop`, capacity, density** — the variance is the PLANET DRAW (world CV 1.49 against path 0.15). Pin the
+     world; replicate ACROSS worlds. One run per world is adequate.
+   - **`pct_stratified`, `gini_cred`** — world CV 0.95 but path CV 0.40 and climate 0.55. **Both bars are
+     large.** Multiple worlds do NOT substitute for multiple paths here.
+   - **`deaths_starv`** — path variance EXCEEDS world variance (1.47 vs 1.25). An event tally is driven by bad
+     draws, not by how much land there is. Replicate the path.
+   Single-point verdicts on high-variance markers are not evidence. Before `fe00524` "seed variance" could only
+   mean world variance, because one integer drew the planet, the climate and the path together.
 4. **Markers travel together.** A wealth marker read on a steeply growing population means something different
    from one read at stationarity, which is why the demographic-engine block is scored alongside, not separately.
 
