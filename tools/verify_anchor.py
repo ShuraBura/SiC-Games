@@ -126,6 +126,19 @@ REGISTRY = [
     ("Yanomamo 1960s age-sex composition (Neel & Weiss 1975:28, via Table 4.4): 1190/1405/27",
      "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
      r"0-15 682 508 1190"),
+    # TIER 3 FERTILITY ANCHORS, found 2026-08-11 after Addendum 41 withdrew two crude birth rates I had
+    # quoted from memory. The monograph states NO crude birth rate in any searchable form -- what it has is
+    # AGE-SPECIFIC fertility and TFR, which is the quantity a model should be compared on anyway. Found by
+    # listing the book's 73 table CAPTIONS instead of guessing phrases; that technique is the reusable part.
+    ("Hill & Hurtado Table 8.1 - Ache forest ASFR by single year, 3309 women-years, TFR 8.031",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"total 3309 .{0,12}TFR = 8\.031"),
+    ("Hill & Hurtado Table 8.2 - comparative TFR: Ache 8.03 / !Kung 4.69 / Yanomamo 6.86",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"Total Fertility Rate \(TFR\) 8\.03 4\.69 6\.86"),
+    ("Hill & Hurtado Table 8.2 - interbirth interval (months): Ache 37.6 / !Kung 49.4 / Yanomamo 34.4",
+     "Aché life history - the ecology and demography of a -- Kim Hill and A. Magdalena Hurtado -- ( WeLib.org ).pdf",
+     r"interbirth interval \(months\) 37\.6 49\.4 34\.4"),
     ("Hayden 1995 Fig. 6 - transegalitarian density bands",
      "hayden1995.pdf",
      None),   # a FIGURE: the bands were read off the page image, which no text search can confirm

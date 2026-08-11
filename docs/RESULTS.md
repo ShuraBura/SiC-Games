@@ -6252,4 +6252,76 @@ this. That points at adult survivorship, and it is a hypothesis, not a finding.
 
 ---
 
+**ADDENDUM 42 — THE FERTILITY ANCHOR EXISTS AND IS NOW FILED, BUT IT IS NOT A CRUDE BIRTH RATE. My attempt to
+derive one was dominated by an assumption I invented, and I abandoned it rather than ship it. The comparison
+tier 3 needs is TFR, and the model does not measure TFR (2026-08-11).**
+
+### Found, by listing the book's tables instead of guessing phrases
+
+Addendum 41 searched the Hill & Hurtado PDF for *"crude birth rate"*, *"births per 1000"* and *"birth rate of"*
+and got nothing, so two comparators were withdrawn. The failure was the **search method**: guessing what a
+sentence might say. Extracting all **73 table captions** and reading them found the data immediately.
+
+Three anchors now registered and VERIFIED (registry 22/22):
+
+| anchor | content |
+|---|---|
+| **Table 8.1** | Aché forest ASFR by SINGLE year of age, 10–49, with women-years at risk. **3,309 women-years, TFR 8.031** |
+| **Table 8.2** | Comparative TFR — **Aché 8.03 · !Kung 4.69 · Yanomamö 6.86** |
+| **Table 8.2** | Interbirth interval (months) — **Aché 37.6 · !Kung 49.4 · Yanomamö 34.4** |
+
+Table 8.2 covers **the same three societies as Table 4.4**, so fertility and age structure can be read off one
+consistent set. `!Kung` from Howell 1979 Table 6.1; Yanomamö from Melancon 1982 Table 4.2.
+
+### The derivation I abandoned, and why that is the result
+
+The monograph states **no crude birth rate anywhere.** I tried to derive one by combining Table 4.4's age
+structure with Table 8.2's age-specific rates. Table 4.4 gives 15–60 as ONE band, so the within-band female age
+split has to be assumed. Sensitivity to that assumption:
+
+| assumed attrition per decade | Aché | !Kung | model ÷ Aché |
+|---|---|---|---|
+| 1.00 (flat) | 4.13 | 3.24 | **1.27×** |
+| 0.95 | 5.07 | 4.61 | 1.04× |
+| 0.90 | 5.27 | 5.41 | **1.00×** |
+| 0.80 | 5.00 | 5.90 | 1.05× |
+
+**The conclusion flips on the assumption.** At flat weighting the model has 27% excess fertility and that alone
+explains the excess child fraction; at 0.90 the model's fertility matches the Aché exactly and the excess needs
+a different cause. My invented parameter was doing all the work, so the derivation says nothing — and my
+memory-quoted 4.6%/yr happens to sit inside the range, which is luck, not corroboration.
+
+**Abandoned rather than published.** Six days ago this project shipped a diagnostic that divided incompatible
+units; the lesson was to name the quantity before computing it. Here the quantity was fine and the *input* was
+invented. Same discipline, different point in the chain.
+
+### What the comparison should be, and what it needs
+
+**TFR, not CBR.** TFR needs no total-population denominator, it is stated verbatim for all three societies, and
+it is the quantity a fertility model should be judged on. Interbirth interval is a second direct comparator and
+the model already has an IBI mechanism (`_do_births_ibi`).
+
+**But the model measures neither.** The trajectory logs `births` (a count per step) and `juv_frac`. It does not
+log TFR, age-specific fertility, or realised IBI. So the tier-3 fertility question — the one Addendum 41 stopped
+on — **cannot be answered from any run on disk**, and no amount of re-analysis will change that.
+
+### Status of Addendum 41's hypothesis
+
+Addendum 41 closed with *"that points at adult survivorship"*, reasoning that the lowest-CBR arms still carried
+high juvenile fractions. **That reasoning used the withdrawn comparators and is now unsupported in either
+direction.** It is neither confirmed nor refuted; it is untested, and it stays that way until the model reports
+TFR.
+
+### The enabling work, in order
+
+1. **Log TFR, ASFR and realised IBI** per run. Pairs with the age-band diagnostic (`frac_child` / `frac_adult` /
+   `frac_elder` / `dependency_ratio`) which `demography()` already computes and nothing writes down.
+2. Then compare against Table 8.1/8.2 directly, with no derivation and no assumed splits.
+
+**A note on method, because it generalises.** Grepping a PDF for a phrase you expect tests your guess about the
+wording, not the document. Listing its TABLE CAPTIONS tests the document. That is how Table 4.4 was recovered
+after being wrongly called OCR-garbled, and it is how these three were found in one pass.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
