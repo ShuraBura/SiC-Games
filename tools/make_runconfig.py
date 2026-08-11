@@ -138,13 +138,24 @@ def main(argv=None) -> int:
                     help="wall-clock budget; the run stops cleanly at it. 0 = uncapped.")
     ap.add_argument("--terrain")
     ap.add_argument("--climate")
+    # THE SEED'S THREE ROLES (runspec RUN_DEFAULTS, 2026-08-11). Omit them and all three follow `--seed`,
+    # which is what every existing run file does. State one to PIN it: `--world-seed 0 --agent-seed 3` holds
+    # the planet still and varies only the stochastic path, which is the only way to separate WORLD variance
+    # from PATH variance. With one integer, two "seeds" are two different planets.
+    ap.add_argument("--world-seed", dest="world_seed", type=int,
+                    help="pin the world draw (terrain+climate knobs and the noise grid)")
+    ap.add_argument("--climate-seed", dest="climate_seed", type=int,
+                    help="pin the climate realisation on that world")
+    ap.add_argument("--agent-seed", dest="agent_seed", type=int,
+                    help="pin the agents' stochastic path")
     ap.add_argument("--why", default="", help="why this run differs from the canonical stack")
     a = ap.parse_args(argv)
 
     run_over = {k: v for k, v in
                 (("steps", a.steps), ("seed", a.seed), ("founders", a.founders),
                  ("terrain", a.terrain), ("climate", a.climate),
-                 ("max_minutes", a.max_minutes)) if v is not None}
+                 ("max_minutes", a.max_minutes), ("world_seed", a.world_seed),
+                 ("climate_seed", a.climate_seed), ("agent_seed", a.agent_seed)) if v is not None}
     text = build(a.name,
                  on=[s.strip() for s in a.on.split(",") if s.strip()],
                  off=[s.strip() for s in a.off.split(",") if s.strip()],

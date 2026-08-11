@@ -81,7 +81,11 @@ if "--config" in sys.argv:
     _ENV_FROM_RUN = {"steps": "C_STEPS", "seed": "C_SEED", "founders": "C_FOUNDERS", "terrain": "C_TERR",
                      "climate": "C_CLIM", "patch": "C_PATCH", "tag": "C_TAG", "max_minutes": "C_MAXMIN",
                      "log_every": "C_LOGEVERY", "gen_every": "C_GENEVERY", "flush_every": "C_FLUSHEVERY",
-                     "genealogy": "C_GENEA", "genome": "C_GENOME"}
+                     "genealogy": "C_GENEA", "genome": "C_GENOME",
+                     # The seed's three roles (runspec RUN_DEFAULTS). Absent from a run file ⇒ all three equal
+                     # `seed` ⇒ every prior run is bit-exact.
+                     "world_seed": "C_WORLD_SEED", "climate_seed": "C_CLIM_SEED",
+                     "agent_seed": "C_AGENT_SEED"}
     for _k, _env in _ENV_FROM_RUN.items():
         _v = _SPEC.run[_k]
         os.environ[_env] = ("1" if _v else "0") if isinstance(_v, bool) else str(_v)
@@ -89,6 +93,12 @@ if "--config" in sys.argv:
 FOUNDERS  = int(os.environ.get("C_FOUNDERS", "3000"))
 STEPS     = int(os.environ.get("C_STEPS", "15000"))
 SEED      = int(os.environ.get("C_SEED", "0"))
+# THE SEED IS THREE THINGS (runspec RUN_DEFAULTS, 2026-08-11). Default: all three = SEED, so nothing changes
+# unless a run file pins one. Holding WORLD_SEED still while AGENT_SEED varies is the only way to measure PATH
+# variance — with a single integer, two "seeds" are two different planets and the two variances are confounded.
+WORLD_SEED  = int(os.environ.get("C_WORLD_SEED", str(SEED)))
+CLIM_SEED   = int(os.environ.get("C_CLIM_SEED", str(SEED)))
+AGENT_SEED  = int(os.environ.get("C_AGENT_SEED", str(SEED)))
 LOGEVERY  = int(os.environ.get("C_LOGEVERY", "25"))
 GENEVERY  = int(os.environ.get("C_GENEVERY", "200"))     # genome H/relatedness — O(N·L); sample less often
 FLUSHEVERY = int(os.environ.get("C_FLUSHEVERY", "500"))  # genealogy CSV flush cadence (bounded memory)
@@ -502,7 +512,7 @@ def main():
         print(f"campaign: !! WORKING TREE DIRTY at {sha} -- this arm is NOT identified by its sha and must "
               f"not be paired against an arm from a clean tree. Commit before running a comparison.",
               flush=True)
-    k = world_lottery_climate(SEED, terrain=TERR, climate=CLIM)
+    k = world_lottery_climate(WORLD_SEED, terrain=TERR, climate=CLIM)   # the PLANET
     f = generate_world(k, mode="climate")
     _patch = (X0, Y0, PATCHSZ if PATCHSZ > 0 else PATCH)     # R-103i: shrink ⇒ circumscription
     base = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
@@ -558,7 +568,7 @@ def main():
         print("campaign: C_CLIMPARAM " + ", ".join(f"{a}={b}" for a, b in _cu.items()), flush=True)
     # `fields=f` supplies the GRASS sub-biome masks C.4b/C.4c need; without them those layers are inert at
     # any amplitude, and `build_climate_field` raises rather than running them dead.
-    cap = build_climate_field(base, clim, fields=f, seed=SEED)
+    cap = build_climate_field(base, clim, fields=f, seed=CLIM_SEED)   # the climate realisation
     pos = [land[i % len(land)] for i in range(FOUNDERS)]
     cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
@@ -806,7 +816,7 @@ def main():
             raise SystemExit(f"{_SPEC.path.name} does not state {len(_missing)} field(s): {_missing[:8]} — "
                              f"a resolved run file lists EVERY field, or the run silently takes a code "
                              f"default for the rest. Regenerate with tools/make_runconfig.py.")
-        cap = build_climate_field(base, clim, fields=f, seed=SEED)
+        cap = build_climate_field(base, clim, fields=f, seed=CLIM_SEED)   # the climate realisation
         print(f"campaign: CONFIG = {_SPEC.path} ({_SPEC.name}) — "
               f"{len(_SPEC.mechanisms)} mechanisms, {len(_SPEC.parameters)} parameters, "
               f"0 unstated", flush=True)
@@ -822,7 +832,7 @@ def main():
         raise SystemExit("campaign: ON-but-dead mechanism(s) in the final config:\n  " + "\n  ".join(_dead)
                          + "\n  Turn the flag off to ablate, or give the magnitude a value.")
 
-    w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=SEED,
+    w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=AGENT_SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
                                                    contest_exponent=1.5, move_cost_flat=0.0, **GRP),

@@ -211,3 +211,46 @@ def test_the_seed_itself_is_still_overridden(tmp_path):
     """The tag change must not disturb what the override is FOR."""
     p = _write_spec(tmp_path, seed=0)
     assert runspec.load(p, seed=5).run["seed"] == 5
+
+
+# ── the seed is three things (2026-08-11) ─────────────────────────────────────────────────────────────────
+
+def _spec_with(tmp_path, body):
+    """Write a run file by copying a REAL resolved one and appending [run] keys, so it stays complete."""
+    import pathlib as _pl
+    src = _pl.Path(__file__).resolve().parents[2] / "config" / "runs" / "full_campaign.toml"
+    text = src.read_text(encoding="utf-8")
+    head, rest = text.split("[mechanisms]", 1)
+    p = tmp_path / "split.toml"
+    p.write_text(head.rstrip() + "\n" + body + "\n\n[mechanisms]" + rest, encoding="utf-8")
+    return p
+
+
+def test_the_three_roles_default_to_the_plain_seed(tmp_path):
+    """BACK-COMPAT, and it is the whole safety argument: a run file that says nothing about the roles must
+    behave exactly as it did when one integer did all three jobs."""
+    s = runspec.load(_spec_with(tmp_path, ""), seed=3)
+    assert s.run["world_seed"] == s.run["climate_seed"] == s.run["agent_seed"] == 3
+
+
+def test_a_stated_role_is_PINNED_and_the_others_still_follow_the_seed(tmp_path):
+    """The point of the split: hold the WORLD still and let the path vary. Before this, two 'seeds' were two
+    different planets — `world_lottery_climate(seed)` draws relief, roughness, water, latitude and aridity
+    from the preset ranges — so path variance could not be measured at all."""
+    s = runspec.load(_spec_with(tmp_path, "world_seed = 0"), seed=5)
+    assert s.run["world_seed"] == 0, "a stated role must not be overridden by --seed"
+    assert s.run["climate_seed"] == 5 and s.run["agent_seed"] == 5
+
+
+def test_each_stated_role_lands_in_the_TAG(tmp_path):
+    """Same lesson as the seed-tag collision, applied before it can bite: a decomposition sweep varies
+    agent_seed alone over one pinned world, and without a distinguishing tag every arm writes to one path."""
+    tags = {runspec.load(_spec_with(tmp_path, f"world_seed = 0\nagent_seed = {a}")).run["tag"]
+            for a in (1, 2, 3)}
+    assert len(tags) == 3, f"agent-seed arms collide on one tag: {tags}"
+    assert all("_w0_a" in t for t in tags), tags
+
+
+def test_an_UNSTATED_role_does_not_touch_the_tag(tmp_path):
+    """The suffix must be earned. A file that leaves the roles implicit keeps its original output filename."""
+    assert runspec.load(_spec_with(tmp_path, "")).run["tag"] == "_split"

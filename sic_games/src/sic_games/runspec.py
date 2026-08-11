@@ -58,6 +58,23 @@ RUN_DEFAULTS: dict = {
     "steps": 15000, "seed": 0, "founders": 3000, "terrain": "coastal", "climate": "temperate",
     "patch": 0, "tag": "", "max_minutes": 0, "log_every": 25, "gen_every": 200, "flush_every": 500,
     "genealogy": True, "genome": True,
+    # ── THE SEED IS THREE THINGS, and until 2026-08-11 one integer did all three jobs ──────────────────────
+    # `seed` reaches the run at three independent places:
+    #   world_seed    world_lottery_climate(seed) — DRAWS THE WORLD. relief, roughness, water fraction,
+    #                 latitude and aridity are `rng.uniform(lo, hi)` over the preset ranges, and `seedStr`
+    #                 drives the terrain noise grid. Changing it changes the PLANET.
+    #   climate_seed  build_climate_field(..., seed=seed) — the climate realisation on that planet.
+    #   agent_seed    TerrainWorld(seed=seed) — the agents' stochastic path.
+    # (Founder placement is NOT a fourth: run_campaign lays founders out deterministically over land cells.)
+    #
+    # WHY IT MATTERS. With one integer there is NO PURE REPLICATE: two "seeds" are two different planets, so
+    # "seed variance" has always meant WORLD variance and path variance has never been measured. Addendum 39
+    # reported flat-control spreads of 46.7× / 5.5× / 2.7×, and the world's own carrying capacity varies only
+    # ~2.5× across those same seeds — so most of that spread is NOT the world being bigger or smaller, and the
+    # harness could not say what it was instead.
+    #
+    # Each defaults to None ⇒ take `seed`. Every existing run file therefore behaves exactly as before.
+    "world_seed": None, "climate_seed": None, "agent_seed": None,
 }
 
 
@@ -120,6 +137,14 @@ def load(path, seed: int | None = None) -> RunSpec:
 
     if seed is not None:
         run["seed"] = int(seed)     # the ONE permitted override; a seed sweep is one experiment repeated
+    # Resolve the three roles AFTER any override, so `--seed N` still moves all three together (a sweep over
+    # `seed` remains a sweep over whole worlds, which is what every existing harness expects). A run file that
+    # states one of these explicitly PINS that role and is the only way to hold the world still.
+    for _role in ("world_seed", "climate_seed", "agent_seed"):
+        if run.get(_role) is None:
+            run[_role] = int(run["seed"])
+        else:
+            run[_role] = int(run[_role])
     if not run.get("tag"):
         run["tag"] = f"_{path.stem}"
     if seed is not None and int(seed) != int(raw["run"].get("seed", RUN_DEFAULTS["seed"])):
@@ -133,6 +158,12 @@ def load(path, seed: int | None = None) -> RunSpec:
         # Suffix ONLY when the seed actually differs from the file's, so every existing run keeps its tag and
         # its output filename exactly as before.
         run["tag"] = f"{run['tag']}_s{int(seed)}"
+    # SAME RULE FOR THE THREE ROLES. A decomposition sweep varies `agent_seed` alone across one pinned world;
+    # without this every arm of it writes to one path and the sweep destroys itself exactly as the first one
+    # did. Only roles STATED in the file get a suffix — a file that leaves them implicit is unchanged.
+    for _role, _abbr in (("world_seed", "w"), ("climate_seed", "c"), ("agent_seed", "a")):
+        if raw["run"].get(_role) is not None:
+            run["tag"] = f"{run['tag']}_{_abbr}{run[_role]}"
 
     # EVERY KEY IS CHECKED AGAINST THE CONFIG CLASSES. Found by this module's own CTB: `build()` filters to
     # fields the class knows, so a typo like `cv_saef = 0.05` was silently DROPPED and the run used the
