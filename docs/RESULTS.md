@@ -6194,4 +6194,62 @@ wrote to investigate the first one.
 
 ---
 
+**ADDENDUM 41 — THE TIER-3 AGE-STRUCTURE FAULT IS REAL: two alternative explanations tested and both
+FALSIFIED. But the mechanism is NOT yet attributable, because the vital-rate comparators I reached for are not
+in the filed source and I withdraw them (2026-08-11).**
+
+### The fault, on verified ground
+
+Model under-15 fraction at stationarity, measured across nine arms (Addendum 40's decomposition set):
+
+| | value |
+|---|---|
+| model, 9 arms | **0.478 – 0.569**, mean **0.518** |
+| !Kung 1968 | 0.287 |
+| Aché 1970 | 0.419 |
+| Yanomamö 1960s | 0.454 |
+
+Table 4.4 is VERIFIED verbatim and uses the model's own age classes, so no conversion is involved. **Every arm
+sits above the highest of three real forager populations.** Model mean age is 19.0 years.
+
+### Alternative 1: "the population is still growing" — FALSIFIED
+
+A growing population is legitimately young, and MARKER_MATRIX rule 4 exists to catch exactly this. Measured the
+tail growth rate (log-linear, last 20%) on all fifteen arms: **most are stationary**, |growth| < 0.5%/yr, and
+they carry juvenile fractions of 0.478–0.569 regardless. Two arms that ARE growing (0.93 and 1.20 %/yr) sit at
+0.546 and 0.514 — inside the same range. The fault is not a transient.
+
+### Alternative 2: "the definition differs from the anchor's" — FALSIFIED
+
+`juv_frac` could have been the `is_juvenile()` productivity gate rather than the under-15 count, which would
+make the whole comparison a category error — the `connubium_med` failure again. Checked at the point of
+computation: `sum(1 for x in ages if x < 180) / pop`, and 180 months is 15 years. **It is the under-15
+fraction.** The comparison is valid.
+
+### AND HERE I HAVE TO STOP, because the next step needs an anchor I do not have
+
+The obvious mechanism question is whether this is too much fertility or too little adult survival. Model crude
+birth rate across the same arms is **3.99 – 7.75 %/yr, mean 5.26**. I compared that to "Aché ~4.6 %/yr" and
+"!Kung ~3.5 %/yr" — **and those two numbers are not verified.** Searching the filed Hill & Hurtado PDF for
+*crude birth rate*, *births per 1000* and *birth rate of* returns **nothing**. I quoted them from memory, which
+is the precise failure this project has recorded four times in six days.
+
+**Both comparators are withdrawn.** With them goes the interpretation they supported — that the model is a
+high-turnover population with excess fertility. It may be; the evidence for it is not on file.
+
+What that leaves, which is still worth having: **several arms produce a juvenile fraction of 0.478–0.514 at a
+crude birth rate of 3.99–4.37 %/yr.** Whatever the ethnographic rate turns out to be, a *within-model* fact
+holds — the youngest age structures do not sit on the highest birth rates, so fertility alone does not order
+this. That points at adult survivorship, and it is a hypothesis, not a finding.
+
+### Next, and it is a literature task before it is a modelling one
+
+1. Find a VERIFIED forager crude birth rate, or a life table. The Aché book has one (it is a demography
+   monograph) but not under the phrases searched; it will need the tables read, not grepped.
+2. Then compare the model's survivorship curve, not its aggregate rates. The age-band diagnostic already exists
+   (`demography()` returns `frac_child` / `frac_adult` / `frac_elder` / `dependency_ratio`) but is NOT in the
+   trajectory rows, so it cannot be read off any completed run — that wiring is the cheap enabling step.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
