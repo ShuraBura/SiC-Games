@@ -5970,4 +5970,146 @@ the CTB that caught the σ bug, and the field measurements on the three canonica
 
 ---
 
+**ADDENDUM 39 — THE CANONICAL WORLDS, AND THE SEED. The savanna capacity anomaly carried through three addenda
+is a SEED, not a world. Replicating it closed it; every world in this project is far more seed-dispersed than
+any single-run result has admitted; the montane world cannot be partitioned and no world can be; and the
+capacity denominator has a floor nobody had noticed (2026-08-08 / 08-11).**
+
+### Why this entry is late, and what that cost
+
+The three worlds were built and run on 2026-08-08 and reported in chat only. `world_montane.toml` carried a
+`why` citing *"the partition measurement in Addendum 36"* — an addendum that did not exist, and whose number was
+then taken by the retraction entry. The false forward reference is removed. Every figure below was re-measured
+from the current code and the committed run outputs, not transcribed from the earlier report.
+
+### The world set
+
+| world | terrain × climate | land cells | biomes present (land cells) |
+|---|---|---|---|
+| `world_temperate` | coastal × temperate | 9,449 | forest 3,399 · grass 5,474 · desert 576 |
+| `world_savanna` | coastal × savanna | 9,453 | savanna 4,499 · desert 2,896 · forest 1,717 · grass 237 · wetland 104 |
+| `world_montane` | mountainous × savanna | 9,822 | grass 4,325 · forest 2,285 · desert 2,113 · savanna 654 · mountain 367 · wetland 78 |
+
+Between them the set covers all six land biomes. **No single world does**, which closed the supervisor's option
+(a) — one canonical world containing everything — and forced the three-world set.
+
+### THE DENOMINATOR, because this measure has two
+
+`settled_fraction` = settled population ÷ supportable population, and "supportable" has two defensible readings
+that differ by 3.9×. Both are recorded so no later reader has to guess which one a number meant.
+
+| world | MEAN capacity | TROUGH capacity | trough ÷ mean |
+|---|---|---|---|
+| `world_temperate` | 27,614 | 7,161 | **0.259** |
+| `world_savanna` | 26,549 | 6,907 | **0.260** |
+| `world_montane` | 31,023 | 8,052 | **0.260** |
+
+Measured over 2,500 steps of the live climate field, all channels on, sampled every 5 steps. **The trough/mean
+ratio is 0.26 in all three worlds to three decimals** — the climate layer compresses capacity by the same factor
+everywhere, so a cross-world comparison is insensitive to the choice. That is what makes the next section safe,
+and it was not obvious in advance.
+
+### THE FINDING: the savanna anomaly is a seed
+
+`world_savanna`, flat-meat control, settled population by seed:
+
+| seed | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| settled | 594 | 3,034 | 2,518 | **8,677** | 634 | 3,572 | **186** | 3,961 |
+
+**Range 186 → 8,677: a 46.7× spread, CV 0.949.** Seed 3 settles at 126% of its own trough capacity; seed 0 — the
+seed every earlier savanna number came from — is near the floor.
+
+So *"world_savanna settles at 9% of trough capacity while the others reach 51% and 69%"* is a statement about
+**seed 0**. It was carried as an open anomaly through Addenda 36, 37 and 38, survived two retracted explanations
+and one reverted diagnostic, and **every one of those rounds was spent interpreting a single run.** One extra
+seed would have closed it at the start, for twenty minutes of compute. MARKER_MATRIX binding rule 3 — *a seeded
+effect must beat 30× seed variance* — exists for exactly this and was applied to markers but not to this.
+
+### AND THE DISPERSION IS NOT SAVANNA'S ALONE
+
+| world | flat-control range | spread | CV | n seeds |
+|---|---|---|---|---|
+| `world_savanna` | 186 → 8,677 | **46.7×** | 0.949 | 8 |
+| `world_temperate` | 2,445 → 13,467 | 5.5× | 0.666 | 5 |
+| `world_montane` | 3,729 → 9,975 | **2.7×** | 0.392 | 5 |
+
+Savanna is genuinely the outlier — the ordering is clean and monotone. **But even montane, the tightest world,
+spans 2.7× on identical configuration.** No single-seed settled population in this project's history means what
+it appears to mean, and that includes results this log has recorded as findings.
+
+### The flag effects, replicated
+
+Each arm against the SAME seed's own flat control (the per-biome meat wiring of Addendum 37):
+
+| world | fraction only | CV only | both |
+|---|---|---|---|
+| `world_savanna` | −30.3% (n=8, all neg) | **−65.3%** (n=8, all neg) | **−67.5%** (n=8, all neg) |
+| `world_temperate` | −11.6% (n=5, all neg) | −8.0% (n=5, **not** all neg) | −19.4% (n=5, all neg) |
+| `world_montane` | −10.7% (n=5, **not** all neg) | −17.1% (n=5, all neg) | −28.7% (n=5, **not** all neg) |
+
+Standard deviations run 7–28 points, comparable to the effects themselves. **The sign replicates; the magnitude
+is not estimable from five seeds.** Savanna is the only world where every arm in every seed is negative — in the
+other two the flags sometimes *help* (temperate CV-only +11% at seed 0, montane both +5% at seed 3). So *"the
+per-biome wiring reduces population"* is a savanna statement, not a model statement.
+
+**One clean structural signal, and it is the first thing in this arc that behaved as predicted without needing a
+retraction first: effect size tracks the size of the CV change.** Savanna's mean meat CV moves 0.73 → 3.85,
+montane's → 2.46, temperate's → 2.11, and the CV-only effects order the same way (−65%, −17%, −8%).
+
+### A SELECTION BIAS IN THE ANALYSIS, caught before publication
+
+The first version of this analysis filtered on `steps_completed == 2500` and silently dropped two savanna arms
+— seed 6, CV-only and both — which had **gone EXTINCT** (population 1 at steps 1411 and 1503;
+`run_campaign.py:915` is `log("EXTINCT"); break`, and with `max_minutes = 0` the budget branch cannot fire).
+
+**Those are the strongest possible instances of the effect being measured, and the filter threw them away**,
+biasing every arm mean toward the survivors. Correcting it — an extinction is settled = 0, not a missing datum —
+moved savanna CV-only from −60.4% to **−65.3%** and both from −62.8% to **−67.5%**, and made seed 6 read −100%
+on both arms. The filter now distinguishes extinction from budget truncation and asserts which it is seeing.
+
+### The montane world is NOT partitioned, and no world can be
+
+Measured on the traversal-cost field the model actually uses, not on elevation:
+
+- land traversal cost **0.151 → 1.000**, mean 0.420 · cells at maximum cost: **3** · **impassable cells: 0**
+- mountain biome: 367 cells, **3.7% of land**
+
+**The model has no impassable terrain.** Relief raises the *cost* of movement and cannot isolate a population.
+The supervisor's original design — *"all biomes seeded with people and preferably separated by hard-to-pass
+mountains that would keep the pops separated and evolving differently"* — is **not buildable on this terrain
+generator as it stands**. That is a statement about the generator, not about these worlds. A partitioned world
+needs water or a gap of uninhabitable cells.
+
+### The capacity diagnostic has a floor, and the CTB negative found it
+
+CTB before use: a flat 800 g/m²/yr NPP world over the 40×40 patch. Expected 8.62 persons/cell × 1,600 cells =
+13,799; the diagnostic returned **13,799**.
+
+**Then the negative, which is the half that earned its keep.** A zero-NPP world — bare rock, all water — should
+support nobody. It reads **1,398 persons**, ~0.87 per 100 km². `density_tallavaara` is `exp(INT + B1·npp + …)`
+and `exp(−0.1353) = 0.873` at npp = 0. An exponential never reaches zero, and Tallavaara 2018's data do not
+extend to a barren world, so this is extrapolation outside the fitted range.
+
+Size: ~1,398 in a denominator of 26,000–31,000, so **~5% of every capacity figure in this entry is floor rather
+than ecology.** It changes no conclusion here, but it is a real property of the measure and has presumably been
+present in every capacity number this project has produced.
+
+### What tier 2 covers, and what it does not
+
+**Covered:** all six land biomes across the set; the Hawkes 1991 savanna game rate and the llanos flood are
+reachable for the first time (they read `UNREACHABLE` on `world_temperate` and looked broken for that reason);
+the capacity diagnostic is CTB'd positive and negative.
+
+**Not covered:** a partitioned world. Independent evolution of separated populations is not testable at tier 2
+as built.
+
+**CLOSED:** the savanna capacity gap. There is nothing left to explain at world level.
+
+**NEWLY OPEN, and larger than what it replaced:** every world is seed-dispersed by 2.7–47×, and this project has
+been reading single runs as results throughout. The question is no longer "why is savanna low" but **"which
+existing findings survive replication?"** That is a re-audit, not a study.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

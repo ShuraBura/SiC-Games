@@ -94,9 +94,28 @@ def test_the_refusal_names_every_offending_knob(tiny):
 
 
 def test_seed_is_the_one_override_and_it_reaches_the_run(tiny):
+    """PREMISE CHANGED BY DESIGN 2026-08-11 (commit `3153dea`). An overridden seed now goes into the TAG, so a
+    seed-5 run writes `_ctb_tiny_s5`, not `_ctb_tiny`.
+
+    This test was the one that caught the change, and how it failed is worth keeping: it read `_ctb_tiny` and
+    got seed 0 — a STALE file from an earlier run, not the run it had just launched. That is precisely the
+    defect the tag fix exists for. Before the fix the seed-5 run would have OVERWRITTEN `_ctb_tiny`, the
+    assertion would have passed, and a seed sweep would still have destroyed itself silently. The old form of
+    this test could not have detected the bug it appeared to cover."""
     p = _run(tiny, "--seed", "5")
     assert p.returncode == 0, p.stdout[-3000:] + p.stderr[-3000:]
-    assert _meta("_ctb_tiny")["seed"] == 5
+    assert _meta("_ctb_tiny_s5")["seed"] == 5, "the override did not reach the run"
+
+
+def test_an_overridden_seed_does_not_touch_the_unsuffixed_output(tiny):
+    """The half that makes a sweep survivable: a seed-5 run must leave the seed-0 output alone. Asserted on the
+    file's mtime, because 'the seed is still 0' would also hold if the file had been rewritten identically."""
+    base = OUTDIR / "campaign_trajectory_ctb_tiny.json"
+    assert _run(tiny).returncode == 0
+    before = base.stat().st_mtime_ns
+    assert _run(tiny, "--seed", "6").returncode == 0
+    assert base.stat().st_mtime_ns == before, "a seeded arm overwrote the unseeded one — the collision is back"
+    assert _meta("_ctb_tiny")["seed"] == 0
 
 
 def test_the_run_carries_its_own_resolved_config(tiny):
