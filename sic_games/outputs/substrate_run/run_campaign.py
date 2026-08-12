@@ -401,6 +401,31 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         connubium_med=con.get("median"), connubium_p90=con.get("p90"),
         claim_events=ins.get("claim_events", 0), cells_owned=ins.get("n_owned", 0),
         leader_turnover=leader_turnover,
+        # ── DIAGNOSTICS ADDED 2026-08-11 (task: diagnose the bistable-regime split, R-66/R-97 re-test). Every
+        # field below was ALREADY COMPUTED by the model, every step, and discarded — group A is 12 counters that
+        # existed since their own R-numbers; group B is two new FLOW counters (formed/released settlements,
+        # bud_events per step, vs the pre-existing cumulative-only bud_events); group C summarizes soil/hardship
+        # state that sat in per-site dicts nothing ever read. None of this changes model behaviour.
+        # A — elite/instability/lineage flows, unconditional (initialized every step() regardless of which
+        # flags are on, so these are always numeric, never None)
+        deaths_senesc=w.deaths_senesc_this_step, deaths_orphan=w.deaths_orphan_this_step,
+        leveling_events=w.leveling_events_this_step, depositions=w.depositions_this_step,
+        desertions=w.desertions_this_step, challenges=w.challenges_this_step,
+        feast_spend=round(w.feast_spend_this_step, 2), legitimated=w.legitimated_this_step,
+        reversions=w.reversions_this_step, lineage_branches=w.lineage_branches_this_step,
+        lineage_splits=w.lineage_splits_this_step, lineage_tribute=round(w.lineage_tribute_this_step, 2),
+        # B — settlement FLOW (the stock n_settle already existed; the rate that produces it did not)
+        settle_formed=w.settle_formed_this_step, settle_released=w.settle_released_this_step,
+        bud_events_step=w.bud_events_this_step,          # per-step twin of the cumulative bud_events above
+        frac_resident=st.get("frac_resident", 0.0),      # share of the WHOLE population living on a settlement site
+    )
+    # C — soil depletion (B1) + emergent-abandonment hardship memory, per settlement site. {} when neither flag
+    # has ever fired; defaulted to 0.0 so the column stays numeric across the whole trajectory.
+    _sh = w.settlement_health()
+    row.update(
+        soil_mean=_sh.get("soil_mean", 0.0), soil_min=_sh.get("soil_min", 0.0),
+        soil_frac_depleted=_sh.get("soil_frac_depleted", 0.0),
+        hardship_mean=_sh.get("hardship_mean", 0.0), hardship_max=_sh.get("hardship_max", 0.0),
     )
     # ── MARKER MATRIX (2026-07-27) ──────────────────────────────────────────────────────────────
     # These quantities were all COMPUTED by demography() and none of them reached a campaign

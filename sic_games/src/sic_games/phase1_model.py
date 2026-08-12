@@ -382,6 +382,13 @@ class TerrainWorld(mesa.Model):
         self.births_this_step: int = 0
         self.deaths_starv_this_step: int = 0
         self.deaths_senesc_this_step: int = 0
+        # diag (2026-08-11): the settlement-founding/budding methods are called directly (no step()) by several
+        # existing tests, and by any future caller that wants the founding logic without a full step. Pre-seeded
+        # here for the same reason as the three counters above — step()'s own reset block still zeroes these
+        # every step, so this line changes no run's behaviour and only fixes reads BEFORE the first step().
+        self.settle_formed_this_step: int = 0
+        self.settle_released_this_step: int = 0
+        self.bud_events_this_step: int = 0
 
         self._init_agents(n_agents, kcal_cfg, self._lh_cfg)   # self._lh_cfg = the (possibly auto-built) canonical lh
 
@@ -549,6 +556,9 @@ class TerrainWorld(mesa.Model):
         self.reversions_this_step = 0                 # R-87 diag: bands reverting gumsa → gumlao this step
         self.lineage_branches_this_step = 0           # R-90 diag: births founding a NEW named descent line
         self.lineage_splits_this_step = 0             # R-92 diag: lineages SEGMENTING into two named sub-clades
+        self.settle_formed_this_step = 0              # diag (2026-08-11): NEW settlement sites founded this step
+        self.settle_released_this_step = 0            # diag: settlement sites DISSOLVED (hysteresis timer expired)
+        self.bud_events_this_step = 0                 # diag: village-budding fissions this step (bud_events is cumulative)
         self._orphan_e_cache = None                   # R-74: per-step cache of the endogenous E[mult] divisor
         self._band_starv_this_step = {}               # M2: reset per-band starvation-death tally for this step
         self.starv_cred_this_step: list[float] = []   # diagnostic: cred of agents lost to starvation this step
@@ -1191,6 +1201,7 @@ class TerrainWorld(mesa.Model):
                 self._settlement_sites[site] -= 1
                 if self._settlement_sites[site] <= 0:
                     self._settlement_sites.pop(site, None)
+                    self.settle_released_this_step += 1
         self._nearest_map = None                          # settlements may have dissolved → invalidate the cache
 
     def _update_standing(self) -> None:
@@ -3639,7 +3650,9 @@ class TerrainWorld(mesa.Model):
         """Per-settlement panel (campaign — urban hierarchy + lifespans). For each maintained settlement site with
         live occupants: count, society (dominant band's morph), catchment yield, mean cred, dominant lineage.
         Aggregate rank-size: primate_ratio (largest ÷ 2nd), zipf_slope (OLS of ln size vs ln rank; ≈ −1 = Zipf),
-        median/max. Pure observer."""
+        median/max. `frac_resident` = the share of the WHOLE population living on a settlement site — the direct
+        measure of how sedentary the run is, and the one distinguishing "many people, no settlements" (the
+        model still calls that pop 0 residents) from "few people, mostly settled". Pure observer."""
         import numpy as np
         sites = set(self._settlement_sites)
         if not sites:
@@ -3663,9 +3676,27 @@ class TerrainWorld(mesa.Model):
         primate = round(sizes[0] / sizes[1], 2) if len(sizes) > 1 else None
         zipf = (float(np.polyfit(np.log(np.arange(1, len(sizes) + 1)), np.log(np.asarray(sizes, float)), 1)[0])
                 if len(sizes) >= 3 else None)
+        total = len(self.agent_list)
         return dict(n=len(panel), median=int(np.median(sizes)), max=sizes[0], primate_ratio=primate,
                     zipf_slope=round(zipf, 2) if zipf is not None else None,
+                    frac_resident=round(sum(sizes) / total, 3) if total else 0.0,
                     panel=sorted(panel, key=lambda q: q["n"], reverse=True))
+
+    def settlement_health(self) -> dict:
+        """Soil (B1 depletion) and hardship (emergent-abandonment memory) state across settlement sites. {} when
+        neither dict carries anything — the flags are off, or no site has existed long enough to accumulate
+        state. Pure observer; reads `_settlement_soil` / `_settlement_hardship`, writes nothing."""
+        out: dict = {}
+        if self._settlement_soil:
+            vals = list(self._settlement_soil.values())
+            out["soil_mean"] = round(sum(vals) / len(vals), 3)
+            out["soil_min"] = round(min(vals), 3)
+            out["soil_frac_depleted"] = round(sum(1 for v in vals if v < 0.2) / len(vals), 3)
+        if self._settlement_hardship:
+            vals = list(self._settlement_hardship.values())
+            out["hardship_mean"] = round(sum(vals) / len(vals), 3)
+            out["hardship_max"] = round(max(vals), 3)
+        return out
 
     def instability(self) -> dict:
         """Sociopolitical-instability read-out (campaign). Economic-defensibility (Dyson-Hudson & Smith 1978)
@@ -3902,6 +3933,8 @@ class TerrainWorld(mesa.Model):
             near = sum(occ_cnt.get(((sx + dx) % N, (sy + dy) % N), 0)
                        for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
             if near >= cfg.settle_min_pool:
+                if (sx, sy) not in self._settlement_sites:
+                    self.settle_formed_this_step += 1
                 self._settlement_sites[(sx, sy)] = cfg.settle_release_steps
 
     def _do_gathering(self) -> None:
@@ -3964,6 +3997,8 @@ class TerrainWorld(mesa.Model):
                 near = sum(1 for a in self.agent_list
                            if self._torus_cheby(a.pos[0], a.pos[1], site[0], site[1]) <= rad)
                 if near >= cfg.settle_min_pool:    # a real multi-band aggregation within the cluster → found/refresh
+                    if site not in self._settlement_sites:
+                        self.settle_formed_this_step += 1
                     self._settlement_sites[site] = cfg.settle_release_steps
 
     def _band_knob(self, band_id: int, name: str) -> float:
@@ -4437,8 +4472,11 @@ class TerrainWorld(mesa.Model):
             new_id = self._next_band_id; self._next_band_id += 1     # BUD: rival faction migrates + founds the daughter
             for a in faction:
                 a._group.band_id = new_id; a.pos = best
+            if best not in self._settlement_sites:
+                self.settle_formed_this_step += 1
             self._settlement_sites[best] = cfg.settle_release_steps
             self.bud_events += 1               # counts BOTH paths (was hazard-only — legacy-path budding read 0 always)
+            self.bud_events_this_step += 1     # per-step twin of the cumulative counter above
 
     def _band_groups(self, occ_lists: dict, radius: int) -> list[list]:
         """Partition occupied cells into spatially-connected BANDS for the lumping ablation. radius≤0 ⇒ each cell
