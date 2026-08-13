@@ -6324,4 +6324,84 @@ after being wrongly called OCR-garbled, and it is how these three were found in 
 
 ---
 
+## Addendum 42 — The fertility brake multiplies the wrong term (2026-08-13, R-106)
+
+**THE FAULT.** The demography markers fail together. `frac_child` reads 0.481 to 0.633 against a VERIFIED
+[0.287, 0.454]. `dependency_ratio` reads 1.18 to 1.81 against a VERIFIED [0.598, 0.899]. The realised life
+expectancy is 15 to 19 years against a CONFIGURED 36.6 (Siler ACHE_FOREST, Gurven & Kaplan 2007 Table 2).
+
+**NEW INSTRUMENTS.** Nothing measured a REALISED schedule before this date. `phase1_model.py` now counts
+person-months and deaths per year of age per cause, woman-months and births per mother age, the realised
+IBI, and the fertility multiplier that is actually applied. `life_table()`, `fertility_schedule()` and
+`raw_demographic_counters()` read them. All are pure observers, consume no RNG and carry no flag, so every
+earlier run stays bit-exact. 22 CTB tests, including a positive control that feeds ACHE_FOREST to the
+estimator and demands 36.6 back, and a purity guard that fails on an injected read.
+
+**THE IDENTITY THAT EXPLAINS EVERY ARM.** `TFR = span / (refractory + 1/(fecundability x brake factor))`.
+With span 324 months and fecundability 0.12 this reproduces both measured arms to within 1%:
+
+| arm | refractory | brake factor | predicted TFR | MEASURED TFR |
+|---|---|---|---|---|
+| canonical (`enable_sedentism_fertility` ON) | 22 | 0.950 | 10.53 | 10.46 |
+| `hg_villages_off` (that flag OFF) | 30 | 0.9998 | 8.45 | 8.41 |
+
+**REPAIR 1 FAILS, AND THE IDENTITY SAYS WHY.** The brake multiplies `1/(fecundability x factor)`, which is
+only 22% of the birth interval. A bracket over the EMA half-life (1, 3, 6, 12 months against the shipped
+~17) moved the applied factor from 0.967 to 0.861 — the brake DID bite harder — and moved nothing else:
+
+| half-life (mo) | 1 | 3 | 6 | 12 | ~17 |
+|---|---|---|---|---|---|
+| mean factor | 0.861 | 0.927 | 0.925 | 0.935 | 0.967 |
+| realised TFR | 10.33 | 10.57 | 10.27 | 10.43 | 10.46 |
+| `frac_child` | 0.592 | 0.593 | 0.573 | 0.604 | 0.572 |
+| realised e0 | 15.2 | 15.0 | 15.2 | 15.1 | 15.0 |
+
+Even at the ABSOLUTE ceiling — zero memory, measured factor 0.767 over 240 steps and 331 women — the brake
+reaches TFR 7.93. The age structure needs about 4.5. **The brake cannot regulate this model's fertility.**
+
+**THE VARIANCE HYPOTHESIS IS FALSIFIED, WITH A PASSING POSITIVE CONTROL.** A bracket over `game_meat_cv`
+(0.0 deterministic / 2.11 = terrain.HUNT_CV / 4.0) left the starvation share flat at 0.493, 0.499, 0.518.
+The positive control confirms the knob is live and strong: the same sweep moves the intake coefficient of
+variation from 0.604 to 1.933 and p90/p10 from 4.3 to 9.8. Note the FLAG ALONE would have given a vacuous
+test — `enable_biome_meat_cv=false` falls back to the scalar `game_meat_cv`, which the canonical stack sets
+to 0.73, so the parameter had to go to 0.0.
+
+**THE VILLAGES ARE NOT THE CAUSE.** `hg_villages_off` removes only the settlement lifecycle and keeps every
+production mechanism. It gives the best world this project has produced — regional density 0.061/km2 =
+0.67x the Binford 0.091 anchor, `band_med` 23 against Birdsell ~25, realised IBI 35 months against Hill
+& Hurtado's 37.6, the lowest starvation share at 0.352, and `frac_resident` 0.0. The population is 9661,
+FOUR TIMES the sedentary arms, so the villages SUPPRESS population rather than support it. `frac_child`
+0.543 and `dependency_ratio` 1.292 still fail.
+
+**A CORRECTION.** An earlier note this arc said fertility was exonerated because the observed age structure
+needed TFR 14.3 against "a ceiling of 9". That ceiling assumed `ibi_refractory_months = 30`, but
+`enable_sedentism_fertility` replaces it with a society-dependent value as low as 22. Measured TFR is 8.4
+to 10.5. Fertility is NOT exonerated; it is the dominant term.
+
+**A SECOND CORRECTION.** An earlier note said starvation was a minor death channel, from one final step of
+each of 12 arms. The cumulative counters give 0.35 to 0.58 depending on the arm.
+
+**A DISCARDED PROBE.** A seasonality test returned `season()` = 1.000 for all 12 months and a starvation
+share of 0.026 against the campaign's 0.35. It built a `TerrainWorld` without the campaign's
+`NPPCapacityField` and `ClimateField`, so that world had no climate. Seasonality REMAINS UNTESTED.
+
+**WHAT THE IDENTITY PROPOSES.** Lactational amenorrhea physically IS the refractory period, and energy
+availability modulates its LENGTH — so the energetic condition belongs on the refractory, not on
+fecundability. Inside the FILED ethnographic range the refractory alone spans the needed TFR:
+
+| refractory | 34.4 | 37.6 | 44 | 49.4 |
+|---|---|---|---|---|
+| source | Hill 8.2 reservation | Hill 8.2 forest | Howell !Kung | Hill 8.2 contact |
+| TFR | 7.58 | 7.05 | 6.19 | 5.61 |
+
+The decomposition puts BOTH anchors in band at TFR 5 to 8 on this arm's own mortality. **NOT ADOPTED** —
+this is a proposal awaiting the supervisor.
+
+**AN ANCHOR GAP FOUND.** `demography.py` names Ellison's energetics as the mechanism behind the intake
+brake, but no Ellison source appears in `docs/LITERATURE.md` or in `literature/`, and the specs carry only
+the LENGTH of lactational amenorrhea, not its RESPONSE TIME. `intake_ema_alpha` therefore has no anchor and
+no value was adopted from the bracket.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
