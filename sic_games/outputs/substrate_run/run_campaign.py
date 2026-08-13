@@ -1087,6 +1087,22 @@ def main():
     meta["wall_minutes"] = round((time.time() - t0) / 60.0, 1)
     meta["compute_minutes"] = round(compute_s / 60.0, 1)
     meta["suspended_minutes"] = round(suspended_s / 60.0, 1)
+    # THE AGE-SPECIFIC ARRAYS, ONCE, AT THE END (R-106, 2026-08-13). The per-row fields carry the life-table
+    # SCALARS (e0, TFR, IBI, starvation share), which is what a trajectory needs. They cannot answer the
+    # question that actually decides an age-structure failure: WHICH AGES carry the excess hazard. Without
+    # the arrays a finished run can only be compared against a UNIFORMLY scaled Siler schedule, and a uniform
+    # scaling barely moves a stable age distribution — so the comparison misses precisely the age-graded
+    # distortion it is meant to find. Measured: an arm with TFR 8.41 and realised e0 17.7 should sit at
+    # frac_child ~0.45 under a uniform scaling but sits at 0.543, and the residual is unattributable without
+    # these. One row of ~700 integers per run, written once.
+    if hasattr(w, "raw_demographic_counters"):
+        _c = w.raw_demographic_counters()
+        meta["life_table_final"] = {k: _c[k] for k in
+                                    ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc")}
+        meta["fertility_final"] = {k: _c[k] for k in ("fert_births", "fert_exposure", "ibi_hist")}
+        meta["fertility_final"].update(fert_factor_sum=_c["fert_factor_sum"],
+                                       fert_factor_n=_c["fert_factor_n"],
+                                       fert_factor_sat=_c["fert_factor_sat"])
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(dict(meta=meta, traj=traj), fh)
     log(f"DONE step={step} in {(time.time()-t0)/60:.1f} min -> {OUT} ; genealogy rows={genea_rows} -> {GENEA}")

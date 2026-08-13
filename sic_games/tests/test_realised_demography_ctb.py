@@ -355,6 +355,24 @@ def test_the_observers_never_feed_back():
                     "These counters are pure observers; a read makes them load-bearing.")
 
 
+def test_the_harness_contract_for_the_final_arrays_holds():
+    """run_campaign writes the age-specific arrays into the trajectory meta at the end of a run, by reading
+    exactly these keys off `raw_demographic_counters()`. The per-row fields carry only the SCALARS, and the
+    scalars cannot say WHICH AGES carry the excess hazard — which is the question an age-structure failure
+    turns on. A renamed key here would silently produce runs with no arrays, and nobody would notice until an
+    attribution was attempted months later. This pins the contract without paying for a campaign subprocess."""
+    w = _world(n=40)
+    w.step()
+    c = w.raw_demographic_counters()
+    for k in ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc",
+              "fert_births", "fert_exposure", "ibi_hist",
+              "fert_factor_sum", "fert_factor_n", "fert_factor_sat"):
+        assert k in c, f"run_campaign reads `{k}` off raw_demographic_counters(); it is missing"
+    assert len(c["lt_exposure"]) == LT_MAX_AGE_YR
+    assert len(c["ibi_hist"]) == IBI_HIST_MAX + 1
+    assert sum(c["lt_deaths"]) == sum(c["lt_deaths_starv"]) + sum(c["lt_deaths_senesc"])
+
+
 def test_no_flag_gates_the_observers():
     """Deliberate: a flag would let a run silently produce no life table, and the first thing anyone would
     do with an empty table is assume the run was fine. The counters cost two list increments per agent-step
