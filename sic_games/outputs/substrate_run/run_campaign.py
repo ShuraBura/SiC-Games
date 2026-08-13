@@ -229,6 +229,20 @@ def log(msg):
     print(msg, flush=True)
 
 
+
+def _pctl(vals, qs):
+    """Percentiles without numpy, on a possibly-empty list. Returns 0.0 for each q when empty and never
+    raises: a diagnostic must not be the thing that stops a 15,000-step run."""
+    if not vals:
+        return [0.0 for _ in qs]
+    v = sorted(vals)
+    out = []
+    for q in qs:
+        i = int(round((q / 100.0) * (len(v) - 1)))
+        out.append(v[max(0, min(i, len(v) - 1))])
+    return out
+
+
 def snapshot(w, step, menarche, prev_leaders, last_con):
     al = w.agent_list
     pop = len(al)
@@ -438,6 +452,24 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     # TerrainWorld, and a diagnostic must never be the thing that crashes a 15,000-step run.
     _lt = w.life_table() if hasattr(w, "life_table") else {}
     _fs = w.fertility_schedule() if hasattr(w, "fertility_schedule") else {}
+    # Energy-signal distribution over WOMEN OF REPRODUCTIVE AGE — the population any energetic fertility
+    # mechanism acts on. Read defensively: an older TerrainWorld, or a run with the intake signal off, must
+    # not crash a 15,000-step campaign over a diagnostic.
+    _dm = getattr(w, "_demog", None)
+    _hi = getattr(_dm, "intake_fert_hi", 1.2) if _dm else 1.2
+    _burn = getattr(w, "_burn", 0.0)
+    _ema, _raw = [], []
+    if _dm is not None:
+        for _a in w.agent_list:
+            if _a.sex != "female" or not (_dm.menarche_months <= _a.age < _dm.menopause_months):
+                continue
+            _ema.append(float(getattr(_a, "_intake_ema", 1.0)))
+            _rq0 = _burn * _a.consumption_factor()
+            _raw.append(float(_a._last_intake / _rq0) if _rq0 > 0 else 1.0)
+    _iq = _pctl(_ema, (10, 50, 90))
+    _rq = _pctl(_raw, (10, 50, 90))
+    _elo = (sum(1 for v in _ema if v < _hi) / len(_ema)) if _ema else 0.0
+    _rlo = (sum(1 for v in _raw if v < _hi) / len(_raw)) if _raw else 0.0
     row.update(
         # REPRODUCTION / MATING — the channel that drives every dynastic marker downstream
         frac_polygynous_m=round(_dg.get("frac_polygynous_m", 0.0), 4),   # Marlowe (Hadza) ~0.04
@@ -484,6 +516,15 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         fert_factor_mean=round(_fs.get("factor_mean", float("nan")), 4),
         fert_factor_sat=round(_fs.get("factor_saturated", float("nan")), 4),
         starv_share=round(_lt.get("starv_share", 0.0), 4),
+        # THE ENERGY SIGNAL'S OWN DISTRIBUTION (R-106, 2026-08-13). `fert_factor_sat` says the brake is
+        # saturated; it cannot say BY HOW FAR, and that is what decides whether ANY energetic mechanism can
+        # work. The physiological window is [intake_fert_lo, intake_fert_hi] = [1.0, 1.2], anchored to FAO/IOM
+        # (pregnancy +11%, lactation +20%). If the signal sits at 3x that window, every mechanism keyed to it
+        # pins at one end — which killed the fecundability brake and would equally kill a refractory keyed the
+        # same way. BOTH forms travel: the EMA is what a mechanism reads, the RAW ratio is what the EMA erases.
+        intake_ema_p10=round(_iq[0], 3), intake_ema_p50=round(_iq[1], 3), intake_ema_p90=round(_iq[2], 3),
+        intake_raw_p10=round(_rq[0], 3), intake_raw_p50=round(_rq[1], 3), intake_raw_p90=round(_rq[2], 3),
+        intake_raw_frac_below_hi=round(_rlo, 4), intake_ema_frac_below_hi=round(_elo, 4),
         lt_deaths_total=int(_lt.get("deaths", 0)),
         lt_exposure_py=round(_lt.get("exposure_py", 0.0), 1),
         adult_sex_ratio=round(_dg.get("adult_sex_ratio", 0.0), 3),
