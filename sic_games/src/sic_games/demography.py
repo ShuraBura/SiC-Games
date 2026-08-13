@@ -385,6 +385,81 @@ class DemographyConfig(BaseModel):
     # the whole two-stream path, so the scalar remains the master switch as well as the fallback value.
     enable_biome_meat_frac: bool = False
     enable_biome_meat_cv: bool = False
+    # ── VILLAGE IDENTITY: co-residence dissolves band identity (2026-08-12) ────────────────────────────────
+    # THE GAP THIS FILLS. Birdsell's nesting is already filed in LITERATURE.md — band ~25 → horde/local group
+    # ~40 → dialectal tribe ~500 — and the model implements ONLY the band level. Nothing above it exists, so
+    # co-residence has no effect on identity anywhere in the code. MEASURED consequence: a 204-person
+    # settlement contains **45 distinct bands** of ~4-5 co-resident members each. A "village" is a spatial
+    # coincidence of strangers, not a community, which is why every fission-cleavage rule tested returns a
+    # 1-4 person splinter (see the budding investigation, 2026-08-12).
+    #
+    # `_maintain_bands` cannot do this: its FUSION branch fires only below `band_merge_size` (10), a rescue
+    # rule for dying remnants. Bands sit at equilibrium between merge 10 and split 45 and never combine.
+    #
+    # THE RULE. An agent accrues co-residence at whichever settlement it is within `settle_radius` of (the
+    # model's own `_nearest_settlement`). Past `village_identity_months` it adopts that village's identity.
+    # Leaving resets the clock — so this is per-agent tenure, not a global timer, and it degrades gracefully
+    # when a settlement dissolves.
+    #
+    # THE TIMESCALE IS THE MODEL'S OWN COMING-OF-AGE CONSTANT, not a new number: 180 months = 15 yr =
+    # `menarche_months`. Mechanism — identity is inherited at birth, so a merged identity consolidates when
+    # the first cohort born after aggregation reaches adulthood. Half a generation (the model's mean age at
+    # reproduction is ~28 yr from the Table 8.2 schedule). Supervisor decision 2026-08-12, after the
+    # alternatives (~1 yr Wiessner hxaro = a DYADIC partnership, wrong quantity; ~28 yr full generation =
+    # slower than the 42-yr window in which the settlement bifurcation is decided) were costed.
+    enable_village_identity: bool = False
+    village_identity_months: int = Field(180, ge=1)   # = menarche_months; NOT an independent number
+    # ── BUD SITE SEPARATION: a daughter village's catchment must not overlap its parent's (2026-08-12) ─────
+    # THE ASYMMETRY. `_maintain_settlements` holds a site while >= `settle_min_pool` (40) people are inside its
+    # (2·settle_radius+1) = 5-cell block, but budding only required a daughter 3 cells away. Two sites 3 apart
+    # share 10 of their 25 catchment cells, so each counts the OTHER's residents toward its own survival test.
+    # MEASURED: ~110 settlements at mean spacing 3.79 cells, mean on-site occupancy 15.8 against a 40-person
+    # requirement — individually unviable sites propping each other up. Combined with a fission cleavage that
+    # sheds a median of TWO people (the kinship comparison excludes the 97% who are equidistant), every
+    # micro-splinter founded a settlement that survived on its neighbours. That is the budding runaway.
+    # ON ⇒ minimum separation 2·settle_radius+1, so catchments are DISJOINT and a daughter must hold its own
+    # pool. Default OFF ⇒ bit-exact.
+    enable_bud_site_separation: bool = False
+    # ── EXCLUSIVE VILLAGE MEMBERSHIP: settlement spacing becomes EMERGENT (2026-08-12) ─────────────────────
+    # THE SAME DEFECT, TREATED AT ITS CAUSE INSTEAD OF ITS GEOMETRY. `_maintain_settlements` counts every
+    # person inside a site's (2*settle_radius+1) window, and those windows overlap whenever sites are closer
+    # than that, so neighbouring villages each count the SAME people toward their own survival threshold.
+    # ON => each agent is counted for exactly ONE village, the nearest. Villages COMPETE for members rather
+    # than sharing them, so a village sited too close to another cannot assemble its own pool and dissolves.
+    # SPACING IS THEN AN OUTCOME, NOT A CONSTANT -- supervisor directive 2026-08-12, "we need that distance
+    # emergent", after the geometric rule above was found to hard-code 5 cells = 50 km against a filed anchor
+    # of ~20 km for disjoint forager catchments (Vita-Finzi & Higgs 1970: ~10 km site exploitation radius, the
+    # two-hour walk; Lee's !Kung agree). `enable_bud_site_separation` is retained default-OFF purely as the
+    # ablation control for "geometry alone" vs "competition". Default OFF => bit-exact.
+    enable_exclusive_village_membership: bool = False
+    # ── EMERGENT VILLAGE FOUNDING: one rule for every village (supervisor spec 2026-08-12) ─────────────────
+    # "They travel until they find a suitable place for a village that is more attractive than being a roving
+    #  band -- just like any village forms. So a fitting cell with proto-ag or fishing potential, out of
+    #  catchment range of other villages."
+    # Replaces the ranked-candidate scan, which was measured to be a MAP-COVERAGE parameter wearing a spacing
+    # parameter's name: it sorts storable cells by S_pot descending and stops at 40, so `aggregation_site_sep`
+    # governed how much of the map was eligible. At sep=2 (20 km, the ethnographic value) all 40 candidates sat
+    # in a 9x79 sliver of the single best ridge and ZERO villages formed. Founding is now evaluated where
+    # people ACTUALLY ARE: fitting cell + settle_min_pool within settle_radius + outside every existing
+    # village's catchment (anchored to settle_catchment_radius = Vita-Finzi & Higgs 1970's ~10 km forager site
+    # exploitation territory, [VERIFIED]). No candidate list, no site cap, no separation constant.
+    enable_emergent_village_founding: bool = False
+    # ── BUD-FOUNDING BYPASS REMOVED: settlement founding is occupancy-gated for EVERY path (2026-08-12) ────
+    # `_found_settlements_by_occupancy` already requires settle_min_pool (40) people within settle_radius
+    # before a settlement exists -- an emergent, occupancy-gated rule. Budding SKIPPED it and created a site
+    # outright, so a faction of TWO (the measured median: the kinship cleavage excludes the 97% of villagers
+    # equidistant from both leaders) founded a full settlement. ~1,700 settlements manufactured out of pairs
+    # of people in 400 steps. That asymmetry is the generator of the runaway, and no downstream rule could
+    # absorb it -- five were built and measured, all five failed (min-faction share silenced budding entirely;
+    # village identity was inert against the churn; parent-only separation changed nothing; global separation
+    # worked but imposed 50 km against a ~20 km filed anchor, Vita-Finzi & Higgs 1970; exclusive membership
+    # raised churn rather than spacing).
+    # ON => a bud RELOCATES its faction and splits the band, but founds NO site. The daughter becomes a
+    # settlement only where people actually gather, via the rule every other path already obeys. Settlement
+    # SPACING IS THEN EMERGENT and no distance constant exists anywhere in the model -- supervisor directive
+    # 2026-08-12, "we need that distance emergent". This REMOVES a rule rather than adding one.
+    # Default OFF => bit-exact.
+    enable_bud_requires_occupancy: bool = False
     # ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982,
     # Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp ≤ storage_temp_threshold_c ≈ Binford's
     # Effective-Temperature 15.25 °C storage threshold) an agent banks a `storable_fraction` of its harvest

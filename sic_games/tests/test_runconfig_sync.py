@@ -136,7 +136,18 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # A CANDIDATE under evaluation rather than a built mechanism awaiting activation — a
                # structural change to assabiyah that is measured and defensible but NOT adopted (Addendum
                # 23). C_ALLON must not adopt a model change by side effect.
-               "enable_leaky_assabiyah"}
+               "enable_leaky_assabiyah",
+               # SETTLEMENT-RUNAWAY CANDIDATES, measured and REJECTED (2026-08-12). Each was built while
+               # diagnosing the budding runaway and each failed on measurement, so each stays dark and is
+               # retained only as an ablation control. The reasons live in run_campaign.py's C_ALLON `_skip`
+               # set; they are not repeated here so there is one copy to keep true.
+               #   bud_site_separation          works, but imposes 50 km against a ~20 km filed anchor
+               #   exclusive_village_membership no spacing on its own; raises churn
+               #   village_identity             inert against settlement churn
+               #   bud_requires_occupancy       removes the bypass; superseded by emergent founding
+               # `enable_emergent_village_founding` is deliberately NOT here — it is canonically ON.
+               "enable_bud_site_separation", "enable_exclusive_village_membership",
+               "enable_village_identity", "enable_bud_requires_occupancy"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

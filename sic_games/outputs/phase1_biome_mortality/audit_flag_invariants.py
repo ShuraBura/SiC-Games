@@ -44,6 +44,17 @@ TYPES = {
     "enable_catchment_ceiling": "P", "enable_resource_storability": "P", "enable_improved_land": "P",
     "enable_alluvial_renewal": "P",
     "enable_soil_depletion": "D",
+    # Settlement-nucleation runaway fixes (2026-08-12). All four act on the SETTLEMENT LIFECYCLE — where a
+    # site may be founded, whether it can be held, and who counts as a member — so they are T (territory /
+    # spatial-structure) rather than P (production). None carries a magnitude: each is a pure rule change.
+    # `enable_village_identity` alone owns a parameter (`village_identity_months`), which is a TIMESCALE and
+    # not a gain, so it is not a MAGNITUDE in the charter sense either.
+    "enable_bud_requires_occupancy": "T", "enable_bud_site_separation": "T",
+    "enable_exclusive_village_membership": "T", "enable_village_identity": "T",
+    # The rule the other four were attempts at (supervisor spec 2026-08-12). Same type for the same reason:
+    # it decides WHERE a site may exist, not how much the cell yields. It is the one of the five that is
+    # canonically ON, because it REPLACES the ranked-candidate scan rather than adding a rule beside it.
+    "enable_emergent_village_founding": "T",
     "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
     "enable_leader_share": "X",
     "enable_cred_status": "C", "enable_prowess_facet": "C", "enable_ascribed_mate_choice": "C",
@@ -190,6 +201,8 @@ PREREQ = {
     "enable_leader_office": ("enable_band_affiliation",), "enable_improved_land": ("enable_economic_defensibility",),
     "enable_alluvial_renewal": ("enable_soil_depletion",), "enable_soil_depletion": ("enable_agriculture",),
     "enable_village_budding": ("enable_aggregation_sedentism",),
+    "enable_emergent_village_founding": ("enable_aggregation_sedentism",),
+    "enable_bud_requires_occupancy": ("enable_aggregation_sedentism", "enable_village_budding"),
     "enable_catchment_ceiling": ("enable_aggregation_sedentism",),
     "enable_settlement_scalar_stress": ("enable_aggregation_sedentism",),
     "enable_sedentism_fertility": ("enable_aggregation_sedentism",),

@@ -417,6 +417,30 @@ type  = "float"
 # and desert 10×. Runs predating R-72 (R-18/19/20, society benchmark, paternal calib) hardcode 0.73 = the
 # mis-anchored forest value.
 
+[village_identity_months]
+value = 180
+owner = "DemographyConfig"
+type  = "int"
+# = menarche_months; NOT an independent number — (channel note, inherited) ── VILLAGE IDENTITY:
+# co-residence dissolves band identity (2026-08-12) ──────────────────────────────── THE GAP THIS FILLS.
+# Birdsell's nesting is already filed in LITERATURE.md — band ~25 → horde/local group ~40 → dialectal
+# tribe ~500 — and the model implements ONLY the band level. Nothing above it exists, so co-residence has
+# no effect on identity anywhere in the code. MEASURED consequence: a 204-person settlement contains **45
+# distinct bands** of ~4-5 co-resident members each. A "village" is a spatial coincidence of strangers,
+# not a community, which is why every fission-cleavage rule tested returns a 1-4 person splinter (see the
+# budding investigation, 2026-08-12). `_maintain_bands` cannot do this: its FUSION branch fires only below
+# `band_merge_size` (10), a rescue rule for dying remnants. Bands sit at equilibrium between merge 10 and
+# split 45 and never combine. THE RULE. An agent accrues co-residence at whichever settlement it is within
+# `settle_radius` of (the model's own `_nearest_settlement`). Past `village_identity_months` it adopts
+# that village's identity. Leaving resets the clock — so this is per-agent tenure, not a global timer, and
+# it degrades gracefully when a settlement dissolves. THE TIMESCALE IS THE MODEL'S OWN COMING-OF-AGE
+# CONSTANT, not a new number: 180 months = 15 yr = `menarche_months`. Mechanism — identity is inherited at
+# birth, so a merged identity consolidates when the first cohort born after aggregation reaches adulthood.
+# Half a generation (the model's mean age at reproduction is ~28 yr from the Table 8.2 schedule).
+# Supervisor decision 2026-08-12, after the alternatives (~1 yr Wiessner hxaro = a DYADIC partnership,
+# wrong quantity; ~28 yr full generation = slower than the 42-yr window in which the settlement
+# bifurcation is decided) were costed.
+
 [storable_fraction]
 value = 0.7
 owner = "DemographyConfig"

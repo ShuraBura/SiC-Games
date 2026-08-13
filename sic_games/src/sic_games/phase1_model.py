@@ -225,6 +225,23 @@ _RANK_LADDER = {"egalitarian_forager": "complex_forager",      # R-98: rank prom
 LEGIT_RELAX = 0.02   # R-86: per-step relaxation rate of cred toward its legitimacy-set target
                      # (~50-step approach). A RATE; the magnitude is `legit_cred_gain`.
 
+# ── REALISED DEMOGRAPHIC INSTRUMENTS (R-106, 2026-08-12) ──────────────────────────────────────────────────
+# WHY THESE EXIST. The model is CONFIGURED with a Siler schedule (ACHE_FOREST, e0 = 36.6 yr) and a fertility
+# schedule (expected IBI 38.3 months, ceiling TFR 9). Nothing ever measured the schedules it actually
+# REALISES. When they were finally derived from the age structure, the run was realising e0 ~ 19 yr — a
+# little over half the calibration — which is what drives `frac_child` to 0.60 against a verified [0.287,
+# 0.454] and `dependency_ratio` to 1.81 against [0.598, 0.899]. The excess is monotone in age (0-5 runs
+# 1.17x the predicted share, 60+ runs 0.59x), so it is an age-graded mortality distortion; and it CANNOT be
+# a fertility effect, because reproducing the observed age structure would need TFR ~14.3, well beyond the
+# model's own arithmetic ceiling of 9.
+#
+# The rule this obeys is the project's own: validate the instrument before turning any knob. A configured
+# schedule and a realised schedule are two different objects, and only the second one explains a run.
+# Everything here is a PURE OBSERVER — no RNG draws, no read-back into any dynamic — so every prior run
+# stays bit-exact and no flag gates it.
+LT_MAX_AGE_YR = 100    # life-table / ASFR bands, ONE YEAR wide; ages at or above this fold into the last bin
+IBI_HIST_MAX = 120     # realised-IBI histogram span in months (10 yr); the final bin is the 120+ overflow
+
 
 class TerrainWorld(mesa.Model):
     """Mesa model: C agents on a terrain kcal economy.
@@ -312,6 +329,8 @@ class TerrainWorld(mesa.Model):
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
+        self._village_band: dict[tuple[int, int], int] = {}       # settlement site → its stable village band_id (village identity)
+        self._village_bands: set[int] = set()                     # band_ids that ARE settled villages → exempt from band fission
         self._meat_frac_cache = None                              # per-cell diet meat fraction from terrain.MEAT_FRAC (absent ⇒ the scalar game_meat_frac)
         self._meat_cv_cache = None                                # per-cell day-to-day meat CV from terrain.MEAT_CV (absent ⇒ terrain.HUNT_CV)
         self._diag_pool = None                                    # DIAGNOSTIC: set to {} to record per-cell (S, occupancy) each harvest; None ⇒ off
@@ -382,6 +401,24 @@ class TerrainWorld(mesa.Model):
         self.births_this_step: int = 0
         self.deaths_starv_this_step: int = 0
         self.deaths_senesc_this_step: int = 0
+        # ── realised life table + realised fertility schedule (see LT_MAX_AGE_YR above) ──────────────────
+        # CUMULATIVE over the run, never reset, so a period rate is obtained by differencing two snapshots.
+        # That is deliberate: a trailing window stored in the model would need a window length, and the
+        # length would become a parameter nobody anchored. Differencing leaves the choice to the analysis.
+        self.lt_exposure: list[int] = [0] * LT_MAX_AGE_YR       # person-months lived, by integer age (years)
+        self.lt_deaths: list[int] = [0] * LT_MAX_AGE_YR         # deaths, by integer age
+        self.lt_deaths_starv: list[int] = [0] * LT_MAX_AGE_YR   # ...of which the starvation floor
+        self.lt_deaths_senesc: list[int] = [0] * LT_MAX_AGE_YR  # ...of which Siler / orphan / max-age
+        self.fert_exposure: list[int] = [0] * LT_MAX_AGE_YR     # woman-months lived (the ASFR denominator)
+        self.fert_births: list[int] = [0] * LT_MAX_AGE_YR       # births by MOTHER's integer age (numerator)
+        self.ibi_hist: list[int] = [0] * (IBI_HIST_MAX + 1)     # realised months between successive births
+        # The fertility MULTIPLIER actually applied, sampled over women who passed the age+IBI gate. This is
+        # the direct test of whether an energetic brake bites: `enable_energetic_fertility` was found dead
+        # because the reserve it reads re-saturates at the cap for ~99% of agents, and `enable_intake_
+        # fertility` was built to replace it. Whether the replacement carries signal has never been measured.
+        self.fert_factor_sum: float = 0.0
+        self.fert_factor_n: int = 0
+        self.fert_factor_sat: int = 0                           # count with multiplier >= 0.999 (no brake)
         # diag (2026-08-11): the settlement-founding/budding methods are called directly (no step()) by several
         # existing tests, and by any future caller that wants the founding logic without a full step. Pre-seeded
         # here for the same reason as the three counters above — step()'s own reset block still zeroes these
@@ -627,6 +664,10 @@ class TerrainWorld(mesa.Model):
                 else:
                     self._do_pairing()
             if getattr(self._demog, "enable_band_affiliation", False):
+                # Village identity runs BEFORE band maintenance so a merged village is already in place when
+                # fusion/fission run, and the fission branch can see it in `_village_bands` and skip it.
+                if getattr(self._demog, "enable_village_identity", False):
+                    self._maintain_village_identity()
                 self._maintain_bands()
                 if getattr(self._demog, "enable_village_budding", False):
                     self._maintain_village_budding()   # Bandy 2004: large village sheds a rival-led daughter (relocates)
@@ -1181,20 +1222,46 @@ class TerrainWorld(mesa.Model):
         """Aggregation-sedentism lifecycle: an active settlement PERSISTS while ≥ settle_min_pool people are within
         settle_radius of its site (membership is emergent proximity — robust to band fission/fusion); otherwise its
         hysteresis timer decays and it DISSOLVES (the pool disperses back to mobile bands). Formation is seasonal (in
-        `_do_gathering`); this runs every step to hold or release."""
+        `_do_gathering`); this runs every step to hold or release.
+
+        EXCLUSIVE MEMBERSHIP (`enable_exclusive_village_membership`, 2026-08-12). The block sum below counts every
+        person inside a site's (2·settle_radius+1) window, and windows OVERLAP whenever sites are closer than
+        that — so two neighbouring villages each count the SAME people toward their own survival threshold.
+        Measured: ~110 settlements at a median nearest-neighbour spacing of 1.0 cell, mean on-site occupancy
+        15.8 against a 40-person requirement, i.e. a dense cluster of individually-unviable sites propping each
+        other up. That mutual subsidy is the engine of the budding runaway.
+
+        ON ⇒ each agent is counted for exactly ONE village, the nearest (`_nearest_settlement`, the model's own
+        membership test, with its existing deterministic tie-break). Villages then COMPETE for members instead
+        of sharing them, and settlement spacing becomes EMERGENT: a village sited too near another cannot
+        assemble its own pool, so it dissolves. No distance constant is imposed anywhere — the earlier
+        geometric rule (`enable_bud_site_separation`) hard-coded 2·settle_radius+1 = 50 km against a filed
+        anchor of ~20 km for disjoint hunter-gatherer catchments (Vita-Finzi & Higgs 1970: ~10 km site
+        exploitation radius, the two-hour walk), and is retained default-OFF only as an ablation control.
+        Default OFF ⇒ block sum ⇒ bit-exact."""
         if not self._settlement_sites:
             return
         rad = self._demog.settle_radius
         min_pool = self._demog.settle_min_pool
+        exclusive = getattr(self._demog, "enable_exclusive_village_membership", False)
+        if exclusive:
+            claimed: dict = {}
+            for a in self.agent_list:
+                s = self._nearest_settlement(a.pos)
+                if s is not None:
+                    claimed[s] = claimed.get(s, 0) + 1
         occ: dict = {}                                    # PERF: cell → occupancy; sum each site's neighbourhood
         for a in self.agent_list:                         # instead of O(agents·n_sites) torus-distance checks
             occ[a.pos] = occ.get(a.pos, 0) + 1
         for site in list(self._settlement_sites):
             sx, sy = site
-            n = 0
-            for dx in range(-rad, rad + 1):
-                for dy in range(-rad, rad + 1):
-                    n += occ.get(((sx + dx) % N, (sy + dy) % N), 0)
+            if exclusive:
+                n = claimed.get(site, 0)          # each person counted for ONE village only → no mutual subsidy
+            else:
+                n = 0
+                for dx in range(-rad, rad + 1):
+                    for dy in range(-rad, rad + 1):
+                        n += occ.get(((sx + dx) % N, (sy + dy) % N), 0)
             if n >= min_pool:
                 self._settlement_sites[site] = self._demog.settle_release_steps    # refresh
             else:
@@ -2110,6 +2177,17 @@ class TerrainWorld(mesa.Model):
                 _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
             a.age += 1
+            # Realised life table (pure observer). Exposure is accrued AFTER the age increment so that a
+            # death recorded later in this same iteration lands in the SAME one-year bin as the exposure
+            # that earned it; accruing before would shift deaths up by ~1/12 yr against their denominator
+            # and bias every hazard low. An agent that dies this step still contributes its full month —
+            # the standard life-table half-month refinement is not worth a second code path here.
+            _lt_i = int(a.age // MONTHS_PER_YEAR)
+            if _lt_i >= LT_MAX_AGE_YR:
+                _lt_i = LT_MAX_AGE_YR - 1
+            self.lt_exposure[_lt_i] += 1
+            if a.sex == "female":
+                self.fert_exposure[_lt_i] += 1
             if a._founder_store > 0.0:
                 # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the
                 # dispersal transient (lifts wealth just over the floor; the store decays as it is consumed).
@@ -2123,12 +2201,14 @@ class TerrainWorld(mesa.Model):
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
                     a.alive = False
                     self.deaths_starv_this_step += 1
+                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_starv[_lt_i] += 1
                     self._note_band_starv(a)                          # M2: attribute this starvation death to its band
                     self.starv_cred_this_step.append(a.cred)
                     self.starv_status_this_step.append(a.cred * getattr(a, "prowess", 1.0))
                 elif self._orphan_lethal(a):              # R-74: mother lost in year 1 ⇒ 100% (Hill & Hurtado)
                     a.alive = False
                     self.deaths_senesc_this_step += 1
+                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
                     self.deaths_orphan_this_step += 1
                 else:
                     a2m = self._a2_mult(a, occ_count)     # Step-2 a2 modulators (1.0 if all flags off)
@@ -2136,18 +2216,22 @@ class TerrainWorld(mesa.Model):
                     if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m, om):
                         a.alive = False                   # Siler baseline+senescence
                         self.deaths_senesc_this_step += 1
+                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
                         if om > 1.0:
                             self.deaths_orphan_this_step += 1   # diag: died while carrying an elevated kin hazard
                     elif a.age >= a.max_age:              # hard lifespan cap (Siler-tail backstop; was DEAD CODE
                         a.alive = False                   # under demog — the elif below is only reached when
                         self.deaths_senesc_this_step += 1  # demog is None, so ancient agents slipped through to 1111)
+                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
             elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
+                self.lt_deaths[_lt_i] += 1; self.lt_deaths_starv[_lt_i] += 1
                 self._note_band_starv(a)
             elif a.age >= a.max_age:
                 a.alive = False
                 self.deaths_senesc_this_step += 1
+                self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
 
         # GD-1: advance the depletable resource stock (deplete by this step's foraging pressure, regrow at the
         # biome/season rate). No-op unless the harvest field has depletion enabled. `season` from the climate field
@@ -2370,7 +2454,23 @@ class TerrainWorld(mesa.Model):
             elif cfg.enable_energetic_fertility:               # births scale with NUTRITIONAL status (post-harvest)
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
                 p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs)
+            # Realised fertility schedule (pure observer). Sampled HERE — past the age gate, the IBI gate and
+            # the mate gate — so the denominator is "women actually at risk of conception this step", which is
+            # what makes the multiplier interpretable. Sampling over all women would dilute it with the
+            # refractory and the pre-menarche, and a brake that never bites would look like one that does.
+            _ff = (p_birth / cfg.fecundability) if cfg.fecundability > 0.0 else 1.0
+            self.fert_factor_sum += _ff
+            self.fert_factor_n += 1
+            if _ff >= 0.999:
+                self.fert_factor_sat += 1
             if a.random.random() < p_birth:
+                # Recorded BEFORE months_since_birth is cleared: after the reset the realised interval is gone.
+                # Parity 0 is excluded because her counter measures time since menarche, not since a birth.
+                if a.parity >= 1:
+                    _ibi = int(a.months_since_birth)
+                    self.ibi_hist[_ibi if _ibi < IBI_HIST_MAX else IBI_HIST_MAX] += 1
+                _mi = int(a.age // MONTHS_PER_YEAR)
+                self.fert_births[_mi if _mi < LT_MAX_AGE_YR else LT_MAX_AGE_YR - 1] += 1
                 a.months_since_birth = 0
                 a.parity += 1
                 csex = "male" if a.random.random() < cfg.srb_male else "female"
@@ -2844,6 +2944,101 @@ class TerrainWorld(mesa.Model):
         if dens < 10.0:
             return "entrepreneur"
         return "above-Hayden-range"
+
+    def life_table(self, since: dict | None = None) -> dict:
+        """The life table the run ACTUALLY REALISED, from accumulated exposure and deaths (pure observer).
+
+        This is the counterpart to the Siler schedule the run was CONFIGURED with, and the two are different
+        objects: R-106 measured a run realising e0 ~ 19 yr against a configured ACHE_FOREST e0 of 36.6.
+        Nothing had ever compared them, so an age-structure failure could not be attributed to a hazard.
+
+        Cumulative over the run by default. Pass `since` — an earlier return of `raw_demographic_counters()`
+        — to obtain a PERIOD life table over the interval instead, which is how a run's early transient is
+        kept out of its steady-state schedule.
+
+        Returns `m` (central death rate per person-year, by single year of age), `q` (probability of dying
+        within the year), `l` (survivorship from age 0), `e0`, and the starvation share of deaths. Bins with
+        no exposure return 0.0 for `m` rather than NaN, so `l` stays defined across gaps in a small run.
+        """
+        ex, de = self.lt_exposure, self.lt_deaths
+        ds, dn = self.lt_deaths_starv, self.lt_deaths_senesc
+        if since is not None:
+            ex = [a - b for a, b in zip(ex, since["lt_exposure"])]
+            de = [a - b for a, b in zip(de, since["lt_deaths"])]
+            ds = [a - b for a, b in zip(ds, since["lt_deaths_starv"])]
+            dn = [a - b for a, b in zip(dn, since["lt_deaths_senesc"])]
+        m: list[float] = []
+        for i in range(LT_MAX_AGE_YR):
+            py = ex[i] / MONTHS_PER_YEAR          # person-months -> person-YEARS of exposure
+            m.append((de[i] / py) if py > 0.0 else 0.0)
+        # Actuarial conversion assuming deaths fall uniformly through the year (a(x) = 1/2). At the monthly
+        # step size the approximation costs far less than the sampling noise in any run we do.
+        q = [(mi / (1.0 + 0.5 * mi)) if mi > 0.0 else 0.0 for mi in m]
+        l = [1.0]
+        for i in range(LT_MAX_AGE_YR):
+            l.append(l[-1] * (1.0 - q[i]))
+        e0 = sum(0.5 * (l[i] + l[i + 1]) for i in range(LT_MAX_AGE_YR))
+        td = sum(de)
+        return {"m": m, "q": q, "l": l[:-1], "e0": e0,
+                "deaths": td, "exposure_py": sum(ex) / MONTHS_PER_YEAR,
+                "deaths_starv": sum(ds), "deaths_senesc": sum(dn),
+                "starv_share": (sum(ds) / td) if td else 0.0}
+
+    def fertility_schedule(self, since: dict | None = None) -> dict:
+        """The fertility schedule the run ACTUALLY REALISED: ASFR, TFR, realised IBI (pure observer).
+
+        ASFR is a rate per woman-YEAR and a step is a MONTH, so exposure is divided by 12. TFR is the sum of
+        the single-year ASFRs — the synthetic-cohort measure, which is what Hill & Hurtado Tables 8.1/8.2
+        state (8.031 forest) and so the only one comparable to the anchor. Like `life_table`, cumulative by
+        default and differenceable via `since`.
+
+        `factor_mean` and `factor_saturated` describe the fertility MULTIPLIER actually applied to women at
+        risk. They exist because an energetic brake that never bites is indistinguishable from an absent one
+        in every other diagnostic: `enable_energetic_fertility` read a reserve that re-saturated at the cap
+        for ~99% of agents, and `enable_intake_fertility` replaced it without the replacement ever being
+        measured. `factor_saturated` near 1.0 means the brake is decorative.
+        """
+        bi, ex = self.fert_births, self.fert_exposure
+        hist = self.ibi_hist
+        fsum, fn, fsat = self.fert_factor_sum, self.fert_factor_n, self.fert_factor_sat
+        if since is not None:
+            bi = [a - b for a, b in zip(bi, since["fert_births"])]
+            ex = [a - b for a, b in zip(ex, since["fert_exposure"])]
+            hist = [a - b for a, b in zip(hist, since["ibi_hist"])]
+            fsum -= since["fert_factor_sum"]; fn -= since["fert_factor_n"]; fsat -= since["fert_factor_sat"]
+        asfr: list[float] = []
+        for i in range(LT_MAX_AGE_YR):
+            wy = ex[i] / MONTHS_PER_YEAR
+            asfr.append((bi[i] / wy) if wy > 0.0 else 0.0)
+        n_ibi = sum(hist)
+        med = mean = float("nan")
+        if n_ibi:
+            half, run = n_ibi / 2.0, 0
+            for months, c in enumerate(hist):
+                run += c
+                if run >= half:
+                    med = float(months)
+                    break
+            mean = sum(months * c for months, c in enumerate(hist)) / n_ibi
+        return {"asfr": asfr, "tfr": sum(asfr),
+                "births": sum(bi), "woman_years": sum(ex) / MONTHS_PER_YEAR,
+                "ibi_median": med, "ibi_mean": mean, "ibi_n": n_ibi,
+                "factor_mean": (fsum / fn) if fn else float("nan"),
+                "factor_saturated": (fsat / fn) if fn else float("nan"), "factor_n": fn}
+
+    def raw_demographic_counters(self) -> dict:
+        """A copy of every cumulative demographic counter, for differencing into a PERIOD rate later.
+
+        Copies rather than references: a caller holding a live list would silently see it keep accumulating,
+        and the resulting "period" table would be the cumulative one wearing a period's name.
+        """
+        return {"step": self.step_count,
+                "lt_exposure": list(self.lt_exposure), "lt_deaths": list(self.lt_deaths),
+                "lt_deaths_starv": list(self.lt_deaths_starv),
+                "lt_deaths_senesc": list(self.lt_deaths_senesc),
+                "fert_births": list(self.fert_births), "fert_exposure": list(self.fert_exposure),
+                "ibi_hist": list(self.ibi_hist), "fert_factor_sum": self.fert_factor_sum,
+                "fert_factor_n": self.fert_factor_n, "fert_factor_sat": self.fert_factor_sat}
 
     def demography(self, by: str | None = None) -> dict:
         """Demographic snapshot of the live population.
@@ -3929,6 +4124,42 @@ class TerrainWorld(mesa.Model):
         occ_cnt: dict = {}
         for a in self.agent_list:
             occ_cnt[a.pos] = occ_cnt.get(a.pos, 0) + 1
+        if getattr(cfg, "enable_emergent_village_founding", False):
+            # ── EMERGENT FOUNDING (supervisor spec 2026-08-12) ────────────────────────────────────────────
+            # "People leave the village. They are a roving band now. They travel until they find a suitable
+            #  place for a village that is more attractive than being a roving band — just like any village
+            #  forms. So a fitting cell with proto-ag or fishing potential, out of catchment range of other
+            #  villages."
+            # ONE RULE FOR EVERY VILLAGE. No bud path, no ranked candidate list, no 40-site cap, and no
+            # `aggregation_site_sep`. Measured reason the list had to go: it takes storable cells sorted by
+            # S_pot DESCENDING and stops at 40, so `sep` silently governed HOW MUCH OF THE MAP was eligible,
+            # not how far apart villages ended up. At sep=2 (20 km, the ethnographic figure) all 40 candidates
+            # fell inside a 9x79 sliver of the single best ridge and ZERO villages formed anywhere.
+            # The three conditions, evaluated WHERE PEOPLE ACTUALLY ARE:
+            #   1. a fitting cell   — S_pot >= settle_persist_threshold (proto-ag / fishing potential)
+            #   2. enough people    — settle_min_pool within settle_radius, the existing viability gate
+            #   3. its own land     — outside every existing village's catchment
+            # (3) is anchored, not invented: Vita-Finzi & Higgs 1970 [VERIFIED] put the forager site
+            # exploitation territory at a ~10 km radius (the two-hour walk; Lee's !Kung agree), which is
+            # `settle_catchment_radius` = 1 cell. Two Chebyshev catchments of radius r are disjoint exactly
+            # when their centres are more than 2r apart. NOTE the discretisation inflates this: disjoint
+            # circles of radius 10 km need centres 20 km apart, but disjoint 3x3 cell blocks need 30 km.
+            # Deterministic: occupied cells are visited in sorted order, and earlier foundings constrain later
+            # ones within the same step. Default OFF => the ranked-candidate path above => bit-exact.
+            cr = cfg.settle_catchment_radius
+            for (x, y) in sorted(occ_cnt):
+                if float(aqf[y, x]) < thr:
+                    continue                                   # 1. not a fitting site
+                near = sum(occ_cnt.get(((x + dx) % N, (y + dy) % N), 0)
+                           for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
+                if near < cfg.settle_min_pool:
+                    continue                                   # 2. not enough people to be a village
+                if any(max(abs(x - ox), abs(y - oy)) <= 2 * cr
+                       for (ox, oy) in self._settlement_sites):
+                    continue                                   # 3. inside another village's catchment
+                self._settlement_sites[(x, y)] = cfg.settle_release_steps
+                self.settle_formed_this_step += 1
+            return
         for (sx, sy) in sites:
             near = sum(occ_cnt.get(((sx + dx) % N, (sy + dy) % N), 0)
                        for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
@@ -4013,6 +4244,60 @@ class TerrainWorld(mesa.Model):
         if name in ("patriline_weight", "lineage_reversion", "paternal_provision_frac"):
             return min(1.0, max(0.0, val))
         return max(0.0, val)
+
+    def _maintain_village_identity(self) -> None:
+        """Co-residence dissolves band identity: long-settled bands MERGE into one village community.
+
+        Fills the level Birdsell names and the model lacks — band ~25 nests in a larger local group, but
+        nothing in the code ever merged co-resident bands, so a 204-person settlement held 45 of them.
+
+        An agent accrues tenure at whichever settlement is within `settle_radius` (`_nearest_settlement`, the
+        model's own membership test). Past `village_identity_months` it adopts that village's band_id. Moving
+        away resets the clock, so this is PER-AGENT tenure: newcomers are not instantly absorbed, and a
+        dissolving settlement releases its members without special-casing.
+
+        THE VILLAGE ID IS AN EXISTING band_id, never a minted one — the modal band among the first qualifying
+        cohort, tie-broken by lowest id so it is deterministic. Stored per site in `_village_band` so the
+        identity is stable across steps rather than flipping with the modal count.
+
+        COUPLING THAT MAKES THIS WORK OR THRASH. `_maintain_bands` spatially SPLITS any band above
+        `band_split_size` (45). A merged village of ~200 would be torn apart on the very step it forms, so
+        `_village_bands` (rebuilt here each step) is skipped by that fission branch. This is the existing
+        `tolerable_size` idea taken to its conclusion: a SEDENTARY village tolerates a size a mobile band does
+        not. The exemption lasts exactly as long as the settlement does — the set is rebuilt from live sites,
+        so an abandoned village's band immediately becomes fissionable again.
+
+        Default OFF ⇒ never called ⇒ bit-exact. No RNG."""
+        cfg = self._demog
+        thr = cfg.village_identity_months
+        qualified: dict = {}
+        for a in self.agent_list:
+            site = self._nearest_settlement(a.pos)
+            if site is None:
+                a._cores_site = None
+                a._cores_steps = 0
+                continue
+            if getattr(a, "_cores_site", None) != site:
+                a._cores_site = site                      # arrived somewhere new → tenure restarts
+                a._cores_steps = 1
+            else:
+                a._cores_steps = getattr(a, "_cores_steps", 0) + 1
+            if a._cores_steps >= thr:
+                qualified.setdefault(site, []).append(a)
+        live = set(self._settlement_sites)
+        for site in [s for s in self._village_band if s not in live]:
+            del self._village_band[site]                  # settlement gone → its identity is not preserved
+        self._village_bands = set()
+        for site, members in qualified.items():
+            vid = self._village_band.get(site)
+            if vid is None:
+                counts = Counter(a._group.band_id for a in members)
+                top = max(counts.values())
+                vid = min(b for b, n in counts.items() if n == top)   # modal, tie-broken by lowest id
+                self._village_band[site] = vid
+            for a in members:
+                a._group.band_id = vid
+            self._village_bands.add(vid)
 
     def _maintain_bands(self) -> None:
         """F.3c-1 emergent band fission/fusion (hysteretic) on the affiliation band_id. FUSION: a band below
@@ -4192,8 +4477,14 @@ class TerrainWorld(mesa.Model):
             for a in members[bid]:
                 a._group.band_id = nb
             members[nb].extend(members.pop(bid))
-        # FISSION (above the split threshold → spatial median split)
-        for bid in [b for b, ms in members.items() if len(ms) > split_thr.get(b, cfg.band_split_size)]:
+        # FISSION (above the split threshold → spatial median split). VILLAGE BANDS ARE EXEMPT: a band that is
+        # a settled village (see `_maintain_village_identity`) is no longer a mobile band and must not be cut
+        # back to band_split_size, or the merge it just performed is undone on the same step. The exemption is
+        # scoped to LIVE settlements — `_village_bands` is rebuilt each step from current sites, so an
+        # abandoned village becomes fissionable again immediately. Empty set ⇒ no-op ⇒ bit-exact.
+        _vb = getattr(self, "_village_bands", ())
+        for bid in [b for b, ms in members.items()
+                    if b not in _vb and len(ms) > split_thr.get(b, cfg.band_split_size)]:
             ms = members[bid]
             xs = [a.pos[0] for a in ms]; ys = [a.pos[1] for a in ms]
             if (max(xs) - min(xs)) >= (max(ys) - min(ys)):
@@ -4393,14 +4684,33 @@ class TerrainWorld(mesa.Model):
             if len(faction) < 2 or len(faction) < minf * len(village):
                 continue                                            # no rival bloc to carry a fission
             # NEAREST open storable daughter site (its distance = the relocation cost that drives circumscription)
+            # MINIMUM SEPARATION. The original `sep + 1` = 3 cells is SMALLER than the hold window, which is the
+            # (2·settle_radius+1) = 5-cell block `_maintain_settlements` counts for `settle_min_pool`. Two sites
+            # 3 cells apart therefore share 10 of their 25 catchment cells, and each counts the OTHER's people
+            # toward its own 40-person survival test. Measured consequence: ~110 settlements at a mean spacing
+            # of 3.79 cells, mean on-site occupancy 15.8 against a 40-person requirement — a dense cluster of
+            # individually-unviable sites propping each other up, which is the engine of the budding runaway
+            # (2026-08-12 investigation). With `enable_bud_site_separation` the daughter must sit at least
+            # 2·settle_radius+1 away, so the two catchments are DISJOINT and a daughter has to hold its own
+            # pool to survive. Default OFF ⇒ `sep + 1` ⇒ bit-exact.
+            _minsep = (2 * sep + 1) if getattr(cfg, "enable_bud_site_separation", False) else (sep + 1)
             best, bestd = None, R + 1
             for yy in range(max(0, sy - R), min(H, sy + R + 1)):
                 for xx in range(max(0, sx - R), min(W, sx + R + 1)):
                     d = max(abs(xx - sx), abs(yy - sy))
-                    if d < sep + 1 or d >= bestd or float(aqf[yy, xx]) < persist:
+                    if d < _minsep or d >= bestd or float(aqf[yy, xx]) < persist:
                         continue                                    # own catchment, farther than best, or not storable
                     if (xx, yy) in self._settlement_sites or occ.get((xx, yy), 0) >= cfg.settle_min_pool:
                         continue                                    # already an occupied settlement → not open
+                    if _minsep > sep + 1 and any(
+                            max(abs(xx - ox), abs(yy - oy)) < _minsep
+                            for (ox, oy) in self._settlement_sites):
+                        continue    # DISJOINTNESS IS GLOBAL, NOT JUST PARENT-DAUGHTER. The first version of
+                        #             this rule constrained only the distance back to the PARENT, so a daughter
+                        #             could still be sited one cell from some OTHER village. Measured: with the
+                        #             rule on, median nearest-neighbour spacing was still 1.0 cell and 94% of
+                        #             the population stayed resident — the catchment overlap, and so the mutual
+                        #             propping, survived untouched. A site must clear EVERY existing settlement.
                     best, bestd = (xx, yy), d
             if best is None:
                 continue         # CIRCUMSCRIBED (no open site in reach) → no bud → village grows + stratifies (Bandy → morph)
@@ -4472,9 +4782,22 @@ class TerrainWorld(mesa.Model):
             new_id = self._next_band_id; self._next_band_id += 1     # BUD: rival faction migrates + founds the daughter
             for a in faction:
                 a._group.band_id = new_id; a.pos = best
-            if best not in self._settlement_sites:
-                self.settle_formed_this_step += 1
-            self._settlement_sites[best] = cfg.settle_release_steps
+            # THE BUD-FOUNDING BYPASS. `_found_settlements_by_occupancy` requires settle_min_pool (40) people
+            # within settle_radius before a settlement exists — an emergent, occupancy-gated rule. Budding
+            # skipped it entirely and CREATED a site outright, so a faction of two (the measured median, since
+            # the kinship cleavage excludes the 97% of villagers equidistant from both leaders) founded a full
+            # settlement. That is the generator of the runaway: ~1,700 settlements manufactured out of pairs of
+            # people in 400 steps, after which no downstream rule could produce physical spacing — five were
+            # tried and measured, and all five failed (min-faction share silenced budding; village identity was
+            # inert; parent-only separation did nothing; global separation worked but imposed 50 km against a
+            # ~20 km filed anchor; exclusive membership raised churn instead of spacing).
+            # ON ⇒ the bud RELOCATES its faction and splits the band, but founds no site. The daughter becomes
+            # a settlement only if people actually gather there, through the existing occupancy rule — so
+            # SPACING IS EMERGENT and no distance constant is introduced anywhere. Default OFF ⇒ bit-exact.
+            if not getattr(cfg, "enable_bud_requires_occupancy", False):
+                if best not in self._settlement_sites:
+                    self.settle_formed_this_step += 1
+                self._settlement_sites[best] = cfg.settle_release_steps
             self.bud_events += 1               # counts BOTH paths (was hazard-only — legacy-path budding read 0 always)
             self.bud_events_this_step += 1     # per-step twin of the cumulative counter above
 

@@ -434,6 +434,10 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     # because nothing carried it forward. Cost is one demography() pass per snapshot, i.e. per
     # C_LOGEVERY steps, which is negligible beside the step loop.
     _dg = w.demography()
+    # Realised life table + fertility schedule. Read defensively: several harnesses and tests drive an older
+    # TerrainWorld, and a diagnostic must never be the thing that crashes a 15,000-step run.
+    _lt = w.life_table() if hasattr(w, "life_table") else {}
+    _fs = w.fertility_schedule() if hasattr(w, "fertility_schedule") else {}
     row.update(
         # REPRODUCTION / MATING — the channel that drives every dynastic marker downstream
         frac_polygynous_m=round(_dg.get("frac_polygynous_m", 0.0), 4),   # Marlowe (Hadza) ~0.04
@@ -461,6 +465,27 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         age_60_plus=round(_dg.get("age_60_plus", 0.0), 4),
         pyramid_base_ratio=round(_dg.get("pyramid_base_ratio", 0.0), 3),
         growth_regime=_dg.get("growth_regime", "n/a"),
+        # THE REALISED SCHEDULES (R-106, 2026-08-12). The age pyramid above says WHAT the structure is; these
+        # say WHY. The model is configured with ACHE_FOREST (e0 36.6 yr) and a ceiling TFR of 9, and the age
+        # structure implies it realises e0 ~ 19 — so the two schedules are different objects and only the
+        # realised one explains a run. Both cumulative over the run; difference two rows for a period rate.
+        #   realised_e0        vs the CONFIGURED 36.6. A gap here IS the age-structure failure.
+        #   realised_tfr       vs Hill & Hurtado Table 8.1's 8.031 [VERIFIED], ceiling 9.
+        #   realised_ibi_med   vs Table 8.2's 37.6 forest / 49.4 contact / 34.4 reservation [VERIFIED].
+        #   fert_factor_sat    the share of at-risk women whose fertility multiplier is ~1.0. Near 1.0 means
+        #                      the energetic brake is decorative — the failure `enable_energetic_fertility`
+        #                      already had, and the reason `enable_intake_fertility` replaced it.
+        #   starv_share        how much of the mortality is the Malthusian brake rather than the life table.
+        realised_e0=round(_lt.get("e0", 0.0), 2),
+        realised_tfr=round(_fs.get("tfr", 0.0), 3),
+        realised_ibi_med=round(_fs.get("ibi_median", float("nan")), 1),
+        realised_ibi_mean=round(_fs.get("ibi_mean", float("nan")), 1),
+        realised_ibi_n=int(_fs.get("ibi_n", 0)),
+        fert_factor_mean=round(_fs.get("factor_mean", float("nan")), 4),
+        fert_factor_sat=round(_fs.get("factor_saturated", float("nan")), 4),
+        starv_share=round(_lt.get("starv_share", 0.0), 4),
+        lt_deaths_total=int(_lt.get("deaths", 0)),
+        lt_exposure_py=round(_lt.get("exposure_py", 0.0), 1),
         adult_sex_ratio=round(_dg.get("adult_sex_ratio", 0.0), 3),
         frac_unpaired_adult=round(_dg.get("frac_unpaired_adult", 0.0), 4),
         frac_unpaired_adult_m=round(_dg.get("frac_unpaired_adult_m", 0.0), 4),
@@ -658,6 +683,25 @@ def main():
             # structural model change by side effect — which is the exact class of accident this whole audit
             # has been about. Remove this line when the supervisor adopts it.
             "enable_leaky_assabiyah",
+            # SETTLEMENT-RUNAWAY CANDIDATES UNDER EVALUATION (2026-08-12). Four rules built while diagnosing
+            # the budding runaway; NONE is adopted, and each is measured but not yet chosen, so C_ALLON must
+            # not enable them by side effect — the same accident `enable_leaky_assabiyah` is excluded for.
+            #   enable_bud_site_separation           WORKS but imposes 5 cells = 50 km, against Vita-Finzi &
+            #                                        Higgs 1970's ~10 km forager catchment radius (~20 km for
+            #                                        disjoint catchments). Rejected on the anchor; retained
+            #                                        only as the "geometry alone" ablation control.
+            #   enable_exclusive_village_membership  removes the mutual subsidy as designed, but produces NO
+            #                                        spacing on its own and raises churn (buds 978 -> 1366).
+            #   enable_village_identity              inert against settlement churn on its own (bands per
+            #                                        village 47 -> 42, against an intended 45 -> ~1).
+            #   enable_bud_requires_occupancy        the candidate that removes a rule instead of adding one;
+            #                                        awaiting its re-probe at the time of writing.
+            # Two of these are mutually exclusive in spirit (imposed geometry vs emergent spacing), so
+            # "all on" is not even a coherent state for them.
+            "enable_bud_site_separation",
+            "enable_exclusive_village_membership",
+            "enable_village_identity",
+            "enable_bud_requires_occupancy",
         }
         # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
         # parameters that have to move with the flag for it to mean anything.

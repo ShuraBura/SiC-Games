@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-07
+# generated 2026-08-12
 
 [meta]
 name = "full_campaign"
@@ -40,6 +40,8 @@ enable_biome_meat_cv = true
 enable_biome_meat_frac = true
 enable_bonded_mating = true
 enable_bud_hazard = false
+enable_bud_requires_occupancy = false
+enable_bud_site_separation = false
 enable_caribou_swing = true
 enable_catchment_ceiling = true
 enable_climate_lottery = true
@@ -54,7 +56,9 @@ enable_eccentricity_mean = true
 enable_economic_defensibility = true
 enable_emergent_abandonment = true
 enable_emergent_band_size = true
+enable_emergent_village_founding = true
 enable_energetic_fertility = true
+enable_exclusive_village_membership = false
 enable_exogamy = true
 enable_forage_cap = true
 enable_game = true
@@ -112,9 +116,11 @@ enable_terrain_pathogen = false
 enable_terrain_risk = true
 enable_tier2_shock = true
 enable_village_budding = true
+enable_village_identity = false
 enable_village_resentment = true
 enable_village_scaling = true
 enable_wealth_obligation = true
+
 [parameters]
 a2_cap = 5.0
 a_seas = 0.4
@@ -329,4 +335,5 @@ village_bud_search_radius = 8
 village_circumscription_gain = 0.6
 village_fission_threshold = 150
 village_gain = 5.0
+village_identity_months = 180
 wife_quality_strength = 0.0
