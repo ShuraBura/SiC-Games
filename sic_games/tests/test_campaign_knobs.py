@@ -112,7 +112,10 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # `enable_emergent_village_founding`, the rule that REPLACED them, is canonically ON and so
                # is deliberately absent from this list.
                "enable_bud_site_separation", "enable_exclusive_village_membership",
-               "enable_village_identity", "enable_bud_requires_occupancy"}
+               "enable_village_identity", "enable_bud_requires_occupancy",
+               # A model CORRECTION under evaluation: it changes realised mortality in every
+               # run, so it stays dark until the supervisor adopts it (2026-08-13).
+               "enable_density_reference"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

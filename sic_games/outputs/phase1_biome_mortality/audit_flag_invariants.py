@@ -77,6 +77,9 @@ TYPES = {
     "enable_dependent_load": "N",     # widens the intake-fertility denominator by the juveniles' unmet need
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
+    # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
+    # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
+    "enable_density_reference": "N",
     # enable_band_risk / enable_infanticide deleted 2026-08-06 (death spiral; dead stub)
     "enable_genome": "H", "enable_paternity": "H",
     "enable_tier2_shock": "F",
@@ -200,6 +203,7 @@ PREREQ = {
     "enable_leveling": ("enable_material_capture",), "enable_leader_share": ("enable_material_capture",),
     "enable_leader_office": ("enable_band_affiliation",), "enable_improved_land": ("enable_economic_defensibility",),
     "enable_alluvial_renewal": ("enable_soil_depletion",), "enable_soil_depletion": ("enable_agriculture",),
+    "enable_density_reference": ("enable_density_disease",),
     "enable_village_budding": ("enable_aggregation_sedentism",),
     "enable_emergent_village_founding": ("enable_aggregation_sedentism",),
     "enable_bud_requires_occupancy": ("enable_aggregation_sedentism", "enable_village_budding"),

@@ -340,6 +340,32 @@ class DemographyConfig(BaseModel):
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
     dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
+    # ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ────────────────────────────────────────
+    # THE DEFECT. `a2_mult` multiplies three modulators into Siler's Makeham term. TWO of them are
+    # reference-normalised so that the ANCHOR CONDITION returns exactly 1.0 — `risk_mult` divides by
+    # `risk_ref` ("≈1 in average-risk terrain") and `pathogen_mult` is "mean-normalised so
+    # pathogen_mult(npp_ref) = 1 (the Aché-forest reference biome is neutral)". `density_mult` is NOT. It
+    # returns 1.0 only at ρ = 0, an EMPTY WORLD.
+    #
+    # WHY THAT IS A DOUBLE-COUNT. Gurven & Kaplan 2007 fitted a2 = 0.0130 on Aché foragers who were LIVING AT
+    # A REAL DENSITY, so that coefficient already contains whatever density-dependent disease those people
+    # experienced. Multiplying it again at the same density charges for it twice.
+    #
+    # MEASURED SIZE. `dens_rho_half` = 0.2/km² sits ABOVE the whole ethnographic range (Binford packing
+    # 0.091/km²; Tallavaara observed HG median 0.119/km²; this model's own Tallavaara capacity at its terrain
+    # median NPP ≈ 0.053/km²), so every real forager density lies on the steep rising limb. At Binford's own
+    # anchor the unnormalised term already returns 1.94x. The measured non-starvation hazard runs 1.56x the
+    # configured Siler, and realised e0 is 17.7 yr against a configured 36.6.
+    #
+    # AND THE DYNAMICS AMPLIFY IT. `aggl_beta` = 1.15 gives increasing returns to crowding, so agents pack
+    # into cells of ~71 (0.714/km², EIGHT times the Binford anchor and 3.6x past half-saturation), which drives
+    # the term to 3.34x against its 4.0 ceiling. The error is in the maths; the agglomeration makes it large.
+    #
+    # THE FIX INTRODUCES NO NEW NUMBER. `dens_rho_ref` defaults to Binford 2001's packing threshold, which is
+    # already filed (LITERATURE.md: "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default
+    # OFF ⇒ every prior run stays bit-exact.
+    enable_density_reference: bool = False
+    dens_rho_ref: float = Field(0.091, gt=0.0)  # agents/km² at which density_mult == 1 [ANCHORED, Binford 2001]
     mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994) [PROVISIONAL]
     a2_cap: float = Field(5.0, ge=1.0)          # cap on the a2_eff multiplier (red-team n-1)
     # Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2.
@@ -1796,10 +1822,22 @@ def risk_mult(risk_cell: float, risk_ref: float, cap: float) -> float:
     return min(cap, risk_cell / risk_ref)
 
 
-def density_mult(density_per_km2: float, delta: float, rho_half: float) -> float:
+def density_mult(density_per_km2: float, delta: float, rho_half: float,
+                 rho_ref: float = 0.0) -> float:
     """Density-dependent disease: `1 + δ·ρ/(ρ+ρ_half)`, ρ in **agents/km²** (red-team m-3). Endemic /
-    zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever."""
-    return 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+    zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever.
+
+    `rho_ref > 0` divides through by the value at that density, so the multiplier is exactly 1.0 there and
+    the term becomes a RELATIVE excess above the reference rather than above an empty world. This is the
+    same invariant `risk_mult` and `pathogen_mult` already hold, and the one this function silently broke:
+    Siler's a2 was fitted on a population living at a real density, so charging it again at that density
+    double-counts. `rho_ref = 0` reproduces the historical unnormalised form exactly (bit-exact default).
+    See `DemographyConfig.enable_density_reference` for the measurement that motivated it.
+    """
+    raw = 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+    if rho_ref <= 0.0:
+        return raw
+    return raw / (1.0 + delta * rho_ref / (rho_ref + rho_half))
 
 
 def pathogen_mult(npp_cell: float, npp_ref: float, gamma: float, cap: float) -> float:

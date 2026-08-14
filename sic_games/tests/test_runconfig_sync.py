@@ -147,7 +147,10 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                #   bud_requires_occupancy       removes the bypass; superseded by emergent founding
                # `enable_emergent_village_founding` is deliberately NOT here — it is canonically ON.
                "enable_bud_site_separation", "enable_exclusive_village_membership",
-               "enable_village_identity", "enable_bud_requires_occupancy"}
+               "enable_village_identity", "enable_bud_requires_occupancy",
+               # A model CORRECTION under evaluation: it changes realised mortality in every
+               # run, so it stays dark until the supervisor adopts it (2026-08-13).
+               "enable_density_reference"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

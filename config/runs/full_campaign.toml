@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-12
+# generated 2026-08-14
 
 [meta]
 name = "full_campaign"
@@ -50,6 +50,7 @@ enable_cred_renorm = true
 enable_cred_status = true
 enable_delegitimation = true
 enable_density_disease = true
+enable_density_reference = false
 enable_dependent_load = true
 enable_dynamic_bands = true
 enable_eccentricity_mean = true
@@ -182,6 +183,7 @@ defensibility_min = 0.15
 defensibility_tether = 6.0
 dens_delta = 3.0
 dens_rho_half = 0.2
+dens_rho_ref = 0.091
 divorce_rate = 0.005
 exogamy_degree = "lineage"
 exogamy_relatedness = 0.125

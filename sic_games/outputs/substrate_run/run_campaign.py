@@ -757,6 +757,12 @@ def main():
             "enable_exclusive_village_membership",
             "enable_village_identity",
             "enable_bud_requires_occupancy",
+            # A MODEL CORRECTION UNDER EVALUATION (2026-08-13). `enable_density_reference` re-references
+            # density_mult so the anchor density returns 1.0 -- the invariant risk_mult and pathogen_mult
+            # already hold and this one silently broke. It is measured and principled, but adopting it
+            # changes the realised mortality of EVERY run, so C_ALLON must not take it by side effect.
+            # Remove this line when the supervisor adopts it.
+            "enable_density_reference",
         }
         # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
         # parameters that have to move with the flag for it to mean anything.

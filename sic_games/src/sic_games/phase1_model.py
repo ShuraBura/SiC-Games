@@ -4903,7 +4903,9 @@ class TerrainWorld(mesa.Model):
             m *= risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
-            m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half)
+            # `dens_rho_ref` only when the flag is on; 0.0 reproduces the historical form bit-exactly.
+            _rref = cfg.dens_rho_ref if getattr(cfg, "enable_density_reference", False) else 0.0
+            m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half, _rref)
         # (F.2 band risk-dilution was a fourth multiplier here; deleted 2026-08-06 — a death spiral at any live
         # setting and inert at its default. See DemographyConfig, where the finding is kept.)
         if cfg.enable_terrain_pathogen:                        # S2 biome disease-ecology (Cashdan; NPP proxy)
