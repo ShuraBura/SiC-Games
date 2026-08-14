@@ -441,6 +441,13 @@ class TerrainWorld(mesa.Model):
         self.births_female: int = 0
         self.first_birth_age_sum: float = 0.0     # mother's age in MONTHS at her parity-1 birth
         self.first_birth_n: int = 0
+        # a2-modulator decomposition (see _a2_mult). Cumulative sums; mean = sum / a2_n.
+        self.a2_n: int = 0
+        self.a2_risk_sum: float = 0.0
+        self.a2_dens_sum: float = 0.0
+        self.a2_syn_sum: float = 0.0
+        self.a2_total_sum: float = 0.0
+        self.a2_cond_sum: float = 0.0
         # diag (2026-08-11): the settlement-founding/budding methods are called directly (no step()) by several
         # existing tests, and by any future caller that wants the founding logic without a full step. Pre-seeded
         # here for the same reason as the three counters above — step()'s own reset block still zeroes these
@@ -5155,16 +5162,26 @@ class TerrainWorld(mesa.Model):
 
     def _a2_mult(self, a, occ_count) -> float:
         """Step-2 baseline-mortality (a2) multiplier from the live modulators (1.0 if all flags off) —
-        the only Siler term the world modulates. Capped (red-team n-1). Pathogen OFF in 2b."""
+        the only Siler term the world modulates. Capped (red-team n-1). Pathogen OFF in 2b.
+
+        PER-FACTOR OBSERVERS (R-106, 2026-08-14). The product was measured at ~2.2x the configured Siler in
+        the 5-15 band, but only the PRODUCT was ever visible, so which of the three factors carries it was
+        unknown. Addendum 43 showed the density term is near-neutral once the carrying-capacity ceiling is
+        repaired, which leaves terrain risk and the nutrition synergy — and nothing measured either alone.
+        Each is a plain running sum; no RNG, no read-back.
+        """
         cfg = self._demog
         m = 1.0
+        _f_risk = _f_dens = _f_syn = 1.0
         if cfg.enable_terrain_risk:
-            m *= risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
+            _f_risk = risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
+            m *= _f_risk
         if cfg.enable_density_disease:
             rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
             # `dens_rho_ref` only when the flag is on; 0.0 reproduces the historical form bit-exactly.
             _rref = cfg.dens_rho_ref if getattr(cfg, "enable_density_reference", False) else 0.0
-            m *= density_mult(rho, cfg.dens_delta, cfg.dens_rho_half, _rref)
+            _f_dens = density_mult(rho, cfg.dens_delta, cfg.dens_rho_half, _rref)
+            m *= _f_dens
         # (F.2 band risk-dilution was a fourth multiplier here; deleted 2026-08-06 — a death spiral at any live
         # setting and inert at its default. See DemographyConfig, where the finding is kept.)
         if cfg.enable_terrain_pathogen:                        # S2 biome disease-ecology (Cashdan; NPP proxy)
@@ -5172,13 +5189,21 @@ class TerrainWorld(mesa.Model):
                                cfg.pathogen_gamma, cfg.pathogen_cap)
         if cfg.enable_nutrition_synergy:
             if cfg.enable_condition:                           # S0: disease potentiated by SUSTAINED condition (EMA)
-                m *= 1.0 + (cfg.mu_max - 1.0) * (1.0 - a._condition)
+                _f_syn = 1.0 + (cfg.mu_max - 1.0) * (1.0 - a._condition)
             else:                                              # legacy: instantaneous post-harvest reserve
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
-                m *= synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
+                _f_syn = synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
+            m *= _f_syn
+        self.a2_n += 1
+        self.a2_risk_sum += _f_risk
+        self.a2_dens_sum += _f_dens
+        self.a2_syn_sum += _f_syn
+        self.a2_cond_sum += float(getattr(a, "_condition", 1.0))
         if m > cfg.a2_cap:
             self.a2_cap_hits += 1
+            self.a2_total_sum += cfg.a2_cap
             return cfg.a2_cap
+        self.a2_total_sum += m
         return m
 
     # ── Diagnostics ──────────────────────────────────────────────────────────

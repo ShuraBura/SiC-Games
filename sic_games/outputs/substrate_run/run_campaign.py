@@ -533,6 +533,18 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         fert_factor_mean=round(_fs.get("factor_mean", float("nan")), 4),
         fert_factor_sat=round(_fs.get("factor_saturated", float("nan")), 4),
         starv_share=round(_lt.get("starv_share", 0.0), 4),
+        # THE a2 MODULATOR, FACTOR BY FACTOR. Only the PRODUCT was ever visible, and it runs ~2.2x the
+        # configured Siler in the 5-15 band. `risk_mult` is anchored (accidents ~10% of HG deaths, so it
+        # should sit near 1.1); `density_mult` was shown near-neutral once the ceiling was repaired; the
+        # nutrition synergy is 1 + (mu_max-1)*(1-condition) with mu_max 2.5, so it reaches 2.5x at zero
+        # body condition. Whichever of these carries the inflation is the next thing to fix, and the
+        # product alone can never say which.
+        a2_mean=round((w.a2_total_sum / w.a2_n) if getattr(w, "a2_n", 0) else float("nan"), 3),
+        a2_risk_mean=round((w.a2_risk_sum / w.a2_n) if getattr(w, "a2_n", 0) else float("nan"), 3),
+        a2_dens_mean=round((w.a2_dens_sum / w.a2_n) if getattr(w, "a2_n", 0) else float("nan"), 3),
+        a2_syn_mean=round((w.a2_syn_sum / w.a2_n) if getattr(w, "a2_n", 0) else float("nan"), 3),
+        condition_mean=round((w.a2_cond_sum / w.a2_n) if getattr(w, "a2_n", 0) else float("nan"), 4),
+        a2_cap_hits=int(getattr(w, "a2_cap_hits", 0)),
         # ── THE STANDING DEMOGRAPHY PANEL (supervisor request 2026-08-13) ────────────────────────────────
         # "We cannot expect social dynamics to work when the demography is skewed." Today's example: band_med
         # read 23 against Birdsell ~25 and looked like a pass, on a population that was 54% CHILDREN — about

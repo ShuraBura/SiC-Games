@@ -6496,4 +6496,73 @@ unobtained** and is the single gap blocking a fertility-response timescale.
 
 ---
 
+## Addendum 44 — The model is Malthusian, so no hazard fix can raise e0 (2026-08-14, R-106)
+
+**THE a2 MODULATOR, DECOMPOSED.** `_a2_mult` multiplies three live factors into Siler's Makeham term and only
+the PRODUCT was ever visible. Per-factor observers, measured on a 600-step campaign:
+
+| factor | measured | what it was meant to be |
+|---|---|---|
+| `risk_mult` | **0.630** | ~1.1 — accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007) |
+| `density_mult` | **2.435** (1.329 with `enable_density_reference`) | — |
+| `synergy_mult` | **1.000**, mean body condition 1.0000 | up to 2.5 at zero condition |
+
+**`risk_mult` RUNS BELOW 1.0 — terrain risk is a net PROTECTIVE factor.** It divides by a GLOBAL mean risk
+(`risk_cell / risk_ref`) while agents self-select into low-risk cells, so the realised mean sits on the wrong
+side of 1. The normalisation is not wrong in itself; the reference is a world mean and the sample is a biased
+subset of it. Filed, not fixed.
+
+**CORRECTION TO ADDENDUM 43 — the density fix is not "near-neutral", it is COMPENSATED.** Addendum 43 recorded
+e0 17.87 → 17.96 and called the fix near-neutral. A controlled pair shows the fix working exactly as designed
+and the system absorbing it:
+
+| | 600 steps | 15,000 steps |
+|---|---|---|
+| e0 gain | **+5.8 yr** (21.6 → 27.4) | **+0.09 yr** |
+| `density_mult` | 2.435 → 1.329 (−45%) | same |
+| `a2` product | 1.414 → 0.719 (−49%) | same |
+
+In the 15,000-step pair, `m_other` in the 5–15 band fell **0.0298 → 0.0165** while `m_starv` rose **0.0208 →
+0.0339**, holding total mortality flat at 0.0506 → 0.0504.
+
+**THE STRUCTURAL RESULT.** Once the carrying-capacity ceiling is repaired (Addendum 43), the model is
+MALTHUSIAN: equilibrium e0 is set by the food-to-population balance, NOT by the hazard parameters. Reduce any
+hazard and the population grows until starvation restores the same total mortality. **No hazard fix can raise
+equilibrium e0.** The `hg_villages_off` trajectory shows it directly — e0 falls 30.15 → 18.5 → 17.87 as the
+population fills the world, and thereafter is flat while intake p50 fluctuates 2.3–3.9.
+
+The only levers on equilibrium e0 are FERTILITY (a lower equilibrium density) or PRODUCTIVITY. That is what
+Gurven & Kaplan 2007 Fig. 9 says independently: *"forager mortality is narrowly confined, fertility ranges
+widely from below 4 to as high as 8"*. Regulation runs through fertility, and this model now agrees.
+
+**A CLAIM OF MINE CORRECTED BY ITS OWN TEST.** I first recorded that `enable_nutrition_synergy` is DEAD, having
+measured `synergy_mult` = 1.000 and condition = 1.0000 on a campaign run. The CTB failed at once: in the
+smaller, poorer test world condition is **0.49** and the synergy is live at ~1.76. **The mechanism is not
+inert — it is SILENCED BY THE WORLD**, because campaign agents eat 2.6x their requirement and `_condition`
+saturates. That is the same root cause as the dead energetic fertility brake, which reads an intake signal
+that saturates for the same reason. TWO MECHANISMS, ONE FAILURE. "World-dependent" is a fixable finding;
+"inert" would have aimed the next fix at the wrong target.
+
+**TASK #70 IS PARTLY REHABILITATED.** Its premise — that the energy signal never enters the FAO/IOM window
+[1.0, 1.2] — was falsified on the RUNAWAY world. Re-measured at equilibrium on the repaired world:
+
+| | runaway world | repaired world |
+|---|---|---|
+| intake EMA median | 6.62 | **2.58** |
+| EMA p10 | 1.72 | **1.41** |
+| below 1.2, raw | 4.7% | **8.5%** |
+| below 1.2, after the EMA | **0.0%** | **2.0%** |
+| `fert_factor_sat` | 0.999 | **0.971** |
+
+Still small, but no longer zero, and 2.5x closer to the window. The refractory route deserves a re-test rather
+than the flat falsification recorded earlier.
+
+**BASELINE PAIR, 15,000 steps, ceiling repaired, sha dff049f, both stable.** `hg_villages_off` pop 3,916
+(0.27x Binford), `hg_densref` pop 5,062 (0.35x). Both `structure_ok = False`: `frac_child` 0.535/0.559 against
+[0.287, 0.454] and `dependency` 1.262/1.398 against [0.598, 0.899]. `band_med_adults` **10 against Hill's
+28.2**. Cohort parity 8.46 and synthetic TFR 8.37 now AGREE, confirming the arms are in steady state — the
+divergence seen on the 400-step run was the diagnostic working, not an artefact.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
