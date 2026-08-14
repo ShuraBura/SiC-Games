@@ -452,6 +452,7 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     # TerrainWorld, and a diagnostic must never be the thing that crashes a 15,000-step run.
     _lt = w.life_table() if hasattr(w, "life_table") else {}
     _fs = w.fertility_schedule() if hasattr(w, "fertility_schedule") else {}
+    _sp = w.starvation_profile() if hasattr(w, "starvation_profile") else {}
     # Energy-signal distribution over WOMEN OF REPRODUCTIVE AGE — the population any energetic fertility
     # mechanism acts on. Read defensively: an older TerrainWorld, or a run with the intake signal off, must
     # not crash a 15,000-step campaign over a diagnostic.
@@ -525,6 +526,19 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         intake_ema_p10=round(_iq[0], 3), intake_ema_p50=round(_iq[1], 3), intake_ema_p90=round(_iq[2], 3),
         intake_raw_p10=round(_rq[0], 3), intake_raw_p50=round(_rq[1], 3), intake_raw_p90=round(_rq[2], 3),
         intake_raw_frac_below_hi=round(_rlo, 4), intake_ema_frac_below_hi=round(_elo, 4),
+        # WHO STARVES, AND WHERE (R-106, 2026-08-13). Every field above samples the LIVING, so the starved
+        # are absent from all of them — and a third of deaths are starvation in a population whose 10th
+        # percentile eats 1.65x its requirement. `compute_harvest_shares` gives an occupant S/n, so intake is
+        # set by LOCAL occupancy: `starv_occ_at_death` far above `starv_occ_of_living` means agents starve
+        # because they CROWD (a DISTRIBUTION fault), the two equal means the cells are simply too poor or the
+        # reserve too thin (a SUPPLY fault). `occ_of_living` is weighted per AGENT, not per cell.
+        starv_occ_at_death=round(_sp.get("occ_at_death", float("nan")), 2),
+        starv_occ_of_living=round(_sp.get("occ_of_living", float("nan")), 2),
+        starv_age_at_death=round(_sp.get("age_at_death_yr", float("nan")), 2),
+        starv_intake_at_death=round(_sp.get("intake_at_death", float("nan")), 3),
+        starv_ema_at_death=round(_sp.get("ema_at_death", float("nan")), 3),
+        cells_occupied=int(_sp.get("cells_occupied", 0)),
+        mean_occ_per_cell=round(_sp.get("mean_occ_per_cell", float("nan")), 2),
         lt_deaths_total=int(_lt.get("deaths", 0)),
         lt_exposure_py=round(_lt.get("exposure_py", 0.0), 1),
         adult_sex_ratio=round(_dg.get("adult_sex_ratio", 0.0), 3),

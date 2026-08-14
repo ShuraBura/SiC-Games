@@ -324,7 +324,9 @@ def test_reading_a_diagnostic_does_not_mutate_it():
 
 _OBSERVER_NAMES = ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc",
                    "fert_exposure", "fert_births", "ibi_hist",
-                   "fert_factor_sum", "fert_factor_n", "fert_factor_sat")
+                   "fert_factor_sum", "fert_factor_n", "fert_factor_sat",
+                   "starv_events", "starv_occ_sum", "starv_age_sum", "starv_intake_sum",
+                   "starv_ema_sum", "starv_by_age")
 
 
 def test_the_observers_never_feed_back():
@@ -353,6 +355,75 @@ def test_the_observers_never_feed_back():
                 assert any(p.match(stmt) for p in pats), (
                     f"line {i + 1}: `self.{name}` is READ inside the model dynamics:\n    {stmt}\n"
                     "These counters are pure observers; a read makes them load-bearing.")
+
+
+# ── (2b) the starvation profile — the instrument the survivor samples could not be ────────────────────────
+
+def test_every_starvation_death_is_profiled():
+    """CONSERVATION, and the positive control. If the observer misses deaths, the mean it reports is over an
+    unknown subset — the survivorship problem again, one level down.
+
+    The default test world is too rich to starve anyone, so starvation is FORCED by dropping every agent onto
+    the floor. Weakening the assertion instead would have left a test that passes on zero events, which is
+    the shape of a vacuous guard."""
+    w = _world()
+    w.step()
+    w._burn = 1e13          # maintenance beyond any possible harvest: the whole cohort must cross the floor
+    w.step()
+    p = w.starvation_profile()
+    assert sum(w.lt_deaths_starv) > 0, "starvation was forced and still did not fire"
+    assert p["starv_events"] == sum(w.lt_deaths_starv)
+    assert sum(p["starv_by_age"]) == p["starv_events"]
+
+
+def test_occupancy_at_death_is_the_agents_own_cell():
+    """CTB: a constructed crowd whose occupancy is known. Twelve agents share one cell and are pushed under
+    the starvation floor; the profile must report 12, not the map average and not 1."""
+    from types import SimpleNamespace
+    w = _world(n=40)
+    w.step()
+    a = w.agent_list[0]
+    w.starv_events = 0
+    w.starv_occ_sum = 0.0
+    w._note_starvation_state(a, {a.pos: 12}, 3)
+    p = w.starvation_profile()
+    assert p["starv_events"] == 1
+    assert p["occ_at_death"] == pytest.approx(12.0)
+
+
+def test_living_occupancy_is_weighted_by_agent_not_by_cell():
+    """THE COMPARISON HINGES ON THIS. Ten agents on one cell and one agent on another: the crowding an
+    average AGENT experiences is (10*10 + 1*1)/11 = 9.18, while the average CELL holds 5.5. Reporting the
+    cell mean would understate crowding exactly where the agents are, and would make a distribution fault
+    look like a supply fault."""
+    w = _world(n=40)
+    w.step()
+    keep = w.agent_list[:11]
+    for x in keep[:10]:
+        x.pos = (5, 5)
+    keep[10].pos = (40, 40)
+    w.agent_list = keep
+    p = w.starvation_profile()
+    assert p["occ_of_living"] == pytest.approx((10 * 10 + 1 * 1) / 11)
+    assert p["mean_occ_per_cell"] == pytest.approx(11 / 2)
+    assert p["cells_occupied"] == 2
+
+
+def test_the_profile_can_separate_crowding_from_poverty():
+    """The instrument must be able to return BOTH verdicts, or it cannot discriminate. Two constructed
+    populations, same size: one starves in crowds, one starves alone."""
+    w = _world(n=40)
+    w.step()
+    a = w.agent_list[0]
+    w.starv_events = 0; w.starv_occ_sum = 0.0
+    for _ in range(20):
+        w._note_starvation_state(a, {a.pos: 30}, 3)
+    crowded = w.starvation_profile()["occ_at_death"]
+    w.starv_events = 0; w.starv_occ_sum = 0.0
+    for _ in range(20):
+        w._note_starvation_state(a, {a.pos: 1}, 3)
+    alone = w.starvation_profile()["occ_at_death"]
+    assert crowded == pytest.approx(30.0) and alone == pytest.approx(1.0)
 
 
 def test_the_harness_contract_for_the_final_arrays_holds():

@@ -419,6 +419,14 @@ class TerrainWorld(mesa.Model):
         self.fert_factor_sum: float = 0.0
         self.fert_factor_n: int = 0
         self.fert_factor_sat: int = 0                           # count with multiplier >= 0.999 (no brake)
+        # WHO STARVES, AND WHERE. Every other intake diagnostic samples the LIVING, so the starved never
+        # appear in it. See `_note_starvation_state`. Sums, not samples: O(1) per death.
+        self.starv_events: int = 0
+        self.starv_occ_sum: float = 0.0        # occupancy of the cell, at the moment of death
+        self.starv_age_sum: float = 0.0        # age in months
+        self.starv_intake_sum: float = 0.0     # last intake / own requirement
+        self.starv_ema_sum: float = 0.0        # the smoothed signal a fertility brake would have read
+        self.starv_by_age: list[int] = [0] * LT_MAX_AGE_YR
         # diag (2026-08-11): the settlement-founding/budding methods are called directly (no step()) by several
         # existing tests, and by any future caller that wants the founding logic without a full step. Pre-seeded
         # here for the same reason as the three counters above — step()'s own reset block still zeroes these
@@ -2202,6 +2210,7 @@ class TerrainWorld(mesa.Model):
                     a.alive = False
                     self.deaths_starv_this_step += 1
                     self.lt_deaths[_lt_i] += 1; self.lt_deaths_starv[_lt_i] += 1
+                    self._note_starvation_state(a, occ_count, _lt_i)   # WHO starves, and where (see below)
                     self._note_band_starv(a)                          # M2: attribute this starvation death to its band
                     self.starv_cred_this_step.append(a.cred)
                     self.starv_status_this_step.append(a.cred * getattr(a, "prowess", 1.0))
@@ -2239,6 +2248,32 @@ class TerrainWorld(mesa.Model):
         if hasattr(tf, "deplete_and_regrow"):
             season = tf.season() if hasattr(tf, "season") else 1.0
             tf.deplete_and_regrow(occ_count, season)
+
+    def _note_starvation_state(self, a, occ_count: dict, age_i: int) -> None:
+        """Record the state of an agent AT THE MOMENT IT STARVES (pure observer).
+
+        WHY THIS EXISTS. Every intake diagnostic in this model samples agents that are ALIVE at the snapshot,
+        so the starved are invisible to all of them — survivorship bias. Measured consequence: at a population
+        of 8338 (0.58x Binford density) the median woman takes in 5.3x her requirement and the TENTH percentile
+        still takes in 1.65x, while a third of all deaths are starvation. Those two facts cannot both describe
+        a food shortage, and no diagnostic that samples survivors can tell which of them is misleading.
+
+        THE CANDIDATE THIS SEPARATES. `compute_harvest_shares` is RIVALROUS: an occupant receives S/n, the
+        cell yield divided by the number standing on it. So intake is set by LOCAL occupancy, not by global
+        density, and agents that cluster can starve in a crowded cell while the map average stays high. If
+        that is the mechanism, the mean occupancy at a starvation death will be far ABOVE the occupancy an
+        average agent experiences. If the two match, crowding is not the cause and the yield of the cell is.
+
+        Sums rather than samples, so the cost is O(1) per death and nothing is retained per agent.
+        """
+        self.starv_events += 1
+        self.starv_occ_sum += float(occ_count.get(a.pos, 1))
+        self.starv_age_sum += float(a.age)
+        req = self._burn * a.consumption_factor()
+        self.starv_intake_sum += (a._last_intake / req) if req > 0.0 else 0.0
+        self.starv_ema_sum += float(getattr(a, "_intake_ema", 0.0))
+        if age_i < LT_MAX_AGE_YR:
+            self.starv_by_age[age_i] += 1
 
     def _note_band_starv(self, a) -> None:
         """M2: tally a starvation death against the agent's band (band_id → count this step)."""
@@ -3025,6 +3060,38 @@ class TerrainWorld(mesa.Model):
                 "ibi_median": med, "ibi_mean": mean, "ibi_n": n_ibi,
                 "factor_mean": (fsum / fn) if fn else float("nan"),
                 "factor_saturated": (fsat / fn) if fn else float("nan"), "factor_n": fn}
+
+    def starvation_profile(self) -> dict:
+        """Compare the state of agents that STARVED against the state of the agents that lived (pure observer).
+
+        This is the instrument the survivor-sampled diagnostics could not be. `compute_harvest_shares` divides
+        a cell's yield S among its n occupants, so intake is set by LOCAL occupancy. The discriminating
+        comparison is therefore `occ_at_death` against `occ_of_living`:
+
+          occ_at_death >> occ_of_living  -> agents starve because they CROWD, and the map average is a
+                                            survivor artefact. The fault is DISTRIBUTION.
+          occ_at_death ~= occ_of_living  -> crowding is not it; the cells themselves are too poor, or the
+                                            reserve is too thin to cross a trough. The fault is SUPPLY.
+
+        `occ_of_living` is occupancy weighted BY AGENT, not by cell — an agent's experience of crowding is
+        what its own cell holds, so a per-cell mean would understate it exactly where the agents are.
+        """
+        n = self.starv_events
+        occ: dict = {}
+        for a in self.agent_list:
+            occ[a.pos] = occ.get(a.pos, 0) + 1
+        live_n = len(self.agent_list)
+        occ_live = (sum(occ[a.pos] for a in self.agent_list) / live_n) if live_n else float("nan")
+        cells = len(occ)
+        return {"starv_events": n,
+                "occ_at_death": (self.starv_occ_sum / n) if n else float("nan"),
+                "occ_of_living": occ_live,
+                "age_at_death_yr": (self.starv_age_sum / n / MONTHS_PER_YEAR) if n else float("nan"),
+                "intake_at_death": (self.starv_intake_sum / n) if n else float("nan"),
+                "ema_at_death": (self.starv_ema_sum / n) if n else float("nan"),
+                "cells_occupied": cells,
+                "mean_occ_per_cell": (live_n / cells) if cells else float("nan"),
+                "starv_by_age": list(self.starv_by_age)}
 
     def raw_demographic_counters(self) -> dict:
         """A copy of every cumulative demographic counter, for differencing into a PERIOD rate later.
