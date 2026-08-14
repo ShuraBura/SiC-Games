@@ -130,13 +130,28 @@ def test_capacity_helper_is_geometric_not_site_gated():
     assert got == pytest.approx(3.0 * 9 * 2.0)                        # mult × 3×3 catchment × cell level
 
 
-def test_ceiling_still_needs_aggregation_sedentism_KNOWN_SCOPE(monkeypatch):
-    """DOCUMENTED RESIDUAL SCOPE, not an endorsement. `ceiling_on` is itself gated on
-    `enable_aggregation_sedentism`, so a run with agglomeration ON and aggregation-sedentism OFF gets NO ceiling
-    even with this flag set — the older Stage-1 `climate_viz` runs are in that configuration. Campaign runs
-    (run_campaign.py) set both, so they are covered. Pinned so the gap is visible instead of forgotten.
+def test_ceiling_applies_without_aggregation_sedentism(monkeypatch):
+    """THE SCOPE NOTE WAS CLOSED 2026-08-14, and this test is what caught it — as designed.
+
+    It previously read `test_ceiling_still_needs_aggregation_sedentism_KNOWN_SCOPE` and asserted the OPPOSITE:
+    that a world with agglomeration ON and aggregation-sedentism OFF got no ceiling at all. R-105 pinned that
+    as "DOCUMENTED RESIDUAL SCOPE, not an endorsement ... so the gap is visible instead of forgotten", and its
+    failure message was written to say "scope note is stale — the ceiling now applies without
+    aggregation-sedentism". That message fired on the first run after the fix. The tripwire worked.
+
+    WHAT THE GAP COST WHEN IT WAS FINALLY EXERCISED. The first arms ever run with settlement OFF (2026-08-14)
+    reproduced R-104 exactly: population 2916 → 24,727 by step 3000 of 15,000, per-capita intake RISING with
+    density (2.37 → 6.76x requirement), 221 occupants per cell, 1.72x the Binford packing anchor and still
+    climbing. R-105's own note names the mechanism: "an unbounded increasing-returns loop with no Malthusian
+    limit". The old note said campaign runs set both flags "so they are covered" — true until an arm ablated
+    settlement, which nothing had done before.
+
+    A ceiling is a statement about LAND. Whether people live in villages cannot decide whether their food
+    supply is bounded.
     """
     w = _packed_world(aggl_ceiling=True)
     w._demog = w._demog.model_copy(update=dict(enable_aggregation_sedentism=False))
     pools = _cell_pools(monkeypatch, w)
-    assert max(pools) > CAP, "scope note is stale — the ceiling now applies without aggregation-sedentism"
+    assert max(pools) <= CAP * 1.0001, (
+        f"a mobile crowd out-produced its land: pool {max(pools):,.0f} > capacity {CAP:,.0f} — the "
+        "settlement-off path has lost its ceiling again")

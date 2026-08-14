@@ -81,6 +81,111 @@ class SilerParams:
 # VALIDATED: reproduces e₀=36.5, e₁₅=38.3, e₄₅=21.3, l(15)=0.66, l(45)=0.43, modal adult death=71.
 ACHE_FOREST = SilerParams(a1=0.157, b1=0.721, a2=0.013, a3=4.80e-5, b3=0.103)
 
+# ── THE DEMOGRAPHY MONITOR'S ANCHOR REGISTRY (R-106, 2026-08-14, supervisor request) ──────────────────────
+# "We cannot expect social dynamics to work when the demography is skewed."
+#
+# THE CASE THAT PROVES IT. `band_med` read 23 against Birdsell's ~25 and looked like a PASS, on a population
+# that was 54% children — about 11 ADULTS against Hill et al. 2011's 28.2 ADULTS. A marker read as passing
+# while failing 2.5-fold, because nothing scored the age structure beside it. `docs/MARKER_MATRIX.md` #1
+# already recorded this ("the 23/25 all-ages pass is carried by excess children") and it was still missed.
+#
+# EVERY BAND HERE IS COPIED FROM A FILED SOURCE. Nothing is invented. Two kinds of entry:
+#   ("band", lo, hi, src)   a RANGE that exists in the literature. A hard PASS / OUT-OF-BAND verdict.
+#   ("point", v, tol, src)  a single published value. `tol` is a REPORTING tolerance for flagging a
+#                           DEVIATION — it is a display choice, NOT a calibration target, and no parameter
+#                           is ever fitted to it. The reported quantity is the ratio to the anchor.
+#
+# DENOMINATOR TRAPS ARE ENCODED IN THE KEY NAMES. `surv_to_45` is l(45) FROM BIRTH, which is what Gurven &
+# Kaplan's "survival 15→45 = 0.43" actually means; `surv_15_to_45_cond` is the conditional (0.65) and is
+# deliberately NOT scored against it. `band_med_adults`, not `band_med`, carries Hill's 28.2. Five of this
+# project's retractions were a real number read against the wrong denominator, so the names carry the unit.
+_GK07 = "Gurven & Kaplan 2007 PDR 33(2) Table 2, Aché forest [VERIFIED]"
+_HH44 = "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM]"
+_HH8 = "Hill & Hurtado 1996 Tables 8.1/8.2, forest/contact/reservation [VERIFIED]"
+DEMOG_ANCHORS: dict[str, tuple] = {
+    # ---- age structure: the GATE. If these are out of band, everything above them is provisional. ----
+    "frac_child": ("band", 0.287, 0.454, _HH44 + " — %<15 = 28.7 !Kung / 45.4 Yanomamö / 41.9 Aché"),
+    "dependency_ratio": ("band", 0.598, 0.899, _HH44 + " — 0.598 !Kung / 0.866 Yanomamö / 0.899 Aché"),
+    "sex_ratio_m_f": ("band", 0.896, 1.368, _HH44 + " — 0.896 / 1.202 / 1.368"),
+    # ---- mortality. e15 is the HEADLINE, not e0: e0 is dominated by infant mortality, which is why the
+    #      cross-forager e0 range is 21-37 while e15 sits near 38 everywhere. ----
+    "realised_e0": ("band", 21.0, 37.0, _GK07 + " — cross-HG e0 range 21-37"),
+    "e15": ("point", 38.5, 0.20, _GK07 + " — e15 = 38.5 REMAINING years at exact age 15"),
+    "e45": ("point", 21.1, 0.25, _GK07 + " — e45 = 21.1 remaining years"),
+    "surv_to_15": ("point", 0.66, 0.20, _GK07 + " — l(15) from birth"),
+    "surv_to_45": ("point", 0.43, 0.25, _GK07 + " — l(45) FROM BIRTH, not conditional on reaching 15"),
+    "modal_adult_death": ("band", 68.0, 78.0, _GK07 + " — adaptive lifespan 68-78; cross-HG modal avg 72"),
+    # ---- fertility ----
+    "realised_tfr": ("band", 4.69, 8.03, _HH8 + " — TFR 8.03 forest / 4.69 contact / 6.86 reservation"),
+    "realised_ibi_med": ("band", 34.4, 49.4, _HH8 + " — IBI 37.6 / 49.4 / 34.4 months"),
+    # ---- family ----
+    "frac_motherless": ("point", 0.02, 0.50, "Hill & Hurtado Table 13.1 covariate — mother alive 0.98"),
+    "frac_fatherless": ("point", 0.05, 0.50, "Hill & Hurtado Table 13.1 covariate — father alive 0.95"),
+    # ---- group size: the marker the whole exercise is guarding ----
+    "band_med_adults": ("point", 28.2, 0.25,
+                        "Hill et al. 2011, 32 societies [VERIFIED, PDF read] — 28.2 ADULTS, NOT all-ages"),
+}
+# Markers deliberately NOT scored, because no anchor is filed. Reported as NO-ANCHOR rather than silently
+# omitted, so the gap stays visible: a marker nobody scores is a marker nobody fixes.
+DEMOG_UNANCHORED = ("age_first_birth_yr", "srb_male_frac", "frac_double_orphan",
+                    "frac_never_partnered_30", "frac_widowed_adult", "completed_parity_mean",
+                    "cbr", "cdr", "e0_gap_f_minus_m")
+# The age-structure markers that GATE everything above them in the benchmark ladder.
+DEMOG_GATE = ("frac_child", "dependency_ratio")
+
+
+def demography_health(row: dict) -> dict:
+    """Score a trajectory row against DEMOG_ANCHORS and return verdicts. Pure function of the row.
+
+    MODELLED ON `ClimateField.health()`, which returns UNREACHABLE / NEVER-FIRED verdicts and found three
+    dark climate channels on its first real run. Every demographic failure of 2026-08-13/14 was visible in
+    numbers already being printed; what was missing was something that said OUT-OF-BAND without a human
+    going to look for it.
+
+    THE GATE. `structure_ok` is False when frac_child or dependency_ratio is out of band. When it is False
+    every marker ABOVE demography in the benchmark ladder — band size, connubium, marriage, settlement — is
+    provisional, because it is being read on a population with the wrong age composition. That is not a
+    stylistic warning: `band_med` 23 against Birdsell's ~25 read as a PASS on a population that was 54%
+    children, i.e. ~11 adults against Hill's 28.2 ADULTS.
+
+    Returns verdicts as a list of dicts and a one-line `banner` for the run log.
+    """
+    verdicts = []
+    for key, spec in DEMOG_ANCHORS.items():
+        v = row.get(key)
+        if v is None or (isinstance(v, float) and v != v):        # missing or NaN
+            verdicts.append({"marker": key, "value": v, "verdict": "NO-DATA", "src": spec[-1]})
+            continue
+        if spec[0] == "band":
+            _, lo, hi, src = spec
+            ok = lo <= v <= hi
+            verdicts.append({"marker": key, "value": v, "lo": lo, "hi": hi, "src": src,
+                             "verdict": "PASS" if ok else "OUT-OF-BAND",
+                             "ratio": (v / lo if v < lo else (v / hi if v > hi else 1.0))})
+        else:
+            _, anchor, tol, src = spec
+            ratio = (v / anchor) if anchor else float("nan")
+            # DEVIATION, not FAIL: `tol` is a reporting threshold for display, never a calibration target.
+            ok = abs(ratio - 1.0) <= tol
+            verdicts.append({"marker": key, "value": v, "anchor": anchor, "tol": tol, "src": src,
+                             "verdict": "PASS" if ok else "DEVIATION", "ratio": ratio})
+    for key in DEMOG_UNANCHORED:
+        if key in row:
+            verdicts.append({"marker": key, "value": row.get(key), "verdict": "NO-ANCHOR",
+                             "src": "no filed anchor — reported so the gap stays visible"})
+    bad = [x for x in verdicts if x["verdict"] in ("OUT-OF-BAND", "DEVIATION")]
+    gate = [x for x in verdicts if x["marker"] in DEMOG_GATE]
+    structure_ok = all(x["verdict"] == "PASS" for x in gate) and bool(gate)
+    n_scored = sum(1 for x in verdicts if x["verdict"] in ("PASS", "OUT-OF-BAND", "DEVIATION"))
+    worst = sorted(bad, key=lambda x: -abs(x.get("ratio", 1.0) - 1.0))[:4]
+    parts = ", ".join(f"{x['marker']}={x['value']:.3g}({x.get('ratio', float('nan')):.2f}x)" for x in worst)
+    banner = (f"demography: {n_scored - len(bad)}/{n_scored} in band"
+              + ("" if structure_ok else "  !! AGE STRUCTURE OUT OF BAND -> every marker above"
+                                         " demography in the ladder is PROVISIONAL")
+              + (f"  worst: {parts}" if parts else ""))
+    return {"verdicts": verdicts, "n_scored": n_scored, "n_out": len(bad),
+            "structure_ok": structure_ok, "banner": banner}
+
 # M-3 sex split (Hill & Hurtado 1996, Ch. 6, forest period): documented sex mortality-risk ratios
 # male:female = 0.71 in CHILDHOOD (Aché have HIGHER female child mortality — sex-biased
 # infanticide/neglect) and 1.47 in ADULTHOOD (standard pattern). Applied to the validated both-sexes

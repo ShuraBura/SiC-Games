@@ -409,6 +409,11 @@ class TerrainWorld(mesa.Model):
         self.lt_deaths: list[int] = [0] * LT_MAX_AGE_YR         # deaths, by integer age
         self.lt_deaths_starv: list[int] = [0] * LT_MAX_AGE_YR   # ...of which the starvation floor
         self.lt_deaths_senesc: list[int] = [0] * LT_MAX_AGE_YR  # ...of which Siler / orphan / max-age
+        # SEX-SPLIT EXPOSURE AND DEATHS. The model runs a SEX-SPLIT Siler (`_sex_split`, female higher a1,
+        # male higher a3, crossover in adolescence) and nothing has ever checked the realised split. Male
+        # exposure is (lt_exposure - lt_exposure_f), so only the female arrays are carried.
+        self.lt_exposure_f: list[int] = [0] * LT_MAX_AGE_YR
+        self.lt_deaths_f: list[int] = [0] * LT_MAX_AGE_YR
         self.fert_exposure: list[int] = [0] * LT_MAX_AGE_YR     # woman-months lived (the ASFR denominator)
         self.fert_births: list[int] = [0] * LT_MAX_AGE_YR       # births by MOTHER's integer age (numerator)
         self.ibi_hist: list[int] = [0] * (IBI_HIST_MAX + 1)     # realised months between successive births
@@ -427,6 +432,15 @@ class TerrainWorld(mesa.Model):
         self.starv_intake_sum: float = 0.0     # last intake / own requirement
         self.starv_ema_sum: float = 0.0        # the smoothed signal a fertility brake would have read
         self.starv_by_age: list[int] = [0] * LT_MAX_AGE_YR
+        # FLOW RATES AND THEIR TWO MISSING INPUTS. CBR, CDR and r all fall out of the arrays above, but two
+        # quantities do not and both have anchors. The realised SEX RATIO AT BIRTH checks that `srb_male`
+        # (0.512) survives the birth path — a drift here would bias every adult sex ratio and marriage-market
+        # marker downstream. The AGE AT FIRST BIRTH is the cohort entry point that `menarche_months` and
+        # `fecundability` jointly imply, and nothing measured it.
+        self.births_male: int = 0
+        self.births_female: int = 0
+        self.first_birth_age_sum: float = 0.0     # mother's age in MONTHS at her parity-1 birth
+        self.first_birth_n: int = 0
         # diag (2026-08-11): the settlement-founding/budding methods are called directly (no step()) by several
         # existing tests, and by any future caller that wants the founding logic without a full step. Pre-seeded
         # here for the same reason as the three counters above — step()'s own reset block still zeroes these
@@ -1741,7 +1755,22 @@ class TerrainWorld(mesa.Model):
         # children are provisioned, not self-extracting) → it doesn't dilute the mother's cell; its subsistence
         # comes from the (now larger) provision pool + the band-pooled meat. Adults keep foraging normally.
         excl_on = fam_move and getattr(self._demog, "comove_provision_exclude", False)
-        ceiling_on = settle_on and getattr(self._demog, "enable_catchment_ceiling", False)   # R-63 resource ceiling
+        # R-63 resource ceiling. NOT gated on `settle_on` — see the `_cap_here` block below, which has a
+        # branch written specifically for the AGGLOMERATION bonus at NON-settlement cells (R-105). While this
+        # read `settle_on and ...`, that branch was unreachable in exactly the configuration it exists for: a
+        # world with agglomeration on and settlement off had NO ceiling at all, so the superlinear
+        # `A_cell·(n^β − n)` term ran unbounded — R-105's own note calls it "an unbounded increasing-returns
+        # loop with no Malthusian limit (R-104: pop 3259→97551, zero starvation)".
+        #
+        # MEASURED 2026-08-13, the first arms ever run with settlement off: pop 2916 → 24,727 and climbing at
+        # step 3000 of 15000, per-capita intake RISING with density (2.37 → 6.76x requirement), 221 occupants
+        # per cell, 1.72x the Binford packing anchor. Malthusian dynamics are impossible in that state because
+        # there is no capacity to overshoot.
+        #
+        # BIT-EXACT FOR EVERY RUN IN THE PROJECT'S HISTORY: when `settle_on` is True this expression is
+        # unchanged, and every arm before 2026-08-13 ran with `enable_aggregation_sedentism = True`. Only the
+        # settlement-off path, which had never been exercised, behaves differently — and it was broken.
+        ceiling_on = getattr(self._demog, "enable_catchment_ceiling", False)
 
         def _forage_excl(occ_c, total, kap, mask):
             """Split `total` (κ=kap) among NON-excluded occupants only; excluded get 0. Redistributes the
@@ -2196,6 +2225,7 @@ class TerrainWorld(mesa.Model):
             self.lt_exposure[_lt_i] += 1
             if a.sex == "female":
                 self.fert_exposure[_lt_i] += 1
+                self.lt_exposure_f[_lt_i] += 1
             if a._founder_store > 0.0:
                 # Founder mobile reserve: cover any shortfall from carried provisions so a founder survives the
                 # dispersal transient (lifts wealth just over the floor; the store decays as it is consumed).
@@ -2209,7 +2239,7 @@ class TerrainWorld(mesa.Model):
                 if a.wealth <= a.reserve_floor * a.reserve_scale():   # C.2a age-scaled starvation floor
                     a.alive = False
                     self.deaths_starv_this_step += 1
-                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_starv[_lt_i] += 1
+                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_starv[_lt_i] += 1
                     self._note_starvation_state(a, occ_count, _lt_i)   # WHO starves, and where (see below)
                     self._note_band_starv(a)                          # M2: attribute this starvation death to its band
                     self.starv_cred_this_step.append(a.cred)
@@ -2217,7 +2247,7 @@ class TerrainWorld(mesa.Model):
                 elif self._orphan_lethal(a):              # R-74: mother lost in year 1 ⇒ 100% (Hill & Hurtado)
                     a.alive = False
                     self.deaths_senesc_this_step += 1
-                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
+                    self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
                     self.deaths_orphan_this_step += 1
                 else:
                     a2m = self._a2_mult(a, occ_count)     # Step-2 a2 modulators (1.0 if all flags off)
@@ -2225,22 +2255,22 @@ class TerrainWorld(mesa.Model):
                     if a.random.random() < self._siler[a.sex].monthly_death_prob(a.age, a2m, om):
                         a.alive = False                   # Siler baseline+senescence
                         self.deaths_senesc_this_step += 1
-                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
+                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
                         if om > 1.0:
                             self.deaths_orphan_this_step += 1   # diag: died while carrying an elevated kin hazard
                     elif a.age >= a.max_age:              # hard lifespan cap (Siler-tail backstop; was DEAD CODE
                         a.alive = False                   # under demog — the elif below is only reached when
                         self.deaths_senesc_this_step += 1  # demog is None, so ancient agents slipped through to 1111)
-                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
+                        self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
             elif a.wealth <= a.reserve_floor:
                 a.alive = False
                 self.deaths_starv_this_step += 1
-                self.lt_deaths[_lt_i] += 1; self.lt_deaths_starv[_lt_i] += 1
+                self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_starv[_lt_i] += 1
                 self._note_band_starv(a)
             elif a.age >= a.max_age:
                 a.alive = False
                 self.deaths_senesc_this_step += 1
-                self.lt_deaths[_lt_i] += 1; self.lt_deaths_senesc[_lt_i] += 1
+                self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
 
         # GD-1: advance the depletable resource stock (deplete by this step's foraging pressure, regrow at the
         # biome/season rate). No-op unless the harvest field has depletion enabled. `season` from the climate field
@@ -2506,9 +2536,16 @@ class TerrainWorld(mesa.Model):
                     self.ibi_hist[_ibi if _ibi < IBI_HIST_MAX else IBI_HIST_MAX] += 1
                 _mi = int(a.age // MONTHS_PER_YEAR)
                 self.fert_births[_mi if _mi < LT_MAX_AGE_YR else LT_MAX_AGE_YR - 1] += 1
+                if a.parity == 0:                 # recorded BEFORE the increment: this birth is her first
+                    self.first_birth_age_sum += float(a.age)
+                    self.first_birth_n += 1
                 a.months_since_birth = 0
                 a.parity += 1
                 csex = "male" if a.random.random() < cfg.srb_male else "female"
+                if csex == "male":
+                    self.births_male += 1
+                else:
+                    self.births_female += 1
                 child = self._make_agent(sex=csex, lh_cfg=self._lh_cfg)
                 child.pos = a.pos
                 child.age = 0
@@ -2851,6 +2888,13 @@ class TerrainWorld(mesa.Model):
             "mean_age_yr": _st.mean(ages), "median_age_yr": _st.median(ages),
             "frac_child": len(child) / n, "frac_adult": len(adult) / n, "frac_elder": len(elder) / n,
             "dependency_ratio": (len(child) + len(elder)) / len(adult) if adult else nan,
+            # SPLIT, because the two halves move in OPPOSITE directions and the combined ratio hides it: a
+            # high-fertility runaway raises the child half while thinning the old half, so a ratio can sit
+            # "only" 1.5x its anchor while both components are far out. Measured 2026-08-14: child 1.32 and
+            # old-age 0.01 against a combined 1.33 — essentially all of it is children, which the combined
+            # number does not say.
+            "dependency_child": (len(child) / len(adult)) if adult else nan,
+            "dependency_old": (len(elder) / len(adult)) if adult else nan,
             "frac_paired_adult_f": (len(paired_f) / len(adult_f)) if adult_f else nan,
             "mean_wives_married_m": (_st.mean(married_m) if married_m else nan),
             "frac_polygynous_m": (sum(1 for w in married_m if w > 1) / len(married_m)) if married_m else nan,
@@ -3014,7 +3058,50 @@ class TerrainWorld(mesa.Model):
             l.append(l[-1] * (1.0 - q[i]))
         e0 = sum(0.5 * (l[i] + l[i + 1]) for i in range(LT_MAX_AGE_YR))
         td = sum(de)
+        # ── REMAINING EXPECTANCY AT AGE x, and the survivorships that go with it ─────────────────────────
+        # WHY e0 IS THE WRONG HEADLINE. e0 is dominated by infant mortality, which is why the cross-forager
+        # e0 range is 21-37 while e15 sits near 38 everywhere. Foragers are conventionally compared on e15,
+        # and Gurven & Kaplan 2007's Aché-forest row gives all of these [VERIFIED, LITERATURE.md]:
+        #   e0 = 37   e15 = 38.5 remaining yr   e45 = 21.1   l(15) = 0.66   l(45)/l(15) = 0.43
+        #   modal adult death = 71 (forest) / 78 (settled);  cross-HG modal adult death avg 72
+        # They were on file unused while this arc reported e0 alone.
+        def _ex(x: int) -> float:
+            """Remaining expectancy at exact age x: Σ person-years lived beyond x, per survivor at x."""
+            if x >= LT_MAX_AGE_YR or l[x] <= 0.0:
+                return float("nan")
+            return sum(0.5 * (l[i] + l[i + 1]) for i in range(x, LT_MAX_AGE_YR)) / l[x]
+        # MODAL ADULT DEATH AGE — the mode of the death distribution ABOVE 20, not of all deaths. Including
+        # childhood would return the infant peak every time and the anchor (71) would look absurd. `d(x)` is
+        # the life-table death density l(x)-l(x+1), so this is a property of the SCHEDULE, not of the run's
+        # age composition — which is what makes it comparable to a published life table.
+        _dx = [l[i] - l[i + 1] for i in range(LT_MAX_AGE_YR)]
+        _adult = _dx[20:]
+        modal_adult = (20 + max(range(len(_adult)), key=lambda i: _adult[i])) if any(_adult) else float("nan")
+        # ── MORTALITY BY AGE GROUP (supervisor request 2026-08-13) ───────────────────────────────────────
+        # The single-year `m` array is the honest object but is unreadable in a banner. These bands are the
+        # ones the age pyramid already uses, so a hazard and a population share can be read side by side.
+        bands = [(0, 1), (1, 5), (5, 15), (15, 30), (30, 45), (45, 60), (60, LT_MAX_AGE_YR)]
+        m_band, d_band, e_band = {}, {}, {}
+        for lo, hi in bands:
+            key = f"{lo}_{hi}" if hi < LT_MAX_AGE_YR else f"{lo}_plus"
+            py = sum(ex[lo:hi]) / MONTHS_PER_YEAR
+            m_band[key] = (sum(de[lo:hi]) / py) if py > 0 else 0.0
+            d_band[key] = sum(de[lo:hi])
+            e_band[key] = py
         return {"m": m, "q": q, "l": l[:-1], "e0": e0,
+                "e15": _ex(15), "e45": _ex(45),
+                # BOTH SURVIVORSHIPS, EXPLICITLY NAMED. LITERATURE.md records "survival-to-15 = 0.66,
+                # survival 15→45 = 0.43" for the Aché forest period, and the second label is ambiguous:
+                # fed the published ACHE_FOREST coefficients this estimator returns l(15) = 0.66 exactly and
+                # a CONDITIONAL 15→45 of 0.65, whose product 0.66 × 0.65 = 0.43 is the published figure. So
+                # 0.43 is survival to 45 FROM BIRTH, not conditional on reaching 15. Scoring the conditional
+                # against it would mark a correct schedule as wrong by 50% — the "right number, wrong
+                # denominator" failure this project has now made five times. Both travel, named for what
+                # they are, so no future reader has to reconstruct which one the anchor means.
+                "surv_to_15": l[15], "surv_to_45": l[45],
+                "surv_15_to_45_cond": (l[45] / l[15]) if l[15] > 0 else float("nan"),
+                "modal_adult_death": modal_adult,
+                "m_by_band": m_band, "deaths_by_band": d_band, "exposure_by_band": e_band,
                 "deaths": td, "exposure_py": sum(ex) / MONTHS_PER_YEAR,
                 "deaths_starv": sum(ds), "deaths_senesc": sum(dn),
                 "starv_share": (sum(ds) / td) if td else 0.0}
@@ -3060,6 +3147,170 @@ class TerrainWorld(mesa.Model):
                 "ibi_median": med, "ibi_mean": mean, "ibi_n": n_ibi,
                 "factor_mean": (fsum / fn) if fn else float("nan"),
                 "factor_saturated": (fsat / fn) if fn else float("nan"), "factor_n": fn}
+
+    def life_table_by_sex(self) -> dict:
+        """e0 and e15 computed separately for females and males (pure observer).
+
+        The model runs a SEX-SPLIT Siler — `_sex_split` gives females the higher infant term a1 and males the
+        higher Gompertz a3, putting the crossover in adolescence as the Aché monograph reports — and nothing
+        has ever checked that the realised split matches. A pooled life table cannot: it averages the two
+        schedules and hides a sex-specific defect entirely. The sex GAP is the quantity to watch, since it is
+        a structural prediction of the configuration rather than a free parameter.
+        """
+        def _tab(ex_arr, de_arr):
+            l, out = [1.0], []
+            for i in range(LT_MAX_AGE_YR):
+                py = ex_arr[i] / MONTHS_PER_YEAR
+                mi = (de_arr[i] / py) if py > 0 else 0.0
+                qi = (mi / (1.0 + 0.5 * mi)) if mi > 0 else 0.0
+                l.append(l[-1] * (1.0 - qi))
+            def ex_at(x):
+                if l[x] <= 0.0:
+                    return float("nan")
+                return sum(0.5 * (l[i] + l[i + 1]) for i in range(x, LT_MAX_AGE_YR)) / l[x]
+            return ex_at(0), ex_at(15), l
+        ex_m = [t - f for t, f in zip(self.lt_exposure, self.lt_exposure_f)]
+        de_m = [t - f for t, f in zip(self.lt_deaths, self.lt_deaths_f)]
+        f0, f15, lf = _tab(self.lt_exposure_f, self.lt_deaths_f)
+        m0, m15, lm = _tab(ex_m, de_m)
+        return {"e0_female": f0, "e0_male": m0, "e15_female": f15, "e15_male": m15,
+                "e0_gap_f_minus_m": f0 - m0, "e15_gap_f_minus_m": f15 - m15,
+                "exposure_py_female": sum(self.lt_exposure_f) / MONTHS_PER_YEAR,
+                "exposure_py_male": sum(ex_m) / MONTHS_PER_YEAR}
+
+    def cohort_fertility(self) -> dict:
+        """COMPLETED parity of women past menopause — the cohort measure, against the synthetic TFR.
+
+        `realised_tfr` is a SYNTHETIC-cohort rate: it sums current age-specific rates over a hypothetical
+        woman who lives through today's schedule. Completed parity is what real women actually bore. The two
+        agree only in a stationary population, so their DIVERGENCE is a direct read on whether the run is in
+        steady state — which is exactly what nobody could see when the population ran away on 2026-08-14 and
+        the synthetic TFR sat flat at 10.5 throughout.
+
+        Scored on women past `menopause_months` because their parity is final; including younger women would
+        mix completed with in-progress careers and read as a spurious decline.
+        """
+        cfg = self._demog
+        meno = cfg.menopause_months if cfg is not None else 504
+        done = [a for a in self.agent_list if a.sex == "female" and a.age >= meno]
+        n = len(done)
+        if not n:
+            return {"completed_parity_mean": float("nan"), "completed_parity_med": float("nan"),
+                    "n_completed": 0, "frac_parity_zero": float("nan")}
+        par = sorted(int(getattr(a, "parity", 0)) for a in done)
+        return {"completed_parity_mean": sum(par) / n,
+                "completed_parity_med": float(par[n // 2]),
+                "n_completed": n,
+                # Childlessness is a real ethnographic quantity and a sensitive one: a pairing or fertility
+                # mechanism that silently excludes a subgroup shows up here before it shows up in the mean.
+                "frac_parity_zero": sum(1 for p in par if p == 0) / n}
+
+    def vital_rates(self, since: dict | None = None) -> dict:
+        """Crude birth and death rates, intrinsic growth, realised sex ratio at birth, mean age at first birth.
+
+        WHY THESE AND NOT JUST `pop`. A population count says WHERE the model is; the flows say WHY. r read
+        off two population counts also conflates growth with the sampling interval, which is how this arc
+        differenced 2/3-of-run windows by hand for a week. CBR - CDR is the same number computed from the
+        run's own exposure, so it cannot drift from the life table beside it.
+
+        Cumulative by default; pass a `raw_demographic_counters()` mark as `since` for a period rate.
+
+        Rates are per 1000 person-years, the demographic convention, so they compare directly to published
+        crude rates. `r_pct_yr` is a percentage per year — the same units as the Lotka r used elsewhere.
+        """
+        bi, de, ex = self.fert_births, self.lt_deaths, self.lt_exposure
+        bm, bf = self.births_male, self.births_female
+        fbs, fbn = self.first_birth_age_sum, self.first_birth_n
+        if since is not None:
+            bi = [a - b for a, b in zip(bi, since["fert_births"])]
+            de = [a - b for a, b in zip(de, since["lt_deaths"])]
+            ex = [a - b for a, b in zip(ex, since["lt_exposure"])]
+            bm -= since.get("births_male", 0); bf -= since.get("births_female", 0)
+            fbs -= since.get("first_birth_age_sum", 0.0); fbn -= since.get("first_birth_n", 0)
+        py = sum(ex) / MONTHS_PER_YEAR
+        nb, nd = sum(bi), sum(de)
+        cbr = (1000.0 * nb / py) if py > 0 else float("nan")
+        cdr = (1000.0 * nd / py) if py > 0 else float("nan")
+        tot_b = bm + bf
+        return {"cbr": cbr, "cdr": cdr, "r_pct_yr": (cbr - cdr) / 10.0,
+                "births": nb, "deaths": nd, "person_years": py,
+                "srb_male_frac": (bm / tot_b) if tot_b else float("nan"),
+                "births_male": bm, "births_female": bf,
+                "age_first_birth_yr": (fbs / fbn / MONTHS_PER_YEAR) if fbn else float("nan"),
+                "first_birth_n": fbn}
+
+    def family_structure(self) -> dict:
+        """Who has parents, and who never paired. Pure observer over the live population.
+
+        TWO GAPS THIS FILLS, both requested 2026-08-13.
+
+        JOINT ORPHANHOOD. `frac_motherless` and `frac_fatherless` are reported SEPARATELY, so a child that
+        has lost BOTH is counted once in each and never as itself. That is the group with the highest hazard
+        in Hill & Hurtado's Table 13.1 material (the R-74 orphan work found child mortality is
+        orphan-CONDITIONED, x5.09 for a lost mother), so it is exactly the cell that must not be invisible.
+        Scored over children only, since an adult's parents dying is not orphanhood.
+
+        NEVER-PARTNERED. `frac_unpaired_adult` counts the CURRENTLY unpaired, which pools the widowed, the
+        divorced and the never-married. Those are different phenomena: in foragers, near-universal marriage
+        means never-partnered-by-30 should be close to zero, while widowhood is common. Pooling them makes a
+        broken pairing mechanism indistinguishable from ordinary mortality.
+        """
+        cfg = self._demog
+        adult_m = cfg.menarche_months if cfg is not None else 180
+        pop = self.agent_list
+        n = len(pop)
+        nan = float("nan")
+        if not n:
+            return {k: nan for k in ("frac_both_parents_alive", "frac_one_parent_alive", "frac_double_orphan",
+                                     "n_children", "frac_never_partnered_30", "frac_widowed_adult",
+                                     "frac_partnered_adult", "n_adults_30")}
+        # A MISSING LINK IS "UNKNOWN", NOT "DEAD" — and the first version of this method got that wrong.
+        # `_father` is None whenever paternity was never assigned (the flag is off, or the child predates it),
+        # and counting those as bereaved FABRICATES orphans: the smoke run reported 8.6% double-orphans that
+        # were mostly children with no recorded father at all. `_orphan_status` has always had this right
+        # (`m_dead = m is not None and not m.alive`), so this now follows it, and uses the same RISK SET the
+        # existing frac_motherless/frac_fatherless use — children with at least one KNOWN parent link.
+        kids = [a for a in pop if a.age < adult_m
+                and not (getattr(a, "_mother", None) is None and getattr(a, "_father", None) is None)]
+        both = one = none = 0
+        for c in kids:
+            m = getattr(c, "_mother", None); f = getattr(c, "_father", None)
+            m_known, f_known = m is not None, f is not None
+            m_dead = m_known and not m.alive
+            f_dead = f_known and not f.alive
+            dead = m_dead + f_dead
+            known = m_known + f_known
+            if dead == 0:
+                both += 1                       # no KNOWN parent is dead
+            elif dead < known:
+                one += 1                        # one known parent dead, another known parent alive
+            else:
+                none += 1                       # every known parent is dead
+        nk = len(kids)
+        n_unknown = sum(1 for c in kids
+                        if getattr(c, "_mother", None) is None or getattr(c, "_father", None) is None)
+        # 30 yr, not menarche: by 30 a forager who was ever going to marry has. Reading it at 15 would score
+        # the ordinary pre-marital years as a pairing failure.
+        thirty = 30 * MONTHS_PER_YEAR
+        ad30 = [a for a in pop if a.age >= thirty]
+        never = sum(1 for a in ad30 if not getattr(a, "_ever_partnered", False))
+        adults = [a for a in pop if a.age >= adult_m]
+        def _paired(a):
+            return (getattr(a, "_partner", None) is not None) or bool(getattr(a, "_wives", ()))
+        wid = sum(1 for a in adults if getattr(a, "_ever_partnered", False) and not _paired(a))
+        na = len(adults)
+        return {"frac_both_parents_alive": (both / nk) if nk else nan,
+                "frac_one_parent_alive": (one / nk) if nk else nan,
+                "frac_double_orphan": (none / nk) if nk else nan,
+                "n_children": nk,
+                # COVERAGE, so the reader can see how much of the risk set rests on a partial link. A high
+                # value here means the orphan fractions are computed on one parent for most children and the
+                # "double" category is correspondingly under-observed — a caveat, not a defect.
+                "frac_partial_parent_link": (n_unknown / nk) if nk else nan,
+                "frac_never_partnered_30": (never / len(ad30)) if ad30 else nan,
+                "n_adults_30": len(ad30),
+                "frac_widowed_adult": (wid / na) if na else nan,
+                "frac_partnered_adult": (sum(1 for a in adults if _paired(a)) / na) if na else nan}
 
     def starvation_profile(self) -> dict:
         """Compare the state of agents that STARVED against the state of the agents that lived (pure observer).
@@ -4060,6 +4311,7 @@ class TerrainWorld(mesa.Model):
             else:
                 male = self.random.choice(avail)
             f._partner = male; male._wives.add(f)
+            f._ever_partnered = True; male._ever_partnered = True   # pure observer (never-partnered marker)
             paired_here += 1
             if affil:
                 fb, mb = f._group.band_id, male._group.band_id
@@ -4147,6 +4399,7 @@ class TerrainWorld(mesa.Model):
             else:
                 male = self.random.choice(eligible)
             f._partner = male; male._wives.add(f)
+            f._ever_partnered = True; male._ever_partnered = True   # pure observer (never-partnered marker)
             if affil and f._group.band_id != male._group.band_id:    # virilocal: bride joins groom's band
                 band_sizes[f._group.band_id] -= 1; band_sizes[male._group.band_id] += 1
                 f._group.band_id = male._group.band_id

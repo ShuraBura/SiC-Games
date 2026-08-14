@@ -44,6 +44,7 @@ from sic_games.terrain import generate_world, world_lottery_climate
 from sic_games.capacity import NPPCapacityField
 from sic_games.climate import ClimateConfig, build_climate_field
 from sic_games.invariants import check as invariant_check
+from sic_games.demography import demography_health
 from sic_games import runspec as _runspec
 
 # ── A RUN IS A FILE (2026-08-07) ──────────────────────────────────────────────────────────────────────────
@@ -248,6 +249,14 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     pop = len(al)
     sizes = Counter(a._group.band_id for a in al)
     szv = list(sizes.values())
+    # BAND SIZE IN ADULTS — the quantity MARKER_MATRIX #1's anchor actually names, and which the model has
+    # never logged. Hill et al. 2011's figure is 28.2 ADULTS (32 societies); `band_med` above is ALL AGES.
+    # The matrix already records the consequence: "the 23/25 all-ages pass is carried by excess children",
+    # and on 2026-08-14 a run read band_med 23 against Birdsell ~25 and looked like a PASS on a population
+    # that was 54% children -- about 11 adults, i.e. 0.4x the real anchor. Logging both ends that.
+    _adult_m = getattr(w._demog, "menarche_months", 180) if getattr(w, "_demog", None) else 180
+    _asz = Counter(a._group.band_id for a in al if a.age >= _adult_m)
+    _aszv = list(_asz.values())
     villages = [n for n in szv if n > BAND_SPLIT]
     socs = Counter(society_of(a, w) for a in al)
     cred = [getattr(a, "cred", 1.0) for a in al]
@@ -359,6 +368,8 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         juv_frac=round(sum(1 for x in ages if x < 180) / pop, 3) if pop else 0,   # <15 yr (dependency proxy)
         mean_age_yr=round(statistics.mean(ages) / 12.0, 1) if pop else 0,
         n_bands=len(sizes), band_med=statistics.median(szv) if szv else 0, band_max=max(szv) if szv else 0,
+        band_med_adults=statistics.median(_aszv) if _aszv else 0,   # vs Hill 2011's 28.2 ADULTS
+        band_max_adults=max(_aszv) if _aszv else 0,
         # RENAMED from n_villages/village_med/village_max (R-106, 2026-08-04). These count BANDS with more
         # than `BAND_SPLIT` members — a social unit of any spatial extent — NOT settlements. `settle_med`
         # below is the settlement-site measure, and it is what MARKER_MATRIX scores against Bar-Yosef
@@ -453,6 +464,11 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     _lt = w.life_table() if hasattr(w, "life_table") else {}
     _fs = w.fertility_schedule() if hasattr(w, "fertility_schedule") else {}
     _sp = w.starvation_profile() if hasattr(w, "starvation_profile") else {}
+    _vr = w.vital_rates() if hasattr(w, "vital_rates") else {}
+    _fam = w.family_structure() if hasattr(w, "family_structure") else {}
+    _mb = _lt.get("m_by_band", {})
+    _sx = w.life_table_by_sex() if hasattr(w, "life_table_by_sex") else {}
+    _cf = w.cohort_fertility() if hasattr(w, "cohort_fertility") else {}
     # Energy-signal distribution over WOMEN OF REPRODUCTIVE AGE — the population any energetic fertility
     # mechanism acts on. Read defensively: an older TerrainWorld, or a run with the intake signal off, must
     # not crash a 15,000-step campaign over a diagnostic.
@@ -517,6 +533,61 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         fert_factor_mean=round(_fs.get("factor_mean", float("nan")), 4),
         fert_factor_sat=round(_fs.get("factor_saturated", float("nan")), 4),
         starv_share=round(_lt.get("starv_share", 0.0), 4),
+        # ── THE STANDING DEMOGRAPHY PANEL (supervisor request 2026-08-13) ────────────────────────────────
+        # "We cannot expect social dynamics to work when the demography is skewed." Today's example: band_med
+        # read 23 against Birdsell ~25 and looked like a pass, on a population that was 54% CHILDREN — about
+        # 11 adults against Hill 2011's 28.2 ADULTS. The marker read as passing while failing 2.5-fold,
+        # because nothing scored the age structure beside it. These travel on EVERY row so that can't recur.
+        #
+        # ANCHORS, all Gurven & Kaplan 2007 Table 2, Aché forest [VERIFIED]:
+        #   e15 = 38.5 remaining yr   e45 = 21.1   l(15) = 0.66   l(45) = 0.43   modal adult death = 71
+        # e15 IS THE HEADLINE, NOT e0. e0 is dominated by infant mortality — the cross-forager e0 range is
+        # 21-37 while e15 sits near 38 everywhere — so e0 alone confounds child with adult survival.
+        # NOTE THE DENOMINATOR: the published "survival 15→45 = 0.43" is l(45) FROM BIRTH. Compare
+        # `surv_to_45` against it; `surv_15_to_45_cond` (0.65) is the conditional and is NOT that anchor.
+        e15=round(_lt.get("e15", float("nan")), 2),
+        e45=round(_lt.get("e45", float("nan")), 2),
+        surv_to_15=round(_lt.get("surv_to_15", float("nan")), 3),
+        surv_to_45=round(_lt.get("surv_to_45", float("nan")), 3),
+        surv_15_to_45_cond=round(_lt.get("surv_15_to_45_cond", float("nan")), 3),
+        modal_adult_death=round(_lt.get("modal_adult_death", float("nan")), 1),
+        # MORTALITY BY AGE GROUP — the hazard beside the population share the age pyramid already reports.
+        m_0_1=round(_mb.get("0_1", float("nan")), 4), m_1_5=round(_mb.get("1_5", float("nan")), 4),
+        m_5_15=round(_mb.get("5_15", float("nan")), 4), m_15_30=round(_mb.get("15_30", float("nan")), 4),
+        m_30_45=round(_mb.get("30_45", float("nan")), 4), m_45_60=round(_mb.get("45_60", float("nan")), 4),
+        m_60_plus=round(_mb.get("60_plus", float("nan")), 4),
+        # VITAL RATES — per 1000 person-years, from the run's OWN exposure, so they cannot drift from the
+        # life table beside them the way a hand-differenced growth rate can.
+        cbr=round(_vr.get("cbr", float("nan")), 2), cdr=round(_vr.get("cdr", float("nan")), 2),
+        r_pct_yr=round(_vr.get("r_pct_yr", float("nan")), 3),
+        srb_male_frac=round(_vr.get("srb_male_frac", float("nan")), 4),   # vs the configured srb_male 0.512
+        age_first_birth_yr=round(_vr.get("age_first_birth_yr", float("nan")), 2),
+        # FAMILY STRUCTURE. frac_motherless and frac_fatherless are reported SEPARATELY above, so a child
+        # that lost BOTH was counted once in each and never as itself — the highest-hazard group in the R-74
+        # orphan work. And frac_unpaired_adult pools the widowed with the never-married, which are different
+        # phenomena: near-universal marriage puts never-partnered-by-30 close to zero, widowhood is common.
+        frac_both_parents_alive=round(_fam.get("frac_both_parents_alive", float("nan")), 4),
+        frac_double_orphan=round(_fam.get("frac_double_orphan", float("nan")), 4),
+        frac_partial_parent_link=round(_fam.get("frac_partial_parent_link", float("nan")), 4),
+        frac_never_partnered_30=round(_fam.get("frac_never_partnered_30", float("nan")), 4),
+        frac_widowed_adult=round(_fam.get("frac_widowed_adult", float("nan")), 4),
+        frac_partnered_adult=round(_fam.get("frac_partnered_adult", float("nan")), 4),
+        # SEX-SPLIT LIFE TABLE. The model runs a sex-split Siler and nothing checked the realised split; a
+        # pooled table averages the two schedules and hides a sex-specific defect entirely.
+        e0_female=round(_sx.get("e0_female", float("nan")), 2),
+        e0_male=round(_sx.get("e0_male", float("nan")), 2),
+        e15_female=round(_sx.get("e15_female", float("nan")), 2),
+        e15_male=round(_sx.get("e15_male", float("nan")), 2),
+        e0_gap_f_minus_m=round(_sx.get("e0_gap_f_minus_m", float("nan")), 2),
+        # COHORT vs SYNTHETIC fertility. realised_tfr is synthetic; completed parity is what women actually
+        # bore. They agree only at stationarity, so the DIVERGENCE reads whether the run is in steady state.
+        completed_parity_mean=round(_cf.get("completed_parity_mean", float("nan")), 2),
+        completed_parity_med=round(_cf.get("completed_parity_med", float("nan")), 1),
+        frac_parity_zero=round(_cf.get("frac_parity_zero", float("nan")), 4),
+        n_completed_parity=int(_cf.get("n_completed", 0)),
+        # DEPENDENCY SPLIT — the halves move in opposite directions and the combined ratio hides it.
+        dependency_child=round(_dg.get("dependency_child", float("nan")), 3),
+        dependency_old=round(_dg.get("dependency_old", float("nan")), 3),
         # THE ENERGY SIGNAL'S OWN DISTRIBUTION (R-106, 2026-08-13). `fert_factor_sat` says the brake is
         # saturated; it cannot say BY HOW FAR, and that is what decides whether ANY energetic mechanism can
         # work. The physiological window is [intake_fert_lo, intake_fert_hi] = [1.0, 1.2], anchored to FAO/IOM
@@ -1064,6 +1135,28 @@ def main():
             if ELITE:
                 row["cum_reversions"] = cum_reversions
             traj.append(row)
+            # THE DEMOGRAPHY VERDICT LINE (supervisor request 2026-08-14). Modelled on the climate health
+            # line, which found three dark channels on its first run. Every demographic failure of the last
+            # two days was visible in numbers already printed here; what was missing was a line that SAID
+            # so. Printed only when something is out of band, or once at the first snapshot, so a healthy
+            # run stays quiet and an unhealthy one cannot be scrolled past.
+            _dh = demography_health(row)
+            row["demog_in_band"] = _dh["n_scored"] - _dh["n_out"]
+            row["demog_scored"] = _dh["n_scored"]
+            row["demog_structure_ok"] = _dh["structure_ok"]
+            # DATA GUARD. In the first steps the life table has seen almost no exposure and the founder
+            # cohort sits in two enormous bands, so the panel reads band_med_adults 207 and TFR 0 — verdicts
+            # that are arithmetically correct and completely meaningless. A monitor that cries wolf during
+            # the transient is a monitor people learn to scroll past, which is the failure this line exists
+            # to prevent. 500 person-years is roughly one founder cohort living one year; below it the
+            # scoring is suppressed and the reason is said out loud rather than silently skipped.
+            _py = row.get("lt_exposure_py", 0.0) or 0.0
+            if _py < 500.0:
+                if step <= LOGEVERY:
+                    log(f"  ~~ demography: not scored yet ({_py:.0f} person-years of exposure; "
+                        f"needs 500 before the panel means anything)")
+            elif _dh["n_out"]:
+                log("  ~~ " + _dh["banner"])
             # R-91: complain about CONTRADICTIONS as they appear, rather than printing yet another field.
             # Only the FIRST occurrence of each code is logged — a violation that persists is one event, and a
             # checker that repeats itself every snapshot is one that gets ignored.
