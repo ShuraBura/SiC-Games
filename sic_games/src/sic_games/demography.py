@@ -124,14 +124,81 @@ DEMOG_ANCHORS: dict[str, tuple] = {
     # ---- group size: the marker the whole exercise is guarding ----
     "band_med_adults": ("point", 28.2, 0.25,
                         "Hill et al. 2011, 32 societies [VERIFIED, PDF read] — 28.2 ADULTS, NOT all-ages"),
+    # ---- added from the 2026-08-14 literature survey ----
+    # AGE AT FIRST BIRTH. Walker et al. 2006 Table 2 gives 15 forager societies between 16.2 (Wichi) and
+    # 20.5 (Hiwi), median ~18.6. Gainj 25.7 and Turkana 22.2 are EXCLUDED — New Guinea highland
+    # horticulturalists and pastoralists respectively, not foragers. A second, independent tie exists:
+    # AFR = menarche + 4.5 yr (SD 1.6, n=14), so with menarche_months = 180 the model's own configuration
+    # implies ~19.5. CAUTION from the survey: W06's figure is a mean over ALL adult women and is biased
+    # UPWARD by age-estimation error — for the Hiwi it is 20.5 over all women but 17.9 over mothers under
+    # 35, where ages are reliable. Prefer the LOW end. Measured here: 22.4-24.9, above every forager in
+    # the sample.
+    "age_first_birth_yr": ("band", 16.2, 20.5,
+                           "Walker et al. 2006 AJHB 18(3) Table 2, 15 forager societies [VERIFIED]"),
+    # MID-CHILDHOOD HAZARD. GK07 p.330 verbatim: "The mortality hazard has slowed to 0.01 by age 10,
+    # doubled to about 0.02 by age 40". Ages 5-15 is the LOWEST-mortality band in a human life table and
+    # the trough is broad. The tolerance is wide because the source states one significant figure.
+    "m_5_15": ("point", 0.010, 0.50,
+               "Gurven & Kaplan 2007 p.330 [VERIFIED VERBATIM] — hazard ~0.01/yr at age 10, cross-HG"),
 }
 # Markers deliberately NOT scored, because no anchor is filed. Reported as NO-ANCHOR rather than silently
 # omitted, so the gap stays visible: a marker nobody scores is a marker nobody fixes.
-DEMOG_UNANCHORED = ("age_first_birth_yr", "srb_male_frac", "frac_double_orphan",
+DEMOG_UNANCHORED = ("srb_male_frac", "frac_double_orphan",
                     "frac_never_partnered_30", "frac_widowed_adult", "completed_parity_mean",
                     "cbr", "cdr", "e0_gap_f_minus_m")
 # The age-structure markers that GATE everything above them in the benchmark ladder.
 DEMOG_GATE = ("frac_child", "dependency_ratio")
+
+
+def isogrowth_check(tfr: float, l15: float, r_measured_pct: float,
+                    srb_male: float = 0.512, gen_length: float = 28.0) -> dict:
+    """The GURVEN & KAPLAN ISO-GROWTH IDENTITY — a HARD consistency constraint, not another anchor.
+
+    GK07 endnote 5 [VERIFIED via literature survey 2026-08-14]:
+
+        R0  = (TFR / 2.06) · l25
+        l25 = 0.9973·l15 − 0.0422        (their regression, R² = 0.98, p < 0.0001)
+        R0  = exp(r · T),  T = 28 yr
+
+    GIVEN ANY TWO OF {TFR, l15, r} THE THIRD IS FIXED. There is no freedom. That makes this the check the
+    project has lacked: a run can be scored against its own internal consistency rather than only against
+    point values. The identity reproduces GK07's own published claims — at l15 = 0.55 it returns TFR = 4.069
+    for r = 0, which is the number they state.
+
+    THE 2.06 IS A SEX-RATIO ASSUMPTION, NOT A CONSTANT. It converts TFR to daughters and embeds 1.06 males
+    per female. This model configures `srb_male` (0.512 ⇒ 2.049), so the divisor is derived from the model's
+    own value rather than hard-coded — importing 2.06 blind would be exactly the kind of borrowed constant
+    that has cost this project five retractions.
+
+    WHY THE IMPLIED GENERATION LENGTH IS RETURNED. T = 28 yr is GK07's forager value. A model whose age at
+    first birth is late carries a LONGER generation, which lowers r for the same R0 — so a mismatch here can
+    mean an inconsistent run OR simply a different T. Reporting `implied_gen_length` separates the two: if it
+    comes back near 28 the discrepancy is real, and if it comes back at 35 the run's fertility SCHEDULE is
+    displaced rather than its arithmetic being wrong. Measured 2026-08-14: this model's age at first birth is
+    22-25 yr against a forager bracket of 16.2-20.5 (Walker 2006), so a long implied T is expected and is the
+    same defect seen from another side.
+    """
+    nan = float("nan")
+    if not (tfr and tfr > 0.0) or l15 is None or l15 != l15:
+        return {"r_predicted_pct": nan, "R0": nan, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    l25 = 0.9973 * l15 - 0.0422
+    if l25 <= 0.0:                      # l25 hits zero at l15 ≈ 0.0423; the regression is invalid below it
+        return {"r_predicted_pct": nan, "R0": nan, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    R0 = tfr * (1.0 - srb_male) * l25
+    if R0 <= 0.0:
+        return {"r_predicted_pct": nan, "R0": R0, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    r_pred = math.log(R0) / gen_length
+    implied_T = nan
+    if r_measured_pct is not None and r_measured_pct == r_measured_pct and abs(r_measured_pct) > 1e-9:
+        implied_T = math.log(R0) / (r_measured_pct / 100.0)
+    ok = None
+    if r_measured_pct is not None and r_measured_pct == r_measured_pct:
+        ok = abs(r_pred * 100.0 - r_measured_pct) <= 0.5      # within half a percent per year
+    return {"r_predicted_pct": r_pred * 100.0, "R0": R0, "l25": l25,
+            "implied_gen_length": implied_T, "r_measured_pct": r_measured_pct, "consistent": ok}
 
 
 def demography_health(row: dict) -> dict:

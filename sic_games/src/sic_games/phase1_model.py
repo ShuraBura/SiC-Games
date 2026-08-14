@@ -3052,7 +3052,13 @@ class TerrainWorld(mesa.Model):
             m.append((de[i] / py) if py > 0.0 else 0.0)
         # Actuarial conversion assuming deaths fall uniformly through the year (a(x) = 1/2). At the monthly
         # step size the approximation costs far less than the sampling noise in any run we do.
-        q = [(mi / (1.0 + 0.5 * mi)) if mi > 0.0 else 0.0 for mi in m]
+        # CLAMPED TO 1.0. The actuarial conversion q = m/(1 + m/2) exceeds 1 whenever m > 2 deaths per
+        # person-year, and a probability above 1 drives l(x) NEGATIVE. Measured 2026-08-14 on the short
+        # test runs, which have almost no exposure: l(15) came back as -0.091 and l(25) as -0.500. A real
+        # 15,000-step arm never approaches m = 2 so no scored result was affected, but a survivorship that
+        # can go negative is not a survivorship, and every quantity built on it (e0, e15, surv_to_15) would
+        # inherit the sign. The CTB battery missed it because every constructed case fed a plausible hazard.
+        q = [min(1.0, mi / (1.0 + 0.5 * mi)) if mi > 0.0 else 0.0 for mi in m]
         l = [1.0]
         for i in range(LT_MAX_AGE_YR):
             l.append(l[-1] * (1.0 - q[i]))
@@ -3162,7 +3168,7 @@ class TerrainWorld(mesa.Model):
             for i in range(LT_MAX_AGE_YR):
                 py = ex_arr[i] / MONTHS_PER_YEAR
                 mi = (de_arr[i] / py) if py > 0 else 0.0
-                qi = (mi / (1.0 + 0.5 * mi)) if mi > 0 else 0.0
+                qi = min(1.0, mi / (1.0 + 0.5 * mi)) if mi > 0 else 0.0   # clamp: see life_table()
                 l.append(l[-1] * (1.0 - qi))
             def ex_at(x):
                 if l[x] <= 0.0:

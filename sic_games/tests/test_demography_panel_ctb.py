@@ -123,6 +123,45 @@ def test_modal_adult_death_ignores_the_infant_peak():
     assert dx.index(max(dx)) < 5, "the all-ages mode really is in infancy — which is why it is excluded"
 
 
+def test_survivorship_can_never_go_negative():
+    """THE DEFECT THIS BATTERY MISSED FOR A DAY. `q = m/(1 + m/2)` exceeds 1.0 whenever m > 2 deaths per
+    person-year, and a probability above 1 drives l(x) NEGATIVE. Found 2026-08-14 on the short test runs,
+    which carry almost no exposure: l(15) came back -0.091 and l(25) -0.500, and every quantity built on
+    them — e0, e15, surv_to_15 — inherits the sign.
+
+    A real 15,000-step arm never approaches m = 2, so no scored result was affected. But a survivorship that
+    can go negative is not a survivorship. Every constructed case in this file fed a plausible hazard, which
+    is exactly why the battery passed while the estimator could produce nonsense.
+    """
+    for hazard in (2.5, 10.0, 100.0):
+        c = _Counters()
+        for i in range(LT_MAX_AGE_YR):
+            c.lt_exposure[i] = 12 * 100                   # 100 person-years
+            c.lt_deaths[i] = int(100 * hazard)            # m = hazard, far above 2
+            c.lt_deaths_senesc[i] = c.lt_deaths[i]
+        r = c.lt()
+        assert all(0.0 <= x <= 1.0 for x in r["l"]), f"l(x) left [0,1] at m={hazard}: min {min(r['l'])}"
+        assert all(0.0 <= x <= 1.0 for x in r["q"]), f"q left [0,1] at m={hazard}"
+        assert r["e0"] >= 0.0 and r["surv_to_15"] >= 0.0
+        assert r["e0"] < 2.0, "at 2.5+ deaths per person-year nobody should live long"
+
+
+def test_the_sex_split_table_also_clamps():
+    """Same guard on the other life table. A fix applied to one copy and not the other is how this project
+    got two survivorship conventions in the first place."""
+    w = _world(n=40)
+    w.step()
+    for i in range(LT_MAX_AGE_YR):
+        w.lt_exposure[i] = 12 * 50
+        w.lt_exposure_f[i] = 12 * 25
+        w.lt_deaths[i] = 500                              # m = 10/yr
+        w.lt_deaths_f[i] = 250
+    s = w.life_table_by_sex()
+    for k in ("e0_female", "e0_male", "e15_female", "e15_male"):
+        v = s[k]
+        assert v != v or v >= 0.0, f"{k} went negative: {v}"
+
+
 def test_mortality_by_age_group_conserves_and_is_readable():
     c = _Counters()
     _feed(c, ACHE_FOREST.hazard)

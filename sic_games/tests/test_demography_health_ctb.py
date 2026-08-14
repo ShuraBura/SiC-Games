@@ -23,6 +23,65 @@ import pytest
 from sic_games.demography import (DEMOG_ANCHORS, DEMOG_GATE, DEMOG_UNANCHORED, demography_health)
 
 
+def test_the_isogrowth_identity_reproduces_gurven_and_kaplans_own_claims():
+    """THE CENTRAL CTB FOR THE IDENTITY, and the only one that matters: GK07 endnote 5 states two specific
+    zero-growth combinations, so the identity is checked against the paper that supplies it.
+
+        R0 = (TFR / 2.06) * l25,  l25 = 0.9973*l15 - 0.0422,  R0 = exp(r*T), T = 28
+
+    They state r = 0 at l15 = 0.55 requires TFR = 4.069. Substituting must return R0 = 1.
+    The 2.06 embeds 1.06 males per female, so `srb_male` is set to match THEIR assumption here — the
+    production code derives the divisor from the model's own configured sex ratio instead, because
+    importing 2.06 blind is the borrowed-constant error this project has made five times.
+    """
+    from sic_games.demography import isogrowth_check
+    gk_srb = 1.0 - 1.0 / 2.06
+    c = isogrowth_check(tfr=4.069, l15=0.55, r_measured_pct=0.0, srb_male=gk_srb)
+    assert c["R0"] == pytest.approx(1.0, abs=0.001)
+    assert c["r_predicted_pct"] == pytest.approx(0.0, abs=0.01)
+    assert c["l25"] == pytest.approx(0.9973 * 0.55 - 0.0422, rel=1e-9)
+
+
+def test_the_zero_growth_locus_matches_the_published_table():
+    """The survey tabulated the TFR needed for r = 0 at each l15. Those are consequences of the identity,
+    so they pin it at four more points than the two GK07 state."""
+    from sic_games.demography import isogrowth_check
+    gk_srb = 1.0 - 1.0 / 2.06
+    for l15, tfr in ((0.40, 5.79), (0.50, 4.53), (0.60, 3.70), (0.70, 3.13)):
+        c = isogrowth_check(tfr=tfr, l15=l15, r_measured_pct=0.0, srb_male=gk_srb)
+        assert c["R0"] == pytest.approx(1.0, abs=0.01), f"l15={l15} TFR={tfr} gave R0={c['R0']:.4f}"
+
+
+def test_the_sex_ratio_is_derived_not_hard_coded():
+    """W8 from the survey: 2.06 is a birth-sex-ratio ASSUMPTION, not a universal. A model with a different
+    SRB must get a different divisor, or the identity silently scores against someone else's population."""
+    from sic_games.demography import isogrowth_check
+    a = isogrowth_check(tfr=6.0, l15=0.55, r_measured_pct=0.0, srb_male=0.512)
+    b = isogrowth_check(tfr=6.0, l15=0.55, r_measured_pct=0.0, srb_male=0.600)
+    assert a["R0"] > b["R0"], "more male births must mean fewer daughters and a lower R0"
+
+
+def test_the_identity_refuses_an_out_of_range_survivorship():
+    """`l25 = 0.9973*l15 - 0.0422` goes negative below l15 ~ 0.0423, where the regression is meaningless.
+    Returning a number there would be worse than returning nothing."""
+    from sic_games.demography import isogrowth_check
+    c = isogrowth_check(tfr=6.0, l15=0.01, r_measured_pct=0.0)
+    assert c["r_predicted_pct"] != c["r_predicted_pct"]      # NaN
+    assert c["consistent"] is None
+
+
+def test_the_implied_generation_length_separates_the_two_explanations():
+    """A gap between predicted and measured r can mean an inconsistent run OR a different generation
+    length. Reporting the T that reconciles them tells the reader which — and this model's late age at
+    first birth (22-25 vs a forager 16.2-20.5) makes a long T the expected reading."""
+    from sic_games.demography import isogrowth_check
+    c = isogrowth_check(tfr=8.3, l15=0.426, r_measured_pct=1.57)   # measured == predicted at T=28
+    assert c["implied_gen_length"] == pytest.approx(28.0, rel=0.05)
+    assert c["consistent"] is True
+    d = isogrowth_check(tfr=8.3, l15=0.426, r_measured_pct=-0.30)  # the arm actually measured
+    assert d["consistent"] is False
+
+
 def _healthy():
     """A row sitting inside every filed band. Values chosen as band midpoints / published anchors."""
     return {"frac_child": 0.37, "dependency_ratio": 0.75, "sex_ratio_m_f": 1.1,
@@ -127,17 +186,20 @@ def test_missing_and_nan_values_are_NO_DATA_not_PASS():
 
 def test_unanchored_markers_are_reported_not_dropped():
     """A gap that is invisible is a gap nobody fixes. These have no filed anchor and must say so."""
-    row = _healthy(); row["age_first_birth_yr"] = 24.9; row["srb_male_frac"] = 0.463
+    row = _healthy(); row["srb_male_frac"] = 0.463; row["frac_widowed_adult"] = 0.166
     vs = {v["marker"]: v["verdict"] for v in demography_health(row)["verdicts"]}
-    assert vs["age_first_birth_yr"] == "NO-ANCHOR" and vs["srb_male_frac"] == "NO-ANCHOR"
-    assert "age_first_birth_yr" in DEMOG_UNANCHORED
+    assert vs["srb_male_frac"] == "NO-ANCHOR" and vs["frac_widowed_adult"] == "NO-ANCHOR"
+    assert "srb_male_frac" in DEMOG_UNANCHORED
+    # age_first_birth_yr LEFT this list on 2026-08-14 when the literature survey supplied Walker et al.
+    # 2006's forager bracket. A marker gaining an anchor is the point of the exercise.
+    assert "age_first_birth_yr" not in DEMOG_UNANCHORED
 
 
 def test_unanchored_markers_do_not_count_toward_the_score():
     """They are context, not a verdict. Counting them would dilute the in-band fraction and make a failing
     panel look healthier as more unanchored fields are added."""
     a = demography_health(_healthy())
-    row = _healthy(); row["age_first_birth_yr"] = 24.9
+    row = _healthy(); row["srb_male_frac"] = 0.463
     b = demography_health(row)
     assert a["n_scored"] == b["n_scored"]
 
