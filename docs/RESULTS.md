@@ -6404,4 +6404,96 @@ no value was adopted from the bracket.
 
 ---
 
+## Addendum 43 — The demography monitor, and two corrections to Addendum 42's follow-ups (2026-08-14, R-106)
+
+**THE STANDING PANEL.** Supervisor directive: *"We cannot expect social dynamics to work when the demography
+is skewed."* The case that proves it: `band_med` read 23 against Birdsell's ~25 and looked like a PASS on a
+population that was 54% children — about 11 ADULTS against Hill et al. 2011's **28.2 ADULTS**. A marker read
+as passing while failing 2.5-fold. `MARKER_MATRIX.md` #1 had already recorded this and it was still missed.
+
+Every run now logs, and SCORES against filed bands: `e15` / `e45` / `surv_to_15` / `surv_to_45` /
+`modal_adult_death`; mortality in seven age bands; `cbr` / `cdr` / `r_pct_yr` / `srb_male_frac` /
+`age_first_birth_yr`; completed parity of post-menopausal women; joint orphanhood, never-partnered-by-30,
+widowhood; sex-specific `e0`/`e15`; child and old-age dependency separately; and **`band_med_adults`**, the
+quantity Hill's anchor names and which the model had never logged. `demography_health()` prints one verdict
+line and GATES the ladder: age structure out of band ⇒ every marker above demography is provisional.
+
+**THE CEILING FIX WORKED.** `ceiling_on` required `settle_on`, so switching villages off switched the R-63
+carrying capacity off with them — including R-105's branch for capping agglomeration at non-settlement
+cells, unreachable in exactly the configuration it exists for. Before: population 2,916 → 24,727 by step
+3,000 and climbing, per-capita intake RISING with density. After: both arms **stable at 15,000 steps**,
+0.27x and 0.35x Binford, r ≈ 0. R-105's tripwire test fired with its own message, *"scope note is stale"*,
+exactly as it was written to.
+
+**CORRECTION 1 — the density-reference fix does NOT buy 3 years of life expectancy.** Addendum 42's
+follow-up reported e0 17.7 → 20.9. That was measured on the RUNAWAY world, where density had exploded and
+`density_mult` was saturated near its 4.0 ceiling, so re-referencing it mattered. With the ceiling working,
+density stays low, the term sits near its reference, and the fix is **near-neutral: e0 17.87 → 17.96, +0.09
+yr**. The normalisation remains correct on its own terms — `risk_mult` and `pathogen_mult` hold that
+invariant and `density_mult` did not — but it is NOT load-bearing at forager densities. It stays default-OFF
+and out of `C_ALLON`.
+
+**CORRECTION 2 — "age at first birth 22-25, above every forager" was a short-run transient.** Measured on
+400-step smoke runs. Over 15,000 steps AFB declines monotonically 18.95 → **16.25**, which is INSIDE Walker
+et al. 2006's forager bracket [16.2, 20.5] — at its extreme low edge. The defect I reported does not exist
+at equilibrium; if anything the equilibrium value is now too early.
+
+**THE ISO-GROWTH CONSTRAINT IS VIOLATED, IDENTICALLY IN BOTH ARMS.** Gurven & Kaplan 2007 endnote 5 gives
+`R0 = (TFR/2.06)·l25`, `l25 = 0.9973·l15 − 0.0422`, `R0 = exp(r·28)`. The implementation reproduces their
+own published claims (R0 = 1.0001 at their stated TFR 4.069, l15 0.55). Applied to the pair:
+
+| arm | TFR | l(15) | r measured | r REQUIRED | gap |
+|---|---|---|---|---|---|
+| hg_villages_off | 8.37 | 0.424 | +0.02 %/yr | **+1.58 %/yr** | +1.56 |
+| hg_densref | 8.40 | 0.427 | +0.03 %/yr | **+1.62 %/yr** | +1.59 |
+
+**WHERE THE VIOLATION LIVES.** GK07's regression (R² = 0.98) says adult survival is tightly predicted by
+child survival in a real forager. Measured against it: predicted l(25) 0.390, **ACTUAL 0.268 — a ratio of
+0.69**, consistent at 0.67–0.71 across every arm. The model's adults die ~30% faster than the forager
+relationship allows, on top of already-poor child survival.
+
+**THE REMAINING DEFECT, DECOMPOSED.** `m_5_15` = **0.0506 against GK07's 0.010** — five times over, in the
+band that is the LOWEST-mortality band of a human life table. Split by cause (control arm):
+
+| band | m total | m starvation | m other |
+|---|---|---|---|
+| 1–5 | 0.0574 | 0.0143 | 0.0430 |
+| **5–15** | **0.0506** | **0.0208** | **0.0298** |
+| 15–30 | 0.0474 | 0.0225 | 0.0249 |
+| 30–45 | 0.0474 | 0.0211 | 0.0263 |
+| 45–60 | 0.0528 | 0.0206 | 0.0321 |
+
+Two roughly equal contributors, both already named. (i) `m_other` in the 5–15 band is 0.0298 against a
+configured Siler ~0.0137 = **2.2x**, which is the `a2_mult` inflation — and since the density term is now
+shown to be near-neutral at these densities, the remaining inflation must be `risk_mult` and/or
+`synergy_mult`, NOT density. (ii) `m_starv` is **flat at ~0.021 from age 1 to 60**, confirming Addendum 42's
+"second Makeham term" at scale and now per age band.
+
+**THREE DEFECTS IN MY OWN INSTRUMENTS, all caught before they reached a conclusion.**
+- `family_structure()` counted a missing `_father` link as a DEAD father, inflating double-orphanhood
+  **8.8x** (0.086 → 0.0098). `_orphan_status` had always been right. The CTB missed it because every
+  constructed family had explicit links.
+- `q = m/(1+m/2)` exceeds 1.0 at m > 2 deaths/person-year, driving survivorship NEGATIVE: short test runs
+  returned l(15) = −0.091, l(25) = −0.500. No scored result was affected (a real arm never approaches m=2),
+  but a survivorship that can go negative is not a survivorship. Clamped, negative control confirms
+  l(x) = −0.111 without it.
+- A duplicate keyword argument from a rename broke the campaign entrypoint and cost a 27-failure suite run,
+  because I launched the suite without an import check.
+
+**A PROCESS NOTE.** Editing source while the suite runs produces spurious failures: several tests read
+`phase1_model.py` FROM DISK for token scans, so a half-written file fails them. Three such failures were
+recorded and discarded on 2026-08-14.
+
+**LITERATURE SURVEY (2026-08-14).** Registered `age_first_birth_yr` [16.2, 20.5] (Walker et al. 2006 Table
+2, 15 forager societies; Gainj and Turkana excluded as horticulturalist/pastoralist) and `m_5_15` = 0.010
+(GK07 p.330 verbatim). The survey also established that **e0 is NOT diagnostic**: Sweden 1751–59 had e0 = 34,
+inside the forager range of 21–37. Neither is e45 (20.7 vs 19.8 across HG and forager-horticulturalist) nor
+MRDT (6–10 yr, a human constant). **Score on l(15), r and the juvenility index.** And GK07 Fig. 9: *"forager
+mortality is narrowly confined, fertility ranges widely from below 4 to as high as 8"* — regulation runs
+through fertility. **NO forager anchor exists** for joint orphanhood, never-married-by-30, widowhood, sex-
+specific life tables, or CBR/CDR; those report NO-ANCHOR rather than being dropped. **Ellison remains
+unobtained** and is the single gap blocking a fertility-response timescale.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
