@@ -793,66 +793,80 @@ value = 0.3
 owner = "DemographyConfig"
 type  = "float"
 # site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL] —
-# (channel note, inherited) ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism;
-# Mauss/Binford/Johnson): settlements as MULTI-BAND coalescence — "the gathering that stops dispersing".
-# Q1 lit: villages form by COALESCENCE of several bands at a rich node (not one band packing); Q2: the
-# landscape is ~6× below Binford packing, so the density must come from AGGREGATING bands. At a
-# persistent-abundant site a seasonal pool (≥ settle_min_pool people) PERSISTS: members within
-# settle_radius are held (cohesion → site, at the POOL scale where it is stable) so the aggregation packs
-# → the density morph fires; scalar stress → hierarchy. Dissolves (hysteresis) when the pool can't be
-# sustained. LAYER 1 (this): lifecycle + hold, reside-on-cluster harvest. LAYER 2 (later): logistical
-# CATCHMENT foraging (residence ≠ foraging; Binford collectors) + catchment-grain defensibility. Needs
-# enable_marriage_aggregation (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒
-# bit-exact.
+# (channel note, inherited) THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield`
+# grants settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no
+# clearing, no soil development, no ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing
+# village and a farming village get the identical instant unlock. Founding is therefore costless and
+# instantly profitable, every qualifying site is occupied immediately and permanently, and settlement is a
+# lookup rather than a decision under uncertainty. ON => the tier-2 yield is summed only over cells this
+# settlement's band actually OWNS (`_cell_owner`), so it RAMPS as claims mature at +1/step to
+# `defensibility_claim_dwell` and spreads outward as the village grows. The lag is EMERGENT from the
+# clearing process rather than a parameter anybody has to anchor. Settling on a wild stand still pays
+# immediately through tier-1 -- which is why the Natufians settled -- while CULTIVATED returns accrue only
+# as land is worked. IT ALSO MATTERS FOR THE ELITE LAYER. Hayden's aggrandizer needs a surplus that is
+# controllable and unevenly held. A flat catchment-wide tier-2 yield hands every occupant the same thing,
+# so there is nothing to monopolise; worked land is spatially uneven AND owned, which is the substrate the
+# mechanism requires. Default OFF => bit-exact.
 
 [settle_radius]
 value = 2
 owner = "DemographyConfig"
 type  = "int"
 # Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells) —
-# (channel note, inherited) ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism;
-# Mauss/Binford/Johnson): settlements as MULTI-BAND coalescence — "the gathering that stops dispersing".
-# Q1 lit: villages form by COALESCENCE of several bands at a rich node (not one band packing); Q2: the
-# landscape is ~6× below Binford packing, so the density must come from AGGREGATING bands. At a
-# persistent-abundant site a seasonal pool (≥ settle_min_pool people) PERSISTS: members within
-# settle_radius are held (cohesion → site, at the POOL scale where it is stable) so the aggregation packs
-# → the density morph fires; scalar stress → hierarchy. Dissolves (hysteresis) when the pool can't be
-# sustained. LAYER 1 (this): lifecycle + hold, reside-on-cluster harvest. LAYER 2 (later): logistical
-# CATCHMENT foraging (residence ≠ foraging; Binford collectors) + catchment-grain defensibility. Needs
-# enable_marriage_aggregation (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒
-# bit-exact.
+# (channel note, inherited) THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield`
+# grants settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no
+# clearing, no soil development, no ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing
+# village and a farming village get the identical instant unlock. Founding is therefore costless and
+# instantly profitable, every qualifying site is occupied immediately and permanently, and settlement is a
+# lookup rather than a decision under uncertainty. ON => the tier-2 yield is summed only over cells this
+# settlement's band actually OWNS (`_cell_owner`), so it RAMPS as claims mature at +1/step to
+# `defensibility_claim_dwell` and spreads outward as the village grows. The lag is EMERGENT from the
+# clearing process rather than a parameter anybody has to anchor. Settling on a wild stand still pays
+# immediately through tier-1 -- which is why the Natufians settled -- while CULTIVATED returns accrue only
+# as land is worked. IT ALSO MATTERS FOR THE ELITE LAYER. Hayden's aggrandizer needs a surplus that is
+# controllable and unevenly held. A flat catchment-wide tier-2 yield hands every occupant the same thing,
+# so there is nothing to monopolise; worked land is spatially uneven AND owned, which is the substrate the
+# mechanism requires. Default OFF => bit-exact.
 
 [settlement_cohesion]
 value = 1.5
 owner = "DemographyConfig"
 type  = "float"
 # (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation) — (channel note,
-# inherited) ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson):
-# settlements as MULTI-BAND coalescence — "the gathering that stops dispersing". Q1 lit: villages form by
-# COALESCENCE of several bands at a rich node (not one band packing); Q2: the landscape is ~6× below
-# Binford packing, so the density must come from AGGREGATING bands. At a persistent-abundant site a
-# seasonal pool (≥ settle_min_pool people) PERSISTS: members within settle_radius are held (cohesion →
-# site, at the POOL scale where it is stable) so the aggregation packs → the density morph fires; scalar
-# stress → hierarchy. Dissolves (hysteresis) when the pool can't be sustained. LAYER 1 (this): lifecycle +
-# hold, reside-on-cluster harvest. LAYER 2 (later): logistical CATCHMENT foraging (residence ≠ foraging;
-# Binford collectors) + catchment-grain defensibility. Needs enable_marriage_aggregation (the gathering) +
-# enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
+# inherited) THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants
+# settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no clearing, no
+# soil development, no ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing village and
+# a farming village get the identical instant unlock. Founding is therefore costless and instantly
+# profitable, every qualifying site is occupied immediately and permanently, and settlement is a lookup
+# rather than a decision under uncertainty. ON => the tier-2 yield is summed only over cells this
+# settlement's band actually OWNS (`_cell_owner`), so it RAMPS as claims mature at +1/step to
+# `defensibility_claim_dwell` and spreads outward as the village grows. The lag is EMERGENT from the
+# clearing process rather than a parameter anybody has to anchor. Settling on a wild stand still pays
+# immediately through tier-1 -- which is why the Natufians settled -- while CULTIVATED returns accrue only
+# as land is worked. IT ALSO MATTERS FOR THE ELITE LAYER. Hayden's aggrandizer needs a surplus that is
+# controllable and unevenly held. A flat catchment-wide tier-2 yield hands every occupant the same thing,
+# so there is nothing to monopolise; worked land is spatially uneven AND owned, which is the substrate the
+# mechanism requires. Default OFF => bit-exact.
 
 [settle_release_steps]
 value = 12
 owner = "DemographyConfig"
 type  = "int"
 # hysteresis: steps a settlement survives below settle_min_pool before it dissolves — (channel note,
-# inherited) ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson):
-# settlements as MULTI-BAND coalescence — "the gathering that stops dispersing". Q1 lit: villages form by
-# COALESCENCE of several bands at a rich node (not one band packing); Q2: the landscape is ~6× below
-# Binford packing, so the density must come from AGGREGATING bands. At a persistent-abundant site a
-# seasonal pool (≥ settle_min_pool people) PERSISTS: members within settle_radius are held (cohesion →
-# site, at the POOL scale where it is stable) so the aggregation packs → the density morph fires; scalar
-# stress → hierarchy. Dissolves (hysteresis) when the pool can't be sustained. LAYER 1 (this): lifecycle +
-# hold, reside-on-cluster harvest. LAYER 2 (later): logistical CATCHMENT foraging (residence ≠ foraging;
-# Binford collectors) + catchment-grain defensibility. Needs enable_marriage_aggregation (the gathering) +
-# enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
+# inherited) THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants
+# settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no clearing, no
+# soil development, no ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing village and
+# a farming village get the identical instant unlock. Founding is therefore costless and instantly
+# profitable, every qualifying site is occupied immediately and permanently, and settlement is a lookup
+# rather than a decision under uncertainty. ON => the tier-2 yield is summed only over cells this
+# settlement's band actually OWNS (`_cell_owner`), so it RAMPS as claims mature at +1/step to
+# `defensibility_claim_dwell` and spreads outward as the village grows. The lag is EMERGENT from the
+# clearing process rather than a parameter anybody has to anchor. Settling on a wild stand still pays
+# immediately through tier-1 -- which is why the Natufians settled -- while CULTIVATED returns accrue only
+# as land is worked. IT ALSO MATTERS FOR THE ELITE LAYER. Hayden's aggrandizer needs a surplus that is
+# controllable and unevenly held. A flat catchment-wide tier-2 yield hands every occupant the same thing,
+# so there is nothing to monopolise; worked land is spatially uneven AND owned, which is the substrate the
+# mechanism requires. Default OFF => bit-exact.
 
 [settle_catchment_radius]
 value = 1

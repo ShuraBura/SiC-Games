@@ -111,7 +111,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `catchment_ceiling`, `agglomeration`, `aggl_ceiling`, `emergent_abandonment`,
   `economic_defensibility`, `improved_land`, `agriculture`, `emergent_village_founding`,
   `bud_requires_occupancy`, `bud_site_separation`, `exclusive_village_membership`,
-  `village_identity`
+  `village_identity`, `storable_founding`, `worked_land_yield`
 - **10 Surplus & material** — `material_capture`, `material_inheritance`, `wealth_obligation`, `standing`,
   `cred_status`, `cred_renorm`, `prowess_facet`
 - **11 Stratification** — `morph`, `rank_hierarchy`, `stratification_inequality_gate`

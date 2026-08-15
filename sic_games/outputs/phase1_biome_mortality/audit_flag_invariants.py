@@ -55,6 +55,9 @@ TYPES = {
     # it decides WHERE a site may exist, not how much the cell yields. It is the one of the five that is
     # canonically ON, because it REPLACES the ranked-candidate scan rather than adding a rule beside it.
     "enable_emergent_village_founding": "T",
+    # Founding judged on STORABLE surplus rather than raw S_pot, and tier-2 yield summed over OWNED cells.
+    # Both are T: they decide WHERE a site may exist and WHICH land it draws on, not how much a cell yields.
+    "enable_storable_founding": "T", "enable_worked_land_yield": "T",
     "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
     "enable_leader_share": "X",
     "enable_cred_status": "C", "enable_prowess_facet": "C", "enable_ascribed_mate_choice": "C",
@@ -209,6 +212,8 @@ PREREQ = {
     "enable_density_reference": ("enable_density_disease",),
     "enable_village_budding": ("enable_aggregation_sedentism",),
     "enable_emergent_village_founding": ("enable_aggregation_sedentism",),
+    "enable_storable_founding": ("enable_aggregation_sedentism", "enable_resource_storability"),
+    "enable_worked_land_yield": ("enable_aggregation_sedentism", "enable_economic_defensibility"),
     "enable_bud_requires_occupancy": ("enable_aggregation_sedentism", "enable_village_budding"),
     "enable_catchment_ceiling": ("enable_aggregation_sedentism",),
     "enable_settlement_scalar_stress": ("enable_aggregation_sedentism",),

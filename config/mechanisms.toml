@@ -496,6 +496,55 @@ type  = "bool"
 # collectors) + catchment-grain defensibility. Needs enable_marriage_aggregation (the gathering) +
 # enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
 
+[enable_storable_founding]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# ── FOUNDING ON STORABLE SURPLUS, AND YIELD ON WORKED LAND (R-106, 2026-08-15) ────────────────────── ONE
+# DEFECT, TWO SYMPTOMS. `_s_pot_field()` = max(aquatic_food, cultivability) on RAW TERRAIN is asked three
+# different questions, and conflates a wild cereal stand with a ploughed field in two of them: is this
+# worth settling? -> raw S_pot CONFLATED what does settling yield? -> raw S_pot over the catchment
+# CONFLATED can you own it? -> aquatic anywhere; cultivable ONLY where worked CORRECT
+# `_update_defensibility_claims` already gets the third right -- "You own what you've cleared (Testart),
+# not any fertile wilderness cell" -- so the FOUNDING rule permits founding on land the OWNERSHIP rule
+# says cannot be claimed until a settlement is already there. The two layers contradict each other. WHY
+# NOT AQUATIC-ONLY FOUNDING, WHICH WAS THE FIRST PROPOSAL. The 2026-08-15 site-suitability survey
+# contradicted it with two published cases. (a) MESOAMERICA: Ranere & Piperno PNAS 2009, verbatim --
+# "small groups moved around the countryside seasonally ... by farming along river and lake shores"; maize
+# and squash domesticated 8,990-8,610 cal BP by MOBILE people, sedentary villages only ~3,000 BP, so the
+# lag runs ~5,700 yr the WRONG WAY in one of the three primary domestication centres. (b) THE LEVANT, the
+# best case FOR sedentism-first, did not found on a fishery: Natufian base camps sat in oak-pistachio
+# woodland on wild cereals, nuts and gazelle (Bar-Yosef, filed), and Bar-Yosef records that "storage
+# installations are rare in Natufian sites". SO THE CRITERION IS STORABLE SURPLUS, NOT WATER. Hayden 1995
+# (filed) names the mechanism: villages form where someone can control "spatially restricted resource
+# locations or productive facilities -- fishing rocks, weirs, boats, deer fences, drying sheds". A dense
+# oak or wild-cereal stand qualifies; a salmon choke point qualifies; open water does not. That covers the
+# Levant AND Mesoamerica, and it needs no unlock times and no technology tree -- the ordering falls out of
+# the terrain. NO NEW NUMBER. The founding test becomes S_pot x `_storable_frac_field()`, the per-cell
+# storable fraction ALREADY computed from the local {grain, fish, forage, game} mix with Testart's
+# STORABILITY_BY_RESOURCE (grain 0.85 / fish 0.80 / forage 0.15 / game 0.35). Its own docstring already
+# states the intent: "Grain/fishing cells -> high (accumulate granaries -> sedentism); fresh-forage cells
+# -> low (can't store -> mobile)."
+
+[enable_worked_land_yield]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants settle_tier2_yield x
+# SUM(S_pot) over the WHOLE catchment the instant a site exists -- no clearing, no soil development, no
+# ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing village and a farming village get
+# the identical instant unlock. Founding is therefore costless and instantly profitable, every qualifying
+# site is occupied immediately and permanently, and settlement is a lookup rather than a decision under
+# uncertainty. ON => the tier-2 yield is summed only over cells this settlement's band actually OWNS
+# (`_cell_owner`), so it RAMPS as claims mature at +1/step to `defensibility_claim_dwell` and spreads
+# outward as the village grows. The lag is EMERGENT from the clearing process rather than a parameter
+# anybody has to anchor. Settling on a wild stand still pays immediately through tier-1 -- which is why
+# the Natufians settled -- while CULTIVATED returns accrue only as land is worked. IT ALSO MATTERS FOR THE
+# ELITE LAYER. Hayden's aggrandizer needs a surplus that is controllable and unevenly held. A flat
+# catchment-wide tier-2 yield hands every occupant the same thing, so there is nothing to monopolise;
+# worked land is spatially uneven AND owned, which is the substrate the mechanism requires. Default OFF =>
+# bit-exact.
+
 [enable_catchment_ceiling]
 value = true
 owner = "DemographyConfig"

@@ -375,6 +375,13 @@ def _found_world(spot_cells, agent_cells, existing=(), cr=1, thr=0.3, min_pool=4
                         _harvest_field=SimpleNamespace(width=100, height=100),
                         _settlement_sites={s: 12 for s in existing}, settle_formed_this_step=0)
     f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
+    # The founding path judges sites through `_founding_pot_field` (R-106, 2026-08-15), which falls back to
+    # `_s_pot_field` while `enable_storable_founding` is off. Bound here so this fixture keeps testing the
+    # SITE RULE — the three conditions — rather than the storability weighting, which has its own battery in
+    # test_storable_founding_ctb.py.
+    f._founding_pot_cache = None
+    f._storable_frac_cache = None
+    f._founding_pot_field = lambda: TerrainWorld._founding_pot_field(f)
     return f
 
 

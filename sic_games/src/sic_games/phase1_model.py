@@ -315,6 +315,7 @@ class TerrainWorld(mesa.Model):
         self.obligation_grants = 0                             # CUMULATIVE wealth->obligation grants
         self.bud_events = 0                                    # CUMULATIVE village fissions (not per-step): the
         #   realised rate, to be compared back against Bandy's 2-5e-3 per large-village-year
+        self._founding_pot_cache = None                        # storability-weighted founding potential (cached)
         self._cell_owner: dict[tuple[int, int], int] = {}      # econ-defensibility: owned cell → owner band_id (absent ⇒ open access)
         self._cell_claim: dict[tuple[int, int], tuple[int, int]] = {}  # econ-defensibility: cell → (claim strength, claimant band_id)
         self._claim_events_this_step: int = 0                  # instability diagnostic: defensibility contest events this step
@@ -869,6 +870,29 @@ class TerrainWorld(mesa.Model):
                 self._spot_cache = aq
         return self._spot_cache
 
+    def _founding_pot_field(self):
+        """The potential a SITE is judged on, as distinct from what it YIELDS. See
+        `DemographyConfig.enable_storable_founding`.
+
+        OFF  -> `_s_pot_field()`, i.e. max(aquatic, cultivability) on raw terrain. Bit-exact.
+        ON   -> that, times `_storable_frac_field()` — the per-cell storable fraction already computed from
+                the local {grain, fish, forage, game} mix with Testart's STORABILITY_BY_RESOURCE. A dense
+                wild-cereal stand and a salmon choke point both score; a fresh-forage cell does not.
+
+        This is the criterion Hayden 1995 names and the one that survives BOTH the Levantine sedentism-first
+        case and the Mesoamerican mobile-farming counter-case. It introduces no new number: every constant it
+        uses is already filed and already in use elsewhere in the model.
+        """
+        sp = self._s_pot_field()
+        if sp is None or self._demog is None:
+            return sp
+        if not getattr(self._demog, "enable_storable_founding", False):
+            return sp
+        if self._founding_pot_cache is None:
+            sf = self._storable_frac_field()
+            self._founding_pot_cache = sp if sf is None else sp * sf
+        return self._founding_pot_cache
+
     def _forage_cap_field(self):
         """Per-person forage cap = forage_kcal · forage_cap_hours (the biome return-rate × work hours — the most one
         forager can harvest). Cached. None if no forage_kcal field."""
@@ -1228,9 +1252,19 @@ class TerrainWorld(mesa.Model):
             return 0.0
         rad = self._demog.settle_catchment_radius
         sx, sy = site; tot = 0.0
+        # WORKED-LAND YIELD (see `enable_worked_land_yield`). OFF: sum the whole catchment, so the full
+        # tier-2 unlock arrives the instant the site exists — no clearing, no ramp. ON: sum only the cells
+        # somebody actually OWNS, so the yield RAMPS as claims mature (+1/step to defensibility_claim_dwell)
+        # and spreads outward as the village grows. The lag is emergent from the clearing process; no delay
+        # parameter is introduced. Tier-1 is untouched, so settling on a wild stand still pays at once.
+        worked_only = (self._demog is not None
+                       and getattr(self._demog, "enable_worked_land_yield", False))
         for dy in range(-rad, rad + 1):
             for dx in range(-rad, rad + 1):
-                tot += sp[(sy + dy) % N, (sx + dx) % N]
+                cell = ((sx + dx) % N, (sy + dy) % N)
+                if worked_only and cell not in self._cell_owner:
+                    continue
+                tot += sp[cell[1], cell[0]]
         return self._demog.settle_tier2_yield * tot
 
     def _settlement_carrying_capacity(self, site: tuple[int, int]) -> float:
@@ -4445,7 +4479,7 @@ class TerrainWorld(mesa.Model):
         settle_radius / settle_release_steps) and the top-S_pot min-separated candidate set, so the two paths agree.
         No RNG → the daily _maintain_settlements handles hold/release exactly as for the gathering path."""
         cfg = self._demog
-        aqf = self._s_pot_field()
+        aqf = self._founding_pot_field()  # FOUNDING judgement -> storability-weighted (see _founding_pot_field)
         if aqf is None:
             return
         hf = self._harvest_field
@@ -4568,7 +4602,7 @@ class TerrainWorld(mesa.Model):
         # Aggregation-sedentism (Layer 1): a pool at a PERSISTENT-ABUNDANT site that reaches settle_min_pool FOUNDS /
         # refreshes a settlement — the gathering that stops dispersing. Held + released each step by _maintain_settlements.
         if getattr(cfg, "enable_aggregation_sedentism", False):
-            aqf = self._s_pot_field()            # S_pot = max(aquatic, cultivability) → farming sites qualify too
+            aqf = self._founding_pot_field()  # FOUNDING judgement -> storability-weighted (see _founding_pot_field)
             rad = cfg.settle_radius
             for si in pools:                      # sites that pooled ≥1 band this gathering
                 site = sites[si]
@@ -4972,7 +5006,7 @@ class TerrainWorld(mesa.Model):
         so the band~25 fission scale is untouched. No RNG
         (deterministic cleavage + siting). Default OFF ⇒ never called (bit-exact)."""
         cfg = self._demog
-        aqf = self._s_pot_field()
+        aqf = self._founding_pot_field()  # FOUNDING judgement -> storability-weighted (see _founding_pot_field)
         if aqf is None or not self._settlement_sites:
             return
         thr_base = cfg.village_fission_threshold; circ_gain = cfg.village_circumscription_gain

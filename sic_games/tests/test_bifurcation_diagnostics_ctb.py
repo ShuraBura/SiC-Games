@@ -40,6 +40,12 @@ def _occ_world(agent_positions, spot=None, min_pool=10, sep=10.0, thr=0.3, relea
         agent_list=[SimpleNamespace(pos=p) for p in agent_positions],
     )
     f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
+    # The founding path judges sites through `_founding_pot_field` (R-106, 2026-08-15); it falls
+    # back to `_s_pot_field` while `enable_storable_founding` is off, so these tests keep
+    # exercising the SITE RULE rather than the storability weighting.
+    f._founding_pot_cache = None
+    f._storable_frac_cache = None
+    f._founding_pot_field = lambda: TerrainWorld._founding_pot_field(f)
     return f
 
 
