@@ -1170,11 +1170,63 @@ Elites can only emerge where this leveling is **defeated** (storable/defensible 
 circumscription, or scale beyond gossip-policing). Complements Testart 1982 (storage as the enabler) and Hayden
 (aggrandizers as the driver). NB the model already has a "Boehm gate" (`leader_society_weight`) — this is its anchor.
 
+### FAO / FAOSTAT land-use statistics, via Our World in Data — **the denominator reference for `cultivability`**
+**Status: [SECONDARY] — read via OWID's land-use pages 2026-08-15, not from FAOSTAT directly.**
+
+**What was lifted — the CEILING on any early-agriculture site fraction (MODEL_SPEC §4.3.12).**
+- Global **arable land 10.9%** (2011, ~1.4 billion ha) — denominator is **FAO "land area" = 13.0 billion ha**,
+  which **EXCLUDES inland water AND Antarctica**.
+- Permanent crops **1.2%**; permanent pasture **26.3%**; all agricultural land **~37%** — same denominator.
+
+**⚠ THIS IS THE DENOMINATOR TRAP THE MODEL WALKS INTO.** Three different quantities are all called "land":
+FAO **land area** 13.0 Bha; **total land** 14.9 Bha (with Antarctica); **habitable land** ~10.4 Bha (also
+excluding glaciers and barren). The model measures against the THIRD. Arable is 10.9% of the first but
+**~13.5% of the third** — so quoting "about 11%" against a habitable-land denominator under-counts by ~25%.
+OWID's own two pages disagree on habitable land (71% vs 76% of land) and on agriculture's share of it (44% vs
+50%); pick one, record which, never mix.
+
+**⚠ AND IT IS A CEILING, NEVER A TARGET.** The 13.5% is the product of the plough, irrigation, drainage,
+fertiliser and 10,000 years of expansion. Early rain-fed pre-plough agriculture must fall **strictly below**
+it. The model's measured 39.6% (coastal-temperate) EXCEEDS the modern industrial figure by ~3×, which is
+impossible on its face.
+
+**⚠ FAO S1/S2/S3/N land-suitability studies are NOT usable for this.** They almost always condition on land
+that is **already agricultural** — one states outright that "37.6% of *the agricultural land* was highly
+suitable (S1)". Read as a landscape fraction that would inflate a cultivability target five-fold or more.
+
+**How used:** the ceiling and the provisional 5–12% / 3–10% / 0–2% targets in MODEL_SPEC §4.3.12. **Low
+confidence — to be SWEPT, not fitted.** Bar-Yosef [filed] supplies the qualitative bound that matters more:
+the earliest Levantine farming communities sat on a LINE, "along today's boundary between the Mediterranean
+and the Irano-Turanian steppic vegetational belts".
+**Citation tag:** [CEILING — modern arable as an upper bound on early-agriculture site fraction; denominator-critical]
+
 ### Testart, A. (1982). "The Significance of Food Storage among Hunter-Gatherers: Residence Patterns, Population Densities, and Social Inequalities [and Comments and Reply]." *Current Anthropology* 23(5):523–537.
 **Status: FILED + [VERIFIED] — full text read 2026-07-17** (`literature/Testart - 1982 - The Significance of Food Storage Among Hunter-Gatherers.pdf`, 15 pp). **Obtained from the author's own site**
 (`alaintestart.com/UK/documents/storage.pdf` — self-archived OA; note the host's TLS cert mismatches, fetched over
 plain HTTP). **This closes the long-standing "TO-GRAB (paywalled)" flag on Testart in this file** — every prior
 Testart citation in the docs was SEARCH-VERIFIED only; they can now be checked against the primary text.
+
+**ADDED 2026-08-15 — THE SITE-RARITY NUMBERS, and the denominator correction that makes them usable
+(MODEL_SPEC §4.3.12).** p.529 counts **10 storing societies out of 40** hunter-gatherer societies drawn from the
+SCCS 186 — Ainu, Gilyak, Aleut, Eyak, Haida, Bellacoola, Twana, Yurok, Pomo, Yokuts (11 with the doubtful
+Kutenai). **8 of the 10 are aquatic**; Pomo and Yokuts are acorn-based. `[VERIFIED]` He also gives a hard
+exclusion: **>35% dependence on land hunting precludes a storing economy** `[VERIFIED]`, and density codes
+**A <0.2, B 0.2–1, C 1.1–5, D 5.1–25 persons per SQUARE MILE** (Murdock & Wilson 1972) `[VERIFIED]`.
+
+**⚠ DENOMINATOR — DO NOT READ 25% AS A LAND FRACTION.** The 10/40 is a count **of societies**. Storing
+societies sit at codes C–D and non-storing at A–B, so they hold **5–25× less land each**. Converting to a land
+fraction divides by roughly three: **25% of societies ≈ 5–14% of land.** This is the correction that makes the
+model's measured 5.9% aquatic pass-fraction defensible rather than apparently four times too low. Cross-check:
+Cunningham 2020 [filed] gives 7/36 SCCS foragers at medium/high density, 6 of them fished — the same
+correction takes 16.7% of societies to roughly 3–8% of land.
+
+**⚠ UNITS.** Testart's codes are per SQUARE MILE; Binford's packing threshold of 9.1 persons/100 km² is
+**0.091/km²**. The two published thresholds differ in units by a factor of ~259 and ~100 respectively. Convert
+before comparing.
+
+**NO TROPICAL STORER APPEARS IN THE 40.** Consistent with Binford's ET = 15.25 storage threshold, and the basis
+for the §4.3.12 recommendation that the model's TROPICAL aquatic pass-fraction (measured 4.2%) should fall to
+0.5–2% — the constraint is storability, not fishery productivity.
 
 **What was lifted — the STORAGE prime-mover (the enabling condition of the elite layer).** Testart's thesis is that
 *storing* hunter-gatherers form a distinct economic type from *non-storing* ones, and that three traits covary with

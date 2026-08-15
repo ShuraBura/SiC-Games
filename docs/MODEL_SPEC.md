@@ -663,6 +663,76 @@ The economy layer added to give the demographic modulators nutritional *variance
 the graded modulators bite at equilibrium, because the density-regulated population self-organises to
 "broadly fed at the biome carrying capacity." Each only moves the *carrying capacity*.
 
+### §4.3.12 THE RESOURCE DISTRIBUTIONS — how concentrated each stream is, and what is anchored
+
+**WHY THIS SECTION EXISTS.** Every resource field's RETURN RATE is anchored (§4.1.5, §4.3.6, the Game
+Return-Rate Table). Until 2026-08-15 the **DISTRIBUTION** — how unevenly that return is spread across a
+landscape, and what fraction of cells qualify as a good site — was documented nowhere, even though it decides
+how rare a village is, how much reason a band has to move, and how much of the intake variance is
+environmental rather than social. It is the difference between "a forager gets 5,541 kcal/hr in forest"
+(anchored) and "1 cell in 20 is worth settling" (was not).
+
+**MEASURED, coastal-temperate, 1584 habitable cells, `world_seed=0`** (2026-08-15):
+
+| field | Gini | CV | p90/p50 | lag-1 spatial r |
+|---|---|---|---|---|
+| `aquatic_food` | **0.817** | 2.21 | ∞ (median 0) | +0.80 |
+| `cultivability` | **0.502** | 0.94 | 4.5 | +0.90 |
+| `game_kcal` | 0.305 | 0.74 | 3.0 | +0.94 |
+| `forage_kcal` | 0.220 | 0.46 | 2.3 | +0.93 |
+| `forage` (normalised) | 0.111 | 0.20 | 1.3 | +0.98 |
+| `npp` | 0.100 | 0.17 | 1.2 | +0.99 |
+
+**THE VARIATION IS PATCHY, NOT NOISY.** Lag-1 spatial autocorrelation runs +0.80 to +0.99 on every field, so
+good cells form regions rather than scattered pixels. A white-noise landscape would give nonsense IFD
+movement — a band would have no gradient to climb and no reason to persist anywhere.
+
+**THE ORDERING IS RIGHT AND WAS NOT IMPOSED.** aquatic ≫ cultivable > game > forage. Fisheries most
+concentrated (median ZERO, Gini 0.82 — the salmon-run choke-point structure, §4.3.9), plant gathering flattest.
+That is the ethnographic pattern: gathering is the reliable, spatially uniform fallback, which is why foragers
+rely on it. It emerges from the field constructions rather than from a distributional parameter.
+
+**WHAT IS ANCHORED, AND WHAT IS A TERRAIN-GENERATOR ARTEFACT — read this before tuning anything.**
+
+- **ANCHORED — the return rates.** Hill 1987 (forest 5,541 kcal/hr), Hurtado & Hill 1987 (grassland 3,001),
+  Hawkes et al. 1991 (encounter 518 / intercept 745 kcal/hr), Bird 1997 (intertidal); Lieth 1973 Miami NPP;
+  Tallavaara 2018 NPP→density. All `[VERIFIED]`, see LITERATURE.md.
+- **ANCHORED — the storabilities.** `STORABILITY_BY_RESOURCE` grain 0.85 / fish 0.80 / forage 0.15 / game
+  0.35, Testart 1982 (§4.5.10). This is what makes grain-and-fish cells the sedentism-capable ones.
+- **PARTIALLY ANCHORED — the aquatic pass fraction.** Measured 5.9% temperate / 3.5% boreal / 4.2% tropical
+  of habitable land. Derived target **4–8% temperate and boreal**: Testart 1982:529 records **10 of 40** HG
+  societies as storing (25% **by society count**), and Cunningham 2020 gives **7 of 36** SCCS foragers at
+  medium/high density, **6 of them** fished. **DENOMINATOR CORRECTION (load-bearing):** storing societies sit
+  at Testart's density codes C–D (>1.1 persons/sq mi) against A–B (<1) for the rest, so they hold 5–25× LESS
+  LAND per society. Converting a society count to a land fraction divides by roughly three: **25% of
+  societies ≈ 5–14% of land.** Temperate and boreal are therefore DEFENSIBLE AS THEY STAND. **Tropical at
+  4.2% is TOO HIGH — target 0.5–2%**, and the reason is Binford's ET = 15.25 storage threshold suppressing
+  storage in the tropics, not fishery productivity. Testart's 40-society sample contains NO tropical storer.
+- **NOT ANCHORED, AND WRONG — the cultivable pass fraction.** Measured **39.6% temperate / 28.1% tropical**.
+  FAO global arable is **10.9% of FAO land area**, and FAO land area (13.0 Bha, excluding inland water and
+  Antarctica) is NOT the model's denominator; against HABITABLE land (~10.4 Bha) arable is **~13.5%**. That
+  is a **CEILING, not a target** — it is the product of the plough, irrigation, drainage and fertiliser, so
+  early rain-fed pre-plough agriculture must fall strictly below it. **The model exceeds the modern
+  industrial ceiling by a factor of ~3.** Bar-Yosef gives the qualitative bound: the earliest Levantine
+  farming communities sat on a LINE, "along today's boundary between the Mediterranean and the
+  Irano-Turanian steppic vegetational belts" — a one-dimensional feature in a two-dimensional landscape.
+  Provisional target **5–12% temperate / 3–10% tropical / 0–2% boreal**, all LOW CONFIDENCE, to be swept.
+- **UNANCHORED — everything else in the table.** The Ginis and autocorrelations above are MEASUREMENTS of
+  what the generator produces, not calibrations against a source. No literature was found reporting a
+  landscape-wide concentration statistic for forager resources. Treat them as a baseline to detect drift
+  against, NOT as validated values.
+
+**`cultivability` IS NEARLY BIMODAL** — median 0.219 but p90 0.995, with 20.8% of land ≥ 0.6. It is
+mostly-bad-or-excellent rather than a gradient, so `settle_persist_threshold` JUMPS rather than glides. If a
+target fraction of ~10% is wanted against a measured 39.6%, the honest instrument is the field's GENERATION,
+not the threshold.
+
+**THE VARIANCE AGENTS ACTUALLY EXPERIENCE IS SOCIAL, NOT ENVIRONMENTAL.** Realised per-agent intake spans p10
+1.36 / p50 2.64 / p90 9.30 — about 7×, far wider than any single resource field. The excess comes from
+rivalrous harvest (`S/n`, §4.5) and the agglomeration exponent (`aggl_beta` = 1.15, §4.8.21), not from the
+land. Any diagnosis of starvation, of the energetic fertility brake, or of the age structure must start
+there; the landscape statistics above are not the cause. See RESULTS Addenda 42–45.
+
 ### §4.4.1 Seasonality (A.1) — `s(t)` harvest multiplier
 Uniform annual cosine `s(t) = s_min + (1−s_min)·½(1+cos(2π·t/12))`, period 12 steps = 1 yr. **`s_min`
 PROVISIONAL** (no lit anchor yet; tied to the deferred climate-season stage CL-1 / Berger insolation). On
