@@ -5,12 +5,12 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-14
+# generated 2026-08-15
 
 [meta]
 name = "hg_villages_off"
 differs_from_canonical = 8
-why = "ARM A, the CORRECTED village ablation, and the CONTROL for hg_densref which differs from it by enable_density_reference alone. The first attempt (hg_settle_off) also switched off enable_agglomeration, enable_aggl_ceiling and enable_catchment_ceiling because their names read as settlement; the charter registry types agglomeration and catchment_ceiling as P = PRODUCTION, so that arm cut the food supply, the population fell 2911 to 135 (107x below the Binford anchor), and the marker gains could not be separated from the loss of 95% of the competition. This arm removes ONLY the settlement lifecycle. NOTE 2026-08-13: regenerated to STATE enable_density_reference = false. The completed run of 2026-08-13 predates the flag and ran with it False by default, so its results remain valid and directly comparable to hg_densref."
+why = "CONTROL for the energetic-refractory pair (hg_refrac, hg_refrac_ema), and the corrected village ablation. Removes ONLY the settlement lifecycle; the first attempt (hg_settle_off) also ablated enable_agglomeration and enable_catchment_ceiling, which the charter registry types as P = PRODUCTION, so that arm cut the food supply and its marker gains were unattributable. REGENERATED 2026-08-14 to state enable_energetic_refractory and enable_density_reference explicitly, so the trio differs by exactly one setting at a time. The 2026-08-14 run at sha dff049f had both flags False by default and remains valid; it is re-run here only so all three arms share one sha."
 # THE DIFFERENCE, stated field by field:
 #   enable_aggregation_sedentism: True -> false
 #   enable_village_budding: True -> false
@@ -68,6 +68,7 @@ enable_emergent_abandonment = true
 enable_emergent_band_size = true
 enable_emergent_village_founding = false
 enable_energetic_fertility = true
+enable_energetic_refractory = false
 enable_exclusive_village_membership = false
 enable_exogamy = true
 enable_forage_cap = true
@@ -290,6 +291,7 @@ polygyny_rate = 0.005
 provision_self_keep = 1.0
 prowess_decay = 0.05
 rank_hierarchy_frac = 0.15
+refractory_stretch_max = 1.436
 regime_amp = 0.0
 regime_duration = 0
 regime_recurrence = 0

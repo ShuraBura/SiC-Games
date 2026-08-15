@@ -98,7 +98,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `nutrition_synergy`, `condition`, `store_anchor`, `storage`, `tier2_shock`, `energetic_fertility`,
   `intake_fertility`
 - **3 Demography** — `orphan_mortality`, `density_disease`, `density_reference`, `terrain_pathogen`, `dependent_load`,
-  `sedentism_fertility`, `life_history`, `malnutrition_fission`
+  `sedentism_fertility`, `energetic_refractory`, `life_history`, `malnutrition_fission`
 - **4 Movement** — `landscape_packing`, `site_appraisal`, `productivity_mobility`
 - **5 Bands** — `band_affiliation`, `dynamic_bands`, `band_family_knobs`, `emergent_band_size`,
   `leader_coherence`, `size_repulsion`, `resource_directed_fusion`, `leaky_assabiyah`,

@@ -150,7 +150,9 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                "enable_village_identity", "enable_bud_requires_occupancy",
                # A model CORRECTION under evaluation: it changes realised mortality in every
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
-               "enable_density_reference"}
+               "enable_density_reference",
+               # A CANDIDATE under evaluation: it changes the fertility of every run (2026-08-14).
+               "enable_energetic_refractory"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

@@ -115,7 +115,9 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                "enable_village_identity", "enable_bud_requires_occupancy",
                # A model CORRECTION under evaluation: it changes realised mortality in every
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
-               "enable_density_reference"}
+               "enable_density_reference",
+               # A CANDIDATE under evaluation: it changes the fertility of every run (2026-08-14).
+               "enable_energetic_refractory"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

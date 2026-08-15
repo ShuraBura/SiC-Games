@@ -846,6 +846,12 @@ def main():
             # changes the realised mortality of EVERY run, so C_ALLON must not take it by side effect.
             # Remove this line when the supervisor adopts it.
             "enable_density_reference",
+            # A CANDIDATE UNDER EVALUATION (2026-08-14). `enable_energetic_refractory` puts the energetic
+            # condition on the LENGTH of lactational amenorrhea, which Addendum 42 showed is the only
+            # fertility term with leverage and Ellison 2008 anchors physiologically. It is measured but NOT
+            # adopted, and `refractory_stretch_max` is a BRACKET ENDPOINT awaiting its sweep. Adopting it by
+            # side effect would change the fertility of every run.
+            "enable_energetic_refractory",
         }
         # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
         # parameters that have to move with the flag for it to mean anything.

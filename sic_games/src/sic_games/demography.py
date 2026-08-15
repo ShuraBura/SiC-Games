@@ -454,6 +454,43 @@ class DemographyConfig(BaseModel):
     # .eta_juvenile_exponent` — see config.py; do not document the anchor twice). 1.0 = the original linear
     # juvenile production ramp, bit-exact. >1 bends it toward Kaplan 2000's convex curve.
     lh_eta_juvenile_exponent: float = Field(1.0, gt=0.0)
+    # ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ──
+    # WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 established the identity
+    #     TFR = span / (refractory + 1/(fecundability x brake))
+    # which reproduces both measured arms to within 1%. The existing brake multiplies `fecundability`, and
+    # 1/(fecundability x brake) is only 22% of the birth interval — so even at its ABSOLUTE ceiling (measured
+    # mean factor 0.767 over 240 steps and 331 women) it reaches TFR 7.93 where about 4.5 is needed. The
+    # REFRACTORY is the term with leverage, and it is also the correct physiology: lactational amenorrhea IS
+    # the refractory period.
+    #
+    # THE MECHANISM IS ANCHORED, NOT ASSUMED. Ellison 2008 (PaleoAnthropology 2008:172-200, filed) reports for
+    # the Toba that C-peptide rises in the one to two months before menstruation resumes, correlates with
+    # maternal weight and urinary estrogen, and shows "no correlations ... with any indices of nursing pattern
+    # or frequency" [VERIFIED VERBATIM]. So ENERGY sets the length of amenorrhea and suckling frequency does
+    # not — the competing pathway is ruled out in the same dataset.
+    #
+    # IT COMPOSES WITH `enable_sedentism_fertility` RATHER THAN FIGHTING IT. Sedentism sets the BASE refractory
+    # (SEDENTISM_IBI_MONTHS: 30 egalitarian → 22 complex, storable weaning foods shorten it); energy STRETCHES
+    # whatever base applies. A sedentary woman who is hungry should still space births further than a sedentary
+    # woman who is not, and multiplying leaves both mechanisms independently ablatable.
+    #
+    # NO NEW THRESHOLD. The energy signal is read through the SAME FAO/IOM window `[intake_fert_lo,
+    # intake_fert_hi]` = [1.0, 1.2] the fecundability brake already uses (pregnancy +11%, lactation +20%).
+    #
+    # THE STRETCH IS A FILED RATIO, AND IT IS A BRACKET. Hill & Hurtado Table 8.2 gives realised IBI across
+    # three Aché periods: 34.4 reservation / 37.6 forest / 49.4 contact [VERIFIED]. The default 1.436 is
+    # 49.4/34.4 — the full span of that filed range, i.e. the most a real Aché population's spacing is
+    # observed to move. It is a BRACKET ENDPOINT to sweep, NOT a fitted value, and the contact period carries
+    # disease and social disruption as well as energy stress, so the true energy-only span is probably
+    # SMALLER. Sweep downward from here; do not adopt 1.436 because a run happens to like it.
+    enable_energetic_refractory: bool = False
+    refractory_stretch_max: float = Field(1.436, ge=1.0)   # x base refractory at zero energy surplus
+    #   [PROVISIONAL — a BRACKET ENDPOINT awaiting its sweep, not a fitted value. Hill & Hurtado 1996
+    #   Table 8.2: 49.4/34.4 = the full filed span of Aché realised IBI across the forest, contact and
+    #   reservation periods. Sweep DOWNWARD from here: the contact period carries disease and social
+    #   disruption as well as energy stress, so the energy-only span is probably smaller, and applying the
+    #   ratio to the REFRACTORY while the anchor sits on the realised INTERVAL overshoots the filed maximum
+    #   by ~2 months (measured: implied IBI spans 38.3 to 51.4 against a filed 34.4 to 49.4).]
     intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
     intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
     #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
@@ -1969,6 +2006,24 @@ SEDENTISM_IBI_MONTHS = {
 def sedentism_ibi(society: str | None, base: int) -> int:
     """Society-dependent lactational refractory (NDT). Unknown/None → the base (config) value."""
     return SEDENTISM_IBI_MONTHS.get(society, base)
+
+
+def energetic_refractory(base_months: float, intake_ratio: float, cfg: DemographyConfig) -> float:
+    """Stretch a lactational refractory by the energy shortfall. See `enable_energetic_refractory`.
+
+        f = clamp((intake − lo) / (hi − lo), 0, 1)        0 at maintenance, 1 at full reproductive capacity
+        refractory = base × (1 + (stretch_max − 1)·(1 − f))
+
+    `f` uses the FAO/IOM window the fecundability brake already reads, so no new threshold is introduced.
+    `base` is whatever `sedentism_ibi` returned, so this composes with the NDT mechanism instead of
+    overriding it. At full energy the function is the IDENTITY — that is what keeps the flag bit-exact when
+    every woman is well fed, and it is also why the mechanism can only ever LENGTHEN spacing, never shorten
+    it below the society's own base.
+    """
+    span = cfg.intake_fert_hi - cfg.intake_fert_lo
+    f = 1.0 if span <= 0.0 else (intake_ratio - cfg.intake_fert_lo) / span
+    f = 0.0 if f < 0.0 else (1.0 if f > 1.0 else f)
+    return base_months * (1.0 + (cfg.refractory_stretch_max - 1.0) * (1.0 - f))
 
 
 def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig) -> bool:

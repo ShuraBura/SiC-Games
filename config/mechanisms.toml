@@ -107,6 +107,34 @@ type  = "bool"
 # juvenile eta ramp against Kaplan's production/consumption curves (foragers do not break even until
 # ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
 
+[enable_energetic_refractory]
+value = false
+owner = "DemographyConfig"
+type  = "bool"
+# ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ──
+# WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 established the identity TFR = span /
+# (refractory + 1/(fecundability x brake)) which reproduces both measured arms to within 1%. The existing
+# brake multiplies `fecundability`, and 1/(fecundability x brake) is only 22% of the birth interval — so
+# even at its ABSOLUTE ceiling (measured mean factor 0.767 over 240 steps and 331 women) it reaches TFR
+# 7.93 where about 4.5 is needed. The REFRACTORY is the term with leverage, and it is also the correct
+# physiology: lactational amenorrhea IS the refractory period. THE MECHANISM IS ANCHORED, NOT ASSUMED.
+# Ellison 2008 (PaleoAnthropology 2008:172-200, filed) reports for the Toba that C-peptide rises in the
+# one to two months before menstruation resumes, correlates with maternal weight and urinary estrogen, and
+# shows "no correlations ... with any indices of nursing pattern or frequency" [VERIFIED VERBATIM]. So
+# ENERGY sets the length of amenorrhea and suckling frequency does not — the competing pathway is ruled
+# out in the same dataset. IT COMPOSES WITH `enable_sedentism_fertility` RATHER THAN FIGHTING IT.
+# Sedentism sets the BASE refractory (SEDENTISM_IBI_MONTHS: 30 egalitarian → 22 complex, storable weaning
+# foods shorten it); energy STRETCHES whatever base applies. A sedentary woman who is hungry should still
+# space births further than a sedentary woman who is not, and multiplying leaves both mechanisms
+# independently ablatable. NO NEW THRESHOLD. The energy signal is read through the SAME FAO/IOM window
+# `[intake_fert_lo, intake_fert_hi]` = [1.0, 1.2] the fecundability brake already uses (pregnancy +11%,
+# lactation +20%). THE STRETCH IS A FILED RATIO, AND IT IS A BRACKET. Hill & Hurtado Table 8.2 gives
+# realised IBI across three Aché periods: 34.4 reservation / 37.6 forest / 49.4 contact [VERIFIED]. The
+# default 1.436 is 49.4/34.4 — the full span of that filed range, i.e. the most a real Aché population's
+# spacing is observed to move. It is a BRACKET ENDPOINT to sweep, NOT a fitted value, and the contact
+# period carries disease and social disruption as well as energy stress, so the true energy-only span is
+# probably SMALLER. Sweep downward from here; do not adopt 1.436 because a run happens to like it.
+
 [enable_sedentism_fertility]
 value = true
 owner = "DemographyConfig"

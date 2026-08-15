@@ -57,7 +57,7 @@ from sic_games.agents.strategies.carbon import CarbonDecision
 from sic_games.agents.traits import TraitVector
 from sic_games.config import KcalEconomyConfig, LifeHistoryConfig, SubstrateConfig
 from sic_games.demography import (
-    DemographyConfig, MONTHS_PER_YEAR, density_mult, energetic_fertility_factor, is_fertile, sedentism_ibi,
+    DemographyConfig, MONTHS_PER_YEAR, density_mult, energetic_fertility_factor, energetic_refractory, is_fertile, sedentism_ibi,
     pathogen_mult, risk_mult, synergy_mult,
     society_from_character, SOCIETY_PRESETS, leader_society_weight, size_repulsion, mate_ascribed_weight,
     mobility_radius, footprint_radius,
@@ -2176,7 +2176,10 @@ class TerrainWorld(mesa.Model):
         # ablatable (flip either flag alone) while sharing one signal, not two parallel computations of it.
         mobility_wants_intake = (demog is not None and getattr(demog, "enable_productivity_mobility", False)
                                   and getattr(demog, "mobility_pressure_source", "npp") == "intake")
-        intake_signal_on = intake_fert_on or mobility_wants_intake
+        # The energetic refractory reads the same intake EMA, so it must also switch the signal on — a
+        # mechanism gated on a signal nobody computes is the "ON but dead" failure this project keeps finding.
+        refrac_on = demog is not None and getattr(demog, "enable_energetic_refractory", False)
+        intake_signal_on = intake_fert_on or mobility_wants_intake or refrac_on
         i_alpha = demog.intake_ema_alpha if intake_signal_on else 0.0
         i_menarche = demog.menarche_months if intake_signal_on else 0
         dep_load = {}
@@ -2493,13 +2496,26 @@ class TerrainWorld(mesa.Model):
                             return True
             return False
         sed_fert = getattr(cfg, "enable_sedentism_fertility", False)   # NDT: society-dependent birth-spacing
+        # Resolved here as well as in `_step_rivalrous` (which uses it to switch the intake EMA on) because
+        # the two live in different methods; a name defined in one is not visible in the other.
+        refrac_on = getattr(cfg, "enable_energetic_refractory", False)
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
                 continue
-            if sed_fert:
-                soc = self._band_society.get(a._group.band_id) or self._cell_society.get(a.pos)
-                ibi_m = sedentism_ibi(soc, cfg.ibi_refractory_months)   # sedentary/complex → shorter IBI → higher fertility
+            # THE REFRACTORY, resolved in one place so the two mechanisms COMPOSE instead of racing.
+            # `sedentism_ibi` sets the society BASE (30 egalitarian → 22 complex); `energetic_refractory`
+            # then STRETCHES whatever base applies by the woman's own energy shortfall. Written as a single
+            # expression because the previous shape — an if/elif with the eligibility test duplicated in each
+            # branch — is how a third mechanism would end up applied on one path and not the other.
+            if refrac_on or sed_fert:
+                if sed_fert:
+                    soc = self._band_society.get(a._group.band_id) or self._cell_society.get(a.pos)
+                    ibi_m = float(sedentism_ibi(soc, cfg.ibi_refractory_months))
+                else:
+                    ibi_m = float(cfg.ibi_refractory_months)
+                if refrac_on:
+                    ibi_m = energetic_refractory(ibi_m, a._intake_ema, cfg)
                 if not (cfg.menarche_months <= a.age < cfg.menopause_months and a.months_since_birth >= ibi_m):
                     continue
             elif not is_fertile(a.age, a.months_since_birth, cfg):

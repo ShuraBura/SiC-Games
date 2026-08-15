@@ -74,6 +74,9 @@ TYPES = {
     "enable_leader_office": "A", "enable_leader_coherence": "A", "enable_band_family_knobs": "A",
     "enable_orphan_mortality": "N", "enable_energetic_fertility": "N", "enable_sedentism_fertility": "N",
     "enable_intake_fertility": "N",   # same vital-rate type as the reserve-based branch it supersedes
+    # Energy modulates the LENGTH of lactational amenorrhea (Ellison 2008, Toba C-peptide). Same vital-rate
+    # type as the fecundability brake it complements -- it changes a birth RATE, not a graph or a pool.
+    "enable_energetic_refractory": "N",
     "enable_dependent_load": "N",     # widens the intake-fertility denominator by the juveniles' unmet need
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
@@ -210,6 +213,9 @@ PREREQ = {
     "enable_catchment_ceiling": ("enable_aggregation_sedentism",),
     "enable_settlement_scalar_stress": ("enable_aggregation_sedentism",),
     "enable_sedentism_fertility": ("enable_aggregation_sedentism",),
+    # It reads the intake EMA, which only the demographic stage maintains; and it MULTIPLIES whatever base
+    # sedentism_ibi returns, so it composes with the NDT mechanism rather than requiring it.
+    "enable_energetic_refractory": ("enable_bonded_mating",),
     "enable_adaptive_connubium": ("enable_pair_bonds",), "enable_marriage_aggregation": ("enable_pair_bonds",),
     "enable_bonded_mating": ("enable_pair_bonds",), "enable_exogamy": ("enable_band_affiliation",),
     "enable_emergent_band_size": ("enable_band_affiliation",), "enable_dynamic_bands": ("enable_band_affiliation",),
