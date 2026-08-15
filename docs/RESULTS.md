@@ -6565,4 +6565,66 @@ divergence seen on the 400-step run was the diagnostic working, not an artefact.
 
 ---
 
+## Addendum 45 — The refractory lever works, and delivers a tenth of what is needed (2026-08-15, R-106)
+
+**THE TRIO.** Three arms at one sha (96caab9), 15,000 steps, differing by ONE setting at a time. Control =
+`hg_villages_off`; `hg_refrac` adds `enable_energetic_refractory`; `hg_refrac_ema` adds the Ellison-anchored
+one-month EMA half-life (`intake_ema_alpha` 0.04 → 0.5) on top.
+
+| marker | control | +refractory | +refractory & EMA | anchor |
+|---|---|---|---|---|
+| realised TFR | 8.372 | 8.355 | **8.005** | [4.69, 8.03] |
+| cohort parity | 8.46 | 8.57 | 8.12 | — |
+| realised IBI mean | 38.0 | 38.1 | **39.5** | — |
+| e0 | 17.87 | 17.90 | **18.35** | [21, 37] |
+| l(15) | 0.424 | 0.426 | **0.434** | 0.66 |
+| starvation share | 0.364 | 0.362 | **0.352** | — |
+| markers in band | 3/16 | 3/16 | **4/16** | — |
+
+**PREDICTION 1 CONFIRMED — the mechanism alone does nothing.** `hg_refrac` moved TFR by 0.017 and e0 by 0.03,
+i.e. nothing. The shipped 17-month EMA smooths away the very signal the mechanism reads. This was stated
+before the run.
+
+**PREDICTION 2 CONFIRMED — the Ellison timescale is what makes it live.** With the one-month half-life, the
+fraction of women below the FAO/IOM window rises **0.0195 → 0.0476**, realised IBI mean rises 38.0 → 39.5
+months, and **`realised_tfr` crosses from OUT-OF-BAND into PASS** (8.005 against a [4.69, 8.03] band). That
+is the first marker this mechanism has brought into band, and it is attributable to the TIMESCALE rather than
+to the mechanism, because the two arms separate them.
+
+**PREDICTION 3 CONFIRMED, WEAKLY — e0 rose.** 17.87 → 18.35, **+0.48 yr**, with l(15) 0.424 → 0.434 and the
+starvation share falling 0.364 → 0.352. The direction is exactly what Addendum 44's Malthusian reading
+requires: lower fertility → lower equilibrium density → less starvation → longer life. **Addendum 44 STANDS.**
+The refrac-only arm moved e0 by 0.03, so the EMA arm's 0.48 is roughly sixteen times that noise floor — but
+this is ONE SEED and the claim deserves replication before it is leaned on.
+
+**THE MAGNITUDE IS ABOUT A TENTH OF WHAT IS NEEDED.** The iso-growth identity requires TFR ≈ 5.45 at this
+l(15); the mechanism delivers 8.005. The iso-growth gap barely moves (+1.56 → +1.49 percentage points). e0
+needs +19 years and gains 0.48.
+
+**WHY, AND IT IS THE SAME REASON AS EVERY PREVIOUS FAILURE.** Even with the anchored fast EMA, only **4.8% of
+women fall below the physiological window**. The other 95% get no stretch at all, because the median woman
+takes in **2.85x her requirement**. The lever is correctly built, correctly anchored and correctly wired, and
+it has almost nothing to act on.
+
+**FOUR MECHANISMS ARE NOW DEAD FOR ONE REASON.** `enable_energetic_fertility` (the reserve saturates at its
+cap), `enable_intake_fertility` (the intake ratio sits at 2.6-3.4x the window), `enable_nutrition_synergy`
+(body condition pins at 1.0 — see Addendum 44, where this was first misreported as inertness and corrected to
+world-dependence), and now `enable_energetic_refractory`. Every energetically-gated mechanism in the model is
+silenced by the same fact: **the world feeds almost everyone above the level at which any energetic signal
+carries information.**
+
+**SO THE ARC RETURNS TO WHERE THE SUPERVISOR PUT IT ON DAY ONE** — *"either our bands are idiots and settle
+too easy or this world is too abundant"* (2026-08-12). Task #65 measured the first half then: 40% of habitable
+land passes the village-site test, because `settle_persist_threshold` sits at the MEDIAN of S_pot. This
+addendum measures the second half from the demographic side: the median agent eats ~2.85x maintenance, and
+that single fact has now defeated four separate mechanisms and every mortality fix attempted since Addendum
+42. **The productivity question is no longer deferrable; it is the binding constraint on the whole
+demographic layer.**
+
+**WHAT IS NOT CLAIMED.** That `refractory_stretch_max = 1.436` is right — it is a bracket endpoint and was
+never swept, because the mechanism turned out to be signal-limited rather than magnitude-limited. Sweeping it
+before fixing the supply would be tuning a lever that is not attached to anything.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
