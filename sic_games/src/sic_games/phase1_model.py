@@ -1500,6 +1500,23 @@ class TerrainWorld(mesa.Model):
         # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
         cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
         fcap = self._forage_cap_field() if cap_on else None
+        # R-106 (2026-08-15): the CLAIM WEIGHT on the cell split. `need` claims in proportion to what an
+        # occupant needs (Kaplan 2000); `eta_w` claims in proportion to what an occupant can actually
+        # harvest. Both OFF ⇒ `_claim()` returns None ⇒ the historical S/n split, bit-exact. See
+        # `DemographyConfig.enable_need_weighted_shares` for why an age-blind split produces the age-blind
+        # excess hazard that holds e15 at 16 against a forager anchor of ~35.
+        need_w = self._demog is not None and getattr(self._demog, "enable_need_weighted_shares", False)
+        eta_w = self._demog is not None and getattr(self._demog, "enable_eta_weighted_shares", False)
+
+        def _claim(occ_c):
+            """Per-occupant claim weight, or None for the historical even split."""
+            if need_w and eta_w:
+                return [a.consumption_factor() * a.eta() for a in occ_c]
+            if need_w:
+                return [a.consumption_factor() for a in occ_c]
+            if eta_w:
+                return [a.eta() for a in occ_c]
+            return None
         # Stage 1b terrain move cost: perceived in IFD (move_cost_field) + drained at metabolism for movers. Off ⇒ None.
         tmc_on = self._demog is not None and getattr(self._demog, "enable_terrain_move_cost", False)
         mcf = self._move_cost_field() if tmc_on else None
@@ -1819,7 +1836,10 @@ class TerrainWorld(mesa.Model):
             idx = [i for i, e in enumerate(mask) if not e]
             if not idx:
                 return [0.0] * len(occ_c)
-            sub = compute_harvest_shares([occ_c[i] for i in idx], total, kap, phi_eps)
+            sub_occ = [occ_c[i] for i in idx]
+            # The claim weight must be subset the SAME way, or the excluded juveniles' weights would be
+            # charged against foragers who are not in `sub_occ` and Σ shares would no longer be `total`.
+            sub = compute_harvest_shares(sub_occ, total, kap, phi_eps, claim=_claim(sub_occ))
             out = [0.0] * len(occ_c)
             for j, i in enumerate(idx):
                 out[i] = sub[j]
@@ -1880,13 +1900,17 @@ class TerrainWorld(mesa.Model):
                     meat_pool = math.exp(self.random.normalvariate(math.log(meat_pool) - 0.5 * sig * sig, sig))
                 # ENERGY CONSERVATION: the forage stream is the COMPLEMENT of the same `mf_c` used for the meat
                 # pool. If these two ever read different fractions the cell silently creates or destroys kcal.
+                # The SAME claim weight goes on BOTH streams. Weighting one and not the other would make the
+                # forage and meat splits disagree about who is present, which is the same class of error the
+                # `mf_c` energy-conservation note above guards against.
+                cl = _claim(occ)
                 f_sh = (_forage_excl(occ, (1.0 - mf_c) * S, 0.0, excl_mask) if excl_mask
-                        else compute_harvest_shares(occ, (1.0 - mf_c) * S, 0.0, phi_eps))
-                m_sh = compute_harvest_shares(occ, meat_pool, kappa_cell, phi_eps)
+                        else compute_harvest_shares(occ, (1.0 - mf_c) * S, 0.0, phi_eps, claim=cl))
+                m_sh = compute_harvest_shares(occ, meat_pool, kappa_cell, phi_eps, claim=cl)
                 shares = [f + m for f, m in zip(f_sh, m_sh)]
             else:
                 shares = (_forage_excl(occ, S, kappa_cell, excl_mask) if excl_mask
-                          else compute_harvest_shares(occ, S, kappa_cell, phi_eps))
+                          else compute_harvest_shares(occ, S, kappa_cell, phi_eps, claim=_claim(occ)))
             if cap_on and fcap is not None:
                 # PER-PERSON FORAGE CAP: a forager harvests at most forage_kcal·work_hours (the biome return-rate);
                 # the surplus of a lightly-occupied cell is UNharvested (removes the S/n lone-agent over-reward).

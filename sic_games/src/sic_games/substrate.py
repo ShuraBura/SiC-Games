@@ -47,19 +47,51 @@ def compute_harvest_shares(
     S: float,
     kappa: float,
     phi_epsilon: float,
+    claim: list[float] | None = None,
 ) -> list[float]:
-    """Return per-occupant shares of S (Σ shares == S). See module docstring."""
+    """Return per-occupant shares of S (Σ shares == S). See module docstring.
+
+    `claim` is an optional per-occupant CLAIM WEIGHT applied before the κ contest. `claim=None` is the
+    historical split and is reproduced bit-exact, so every prior result stands and the vectorised
+    `soa_tier1.harvest_split_segment` equivalence holds unchanged.
+
+    WHY A CLAIM WEIGHT EXISTS (R-106, 2026-08-15). The flat branch gives every occupant S/n regardless of
+    age. 59% of a canonical population is under 15, so a newborn claims exactly what a 30-year-old hunter
+    claims. The realised hazard is then FLAT at ~0.06/yr from age 1 to 60 — crowding starves a prime adult
+    at the same rate as a child — against a Siler intrinsic hazard of 0.0141/yr at age 30. An age-blind
+    split is the only term in the model that can produce an age-blind excess hazard.
+
+    The caller supplies the weight; this function does not decide what a claim should be. Two candidates
+    live in `DemographyConfig`: `enable_need_weighted_shares` (claim ∝ consumption_factor, Kaplan 2000
+    net-consumer childhood) and `enable_eta_weighted_shares` (claim ∝ η, a person claims what they can
+    actually harvest). They are separate flags because they are separate assertions about the world.
+    """
     n = len(occupants)
     if n == 0:
         return []
-    if kappa == 0.0 or n == 1:
+    if claim is None:
+        if kappa == 0.0 or n == 1:
+            base = S / n
+            return [base] * n
+        weights = [
+            base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
+            for a in occupants
+        ]
+    elif kappa == 0.0:
+        weights = list(claim)
+    else:
+        # MULTIPLICATIVE composition: the claim scales the contest rather than replacing it, so the Carbon
+        # κ-contest keeps its ordering within an age class and κ=0 stays the pure claim split.
+        weights = [
+            c * (base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0)
+            for c, a in zip(claim, occupants)
+        ]
+    wsum = sum(weights)
+    if wsum <= 0.0:
+        # Degenerate claim (every weight zero): fall back to the even split rather than divide by zero.
+        # Σ shares == S must hold in EVERY branch — a cell that silently returned zeros would destroy kcal.
         base = S / n
         return [base] * n
-    weights = [
-        base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
-        for a in occupants
-    ]
-    wsum = sum(weights)
     return [S * w / wsum for w in weights]
 
 

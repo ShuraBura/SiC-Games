@@ -90,8 +90,10 @@ def run(demog, scale=None, seed_scale=None, npp_scale=None, update=None):
 
     pools: list[float] = []
     real = phase1_model.compute_harvest_shares
-    phase1_model.compute_harvest_shares = lambda occ, tot, kap, eps=0.0: (pools.append(tot),
-                                                                          real(occ, tot, kap, eps))[1]
+    # `claim` (R-106 2026-08-15) MUST be forwarded, not swallowed: a spy that dropped it would silently
+    # measure the flat split while the model under test ran the claim-weighted one.
+    phase1_model.compute_harvest_shares = lambda occ, tot, kap, eps=0.0, claim=None: (
+        pools.append(tot), real(occ, tot, kap, eps, claim=claim))[1]
     try:
         traj = []
         for _ in range(STEPS):

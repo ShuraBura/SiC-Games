@@ -670,17 +670,58 @@ type  = "bool"
 # Default OFF ⇒ legacy S/n ⇒ bit-exact. (v2: × age-skill curve + cred-transmitted embodied capital —
 # Walker 2002 / Gurven 2006 / Koster 2020, pending fetch.)
 
+[enable_need_weighted_shares]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# ── THE CLAIM WEIGHT ON THE CELL SPLIT (R-106, 2026-08-15) ────────────────────────────────────────────
+# THE DEFECT. `compute_harvest_shares` gives every occupant S/n at κ=0. 59% of a canonical population is
+# under 15 (measured age_0_5 26.0%, age_5_15 33.2%), so a newborn claims exactly what a 30-year-old hunter
+# claims. The consequence is measurable and it is the reason the demography will not move: the realised
+# hazard is FLAT at ~0.06/yr from age 1 to 60 (m_1_5 0.069, m_5_15 0.057, m_15_30 0.060, m_30_45 0.059,
+# m_45_60 0.064) while Siler ACHE_FOREST gives 0.0141/yr at age 30. An excess of ~0.045/yr that does not
+# vary with age cannot come from starvation, which kills the small and the old first. It comes from an
+# age-blind split. This also resolves the paradox that the median agent eats 2.8× requirement while
+# starv_share is 0.51: only ~3% sit below the floor at any instant, and the flux through that state
+# carries the deaths at every age at once. TWO SEPARATE ASSERTIONS, TWO FLAGS. Measure each alone. Turning
+# both on first is how one fails to learn which worked. Both default OFF only so the pre-fix split stays
+# runnable as the negative control; the adoption decision is made on measurement in the same session,
+# never deferred.
+
+[enable_eta_weighted_shares]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# Claim ∝ `consumption_factor(a)` — a person claims in proportion to what they need. [ANCHORED — Kaplan
+# 2000, already the citation on `BaseAgent.consumption_factor`: human childhood is a long net CONSUMER
+# period subsidised by adult production. The model already holds the number and throws it away at the one
+# place that decides who eats.] Introduces NO new parameter: the ramp is the existing cons_min 0.3 → 1.0
+# over forage_age_min. Population-mean consumption_factor over the measured age structure is ~0.771, so an
+# adult share rises ~1.30×.
+
 [enable_bonded_mating]
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force
-# packing; superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire
-# the morph on their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.) F.1 bonded
-# mating (emergent bands via SELECTION): a female reproduces only if her cell has a co-resident adult male
-# who is NOT her own son (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and the
-# population concentrates in bands by selection (not navigation). Default OFF = asexual/female-only
-# (R-18/19).
+# Claim ∝ `eta(a)` — a person claims what they can actually harvest. The module contract in substrate.py
+# states shares are PRE-efficiency and the caller applies η when banking, so today a juvenile removes a
+# full adult share from the pool and converts only η of it (phase1_model `intake = a.eta() * sh`).
+# Population-mean η over the measured age structure is ~0.737, so ~26% of every cell pool is claimed by
+# someone who cannot take it. Introduces NO new parameter: the ramp is the existing eta_min 0.2 → 1.0.
+# [DERIVED from the existing η contract, not a new anchor.] WHEN BOTH ARE ON the weights MULTIPLY (claim
+# what you can take, scaled to what you need). That is a THIRD condition with its own size, so it is
+# reported as its own arm and never as evidence for either. The κ contest composes on top of the claim in
+# every case, so Carbon keeps its ordering within an age class and κ=0 stays the pure claim split. THE
+# FORAGE CAP DOES NOT NULLIFY THIS, and the reason decides whether the mechanism can work at all:
+# `enable_forage_cap` clips the FORAGE stream only, while the meat stream (game_meat_frac 0.55) is split
+# flat and uncapped. And in the crowded cells where agents actually die, S/n is far below the cap. The cap
+# binds in rich empty cells; the claim weight bites in the starving ones. (storage_tether_reserves RETIRED
+# 2026-06-29 — the band-aid that froze stocked bands in place to force packing; superseded by the
+# emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on their own. See
+# MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.) F.1 bonded mating (emergent bands via
+# SELECTION): a female reproduces only if her cell has a co-resident adult male who is NOT her own son
+# (kin-avoidance) — a LONER cannot reproduce, so loner lineages die out and the population concentrates in
+# bands by selection (not navigation). Default OFF = asexual/female-only (R-18/19).
 
 [enable_pair_bonds]
 value = true

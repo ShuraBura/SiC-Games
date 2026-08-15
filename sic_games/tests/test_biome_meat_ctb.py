@@ -164,9 +164,9 @@ def test_energy_is_conserved_per_cell(demog, monkeypatch):
     seen: list[float] = []
     real = phase1_model.compute_harvest_shares
 
-    def spy(occ, total, kappa, phi_eps=0.0):
+    def spy(occ, total, kappa, phi_eps=0.0, claim=None):
         seen.append(total)
-        return real(occ, total, kappa, phi_eps)
+        return real(occ, total, kappa, phi_eps, claim=claim)
 
     monkeypatch.setattr(phase1_model, "compute_harvest_shares", spy)
     w = build(demog, enable_biome_meat_frac=True, enable_biome_meat_cv=False, game_meat_cv=0.0)

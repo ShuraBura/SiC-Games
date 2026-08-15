@@ -70,9 +70,9 @@ def _cell_pools(monkeypatch, world):
     seen: list = []
     real = phase1_model.compute_harvest_shares
 
-    def spy(occ, total, kappa, phi_eps=0.0):
+    def spy(occ, total, kappa, phi_eps=0.0, claim=None):
         seen.append(total)
-        return real(occ, total, kappa, phi_eps)
+        return real(occ, total, kappa, phi_eps, claim=claim)
 
     monkeypatch.setattr(phase1_model, "compute_harvest_shares", spy)
     world._settlement_carrying_capacity = lambda site: CAP        # a known ceiling, so the assertion is exact

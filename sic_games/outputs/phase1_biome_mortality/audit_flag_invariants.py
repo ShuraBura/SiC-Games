@@ -41,6 +41,12 @@ TYPES = {
     # and the variance of the meat half, not the size of the pool. Neither carries its own magnitude — each
     # reads an anchored dict (terrain.MEAT_FRAC / terrain.MEAT_CV), so there is no knob to sit at neutral.
     "enable_biome_meat_frac": "P", "enable_biome_meat_cv": "P",
+    # THE CLAIM WEIGHT on the cell split (R-106, 2026-08-15). Typed P for the same reason the two biome-meat
+    # flags above are: each changes WHO GETS WHAT out of the cell pool, never the size of the pool. Sigma
+    # shares == S is asserted in every branch of `compute_harvest_shares`, so neither can create or destroy
+    # kcal. Neither carries its own magnitude -- `need` reads the existing consumption_factor ramp and `eta`
+    # the existing eta ramp, so there is no knob that can sit at neutral and no invented number.
+    "enable_need_weighted_shares": "P", "enable_eta_weighted_shares": "P",
     "enable_catchment_ceiling": "P", "enable_resource_storability": "P", "enable_improved_land": "P",
     "enable_alluvial_renewal": "P",
     "enable_soil_depletion": "D",

@@ -96,7 +96,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `alluvial_renewal`, `resource_storability`
 - **2 Energetics** — `game`, `biome_meat_frac`, `biome_meat_cv`, `forage_cap`, `provisioning`,
   `nutrition_synergy`, `condition`, `store_anchor`, `storage`, `tier2_shock`, `energetic_fertility`,
-  `intake_fertility`
+  `intake_fertility`, `need_weighted_shares`, `eta_weighted_shares`
 - **3 Demography** — `orphan_mortality`, `density_disease`, `density_reference`, `terrain_pathogen`, `dependent_load`,
   `sedentism_fertility`, `energetic_refractory`, `life_history`, `malnutrition_fission`
 - **4 Movement** — `landscape_packing`, `site_appraisal`, `productivity_mobility`
