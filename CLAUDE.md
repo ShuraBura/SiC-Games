@@ -115,6 +115,34 @@ whose docstring states that every other test in the file is void if that control
   that breaks collection otherwise.
 - Every mechanism is a **flag, default OFF, bit-exact when off**, with its magnitude beside it. A boolean flip
   without its magnitude is not enabling a mechanism (R-85c).
+- **DEFAULT-OFF IS FOR REPRODUCIBILITY, NOT FOR DEFERRING A DECISION.** The dataclass default stays `False` so
+  every historical run reproduces bit-exactly. The CANONICAL STACK is a separate question, and the standing
+  rule there is the opposite: *every BUILT mechanism runs unless it is off for an ablation*. So a new mechanism
+  belongs in `C_ALLON` unless there is a STATED reason it must not be — a genuine alternative to something else
+  already on, or a known-broken candidate. **A correction to a defect is never flagged off**; the
+  carrying-capacity ceiling bug (2026-08-14) was fixed directly with no flag, and flagging an equally clear
+  correction beside it is simply inconsistent. Added 2026-08-15 after the supervisor challenge *"you build
+  stuff, flag them off, then wonder why things don't work"* — four mechanisms built that week had been parked
+  in the `C_ALLON` skip set for no stated reason, so every arm run that week silently tested the OLD behaviour.
+  The audit that created `C_ALLON` found **27 of 79 flags dark and nobody knew**; adding to that pile is the
+  failure it exists to prevent.
+- **EVERY REPORT CARRIES THE DEMOGRAPHY PANEL.** Adopted 2026-08-15 by the supervisor. Any report of a run,
+  an arm, a comparison or a finding must present the demographic benchmarks alongside whatever it is actually
+  about — not a summary verdict, the numbers, each against its filed band:
+  **age structure** (`frac_child`, `dependency_ratio` split into child and old-age, the seven age bands),
+  **sex** (`sex_ratio_m_f`, `srb_male_frac`, sex-specific `e0`/`e15`),
+  **mortality** (`e15` as the headline — NOT `e0`, which cannot separate a forager from an 18th-century Swede
+  — plus `surv_to_15`, `surv_to_45`, `modal_adult_death`, and mortality by age band),
+  **fertility** (`realised_tfr` against completed cohort parity, `realised_ibi_med`, `age_first_birth_yr`),
+  **families** (`frac_both_parents_alive`, `frac_double_orphan`, `frac_never_partnered_30`,
+  `frac_widowed_adult`, `frac_partnered_adult`),
+  **group size** (`band_med_adults` — Hill's 28.2 anchor is ADULTS, never all-ages),
+  and the **iso-growth consistency check** (does the arm's own TFR and l(15) permit its measured r?).
+  `demography_health()` computes all of it and returns a verdict line; there is no excuse for a report that
+  omits it. WHY: social dynamics are built on the age-sex structure, so a marker read on a skewed population
+  is not a result. `band_med` 23 read as a PASS against Birdsell's ~25 on a population that was 54% children
+  — about 11 adults against an anchor of 28.2 — and `MARKER_MATRIX.md` had already recorded that failure
+  before it recurred.
 - A calibrated value has ONE home. Docs cite the config field by name; they do not restate the number
   (charter §11 P1).
 - Long runs must be launched from a **clean tree** — `meta.tree_dirty` gates every harness, and an edit

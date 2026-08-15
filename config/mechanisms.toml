@@ -108,7 +108,7 @@ type  = "bool"
 # ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
 
 [enable_energetic_refractory]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ──
@@ -203,7 +203,7 @@ type  = "bool"
 # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
 
 [enable_density_reference]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ────────────────────────────────────────

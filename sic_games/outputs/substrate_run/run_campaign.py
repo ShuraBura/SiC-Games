@@ -845,13 +845,22 @@ def main():
             # already hold and this one silently broke. It is measured and principled, but adopting it
             # changes the realised mortality of EVERY run, so C_ALLON must not take it by side effect.
             # Remove this line when the supervisor adopts it.
-            "enable_density_reference",
-            # A CANDIDATE UNDER EVALUATION (2026-08-14). `enable_energetic_refractory` puts the energetic
-            # condition on the LENGTH of lactational amenorrhea, which Addendum 42 showed is the only
-            # fertility term with leverage and Ellison 2008 anchors physiologically. It is measured but NOT
-            # adopted, and `refractory_stretch_max` is a BRACKET ENDPOINT awaiting its sweep. Adopting it by
-            # side effect would change the fertility of every run.
-            "enable_energetic_refractory",
+            #
+            # `enable_density_reference` AND `enable_energetic_refractory` WERE REMOVED FROM THIS LIST on
+            # 2026-08-15, by supervisor challenge: "you build stuff, flag them off, then wonder why things
+            # don't work." Both had been parked here reflexively rather than for a stated reason.
+            #   density_reference is a BUG FIX -- density_mult lacked the reference normalisation that
+            #     risk_mult and pathogen_mult both hold. The carrying-capacity ceiling bug of 2026-08-14 was
+            #     fixed DIRECTLY with no flag at all, so flagging an equally clear correction was simply
+            #     inconsistent.
+            #   energetic_refractory is anchored (Ellison 2008, Toba C-peptide) and brought realised_tfr
+            #     INTO band. A mechanism that moves a marker into band should not sit dark because a bracket
+            #     endpoint has not been swept yet; the sweep is a refinement, not a precondition.
+            # THE STANDING RULE THIS RESTORES is the one at the head of this block: every BUILT mechanism
+            # runs unless it is off for an ablation. This list is for genuine ALTERNATIVES and KNOWN-BROKEN
+            # candidates -- not a place to defer a decision the evidence already supports. The audit that
+            # created C_ALLON found 27 of 79 flags dark and nobody knew; adding to that pile silently is the
+            # failure it exists to prevent.
         }
         # Flags a C_* knob above decides, mapped to the env var(s) that decide them, PLUS the companion
         # parameters that have to move with the flag for it to mean anything.
