@@ -6627,4 +6627,95 @@ before fixing the supply would be tuning a lever that is not attached to anythin
 
 ---
 
+## Addendum 46 — The cell split was age-blind, and that is why the hazard was age-blind (2026-08-15, R-106)
+
+**THE SUPERVISOR'S QUESTION.** *"What then will move the demography? If not food — something is broken in
+demographic mechanisms."* This addendum answers it. Something was broken, it was not a demographic mechanism,
+and it was not food. It was the rule that decides who eats.
+
+**THE DEFECT.** `substrate.compute_harvest_shares` divided a cell pool FLAT per head at κ=0: `base = S / n`.
+Every occupant claimed the same absolute kcal regardless of age. **59% of a canonical population is under 15**
+(measured age_0_5 26.0%, age_5_15 33.2%), so a newborn claimed exactly what a 30-year-old hunter claimed.
+
+**THE MEASUREMENT THAT NAMES IT.** The realised hazard was FLAT across the whole of life:
+
+| age band | 1-5 | 5-15 | 15-30 | 30-45 | 45-60 |
+|---|---|---|---|---|---|
+| realised hazard /yr | 0.069 | 0.057 | 0.060 | 0.059 | 0.064 |
+
+Siler ACHE_FOREST gives **0.0141/yr at age 30**. The excess is ~0.045/yr and it does not vary with age.
+Starvation cannot produce that — starvation kills the small and the old first. An age-blind split can, and it
+was the only term in the model that could.
+
+**THIS RESOLVES THE PARADOX OPEN SINCE ADDENDUM 44.** The median agent eats 2.8x requirement AND
+`starv_share` is 0.51-0.67. Both are true. Only ~3% sit below the floor at any instant
+(`intake_ema_frac_below_hi` 0.031); the FLUX through that state carries the deaths, at every age at once.
+
+**A HYPOTHESIS OF MINE IS FALSIFIED, and is recorded rather than dropped.** Task #71 predicted the starving
+would be ISOLATED agents. They are not. `starv_occ_at_death` 44.1 against `starv_occ_of_living` 27.7 — the
+dead sit in cells MORE crowded than the living. The earlier 6.5-against-71.4 reading came from a single arm
+and did not replicate. The isolation-flux hypothesis is dead.
+
+**THE FIX.** `compute_harvest_shares` gains an optional per-occupant CLAIM WEIGHT applied before the κ
+contest. `claim=None` reproduces the historical split bit-exact. Two flags, because they are two separate
+assertions, and neither introduces a new number — each reads a ramp that already exists:
+
+- `enable_need_weighted_shares` — claim ∝ `consumption_factor` (cons_min 0.3→1.0). [ANCHORED — Kaplan 2000,
+  already the citation on `BaseAgent.consumption_factor`.]
+- `enable_eta_weighted_shares` — claim ∝ `eta` (eta_min 0.2→1.0). Recovers the ~26% of every cell pool
+  claimed by someone who cannot convert it.
+
+**THE PREDICTION WAS STATED BEFORE THE MEASUREMENT, and it held at BOTH ends.** Coastal-temperate, seed 0:
+
+| marker | control | need | eta | both | anchor |
+|---|---|---|---|---|---|
+| m 0-1 | 0.1366 | 0.1666 | 0.1702 | 0.1819 | ~0.20 (Aché) |
+| m 15-30 | 0.0611 | 0.0539 | 0.0538 | 0.0494 | 0.005-0.010 (G&K) |
+| m 30-45 | 0.0594 | 0.0534 | 0.0522 | 0.0493 | 0.005-0.010 |
+| **e15** | **15.92** | **17.60** | **17.73** | **18.85** | **~35** |
+| e45 | 12.95 | 13.57 | 13.69 | 14.03 | |
+| frac_double_orphan | 0.0394 | 0.0291 | 0.0263 | 0.0202 | |
+| frac_both_parents_alive | 0.746 | 0.776 | 0.779 | 0.801 | |
+| band_med_adults | 9.74 | 10.25 | 10.18 | 11.06 | 9-25 |
+
+Monotone in how much claim weighting is applied. Family structure improved without being targeted.
+
+**THE CTB IS LOAD-BEARING, CHECKED RATHER THAN ASSERTED.** 26 tests pass, and 4 FAIL under a perturbation
+that disables the mechanism. The control that decides interpretability is
+`test_all_adult_cell_is_untouched_by_*`: every adult has `consumption_factor` 1.0, so an all-adult cell must
+not move. If it did, the effect would be a code-path artefact rather than age composition.
+
+**A SIDE EFFECT PREDICTED BEFORE IT WAS MEASURED.** Task #77 recorded that this change would move the spatial
+distribution. The savanna reachability gate that failed at 0.058 now measures 0.210, population 861→1017. The
+threshold was NOT touched.
+
+**WHAT DID NOT MOVE, AND IT MATTERS MORE THAN WHAT DID.** `starv_share` is 0.67 in EVERY arm. TFR is ~10 in
+every arm. The claim weight changed WHO starves, not HOW MANY. That CONFIRMS Addendum 44 rather than
+overturning it: total deaths are still set by the food-to-population balance. This fix redistributes them
+across ages.
+
+**THE SHARPER DEFECT THIS EXPOSES.** `m_0_1` now nearly reaches its anchor (0.182 vs ~0.20), but `l15` moved
+the WRONG way, 0.399 → 0.357 against an anchor of 0.55-0.60. Those two are compatible only if mortality
+between 1 and 15 is far lower than the model's — it is not (`m_1_5` 0.080, `m_5_15` 0.054, against `m_30_45`
+0.049). **The hazard is still nearly flat from 1 to 60.** Real foragers have a deep survival trough across
+ages 5-40 that this model lacks. The claim weight fixed the SIGN of the age gradient at the infant end; the
+trough is a separate, still-open defect.
+
+**HONEST SIZE OF THE GAIN.** e15 closes ~15% of its gap to 35. Prime-adult hazard falls 17% where a 5-10x
+reduction is needed. This is a real, correctly-signed, mechanism-driven improvement. It is NOT a solved
+demography.
+
+**A METHOD NOTE, because it saved four CPU-hours.** Two of the four arms were cut short at ~13800 steps. I
+began a re-run, then tested the assumption instead: reading the two COMPLETE arms at BOTH 13875 and 15000
+changed every marker the finding rests on by **≤0.3%**, against effect sizes of 17-33%. The truncation is two
+orders of magnitude below the signal, so the re-run was cancelled. The endpoint check is three minutes of
+arithmetic; the re-run was four hours.
+
+**WHAT IS NOT CLAIMED.** That the claim weight fixes the demography — it does not; it fixes the shape, and the
+level remains wrong. That `both` is the right adoption — it is canonically ON via C_ALLON per the standing
+rule, and every mortality-shape marker improves monotonically, but the arms are ONE world and TWO of them are
+single-seed. That the residual flat hazard is understood — it is not.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
