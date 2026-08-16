@@ -210,3 +210,62 @@ dependents in the fertility requirement (PARAMETERS §21.10).
 even with inheritance, tribute, noble exemption, zero decay and a narrow elite. Diagnosed as **no return on
 capital**: `material` is a terminal stock that cannot buy anything, whereas Sahlins' big-man "uses wealth to
 place others in his debt … he constructs a following whose production may be harnessed to his ambition."
+
+---
+
+## The spatial sanity check — compare the population to the MAP, every run
+
+**Why this section exists.** The R-106 arc spent a week diagnosing mortality, then fertility, on a population
+that was using **14% of its land**, sitting **4.8× BELOW** Binford packing regionally while **1.4× ABOVE** it
+locally, with the median agent eating **2.7× requirement**. Every input was already logged in every row.
+Nothing multiplied `pop` by anything and compared it to the map. The supervisor's verdict: *"Copious amount of
+time and tokens was wasted not doing just that."*
+
+**It is wired, not just written.** `demography.spatial_health()` runs in every snapshot of every campaign and
+prints a `!! SPATIAL:` banner when a check fails. A table nobody reads is what let this happen.
+
+### What the map should carry
+
+Habitable area = `habitable_cells × 100 km²`. That is the **capacity patch's** land (R-103i circumscription),
+NOT the 100×100 grid — the population cannot disperse outside it. For the standard coastal-temperate world,
+1584 habitable cells = **158,400 km²**.
+
+| density /km² | source | people | bands of 25 | connubia of 150 | tribes of 500 |
+|---|---|---|---|---|---|
+| 0.010 | arid / sparse — *round, illustrative* | 1,584 | 63 | 11 | 3 |
+| 0.030 | boreal–temperate — *round, illustrative* | 4,752 | 190 | 32 | 10 |
+| 0.050 | temperate generalist — *round, illustrative* | 7,920 | 317 | 53 | 16 |
+| **0.091** | **Binford 2001 packing — FILED ANCHOR** | **14,414** | **577** | **96** | **29** |
+| 0.150 | rich coastal — *round, illustrative* | 23,760 | 950 | 158 | 48 |
+
+**Only 0.091 is a filed anchor**, and it is a **CEILING**, not a target — the threshold above which Binford
+says foragers intensify. Per binding rule 2 of this document, the other rows are a reference bracket and must
+never be cited as though this project had filed them. `expected_population()` labels them in code for the same
+reason.
+
+### The two checks — neither introduces a new number
+
+| check | rule | anchor |
+|---|---|---|
+| **PACKING PARADOX** | not (local > 0.091 **and** regional < 0.091) | Binford 2001, used twice — once per side |
+| **BAND CATCHMENT** | km² per band ≥ 314 | Vita-Finzi & Higgs 1970, 10 km site catchment |
+
+**The paradox is the one that matters.** A forager population cannot be simultaneously PACKED (locally dense
+enough to intensify) and SPARSE (regionally nowhere near filling its range). If both hold, the population is
+**not food-limited — it is failing to disperse**, and every carrying-capacity conclusion drawn from that run
+is void. A ±10% deadband keeps the verdict off the knife edge; without it a population sitting exactly at
+packing reads as "sparse" by one part in 10,000 (caught by this checker's own CTB before it was wired in).
+
+**The band-catchment check** is the blunter one. A band commanding less land than its own foraging radius
+would have territories overlapping completely. That is not a forager landscape.
+
+### What the model actually did (2026-08-16, coastal-temperate seed 0)
+
+| arm | pop | bands | land used | regional /km² | local /km² | km²/band | verdict |
+|---|---|---|---|---|---|---|---|
+| `claim_both` | 2,782 | 102 | 12.3% | 0.0176 | 0.143 | 214 | **PARADOX + below catchment** |
+| `fert_sedoff_s0` | 3,010 | 107 | 14.4% | 0.0190 | 0.132 | 214 | **PARADOX + below catchment** |
+| `morph_off_s0` | 3,070 | 157 | 16.7% | 0.0194 | 0.116 | 169 | **PARADOX + below catchment** |
+| `fert_ctl_savanna` | 240 | 12 | **0.8%** | 0.0016 | 0.198 | 100 | **PARADOX + below catchment** |
+
+Band size itself is fine (28 per band against Hill's ~25–28 adults). **The arrangement is the defect.**

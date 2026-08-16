@@ -44,7 +44,7 @@ from sic_games.terrain import generate_world, world_lottery_climate
 from sic_games.capacity import NPPCapacityField
 from sic_games.climate import ClimateConfig, build_climate_field
 from sic_games.invariants import check as invariant_check
-from sic_games.demography import demography_health
+from sic_games.demography import demography_health, spatial_health
 from sic_games import runspec as _runspec
 
 # ── A RUN IS A FILE (2026-08-07) ──────────────────────────────────────────────────────────────────────────
@@ -1171,6 +1171,35 @@ def main():
             row["demog_in_band"] = _dh["n_scored"] - _dh["n_out"]
             row["demog_scored"] = _dh["n_scored"]
             row["demog_structure_ok"] = _dh["structure_ok"]
+            # THE SPATIAL SANITY CHECK (R-106, 2026-08-16). Compare the population to the MAP, every run.
+            # The R-106 arc spent a week on mortality and then fertility while the population used 14% of its
+            # land, sat 4.8x BELOW Binford packing regionally and 1.4x ABOVE it locally, and ate 2.7x
+            # requirement. Every input was already in this row. Nothing multiplied `pop` by anything and
+            # compared it to the map. This is that multiplication, and it needs NO new anchor — it uses
+            # Binford's filed 0.091 twice, once per side.
+            _sp = spatial_health(pop=row.get("pop", 0) or 0,
+                                 habitable_cells=getattr(w, "_habitable_cells", 0),
+                                 cells_occupied=row.get("cells_occupied", 0) or 0,
+                                 n_bands=row.get("n_bands", 0) or 0)
+            row["spatial_regional_per_km2"] = _sp["regional_per_km2"]
+            row["spatial_local_per_km2"] = _sp["local_per_km2"]
+            row["spatial_land_use_frac"] = _sp["land_use_frac"]
+            row["spatial_km2_per_band"] = _sp["km2_per_band"]
+            row["spatial_paradox"] = _sp["paradox"]
+            row["spatial_band_below_catchment"] = _sp["band_below_catchment"]
+            if _sp["paradox"] or _sp["band_below_catchment"]:
+                # Loud, because being scrolled past is exactly how this went unseen for a week.
+                _bits = []
+                if _sp["paradox"]:
+                    _bits.append(f"PACKED AND SPARSE AT ONCE (local {_sp['local_per_km2']:.3f} > 0.091 "
+                                 f"> regional {_sp['regional_per_km2']:.4f} /km2) on "
+                                 f"{100 * _sp['land_use_frac']:.1f}% of the land")
+                if _sp["band_below_catchment"]:
+                    _bits.append(f"band commands {_sp['km2_per_band']:.0f} km2, inside its own 314 km2 "
+                                 f"catchment (Vita-Finzi & Higgs)")
+                log("  !! SPATIAL: " + "; ".join(_bits)
+                    + " -- the population is NOT food-limited, it is failing to disperse; any "
+                      "carrying-capacity reading of this run is void")
             # DATA GUARD. In the first steps the life table has seen almost no exposure and the founder
             # cohort sits in two enormous bands, so the panel reads band_med_adults 207 and TFR 0 — verdicts
             # that are arithmetically correct and completely meaningless. A monitor that cries wolf during

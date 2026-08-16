@@ -126,6 +126,27 @@ whose docstring states that every other test in the file is void if that control
   in the `C_ALLON` skip set for no stated reason, so every arm run that week silently tested the OLD behaviour.
   The audit that created `C_ALLON` found **27 of 79 flags dark and nobody knew**; adding to that pile is the
   failure it exists to prevent.
+- **CHECK THE POPULATION AGAINST THE MAP, BEFORE ANYTHING ELSE.** Adopted 2026-08-16 by the supervisor, whose
+  verdict was: *"Copious amount of time and tokens was wasted not doing just that."* Before diagnosing any
+  vital rate, multiply `pop` by the map and see whether the number is even possible. The R-106 arc spent a
+  week on mortality and then fertility while the population used **14% of its land**, sat **4.8× BELOW**
+  Binford packing regionally and **1.4× ABOVE** it locally, and ate **2.7× requirement**. Every input was in
+  every row already. Nothing compared them.
+  - The table and the two checks live in `docs/MARKER_MATRIX.md` §"The spatial sanity check". They are WIRED,
+    not merely written: `demography.spatial_health()` runs in every campaign snapshot and prints a
+    `!! SPATIAL:` banner. Do not report a run without reading that banner.
+  - **THE PACKING PARADOX.** A population cannot be PACKED (local density > Binford 0.091/km²) and SPARSE
+    (regional < 0.091/km²) at the same time. If it is, it is **not food-limited — it is failing to disperse**,
+    and every carrying-capacity conclusion drawn from that run is void. Note that this introduces NO new
+    number: it uses one filed anchor twice, once per side.
+  - **THE BAND CATCHMENT.** A band must command at least its own foraging radius — 314 km², Vita-Finzi &
+    Higgs' 10 km site catchment. Below that, band territories would overlap completely.
+  - The habitable area is the **capacity patch's** land (`habitable_cells × 100 km²`, R-103i circumscription),
+    NOT the 100×100 grid. The population cannot disperse outside the patch.
+  - Only Binford's 0.091 is a filed anchor, and it is a **CEILING**, not a target. The other densities in the
+    table are a labelled reference bracket and must never be cited as filed bands (binding rule 2 of
+    `MARKER_MATRIX.md`).
+
 - **EVERY REPORT CARRIES THE DEMOGRAPHY PANEL.** Adopted 2026-08-15 by the supervisor. Any report of a run,
   an arm, a comparison or a finding must present the demographic benchmarks alongside whatever it is actually
   about — not a summary verdict, the numbers, each against its filed band:

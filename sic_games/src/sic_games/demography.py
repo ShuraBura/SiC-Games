@@ -201,6 +201,88 @@ def isogrowth_check(tfr: float, l15: float, r_measured_pct: float,
             "implied_gen_length": implied_T, "r_measured_pct": r_measured_pct, "consistent": ok}
 
 
+# ── THE SPATIAL SANITY CHECK (R-106, 2026-08-16) ──────────────────────────────────────────────────────────
+# WHY THIS EXISTS. For a week this arc chased mortality, then fertility, on a population that was using 14% of
+# its land, at 4.8x BELOW Binford's packing threshold regionally while sitting 1.4x ABOVE it locally, with the
+# median agent eating 2.7x requirement. Every one of those numbers was already being logged. Nobody multiplied
+# `pop` by anything and compared it to the map. The supervisor's verdict was blunt and correct: "Copious
+# amount of time and tokens was wasted not doing just that."
+#
+# IT INTRODUCES NO NEW NUMBER. Every check below is built from anchors already filed in LITERATURE.md, and the
+# central one uses a single filed number TWICE rather than adding a second:
+#   Binford 2001 packing threshold      0.091 persons/km²   [FILED, cross-checked in LITERATURE.md:1099]
+#   Vita-Finzi & Higgs 1970 catchment   10 km radius = 314 km²   [FILED, cited at phase1_model.py:1302]
+#
+# THE PACKING PARADOX is the check that would have caught this arc on day one. A forager population cannot be
+# simultaneously PACKED (local density above Binford's threshold, i.e. dense enough to intensify) and SPARSE
+# (regional density below it, i.e. nowhere near filling its range). If both hold at once, the population is not
+# food-limited — it is failing to disperse, and every carrying-capacity conclusion drawn from it is void.
+SPATIAL_ANCHORS = {
+    "binford_packing_per_km2": (0.091, "Binford 2001 Constructing Frames of Reference — 9.098 persons/100 km²; "
+                                       "the threshold ABOVE which foragers intensify, i.e. a CEILING for "
+                                       "simple foragers, not a target [FILED, cross-checked]"),
+    "catchment_km2": (314.0, "Vita-Finzi & Higgs 1970 — the 10 km site catchment (two-hour walk); a band must "
+                             "command at least its own foraging radius [FILED]"),
+}
+
+
+def spatial_health(pop: float, habitable_cells: float, cells_occupied: float,
+                   n_bands: float, cell_km2: float = 100.0) -> dict:
+    """Check a population against the MAP it lives on. Pure function of four numbers already in every row.
+
+    Returns regional/local density, land use, km² per band, and the verdicts. `paradox` is the one that
+    matters: True means the population is packed and sparse AT THE SAME TIME, which no real forager
+    population can be, and which voids any carrying-capacity reading of the run.
+    """
+    pack = SPATIAL_ANCHORS["binford_packing_per_km2"][0]
+    catch = SPATIAL_ANCHORS["catchment_km2"][0]
+    hab_km2 = habitable_cells * cell_km2
+    occ_km2 = cells_occupied * cell_km2
+    regional = (pop / hab_km2) if hab_km2 > 0 else float("nan")
+    local = (pop / occ_km2) if occ_km2 > 0 else float("nan")
+    land_use = (cells_occupied / habitable_cells) if habitable_cells > 0 else float("nan")
+    km2_band = (occ_km2 / n_bands) if n_bands > 0 else float("nan")
+    # A DEADBAND, not a knife edge. Without it a population sitting exactly AT packing reads as "sparse"
+    # because 14414/158400 = 0.09099 < 0.091 by one part in 10,000 — caught by this module's own CTB
+    # (`test_a_genuinely_full_world_is_not_flagged_as_a_paradox`) before the checker was ever wired in. The
+    # +-10% band means neither verdict fires near the threshold, so the paradox needs a REAL separation
+    # between local and regional density rather than rounding noise on a filed number.
+    margin = 1.10
+    packed = local > pack * margin        # locally dense enough that Binford says foragers would intensify
+    sparse = regional < pack / margin     # regionally nowhere near filling the available range
+    return {
+        "regional_per_km2": regional,
+        "local_per_km2": local,
+        "land_use_frac": land_use,
+        "km2_per_band": km2_band,
+        "habitable_km2": hab_km2,
+        "packed_locally": packed,
+        "sparse_regionally": sparse,
+        # THE PARADOX: packed and sparse at once ⇒ a dispersal failure, not a food limit.
+        "paradox": bool(packed and sparse),
+        # A band packed tighter than its own site catchment cannot be a forager band — territories would
+        # have to overlap completely.
+        "band_below_catchment": bool(km2_band == km2_band and km2_band < catch),
+    }
+
+
+def expected_population(habitable_cells: float, cell_km2: float = 100.0,
+                        band_size: float = 25.0) -> list[tuple]:
+    """The population/band table a map of this size SHOULD carry, as a BRACKET across forager densities.
+
+    This is a reference bracket, NOT a target: only 0.091 is a filed anchor (Binford's packing CEILING). The
+    other rows are round densities spanning the ethnographic forager range and are labelled as such, so nobody
+    later cites 0.05 as though this project had filed it.
+    """
+    hab = habitable_cells * cell_km2
+    rows = [(0.010, "arid / sparse [ROUND, illustrative]"),
+            (0.030, "boreal-temperate [ROUND, illustrative]"),
+            (0.050, "temperate generalist [ROUND, illustrative]"),
+            (0.091, "BINFORD PACKING CEILING [FILED ANCHOR]"),
+            (0.150, "rich coastal [ROUND, illustrative]")]
+    return [(d, lab, d * hab, d * hab / band_size) for d, lab in rows]
+
+
 def demography_health(row: dict) -> dict:
     """Score a trajectory row against DEMOG_ANCHORS and return verdicts. Pure function of the row.
 
