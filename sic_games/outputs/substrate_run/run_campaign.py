@@ -1305,6 +1305,44 @@ def main():
     # distortion it is meant to find. Measured: an arm with TFR 8.41 and realised e0 17.7 should sit at
     # frac_child ~0.45 under a uniform scaling but sits at 0.543, and the residual is unattributable without
     # these. One row of ~700 integers per run, written once.
+    # THE SPATIAL DUMP, ONCE, AT THE END (R-106, 2026-08-16). Every aggregate this project logs — pop,
+    # cells_occupied, n_settle — collapses the map to a scalar. That is how a population sitting on 14% of its
+    # land in a ~20x-overlapping carpet of settlement windows went a week without anyone seeing the shape of
+    # it. Four 100x100 arrays per run, written once, so the arrangement can be LOOKED AT rather than inferred
+    # from ratios. Reconstructing the world in a separate probe script was the alternative and was rejected:
+    # rebuilding world construction by hand is exactly how the test fixtures diverged from the model earlier
+    # in this arc.
+    try:
+        import numpy as _np
+        _W = getattr(w.terrain_field, "width", 100)
+        _H = getattr(w.terrain_field, "height", 100)
+        _people = _np.zeros((_H, _W), dtype=_np.int32)
+        for _a in w.agent_list:
+            _px, _py = _a.pos
+            _people[_py % _H, _px % _W] += 1
+        _sites = _np.zeros((_H, _W), dtype=_np.int8)
+        for (_sx, _sy) in getattr(w, "_settlement_sites", ()):
+            _sites[_sy % _H, _sx % _W] = 1
+        # `f` and `land` are the world as MAIN built it. An earlier attempt read these off `w.terrain_field`
+        # with getattr fallbacks and silently wrote three all-zero arrays — the fallback hid the wrong
+        # attribute name instead of failing. Read the real handles, and assert they are not empty.
+        _biome = _np.asarray(f.biome)
+        _forage = _np.asarray(f.forage_kcal, dtype=float)
+        _water = _np.asarray(f.isWater, dtype=_np.int8)
+        _hab = _np.zeros((_H, _W), dtype=_np.int8)
+        for (_hx, _hy) in land:
+            _hab[_hy % _H, _hx % _W] = 1
+        assert _hab.sum() > 0 and _forage.max() > 0, "spatial dump read an empty terrain — wrong handle"
+        _spath = OUT.replace("campaign_trajectory_", "campaign_spatial_").replace(".json", ".npz")
+        _np.savez_compressed(_spath, people=_people, sites=_sites, biome=_biome,
+                             forage_kcal=_forage, habitable=_hab, water=_water,
+                             step=_np.int64(step))
+        meta["spatial_dump"] = os.path.basename(_spath)
+        log(f"  spatial dump -> {_spath}  (people {int(_people.sum())} on {int((_people > 0).sum())} cells, "
+            f"{int(_sites.sum())} sites)")
+    except Exception as _e:                      # a diagnostic must never lose a finished run
+        log(f"  !! spatial dump failed ({_e}) — the run itself is unaffected")
+
     if hasattr(w, "raw_demographic_counters"):
         _c = w.raw_demographic_counters()
         meta["life_table_final"] = {k: _c[k] for k in
