@@ -126,6 +126,36 @@ whose docstring states that every other test in the file is void if that control
   in the `C_ALLON` skip set for no stated reason, so every arm run that week silently tested the OLD behaviour.
   The audit that created `C_ALLON` found **27 of 79 flags dark and nobody knew**; adding to that pile is the
   failure it exists to prevent.
+- **A SCALAR CANNOT SHOW A STRUCTURE. LOOK AT IT, THEN MEASURE IT.** Adopted 2026-08-16 by the supervisor:
+  *"another showcase of how ur math and tables only show a part of the story, often misinterpreted, and the
+  paramount importance of visual aids."* Earned three times in one day, and the discipline runs BOTH ways.
+  - **The picture generates what a scalar cannot.** `cells_occupied = 213` was logged in every row for a
+    week. It says how many cells, never that they form chains through mediocre land while 65% of the richest
+    land sits empty. One map said it at a glance.
+  - **The number then corrects the picture.** From that same map I claimed "agents avoid the best land". The
+    arithmetic said otherwise — they weakly PREFER it (occupied cells +17% forage, r = +0.12); the true
+    statement is that 65% of the top decile is unoccupied. A picture invites overstatement exactly as a
+    table invites blindness.
+  - **A summary statistic of a skewed distribution is a lie of omission.** `settle_med = 11` with
+    `settle_max = 86` is not "typical village 11". Reporting the median alone produced "a sprawl of 184 tiny
+    hamlets", which was wrong — the real structure was one clustered population counted ~20x by overlapping
+    windows.
+
+  **A VISUAL IS MANDATORY, not optional, for:**
+  | claim about | required | never sufficient |
+  |---|---|---|
+  | WHERE — arrangement, settlement, dispersal, territory | a MAP | `cells_occupied`, `n_settle` |
+  | a DISTRIBUTION — band/village size, wealth, age | the HISTOGRAM | median, or median+max |
+  | EQUILIBRIUM or dynamics | the TRAJECTORY | a last-N-step mean (it hid a peak of 6084 falling to 2317) |
+  | whether a mechanism FIRED | raw signal + threshold on the SAME axes | a fired/not-fired verdict |
+
+  **What the figure must carry:** the anchor or band drawn ON the axes, not quoted in the caption; the RAW
+  data, not only a fit or a smoothed line; the DENOMINATOR — empty land drawn as empty rather than cropped
+  away; and the control arm in the same figure wherever one exists.
+
+  **Then SEND it.** A PNG left on disk is not a report. `sic_games/outputs/substrate_run/plot_spatial.py` is
+  the worked example: terrain, people and settlements side by side, one row per arm.
+
 - **CHECK THE POPULATION AGAINST THE MAP, BEFORE ANYTHING ELSE.** Adopted 2026-08-16 by the supervisor, whose
   verdict was: *"Copious amount of time and tokens was wasted not doing just that."* Before diagnosing any
   vital rate, multiply `pop` by the map and see whether the number is even possible. The R-106 arc spent a
