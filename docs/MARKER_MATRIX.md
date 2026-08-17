@@ -33,7 +33,7 @@ validated, however long it ran.
 |---|---|---|---|---|---|
 | 1 | band size | `band_med` | **28.2 ADULTS** (Hill 2011, 32 societies) — the all-ages [18–35] is mis-attributed | Hill et al. 2011 `[VERIFIED, PDF read]`; ~~Johnson~~ | **FAILS 16/16 on adults** — model 11.8 adults/band = 0.42×. The 23/25 all-ages pass is carried by excess children |
 | 2 | ~~settlement size~~ | ~~`settle_med`~~ | **RETIRED 2026-08-06** | Bar-Yosef 1998: PDF filed, read, and confirmed by the supervisor to be maps and burial sites — no village-population figure exists in the text to find | **Retired at zero cost to coverage:** it was a second, unverifiable band on the *same field* as #3, whose band is verified. Nothing was being measured here that #3 does not measure |
-| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **46/52 arms PASS** (2026-08-06 re-score over every trajectory on disk; median of arm medians **97.5**) |
+| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **PROVISIONAL — THE FIELD IS CONTAMINATED (2026-08-16).** The prior "46/52 arms PASS, median of arm medians 97.5" was read off a settlement list that double-counts people ~20×. See the settlement-overlap note below. |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
 | 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
@@ -42,8 +42,8 @@ validated, however long it ran.
 | 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
 | 10 | **polygyny** | `frac_polygynous_m` | **~0.04 OF ALL MEN** — our field divides by MARRIED men | Marlowe, *The Hadza* — **VERIFIED VERBATIM 2026-08-07**: *"about 4% of men have 2 wives at any given time, but never more than two wives"* | **UNIT MISMATCH on a PASS.** 0.0362 on our denominator reads ~1.0×; on Marlowe's it is **0.0307 = 0.77×**. The gap IS the male marriage rate (0.847), so the bias MOVES between arms |
 | 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
-| 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **never previously scored**; first read −0.98 |
-| 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **never previously scored** |
+| 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** The clean-looking first read of −0.98 is a rank-size slope over ~20× phantom settlements. See the note below. |
+| 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** Computed from the same settlement list. See the note below. |
 | 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
 | 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
 | 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | **NOW ANCHORED (2026-08-08)** — Hill & Hurtado Table 4.4 p.141, on the model's OWN age classes (0–15/15–60/60+): dependency **0.598 !Kung / 0.866 Yanomamö / 0.899 Aché**; %<15 **28.7 / 45.4 / 41.9**; sex ratio **0.896 / 1.202 / 1.368** | Hill & Hurtado 1996 Table 4.4 `[VERIFIED VERBATIM, 3 rows registered]`; !Kung via Lee 1979:45, Yanomamö via Neel & Weiss 1975:28 | **dependency 1.495 — 1.66× the HIGHEST of three forager populations**; `frac_child` 0.585 vs a 0.287–0.454 range. **Sex ratio 1.061 PASSES** (inside 0.896–1.368). No longer context — a scored row |
@@ -210,6 +210,55 @@ dependents in the fertility requirement (PARAMETERS §21.10).
 even with inheritance, tribute, noble exemption, zero decay and a narrow elite. Diagnosed as **no return on
 capital**: `material` is a terminal stock that cannot buy anything, whereas Sahlins' big-man "uses wealth to
 place others in his debt … he constructs a following whose production may be harnessed to his ambition."
+
+---
+
+## THE SETTLEMENT LIST DOUBLE-COUNTS PEOPLE ~20× — markers #3, #12, #13 are provisional (2026-08-16)
+
+**The defect.** `_maintain_settlements` counts every person inside a site's `(2·settle_radius+1)` window —
+`settle_radius = 2`, so **25 cells = 2,500 km²** — and its own docstring warns the windows **overlap** whenever
+sites sit closer than that, so neighbouring villages each count the **same** people toward their own
+`settle_min_pool` floor of 40.
+
+**Measured, canonical arm, coastal-temperate seed 0:**
+
+```
+184 sites × 25 cells = 4,602 window-cells  over  229 OCCUPIED cells
+→ every occupied cell lies inside ~20 different sites' persistence windows
+```
+
+So `n_settle = 184` and `settle_med = 11` do not describe 184 hamlets of 11 people. They describe **one
+clustered population counted about twenty times over**, each site reporting ~11 residents of its own while
+borrowing its neighbours to survive. None could stand alone.
+
+**Savanna is the natural control and it agrees:** 2 sites, only 4.2× overlap, `settle_med` **85.1** — inside
+Alvard's verified 50–250. Where sites cannot overlap, the reported village is village-sized.
+
+**An anchor-free consistency check that should have caught this years earlier.** Alvard's 50–250 plus the
+measured population *bounds* the settlement count — no new number required:
+
+| arm | pop | allowed `n_settle` | reported | verdict |
+|---|---|---|---|---|
+| canonical s0 | 2,782 | 11 – 56 | 160 | **TOO MANY** |
+| canonical s1 | 9,084 | 36 – 182 | 213 | **TOO MANY** |
+| savanna | 240 | 1 – 5 | 2 | OK |
+
+**Three markers are affected, not one.** `primate_ratio` and `zipf_slope` are computed from the *same*
+settlement list (`run_campaign.py:424`), so #12's clean-looking first read of **−0.98** is a rank-size slope
+over phantom settlements.
+
+**The fix is NOT `enable_exclusive_village_membership`.** It was re-tested on 2026-08-16 against this question
+rather than the spacing question it was rejected for in August, and it **failed the discriminator**: a pure
+measurement fix must move `settle_med` while leaving the physical distribution alone. Instead population fell
+**9.5% / 63.7%** across two seeds, occupied land **halved**, and founding churn rose **8×** — confirming the
+original "raises churn" rejection from a second direction. It buys a correct-looking number by destroying the
+population that produced it.
+
+**What is needed** is a pure diagnostic with no behavioural coupling: cluster the occupied cells into
+connected components and report distinct settlements and their true sizes, leaving `_maintain_settlements`
+untouched. Scoreable on size (#3, Alvard **VERIFIED**), max (#17), slope (#12) and primacy (#13). **Spacing
+has no filed anchor** and must be reported as a bracket with only a floor — two non-overlapping 10 km HG
+catchments imply ≥20 km — never as a scored target.
 
 ---
 
