@@ -1703,3 +1703,67 @@ capacity.** That is the same clustering pathology as the packing paradox, seen i
 **Citation tag:** [ANCHORED — arid forager density target ~0.005/km²; Long 1971, Cane 1990]
 Sources: [Aboriginal subsistence in the Western Desert](https://link.springer.com/article/10.1007/BF00887998) ·
 [Precontact foraging habitats, Western Desert](https://www.nature.com/articles/s41598-021-89642-1)
+
+---
+
+### Hunter-gatherer storage MODES, and why Binford's ET gate is incomplete rather than wrong
+
+**Fetched 2026-08-22**, after the arid world was measured to die in its first seasonal trough with no buffer,
+and the ET storage gate was suspected of being the wrong criterion. It is not the wrong criterion. It is one
+criterion out of three.
+
+**What was lifted — Binford's ET threshold is specifically about WINTER:** *"At latitudes with ET below the
+15.25 storage threshold, hunter-gatherers remain highly dependent on the ability to procure a large food
+surplus during the growing season to get through the winter."* ET was designed to reflect both the warmth and
+the LENGTH of the growing season; higher ET = higher productivity = slower depletion and fewer moves.
+Companion threshold: plant dependence possible where ET ≥ 12.75 °C. So `store_temp_thr = 15.25` correctly
+gates *overwintering* storage — and a hot desert genuinely does not overwinter.
+
+**What was lifted — THE THREE MODES (Modeling Modes of Hunter-Gatherer Food Storage):**
+
+| mode | what it copes with |
+|---|---|
+| **central-place storage** | *"single-year seasonal variability and sedentary overwintering strategies"* |
+| **dispersed caching** | multi-year environmental **unpredictability** + **seasonal residential moves** |
+| **dispersed bulk caching** | as above; *"faster storage rates and better chance to maximize storage capacity when seasonality and scheduling conflicts limit storing opportunities"* |
+
+**⇒ THE GAP.** The model implements ONLY central-place overwintering storage, gated on ET. The mode that
+applies to arid Australia — dispersed caching, keyed to multi-year unpredictability and residential mobility —
+has no representation at all. That is why a desert forager in this model has no lean-season buffer: not
+because the ET gate is miscalibrated, but because the applicable mode was never built.
+
+**That deserts DO store is not in question:** Australian arid-zone seed grinding is attested from ~30,000 BP,
+over 200 plant-seed varieties were traditionally ground, grass seeds served as a fall-back "when more easily
+harvested plants had been locally exhausted", and Western Desert grindstones show seed-processing
+intensification over the last ~4,000 years.
+
+**How used:** NOT yet used. Recorded so that the next attempt on arid survival starts from "add the missing
+mode" rather than from "re-tune `store_temp_thr`", which would have been the wrong repair. Adding dispersed
+caching is a NEW MECHANISM keyed to UNPREDICTABILITY, not a gate fix, and it needs its own design and CTB.
+
+**Citation tag:** [ANCHORED — storage-mode taxonomy; Binford ET 15.25 confirmed as an OVERWINTERING criterion]
+Sources: [Modeling Modes of Hunter-Gatherer Food Storage](https://www.researchgate.net/publication/233987517_Modeling_Modes_of_Hunter-Gatherer_Food_Storage) ·
+[Testart, The Significance of Food Storage Among Hunter-Gatherers](http://www.alaintestart.com/UK/documents/storage.pdf) ·
+[Pleistocene seed-grinding implements from the Australian arid zone](https://www.cambridge.org/core/journals/antiquity/article/abs/pleistocene-seedgrinding-implements-from-the-australian-arid-zone/8E700F3D53F14CC122E1A266ABC9E44D)
+
+---
+
+### Yengoyan on sparse-population marriage systems — ALREADY SATISFIED by the model
+
+**Fetched 2026-08-22** (Yengoyan, in Lee & DeVore, *Man the Hunter*), to decide whether the connubium needed a
+sparse-population relaxation. It does not — the model already behaves as the ethnography describes.
+
+**What was lifted:** a tribe of **1,100** operates an eight-subsection system without difficulty, *"since each
+of the eight divisions would contain about 25 eligible mates"*. A tribe of **200 or less** cannot arrange
+marriages *"without considerable deviation from the stated rules"*, and few small tribes in his sample
+exhibited eight-section organisation at all. **The ethnographic response to sparsity is that the RULES RELAX,
+not that the population fails to reproduce.**
+
+**How used — as a CHECK that passed, which is why no code changed.** `_do_connubium` expands its search
+ring-by-ring to `mate_search_max_radius`; if it meets `mate_search_min_eligible` it stops early, and if it
+exhausts the radius with FEWER than m* but at least one candidate it **still pairs from what it found** —
+skipping only on a completely empty pool. Graceful degradation is already implemented. Confirmed in the arid
+world, which reaches `frac_partnered_adult = 0.667` despite a population under 120.
+
+**Citation tag:** [ANCHORED — sparse-population marriage-rule relaxation; verifies existing behaviour]
+Source: [Man the Hunter, Lee & DeVore](https://www.thetedkarchive.com/library/richard-b-lee-irven-devore-man-the-hunter)
