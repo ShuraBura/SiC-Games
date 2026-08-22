@@ -1364,10 +1364,21 @@ def main():
         _hab = _np.zeros((_H, _W), dtype=_np.int8)
         for (_hx, _hy) in land:
             _hab[_hy % _H, _hx % _W] = 1
+        # THE FIELD VILLAGES ARE ACTUALLY SITED ON (added 2026-08-17, supervisor's question).
+        # Settlement founding judges S_pot = max(aquatic_food, cultivability), NOT forage_kcal. Every spatial
+        # claim in this arc so far -- corr(forage,people) = +0.12, "65% of the best land is empty" -- was
+        # measured against forage_kcal. That is the right yardstick for INDIVIDUAL forager movement, because
+        # the movement rule reads per-capita forage yield. It is the WRONG yardstick for VILLAGE SITING: a
+        # village on a salmon choke point or fertile alluvium can sit on mediocre forage land and be
+        # correctly placed. Without these two arrays the question cannot even be asked.
+        _aq = _np.asarray(getattr(f, "aquatic_food", _np.zeros((_H, _W))), dtype=float)
+        _cult = _np.asarray(getattr(f, "cultivability", _np.zeros((_H, _W))), dtype=float)
+        _spot = _np.maximum(_aq, _cult)
         assert _hab.sum() > 0 and _forage.max() > 0, "spatial dump read an empty terrain — wrong handle"
         _spath = OUT.replace("campaign_trajectory_", "campaign_spatial_").replace(".json", ".npz")
         _np.savez_compressed(_spath, people=_people, sites=_sites, biome=_biome,
                              forage_kcal=_forage, habitable=_hab, water=_water,
+                             aquatic_food=_aq, cultivability=_cult, s_pot=_spot,
                              step=_np.int64(step))
         meta["spatial_dump"] = os.path.basename(_spath)
         log(f"  spatial dump -> {_spath}  (people {int(_people.sum())} on {int((_people > 0).sum())} cells, "
