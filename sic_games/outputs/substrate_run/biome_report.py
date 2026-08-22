@@ -1,0 +1,76 @@
+"""Score a run against the SUPERVISOR'S CRITERION: do villages prefer lush land over arid?
+
+    py -3 sic_games/outputs/substrate_run/biome_report.py base_s0 [other_tag ...]
+
+Stated by the supervisor 2026-08-17: "Successful test means rational population maps, where villages prefer
+lush forest location to arid areas."
+
+WHY THIS IS ITS OWN TOOL. Every spatial claim in this arc was scored against `forage_kcal`. Village siting is
+governed by `S_pot = max(aquatic_food, cultivability)`, and the two are UNCORRELATED (+0.027) -- so the
+existing report cannot answer this question at all. A biome breakdown is the only framing in which "lush
+forest versus arid" is even expressible, because it is a statement about WHERE, not about a scalar.
+
+THE TEST, stated before the run so it cannot be chosen to fit:
+  PASS  people and sites are ENRICHED (>1) in forest/wetland and DEPLETED (<1) in desert.
+  FAIL  either is enriched in desert, or forest is depleted.
+Enrichment = (share of people in biome b) / (share of habitable cells in biome b). 1.0 = indifferent.
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+BIOME = {0: "water", 1: "wetland", 2: "forest", 3: "savanna", 4: "grass", 5: "desert", 6: "mountain"}
+LUSH, ARID = ("forest", "wetland"), ("desert", "savanna")
+
+
+def report(tags):
+    for tag in tags:
+        p = os.path.join(HERE, f"campaign_spatial_{tag}.npz")
+        if not os.path.exists(p):
+            print(f"!! no spatial dump for {tag}")
+            continue
+        d = np.load(p)
+        if "s_pot" not in d.files:
+            print(f"!! {tag} predates the S_pot dump -- re-run it; siting cannot be scored against forage")
+            continue
+        people, sites, biome = d["people"], d["sites"], d["biome"]
+        spot, forage, hab = d["s_pot"], d["forage_kcal"], d["habitable"]
+        m = hab > 0
+        tot_p, tot_s, tot_c = people[m].sum(), sites[m].sum(), m.sum()
+        print(f"\n=== {tag}  (step {int(d['step'])})  pop {int(tot_p):,}  sites {int(tot_s)} ===")
+        print(f"  {'biome':<10}{'cells':>7}{'%land':>7}{'people':>8}{'%pop':>7}"
+              f"{'ENRICH':>8}{'sites':>7}{'siteENR':>9}{'S_pot':>7}{'forage':>8}")
+        rows = {}
+        for code, name in BIOME.items():
+            b = m & (biome == code)
+            n = int(b.sum())
+            if n == 0:
+                continue
+            pp, ss = int(people[b].sum()), int(sites[b].sum())
+            share_c, share_p = n / tot_c, (pp / tot_p if tot_p else 0)
+            share_s = ss / tot_s if tot_s else 0
+            enr = share_p / share_c if share_c else float("nan")
+            senr = share_s / share_c if share_c else float("nan")
+            rows[name] = (enr, senr)
+            print(f"  {name:<10}{n:>7}{100*share_c:>6.1f}%{pp:>8}{100*share_p:>6.1f}%"
+                  f"{enr:>8.2f}{ss:>7}{senr:>9.2f}{spot[b].mean():>7.3f}{forage[b].mean():>8.0f}")
+        print("\n  ENRICHMENT = share of people (or sites) / share of habitable cells.  1.00 = indifferent.")
+        verdict, why = "PASS", []
+        for name in LUSH:
+            if name in rows and rows[name][0] < 1.0:
+                verdict = "FAIL"; why.append(f"{name} people-enrichment {rows[name][0]:.2f} < 1")
+        for name in ARID:
+            if name in rows and rows[name][0] > 1.0:
+                verdict = "FAIL"; why.append(f"{name} people-enrichment {rows[name][0]:.2f} > 1")
+        print(f"  CRITERION (lush enriched, arid depleted): {verdict}"
+              + ("   -- " + "; ".join(why) if why else ""))
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        raise SystemExit(__doc__)
+    report(sys.argv[1:])

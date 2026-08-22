@@ -38,7 +38,7 @@ def _load(tag):
 
 def plot(tags, out=None):
     n = len(tags)
-    fig, axes = plt.subplots(n, 3, figsize=(17.5, 6.2 * n), squeeze=False)
+    fig, axes = plt.subplots(n, 4, figsize=(23.0, 6.2 * n), squeeze=False)
     for r, tag in enumerate(tags):
         d = _load(tag)
         people, sites = d["people"], d["sites"]
@@ -70,8 +70,24 @@ def plot(tags, out=None):
         ax.set_title(f"{tag}  —  TERRAIN\n{n_hab} habitable cells = {n_hab * CELL_KM2:,.0f} km²"
                      f"   (grey = outside capacity patch, blue = water)", fontsize=9)
 
-        # ── 2. PEOPLE: log scale, because the whole point is a few cells hold everyone ──
+        # ── 1b. S_POT: the field VILLAGE SITING actually reads, max(aquatic_food, cultivability).
+        # It is UNCORRELATED with forage_kcal (+0.027), so a panel showing only forage cannot say whether a
+        # village is well placed -- the error that ran through this whole arc until 2026-08-17.
         ax = axes[r][1]
+        if "s_pot" in d.files:
+            ax.imshow(np.zeros_like(hab[crop], dtype=float), cmap=ListedColormap(["#e8e8e8"]),
+                      origin="lower", interpolation="nearest", extent=ext, vmin=0, vmax=1)
+            im = ax.imshow(np.where(hab > 0, d["s_pot"], np.nan)[crop], cmap="BuPu",
+                           origin="lower", interpolation="nearest", extent=ext, vmin=0, vmax=1)
+            plt.colorbar(im, ax=ax, fraction=0.046, label="S_pot = max(aquatic, cultivability)")
+            sy2, sx2 = np.nonzero(sites)
+            ax.scatter(sx2 + 0.5, sy2 + 0.5, s=11, facecolors="none", edgecolors="#d62728", linewidths=0.8)
+            ax.set_title("SITING FIELD S_pot (red = sites) -- villages are judged on THIS, not on forage", fontsize=9)
+        else:
+            ax.set_title("S_pot absent -- run predates the dump", fontsize=9)
+
+        # ── 2. PEOPLE: log scale, because the whole point is a few cells hold everyone ──
+        ax = axes[r][2]
         ax.imshow(np.where(hab > 0, 0.0, np.nan)[crop], cmap=ListedColormap(["#f0f0f0"]),
                   origin="lower", interpolation="nearest", extent=ext, vmin=0, vmax=1)
         pp = np.where(people > 0, people, np.nan)
@@ -87,7 +103,7 @@ def plot(tags, out=None):
                      f"(Binford packing {PACK})", fontsize=9)
 
         # ── 3. SETTLEMENTS over the same people field, so overlap is visible ──
-        ax = axes[r][2]
+        ax = axes[r][3]
         ax.imshow(np.where(hab > 0, 0.0, np.nan)[crop], cmap=ListedColormap(["#f0f0f0"]),
                   origin="lower", interpolation="nearest", extent=ext, vmin=0, vmax=1)
         ax.imshow(pp[crop], cmap="Greys", origin="lower", interpolation="nearest",
