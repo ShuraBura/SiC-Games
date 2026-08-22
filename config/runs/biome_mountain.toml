@@ -9,17 +9,18 @@
 
 [meta]
 name = "biome_mountain"
-differs_from_canonical = 3
-why = "CANONICAL SINGLE-BIOME WORLD 3 of 4: MOUNTAIN (99.1 percent mountain at seed 0). Mountain carries the highest forage return of any biome (5387 kcal/forager-hr, Rhode and Rhode limber pine) and was almost entirely EMPTY in the mixed world."
+differs_from_canonical = 4
+why = "CANONICAL SINGLE-BIOME WORLD 3 of 4: MOUNTAIN (99.1 percent mountain at seed 0). FOUNDERS CORRECTED 2026-08-22 from 3000 to 300 for the same reason as biome_arid: a mountain cell feeds 1.9 people, so 3000 founders started at 99 percent of capacity and the run died at step 144. Note the tension worth watching: MOUNTAIN carries the highest per-hour forage return of any biome (5387 kcal/forager-hr) yet the LOWEST cell capacity, because the capacity field is NPP-based and alpine NPP is low. Those two facts are both in the model and they disagree."
 # THE DIFFERENCE, stated field by field:
 #   run.steps: 2500 -> 15000
+#   run.founders: 3000 -> 300
 #   run.terrain: coastal -> alpine
 #   run.climate: temperate -> boreal
 
 [run]
 steps = 15000
 seed = 0
-founders = 3000
+founders = 300
 terrain = "alpine"
 climate = "boreal"
 patch = 0
