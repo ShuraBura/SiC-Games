@@ -223,8 +223,15 @@ def resolved_canonical():
     os.remove(out)
     # Keyed by owner class rather than flattened: two config classes may legitimately share a field name, and
     # a flat dict would let one silently overwrite the other's value in the authoritative file.
+    # SubstrateConfig was ABSENT from this dict until 2026-08-17, so every SubstrateConfig field fell through
+    # to `literal_default` -- the CLASS default -- and the authoritative file stated `group_safety_max = 0.0`
+    # and `group_mate_min = 0.0` (grouping drives OFF) while every campaign ran them at 8.0 / 15.0 through the
+    # hardcoded `**GRP`. That is precisely the failure this function's own docstring says it exists to
+    # prevent: "a file reporting class defaults would say enable_agglomeration = false while every campaign
+    # runs it true -- worse than no file." The blind spot was per-class, not per-field, so nothing caught it.
     return {"DemographyConfig": meta["demography_config"],
-            "ClimateConfig": meta.get("climate_config", {})}
+            "ClimateConfig": meta.get("climate_config", {}),
+            "SubstrateConfig": meta.get("substrate_config", {})}
 
 
 def main():

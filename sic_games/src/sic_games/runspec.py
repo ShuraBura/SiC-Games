@@ -171,8 +171,15 @@ def load(path, seed: int | None = None) -> RunSpec:
     # `C_PARAM` was hardened against in 2026-08-04, reintroduced by moving the configuration into a file.
     # A file may not fail quietly just because it is a file.
     from sic_games.climate import ClimateConfig
+    from sic_games.config import SubstrateConfig
     from sic_games.demography import DemographyConfig
-    known = set(DemographyConfig.model_fields) | set(ClimateConfig.model_fields)
+    # SubstrateConfig joined 2026-08-17. `build()` below was ALREADY generic over the three config modules, so
+    # only this validation set was hardcoded to two -- which is why a run file could never name a substrate
+    # field. The same DemographyConfig+ClimateConfig pair was hardcoded in FOUR places (here, gen_runconfig's
+    # resolved_canonical, make_runconfig's field check, and run_campaign's build calls); the grouping drives
+    # fell through every one of them.
+    known = (set(DemographyConfig.model_fields) | set(ClimateConfig.model_fields)
+             | set(SubstrateConfig.model_fields))
     for section in ("mechanisms", "parameters"):
         bad = sorted(k for k in raw[section] if k not in known)
         if bad:

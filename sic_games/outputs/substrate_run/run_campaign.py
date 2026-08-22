@@ -1039,6 +1039,26 @@ def main():
     if _SPEC is not None:
         demog = _runspec.build(_SPEC, "DemographyConfig")
         clim = _runspec.build(_SPEC, "ClimateConfig")
+        # R-106 (2026-08-17): SubstrateConfig comes from the RUN FILE too. It used to be hardcoded at the
+        # construction site with `**GRP` imported from a 2026 one-off script, so the four grouping-drive
+        # parameters -- the single strongest force in the model's spatial behaviour, worth a 20.6x penalty for
+        # leaving a band -- could not be stated or varied by a run file at all. Verified bit-exact against the
+        # hardcoded construction before this line was added.
+        # REFUSE, DO NOT SILENTLY SUBSTITUTE. Run files authored before 2026-08-17 predate SubstrateConfig
+        # being in the schema, so building one from them yields CLASS defaults: enabled=False,
+        # contest_exponent=0.0, group_safety_max=0.0. That would not merely change the grouping drives -- it
+        # would switch the substrate OFF entirely and silently invalidate the arm, while the run looked
+        # perfectly healthy and carried a config file that "described" it. Caught before any arm was run.
+        _sub_missing = [f for f in ("enabled", "contest_exponent", "group_safety_max", "group_mate_min")
+                        if f not in _SPEC.parameters and f not in _SPEC.mechanisms]
+        if _sub_missing:
+            raise SystemExit(
+                f"{_SPEC.path.name} predates SubstrateConfig in the run schema and does not state "
+                f"{', '.join(_sub_missing)}.\n"
+                f"Building one anyway would give enabled=False and contest_exponent=0.0 -- the substrate "
+                f"OFF -- and the run would look perfectly healthy.\n"
+                f"Regenerate it:  py -3 tools/make_runconfig.py {_SPEC.path.stem} ...")
+        _SUB = _runspec.build(_SPEC, "SubstrateConfig")
         _missing = _runspec.coverage(_SPEC)
         if _missing:
             raise SystemExit(f"{_SPEC.path.name} does not state {len(_missing)} field(s): {_missing[:8]} — "
@@ -1062,8 +1082,9 @@ def main():
 
     w = TerrainWorld(n_agents=FOUNDERS, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False, seed=AGENT_SEED,
                      carbon_cfg=CarbonConfig(kappa=1.5),
-                     substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
-                                                   contest_exponent=1.5, move_cost_flat=0.0, **GRP),
+                     substrate_cfg=(_SUB if _SPEC is not None else
+                                    SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                    contest_exponent=1.5, move_cost_flat=0.0, **GRP)),
                      harvest_field=cap, placement_positions=pos, demography_cfg=demog)
     w._habitable_cells = len(land)   # the denominator for regional density (read by snapshot)
     menarche = demog.menarche_months
@@ -1076,7 +1097,18 @@ def main():
     except Exception:
         _full_cfg = {k: getattr(demog, k) for k in dir(demog) if not k.startswith("_")}
     _full_cfg = {k: v for k, v in _full_cfg.items() if isinstance(v, (int, float, str, bool, type(None)))}
-    meta = dict(sha=sha, tree_dirty=dirty, climate_config=clim.model_dump(),
+    # R-106 (2026-08-17): DUMP THE RESOLVED SubstrateConfig TOO. `tools/gen_runconfig.py` derives
+    # config/parameters.toml by ASKING A CANONICAL RUN what it uses (resolved_canonical), and it looks the
+    # answer up per owner class. Only `demography_config` was ever dumped, so SubstrateConfig fell back to
+    # CLASS DEFAULTS -- and the file has therefore stated `group_safety_max = 0.0` and `group_mate_min = 0.0`,
+    # i.e. the grouping drives OFF, while every campaign has run them at 8.0/15.0 via the hardcoded `**GRP`.
+    # Those two multipliers make leaving a band of 30 cost 20.6x in perceived yield against a terrain signal
+    # whose whole range is 4.8x, so the file was silent about the single strongest force in the model's
+    # spatial behaviour. Dumping it here fixes the generator's blind spot with the mechanism it already uses,
+    # rather than a second copy of the resolution logic. Same class of defect as the climate channels.
+    _sub_cfg = {k: v for k, v in w._substrate_cfg.model_dump().items()
+                if isinstance(v, (int, float, str, bool, type(None)))} if getattr(w, "_substrate_cfg", None) else {}
+    meta = dict(sha=sha, tree_dirty=dirty, climate_config=clim.model_dump(), substrate_config=_sub_cfg,
                 seed=SEED, founders=FOUNDERS, steps=STEPS, world=f"{TERR}-{CLIM}",
                 terrain=TERR, climate=CLIM, patch_size=(PATCHSZ if PATCHSZ > 0 else PATCH),
                 habitable_cells=len(land), reserve_full=w._reserve_full, band_split=BAND_SPLIT,

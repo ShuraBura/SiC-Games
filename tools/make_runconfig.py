@@ -49,14 +49,19 @@ def _fmt(v) -> str:
 def build(name: str, on=(), off=(), sets=(), run_over=None, why: str = "") -> str:
     from sic_games import runconfig
     from sic_games.climate import ClimateConfig
+    from sic_games.config import SubstrateConfig
     from sic_games.demography import DemographyConfig
 
     loaded = runconfig.load(refresh=True)
     flat: dict = {}
-    for owner in ("DemographyConfig", "ClimateConfig"):
+    for owner in ("DemographyConfig", "ClimateConfig", "SubstrateConfig"):
         flat.update(loaded.get(owner, {}))
 
-    known = set(DemographyConfig.model_fields) | set(ClimateConfig.model_fields)
+    # SubstrateConfig added 2026-08-17. Its fields were unnameable here, so `--set group_safety_max=0` was
+    # rejected as an unknown field and the grouping drives could not be varied by any run file -- while every
+    # campaign ran them at 8.0/15.0 through a hardcoded `**GRP`.
+    known = (set(DemographyConfig.model_fields) | set(ClimateConfig.model_fields)
+             | set(SubstrateConfig.model_fields))
     diffs: list[str] = []
 
     for f in on:
@@ -76,7 +81,8 @@ def build(name: str, on=(), off=(), sets=(), run_over=None, why: str = "") -> st
         k = k.strip()
         if k not in known:
             raise SystemExit(f"--set: unknown field {k!r}")
-        ann = (DemographyConfig.model_fields.get(k) or ClimateConfig.model_fields[k]).annotation
+        ann = (DemographyConfig.model_fields.get(k) or ClimateConfig.model_fields.get(k)
+               or SubstrateConfig.model_fields[k]).annotation
         cast = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(ann, str)
         new = cast(v.strip())
         if flat.get(k) != new:

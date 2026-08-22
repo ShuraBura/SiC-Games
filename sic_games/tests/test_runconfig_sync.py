@@ -62,7 +62,7 @@ def _canonical():
         f"the canonical campaign would not run, so fidelity cannot be checked:\n{p.stderr[-2000:]}"
     try:
         with open(out, encoding="utf-8") as fh:
-            return json.load(fh)["meta"]["demography_config"]
+            return json.load(fh)["meta"]
     finally:
         for f in (out, out.replace("trajectory", "progress").replace(".json", ".txt")):
             try:
@@ -107,12 +107,27 @@ def test_owner_classes_build_from_the_files(owner):
 
 
 @pytest.mark.slow
-def test_building_from_files_reproduces_the_canonical_run_exactly():
-    """FIDELITY: the whole safety argument. If this drifts, a run no longer does what the file says."""
-    from_files = runconfig.build("DemographyConfig")
-    canon = _canonical()
+@pytest.mark.parametrize("owner,meta_key", [("DemographyConfig", "demography_config"),
+                                            ("SubstrateConfig", "substrate_config")])
+def test_building_from_files_reproduces_the_canonical_run_exactly(owner, meta_key):
+    """FIDELITY: the whole safety argument. If this drifts, a run no longer does what the file says.
+
+    PARAMETRISED OVER OWNER CLASSES 2026-08-17, because checking only DemographyConfig left the exact hole it
+    was built to close. `SubstrateConfig` was constructed inline at the campaign call site with `**GRP`
+    imported from a 2026 one-off script, so `config/parameters.toml` stated `group_safety_max = 0.0` and
+    `group_mate_min = 0.0` -- the grouping drives OFF -- while EVERY campaign ran them at 8.0 / 15.0. Those
+    two multipliers impose a 20.6x penalty for leaving a band, against a terrain signal whose entire range is
+    4.8x, so the authoritative file was silent about the strongest force in the model's spatial behaviour.
+    One class-shaped blind spot, invisible to a per-field check.
+    """
+    import importlib
+    mod = importlib.import_module("sic_games.demography" if owner == "DemographyConfig" else "sic_games.config")
+    cls = getattr(mod, owner)
+    from_files = runconfig.build(owner)
+    canon = _canonical().get(meta_key, {})
+    assert canon, f"the campaign does not dump {meta_key}; fidelity for {owner} cannot be checked"
     diffs = {f: (canon[f], getattr(from_files, f))
-             for f in DemographyConfig.model_fields
+             for f in cls.model_fields
              if f in canon and canon[f] != getattr(from_files, f)}
     assert not diffs, (
         f"{len(diffs)} field(s) differ between what a canonical run uses and what the files say "
@@ -125,7 +140,7 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
     """The standing rule is that every BUILT mechanism runs unless it is off for an ablation, so the
     authoritative file must show only the documented exclusions dark. A file that quietly listed 27 dark
     mechanisms is the situation these files were created to end."""
-    canon = _canonical()
+    canon = _canonical()["demography_config"]
     off = {k for k, v in canon.items() if k.startswith("enable_") and v is not True}
     # enable_infanticide + enable_band_risk were on this list and are now DELETED (2026-08-06): the
     # exclusion list shrank by deletion rather than by a longer excuse.
