@@ -931,6 +931,63 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         shadow = np.clip(1.0 - P_ORO_SHADOW_GAIN * np.maximum(0.0, upwind_max - elev), P_ORO_MIN, 1.0)
         oro = np.clip(uplift * shadow, P_ORO_MIN, P_ORO_MAX)
         precip_mm = np.clip(p_band * oro * (1.0 + P_MARITIME_GAIN * wateracc) * (0.7 + 0.6 * moist), 0.0, None)
+
+        # ── C8 RUNOFF-WEIGHTED RIVERS (2026-08-22, supervisor: "wire the precipitation into the generator") ──
+        # THE DEFECT. The river pass above sets `flow = np.ones(N*N)` -- every cell contributes one unit
+        # REGARDLESS OF RAINFALL -- so `isRiver` is pure drainage AREA with no water balance. A desert with a
+        # large upstream catchment therefore gets a perennial river, `aquatic_food` scores it as a cold
+        # anadromous fishery, and villages settle it. Measured on the mixed world (R-106, 2026-08-22): desert
+        # cells carried mean aquatic 0.298 against forest's 0.051, only 5.3% of them shore-adjacent, and drew
+        # 2.5x their expected share of villages.
+        #
+        # WHY IT WAS BUILT THIS WAY -- a real dependency cycle, not an oversight. Rivers must precede
+        # `wateracc` (the BFS seeds on river cells), and `precip_mm` above multiplies by
+        # (1 + P_MARITIME_GAIN * wateracc). So precipitation cannot be available to the first river pass.
+        #
+        # THE BREAK. D8 `downstream` routing is a function of ELEVATION ALONE and does not change when the
+        # weights change. So a second accumulation along the SAME links, weighted by runoff instead of ones,
+        # costs one extra pass and no re-derivation of the routing.
+        #
+        # NO NEW NUMBER: runoff = max(0, P - PET) reuses `CULT_PET_PER_DEG`, the Thornthwaite-style PET proxy
+        # already used by `cultivability_field`. A catchment whose P - PET is negative -- a real desert --
+        # contributes nothing, which is what makes wadis ephemeral and leaves only ALLOGENIC rivers (Nile,
+        # Colorado) fed from wet uplands.
+        if knobs.get("runoff_rivers"):
+            _pet = CULT_PET_PER_DEG * np.maximum(temperature, 1.0)
+            _runoff = np.maximum(0.0, precip_mm - _pet).reshape(-1)
+            _flow2 = np.where(isWater_flat == 0, _runoff, 0.0).astype(np.float64)
+            for _idx in order:                      # descending elevation: contributors before receivers
+                _d = downstream[_idx]
+                if _d >= 0:
+                    _flow2[_d] += _flow2[_idx]
+            _lf2 = _flow2[land_idx]
+            _fmax2 = float(_lf2.max()) if len(_lf2) > 0 and _lf2.max() > 0 else 1.0
+            _thr2 = _fmax2 * (0.10 - waterK * 0.06)
+            isRiver_flat = ((isWater_flat == 0) & (_flow2 > _thr2)).astype(np.uint8)
+            isRiver = isRiver_flat.reshape(N, N)
+            # wateracc seeds on water OR river, so it must be rebuilt from the corrected river mask.
+            _dist = np.full(N * N, np.inf, dtype=np.float64)
+            _q: deque = deque()
+            for _i in range(N * N):
+                if isWater_flat[_i] or isRiver_flat[_i]:
+                    _dist[_i] = 0.0
+                    _q.append(_i)
+            while _q:
+                _i = _q.popleft()
+                _xc, _yc = int(_i % N), int(_i // N)
+                _dv = _dist[_i]
+                for _dx, _dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    _xx, _yy = _xc + _dx, _yc + _dy
+                    if 0 <= _xx < N and 0 <= _yy < N:
+                        _j = _yy * N + _xx
+                        if _dist[_j] > _dv + 1:
+                            _dist[_j] = _dv + 1
+                            _q.append(_j)
+            wateracc = np.where(isWater, 1.0, np.exp(-decay * _dist.reshape(N, N)))
+            # `precip_mm` and `biome` are deliberately NOT recomputed from the new wateracc: that would
+            # reopen the cycle and need iteration to converge. The defect being fixed is `aquatic_food`
+            # (computed below from `isRiver`), and this is the minimal change that reaches it. The residual
+            # -- precip still reflects the uniform-flow river map -- is stated rather than hidden.
         precip_mm[isWater == 1] = 0.0
         # C6: river/surface-water temperature carries the cold of its montane HEADWATER (snowmelt), not the local
         # air — a valley river can be cold where the air is warm. headwater = max upstream elevation (src_elev).

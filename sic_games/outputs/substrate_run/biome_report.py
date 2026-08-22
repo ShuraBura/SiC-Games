@@ -55,17 +55,43 @@ def report(tags):
             share_s = ss / tot_s if tot_s else 0
             enr = share_p / share_c if share_c else float("nan")
             senr = share_s / share_c if share_c else float("nan")
-            rows[name] = (enr, senr)
+            rows[name] = (enr, senr, n, share_c)
             print(f"  {name:<10}{n:>7}{100*share_c:>6.1f}%{pp:>8}{100*share_p:>6.1f}%"
                   f"{enr:>8.2f}{ss:>7}{senr:>9.2f}{spot[b].mean():>7.3f}{forage[b].mean():>8.0f}")
         print("\n  ENRICHMENT = share of people (or sites) / share of habitable cells.  1.00 = indifferent.")
+        # SCORING GUARD -- BY STATISTICAL POWER, NOT BY CELL COUNT (2026-08-22).
+        # First attempt used a flat "skip biomes under 30 cells / 5% of land". That was WRONG in a way worth
+        # recording: it silently turned the mixed world's headline FAIL into a PASS by skipping its 19 desert
+        # cells -- the exact finding the tool was built to surface. An arbitrary threshold that erases a real
+        # result is worse than no guard.
+        # The right question is not "how much land" but "could this deviation be chance". Under a Poisson
+        # null of indifferent placement, expected = pop * share_of_land, and z = (obs - exp) / sqrt(exp).
+        #   base_s0 desert : 19 cells, expected 33 people, observed 66  -> z = +5.7   REAL, must be scored
+        #   savanna forest : 11 cells, expected 1.7,       observed 0   -> z = -1.3   noise, must be skipped
+        MIN_EXPECTED, Z_CRIT = 10.0, 2.0
+        scorable, skipped = {}, []
+        for name, (enr, senr, ncells, share_c) in rows.items():
+            exp = tot_p * share_c
+            if exp < MIN_EXPECTED:
+                skipped.append(f"{name}(exp {exp:.1f})")
+                continue
+            obs = enr * exp
+            scorable[name] = (enr, senr, (obs - exp) / (exp ** 0.5))
+        if skipped:
+            print(f"  NOT SCORED -- too few people expected for any deviation to mean anything: "
+                  f"{', '.join(sorted(skipped))}")
         verdict, why = "PASS", []
         for name in LUSH:
-            if name in rows and rows[name][0] < 1.0:
-                verdict = "FAIL"; why.append(f"{name} people-enrichment {rows[name][0]:.2f} < 1")
+            if name in scorable and scorable[name][0] < 1.0 and scorable[name][2] < -Z_CRIT:
+                verdict = "FAIL"
+                why.append(f"{name} enrichment {scorable[name][0]:.2f} (z={scorable[name][2]:+.1f})")
         for name in ARID:
-            if name in rows and rows[name][0] > 1.0:
-                verdict = "FAIL"; why.append(f"{name} people-enrichment {rows[name][0]:.2f} > 1")
+            if name in scorable and scorable[name][0] > 1.0 and scorable[name][2] > Z_CRIT:
+                verdict = "FAIL"
+                why.append(f"{name} enrichment {scorable[name][0]:.2f} (z={scorable[name][2]:+.1f})")
+        if not any(n in scorable for n in LUSH + ARID):
+            verdict = "NOT SCORABLE"
+            why = ["no lush or arid biome carries enough people in this world to score"]
         print(f"  CRITERION (lush enriched, arid depleted): {verdict}"
               + ("   -- " + "; ".join(why) if why else ""))
 
