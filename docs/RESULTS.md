@@ -6718,4 +6718,136 @@ single-seed. That the residual flat hazard is understood — it is not.
 
 ---
 
+## Addendum 47 — The population is not food-limited; it fails to disperse (2026-08-22, R-106)
+
+**THE HEADLINE, and it retires a claim this document made three addenda ago.** Addendum 44 concluded "the
+model is Malthusian, so no hazard fix can raise e0". The arithmetic there was right and the label was wrong.
+A population sitting at **4.8× BELOW** Binford's packing threshold regionally, on **13% of its habitable
+land**, with the median agent eating **2.7× requirement**, is not limited by carrying capacity. It is limited
+by a local crowding pathology. Every carrying-capacity reading taken between Addenda 44 and 46 should be
+re-read in that light.
+
+### The packing paradox
+
+A forager population cannot be simultaneously PACKED (locally dense enough that Binford says it would
+intensify) and SPARSE (regionally nowhere near filling its range). Measured on coastal-temperate, seed 0:
+
+| | value | anchor |
+|---|---|---|
+| regional density | 0.0174 /km² | **4.8× below** Binford packing 0.091 |
+| local density | 0.131 /km² | **1.4× above** it |
+| land used | 13.3% | — |
+| km² per band | 214 | below its own 314 km² catchment (Vita-Finzi & Higgs) |
+| corr(forage, people) | **+0.12** | on a landscape with a 5× productivity range |
+| top-decile land occupied | 34.6% | — |
+
+The check needs NO new number: it uses Binford's filed 0.091 twice, once per side. It is now WIRED
+(`demography.spatial_health`, a `!! SPATIAL:` banner in every campaign snapshot) rather than written down,
+because a table nobody reads is what allowed this. Verified firing from the first snapshot of a live run.
+
+### SubstrateConfig was outside the config system
+
+`run_campaign` built `SubstrateConfig` inline from `**GRP`, imported from a 2026 one-off script, while
+`config/parameters.toml` — the authoritative file — stated the grouping drives were **OFF**:
+
+| field | the file said | every campaign ran |
+|---|---|---|
+| `group_safety_max` | 0.0 | **8.0** |
+| `group_mate_min` | 0.0 | **15.0** |
+
+Those two multipliers make leaving a band of 30 cost **20.6×** in perceived yield, against a terrain signal
+whose entire range is 4.8× — clustering outweighed the whole landscape by 4.3×. The same
+`DemographyConfig + ClimateConfig` pair was hardcoded in FOUR places (`gen_runconfig.resolved_canonical`,
+`runspec.load` validation, `make_runconfig --set`, and the campaign's construction), and SubstrateConfig fell
+through every one. `runspec.build` was ALREADY generic over all three modules — the design was right and only
+the guards were narrow. Fixed in five bit-exact steps, and the fidelity test is now parametrised over owner
+classes rather than checking DemographyConfig alone.
+
+### THE HYPOTHESIS THAT FOLLOWED WAS FALSIFIED
+
+Having found a 20.6× clustering force, the obvious inference was that it caused the crowding. **It does not.**
+Ablating both grouping drives entirely moved land use 13.3% → **14.1%**, and `corr(forage,people)` got WORSE
+(+0.120 → +0.082). Five arms — mobility radius, agglomeration attraction, cohesion, E.1 safety, E.2 mate
+access — every attraction term nameable, and **none disperses the population**. The constraint is not any
+single attraction parameter, and that is recorded here because the 20.6× number is seductive and wrong.
+
+Note also `disp_radius` came back BIT-IDENTICAL to control: `mobility_max_radius` only binds where NPP < 150
+g/m²/yr, which never occurs on occupied land. A knob raised 6 → 20 changed nothing.
+
+### TWO CLAIMS OF MINE, WITHDRAWN
+
+**(1) "Villages form on non-optimal areas" — WITHDRAWN.** Every spatial claim in this arc was scored against
+`forage_kcal`. Village siting reads `S_pot = max(aquatic_food, cultivability)`, and the two are
+**UNCORRELATED (+0.027)**. Scored against the field that actually governs it, sites sit at S_pot **0.934**
+against a habitable mean of 0.353 — 2.6× better than average and near the maximum. **Villages are well
+sited.** What survives, restated properly: only 9.5% of top-decile S_pot land carries a site.
+
+**(2) The isolation-flux hypothesis (task #71) — FALSIFIED.** The dead sit in cells MORE crowded than the
+living (`occ_at_death` 44.1 vs `occ_of_living` 27.7). The earlier 6.5-against-71.4 reading came from a single
+arm and did not replicate.
+
+### Two terrain-generator defects, found by single-biome testing
+
+The generator had never had a coherence benchmark. It is structurally SOUND — determinism, no NaN, rivers and
+shore never on water, `aquatic_food` bounded and only where there is water, every biome label re-derivable
+from its own climate, and **every filed per-biome forage anchor reproduced at 0.96–1.00** once shore cells are
+excluded (the `SHORE_BONUS_KCAL` addition, verified by a positive control so the exclusion cannot hide a real
+defect). Two real defects:
+
+**(a) Rivers are drainage AREA with no water balance.** `flow = np.ones()` gives every cell one unit
+regardless of rainfall, so across 20 worlds **deserts are 1.63× WETTER than forests** (0.075 vs 0.046). That
+propagates: `aquatic_food` scores desert rivers as cold anadromous fisheries, `S_pot` ranks desert 0.413 >
+grass 0.404 > forest 0.259, and villages settle the desert at 2.5× enrichment. Weighting the accumulation by
+Budyko runoff (VERIFIED and filed; parameter-free) reverses the ordering to forest 0.283 > grass 0.228 >
+desert 0.171 and the river ratio to 0.49.
+
+**(b) The river threshold is RELATIVE.** `riverThresh = fmax * (0.10 − waterK*0.06)` is a fraction of the
+world's own maximum flow, so "is this a river" means "is this in the top decile of this world's drainage" —
+equally true in a rainforest and a desert. The 100%-desert world went 474 → **519** river cells under Budyko.
+An earlier version of the test asserted that world dropped to ~0 rivers; it did under the crude
+`Q = max(0, P − PET)`, but FOR THE WRONG REASON — that form returns exactly zero everywhere P < PET, so `fmax`
+was 0, the guard substituted 1.0, and every cell failed the comparison. **An accident of a broken runoff model
+passing a test by luck.** The fix this points to is an ABSOLUTE discharge threshold, which introduces a number
+this project has not filed.
+
+### Three scored markers are provisional
+
+`_maintain_settlements` counts everyone inside a site's 25-cell, 2,500 km² window, and the windows OVERLAP:
+**184 sites × 25 cells = 4,602 window-cells over 229 OCCUPIED cells**, so every occupied cell lies inside ~20
+different sites' persistence windows. `n_settle = 184` with `settle_med = 11` is ONE clustered population
+counted twenty times. `primate_ratio` and `zipf_slope` read the same list, so #12's clean-looking Zipf −0.98
+is a rank-size slope over phantom settlements. Markers #3, #12, #13 are flagged PROVISIONAL; #3's prior
+"46/52 arms PASS" is withdrawn.
+`enable_exclusive_village_membership` is NOT the fix: re-tested against this question rather than the spacing
+question it was rejected for, it failed the discriminator — population fell 9.5%/63.7% across two seeds and
+founding churn rose 8×. It buys a correct-looking number by destroying the population that produced it.
+
+### What single-biome testing found that the mixed world hid
+
+Forest and savanna run. **Arid and mountain go extinct inside 80 steps, 95% starvation, ZERO births**, and the
+mixed world never pressed on it because base_s0 has 1,229 viable anchor sites. Four predictions were made and
+all four FAILED: cluster seeding, capacity-scaled grouping, both together, and seeding at the anchored
+density. The measured cause is a startup transient — the bottom intake decile sits at 0.62× requirement from
+step 1 with reserves under one month, 90% die in six steps, and the ~30 survivors on good land thrive
+(intake 2–5×) but are below the breeding threshold. The arid world is NOT uninhabitable: 1,471 of its 3×3
+neighbourhoods can feed ≥15 people, and the filed density (0.005/km², Long 1971 / Cane 1990) clears its
+stability ceiling `K/(1+DEPLETE_FRAC)` = 1.33 by 2.7×.
+
+**One real defect was found there:** `comove_footprint = 0` ("exact snap") collapses every co-moving family
+onto ONE cell, so the annual pairing gate halves the occupied-cell count in a single step (110 → 75, occupancy
+1.07 → 1.56). Two competing explanations were falsified first — ablating the annual drought shock and ablating
+band cohesion each left it untouched. The fix was ALREADY BUILT AND DARK: `comove_footprint_scaled`, k ∝ 1/NPP
+on the Kelly/Binford shape, giving **k = 0 on every rich world** (bit-exact) and k = 2–3 on poor ones.
+
+### What is NOT claimed
+
+That the demography is fixed — `e15` is 18.9 against ~35, TFR ~10 against 5–8. That any of tonight's
+mechanisms rescues arid — none does; it still dies in the first seasonal trough, and the reason is now
+anchored: the model implements only CENTRAL-PLACE overwintering storage, and the mode that applies to arid
+Australia (dispersed caching, keyed to multi-year unpredictability) was never built. That `runoff_rivers`,
+`enable_capacity_scaled_grouping` or `comove_footprint_scaled` should be adopted — all three remain OFF
+pending a supervisor call. And that the residual flat hazard is understood — it is not.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
