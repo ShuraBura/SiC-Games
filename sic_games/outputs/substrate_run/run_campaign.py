@@ -86,7 +86,8 @@ if "--config" in sys.argv:
                      # The seed's three roles (runspec RUN_DEFAULTS). Absent from a run file ⇒ all three equal
                      # `seed` ⇒ every prior run is bit-exact.
                      "world_seed": "C_WORLD_SEED", "climate_seed": "C_CLIM_SEED",
-                     "agent_seed": "C_AGENT_SEED"}
+                     "agent_seed": "C_AGENT_SEED",
+                     "seed_layout": "C_SEED_LAYOUT", "seed_cluster_size": "C_SEED_CLUSTER"}
     for _k, _env in _ENV_FROM_RUN.items():
         _v = _SPEC.run[_k]
         os.environ[_env] = ("1" if _v else "0") if isinstance(_v, bool) else str(_v)
@@ -166,6 +167,8 @@ MATRULE   = os.environ.get("C_MATRULE", "primogeniture") # none|primogeniture|pa
 LINTRIB   = os.environ.get("C_LINTRIBUTE", "0") == "1"   # R-103f per-lineage chiefly tribute (default OFF)
 TRIBFRAC  = float(os.environ.get("C_TRIBFRAC", "0.15"))  # R-103f share of production the chief levies [gumsa a-thigh]
 DELEGIT   = os.environ.get("C_DELEGIT", "1") == "1"      # R-103f test knob: gumsa/gumlao reversion (default ON, bit-exact)
+SEED_LAYOUT = os.environ.get("C_SEED_LAYOUT", "cycle")   # "cycle" (legacy, bit-exact) | "cluster"
+SEED_CLUSTER = int(os.environ.get("C_SEED_CLUSTER", "25"))
 PATCHSZ   = int(os.environ.get("C_PATCH", "0"))          # R-103i CIRCUMSCRIPTION (Carneiro): capacity sub-window
                                                           # size; 0 = the validated default PATCH. NPPCapacityField
                                                           # masks capacity to (X0,Y0,size) with ZERO outside, so a
@@ -757,7 +760,50 @@ def main():
     # `fields=f` supplies the GRASS sub-biome masks C.4b/C.4c need; without them those layers are inert at
     # any amplitude, and `build_climate_field` raises rather than running them dead.
     cap = build_climate_field(base, clim, fields=f, seed=CLIM_SEED)   # the climate realisation
-    pos = [land[i % len(land)] for i in range(FOUNDERS)]
+    if SEED_LAYOUT == "cluster":
+        # CAPACITY-AWARE CLUSTER SEEDING. Two constraints pull opposite ways and both must hold:
+        #   MATE GATE   phase1_model F.1 requires a co-resident adult male for a birth, so founders spread
+        #               one-per-cell can never reproduce -- the cycle layout's failure mode in poor worlds.
+        #   CAPACITY    a cell that feeds 2 people cannot host a band of 25, or everyone starves at step 1.
+        # So: group founders into clusters of `seed_cluster_size` (the band anchor), and lay each cluster over
+        # as many neighbouring cells as its own local capacity requires -- tight enough to mate, thin enough
+        # to eat. Cells are taken best-capacity-first, so clusters land on the ABUNDANT ground.
+        _rank = sorted(land, key=lambda c: -cap.level(c[0], c[1]))
+        _head = {c: max(1, int(cap.level(c[0], c[1]) // BURN)) for c in _rank}
+        _free = dict(_head)
+        pos = []
+        _ci = 0
+        while len(pos) < FOUNDERS and _ci < len(_rank):
+            _cx, _cy = _rank[_ci]; _ci += 1
+            if _free.get((_cx, _cy), 0) <= 0:
+                continue
+            _near = sorted((c for c in _rank
+                            if max(abs(c[0] - _cx), abs(c[1] - _cy)) <= 3 and _free.get(c, 0) > 0),
+                           key=lambda c: -cap.level(c[0], c[1]))
+            # ROUND-ROBIN, ONE PER CELL FIRST -- not fill-to-capacity. Filling each cell to its headroom put
+            # 21 founders on the single richest arid cell and the probe went extinct at step 18, FASTER than
+            # the one-per-cell layout's step 29. The mate gate's own comment says a band "spreads ~1/cell over
+            # its territory", and `bonded_mate_radius = 1` means a mother needs an unrelated adult male inside
+            # her 3x3. So the target is a COMPACT BLOCK AT ~1/CELL: every member has neighbours inside the
+            # mate radius, while local density stays far below what the cell can feed.
+            _placed = 0
+            for _c in _near:                       # ONE PASS, at most ONE founder per cell
+                if _placed >= SEED_CLUSTER or len(pos) >= FOUNDERS:
+                    break
+                if _free.get(_c, 0) <= 0:
+                    continue
+                pos.append(_c)
+                _free[_c] = 0                      # this cell is spent for seeding purposes
+                _placed += 1
+        if len(pos) < FOUNDERS:                       # world too small to hold them within capacity
+            pos.extend(land[i % len(land)] for i in range(FOUNDERS - len(pos)))
+        _occ = {}
+        for _c in pos:
+            _occ[_c] = _occ.get(_c, 0) + 1
+        log(f"campaign: seed_layout=cluster -> {len(pos)} founders on {len(_occ)} cells "
+            f"(max {max(_occ.values())}/cell, clusters of {SEED_CLUSTER})")
+    else:
+        pos = [land[i % len(land)] for i in range(FOUNDERS)]
     cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
         enable_landscape_packing=True, enable_sedentism_fertility=SEDFERT,

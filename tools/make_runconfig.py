@@ -31,11 +31,21 @@ sys.path.insert(0, str(ROOT / "sic_games" / "src"))
 RUNS_DIR = ROOT / "config" / "runs"
 
 # Execution settings for the reference arm. A run file states all of them explicitly.
-BASE_RUN = {
-    "steps": 2500, "seed": 0, "founders": 3000, "terrain": "coastal", "climate": "temperate",
-    "patch": 0, "max_minutes": 0, "log_every": 25, "gen_every": 200, "flush_every": 500,
-    "genealogy": True, "genome": True,
-}
+# DERIVED FROM runspec.RUN_DEFAULTS, NOT A SECOND COPY (2026-08-22). It WAS a hand-maintained duplicate, and
+# it drifted the moment `seed_layout` was added: new run keys silently failed to appear in authored files, so
+# a run file could not express the setting at all. Charter P4 -- a second copy is tested or deleted.
+# `tag` is excluded (it is per-invocation, not a run property) and `steps` keeps its smaller AUTHORING default
+# so a hand-made arm is cheap to smoke-test before anyone commits to 15000 steps.
+def _base_run() -> dict:
+    from sic_games.runspec import RUN_DEFAULTS
+    # `tag` is per-invocation, not a run property. None-valued defaults (world_seed / climate_seed /
+    # agent_seed) mean "inherit from `seed`" and have no TOML representation -- emitting them wrote
+    # `world_seed = None`, which is not valid TOML and broke every file authored for one commit.
+    skip = {"tag"} | {k for k, v in RUN_DEFAULTS.items() if v is None}
+    return {**{k: v for k, v in RUN_DEFAULTS.items() if k not in skip}, "steps": 2500}
+
+
+BASE_RUN = _base_run()
 
 
 def _fmt(v) -> str:
@@ -142,6 +152,9 @@ def main(argv=None) -> int:
     ap.add_argument("--founders", type=int)
     ap.add_argument("--max-minutes", dest="max_minutes", type=int,
                     help="wall-clock budget; the run stops cleanly at it. 0 = uncapped.")
+    ap.add_argument("--seed-layout", dest="seed_layout", choices=["cycle", "cluster"],
+                    help="founder layout: cycle (legacy, 1/cell) or cluster (capacity-sized groups)")
+    ap.add_argument("--seed-cluster-size", dest="seed_cluster_size", type=int)
     ap.add_argument("--terrain")
     ap.add_argument("--climate")
     # THE SEED'S THREE ROLES (runspec RUN_DEFAULTS, 2026-08-11). Omit them and all three follow `--seed`,
@@ -161,7 +174,9 @@ def main(argv=None) -> int:
                 (("steps", a.steps), ("seed", a.seed), ("founders", a.founders),
                  ("terrain", a.terrain), ("climate", a.climate),
                  ("max_minutes", a.max_minutes), ("world_seed", a.world_seed),
-                 ("climate_seed", a.climate_seed), ("agent_seed", a.agent_seed)) if v is not None}
+                 ("climate_seed", a.climate_seed), ("agent_seed", a.agent_seed),
+                 ("seed_layout", a.seed_layout), ("seed_cluster_size", a.seed_cluster_size))
+                if v is not None}
     text = build(a.name,
                  on=[s.strip() for s in a.on.split(",") if s.strip()],
                  off=[s.strip() for s in a.off.split(",") if s.strip()],

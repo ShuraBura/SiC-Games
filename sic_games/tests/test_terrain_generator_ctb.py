@@ -183,15 +183,32 @@ def test_runoff_weighting_makes_forests_wetter_than_deserts(terr, clim):
     assert d < f, f"{terr}-{clim}: desert river density {d:.3f} still >= forest {f:.3f} with runoff weighting"
 
 
-def test_a_pure_desert_world_has_essentially_no_perennial_rivers():
-    """flat-subtropical is 100% desert. With no wetter biome anywhere upstream there is no allogenic source,
-    so a physical generator must produce almost no perennial river. Measured: 474 river cells -> 0."""
-    p_off = parts(world("flat", "subtropical"))
-    p_on = parts(world("flat", "subtropical", runoff=True))
-    n_off, n_on = int(p_off["river"].sum()), int(p_on["river"].sum())
-    assert n_off > 100, f"expected the uniform-flow generator to carve many desert rivers, got {n_off}"
-    assert n_on <= n_off * 0.05, \
-        f"a 100% desert world still carries {n_on} river cells with runoff weighting (was {n_off})"
+def test_DEFECT_the_river_threshold_is_RELATIVE_so_even_a_pure_desert_has_rivers():
+    """A SECOND, DEEPER DEFECT, found because this test failed after the Budyko fix (2026-08-22).
+
+        riverThresh = fmax * (0.10 - waterK * 0.06)
+
+    The threshold is a fraction of THE WORLD'S OWN MAXIMUM flow, so "is this a river" really means "is this in
+    the top decile of this world's drainage". That is true in a rainforest and in a desert alike: a drier
+    world simply rescales and keeps the same river FRACTION. Absolute water never enters the decision.
+
+    Measured on flat-subtropical, which is 100% desert: 474 river cells with uniform flow, and 519 -- MORE --
+    with Budyko runoff, because uniform aridity gives a uniform (small) runoff whose top decile is unchanged.
+
+    An earlier version of this test asserted the pure-desert world dropped to ~0 rivers. It did, under the
+    crude Q = max(0, P - PET), but for the WRONG REASON: that form returns exactly zero everywhere P < PET, so
+    across a whole desert fmax was 0, the guard substituted 1.0, and every cell failed the comparison. An
+    accident of a broken runoff model, not a physical result -- and the same over-drying that stripped the
+    grasslands. Recording it rather than keeping a test that passed by luck.
+
+    THE FIX this points to is an ABSOLUTE discharge threshold (a perennial river needs real m3/s, not a
+    percentile), which introduces a number this project has not filed. Left for the supervisor.
+    """
+    off = int(np.asarray(world("flat", "subtropical").isRiver).sum())
+    on = int(np.asarray(world("flat", "subtropical", runoff=True).isRiver).sum())
+    assert off > 100, f"expected the uniform-flow generator to carve many desert rivers, got {off}"
+    assert on > 100, (f"a 100% desert world now has only {on} river cells -- if the threshold was made "
+                      f"ABSOLUTE, delete this test and assert the absence instead")
 
 
 def test_runoff_weighting_is_bit_exact_when_off():

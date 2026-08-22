@@ -58,6 +58,15 @@ RUN_DEFAULTS: dict = {
     "steps": 15000, "seed": 0, "founders": 3000, "terrain": "coastal", "climate": "temperate",
     "patch": 0, "tag": "", "max_minutes": 0, "log_every": 25, "gen_every": 200, "flush_every": 500,
     "genealogy": True, "genome": True,
+    # FOUNDER LAYOUT (2026-08-22). "cycle" is the historical rule -- one founder per land cell, cycling --
+    # and stays the default so every prior run is bit-exact. "cluster" seeds capacity-sized groups instead.
+    # WHY IT EXISTS: `phase1_model` F.1 requires a CO-RESIDENT adult male for any birth ("loners can't
+    # reproduce"). The cycle layout puts ~1 founder per cell, so in a low-capacity world (arid 2.0 people per
+    # cell, mountain 1.9) the founders are too dispersed to ever pair, no birth occurs, and senescence alone
+    # empties the map -- biome_arid died at step 29 and biome_mountain at step 52 with deaths_starv = 0 and
+    # intake at 1.2x requirement. That is a SEEDING artefact, not a statement about those environments.
+    "seed_layout": "cycle",
+    "seed_cluster_size": 25,
     # ── THE SEED IS THREE THINGS, and until 2026-08-11 one integer did all three jobs ──────────────────────
     # `seed` reaches the run at three independent places:
     #   world_seed    world_lottery_climate(seed) — DRAWS THE WORLD. relief, roughness, water fraction,

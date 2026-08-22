@@ -953,8 +953,19 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         # contributes nothing, which is what makes wadis ephemeral and leaves only ALLOGENIC rivers (Nile,
         # Colorado) fed from wet uplands.
         if knobs.get("runoff_rivers"):
+            # BUDYKO (1974) mean-annual water balance, and it is PARAMETER-FREE -- no new number:
+            #     AI = PET/P ;  E/P = [ AI * tanh(1/AI) * (1 - exp(-AI)) ]^(1/2) ;  Q = P * (1 - E/P)
+            # The first version used the cruder Q = max(0, P - PET), which the supervisor's grassland concern
+            # correctly caught: that form gives EXACTLY ZERO runoff wherever annual P < PET, so it drains
+            # every steppe and prairie -- and prairie rivers are real. Budyko keeps them partially wet while
+            # still drying true desert, because actual ET is water-limited rather than equal to POTENTIAL ET.
+            # Measured at PET = 900 mm/yr:  P=100 -> Q 0 (desert) | P=500 -> crude 0, Budyko 65 (steppe)
+            # | P=700 -> crude 0, Budyko 155 | P=1800 -> crude 900, Budyko 1016 (wet forest).
             _pet = CULT_PET_PER_DEG * np.maximum(temperature, 1.0)
-            _runoff = np.maximum(0.0, precip_mm - _pet).reshape(-1)
+            _P = np.maximum(precip_mm, 1e-6)
+            _ai = np.clip(_pet / _P, 1e-6, 1e6)
+            _e_over_p = np.sqrt(np.clip(_ai * np.tanh(1.0 / _ai) * (1.0 - np.exp(-_ai)), 0.0, 1.0))
+            _runoff = np.maximum(0.0, _P * (1.0 - _e_over_p)).reshape(-1)
             _flow2 = np.where(isWater_flat == 0, _runoff, 0.0).astype(np.float64)
             for _idx in order:                      # descending elevation: contributors before receivers
                 _d = downstream[_idx]
