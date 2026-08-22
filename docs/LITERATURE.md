@@ -1632,3 +1632,74 @@ small founder set's national capture (Yan, 3 lineages -> 40%), and the aggregate
 `dynasties()` diagnostic against these three, at the level each is actually comparable: `top_share` (largest
 single lineage's fraction) against Zerjal's ~8%; the summed share of the top 3 lineages against Yan's ~40%;
 and `eff_lineages` (inverse-Simpson effective count), egalitarian vs stratified, against Karmin's ~17x Ne ratio.
+
+---
+
+### Budyko 1974 — mean annual water balance (the runoff term in the terrain generator)
+
+**Fetched and verified 2026-08-22**, after the supervisor asked whether it had been fetched or written from
+memory. It had been written from memory and shipped unverified; that was wrong, and the check is recorded here
+so the claim never rests on recollection again.
+
+**What was lifted — the evaporation-ratio curve:**
+
+    E/P = [ AI · tanh(1/AI) · (1 − exp(−AI)) ]^(1/2)      AI = Ep/P (aridity index)
+    Q   = P · (1 − E/P)                                    (runoff, the complement)
+
+Budyko carried out an empirical analysis of long-term mean annual water balances across a large number of
+environments worldwide and showed that catchments in different climatic regions fit this curve. Note it is
+**PARAMETER-FREE** — Fu 1981 / Zhang et al. 2004 add a shape parameter ω (traditional Budyko ≈ ω 2.6), which
+this project does NOT use, so no new constant enters.
+
+**How used:** `terrain.py`, `knobs["runoff_rivers"]`. The generator's river pass allocated `flow = ones()` —
+one unit per cell regardless of rainfall — so `isRiver` was pure drainage AREA with no water balance, and
+deserts came out 1.63x WETTER than forests across 20 worlds. Weighting the accumulation by Budyko runoff
+reverses that to 0.49. Actual ET is water-limited rather than equal to POTENTIAL ET, which is why the cruder
+`Q = max(0, P − PET)` was wrong: it returns exactly zero wherever P < PET and so drains every steppe and
+prairie, and prairie rivers are real.
+
+**Status: [VERIFIED — formula confirmed against the published form, 2026-08-22].** The PDF is not in
+`literature/`; the confirmation is from the secondary literature reporting Budyko's equation verbatim.
+
+**Citation tag:** [ANCHORED — mean-annual runoff partitioning; parameter-free]
+Sources: [HESS technical note](https://hess.copernicus.org/articles/26/4575/2022/) ·
+[Understanding the Budyko Equation](https://www.researchgate.net/publication/315928327_Understanding_the_Budyko_Equation)
+
+---
+
+### Pre-contact hunter-gatherer density in the Australian Western Desert — the ARID calibration target
+
+**Fetched 2026-08-22.** The project had no arid density anchor; the figure previously used in discussion
+(0.01/km²) was from memory and is roughly **twice** the published values.
+
+**What was lifted — three independent estimates that converge:**
+
+| source | figure | density |
+|---|---|---|
+| Long 1971 | 1 person per **200 km²** (Western Desert generally) | 0.0050 /km² |
+| Cane 1990 | 1 person per **170 km²** (Great Sandy Desert) | 0.0059 /km² |
+| Ngaatjatjarra | ~500 people over ~100,000 km² | 0.0050 /km² |
+
+**⚠ DO NOT confuse with the 0.05 /km² figure** that a general search returns for "arid Australia" — that is an
+order of magnitude higher and does not refer to pre-contact foragers. The three above agree at **~0.005 /km²**,
+i.e. one person per 170–200 km², and that is the number to score against.
+
+**How used:** the target for a canonical ARID world (`flat-subtropical`, 100% desert). On the 158,400 km²
+capacity patch it implies **~790 people**, and in this model's 100 km² cells it is **~0.5 people per cell**.
+The model currently produces **ZERO** — every arid run goes extinct in under 60 steps, 95% of deaths from
+starvation, with no births at all.
+
+**WHY THAT IS NOT A REGROWTH-RATE PROBLEM, and this matters because it was nearly mis-calibrated:** the
+depletion model equilibrates at
+
+    B* = 1 − DEPLETE_FRAC · pressure ,   pressure = occupants / cell capacity
+
+which contains **no r**. `R_BIOME_PER_YR` sets only the SPEED of approach, never the equilibrium stock, so
+tuning desert regrowth cannot fix the collapse. The measured cause is that arid is habitable at ≤2 people per
+cell (B* 0.75, yield 1.5) and the agents cluster at ~14 per cell — the density that is comfortable at
+temperate capacity 24.6 and lethal at arid capacity 2.0. **Aggregation does not scale to local carrying
+capacity.** That is the same clustering pathology as the packing paradox, seen in a world with no slack.
+
+**Citation tag:** [ANCHORED — arid forager density target ~0.005/km²; Long 1971, Cane 1990]
+Sources: [Aboriginal subsistence in the Western Desert](https://link.springer.com/article/10.1007/BF00887998) ·
+[Precontact foraging habitats, Western Desert](https://www.nature.com/articles/s41598-021-89642-1)

@@ -953,7 +953,10 @@ def generate_world(knobs: dict, mode: str = "legacy") -> WorldFields:
         # contributes nothing, which is what makes wadis ephemeral and leaves only ALLOGENIC rivers (Nile,
         # Colorado) fed from wet uplands.
         if knobs.get("runoff_rivers"):
-            # BUDYKO (1974) mean-annual water balance, and it is PARAMETER-FREE -- no new number:
+            # BUDYKO (1974) mean-annual water balance. [VERIFIED 2026-08-22 -- fetched and confirmed against
+            # the published form; filed in LITERATURE.md. It was written from MEMORY and shipped unverified
+            # first, which was wrong.] PARAMETER-FREE -- Fu 1981 / Zhang 2004 add a shape parameter omega that
+            # this project does NOT use, so no new constant enters:
             #     AI = PET/P ;  E/P = [ AI * tanh(1/AI) * (1 - exp(-AI)) ]^(1/2) ;  Q = P * (1 - E/P)
             # The first version used the cruder Q = max(0, P - PET), which the supervisor's grassland concern
             # correctly caught: that form gives EXACTLY ZERO runoff wherever annual P < PET, so it drains
