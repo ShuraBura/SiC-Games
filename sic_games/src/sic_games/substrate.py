@@ -127,6 +127,8 @@ def diffusion_select_target(
     store_field=None,
     store_gain: float = 0.0,
     store_horizon: float = 24.0,
+    cap_group: bool = False,
+    burn: float = 0.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -212,6 +214,19 @@ def diffusion_select_target(
         # E.2 mating access (a penalty below the minimum viable band ⇒ being alone is actively bad).
         if s_max > 0.0 or g_mate > 0.0:
             g = n_cell if is_cur else n_cell + 1                 # post-move group size
+            # CAPACITY-SCALED GROUPING (R-106, 2026-08-22). A group larger than the land can feed confers NO
+            # further grouping benefit: fifteen people on a cell that feeds two are not a safer band, they are
+            # a famine. Without this the E.1/E.2 multipliers reward aggregation identically at every
+            # productivity, which is calibrated for rich ground and lethal on poor.
+            # MEASURED: a stable cell needs occ <= K/(1+DEPLETE_FRAC). Arid K=2.0 gives occ_max 1.33; the
+            # agents sat at 1.40 and every arid run went extinct inside 60 steps, 95% of deaths from
+            # starvation, zero births ever. Forest K=36.3 gives occ_max 24.2, so the same behaviour is
+            # harmless there -- which is why this only ever showed up on a single-biome test.
+            # NO NEW PARAMETER: the cap is the cell's own food divided by BURN, both already in hand.
+            # Real foragers size groups to what the country supports -- the Western Desert pattern behind the
+            # 0.005/km2 anchor (Long 1971, Cane 1990; LITERATURE.md).
+            if cap_group and burn > 0.0:
+                g = min(g, max(1.0, S / burn))
             if s_max > 0.0:
                 gs_local = float(band_opt_field[cy, cx]) if band_opt_field is not None else g_s   # v3: CV-derived
                 ypc *= 1.0 + s_max * (1.0 - math.exp(-g / gs_local))                              # risk-pooling saturates at g*(CV)

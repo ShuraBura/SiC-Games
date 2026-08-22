@@ -146,6 +146,11 @@ class SubstrateConfig(BaseModel):
     # (no mates) — a lone agent's cell value is multiplied by group_mate_floor, rising to 1 at group_mate_min.
     group_mate_min: float = Field(0.0, ge=0.0)         # g_mate: band size at/above which no mating penalty; 0 = off
     group_mate_floor: float = Field(0.3, ge=0.0, le=1.0)  # cell-value multiplier for a LONE agent (g=1)
+    # CAPACITY-SCALED GROUPING (R-106, 2026-08-22): cap the group size that earns an E.1/E.2 benefit at what
+    # the cell can actually feed (S/BURN). Without it the grouping drives reward aggregation identically at
+    # every productivity -- fine at forest capacity 36.3 people/cell, fatal at arid 2.0, where a stable cell
+    # needs occ <= K/(1+DEPLETE_FRAC) = 1.33 and the agents sat at 1.40. Default OFF => bit-exact.
+    enable_capacity_scaled_grouping: bool = False
 
 
 class RunConfig(BaseModel):

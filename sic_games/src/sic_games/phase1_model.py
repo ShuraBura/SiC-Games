@@ -1498,6 +1498,9 @@ class TerrainWorld(mesa.Model):
         # `S += aggl_R·(n^β − n)`) is untouched, so attraction and subsistence are independently tunable. 1.0 ⇒ bit-exact.
         aggl_at = getattr(self._demog, "aggl_attraction_weight", 1.0) if aggl_on else 1.0
         # Per-person forage cap (solitude fix): a forager harvests at most forage_kcal·work_hours, not the whole cell.
+        # CAPACITY-SCALED GROUPING (R-106, 2026-08-22) lives on SubstrateConfig with the other E.1/E.2
+        # grouping parameters, not on DemographyConfig -- same owner as the drives it bounds.
+        capgrp_on = getattr(self._substrate_cfg, "enable_capacity_scaled_grouping", False)
         cap_on = self._demog is not None and getattr(self._demog, "enable_forage_cap", False)
         fcap = self._forage_cap_field() if cap_on else None
         # R-106 (2026-08-15): the CLAIM WEIGHT on the cell split. `need` claims in proportion to what an
@@ -1683,7 +1686,8 @@ class TerrainWorld(mesa.Model):
                                              forage_cap=fcap, move_cost_field=mcf,
                                              site_field=sfield, band_opt_field=band_opt,
                                              home_cells=hcells, foreign_status_mult=fmult,
-                                             store_field=st_field, store_gain=st_gain, store_horizon=st_hor)
+                                             store_field=st_field, store_gain=st_gain, store_horizon=st_hor,
+                                             cap_group=capgrp_on, burn=self._burn)
             if target != old and self._fields.isWater[target[1], target[0]] != 0:
                 target = old   # terrain guard: never step onto water (diffusion is water-blind)
             if target != old:
