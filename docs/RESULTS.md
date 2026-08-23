@@ -6850,4 +6850,86 @@ pending a supervisor call. And that the residual flat hazard is understood — i
 
 ---
 
+## Addendum 48 — Earth climate becomes the baseline, and Addendum 47's numbers are superseded (2026-08-23, R-106)
+
+**READ THIS BEFORE QUOTING ADDENDUM 47.** Every quantity in Addendum 47 was measured on a planet with more
+than twice Earth's obliquity. The FINDINGS there stand; the NUMBERS are superseded by the ones below.
+
+### The canonical world was an outlier, by lottery accident
+
+`a_seas` — the seasonal amplitude of the food field — is drawn per world from an obliquity lottery,
+ε ~ U[0°, 60°], as `a_seas = 0.40 · sin ε / sin 23.4°`. **Seed 0, which every canonical run in this project
+uses, draws ε = 50.7° → a_seas 0.779**: the second highest of twelve seeds, against a median of 0.464 and
+Earth's 0.4.
+
+| seed | ε (deg) | a_seas | trough yield |
+|---|---|---|---|
+| **0 (canonical)** | **50.7** | **0.779** | **22.1% of mean** |
+| median of 12 | ~27 | 0.464 | 53.6% |
+| Earth | 23.4 | 0.400 | 60.0% |
+
+**That amplitude is not anchored.** `obliquity_to_amplitude`'s own docstring calls it *"a PROVISIONAL bounding
+heuristic onto the Earth band, NOT a sunlight→food transfer function (forage amplitude is rain/phenology-
+driven)"*. An insolation heuristic was doing load-bearing work on food seasonality in every result.
+
+### It is why arid could not be fixed
+
+At a_seas 0.779 an arid cell yields **0.44 BURN** at the seasonal trough against a lone adult's requirement of
+1.0. **The world cannot feed anyone for part of every year — at any density, however seeded or dispersed.**
+Four mechanism-level fixes (cluster seeding, capacity-scaled grouping, both together, seeding at the
+anchored density) were each predicted to work and each failed, because all four were tuned against a periodic
+hard floor that none of them could lift. The floor should have been checked before the second attempt, let
+alone the fourth.
+
+### Adopted (supervisor call, 2026-08-22)
+
+**Earth climate is now the default.** `C_CLIMATE` defaulted to `"1"` — every channel on; it now defaults to
+`"0"`, so `ClimateConfig`'s class defaults apply, and those already ARE the Earth baseline (a_seas 0.4,
+seasonality live, lottery / interannual / regime-shift / caribou / llanos / eccentricity off). Variability is
+opted INTO with `C_CLIMATE=1`, and belongs to a later stage.
+
+Three mechanisms adopted alongside it: `runoff_rivers` (Budyko-weighted flow; reverses deserts being 1.63×
+wetter than forests), `enable_capacity_scaled_grouping` (a group larger than the land feeds earns no further
+benefit), `comove_footprint_scaled` (k ∝ 1/NPP; fixes the annual pairing collapse).
+
+### The re-measurement
+
+| | Addendum 47 (a_seas 0.779) | Addendum 48 (Earth) | target |
+|---|---|---|---|
+| pop | 2,760 | **3,841** | — |
+| land used | 13.3% | **14.3%** | > 50% |
+| regional /km² | 0.0174 | **0.0242** | ~0.091 |
+| corr(forage, people) | +0.120 | **+0.157** | > +0.50 |
+| top-decile occupied | 34.6% | **38.4%** | > 80% |
+| km² per site | 85 | **125** | > 314 |
+| settle_med | 11.5 | **15.4** | 50–250 |
+| e15 | 18.9 | **19.4** | ~35 |
+| TFR | 9.96 | **9.93** | 5.0–8.0 |
+| starv share | 0.666 | **0.661** | — |
+| PACKING PARADOX | yes | **yes** | no |
+
+**Everything moved the right way and nothing was fixed.** Population +39%, but the paradox holds, land use is
+still 14% against a 50% target, and **TFR and starvation share are unchanged**. Arid survives 294 steps
+against 29–52 originally and 150 for Earth-climate-alone — roughly 6× — and still goes extinct.
+
+### A confound in my own test design, stated rather than buried
+
+`earth_forest` was presented as the control for the claim that the adoptions are bit-exact where land is
+productive. **It is not a control**: it changes the climate AND the three mechanisms at once, so its +31%
+population against `biome_forest` is unattributable. That claim was measured only on unit arithmetic (0 of 72
+rich configurations changed; footprint k = 0 at forest NPP) and **remains untested at run scale**. An arm with
+the two behavioural mechanisms ablated is running to separate them.
+
+### What is NOT claimed
+
+That the demography is fixed — `e15` 19.4 against ~35 and TFR 9.9 against 5–8 are barely moved. That arid is
+solved — it is not, and the anchored reason stands: the model implements only CENTRAL-PLACE overwintering
+storage, and the mode that applies to arid Australia (dispersed caching, keyed to multi-year unpredictability)
+was never built. That the adoptions are individually validated at run scale — one arm is still running to
+test that. And that `runoff_rivers` is properly configurable — it is a TERRAIN knob outside the config system,
+the same defect class as the `SubstrateConfig` breach and `ClimateConfig.a_seas` being overridden by the
+lottery, both found this week.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
