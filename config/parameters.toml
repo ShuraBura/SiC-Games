@@ -2517,7 +2517,7 @@ type  = "int"
 # co-movement); at most one should be canonicalized after the comparison. Need enable_pair_bonds.
 
 [comove_footprint_scaled]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # (ii-scaled) the footprint = the biome-scaled MONTHLY RANGE on the uniform grid: the 10 km cell = forest

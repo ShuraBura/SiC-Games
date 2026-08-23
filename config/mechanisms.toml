@@ -1500,7 +1500,7 @@ type  = "bool"
 # only sets WHO fathers / how lineage propagates).
 
 [enable_climate_lottery]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── MASTER ─────────────────────────────────────────────────────────────────────────────────────── Draw
@@ -1515,14 +1515,14 @@ type  = "bool"
 # ── C.1 SEASONALITY (validated: R-6 run_2d form) ─────────────────────────────────────────────────
 
 [enable_eccentricity_mean]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A
 # scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no effect. [Spiegel 2010 envelope]
 
 [enable_interannual]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── PERIOD
@@ -1535,7 +1535,7 @@ type  = "bool"
 # model has never had.
 
 [enable_regime_shift]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ───────────
@@ -1544,7 +1544,7 @@ type  = "bool"
 # secular-cycle test needs, and it has been off in every run.
 
 [enable_caribou_swing]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── [St.
@@ -1555,7 +1555,7 @@ type  = "bool"
 # Needs `steppe_mask`; without it the layer is inert whatever the amplitude.
 
 [enable_llanos_flood]
-value = true
+value = false
 owner = "ClimateConfig"
 type  = "bool"
 # ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ───────────
@@ -1573,7 +1573,7 @@ type  = "bool"
 # keeps it on and bit-exact.
 
 [enable_capacity_scaled_grouping]
-value = false
+value = true
 owner = "SubstrateConfig"
 type  = "bool"
 # CAPACITY-SCALED GROUPING (R-106, 2026-08-22): cap the group size that earns an E.1/E.2 benefit at what

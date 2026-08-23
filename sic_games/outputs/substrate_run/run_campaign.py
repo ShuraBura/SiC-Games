@@ -704,6 +704,14 @@ def main():
               f"not be paired against an arm from a clean tree. Commit before running a comparison.",
               flush=True)
     k = world_lottery_climate(WORLD_SEED, terrain=TERR, climate=CLIM)   # the PLANET
+    # RUNOFF-WEIGHTED RIVERS ADOPTED (2026-08-22). The river pass allocated `flow = ones()` -- one unit per
+    # cell regardless of rainfall -- so `isRiver` was pure drainage AREA with no water balance and, measured
+    # across 20 worlds, DESERTS CAME OUT 1.63x WETTER THAN FORESTS (0.075 vs 0.046). That propagated:
+    # aquatic_food scored desert rivers as cold anadromous fisheries, S_pot ranked desert 0.413 > grass 0.404
+    # > forest 0.259, and villages settled the desert at 2.5x enrichment. Weighting the accumulation by
+    # Budyko (1974) runoff -- VERIFIED and filed, parameter-free -- reverses that to forest 0.283 > grass
+    # 0.228 > desert 0.171 and the river ratio to 0.49.
+    k["runoff_rivers"] = True
     f = generate_world(k, mode="climate")
     _patch = (X0, Y0, PATCHSZ if PATCHSZ > 0 else PATCH)     # R-103i: shrink ⇒ circumscription
     base = NPPCapacityField(f, BURN, patch=_patch, mode="tallavaara", aquatic=True, enable_depletion=True)
@@ -733,7 +741,20 @@ def main():
     # reading as "built" — including four separate searches for Malthusian and secular cycles conducted with
     # the slow environmental driver switched off. A control has to be CHOSEN, not inherited by default.
     clim = ClimateConfig()
-    if os.environ.get("C_CLIMATE", "1") == "1":
+    # EARTH CLIMATE IS THE DEFAULT (2026-08-22, supervisor: "let's set Earth climate as a default condition
+    # for now. The variations belong to a later stage, when everything works well already.")
+    # This default was "1" -- every climate channel ON -- on the reasoning quoted above that a control must be
+    # CHOSEN rather than inherited. That reasoning stands, and the choice has now been made the other way:
+    # the baseline is Earth and variability is opted INTO with C_CLIMATE=1.
+    # WHY IT MATTERS, measured: a_seas is drawn per world from an obliquity lottery, eps ~ U[0,60] deg, and
+    # seed 0 -- which EVERY canonical run uses -- draws eps 50.7 deg giving a_seas 0.779, the second highest
+    # of twelve seeds against a median 0.464 and Earth 0.4. At 0.779 an arid cell yields 0.44 BURN at the
+    # seasonal trough against a lone adult's requirement of 1.0, so the world cannot feed anyone for part of
+    # every year and four separate mechanism-level fixes failed against that floor. The amplitude is also NOT
+    # anchored: `obliquity_to_amplitude` calls itself "a PROVISIONAL bounding heuristic ... NOT a
+    # sunlight-to-food transfer function". ClimateConfig's own class defaults ARE the Earth baseline
+    # (a_seas 0.4, every variability channel off), so this simply stops overriding them.
+    if os.environ.get("C_CLIMATE", "0") == "1":
         clim = clim.model_copy(update={f: True for f in type(clim).model_fields
                                        if f.startswith("enable_") and f not in _CLIMATE_UNSOURCED})
     for _var, _on in (("C_CLIM_ON", True), ("C_CLIM_OFF", False)):
@@ -806,6 +827,14 @@ def main():
         pos = [land[i % len(land)] for i in range(FOUNDERS)]
     cut2 = (CONNUBIUM == "cut2")
     demog = emergent_village_demog().model_copy(update=dict(
+        # SCALED FAMILY FOOTPRINT ADOPTED (2026-08-22). `comove_footprint = 0` is "exact snap": every
+        # co-moving family collapses onto ONE cell, so the annual pairing gate halved the occupied-cell count
+        # in a single step (110 -> 75, occupancy 1.07 -> 1.56). Two competing explanations were falsified
+        # first -- ablating the annual drought shock and ablating band_cohesion each left it untouched.
+        # `comove_footprint_scaled` gives k proportional to 1/NPP on the Kelly/Binford shape already used by
+        # mobility_radius, which is k = 0 on EVERY rich world (bit-exact with the exact snap) and k = 2-3
+        # only where the land is poor. It was built, anchored and dark.
+        comove_footprint_scaled=True,
         enable_landscape_packing=True, enable_sedentism_fertility=SEDFERT,
         enable_marriage_aggregation=True, enable_aggregation_sedentism=True,
         enable_catchment_ceiling=True, enable_settlement_scalar_stress=True, settle_catchment_radius=1,
@@ -1130,7 +1159,8 @@ def main():
                      carbon_cfg=CarbonConfig(kappa=1.5),
                      substrate_cfg=(_SUB if _SPEC is not None else
                                     SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
-                                                    contest_exponent=1.5, move_cost_flat=0.0, **GRP)),
+                                                    contest_exponent=1.5, move_cost_flat=0.0,
+                                                    enable_capacity_scaled_grouping=True, **GRP)),
                      harvest_field=cap, placement_positions=pos, demography_cfg=demog)
     w._habitable_cells = len(land)   # the denominator for regional density (read by snapshot)
     menarche = demog.menarche_months

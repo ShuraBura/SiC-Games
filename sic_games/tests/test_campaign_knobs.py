@@ -188,10 +188,16 @@ def test_climate_runs_by_default_and_reports_its_own_health():
     whole layer sat out every experiment this project ran while reading as built — including four searches
     for Malthusian and secular cycles conducted with the slow driver switched off.
 
-    A campaign must now run climate unless asked not to, AND report per-channel whether each one actually
-    moved the field. `season` is the one channel guaranteed live on any world, so it is the assertion that
-    fails loudly if the layer is ever silently unplugged again."""
-    p, out = _run("_t_clim_default")
+    DEFAULT FLIPPED BACK 2026-08-22, by the supervisor: "let's set Earth climate as a default condition for
+    now. The variations belong to a later stage, when everything works well already." The baseline is now
+    Earth -- a_seas 0.4, seasonality live, every variability channel off -- and variability is opted INTO
+    with C_CLIMATE=1.
+
+    THE GUARD THIS TEST EXISTS FOR IS UNCHANGED, and is what matters: the layer must not sit dark while
+    reading as built. So it now asserts the channels come LIVE WHEN ENABLED, rather than that they are on by
+    default. `season` is the one channel guaranteed live on any world, so it is still the assertion that
+    fails loudly if the layer is ever silently unplugged."""
+    p, out = _run("_t_clim_default", C_CLIMATE="1")
     assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
     h = _health(out)
     assert h, "the run carried no climate_health block"
@@ -209,11 +215,36 @@ def test_the_caribou_channel_is_on_now_that_its_thesis_is_filed():
     Bergerud who is not cited in the thesis at all, against an observed 23–67. Corrected and switched on.
 
     Asserted as "not OFF" rather than "LIVE" because the channel is steppe-masked: on a world with no steppe
-    the honest verdict is UNREACHABLE, and that is a property of the world, not a regression."""
-    p, out = _run("_t_clim_caribou")
+    the honest verdict is UNREACHABLE, and that is a property of the world, not a regression.
+
+    RUN WITH C_CLIMATE=1 from 2026-08-22: the Earth baseline is now the default and variability is opted into.
+    The point of this test is that the channel is not silently unplugged WHEN ASKED FOR -- which is exactly
+    what it caught in the first place -- not that it runs in every campaign."""
+    p, out = _run("_t_clim_caribou", C_CLIMATE="1")
     assert p.returncode == 0, f"{p.stdout[-3000:]}\n{p.stderr[-3000:]}"
     assert _health(out)["caribou"]["verdict"] != "OFF", (
         "caribou was switched on when its source was filed; OFF means it got unplugged again")
+
+
+def test_the_EARTH_BASELINE_is_the_default_and_carries_no_variability():
+    """PINS THE NEW DEFAULT (2026-08-22) so it cannot drift back unnoticed, the same way the old one did.
+
+    WHY IT WAS CHANGED, measured: `a_seas` is drawn per world from an obliquity lottery, eps ~ U[0,60] deg.
+    Seed 0 -- which EVERY canonical run uses -- draws eps 50.7 deg giving a_seas 0.779, the SECOND HIGHEST of
+    twelve seeds against a median of 0.464 and Earth's 0.4. At 0.779 an arid cell yields 0.44 BURN at the
+    seasonal trough against a lone adult's requirement of 1.0, so the world cannot feed anyone for part of
+    every year and four separate mechanism-level fixes failed against that floor. The amplitude is also not
+    anchored: `obliquity_to_amplitude` calls itself "a PROVISIONAL bounding heuristic ... NOT a
+    sunlight-to-food transfer function"."""
+    p, out = _run("_t_clim_earth")
+    assert p.returncode == 0, p.stdout[-3000:] + p.stderr[-3000:]
+    with open(out, encoding="utf-8") as fh:
+        c = json.load(fh)["meta"]["climate_config"]
+    assert c["a_seas"] == 0.4, f"the Earth baseline is a_seas 0.4, got {c['a_seas']}"
+    assert c["enable_seasonality"] is True, "Earth has seasons -- seasonality must stay live"
+    for ch in ("enable_climate_lottery", "enable_interannual", "enable_regime_shift",
+               "enable_caribou_swing", "enable_llanos_flood", "enable_eccentricity_mean"):
+        assert c[ch] is False, f"{ch} is on by default; variability is opted INTO with C_CLIMATE=1"
 
 
 def test_the_flat_climate_control_is_still_reachable():
