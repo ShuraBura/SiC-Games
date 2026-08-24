@@ -566,7 +566,7 @@ type  = "float"
 # fresh-forage cells can't store → stay mobile (the Testart distinction). Default OFF ⇒ scalar, bit-exact.
 
 [storage_temp_threshold_c]
-value = 100.0
+value = 15.25
 owner = "DemographyConfig"
 type  = "float"
 # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION] — (channel note, inherited) RESOURCE-DEPENDENT

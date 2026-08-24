@@ -105,7 +105,15 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
         enable_storage=True, storable_fraction=0.7, store_capacity_reserves=12.0,   # LIT-CALIBRATED (storage survey): 0.7 stored frac; 12≈16mo≈1-2yr granary (was 0.5/3=4mo)
-        storage_temp_threshold_c=100.0, storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
+        # storage_temp_threshold_c REMOVED 2026-08-24 -> falls to the class default 15.25 (Binford ET). The
+        # override was 100.0, which put EVERY cell on the planet in the "overwintering zone", so storage fired
+        # even in a tropical world with no winter (measured: coastal-tropical 100% of cells stored, surplus
+        # 0.62, 70% of bands read complex_forager -> 22-month birth spacing). 100.0 was an un-annotated
+        # test convenience ("overwintering everywhere") that leaked into the production preset, sitting among
+        # otherwise lit-calibrated values -- the same override-defeats-anchored-default class as the
+        # SubstrateConfig **GRP and a_seas-lottery breaches. At 15.25 only genuinely cold worlds store, which
+        # is Testart's distinction (warm/aseasonal -> immediate-return -> egalitarian).
+        storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
         enable_band_family_knobs=True, enable_dynamic_bands=True, band_base_tolerable=25,
         assabiyah_gain=0.05, assabiyah_decay=0.02)
 
