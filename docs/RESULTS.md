@@ -6932,4 +6932,67 @@ lottery, both found this week.
 
 ---
 
+## Addendum 49 — Fertility solved: it was two config errors, not a mechanism (2026-08-24, R-106)
+
+**THE RESULT.** On a warm world with both fixes active, the demography reaches its forager anchors for the
+first time in this project, and life expectancy rose 9 years as a free consequence:
+
+| | earth_base (broken) | fert_warm (fixed) | anchor |
+|---|---|---|---|
+| %egalitarian | 8% | **100%** | >80 |
+| surplus_med (false storage) | 0.76 | **0.00** | ~0 |
+| IBI median | 24 | **35** | 37 (Aché) |
+| TFR | 9.9 | **7.5** | 5–8 |
+| CBR /1000 | 65 | **53** | 45–55 |
+| **e15** | **19.4** | **28.5** | ~35 |
+| starv share | 0.66 | 0.59 | — |
+
+TFR and CBR are IN BAND for the first time. IBI is at 35 against a 37 anchor. And **e15 rose from 19.4 to 28.5
+with no mortality parameter touched** — the "dying is the bill for the breeding" chain, confirmed: the
+population is stationary, births fell, deaths followed.
+
+### It was TWO config errors, both the same defect class
+
+Neither the fertility mechanism nor the society classifier was wrong. Each was fed a corrupted input, by an
+override silently defeating an anchored default — the class of defect this arc found four times (SubstrateConfig
+`**GRP`, the `a_seas` lottery, and these two).
+
+**Cause 1 — the classifier read LOCAL density (Addendum 48 groundwork; fixed `ea725c6`).** The morph
+classifier asks "is this band packed past Binford's 0.091/km²?" — a REGIONAL threshold. It was fed
+members/occupied-cells, a LOCAL density. Because the model crowds everyone onto ~14% of the land, every band
+read as packed → chiefdom → 14-month refractory. 46–57% of a pure forager world came out stratified. Fix: feed
+the classifier members/(range share), the scale Binford's number means. Stratified share → 0.
+
+**Cause 2 — storage was ungated (fixed `f92eb83`).** `realistic_forager_demog()` overrode
+`storage_temp_threshold_c = 100.0`, so every cell on every world counted as "overwintering" and stored. A warm
+tropical world with no winter stored anyway (surplus 0.62), which read as `complex_forager` → 22-month
+refractory. The correct value is Binford's ET 15.25 °C — the class default, named in the field's own doc, on
+the scale of the model's temperature field (tropical 21, temperate 10, boreal 2 °C). The 100 was an
+un-annotated test convenience that leaked into the production preset. Fix: delete the override. Warm worlds now
+store nothing and stay egalitarian; only genuinely cold worlds store — Testart's distinction.
+
+### A correction to my own reasoning, on record
+
+After the FIRST fix alone (temperate world, storage still ungated), e15 moved only +0.8 years, and I wrote that
+this WEAKENED the fertility→mortality chain. That was wrong: only half the fix was active. With BOTH causes
+removed, e15 moved +9.1 years. The chain is not weak; the earlier measurement was on a half-fixed run.
+
+### Two legitimate regimes, not one target
+
+This is the WARM world (immediate-return, egalitarian, IBI ~35). The TEMPERATE world correctly DOES store, so
+its bands read complex and space births shorter (~24), and that is the Neolithic Demographic Transition
+(Bocquet-Appel 2011), not a bug. A cold storing world SHOULD out-breed a warm mobile one. Both must be reported
+as the two regimes the model now distinguishes correctly, rather than forcing both to the Aché mobile anchor.
+
+### What is NOT solved
+
+e15 is 28.5 against ~35, and l15 is 0.38 against 0.55–0.60 — closer, not closed. The residual mortality is now
+CONCENTRATED IN CHILDHOOD (m_1_5 at 3.3× Siler, m_5_15 2.7×), where before the whole curve was flat; prime-
+adult hazard has fallen to ~1.8× Siler. The paradox persists in age-graded form: the bottom intake decile eats
+2.7× requirement, yet 59% of deaths are "starvation", and they are children. Provisioning and both claim-
+weights are ON, so it is not a missing mechanism — something is defeating the provisioning that exists. That is
+the next thread (child mortality), diagnosed rather than guessed.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
