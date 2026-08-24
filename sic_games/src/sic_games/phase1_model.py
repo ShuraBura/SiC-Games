@@ -2086,12 +2086,22 @@ class TerrainWorld(mesa.Model):
                     if _rk[_a] in self._lineage_ascribed:
                         _b = _a._group.band_id
                         asc_n[_b] = asc_n.get(_b, 0) + 1
+            # REGIONAL-DENSITY basis for the classifier (R-106, 2026-08-24): each band's fair share of the
+            # whole habitable range, = habitable_km2 / n_bands. This is the scale Binford's 0.091/km2
+            # threshold is defined at; the occupied-cell footprint below is a LOCAL density that reads every
+            # crowded band as packed. Off => the legacy occupied-cell basis, bit-exact.
+            reg_dens_on = getattr(self._demog, "enable_society_regional_density", False)
+            _hab_km2 = getattr(self, "_habitable_cells", 0) * _CELL_KM2
+            _range_km2 = (_hab_km2 / len(band_members)) if (reg_dens_on and band_members and _hab_km2 > 0) else 0.0
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
                 # LANDSCAPE population density (all agents on the band's cells / area = the Binford quantity) when on;
                 # else the legacy band-members/footprint (a band's density over its own range).
                 head = sum(len(occ_lists[c]) for c in band_cells[bid]) if land_pack else n
-                density = head / footprint_km2 if footprint_km2 > 0 else 0.0
+                if _range_km2 > 0.0:
+                    density = n / _range_km2                 # members over the band's SHARE of the range
+                else:
+                    density = head / footprint_km2 if footprint_km2 > 0 else 0.0
                 # R-60 fix: the band's SHARE of each (possibly shared) cell granary, not the whole-cell granary — the
                 # per-cell cap scales with TOTAL occupancy, so summing whole granaries / band-only members gave
                 # surplus_frac ≈ 6-14 (gate inert). Share = cell_store · (band members on cell / total occ) ⇒ 0..1.

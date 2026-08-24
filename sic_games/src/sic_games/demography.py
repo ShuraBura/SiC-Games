@@ -825,6 +825,19 @@ class DemographyConfig(BaseModel):
     # ceiling also applies wherever the agglomeration bonus is applied. Default OFF ⇒ bit-exact with every
     # pre-R-105 result (which were all run with the gap open).
     enable_aggl_ceiling: bool = False
+    # SOCIETY CLASSIFIER ON REGIONAL DENSITY (R-106, 2026-08-24). The morph classifier asks "is this band
+    # packed past Binford's threshold?" -- and Binford's 0.091/km2 is a REGIONAL figure (persons per 100 km2
+    # of RANGE). The classifier was fed the band's members over its OCCUPIED cells, which is a LOCAL density:
+    # a band crowded onto 1.9 cells reads 0.167/km2 = 1.8x packing = STRATIFIED, while the same population
+    # over its true range is 0.025/km2 = 0.28x packing = egalitarian. Because the model crowds everyone onto
+    # ~14% of the land (the packing paradox), EVERY band read as packed, 57% came out stratified in a pure
+    # forager world, SEDENTISM_IBI_MONTHS gave chiefdoms a 14-month refractory, and TFR ran ~10 against a
+    # 5-8 anchor. This is a UNITS error: local density fed to a threshold defined regionally.
+    # When on, the classifier density = members / (habitable_km2 / n_bands) -- the band's fair share of the
+    # whole range, which equals the true regional density and is the scale Binford's number means. The DISEASE
+    # hazard (density_disease) still uses LOCAL per-cell density, correctly: contagion is a local quantity.
+    # Default OFF => bit-exact.
+    enable_society_regional_density: bool = False
     enable_stratification_inequality_gate: bool = False
     stratification_gini_min: float = Field(0.40, ge=0.0, le=1.0)  # BHM 2009 Table 2 α-weighted Gini: forager 0.25,
     #   horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40.

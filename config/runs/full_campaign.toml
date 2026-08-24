@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-22
+# generated 2026-08-24
 
 [meta]
 name = "full_campaign"
@@ -113,6 +113,7 @@ enable_sedentism_fertility = true
 enable_settlement_scalar_stress = true
 enable_site_appraisal = true
 enable_size_repulsion = true
+enable_society_regional_density = true
 enable_soil_depletion = true
 enable_standing = true
 enable_storable_founding = true

@@ -92,6 +92,11 @@ TYPES = {
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
     # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
     "enable_density_reference": "N",
+    # Society classifier on REGIONAL density (R-106, 2026-08-24). Typed A (Affiliation/social-structure): it
+    # changes which SOCIETY LABEL a band takes, which reshapes the band/society graph -- not a hazard (N),
+    # production (P) or terrain (T) quantity. It feeds the classifier members/(range share) instead of
+    # members/occupied-cells, matching the regional scale Binford's packing threshold is defined at.
+    "enable_society_regional_density": "A",
     # enable_band_risk / enable_infanticide deleted 2026-08-06 (death spiral; dead stub)
     "enable_genome": "H", "enable_paternity": "H",
     "enable_tier2_shock": "F",
