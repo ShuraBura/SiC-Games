@@ -432,6 +432,11 @@ class TerrainWorld(mesa.Model):
         self.starv_age_sum: float = 0.0        # age in months
         self.starv_intake_sum: float = 0.0     # last intake / own requirement
         self.starv_ema_sum: float = 0.0        # the smoothed signal a fertility brake would have read
+        # ACUTE vs CHRONIC (2026-08-25): _fed_reserve is the agent's post-harvest reserve THIS step. A high
+        # value the step before death = an ACUTE one-step crash (was fine, share collapsed); a low value = a
+        # CHRONIC decline (dwelt near the floor). Distinguishes "flee an emergency" from "slow starvation".
+        self.starv_fedres_sum: float = 0.0     # _fed_reserve at death, as a fraction of the reserve cap
+        self.starv_acute_n: int = 0            # deaths where _fed_reserve was > 50% of cap the step before
         self.starv_by_age: list[int] = [0] * LT_MAX_AGE_YR
         # FLOW RATES AND THEIR TWO MISSING INPUTS. CBR, CDR and r all fall out of the arrays above, but two
         # quantities do not and both have anchors. The realised SEX RATIO AT BIRTH checks that `srb_male`
@@ -2384,6 +2389,11 @@ class TerrainWorld(mesa.Model):
         req = self._burn * a.consumption_factor()
         self.starv_intake_sum += (a._last_intake / req) if req > 0.0 else 0.0
         self.starv_ema_sum += float(getattr(a, "_intake_ema", 0.0))
+        _cap = self._reserve_full * a.reserve_scale()
+        _fr = (float(getattr(a, "_fed_reserve", 0.0)) / _cap) if _cap > 0.0 else 0.0
+        self.starv_fedres_sum += _fr
+        if _fr > 0.5:                          # was more than half-full last step -> acute crash, not slow decline
+            self.starv_acute_n += 1
         if age_i < LT_MAX_AGE_YR:
             self.starv_by_age[age_i] += 1
 
@@ -3441,6 +3451,8 @@ class TerrainWorld(mesa.Model):
                 "age_at_death_yr": (self.starv_age_sum / n / MONTHS_PER_YEAR) if n else float("nan"),
                 "intake_at_death": (self.starv_intake_sum / n) if n else float("nan"),
                 "ema_at_death": (self.starv_ema_sum / n) if n else float("nan"),
+                "fedres_at_death": (self.starv_fedres_sum / n) if n else float("nan"),   # reserve fraction the step before death
+                "frac_acute": (self.starv_acute_n / n) if n else float("nan"),           # share of deaths that were one-step crashes
                 "cells_occupied": cells,
                 "mean_occ_per_cell": (live_n / cells) if cells else float("nan"),
                 "starv_by_age": list(self.starv_by_age)}
@@ -4295,6 +4307,54 @@ class TerrainWorld(mesa.Model):
                     zipf_slope=round(zipf, 2) if zipf is not None else None,
                     frac_resident=round(sum(sizes) / total, 3) if total else 0.0,
                     panel=sorted(panel, key=lambda q: q["n"], reverse=True))
+
+    def settlement_clusters(self) -> dict:
+        """CONNECTED-COMPONENT settlement sizes — the CLEAN counterpart to `settlements()` (R-106, 2026-08-25).
+
+        `settlements()` counts agents standing on the exact site cell (`a.pos in sites`), so a village spread
+        over adjacent cells is fragmented across several sites and each reads a fraction of the true size.
+        `settle_med` has therefore been ~11 against Alvard's verified 50-250, and markers #3/#12/#13 were
+        flagged PROVISIONAL because of it.
+
+        Here the sites are clustered by adjacency (two sites within `settle_radius` join one cluster, union-
+        find), and the cluster's size is EVERY agent whose cell is within `settle_radius` of any of its sites
+        -- the whole community, counted once. Pure observer; no behaviour, no RNG.
+        """
+        sites = list(self._settlement_sites)
+        if not sites:
+            return {}
+        r = int(getattr(self._demog, "settle_radius", 2))
+        # union-find over sites that are within (2r) Chebyshev of each other -> one village per component
+        parent = {s: s for s in sites}
+        def find(a):
+            while parent[a] != a:
+                parent[a] = parent[parent[a]]; a = parent[a]
+            return a
+        for i, si in enumerate(sites):
+            for sj in sites[i + 1:]:
+                if max(abs(si[0] - sj[0]), abs(si[1] - sj[1])) <= 2 * r:
+                    parent[find(si)] = find(sj)
+        comp_sites: dict = {}
+        for s in sites:
+            comp_sites.setdefault(find(s), []).append(s)
+        # each agent belongs to the component whose ANY site is within r of its cell; counted once (nearest)
+        comp_n: dict = {c: 0 for c in comp_sites}
+        for a in self.agent_list:
+            ax, ay = a.pos
+            best = None
+            for c, cs in comp_sites.items():
+                d = min(max(abs(ax - sx), abs(ay - sy)) for sx, sy in cs)
+                if d <= r and (best is None or d < best[0]):
+                    best = (d, c)
+            if best is not None:
+                comp_n[best[1]] += 1
+        sizes = sorted((n for n in comp_n.values() if n > 0), reverse=True)
+        if not sizes:
+            return {}
+        import numpy as np
+        total = len(self.agent_list)
+        return dict(n_clusters=len(sizes), cluster_med=int(np.median(sizes)), cluster_max=sizes[0],
+                    cluster_min=sizes[-1], resident_frac=round(sum(sizes) / total, 3) if total else 0.0)
 
     def settlement_health(self) -> dict:
         """Soil (B1 depletion) and hardship (emergent-abandonment memory) state across settlement sites. {} when

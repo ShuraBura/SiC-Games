@@ -623,6 +623,8 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         starv_age_at_death=round(_sp.get("age_at_death_yr", float("nan")), 2),
         starv_intake_at_death=round(_sp.get("intake_at_death", float("nan")), 3),
         starv_ema_at_death=round(_sp.get("ema_at_death", float("nan")), 3),
+        starv_fedres_at_death=round(_sp.get("fedres_at_death", float("nan")), 3),   # reserve fraction step before death
+        starv_frac_acute=round(_sp.get("frac_acute", float("nan")), 3),            # share of deaths that were 1-step crashes
         cells_occupied=int(_sp.get("cells_occupied", 0)),
         mean_occ_per_cell=round(_sp.get("mean_occ_per_cell", float("nan")), 2),
         lt_deaths_total=int(_lt.get("deaths", 0)),
