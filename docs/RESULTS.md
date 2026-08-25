@@ -6995,4 +6995,81 @@ the next thread (child mortality), diagnosed rather than guessed.
 
 ---
 
+## Addendum 50 — Child mortality is not a provisioning bug; it is the density ceiling (2026-08-24, R-106)
+
+**A prediction of mine, falsified and recorded.** After the fertility fix, residual mortality concentrated in
+childhood (m_1_5 at 3.3× Siler). I traced it to `provision_self_keep = 1.0`, which disables tier-2 maternal
+provisioning (the field doc: "1.0 = overflow-only; lower = child priority, gated so child starvation → ≈0").
+I predicted that adding the FATHER as a second provider (`paternal_provision_frac 0 → 0.5`, Marlowe ~58%
+under-3 share) would save children WITHOUT the adult cost the maternal lever carried, so e15 would RISE.
+
+**It did not.** Both levers, measured at equilibrium against `fert_warm`:
+
+| | no provision | maternal 0.7 | paternal 0.5 |
+|---|---|---|---|
+| m_0_1 | 0.221 | 0.153 | 0.176 |
+| l15 | 0.381 | 0.427 | 0.425 |
+| m_30_45 | 0.027 | 0.032 | 0.033 |
+| **e15** | **28.5** | **26.9** | **24.6** |
+| pop | 2597 | 2439 | 2798 |
+
+Every lever saves children (m_0_1 and l15 improve) and every lever LOWERS e15, because adult hazard rises to
+compensate. The paternal path raised population 2597 → 2798 — it genuinely kept more children alive — and e15
+fell hardest of the three.
+
+**Why: the population is at a density ceiling, so mortality is conserved.** The run is stationary. Saving a
+child adds a survivor to an already-crowded world; per-capita falls; the death reappears elsewhere, on adults.
+The maternal lever moved death child→mother; the paternal lever moved it child→adult-via-crowding. Neither
+lowered TOTAL mortality because the ceiling fixes it. This is the mortality-side mirror of the fertility
+result: once births are correct, **you cannot lower total death by transferring food between groups — only by
+lifting the ceiling.** The fertility fixes raised e15 precisely because they changed the BIRTH rate (fewer
+entrants to a stationary system), which provisioning does not.
+
+**So neither provisioning lever is adopted** — both cost adult life for child life at no net gain, and the
+model represents that trade honestly. `provision_self_keep` stays 1.0 and `paternal_provision_frac` stays 0.0
+in the forager preset until the ceiling is lifted.
+
+**And a correction to Addendum 46/49's framing.** "The dying is the bill for the breeding" is right for
+fertility but must not be read as "mortality is downstream of provisioning." The residual e15 gap
+(28.5 vs ~35) is not a child-feeding problem. It is the packing paradox: the population pinned onto ~13% of
+its land. That is the next and root target.
+
+---
+
+## Addendum 51 — The deaths are crowding, not famine; dispersal reads the one signal that can't see it (2026-08-24, R-106)
+
+**VERIFIED: it is not famine.** The supervisor asked to confirm the cause before fixing it. At equilibrium on
+`fert_warm`, 59% of deaths are labelled starvation, yet:
+
+- `frac_below_needs = 0.000` — **not one agent is below the requirement floor**
+- p10 intake = 2.72× requirement — even the bottom decile eats well
+- dying agents ate **0.258×** requirement while the cell median ate 6.4× (p90 17×)
+- `occ_at_death = 56` vs `occ_of_living = 37` — the dead sat on MORE crowded cells
+
+The food is present. A dying agent is losing the CONTEST FOR THE SHARE on a rich, mobbed cell — not sitting on
+empty land. This is a split failure under crowding, not scarcity.
+
+**Answering the three questions.**
+- *What holds people on the cell?* The move utility reads per-capita `S/n_after`, so a mobbed cell does offer
+  a smaller share — that part is sound. But the cell pool `S` stays large (rich land, many occupants), so a
+  crowded rich cell can still out-score an empty poorer neighbour.
+- *Why die rather than move?* From the agent's view the cell is not short of food; the deficit is a losing
+  share, and nothing in its perception says "leave."
+- *Why doesn't dispersal fire?* Because it is keyed to the wrong signal. `mobility_pressure_source = "npp"`
+  sets the move STRIDE from the cell's static geographic NPP. A crowded rich cell has high NPP, so the rule
+  says "good land, short stride, stay" — the one signal that structurally cannot see crowding. A starving
+  agent is pinned at stride 1 and cannot reach past the mob even though the per-capita utility would prefer
+  the emptier cell.
+
+**The fix already exists and was in the wrong mode.** `mobility_pressure_source = "intake"` (R-106 Addendum 6,
+"density-aware, since a crowded cell dilutes it regardless of nominal fertility") sets the stride from the
+agent's own intake EMA: a 0.26× agent gets stride 4 and reaches out; a 2.7× agent stays. The per-capita move
+utility already prefers emptier ground, so stride was the only missing piece. Under test as `disp_intake`;
+prediction on record: land use 13% → >50%, occ/cell down, corr(forage,people) up, starv_share down, e15 up.
+
+**This is the packing-paradox root**, the same defect that made arid uninhabitable and that has held e15 down
+since Addendum 47 — not another age-group transfer.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
