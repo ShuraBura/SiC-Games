@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-24
+# generated 2026-08-26
 
 [meta]
 name = "full_campaign"
@@ -42,7 +42,7 @@ enable_biome_meat_cv = true
 enable_biome_meat_frac = true
 enable_bonded_mating = true
 enable_bud_hazard = false
-enable_bud_requires_occupancy = false
+enable_bud_requires_occupancy = true
 enable_bud_site_separation = false
 enable_capacity_scaled_grouping = true
 enable_caribou_swing = false

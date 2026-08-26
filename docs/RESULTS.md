@@ -7142,4 +7142,36 @@ place its block AFTER `village_identity_months` and add the flag to the C_ALLON 
 
 ---
 
+## Addendum 53 — `bud_requires_occupancy` is adopted into the canonical benchmark; `village_identity` is held (2026-08-26, R-106)
+
+**Decision (supervisor, Path B).** `enable_bud_requires_occupancy` is adopted — removed from the C_ALLON
+exclusion set, so it is now canonically ON. `enable_village_identity` is held in the exclusion set pending a
+multi-biome / long-run validation. `enable_village_pooling` is not adopted and its code is not committed (it
+is net-negative, Addendum 52; recoverable from the session record if ever revisited).
+
+**Why adopt the mesh fix.** `bud_requires_occupancy` closes the budding bypass so village spacing emerges from
+disjoint catchments, with no distance constant. It reproduces the imposed `bud_site_separation` rule
+bit-for-bit (30 separated sites, 0% adjacent, 100% disjoint) and raises population (Addendum 52). It rests on
+the filed ~20 km Vita-Finzi & Higgs catchment, not on one world, so it is safe to make canonical.
+
+**A CORRECTED attribution, and the reason `village_identity` is held.** On the standard characterization
+fixture (n=1500, 300 steps, coastal/temperate, seed 0) the age structure improves markedly WITH identity —
+`frac_child` 0.55 → 0.41 (the ~0.40 Aché anchor), median age 12.8 → 17.1 yr. But `bud_requires_occupancy`
+ALONE leaves it at the old pathology: `frac_child` 0.545, median 13.6. So the age-structure gain is
+**identity's, not the mesh fix's** — the opposite of a mid-investigation guess. Two consequences:
+
+1. `test_the_model_is_currently_pathologically_young` stays valid and GREEN under this adoption, because
+   identity (the thing that flipped it) is held. No re-baseline of that characterization is taken.
+2. Identity does real demographic work — it is the lever that moves the pyramid to the anchor — which is
+   exactly why it must be validated across biomes before it re-baselines the canonical population. Adopting it
+   halves the canonical population (~3,100 → ~1,560, a stable equilibrium; Addendum 52) — a benchmark-wide
+   change that must not rest on the single warm-coastal world it was measured on.
+
+**Validation state.** The full suite is green but for the pre-existing savanna reachability failure
+(`test_agents_actually_stand_where_the_intercept_can_act`, task #77 — verified to fail identically on the
+prior HEAD, unrelated to this change). Registry, run-file reference (`config/runs/full_campaign.toml`) and the
+C_ALLON coverage tests all agree with the new canonical stack.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

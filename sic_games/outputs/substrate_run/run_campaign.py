@@ -907,16 +907,24 @@ def main():
             #                                        only as the "geometry alone" ablation control.
             #   enable_exclusive_village_membership  removes the mutual subsidy as designed, but produces NO
             #                                        spacing on its own and raises churn (buds 978 -> 1366).
-            #   enable_village_identity              inert against settlement churn on its own (bands per
-            #                                        village 47 -> 42, against an intended 45 -> ~1).
-            #   enable_bud_requires_occupancy        the candidate that removes a rule instead of adding one;
-            #                                        awaiting its re-probe at the time of writing.
-            # Two of these are mutually exclusive in spirit (imposed geometry vs emergent spacing), so
-            # "all on" is not even a coherent state for them.
+            #   enable_village_identity              WORKS but HELD (R-106 Addendum 53, 2026-08-26). On the
+            #                                        emergent-spacing base it ends the 45-bands artifact
+            #                                        (188 -> 28) and DRIVES the age-structure gain (frac_child
+            #                                        0.55 -> 0.41 at n=1500/300; bud_requires_occupancy alone
+            #                                        leaves it at 0.55), at a stable low-density equilibrium.
+            #                                        But that is validated in ONE biome (warm coastal). Held
+            #                                        pending a multi-biome / long-run check before it
+            #                                        re-baselines the canonical population by halving it.
+            #   enable_bud_requires_occupancy        ADOPTED (R-106 Addendum 53, 2026-08-26). Closes the
+            #                                        budding bypass so village spacing is EMERGENT from
+            #                                        disjoint catchments (no distance constant); matches the
+            #                                        imposed bud_site_separation rule bit-for-bit and raises
+            #                                        population. Removed from this set -> canonically ON.
+            # bud_site_separation stays as the imposed-geometry ablation control, mutually exclusive in spirit
+            # with the adopted emergent spacing.
             "enable_bud_site_separation",
             "enable_exclusive_village_membership",
             "enable_village_identity",
-            "enable_bud_requires_occupancy",
             # A MODEL CORRECTION UNDER EVALUATION (2026-08-13). `enable_density_reference` re-references
             # density_mult so the anchor density returns 1.0 -- the invariant risk_mult and pathogen_mult
             # already hold and this one silently broke. It is measured and principled, but adopting it

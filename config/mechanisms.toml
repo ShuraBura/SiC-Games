@@ -350,7 +350,7 @@ type  = "bool"
 # site cap, no separation constant.
 
 [enable_bud_requires_occupancy]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── BUD-FOUNDING BYPASS REMOVED: settlement founding is occupancy-gated for EVERY path (2026-08-12) ────
