@@ -7072,4 +7072,74 @@ since Addendum 47 — not another age-group transfer.
 
 ---
 
+## Addendum 52 — The settlement mesh: spacing is emergent from an unclaimed-land founding gate, not an imposed distance (2026-08-26, R-106)
+
+**The defect.** The map showed one dense blob of 109 settlement sites, 92% of them within one cell of another
+(median nearest-neighbour spacing 1.0 cell), with a connected-component village size of ~12. A village did
+not occupy one cell with gaps; the whole population packed a corner as a mesh of adjacent, individually
+unviable sites.
+
+**The cause is one bypass.** The occupancy-founding path (`enable_emergent_village_founding`, on) already
+spaces villages: its condition 3 refuses a site inside another village's catchment — disjoint catchments, the
+~20 km Vita-Finzi & Higgs site-exploitation territory (filed). But `enable_village_budding` (on) bypasses that
+gate: a bud MANUFACTURES a site outright from a faction of two people (~1,700 settlements out of pairs in 400
+steps, 2026-08-12), so condition 3 never judges it. The mesh is that bypass, nothing else.
+
+**Five prior fixes had failed** (recorded in `_maintain_village_budding`): min-faction share silenced budding;
+village identity was inert for spacing; parent-only separation did nothing; global separation worked but
+imposed 50 km against the ~20 km anchor; `enable_exclusive_village_membership` raised founding churn 8× and
+cut population 9.5%/63.7% across two seeds — it buys the spacing by dissolving established villages.
+
+**Road A vs Road B — imposed rule vs emergent mechanism.** Two arms on the warm world, both composed with the
+new default-off `enable_village_pooling`:
+
+| metric | baseline (mesh) | Road A `bud_site_separation` | Road B `bud_requires_occupancy` |
+|---|---|---|---|
+| n sites | 109 | 30 | 30 |
+| NN spacing median | 1.0 | 3.0 | 3.0 |
+| % adjacent (<=1) | 92% | 0% | 0% |
+| % disjoint (>2) | 6% | 100% | 100% |
+| km2 per site | 185 | 723 | 717 |
+| village size (settle_med) | 12 | 72 | 72 |
+| population | 2,159 | 3,059 | 3,056 |
+| e15 | 28.5 | 33.9 | 34.1 |
+
+Road B (`enable_bud_requires_occupancy`: a bud RELOCATES its faction only; the daughter becomes a site solely
+where people gather past `settle_min_pool`, through the gate that already spaces villages) reproduces the
+imposed rule bit-for-bit on geometry AND demography, with NO distance constant anywhere. The falsifier — the
+population collapse that killed exclusive membership — did not fire (3,056, above baseline). Spacing is
+emergent: a bud that lands on another village's catchment cannot assemble its own pool, so no site forms
+there. `bud_requires_occupancy` is the recommended mesh fix.
+
+**Village pooling is load-bearing but net-negative — NOT adopted.** An ablation isolated it: on the separated
+base the gaps are identical with or without pooling (both 30-31 sites, NN 3.0, 0% adjacent), so the gaps come
+entirely from `bud_requires_occupancy`. Pooling only raises on-site concentration 0.65 → 0.75, and it pays
+for that by crowding more infants onto one cell — population −8% (3,325 → 3,056), m_0_1 0.27 → 0.31,
+l15 0.34 → 0.31. It trades child survival for a cosmetic concentration gain. Kept as a tested, default-off
+mechanism.
+
+**Village identity as the social concentration source — under diagnosis.** `enable_village_identity`
+(co-resident bands merge into one band community past 180 months; Birdsell's local group) was tested on the
+Road B base as the meaningful alternative to the pooling food-penalty. It does NOT concentrate (0.63, the
+lowest arm) — so it does not answer the "1 cell" geometry. But it ends the "45 bands in one village" artifact
+(n_bands 188 → 28), grows realistic bands (16 adults) and connubium (575), and gives the best demographic
+RATES of any arm: m_0_1 0.20, l15 0.45, e15 37, TFR 5.3, IBI 36 — nearly every anchor. The catch: population
+HALVED (3,325 → 1,393) and was still drifting down at 8,000 steps (−260/quarter), so those healthy rates may
+be a shrinking-population artifact, not a proven low-density equilibrium. A 16,000-step run is diagnosing
+whether it plateaus or leaks. NOT adopted; the decline must be explained first.
+
+**Canonical benchmark unchanged.** `bud_requires_occupancy`, `bud_site_separation`, `village_pooling` and
+`village_identity` all remain OFF in the C_ALLON canonical resolution, pending one benchmark update once the
+identity decline is diagnosed — so the geometry+demography picture is adopted in a single move, not two.
+New tool: `mesh_report.py` (torus nearest-neighbour spacing, % adjacent/disjoint, on-site vs catchment-ring
+concentration).
+
+**Registration caution.** `gen_runconfig.py` associates a field's preceding comment block by proximity; when
+the `enable_village_pooling` block is inserted between `enable_village_identity` and `village_identity_months`,
+the regenerated `parameters.toml` clobbers the `village_identity_months` Birdsell provenance with the pooling
+text, and `mechanisms.toml` records `enable_village_pooling` at the C_ALLON value. Before registering pooling,
+place its block AFTER `village_identity_months` and add the flag to the C_ALLON exclusion set.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
