@@ -7174,4 +7174,74 @@ C_ALLON coverage tests all agree with the new canonical stack.
 
 ---
 
+## Addendum 54 — Village identity validates in three biomes and is adopted; MARKER #16 re-scored (2026-08-28, R-106)
+
+**The hold is lifted.** Addendum 53 held `enable_village_identity` because its whole case rested on ONE biome
+(warm coastal/tropical), per the standing rule that a mechanism validated in one world is a claim about that
+world. The A/B was then run on the new canonical base (`bud_requires_occupancy` ON) in three contrasting
+biomes, with the predictions registered before the runs. It passed, and it is adopted.
+
+### Every marker moves the same direction in every biome
+
+Equilibrium = last 20% of an 8,000-step run, seed 0, 3,000 founders.
+
+| | tropical off → ON | temperate off → ON | boreal off → ON |
+|---|---|---|---|
+| median age (yr) | 21.7 → **26.4** | 17.5 → **18.8** | 16.0 → **20.7** |
+| TFR (band 5–8) | 7.68 → **5.28** | 6.31 → **5.90** | 8.54 → **6.15** |
+| survival to 15 | .341 → **.451** | .480 → **.503** | .317 → **.398** |
+| starvation share | .559 → **.447** | .478 → **.451** | .558 → **.448** |
+| merged village size | 24 → **101** | 60 → **88** | 31 → **107** |
+| n_bands | 188 → **28** | 182 → **119** | 14 → **7** |
+| population trend (tail) | −157 (stable at 16k) | **−104 → +259** | **−105 → +6** |
+
+**Identity does not drain population — it RESCUES it.** The prediction under test was that identity might buy
+its demography by shrinking the population. The opposite holds in two of three biomes: temperate and boreal
+were both LEAKING without identity (−104, −105 on the tail) and are healthy with it (+259, +6). The tropical
+halving (3,325 → ~1,560, confirmed stable over 16,000 steps: 758 births vs 765 deaths, net −7) is
+world-specific, not a general cost.
+
+### Two of my own criteria were wrong, and are corrected here
+
+* **P3 was mis-specified.** It tested `|births − deaths| ≈ 0` and therefore flagged temperate's GROWTH
+  (+259) as a failure. P3 existed to catch a LEAK; growth is not the failure mode. The meaningful comparison
+  is the direction against the off arm.
+* **"Identity only reaches villagers" was falsified.** Proposed to explain why the band collapse is graded
+  (188→28 tropical vs 182→119 temperate), it predicts a low villager share in temperate. Measured: 84% of the
+  temperate population lives inside a village catchment, against 93% tropical and 100% boreal. The reach is
+  not the limit. What identity does everywhere is form REAL merged villages — big-band count 0.4→8.9
+  tropical, 11→20 temperate, 1.1→2.6 boreal, at median sizes ~90–107.
+
+### Savanna is excluded for cause, and it is NOT a regression
+
+The savanna world is degenerate — population ~125 at equilibrium — so it cannot test any mechanism. A control
+on the OLD canonical (`bud_requires_occupancy` OFF) returns **bit-identical** numbers (pop tail 125, final
+137, 7 bands), so the collapse predates this arc's adoptions entirely. It is a separate open defect, adjacent
+to the standing savanna reachability failure (task #77).
+
+### MARKER #16 re-scored, all four together
+
+The adoption flips `test_the_model_is_currently_pathologically_young`, which is the sanctioned trigger its own
+docstring names. Re-scored on that test's fixture (n=1500, 300 steps, coastal-temperate, seed 0):
+
+| marker | before | after | anchor |
+|---|---|---|---|
+| `frac_child` | 0.585 | **0.414** | 0.287–0.454 — **INSIDE**, at the Aché 0.419 |
+| `dependency_ratio` | 1.495 | **0.907** | 0.598–0.899 — misses the ceiling by 0.9% |
+| `sex_ratio_m_f` | 1.061 | **0.987** | 0.896–1.368 — **INSIDE** |
+| `median_age_yr` | 12.8 | **17.1** | ~20 — **still the open gap** |
+| `frac_motherless` | ~11.8% | **3.6%** | ~2% |
+
+2 of 4 pass, 1 marginal, 1 open. The test is re-baselined and RENAMED to
+`test_the_pyramid_is_young_but_the_child_share_is_now_anchored`; it now pins the improved regime in BOTH
+directions — the child share must stay inside the forager range, and median age must stay short of the anchor
+until the engine improves again.
+
+**What is NOT claimed.** That the demography is solved: `median_age_yr` 17.1 against ~20, `l15` improves in
+every biome but still misses .55–.60 everywhere, and the early-adult cliff (15-30 : 30-45) is 2.71× and
+untouched. That savanna or arid work. That the packing paradox is addressed — it is not; villages are
+separated but the population still occupies ~14% of the land.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

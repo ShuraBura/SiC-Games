@@ -46,7 +46,7 @@ validated, however long it ran.
 | 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** Computed from the same settlement list. See the note below. |
 | 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
 | 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
-| 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | **NOW ANCHORED (2026-08-08)** — Hill & Hurtado Table 4.4 p.141, on the model's OWN age classes (0–15/15–60/60+): dependency **0.598 !Kung / 0.866 Yanomamö / 0.899 Aché**; %<15 **28.7 / 45.4 / 41.9**; sex ratio **0.896 / 1.202 / 1.368** | Hill & Hurtado 1996 Table 4.4 `[VERIFIED VERBATIM, 3 rows registered]`; !Kung via Lee 1979:45, Yanomamö via Neel & Weiss 1975:28 | **dependency 1.495 — 1.66× the HIGHEST of three forager populations**; `frac_child` 0.585 vs a 0.287–0.454 range. **Sex ratio 1.061 PASSES** (inside 0.896–1.368). No longer context — a scored row |
+| 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | **NOW ANCHORED (2026-08-08)** — Hill & Hurtado Table 4.4 p.141, on the model's OWN age classes (0–15/15–60/60+): dependency **0.598 !Kung / 0.866 Yanomamö / 0.899 Aché**; %<15 **28.7 / 45.4 / 41.9**; sex ratio **0.896 / 1.202 / 1.368** | Hill & Hurtado 1996 Table 4.4 `[VERIFIED VERBATIM, 3 rows registered]`; !Kung via Lee 1979:45, Yanomamö via Neel & Weiss 1975:28 | **RE-SCORED 2026-08-28 (R-106 Addendum 54)** after `enable_village_identity` was adopted, all four together on the n=1500/300 coastal-temperate fixture: **`frac_child` 0.585 → 0.414 PASSES** (inside 0.287–0.454, at the Aché 0.419); **dependency 1.495 → 0.907**, was 1.66× the highest of three forager peoples and now misses the 0.899 ceiling by 0.9%; **sex ratio 1.061 → 0.987 PASSES** (inside 0.896–1.368); **`median_age_yr` 12.8 → 17.1, STILL SHORT of ~20 — the open gap.** 2 of 4 pass, 1 marginal, 1 open. No longer context — a scored row |
 | 17 | **fission ceiling** | `settle_max` | communities should not persist far past **158 [147–170]** (max scalar stress) and effectively never past **250** (ethnographic maximum) | Alberti 2014 `[VERIFIED VERBATIM]` + Alvard 2009 `[VERIFIED VERBATIM]`; Hamilton 2007 periodic aggregation **165.32 [152.25–181.00]** independently lands on the same scale `[VERIFIED VERBATIM]` | **MISSES — screen only.** Over 52 trajectories the median `settle_max` is **220**; **39/52 exceed 158** and **18/52 exceed 250**. The typical village is right (#3) while the largest one over-runs the size at which both sources say communities break up |
 
 **HILL 2011 IS NOT A LINEAGE SOURCE (2026-08-06, PDF read).** `MODEL_SPEC` §4.8.8, `TARGETS` and `PARAMETERS`
@@ -201,6 +201,22 @@ population e₀ = 1/CDR, so a CDR of ~50–77/1000 forces e₀ ≈ 20.7, a media
 | `median_age_yr` | 13.4 | **15.2** | ~20 (Aché) |
 | `frac_child` | 54.5% | **49.6%** | ~40% |
 | `frac_motherless` | 11.8% | **7.9%** | ~2% (Hill & Hurtado) |
+
+**RE-SCORE 2026-08-28 (R-106 Addendum 54) — village identity moved the family again, and further.** Same rule,
+same fixture (n=1500 / 300 steps, coastal-temperate, seed 0), after `enable_village_identity` was adopted:
+
+| marker | 2026-08-08 | **now** | anchor |
+|---|---|---|---|
+| `frac_child` | 54.5% | **41.4%** | 28.7–45.4% (Hill & Hurtado Table 4.4) — **INSIDE, at the Aché 41.9%** |
+| `dependency_ratio` | 1.495 | **0.907** | 0.598–0.899 — misses the ceiling by 0.9% |
+| `sex_ratio_m_f` | 1.061 | **0.987** | 0.896–1.368 — **INSIDE** |
+| `median_age_yr` | 13.4 | **17.1** | ~20 (Aché) — **still the open gap** |
+| `frac_motherless` | 11.8% | **3.6%** | ~2% (Hill & Hurtado) |
+
+The mechanism is social, not a mortality knob: co-resident bands merge into one community, which ends the
+"45 bands in one village" artifact and lowers turnover. Validated in THREE biomes (tropical, temperate,
+boreal) before adoption — every marker moved the same direction in each. What is NOT fixed: median age, and
+the early-adult cliff (15-30 : 30-45 = 2.71×).
 
 **Score these four TOGETHER, never singly** — they share a denominator in the vital-rate identity, so moving one
 without the others is a sign of forcing rather than a fix. Still short of every anchor; next lever is counting

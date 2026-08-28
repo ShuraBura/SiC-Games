@@ -158,11 +158,10 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # set; they are not repeated here so there is one copy to keep true.
                #   bud_site_separation          works, but imposes 50 km against a ~20 km filed anchor
                #   exclusive_village_membership no spacing on its own; raises churn
-               #   village_identity             inert against settlement churn
-               #   bud_requires_occupancy       removes the bypass; superseded by emergent founding
-               # `enable_emergent_village_founding` is deliberately NOT here — it is canonically ON.
+               # bud_requires_occupancy (Addendum 53) and village_identity (Addendum 54, after its
+               # multi-biome A/B) were ADOPTED and are canonically ON, as is
+               # `enable_emergent_village_founding` — so all three are deliberately absent here.
                "enable_bud_site_separation", "enable_exclusive_village_membership",
-               "enable_village_identity", "enable_bud_requires_occupancy",
                # A model CORRECTION under evaluation: it changes realised mortality in every
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
                "enable_density_reference",

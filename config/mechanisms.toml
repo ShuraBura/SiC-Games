@@ -280,7 +280,7 @@ type  = "bool"
 # value.
 
 [enable_village_identity]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ── VILLAGE IDENTITY: co-residence dissolves band identity (2026-08-12) ────────────────────────────────

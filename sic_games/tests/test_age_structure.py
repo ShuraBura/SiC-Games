@@ -101,22 +101,32 @@ def test_growth_regime_boundaries(ratio, expected):
     assert TerrainWorld._growth_regime(ratio, 1.0) == expected
 
 
-def test_the_model_is_currently_pathologically_young(markers):
-    """A FACT ABOUT THE MODEL, pinned so it cannot rot — this is MARKER_MATRIX #4/#5's open failure seen in
-    one view. Measured median age ~12.8 against the Aché anchor ~20, `frac_child` ~0.54 against ~0.40, and a
-    3x cliff between the 15-30 and 30-45 classes.
+def test_the_pyramid_is_young_but_the_child_share_is_now_anchored(markers):
+    """A FACT ABOUT THE MODEL, pinned so it cannot rot. RE-BASELINED 2026-08-28 (R-106 Addendum 54) when
+    `enable_village_identity` was adopted; this test was previously
+    `test_the_model_is_currently_pathologically_young` and pinned `frac_child` > 0.45.
 
-    ⚠ THE DIAGNOSIS IN THIS DOCSTRING WAS WRONG AND IS CORRECTED (2026-08-07, tier-3 CTB). It read "people
-    die in early adulthood", which implicated the mortality schedule. The schedule is FINE: integrated, the
-    Siler curve gives e₀ = 36.5 yr against the Aché ~37, and its survivorship shows no early-adult collapse
-    (S(30) = 0.54, S(45) = 0.43). What is actually happening, measured on the long run: births at 5.66 %/yr
-    (crude birth rate ~57/1000 against a forager norm of 40–45) and STARVATION deaths at 3.80 %/yr — larger
-    than the entire anchored life table, whose crude death rate here is ~2.7 %/yr. It is a HIGH-TURNOVER
-    regime, and turnover is what makes a pyramid young. See `test_tier3_demography_ctb.py`.
+    WHAT CHANGED. The old pathology was median age ~12.8 against the Aché ~20 and `frac_child` ~0.54 against
+    a 0.287–0.454 forager range. Adopting village identity (co-resident bands merge into one community) moved
+    the MARKER_MATRIX #16 family together, on this same fixture:
 
-    WHEN THIS STARTS FAILING the demographic engine has improved — re-score e₀, `median_age_yr`,
-    `frac_child` and `frac_motherless` TOGETHER, as MARKER_MATRIX requires, and update R-106."""
-    assert markers["median_age_yr"] < 18.0, "median age has reached the Aché anchor's neighbourhood"
-    assert markers["frac_child"] > 0.45, "the child share has come down toward the ~0.40 anchor"
+        frac_child        0.585 -> 0.414   INSIDE the Hill & Hurtado range, at the Aché value 0.419
+        dependency_ratio  1.495 -> 0.907   was 1.66x the highest of three forager peoples; now ~= Aché 0.899
+        sex_ratio_m_f     1.061 -> 0.987   still inside 0.896-1.368
+        median_age_yr      12.8 -> 17.1    IMPROVED BUT STILL SHORT of the ~20 anchor
+        frac_motherless    high -> 0.036   against ~0.02 Aché
+
+    So #16's child share and sex ratio PASS, dependency misses its ceiling by 0.9 %, and median age remains
+    the open gap. The turnover diagnosis in the old docstring still holds for what is LEFT: the early-adult
+    cliff (15-30 : 30-45) is 2.71x and has not gone away. The Siler schedule was never the cause — integrated
+    it gives e₀ = 36.5 yr against the Aché ~37 — see `test_tier3_demography_ctb.py`.
+
+    WHAT THIS NOW PINS is the improved-but-unfinished regime, in BOTH directions: the child share must stay
+    inside the forager range (a regression that re-inflates it fails here), and median age must stay short of
+    the anchor (when THAT starts failing the engine has improved again — re-score the #16 family together, as
+    MARKER_MATRIX requires, and update R-106)."""
+    assert 0.287 < markers["frac_child"] < 0.454, (
+        "the child share has left the Hill & Hurtado forager range (0.287-0.454) — re-score MARKER #16")
+    assert markers["median_age_yr"] < 19.0, "median age has reached the Aché anchor's neighbourhood"
     assert markers["age_15_30"] > 2.0 * markers["age_30_45"], (
         "the early-adult mortality cliff has softened — the pyramid is no longer collapsing at 30")

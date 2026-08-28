@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-26
+# generated 2026-08-28
 
 [meta]
 name = "full_campaign"
@@ -125,7 +125,7 @@ enable_terrain_pathogen = false
 enable_terrain_risk = true
 enable_tier2_shock = true
 enable_village_budding = true
-enable_village_identity = false
+enable_village_identity = true
 enable_village_resentment = true
 enable_village_scaling = true
 enable_wealth_obligation = true

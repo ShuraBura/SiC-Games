@@ -106,13 +106,12 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # change to assabiyah, measured and defensible but NOT adopted (Addendum 23). C_ALLON must
                # not adopt a model change by side effect.
                "enable_leaky_assabiyah",
-               # SETTLEMENT-RUNAWAY CANDIDATES, measured and REJECTED (2026-08-12). Four rules built while
-               # diagnosing the budding runaway; each failed on measurement and is retained only as an
-               # ablation control. Full reasons are in run_campaign.py's C_ALLON `_skip` set — one copy.
-               # `enable_emergent_village_founding`, the rule that REPLACED them, is canonically ON and so
-               # is deliberately absent from this list.
+               # SETTLEMENT-RUNAWAY CANDIDATES that failed on measurement (2026-08-12) and are retained only
+               # as ablation controls. Full reasons are in run_campaign.py's C_ALLON `_skip` set — one copy.
+               # `enable_emergent_village_founding` (the rule that replaced them), `bud_requires_occupancy`
+               # (Addendum 53) and `village_identity` (Addendum 54, after its multi-biome A/B) are all
+               # canonically ON and so are deliberately absent from this list.
                "enable_bud_site_separation", "enable_exclusive_village_membership",
-               "enable_village_identity", "enable_bud_requires_occupancy",
                # A model CORRECTION under evaluation: it changes realised mortality in every
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
                "enable_density_reference",

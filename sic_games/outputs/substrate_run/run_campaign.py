@@ -907,24 +907,24 @@ def main():
             #                                        only as the "geometry alone" ablation control.
             #   enable_exclusive_village_membership  removes the mutual subsidy as designed, but produces NO
             #                                        spacing on its own and raises churn (buds 978 -> 1366).
-            #   enable_village_identity              WORKS but HELD (R-106 Addendum 53, 2026-08-26). On the
-            #                                        emergent-spacing base it ends the 45-bands artifact
-            #                                        (188 -> 28) and DRIVES the age-structure gain (frac_child
-            #                                        0.55 -> 0.41 at n=1500/300; bud_requires_occupancy alone
-            #                                        leaves it at 0.55), at a stable low-density equilibrium.
-            #                                        But that is validated in ONE biome (warm coastal). Held
-            #                                        pending a multi-biome / long-run check before it
-            #                                        re-baselines the canonical population by halving it.
             #   enable_bud_requires_occupancy        ADOPTED (R-106 Addendum 53, 2026-08-26). Closes the
             #                                        budding bypass so village spacing is EMERGENT from
             #                                        disjoint catchments (no distance constant); matches the
             #                                        imposed bud_site_separation rule bit-for-bit and raises
             #                                        population. Removed from this set -> canonically ON.
+            #   enable_village_identity              ADOPTED (R-106 Addendum 54, 2026-08-28) after the
+            #                                        multi-biome A/B its hold was gated on. In tropical,
+            #                                        temperate AND boreal every marker moves the same way:
+            #                                        median age 21.7/17.5/16.0 -> 26.4/18.8/20.7, TFR into
+            #                                        band, l15 up, starvation down, and merged villages of
+            #                                        ~90-107 replace the 45-bands artifact. It does not drain
+            #                                        population: temperate and boreal were LEAKING without it
+            #                                        (-104, -105 on the tail) and are healthy with it (+259,
+            #                                        +6). Removed from this set -> canonically ON.
             # bud_site_separation stays as the imposed-geometry ablation control, mutually exclusive in spirit
             # with the adopted emergent spacing.
             "enable_bud_site_separation",
             "enable_exclusive_village_membership",
-            "enable_village_identity",
             # A MODEL CORRECTION UNDER EVALUATION (2026-08-13). `enable_density_reference` re-references
             # density_mult so the anchor density returns 1.0 -- the invariant risk_mult and pathogen_mult
             # already hold and this one silently broke. It is measured and principled, but adopting it
