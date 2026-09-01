@@ -7244,4 +7244,58 @@ separated but the population still occupies ~14% of the land.
 
 ---
 
+## Addendum 55 — The young pyramid is a Malthusian-ceiling phenomenon; the subsistence floor is FALSIFIED (2026-08-31, R-106)
+
+**The diagnosis (before any tuning).** The persistent young median (temperate 18.8 at a stable ~4,500) is not
+a transient — it is a HOT equilibrium. Realised e₀ is **23.5 against the Siler schedule 36.5**; 43% of deaths
+are crowding/starvation, and they are STATUS-SELECTIVE: with `contest_exponent = 1.5` on the per-cell food
+split, a low-status adult gets **0.04 of the even share even when the cell holds exactly enough for all**
+(measured on the real `compute_harvest_shares`), so low-status young adults (modal death age ~22) are culled
+while the village mean is 2.4× requirement and the granary is full. Need-weighting is alive but orthogonal (it
+corrects age, not status).
+
+**The fix that FAILED (`enable_subsistence_floor`, built + CTB'd, then reverted).** Forager demand-sharing:
+guarantee each occupant its ration before status contests the surplus. It worked mechanically (cut the cull,
+starvation share 43%→40%) but was **net-negative**: realised e₀ 23.5→22.3, l15 0.502→0.478, infant mortality
+0.131→0.149. A controlled proof of the ceiling: relieving the low-status adult cull raised BIRTHS
+(CBR 42.9→45.1) and the extra infants then died (infant deaths/step 0.17→0.21); CDR did not fall (42.4→44.6).
+**Redistribution relocates death (adult→infant); it does not reduce it**, and e₀ falls because an infant death
+costs more life-years. Reverted. The lesson: the young pyramid is set by the CEILING (total effective food),
+not the distribution — raising e₀ needs a higher ceiling or lower fertility, not a fairer split.
+
+## Addendum 56 — Metabolic down-regulation: a survivable hunger state raises the ceiling (2026-08-31→09-01, R-106)
+
+**Why the deaths are abrupt, and why dispersal never fires.** The reserve is spent at a FLAT burn, so any
+sustained intake below 100% is inexorably fatal (even 70% kills in ~5 months) and there is NO thin-but-alive
+state. 96% of starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4× requirement —
+they look well-fed to every dispersal trigger (static NPP stride, smoothed intake, remembered hardship), which
+are all slow, while the death is fast. The reserve is also CAPPED, so a volatile crowded cell ratchets it down
+even at a high mean intake.
+
+**The mechanism (Keys 1950, Minnesota Starvation; LITERATURE.md, MODEL_SPEC §4.6.7).** `enable_metabolic_downreg`:
+under a draining reserve the burn falls, `burn_eff = burn·(1 − d)`, `d = 0.40·clamp((1 − frac)/0.5)` on the
+reserve fill fraction (Keys: ~40% total BMR reduction at ~25% weight loss). Triggered on the RESERVE LEVEL, not
+the intake-EMA (the crash agents have a HIGH EMA, so an EMA trigger would never fire); it buffers the transient
+crash as it happens, at every age. It preserves the Malthusian ceiling for real scarcity — a true chronic
+deficit below the reduced burn still kills — so it buffers volatility, it does not feed a genuine shortage.
+
+**Validated NET-POSITIVE (the A/B, on vs off).** Temperate (decisive, where the cull was measured): pop
+4,402→**4,848**, e₀ 23.5→**23.7**, median 18.8→**19.2**, l15 0.502→**0.509**, infant mortality
+0.131→**0.120** (toward the anchor), starvation 43%→**34%** — a clean improvement, NOT the subsistence floor's
+relocation (contrast Addendum 55). Boreal (marginal): pop 346→**524 (+51%)**, e₀ 18.5→19.4, median 21.3→23.2,
+starvation 30%→23%, with a small infant-mortality uptick (0.161→0.206 — the ceiling pushback in a marginal
+world). It genuinely raises the ceiling. **Honest caveat: the e₀ gain is small (+0.2 temperate)** — a real,
+modest improvement, not the transformation that closes the 23.7→36.5 gap; the rest is the packing paradox
+(dispersal onto the unused ~86% of the land) or fertility, still open.
+
+**Adopted (built ON per the new rule).** Canonical `C_ALLON` resolution audited: `bud_requires_occupancy`,
+`village_identity`, `metabolic_downreg`, `society_regional_density` all ON; `village_pooling` and
+`subsistence_floor` reverted. Full suite green but for the pre-existing degenerate-savanna family (task #77);
+down-reg surfaced one fragile liveness test (`test_biome_meat_ctb` ran on the collapsing savanna world for 8
+steps — a dead population is insensitive to everything, the CTB rule's own warning) which was HARDENED to run
+on a living population with an alive-guard. **New standing rule (CLAUDE.md, 2026-08-28):** build every
+mechanism ON, audit that it is on, and raise a flagged discussion with a stated reason for any flag left OFF.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

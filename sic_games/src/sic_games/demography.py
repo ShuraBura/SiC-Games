@@ -515,6 +515,22 @@ class DemographyConfig(BaseModel):
     enable_intake_fertility: bool = False
     intake_ema_alpha: float = Field(0.04, gt=0.0, le=1.0)  # half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr:
     #   slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze
+    # METABOLIC DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 Minnesota Starvation, LITERATURE.md;
+    # full doc MODEL_SPEC §4.6.7). The reserve is spent at a FLAT burn, so any sustained intake below 100% is
+    # inexorably fatal (even 70% kills in ~5 months) and there is no thin-but-alive state; measured, 96% of
+    # starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4x requirement, and realised
+    # e0 is 23.5 vs schedule 36.5. Under deficit a real body turns its metabolism down (Keys: ~10-25% adaptive
+    # over weeks, ~40% total incl. mass loss at ~25% weight loss). Triggered on the RESERVE LEVEL — low fat
+    # stores drive down-regulation (the physiological trigger, leptin), and it buffers the acute crash AS it
+    # happens, and applies at every age (the intake-EMA is adult-only and, being high on average, would never
+    # fire for the crash it must stop). burn_eff = burn*(1 - d), d = downreg_max*clamp((1 - frac)/downreg_span, 0, 1),
+    # frac = (wealth - floor)/(full - floor). Full reserve -> d=0, so bit-exact when off AND inert for the
+    # well-fed when on. It buffers TRANSIENT crashes without saving a CHRONICALLY starving agent (a true mean
+    # deficit below the reduced burn still kills), so the Malthusian ceiling for real scarcity is preserved
+    # (contrast the subsistence floor, Addendum 55, which only relocated death and was reverted).
+    enable_metabolic_downreg: bool = False
+    metabolic_downreg_max: float = Field(0.40, ge=0.0, le=0.9)  # Keys total BMR drop at ~25% wt loss; bracket [0.25 adaptive-only, 0.40 total]
+    metabolic_downreg_span: float = Field(0.5, gt=0.0, le=1.0)  # full down-reg reached at ~half reserve depletion (Keys ~25% wt loss)
     # DEPENDENT LOAD (requires enable_intake_fertility). A mother's energy budget is not her own maintenance —
     # she must also cover what her juveniles cannot produce. Counting only her own needs understates the cost of
     # a further birth for a woman who already has dependents, which is the anchored driver of forager birth

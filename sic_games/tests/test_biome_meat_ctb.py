@@ -69,6 +69,37 @@ def trajectory(w):
     return traj
 
 
+# ── LIVENESS runs on a LIVING population (CTB "check the run is alive") ─────────────────────────────────────
+# The savanna world above collapses to ~63 in 8 steps, and a collapsed population is insensitive to everything,
+# so a knife-edge trajectory equality there is noise, not a verdict. This surfaced on 2026-09-01 when
+# `enable_metabolic_downreg` (a validated, unrelated mechanism) tipped that equality from (65,63) to (63,63).
+# `meat_frac`/`meat_cv` ARE live — they change a SURVIVING run — so the liveness tests use a world that lives.
+_LIVE_NAG, _LIVE_STEPS, _LIVE_PATCH = 600, 25, (30, 30, 80)
+
+
+def _live_build(demog, **update):
+    k = world_lottery_climate(SEED, terrain="coastal", climate="temperate")   # a world that survives 25 steps
+    f = generate_world(k, mode="climate")
+    hf = NPPCapacityField(f, BURN, patch=_LIVE_PATCH, mode="tallavaara", aquatic=True, enable_depletion=True)
+    pos = seed_band_positions_spread(f, _LIVE_NAG, hours_per_step=100.0, burn=BURN, band_size=25,
+                                     rng=random.Random(SEED))
+    return TerrainWorld(n_agents=_LIVE_NAG, kcal_cfg=KcalEconomyConfig(), terrain_knobs=k, game_stream=False,
+                        seed=SEED, carbon_cfg=CarbonConfig(kappa=1.5),
+                        substrate_cfg=SubstrateConfig(enabled=True, k_cell=0, movement_mode="diffusion",
+                                                      contest_exponent=1.5, move_cost_flat=0.0),
+                        harvest_field=hf, placement_positions=pos,
+                        demography_cfg=demog.model_copy(update=update) if update else demog)
+
+
+def _live_trajectory(w):
+    traj = []
+    for _ in range(_LIVE_STEPS):
+        w.step()
+        traj.append(sum(1 for a in w.agent_list if a.alive))
+    assert traj[-1] > 200, f"liveness world collapsed (final pop {traj[-1]}) -- a dead run tests nothing (CTB)"
+    return traj
+
+
 # ── default state: every prior run stays bit-exact ────────────────────────────────────────────────────────
 
 def test_both_flags_default_off_in_the_config_class():
@@ -87,15 +118,15 @@ def test_flags_off_reproduces_the_scalar_run_bit_exactly(demog):
 def test_turning_the_flags_on_changes_the_run(demog):
     """THE POSITIVE CONTROL for this mechanism. A flag that is on and changes nothing is the failure mode the
     ON-but-dead gate exists for (Charter §12), and it produced 3 of battery 7's 6 "inert" verdicts."""
-    off = trajectory(build(demog, enable_biome_meat_frac=False, enable_biome_meat_cv=False))
-    on = trajectory(build(demog, enable_biome_meat_frac=True, enable_biome_meat_cv=True))
+    off = _live_trajectory(_live_build(demog, enable_biome_meat_frac=False, enable_biome_meat_cv=False))
+    on = _live_trajectory(_live_build(demog, enable_biome_meat_frac=True, enable_biome_meat_cv=True))
     assert off != on, "both flags on and the trajectory is unchanged — the wiring does not reach the harvest"
 
 
 @pytest.mark.parametrize("flag", ["enable_biome_meat_frac", "enable_biome_meat_cv"])
 def test_each_flag_is_live_on_its_own(demog, flag):
     base = dict(enable_biome_meat_frac=False, enable_biome_meat_cv=False)
-    assert trajectory(build(demog, **base)) != trajectory(build(demog, **{**base, flag: True}))
+    assert _live_trajectory(_live_build(demog, **base)) != _live_trajectory(_live_build(demog, **{**base, flag: True}))
 
 
 # ── the fields carry the anchored values, and the fallbacks are the documented ones ───────────────────────

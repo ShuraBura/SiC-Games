@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-28
+# generated 2026-08-31
 
 [meta]
 name = "full_campaign"
@@ -91,6 +91,7 @@ enable_malnutrition_fission = false
 enable_marriage_aggregation = true
 enable_material_capture = true
 enable_material_inheritance = true
+enable_metabolic_downreg = true
 enable_morph = true
 enable_need_weighted_shares = true
 enable_noble_leveling_exemption = true
@@ -258,6 +259,8 @@ max_wives = 3
 mean_factor = 1.0
 menarche_months = 180
 menopause_months = 504
+metabolic_downreg_max = 0.4
+metabolic_downreg_span = 0.5
 mobility_base_radius = 1
 mobility_exponent = 1.0
 mobility_intake_floor = 0.15

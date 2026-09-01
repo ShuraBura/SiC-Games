@@ -1254,6 +1254,29 @@ maternal-removed female Siler (approach (a), deferred); full pathogen calibratio
 bracketed); the multi-biome harness (S3.5 — to build; every run so far is one 40×40 window); cause-decomposed
 mortality outputs (out of scope — total q(x) only).
 
+### §4.6.7 Adaptive metabolic down-regulation under deficit (`enable_metabolic_downreg`; added 2026-08-28, R-106)
+**The gap (RESULTS Addendum 52–54 diagnosis).** The starvation reserve (`wealth`, Cahill §PARAMETERS) is
+spent at a FLAT burn: `wealth += intake − burn`, death at `wealth ≤ floor`, and `burn` never falls no matter
+how little the agent eats. So ANY sustained intake below 100% of the fixed burn is inexorably fatal — even 70%
+of requirement kills in ~5 months — and there is no thin-but-alive state. Measured consequence at equilibrium:
+**96% of starvation deaths are ACUTE one-step crashes** (reserve still >50% the step before), the dying agent's
+intake-EMA is **2.4× requirement** (well-fed on average) and its realised e₀ is **23.5 vs the Siler schedule
+36.5**. The deaths are volatility on a crowded cell, not scarcity — food is ample on average — but the flat
+burn plus the ~1.7-month capped reserve cannot ride a transient dip.
+
+**The mechanism (Keys 1950, LITERATURE.md — Minnesota Starvation Experiment).** Under a sustained deficit a real
+body turns its metabolism down; the adaptive (mass-independent) component reaches ~10% at wk 4, ~20% at wk 12,
+~25% at wk 24 of prestarvation BMR, and men held at ~50% intake for 6 months lost ~25% of body weight and
+SURVIVED. Modelled: `burn_eff = burn · (1 − d)` where `d = downreg_max · clamp((1 − intake_ema)/downreg_span, 0, 1)`,
+`downreg_max = 0.25` (Keys wk-24 adaptive), `downreg_span = 0.5` (full down-regulation at ≤50% intake). The
+agent's own `_intake_ema` supplies the weeks-scale ramp (a single bad step barely moves it; a sustained deficit
+drives `d` to its cap). Well-fed agents (`intake_ema ≥ 1`) get `d = 0` ⇒ **bit-exact when off, and inert for the
+well-fed even when on**. It buffers TRANSIENT crashes without saving a CHRONICALLY starving agent: at a true
+mean deficit below ~0.75× the reduced burn still exceeds intake and the agent dies, so the Malthusian ceiling
+for real scarcity is preserved (contrast the subsistence-floor experiment, Addendum 55, which only relocated
+death and was reverted). Diminishment couplings (strength/harvest, fertility) are documented in the Keys anchor
+and deferred to a follow-up; the first build is the survival term only.
+
 ---
 
 ## Model architecture — scale, agents, family, fallbacks (added 2026-06-20; RESULTS R-14)

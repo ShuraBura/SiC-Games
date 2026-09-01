@@ -222,6 +222,48 @@ type  = "float"
 # p10 0.93 to p90 4.26 of requirement. Ellison's energetics is the mechanism — fecundity tracks energy
 # FLUX, not stored reserve.
 
+[metabolic_downreg_max]
+value = 0.4
+owner = "DemographyConfig"
+type  = "float"
+# Keys total BMR drop at ~25% wt loss; bracket [0.25 adaptive-only, 0.40 total] — (channel note,
+# inherited) slow enough that one bad month does not stop births, fast enough to track a multi-year
+# squeeze METABOLIC DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 Minnesota Starvation,
+# LITERATURE.md; full doc MODEL_SPEC §4.6.7). The reserve is spent at a FLAT burn, so any sustained intake
+# below 100% is inexorably fatal (even 70% kills in ~5 months) and there is no thin-but-alive state;
+# measured, 96% of starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4x
+# requirement, and realised e0 is 23.5 vs schedule 36.5. Under deficit a real body turns its metabolism
+# down (Keys: ~10-25% adaptive over weeks, ~40% total incl. mass loss at ~25% weight loss). Triggered on
+# the RESERVE LEVEL — low fat stores drive down-regulation (the physiological trigger, leptin), and it
+# buffers the acute crash AS it happens, and applies at every age (the intake-EMA is adult-only and, being
+# high on average, would never fire for the crash it must stop). burn_eff = burn*(1 - d), d =
+# downreg_max*clamp((1 - frac)/downreg_span, 0, 1), frac = (wealth - floor)/(full - floor). Full reserve
+# -> d=0, so bit-exact when off AND inert for the well-fed when on. It buffers TRANSIENT crashes without
+# saving a CHRONICALLY starving agent (a true mean deficit below the reduced burn still kills), so the
+# Malthusian ceiling for real scarcity is preserved (contrast the subsistence floor, Addendum 55, which
+# only relocated death and was reverted).
+
+[metabolic_downreg_span]
+value = 0.5
+owner = "DemographyConfig"
+type  = "float"
+# full down-reg reached at ~half reserve depletion (Keys ~25% wt loss) — (channel note, inherited) slow
+# enough that one bad month does not stop births, fast enough to track a multi-year squeeze METABOLIC
+# DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 Minnesota Starvation, LITERATURE.md; full
+# doc MODEL_SPEC §4.6.7). The reserve is spent at a FLAT burn, so any sustained intake below 100% is
+# inexorably fatal (even 70% kills in ~5 months) and there is no thin-but-alive state; measured, 96% of
+# starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4x requirement, and
+# realised e0 is 23.5 vs schedule 36.5. Under deficit a real body turns its metabolism down (Keys: ~10-25%
+# adaptive over weeks, ~40% total incl. mass loss at ~25% weight loss). Triggered on the RESERVE LEVEL —
+# low fat stores drive down-regulation (the physiological trigger, leptin), and it buffers the acute crash
+# AS it happens, and applies at every age (the intake-EMA is adult-only and, being high on average, would
+# never fire for the crash it must stop). burn_eff = burn*(1 - d), d = downreg_max*clamp((1 -
+# frac)/downreg_span, 0, 1), frac = (wealth - floor)/(full - floor). Full reserve -> d=0, so bit-exact
+# when off AND inert for the well-fed when on. It buffers TRANSIENT crashes without saving a CHRONICALLY
+# starving agent (a true mean deficit below the reduced burn still kills), so the Malthusian ceiling for
+# real scarcity is preserved (contrast the subsistence floor, Addendum 55, which only relocated death and
+# was reverted).
+
 [lh_eta_juvenile_exponent]
 value = 1.0
 owner = "DemographyConfig"

@@ -2259,6 +2259,10 @@ class TerrainWorld(mesa.Model):
         intake_signal_on = intake_fert_on or mobility_wants_intake or refrac_on
         i_alpha = demog.intake_ema_alpha if intake_signal_on else 0.0
         i_menarche = demog.menarche_months if intake_signal_on else 0
+        # §4.6.7 metabolic down-regulation: under a draining reserve, burn falls toward a floor (Keys 1950).
+        downreg_on = demog is not None and getattr(demog, "enable_metabolic_downreg", False)
+        dr_max = demog.metabolic_downreg_max if downreg_on else 0.0
+        dr_span = demog.metabolic_downreg_span if downreg_on else 1.0
         dep_load = {}
         if intake_fert_on and getattr(demog, "enable_dependent_load", False):
             # A mother's real energy budget covers her juveniles' UNMET need, not just her own maintenance.
@@ -2281,7 +2285,17 @@ class TerrainWorld(mesa.Model):
                 _req = self._burn * a.consumption_factor() + dep_load.get(a, 0.0)
                 _ratio = (a._last_intake / _req) if _req > 0.0 else 1.0
                 a._intake_ema = (1.0 - i_alpha) * a._intake_ema + i_alpha * _ratio
-            a.wealth -= self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
+            _burn_a = self._burn * a.consumption_factor()   # C.1 age-scaled maintenance (1.0 if lh_config off)
+            if downreg_on:
+                # §4.6.7: a draining reserve turns the metabolism down (Keys 1950). frac = reserve fill in
+                # [0,1]; full reserve -> d=0 (bit-exact for the well-fed). Buffers a transient crash; a true
+                # chronic deficit below the reduced burn still kills, so real scarcity is unbuffered.
+                _flr = a.reserve_floor * a.reserve_scale()
+                _cap = self._reserve_full * a.reserve_scale()
+                _frac = (a.wealth - _flr) / (_cap - _flr) if _cap > _flr else 1.0
+                _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
+                _burn_a *= 1.0 - dr_max * min(1.0, (1.0 - _frac) / dr_span)
+            a.wealth -= _burn_a
             if mcf is not None and getattr(a, "_moved_this_step", False):
                 a.wealth -= float(mcf[a.pos[1], a.pos[0]])     # Stage 1b: realized terrain move cost (drain movers)
                 a._moved_this_step = False

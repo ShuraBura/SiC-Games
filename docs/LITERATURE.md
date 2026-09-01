@@ -1078,6 +1078,26 @@ bust; the exact quantity the substrate run measures). **Status: SEARCH-VERIFIED 
 filed). Anchor: full 130k / floor 20k / ~44 d runway.**
 **Citation tag:** [PARAMETER — starvation reserve full/floor] — BUILT (`KcalEconomyConfig`); PARAMETERS §13.
 
+### Keys, A., Brožek, J., Henschel, A., Mickelsen, O. & Taylor, H.L. (1950). *The Biology of Human Starvation.* Univ. of Minnesota Press. (The Minnesota Starvation Experiment, 1944–45.)
+**What was lifted — adaptive metabolic down-regulation under sustained deficit (`enable_metabolic_downreg`):**
+36 men held at **~50% of requirement (~1,570 kcal) for 6 months lost ~25% of body weight and SURVIVED** — the
+"diminished but not dead" state the model lacks. Resting metabolic rate fell **~40%** by week 24, of which
+~65% is tissue loss (a smaller body) and **~35% is ADAPTIVE hypometabolism** — a true turn-down of the engine,
+independent of mass. The adaptive component **RAMPS over time: ~10% (wk 4) → ~20% (wk 12) → ~25% (wk 24)** of
+prestarvation BMR. **How used:** under a sustained intake deficit an agent DOWN-REGULATES its burn toward a
+floor (**~0.75, i.e. −25% adaptive**, reached at ≤50% intake, on the agent's own intake-EMA horizon), so a
+transient per-capita crash no longer kills an agent who is well-fed on average. Measured defect it addresses:
+96% of starvation deaths were ACUTE one-step crashes with the reserve still half-full, and realised e₀ sat at
+23.5 vs a schedule 36.5, because the model burns FLAT — exactly the gap the Cahill entry above flags. It
+COMPLEMENTS, does not replace, the Cahill body reserve: Cahill sets how much fuel there is, Keys sets how fast
+it is spent under famine. **Cross-the-board impacts (documented, for the diminishment coupling if built):**
+strength/endurance ~halved; heart rate, blood pressure, temperature down; cold intolerance; oedema; libido→0
+and amenorrhea ⇒ fertility suppressed (already the Ellison/Toba C-peptide anchor + `enable_energetic_refractory`);
+maternal undernutrition ⇒ low birth weight ⇒ raised infant mortality (Dutch Hunger Winter is the human anchor).
+**Status: SEARCH-VERIFIED** (the ~40% / adaptive-35% split and the 10/20/25% wk-4/12/24 ramp are widely cited;
+primary volume not filed). **Anchor: adaptive down-regulation ~10–25% over 1–6 months, saturating at ~50% intake.**
+**Citation tag:** [PARAMETER + MECHANISM — adaptive metabolic down-regulation under deficit] — BUILT (`enable_metabolic_downreg`); MODEL_SPEC §4.6.7.
+
 ### Bar-Yosef, O. (1998). "The Natufian culture in the Levant, threshold to the origins of agriculture." *Evolutionary Anthropology* 6:159–177.
 **What was lifted — minimum-viable-settlement size (`settle_min_pool`):** Natufian settlements span **small (~dozens)
 → medium (100–150 people) → large**, the largest permanent hamlets up to several hundred. **How used:** `settle_min_pool

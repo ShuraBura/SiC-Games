@@ -87,6 +87,10 @@ TYPES = {
     # type as the fecundability brake it complements -- it changes a birth RATE, not a graph or a pool.
     "enable_energetic_refractory": "N",
     "enable_dependent_load": "N",     # widens the intake-fertility denominator by the juveniles' unmet need
+    # Adaptive metabolic down-regulation (Keys 1950): under a draining reserve burn falls, so a starving agent
+    # survives longer. It changes a SURVIVAL rate, not a pool or a graph, and carries a live magnitude
+    # (metabolic_downreg_max=0.40 by default), so a boolean flip enables it — no MAGNITUDE entry needed.
+    "enable_metabolic_downreg": "N",
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and

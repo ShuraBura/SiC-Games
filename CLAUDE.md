@@ -126,6 +126,20 @@ whose docstring states that every other test in the file is void if that control
   in the `C_ALLON` skip set for no stated reason, so every arm run that week silently tested the OLD behaviour.
   The audit that created `C_ALLON` found **27 of 79 flags dark and nobody knew**; adding to that pile is the
   failure it exists to prevent.
+- **BUILD IT ON, AUDIT THAT IT IS ON, AND DISCUSS EVERY OFF.** Added 2026-08-28 by the supervisor, as the hard
+  gate form of the rule above. Three obligations, binding on every mechanism from here:
+  1. **Build it ON.** The moment a mechanism is built it goes into the canonical stack (out of the `C_ALLON`
+     skip set) and is validated WHILE ON. We do not build dark and "adopt later"; the dataclass default stays
+     `False` only for bit-exact reproducibility of historical runs, never as permission to leave it out of
+     canonical.
+  2. **Audit that it is on.** After building, read the canonical `C_ALLON` resolution back and confirm every
+     mechanism built in the working session is live. A flag found OFF is a defect to explain, not a default to
+     accept. `grep`ing the source is not enough — resolve the config and look.
+  3. **Discuss every OFF.** If a flag must be OFF for any reason — a genuine alternative to something already
+     on, a measured net-negative, a known-broken candidate — that is a DISCUSSION to raise with the supervisor,
+     with the stated reason recorded in the `C_ALLON` skip set AND surfaced in chat. Never a silent park. A
+     measured net-negative (e.g. `enable_village_pooling`, `enable_subsistence_floor`) is turned off only after
+     the finding is shown and the supervisor agrees; a falsified mechanism is reverted, not parked.
 - **A SCALAR CANNOT SHOW A STRUCTURE. LOOK AT IT, THEN MEASURE IT.** Adopted 2026-08-16 by the supervisor:
   *"another showcase of how ur math and tables only show a part of the story, often misinterpreted, and the
   paramount importance of visual aids."* Earned three times in one day, and the discipline runs BOTH ways.
