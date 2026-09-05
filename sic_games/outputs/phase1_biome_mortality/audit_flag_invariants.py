@@ -111,6 +111,9 @@ TYPES = {
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
     # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
     "enable_density_reference": "N",
+    # AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05): adults use an attenuated malnutrition-mortality
+    # synergy cap. Modulates the a2 hazard -> N.
+    "enable_synergy_age_grade": "N",
     # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03, keystone): a settled agent's disease density is its
     # village population over the village territory, not single-cell occupancy. Modulates the a2 hazard -> N.
     "enable_village_density_disease": "N",
@@ -288,6 +291,7 @@ PREREQ = {
     "enable_wealth_obligation": ("enable_material_capture",),
     "enable_stratification_inequality_gate": ("enable_morph",),
     "enable_relational_stratification": ("enable_morph",),
+    "enable_synergy_age_grade": ("enable_nutrition_synergy",),
 }
 
 # conserved-quantity fields: an A-typed flag must NOT move these

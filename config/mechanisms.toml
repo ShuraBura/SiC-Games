@@ -289,6 +289,20 @@ type  = "bool"
 # filed (LITERATURE.md: "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default OFF ⇒
 # every prior run stays bit-exact.
 
+[enable_synergy_age_grade]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD
+# malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), but it is applied at full
+# strength to every age. Adults are far more malnutrition-robust: community-dwelling adults >50 at risk of
+# malnutrition run HR ~1.14-1.29 (PMC11634492), not 2.5. The e0 driver breakdown (Addendum 64) showed the
+# 15-45 band at 2.6x the schedule with the synergy at a mean 2.0x — an over-amplification of adult deaths.
+# WHEN ON, an agent past menarche_months (15 yr) uses `synergy_mu_max_adult` instead of `mu_max`; children
+# keep the full Pelletier value. It cuts the adult excess WITHOUT touching the food ceiling (an amplifier,
+# not the food), so it raises e0 without relocating death. Default OFF ⇒ single mu_max at all ages ⇒
+# bit-exact.
+
 [enable_game]
 value = true
 owner = "DemographyConfig"

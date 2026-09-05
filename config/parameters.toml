@@ -476,51 +476,55 @@ type  = "float"
 value = 2.5
 owner = "DemographyConfig"
 type  = "float"
-# nutrition-synergy max (Pelletier 1994) [PROVISIONAL] — (channel note, inherited) ── DENSITY-DISEASE
-# REFERENCE NORMALISATION (R-106, 2026-08-13) ──────────────────────────────────────── THE DEFECT.
-# `a2_mult` multiplies three modulators into Siler's Makeham term. TWO of them are reference-normalised so
-# that the ANCHOR CONDITION returns exactly 1.0 — `risk_mult` divides by `risk_ref` ("≈1 in average-risk
-# terrain") and `pathogen_mult` is "mean-normalised so pathogen_mult(npp_ref) = 1 (the Aché-forest
-# reference biome is neutral)". `density_mult` is NOT. It returns 1.0 only at ρ = 0, an EMPTY WORLD. WHY
-# THAT IS A DOUBLE-COUNT. Gurven & Kaplan 2007 fitted a2 = 0.0130 on Aché foragers who were LIVING AT A
-# REAL DENSITY, so that coefficient already contains whatever density-dependent disease those people
-# experienced. Multiplying it again at the same density charges for it twice. MEASURED SIZE.
-# `dens_rho_half` = 0.2/km² sits ABOVE the whole ethnographic range (Binford packing 0.091/km²; Tallavaara
-# observed HG median 0.119/km²; this model's own Tallavaara capacity at its terrain median NPP ≈
-# 0.053/km²), so every real forager density lies on the steep rising limb. At Binford's own anchor the
-# unnormalised term already returns 1.94x. The measured non-starvation hazard runs 1.56x the configured
-# Siler, and realised e0 is 17.7 yr against a configured 36.6. AND THE DYNAMICS AMPLIFY IT. `aggl_beta` =
-# 1.15 gives increasing returns to crowding, so agents pack into cells of ~71 (0.714/km², EIGHT times the
-# Binford anchor and 3.6x past half-saturation), which drives the term to 3.34x against its 4.0 ceiling.
-# The error is in the maths; the agglomeration makes it large. THE FIX INTRODUCES NO NEW NUMBER.
-# `dens_rho_ref` defaults to Binford 2001's packing threshold, which is already filed (LITERATURE.md:
-# "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default OFF ⇒ every prior run stays
+# nutrition-synergy max (Pelletier 1994, CHILD data — mild RR 2.5) [PROVISIONAL] — (channel note,
+# inherited) ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13)
+# ──────────────────────────────────────── THE DEFECT. `a2_mult` multiplies three modulators into Siler's
+# Makeham term. TWO of them are reference-normalised so that the ANCHOR CONDITION returns exactly 1.0 —
+# `risk_mult` divides by `risk_ref` ("≈1 in average-risk terrain") and `pathogen_mult` is "mean-normalised
+# so pathogen_mult(npp_ref) = 1 (the Aché-forest reference biome is neutral)". `density_mult` is NOT. It
+# returns 1.0 only at ρ = 0, an EMPTY WORLD. WHY THAT IS A DOUBLE-COUNT. Gurven & Kaplan 2007 fitted a2 =
+# 0.0130 on Aché foragers who were LIVING AT A REAL DENSITY, so that coefficient already contains whatever
+# density-dependent disease those people experienced. Multiplying it again at the same density charges for
+# it twice. MEASURED SIZE. `dens_rho_half` = 0.2/km² sits ABOVE the whole ethnographic range (Binford
+# packing 0.091/km²; Tallavaara observed HG median 0.119/km²; this model's own Tallavaara capacity at its
+# terrain median NPP ≈ 0.053/km²), so every real forager density lies on the steep rising limb. At
+# Binford's own anchor the unnormalised term already returns 1.94x. The measured non-starvation hazard
+# runs 1.56x the configured Siler, and realised e0 is 17.7 yr against a configured 36.6. AND THE DYNAMICS
+# AMPLIFY IT. `aggl_beta` = 1.15 gives increasing returns to crowding, so agents pack into cells of ~71
+# (0.714/km², EIGHT times the Binford anchor and 3.6x past half-saturation), which drives the term to
+# 3.34x against its 4.0 ceiling. The error is in the maths; the agglomeration makes it large. THE FIX
+# INTRODUCES NO NEW NUMBER. `dens_rho_ref` defaults to Binford 2001's packing threshold, which is already
+# filed (LITERATURE.md: "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default OFF ⇒
+# every prior run stays bit-exact.
+
+[synergy_mu_max_adult]
+value = 1.3
+owner = "DemographyConfig"
+type  = "float"
+# adult malnutrition-mortality synergy [ANCHORED, community-dwelling >50 HR 1.14-1.29] — (channel note,
+# inherited) AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994
+# CHILD malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), but it is applied at full
+# strength to every age. Adults are far more malnutrition-robust: community-dwelling adults >50 at risk of
+# malnutrition run HR ~1.14-1.29 (PMC11634492), not 2.5. The e0 driver breakdown (Addendum 64) showed the
+# 15-45 band at 2.6x the schedule with the synergy at a mean 2.0x — an over-amplification of adult deaths.
+# WHEN ON, an agent past menarche_months (15 yr) uses `synergy_mu_max_adult` instead of `mu_max`; children
+# keep the full Pelletier value. It cuts the adult excess WITHOUT touching the food ceiling (an amplifier,
+# not the food), so it raises e0 without relocating death. Default OFF ⇒ single mu_max at all ages ⇒
 # bit-exact.
 
 [a2_cap]
 value = 5.0
 owner = "DemographyConfig"
 type  = "float"
-# cap on the a2_eff multiplier (red-team n-1) — (channel note, inherited) ── DENSITY-DISEASE REFERENCE
-# NORMALISATION (R-106, 2026-08-13) ──────────────────────────────────────── THE DEFECT. `a2_mult`
-# multiplies three modulators into Siler's Makeham term. TWO of them are reference-normalised so that the
-# ANCHOR CONDITION returns exactly 1.0 — `risk_mult` divides by `risk_ref` ("≈1 in average-risk terrain")
-# and `pathogen_mult` is "mean-normalised so pathogen_mult(npp_ref) = 1 (the Aché-forest reference biome
-# is neutral)". `density_mult` is NOT. It returns 1.0 only at ρ = 0, an EMPTY WORLD. WHY THAT IS A
-# DOUBLE-COUNT. Gurven & Kaplan 2007 fitted a2 = 0.0130 on Aché foragers who were LIVING AT A REAL
-# DENSITY, so that coefficient already contains whatever density-dependent disease those people
-# experienced. Multiplying it again at the same density charges for it twice. MEASURED SIZE.
-# `dens_rho_half` = 0.2/km² sits ABOVE the whole ethnographic range (Binford packing 0.091/km²; Tallavaara
-# observed HG median 0.119/km²; this model's own Tallavaara capacity at its terrain median NPP ≈
-# 0.053/km²), so every real forager density lies on the steep rising limb. At Binford's own anchor the
-# unnormalised term already returns 1.94x. The measured non-starvation hazard runs 1.56x the configured
-# Siler, and realised e0 is 17.7 yr against a configured 36.6. AND THE DYNAMICS AMPLIFY IT. `aggl_beta` =
-# 1.15 gives increasing returns to crowding, so agents pack into cells of ~71 (0.714/km², EIGHT times the
-# Binford anchor and 3.6x past half-saturation), which drives the term to 3.34x against its 4.0 ceiling.
-# The error is in the maths; the agglomeration makes it large. THE FIX INTRODUCES NO NEW NUMBER.
-# `dens_rho_ref` defaults to Binford 2001's packing threshold, which is already filed (LITERATURE.md:
-# "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default OFF ⇒ every prior run stays
-# bit-exact.
+# cap on the a2_eff multiplier (red-team n-1) — (channel note, inherited) AGE-GRADED NUTRITION SYNERGY
+# (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD malnutrition-mortality data (RR mild
+# 2.5 / moderate 4.6 / severe 8.4), but it is applied at full strength to every age. Adults are far more
+# malnutrition-robust: community-dwelling adults >50 at risk of malnutrition run HR ~1.14-1.29
+# (PMC11634492), not 2.5. The e0 driver breakdown (Addendum 64) showed the 15-45 band at 2.6x the schedule
+# with the synergy at a mean 2.0x — an over-amplification of adult deaths. WHEN ON, an agent past
+# menarche_months (15 yr) uses `synergy_mu_max_adult` instead of `mu_max`; children keep the full
+# Pelletier value. It cuts the adult excess WITHOUT touching the food ceiling (an amplifier, not the
+# food), so it raises e0 without relocating death. Default OFF ⇒ single mu_max at all ages ⇒ bit-exact.
 
 [pathogen_gamma]
 value = 0.0

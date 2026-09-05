@@ -7583,6 +7583,38 @@ says do NOT tune.
   - R-103 relational stratification (62): biome-appropriate chiefdoms.
   - per-biome density (this addendum): biome-appropriate, anchor-centred, no defect.
 
+## Addendum 64 — The e0 gap is HUNGER; age-graded synergy fixes the adult over-amplification (2026-09-05, R-106)
+
+**The measurement.** On the fully-corrected stack (temperate coastal, period life table over steps 900-2200)
+the model realises e0 = 24.6 against the configured Siler schedule (42.8) and the ~36.5 anchor.
+
+**The driver breakdown — where the excess sits.** By age band (realised m_x vs schedule m_x):
+  - infants 0-1: realised 0.147 vs schedule 0.169 — BELOW schedule, not a problem;
+  - weaned children 5-15: 0.034 vs 0.009 — a 3.6x excess, 63% starvation;
+  - adults 15-45: 0.025 vs 0.009 — a 2.6x excess, 55% starvation.
+  47% of ALL deaths are starvation. The a2 modulators: terrain-risk 0.56 (protective), disease-density 1.12
+  (mild, after the village-disease fix), nutrition-synergy 2.0 (DOUBLES the baseline hazard). So the gap is
+  HUNGER in weaned children and adults, amplified by the malnutrition-mortality synergy — not infants, not
+  crowding, not terrain.
+
+**The one mis-calibration, fixed.** `mu_max = 2.5` is Pelletier 1994 CHILD data (RR mild 2.5 / severe 8.4)
+applied at full strength to every age; adults are far more robust (community-dwelling >50 HR ~1.14-1.29).
+`enable_synergy_age_grade` (ADOPTED): an agent past menarche uses `synergy_mu_max_adult = 1.3`; children keep
+the full Pelletier value. A/B: adult mortality 15-45 fell 21% (0.0247 -> 0.0195), e0 +0.8 (24.6 -> 25.4).
+
+**The rest is Malthusian, and this is the key finding.** The e0 gain is only +0.8 because the saved adult lives
+GROW the population (+18%, 20,745 -> 24,421), which pushes it into the food ceiling: child starvation +7%,
+starvation share 0.47 -> 0.51. The saved adults are partly re-spent as child hunger deaths. Provisioning is not
+the gap (it already covers all juveniles 0-15); its SUPPLY is, because hungry mothers have little overflow. So
+the residual e0 gap is not a mortality-calibration problem — it is that the population REGULATES THROUGH
+STARVATION (deaths), which is exactly what holds e0 low.
+
+**The direction this sets (next arc).** To raise e0 in a Malthusian system, regulation must move from DEATHS to
+BIRTHS — the demographic transition, and the original R-106 goal. If hunger suppressed FERTILITY enough to check
+the population before it hit the starvation ceiling, there would be less crowding, less hunger, higher survival.
+The channels exist and are live (`intake_fertility`, `dependent_load`), but starvation share ~0.5 shows the
+fertility brake is too weak to regulate ahead of starvation. Strengthening it is the e0 lever.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

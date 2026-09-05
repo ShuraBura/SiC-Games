@@ -956,6 +956,10 @@ def main():
             # founds daughters directly with its own density-scaled spacing, so occupancy-gating is retired here
             # (it trapped the population at 2% of carrying capacity).
             "enable_bud_requires_occupancy",
+            # AGE-GRADED NUTRITION SYNERGY adopted (R-106, 2026-09-05, Addendum 64). Removed from this set ->
+            # canonically ON. Adults use the attenuated malnutrition-mortality synergy (community-dwelling adult
+            # HR ~1.3 vs Pelletier child 2.5). A/B: adult mortality 15-45 fell 21%, e0 +0.8; the rest is absorbed
+            # by Malthusian growth (the deep e0 gap is the food ceiling, not this calibration).
             # R-103 RELATIONAL STRATIFICATION adopted (R-106, 2026-09-05, Addendum 62). Removed from this set
             # -> canonically ON. The between-band inequality gate replaces the level-only classifier that
             # over-counted stratified villages (36% at between-band Gini 0.14). Stratification now emerges only

@@ -5539,11 +5539,16 @@ class TerrainWorld(mesa.Model):
             m *= pathogen_mult(float(self._fields.npp[a.pos[1], a.pos[0]]), self._pathogen_npp_ref,
                                cfg.pathogen_gamma, cfg.pathogen_cap)
         if cfg.enable_nutrition_synergy:
+            # AGE-GRADED: adults (past menarche) are more malnutrition-robust than children, so they use the
+            # attenuated synergy cap. Default (flag off) ⇒ cfg.mu_max at every age ⇒ bit-exact.
+            _mu = (cfg.synergy_mu_max_adult
+                   if (getattr(cfg, "enable_synergy_age_grade", False) and a.age >= cfg.menarche_months)
+                   else cfg.mu_max)
             if cfg.enable_condition:                           # S0: disease potentiated by SUSTAINED condition (EMA)
-                _f_syn = 1.0 + (cfg.mu_max - 1.0) * (1.0 - a._condition)
+                _f_syn = 1.0 + (_mu - 1.0) * (1.0 - a._condition)
             else:                                              # legacy: instantaneous post-harvest reserve
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
-                _f_syn = synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, cfg.mu_max)
+                _f_syn = synergy_mult(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs, _mu)
             m *= _f_syn
         self.a2_n += 1
         self.a2_risk_sum += _f_risk

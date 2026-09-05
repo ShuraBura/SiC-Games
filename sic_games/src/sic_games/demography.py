@@ -697,7 +697,17 @@ class DemographyConfig(BaseModel):
     # OFF ⇒ every prior run stays bit-exact.
     enable_density_reference: bool = False
     dens_rho_ref: float = Field(0.091, gt=0.0)  # agents/km² at which density_mult == 1 [ANCHORED, Binford 2001]
-    mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994) [PROVISIONAL]
+    mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994, CHILD data — mild RR 2.5) [PROVISIONAL]
+    # AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD
+    # malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), but it is applied at full strength
+    # to every age. Adults are far more malnutrition-robust: community-dwelling adults >50 at risk of
+    # malnutrition run HR ~1.14-1.29 (PMC11634492), not 2.5. The e0 driver breakdown (Addendum 64) showed the
+    # 15-45 band at 2.6x the schedule with the synergy at a mean 2.0x — an over-amplification of adult deaths.
+    # WHEN ON, an agent past menarche_months (15 yr) uses `synergy_mu_max_adult` instead of `mu_max`; children
+    # keep the full Pelletier value. It cuts the adult excess WITHOUT touching the food ceiling (an amplifier,
+    # not the food), so it raises e0 without relocating death. Default OFF ⇒ single mu_max at all ages ⇒ bit-exact.
+    enable_synergy_age_grade: bool = False
+    synergy_mu_max_adult: float = Field(1.3, ge=1.0)   # adult malnutrition-mortality synergy [ANCHORED, community-dwelling >50 HR 1.14-1.29]
     a2_cap: float = Field(5.0, ge=1.0)          # cap on the a2_eff multiplier (red-team n-1)
     # Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2.
     pathogen_gamma: float = Field(0.0, ge=0.0)  # BRACKETED strength (NPP exponent); 0 = OFF/flat. Sweep low/mid/high.
