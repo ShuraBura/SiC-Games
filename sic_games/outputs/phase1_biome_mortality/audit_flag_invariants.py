@@ -36,6 +36,8 @@ from sic_games.terrain import generate_world, world_lottery_climate
 TYPES = {
     "enable_productivity_mobility": "T", "enable_terrain_move_cost": "T", "enable_emergent_abandonment": "T",
     "enable_site_appraisal": "T", "enable_landscape_packing": "T",
+    "enable_hunger_dispersal": "T",   # acute famine dispersal: a low reserve breaks the residence pin (Colson 1979)
+    "enable_founding_delay": "T",     # delay settlement founding a startup generation so founders spread first
     "enable_game": "P", "enable_agriculture": "P", "enable_agglomeration": "P", "enable_forage_cap": "P",
     # Per-biome two-stream (Addendum 37). Both are PRODUCTION modifiers: they change the SPLIT of the cell pool
     # and the variance of the meat half, not the size of the pool. Neither carries its own magnitude — each
@@ -50,6 +52,19 @@ TYPES = {
     "enable_catchment_ceiling": "P", "enable_resource_storability": "P", "enable_improved_land": "P",
     "enable_alluvial_renewal": "P",
     "enable_soil_depletion": "D",
+    # CATCHMENT-FORAGING DEPLETION (R-106, 2026-09-02): routes the harvest-field depletion pressure to the
+    # cells a village FORAGES (its catchment, weighted by yield) instead of the one cell it STANDS on, so a
+    # central place hunts down its own catchment. A resource SINK over cells-through-time, like
+    # enable_soil_depletion -> type D. No magnitude of its own: it re-routes the existing deplete_frac.
+    "enable_catchment_depletion": "D",
+    # VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02): pins settled members to home cells across the village
+    # territory instead of the site point, so the physical footprint (and the pos-based density hazard)
+    # spreads while food regroups at the site. It decides WHERE members stand, not how much a cell yields
+    # -> type T. HELD (runaway; see run_campaign _skip).
+    "enable_village_catchment_spread": "T",
+    # COLONIZING BUDDING (R-106, 2026-09-03): buds FOUND daughters on empty rich land, density-scaled
+    # spacing. Decides WHERE villages exist -> T. HELD pending per-biome validation (see run_campaign _skip).
+    "enable_colonizing_budding": "T",
     # Settlement-nucleation runaway fixes (2026-08-12). All four act on the SETTLEMENT LIFECYCLE — where a
     # site may be founded, whether it can be held, and who counts as a member — so they are T (territory /
     # spatial-structure) rather than P (production). None carries a magnitude: each is a pure rule change.
@@ -96,6 +111,9 @@ TYPES = {
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
     # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
     "enable_density_reference": "N",
+    # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03, keystone): a settled agent's disease density is its
+    # village population over the village territory, not single-cell occupancy. Modulates the a2 hazard -> N.
+    "enable_village_density_disease": "N",
     # Society classifier on REGIONAL density (R-106, 2026-08-24). Typed A (Affiliation/social-structure): it
     # changes which SOCIETY LABEL a band takes, which reshapes the band/society graph -- not a hazard (N),
     # production (P) or terrain (T) quantity. It feeds the classifier members/(range share) instead of

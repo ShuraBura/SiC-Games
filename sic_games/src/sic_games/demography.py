@@ -448,6 +448,20 @@ class DemographyConfig(BaseModel):
     # --- modulator flags (Step-2; neutral/off in Step-1 calibration) ---
     enable_terrain_risk: bool = False
     enable_density_disease: bool = False
+    # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone).
+    # THE DEFECT the whole density arc kept hitting: the density-disease hazard reads occ_count[cell] — SINGLE-CELL
+    # occupancy — so it is the ONLY Malthusian brake, and it is defeated by any dispersal (catchment-spread A.58,
+    # colonizing budding A.59): spread the people and per-cell occupancy falls, the brake releases, and the
+    # population runs away to the food ceiling (~7× the anchor). Epidemiologically the single-cell form is also
+    # wrong: airborne crowd disease scales with the SETTLED COMMUNITY's size and density, not the exact dwelling
+    # spacing — a village of 470 carries a village-scale load whether its houses sit on one cell or spread over
+    # nine. WHEN ON, a SETTLED agent's disease density is its VILLAGE population over the village territory
+    # ((2·settle_radius+1)² cells), so the brake keys on village size and is SPREAD-INVARIANT; a MOBILE agent
+    # keeps the single-cell form. With dens_rho_ref = 0.091 (Binford packing) over the 25-cell / 2500 km²
+    # territory, a village faces rising disease above ~227 people — the Bar-Yosef/Bandy realistic ceiling. This is
+    # the brake that lets colonizing budding / catchment-spread disperse the population WITHOUT a runaway.
+    # Default OFF ⇒ single-cell form ⇒ bit-exact.
+    enable_village_density_disease: bool = False
     enable_terrain_pathogen: bool = False
     enable_nutrition_synergy: bool = False
     # ── KIN/ORPHAN CHILD MORTALITY (Hill & Hurtado 1996 Table 13.1; MODEL_SPEC §4.6.4; R-74) ──────────
@@ -549,9 +563,19 @@ class DemographyConfig(BaseModel):
     # do not break even until ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
     enable_dependent_load: bool = False
     # PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig
-    # .eta_juvenile_exponent` — see config.py; do not document the anchor twice). 1.0 = the original linear
-    # juvenile production ramp, bit-exact. >1 bends it toward Kaplan 2000's convex curve.
-    lh_eta_juvenile_exponent: float = Field(1.0, gt=0.0)
+    # .eta_juvenile_exponent` — see config.py). 1.0 = the legacy LINEAR ramp; >1 bends it toward Kaplan 2000's
+    # CONVEX curve. ADOPTED CANONICAL 3.0 (R-106, 2026-09-04): the 2-D juvenile-calibration sweep (exponent ×
+    # eta_min, docs/RESULTS) found (3.0, 0.10) lands the age structure on both anchors (frac_child 0.42≈0.40,
+    # median 19.2≈20 yr) with 81% of juveniles net-consuming (Kaplan/Hill/Lancaster/Hurtado 2000). The linear
+    # 1.0 made children net PRODUCERS (0% deficit) — an ~18% phantom inflation of carrying capacity and a dead
+    # dependent-load channel. Set 1.0 to recover the legacy ramp.
+    lh_eta_juvenile_exponent: float = Field(3.0, gt=0.0)
+    # PASSTHROUGH to the auto-built LifeHistoryConfig.eta_min (juvenile foraging efficiency at birth). ADOPTED
+    # CANONICAL 0.10 (R-106, 2026-09-04, same sweep): the exponent alone leaves the YOUNGEST as net producers,
+    # because eta_min·share (0.2·1.7=0.34) exceeds cons_min (0.30); dropping eta_min below cons_min/share≈0.176
+    # makes newborns near-zero producers (Kaplan: infants forage nothing) and is what actually pulls the age
+    # structure onto the anchor. 0.2 = the legacy value.
+    lh_eta_min: float = Field(0.10, ge=0.0, le=1.0)
     # ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ──
     # WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 established the identity
     #     TFR = span / (refractory + 1/(fecundability x brake))
@@ -906,6 +930,16 @@ class DemographyConfig(BaseModel):
     # (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
     enable_aggregation_sedentism: bool = False
     settle_min_pool: int = Field(40, ge=2)                     # min people to found/hold a settlement — minimum-viable-hamlet threshold (Bar-Yosef 1998: Natufian settlements range small ~dozens → medium 100–150; 40 = the small-settlement lower bound) [ANCHORED-lower-bound]
+    # FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were founded in
+    # the FIRST 200 steps — the founders bunch and settle at t=0 and the settlement pattern then FREEZES, so the
+    # empty good land (55% of the top forage decile) never gets a village. No settlement may be FOUNDED before
+    # this step, so the founders SPREAD (via IFD / hunger dispersal) for a startup period before "where to
+    # settle" is decided; existing settlements are unaffected (holding is separate). 0 ⇒ no delay ⇒ bit-exact.
+    # ~180 = one generation (menarche_months), the ethnographic "wander then settle" interval. Measured a clean
+    # demographic gain (e0 26.4 -> 27.5, l15 -> 0.566, pop up) by letting the founders spread before the pattern
+    # locks in. Default OFF ⇒ bit-exact; magnitude 180 when on.
+    enable_founding_delay: bool = False
+    settle_founding_delay_steps: int = Field(180, ge=0)
     # ── FOUNDING ON STORABLE SURPLUS, AND YIELD ON WORKED LAND (R-106, 2026-08-15) ──────────────────────
     # ONE DEFECT, TWO SYMPTOMS. `_s_pot_field()` = max(aquatic_food, cultivability) on RAW TERRAIN is asked
     # three different questions, and conflates a wild cereal stand with a ploughed field in two of them:
@@ -975,6 +1009,29 @@ class DemographyConfig(BaseModel):
     # scalar stress caps size; rich (aquatic/arable) catchments carry more → surplus → stratify. Default OFF ⇒ bit-exact.
     enable_catchment_ceiling: bool = False
     catchment_ceiling_mult: float = Field(1.0, gt=0.0)       # ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity
+    # CATCHMENT-FORAGING DEPLETION (R-106, 2026-09-02). Diagnosed: the depletable stock `deplete_and_regrow`
+    # keys on where agents STAND (`occ_count`), but a settled village FORAGES its whole catchment (tier-2,
+    # pooled) — so a hunted-out catchment cell that nobody stands on is never depleted, and a village lives on
+    # an inexhaustible catchment (43 people eating 3.11× requirement with no dispersal pressure). This is the
+    # central-place depletion the over-clustering lacks (supervisor 2026-09-02: "all the cells where agents
+    # hunt/forage should be depleted accordingly — an exact map of how much each is foraged"). When on, the
+    # depletion pressure becomes a FORAGING map: each settled villager's take is spread over its catchment ∝
+    # each cell's yield (richer cells foraged harder); mobile agents forage where they stand. So a village
+    # hunts down its catchment, the ceiling (Σ depletable cell yield) falls, per-capita drops, and it must
+    # spread or split. Regrows when the take eases. Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact.
+    enable_catchment_depletion: bool = False
+    # VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02). Diagnosed: the over-clustering is NOT the agglomeration economy
+    # (already ceiling-bound, R-105) — it is the residence pin stacking every village member onto the SINGLE site
+    # cell. Measured: 100% of the people on big (n≥40) cells are settled/pinned; a "village of 150–300" is 150–300
+    # bodies on one 100 km² cell, eating LESS per head than a loner. A real village's dwellings spread over its
+    # territory. When on, each settled member is pinned to a deterministic HOME cell within settle_radius (∝ cell
+    # yield, so richer cells hold more dwellings) instead of the site point, so the PHYSICAL footprint and the
+    # density-disease hazard (which reads occ_count[pos], Binford 0.091 reference) follow the spread. FOOD stays
+    # bit-exact: the harvest regroups a village's members at its site (the village forages its catchment as one
+    # economic unit — tier-2 pool + ceiling unchanged), so a spread villager's share equals a stacked one's. The
+    # split is principled: physical crowding disperses, social/economic coordination does not. Default OFF ⇒ the pin
+    # targets the site cell ⇒ bit-exact.
+    enable_village_catchment_spread: bool = False
     # SETTLEMENT SCALAR STRESS (Johnson 1982, dissipated by hierarchy) — the missing cost that caps VILLAGE size. The
     # residence pin otherwise pulls every nearby agent into a settlement unconditionally ⇒ villages grow to the food
     # ceiling with no cap (R-63). Here an over-crowded settlement REPELS agents (prob = size_repulsion(village_pop))
@@ -1036,6 +1093,18 @@ class DemographyConfig(BaseModel):
     enable_emergent_abandonment: bool = False
     settlement_memory_yr: float = Field(12.0, gt=0.0)       # the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range]
     abandon_hardship_gain: float = Field(1.0, ge=0.0)       # how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema)
+    # ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor, LITERATURE.md — "the breakup into small
+    # family groups which comb the region"). The residence pin holds a settled agent on its crowded site cell,
+    # where it eats the CRASHING pooled share; the emergent-abandonment valve above releases it only on CHRONIC
+    # remembered hardship, far too slow for the one-step crash that kills (96% of starvation deaths are acute).
+    # Diagnosed (R-106 dispersal): 98% of the hungriest decile are pinned settlers, and 99% would eat >1.3x
+    # better by stepping to an ADJACENT cell one stride away — it is a RETENTION failure, not a reach failure,
+    # so the fix RELEASES the pin (no stride change). When a settled agent's reserve fill fraction falls below
+    # `hunger_flee_reserve_frac`, it breaks the pin THIS step and its ordinary IFD drive takes the better
+    # per-capita cell. The crowd thins, per-capita rises, and the acute crash is averted; villages re-form when
+    # the lean passes (the abandonment/budding cycle). Default OFF ⇒ pin never released on hunger ⇒ bit-exact.
+    enable_hunger_dispersal: bool = False
+    hunger_flee_reserve_frac: float = Field(0.35, ge=0.0, le=1.0)  # reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5]
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so
@@ -1361,6 +1430,20 @@ class DemographyConfig(BaseModel):
     #   raise it to re-impose a minimum-bloc rule. [DESIGN — deliberately unanchored, was blocking an anchored
     #   mechanism]
     village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range
+    # COLONIZING BUDDING (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md). Diagnosed: the population sits
+    # at 2% of the terrain's carrying capacity — trapped, not starved — because a shed faction cannot ESTABLISH on
+    # empty rich land. `enable_bud_requires_occupancy` (adopted, Addendum 53) fixed village spacing but by
+    # forbidding establishment: the faction relocates and must re-aggregate 40 people, which never happens on
+    # empty land, so the parent grows to 300–500 and the excess dies of crowding-disease in place. Probe (4 seeds):
+    # freeing establishment lifts density 4× toward the anchor but packs villages to 1-cell spacing.
+    # WHEN ON, budding (a) sheds a VIABLE emigrant bloc (topped up to settle_min_pool, led by the rival, seeded by
+    # his kin — not the median-2 kinship sliver that made 2-person "villages"), (b) FOUNDS the daughter directly
+    # on the nearest open storable cell, (c) spaced by a DENSITY-SCALED separation d = clamp(round(sqrt(V_target /
+    # K_local)), 1, 3) cells — ~1.6 on rich/aquatic land, ~3 on poor land (the ethnographic gradient), replacing
+    # both the rejected fixed 50 km rule and the 1-cell overlap. It SUPERSEDES enable_bud_requires_occupancy (folds
+    # it in as the OFF path). Default OFF ⇒ the occupancy/legacy path ⇒ bit-exact.
+    enable_colonizing_budding: bool = False
+    bud_spacing_village_target: float = Field(300.0, gt=0.0)  # V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED, Ames 2003]
     # ── EMERGENT FISSION HAZARD (2026-07-27) ────────────────────────────────────────────────────────
     # Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. Bandy 2004 is explicit that the
     # threshold is not a constant — "if the cost of fissioning is low ... fissioning may be expected to occur

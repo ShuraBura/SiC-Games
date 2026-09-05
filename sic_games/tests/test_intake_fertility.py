@@ -72,9 +72,14 @@ def test_on_changes_the_world():
     drawn for a birth. 300 steps is the horizon at which the gate demonstrably binds, and is what the sibling
     EMA-spread test below already uses. The population GROWS through this window (757 → 867), which is the
     root of it: a fertility brake needs scarcity, and this small test world is rich."""
+    # HORIZON 700 (R-106, 2026-09-04). The juvenile-productivity recalibration (lh_eta_juvenile_exponent 3.0,
+    # lh_eta_min 0.10) makes children NET CONSUMERS, which tightens the food economy and pushes the scarcity
+    # that binds the fertility gate LATER: measured on!=off is False at 300 and 500 steps but True at 700. The
+    # mechanism is live (test_the_ema_actually_varies confirms the input discriminates); the gate just binds
+    # later now, so the liveness horizon moved with the calibration.
     import battery1_liveness as B1
-    off, _, _ = B1.signature({}, steps=300, **WORLD)
-    on, _, _ = B1.signature(dict(enable_intake_fertility=True), steps=300, **WORLD)
+    off, _, _ = B1.signature({}, steps=700, **WORLD)
+    on, _, _ = B1.signature(dict(enable_intake_fertility=True), steps=700, **WORLD)
     assert on != off, "enabling intake-fertility is bit-identical — the new branch is dead"
 
 
@@ -103,20 +108,15 @@ def test_dependent_load_defaults_off_and_needs_its_parent_flag():
 
 
 @pytest.mark.slow
-def test_children_are_net_producers_which_is_WHY_dependent_load_is_inert():
-    """THE BLOCKER, pinned as a fact about the model rather than as a passing feature.
+def test_children_are_net_consumers_after_the_kaplan_recalibration():
+    """THE BLOCKER, CLEARED (R-106, 2026-09-04). This test used to pin the opposite fact — that children were
+    net PRODUCERS (only ~1% ran a deficit), which is why dependent-load was inert. The docstring said it "SHOULD
+    START FAILING once the juvenile eta ramp is recalibrated against Kaplan's curves"; the 2-D sweep did exactly
+    that (lh_eta_juvenile_exponent 3.0, lh_eta_min 0.10 — newborns forage ~nothing, the ramp is convex), so it
+    is flipped here.
 
-    Life-history IS on in these presets (eta_min 0.2, cons_min 0.3) and mother-links resolve for ~91% of
-    juveniles — so the dependent-load mechanism is wired correctly. It still finds nothing, because juveniles
-    GATHER MORE THAN THEY NEED: measured eta med 0.529 vs consumption_factor med 0.588, and with adults taking
-    ~1.7x their own burn a child still clears ~1.5x its requirement. Only ~1% run any deficit.
-
-    That contradicts Kaplan 2000 — the net child deficit cited by `consumption_factor()`'s own docstring, and
-    the anchor under human life-history theory (long juvenile period, provisioning, grandmothering).
-
-    THIS TEST SHOULD START FAILING once the juvenile eta ramp is recalibrated against Kaplan's curves
-    (foragers do not break even until ~18-20 yr). When it does, flip it and enable dependent-load.
-    """
+    Children are now NET CONSUMERS as Kaplan 2000 describes: measured ~35% of juveniles run a real deficit (was
+    ~1%), which is what makes the dependent-load channel material (test below, now un-xfailed)."""
     import battery1_liveness as B1
     w = B1._build(dict(enable_intake_fertility=True, enable_dependent_load=True), **WORLD)
     for _ in range(300):
@@ -127,10 +127,10 @@ def test_children_are_net_producers_which_is_WHY_dependent_load_is_inert():
     assert len(juv) > 30, "too few juveniles to judge"
     in_deficit = sum(1 for a in juv
                      if w._burn * a.consumption_factor() - a._last_intake > 0.0) / len(juv)
-    assert in_deficit < 0.10, (
-        f"{in_deficit*100:.1f}% of juveniles now run a deficit (was 1.0%) — children may have become net "
-        f"CONSUMERS as Kaplan describes. If so this blocker is cleared: enable dependent-load, re-run the "
-        f"materiality check, and update R-106.")
+    assert in_deficit > 0.20, (
+        f"only {in_deficit*100:.1f}% of juveniles run a deficit — the Kaplan recalibration (exp 3.0, eta_min "
+        f"0.10) should put children in net deficit (~35% measured). If this regressed, dependent-load is inert "
+        f"again — check lh_eta_juvenile_exponent / lh_eta_min resolved to the canonical 3.0 / 0.10.")
 
 
 @pytest.mark.slow
@@ -150,10 +150,9 @@ def test_dependent_load_does_nothing_without_intake_fertility():
     assert off == alone, "dependent-load acted without its parent flag"
 
 
-@pytest.mark.xfail(reason="BLOCKED: children are net producers in this model (only ~1% of juveniles run a "
-                          "deficit), so there is no dependent load to find. See the Kaplan 2000 blocker test "
-                          "above and R-106. Unblocks when the juvenile eta ramp is recalibrated.",
-                   strict=True)
+# UN-XFAILED (R-106, 2026-09-04): the juvenile-productivity recalibration (lh_eta_juvenile_exponent 3.0,
+# lh_eta_min 0.10) made children net consumers (~35% run a deficit, was ~1%), so the dependent-load channel is
+# now material and this test passes for real. The strict xfail it carried is removed.
 @pytest.mark.slow
 def test_dependent_load_reaches_the_denominator_and_is_material():
     """The mechanism proper, tested DIRECTLY rather than by comparing mothers against childless women.

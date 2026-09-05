@@ -265,12 +265,26 @@ type  = "float"
 # was reverted).
 
 [lh_eta_juvenile_exponent]
-value = 1.0
+value = 3.0
 owner = "DemographyConfig"
 type  = "float"
 # PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig
-# .eta_juvenile_exponent` — see config.py; do not document the anchor twice). 1.0 = the original linear
-# juvenile production ramp, bit-exact. >1 bends it toward Kaplan 2000's convex curve.
+# .eta_juvenile_exponent` — see config.py). 1.0 = the legacy LINEAR ramp; >1 bends it toward Kaplan 2000's
+# CONVEX curve. ADOPTED CANONICAL 3.0 (R-106, 2026-09-04): the 2-D juvenile-calibration sweep (exponent ×
+# eta_min, docs/RESULTS) found (3.0, 0.10) lands the age structure on both anchors (frac_child 0.42≈0.40,
+# median 19.2≈20 yr) with 81% of juveniles net-consuming (Kaplan/Hill/Lancaster/Hurtado 2000). The linear
+# 1.0 made children net PRODUCERS (0% deficit) — an ~18% phantom inflation of carrying capacity and a dead
+# dependent-load channel. Set 1.0 to recover the legacy ramp.
+
+[lh_eta_min]
+value = 0.1
+owner = "DemographyConfig"
+type  = "float"
+# PASSTHROUGH to the auto-built LifeHistoryConfig.eta_min (juvenile foraging efficiency at birth). ADOPTED
+# CANONICAL 0.10 (R-106, 2026-09-04, same sweep): the exponent alone leaves the YOUNGEST as net producers,
+# because eta_min·share (0.2·1.7=0.34) exceeds cons_min (0.30); dropping eta_min below
+# cons_min/share≈0.176 makes newborns near-zero producers (Kaplan: infants forage nothing) and is what
+# actually pulls the age structure onto the anchor. 0.2 = the legacy value.
 
 [refractory_stretch_max]
 value = 1.436
@@ -828,6 +842,20 @@ type  = "int"
 # enable_marriage_aggregation (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒
 # bit-exact.
 
+[settle_founding_delay_steps]
+value = 180
+owner = "DemographyConfig"
+type  = "int"
+# (channel note, inherited) FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at
+# equilibrium were founded in the FIRST 200 steps — the founders bunch and settle at t=0 and the
+# settlement pattern then FREEZES, so the empty good land (55% of the top forage decile) never gets a
+# village. No settlement may be FOUNDED before this step, so the founders SPREAD (via IFD / hunger
+# dispersal) for a startup period before "where to settle" is decided; existing settlements are unaffected
+# (holding is separate). 0 ⇒ no delay ⇒ bit-exact. ~180 = one generation (menarche_months), the
+# ethnographic "wander then settle" interval. Measured a clean demographic gain (e0 26.4 -> 27.5, l15 ->
+# 0.566, pop up) by letting the founders spread before the pattern locks in. Default OFF ⇒ bit-exact;
+# magnitude 180 when on.
+
 [settle_persist_threshold]
 value = 0.3
 owner = "DemographyConfig"
@@ -1109,6 +1137,23 @@ type  = "float"
 # villages relocate every ~5–30 yr (Conklin's "integral pioneers… move on to new village sites often";
 # Yanomamö ~5–10 yr) = WITHIN one generation, not several. Requires enable_soil_depletion. Default OFF ⇒
 # the pin never releases (bit-exact).
+
+[hunger_flee_reserve_frac]
+value = 0.35
+owner = "DemographyConfig"
+type  = "float"
+# reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5] —
+# (channel note, inherited) ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor,
+# LITERATURE.md — "the breakup into small family groups which comb the region"). The residence pin holds a
+# settled agent on its crowded site cell, where it eats the CRASHING pooled share; the
+# emergent-abandonment valve above releases it only on CHRONIC remembered hardship, far too slow for the
+# one-step crash that kills (96% of starvation deaths are acute). Diagnosed (R-106 dispersal): 98% of the
+# hungriest decile are pinned settlers, and 99% would eat >1.3x better by stepping to an ADJACENT cell one
+# stride away — it is a RETENTION failure, not a reach failure, so the fix RELEASES the pin (no stride
+# change). When a settled agent's reserve fill fraction falls below `hunger_flee_reserve_frac`, it breaks
+# the pin THIS step and its ordinary IFD drive takes the better per-capita cell. The crowd thins,
+# per-capita rises, and the acute crash is averted; villages re-form when the lean passes (the
+# abandonment/budding cycle). Default OFF ⇒ pin never released on hunger ⇒ bit-exact.
 
 [aggl_mode]
 value = "point"
@@ -1699,6 +1744,26 @@ type  = "int"
 # raise it to re-impose a minimum-bloc rule. [DESIGN — deliberately unanchored, was blocking an anchored
 # mechanism] cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village
 # grows + stratifies). ~a day's relocation range
+
+[bud_spacing_village_target]
+value = 300.0
+owner = "DemographyConfig"
+type  = "float"
+# V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED,
+# Ames 2003] — (channel note, inherited) COLONIZING BUDDING (R-106, 2026-09-03;
+# docs/DESIGN_colonization_spacing.md). Diagnosed: the population sits at 2% of the terrain's carrying
+# capacity — trapped, not starved — because a shed faction cannot ESTABLISH on empty rich land.
+# `enable_bud_requires_occupancy` (adopted, Addendum 53) fixed village spacing but by forbidding
+# establishment: the faction relocates and must re-aggregate 40 people, which never happens on empty land,
+# so the parent grows to 300–500 and the excess dies of crowding-disease in place. Probe (4 seeds):
+# freeing establishment lifts density 4× toward the anchor but packs villages to 1-cell spacing. WHEN ON,
+# budding (a) sheds a VIABLE emigrant bloc (topped up to settle_min_pool, led by the rival, seeded by his
+# kin — not the median-2 kinship sliver that made 2-person "villages"), (b) FOUNDS the daughter directly
+# on the nearest open storable cell, (c) spaced by a DENSITY-SCALED separation d =
+# clamp(round(sqrt(V_target / K_local)), 1, 3) cells — ~1.6 on rich/aquatic land, ~3 on poor land (the
+# ethnographic gradient), replacing both the rejected fixed 50 km rule and the 1-cell overlap. It
+# SUPERSEDES enable_bud_requires_occupancy (folds it in as the OFF path). Default OFF ⇒ the
+# occupancy/legacy path ⇒ bit-exact.
 
 [bud_hazard_b0]
 value = -18.636

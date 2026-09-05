@@ -925,6 +925,37 @@ def main():
             # with the adopted emergent spacing.
             "enable_bud_site_separation",
             "enable_exclusive_village_membership",
+            # ACUTE-DISPERSAL / FOUNDING-DELAY CANDIDATES UNDER EVALUATION (R-106, 2026-08-28..09-02). Both
+            # are BUILT and CTB'd but EQUIVOCAL, so C_ALLON must not adopt them by side effect (the same
+            # accident excluded above). Each has a measured reason to hold:
+            #   enable_hunger_dispersal   Colson-1979 famine flight: a low reserve breaks the residence pin.
+            #                             It improves the demography markers (connubium re-forms, IBI toward
+            #                             anchor) and resolves the packing paradox, but roughly HALVES the
+            #                             canonical population and empties the degenerate savanna world. The
+            #                             loss is fertility (band fragmentation), not death. Not yet chosen.
+            #   enable_founding_delay     hold pioneer founding a startup generation so founders spread first.
+            #                             Marginal on the demography and trips the age-structure CTB through a
+            #                             startup transient; no literature anchor for the delay length yet.
+            # Remove a line here when the supervisor adopts that mechanism.
+            "enable_hunger_dispersal",
+            "enable_founding_delay",
+            # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
+            # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
+            # packed) by dispersing settled members across the village territory. BUT the density-disease hazard
+            # at packed cells was the de-facto Malthusian brake: spreading the bodies removes it and population
+            # RUNS AWAY (571 -> 5,134 by step 1,200, accelerating, no plateau, density still below anchor).
+            # Over-clustering and the population ceiling are coupled through the density channel; the spread
+            # needs a replacement brake before it can be adopted. HELD until that is built + validated.
+            "enable_village_catchment_spread",
+            # SETTLEMENT PAIR ADOPTED (R-106, 2026-09-05, docs/RESULTS Addendum 61). `enable_colonizing_budding`
+            # and `enable_village_density_disease` are removed from this set -> canonically ON. Together they give
+            # dispersed settlement (spacing ~2.3 cells) at a STATIONARY population (small-world plateau confirmed)
+            # with realistic village size and sound genealogy. Neither works alone: colonizing runs away without
+            # the village-scaled disease brake; the disease brake alone stays trapped-sparse without colonization.
+            # `enable_bud_requires_occupancy` (adopted Addendum 53) is SUPERSEDED by the pair — the colonizing path
+            # founds daughters directly with its own density-scaled spacing, so occupancy-gating is retired here
+            # (it trapped the population at 2% of carrying capacity).
+            "enable_bud_requires_occupancy",
             # A MODEL CORRECTION UNDER EVALUATION (2026-08-13). `enable_density_reference` re-references
             # density_mult so the anchor density returns 1.0 -- the invariant risk_mult and pathogen_mult
             # already hold and this one silently broke. It is measured and principled, but adopting it

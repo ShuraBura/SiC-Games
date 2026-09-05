@@ -7296,6 +7296,233 @@ steps — a dead population is insensitive to everything, the CTB rule's own war
 on a living population with an alive-guard. **New standing rule (CLAUDE.md, 2026-08-28):** build every
 mechanism ON, audit that it is on, and raise a flagged discussion with a stated reason for any flag left OFF.
 
+## Addendum 57 — Catchment-foraging depletion: the resource map follows the take, not the feet (2026-09-02, R-106)
+
+**The defect (supervisor, 2026-09-02).** The depletable stock `deplete_and_regrow` keys on `occ_count` — where
+an agent STANDS. But a settled village FORAGES its whole catchment (tier-2, pooled) while it stands on the site
+cell, so a hunted-out catchment cell that nobody stands on is NEVER depleted. A village therefore lives on an
+inexhaustible catchment (measured: 43 people on a cell eat 3.11× requirement with no dispersal pressure). The
+supervisor spec: "all the cells where the agents hunt and forage should be depleted accordingly — an exact map
+of how much each is foraged and how much that reduces the yield at a given cell."
+
+**The mechanism (`enable_catchment_depletion`).** When on, the depletion pressure becomes a FORAGING map, not a
+standing-occupancy map. `_catchment_foraging_pressure` spreads each settled villager's one forager-unit over its
+catchment cells ∝ each cell's yield (a richer cell is hunted harder); a mobile band forages the cell it stands
+on. The total is conserved (Σ pressure = the population). So a village hunts down its catchment, the depletable
+stock there falls, and the carrying-capacity ceiling (Σ depletable cell yield over the catchment) drops with it.
+Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact.
+
+**CTB (`tests/test_catchment_depletion_ctb.py`, 4 tests).** The load-bearing test seats a village on its site
+cell and drives an EMPTY neighbouring catchment cell down under the foraging map (B < 0.9) while the same cell
+stays FULL (B > 0.98) under the standing-occupancy map — the foraged-but-unoccupied cell now depletes, which was
+the whole gap. The map test verifies conservation and the ∝-yield spread; a monotonicity test verifies a bigger
+village leaves a lower catchment stock.
+
+**A METHOD CATCH worth recording.** The first A/B ran on the `battery1_liveness` preset and read as a strong
+NEGATIVE: catchment depletion consolidated the population into FEWER, MUCH LARGER villages (median 20→52, and
+225–280 in two seeds — above the Bar-Yosef ~150 egalitarian bound), with land-use and peak crowding moving the
+WRONG way. That preset is STALE: it carries `enable_village_identity=False`, `bud_requires_occupancy=False`,
+i.e. it PRE-DATES the adopted anti-clustering fixes (Addenda 53–54). The giant villages were the un-fixed
+mutual-subsidy runaway, funnelled by depletion into the few catchment-viable spots — not the mechanism. The
+honest baseline is the resolved canonical config (`runconfig.load()`), which already carries the adopted fixes.
+
+**On the true adopted stack the effect is EQUIVOCAL and baseline-dependent (A/B, 4 seeds, temperate/coastal,
+450 steps).** The marginal effect depends on what else runs. Against the PRE-HOLD baseline (with
+`hunger_dispersal` + `founding_delay` still on, before they were held — see below) it read neutral-to-mild-
+positive: population mean +39 (3/4 up), land-use up in 3/4, peak crowding low (18–64). Against the FINAL adopted
+baseline (those two held OFF, so villages are larger and more crowded — median 92–212, peak 161–322), catchment
+depletion drops median village size in 3/4 seeds (helps the over-clustering) but costs population: OFF→ON
++133/−20/−43/**−349** (mean −70, driven by one −39% seed). The −349 seed is the Malthusian ceiling biting as
+designed — an over-crowded village that hunts out its own catchment loses the people the depleted land can no
+longer feed (contrast Addendum 55) — not a death spiral: the catchment regrows when the take eases. So the
+mechanism is CORRECT (the resource economy it fixes was wrong) and it pulls median village size down, but its net
+demographic effect on the current stack is a wash with tail risk, because the point-mode agglomeration reward
+(below) keeps rebuilding the crowd that depletion then culls.
+
+**Adopted ON, on the correctness case (built ON per the standing rule; the population wash is not a stated
+reason for OFF — it is the ceiling working).** `gen_runconfig` + `make_runconfig full_campaign` regenerated; the
+resolved canonical config audits `enable_catchment_depletion = true`, `differs_from_canonical = 0`; the
+parameters file is byte-identical bar the new switch; `test_runconfig_sync`, both depletion CTBs, and the schema
+tests are green. Registered: audit TYPE **D** (a resource sink over cells-through-time, like
+`enable_soil_depletion`) and BENCHMARK_LADDER tier 1. **Held OFF in the SAME regeneration, with stated reasons
+(the standing rule's other half): `enable_hunger_dispersal` and `enable_founding_delay`.** Both are built and
+CTB'd but equivocal — hunger_dispersal roughly halves the population (the loss is fertility, band fragmentation,
+not death) and empties the degenerate savanna; founding_delay is marginal and trips the age-structure CTB
+through a startup transient with no anchor for the delay length yet. `C_ALLON` was silently turning both ON in
+`full_campaign.toml`; they are now in the campaign `_skip` set with the reasons above and resolve to false. They
+are the strongest anti-clustering levers in the model (holding them OFF is why the adopted baseline is more
+clustered than the pre-hold one), so their adoption is the open supervisor decision this addendum surfaces.
+
+**What this rules out, and where the density gap actually lives.** Catchment inexhaustibility is NOT the engine
+of the over-clustering: fixing it moves regional density essentially not at all, and only ~1.3–3.5% of viable
+land is occupied in BOTH arms. The remaining levers are the ones diagnosed earlier — point-mode agglomeration
+(β=1.15, a super-linear reward for single-cell packing) and high per-cell Tallavaara capacity (~104 persons on
+the richest cells). Depletion's dispersal pressure cannot express against a mechanism that pays MORE to crowd;
+the agglomeration return is the next thing to attack.
+
+## Addendum 58 — Over-clustering is the residence pin, not the economy; and it is the SAME thing as the population ceiling (2026-09-02, R-106)
+
+**The directive.** Attack over-clustering by attacking agglomeration (the point-mode super-linear reward,
+β=1.15, long suspected as the packing engine — Addendum 4).
+
+**Diagnosis 1: the agglomeration production reward is already bounded, so it is a red herring.** Instrumented the
+REALIZED per-cell output vs occupancy on the canonical stack. Per-capita realized food FALLS with n (620k at
+n=1–4 → 93k at n=40–79), it does not rise, because every big cell (n≥40) is 100% `aggl_ceiling`-bound (R-105):
+the raw `n^β` premium wants 5–14× the catchment capacity and is discarded. The `aggl_attraction_weight` split
+(Addendum 13) confirmed the food is separable — lowering the perceived premium does NOT crater population — but
+it does not robustly reduce packing either (4-seed: 2/4 worse). Packing is not driven by realized production.
+
+**Diagnosis 2: the packing is the residence pin.** Every big cell is a settlement site, and 100% of the people
+on it are settled/pinned (81–89% of the whole population is pinned). A "village of 150–300" is that many bodies
+standing on ONE 100 km² site cell — the pin's target — each eating LESS per head than a loner. A real village's
+dwellings spread over its territory; only the model stacks them on a point.
+
+**The fix built (`enable_village_catchment_spread`, CTB `test_village_catchment_spread_ctb.py`).** Each settled
+member pins to a deterministic HOME cell within settle_radius (∝ yield) instead of the site point. The physical
+footprint and the density-disease hazard (`occ_count[pos]`, Binford 0.091 reference) follow the spread; FOOD is
+bit-exact because the harvest regroups a village's members at its site (it forages its catchment as one economic
+unit). The CTB proves the invariant: bodies spread over many cells, membership preserved, the food group returns
+the whole village to its site — and OFF stacks 95% on the site cell.
+
+**It fixes the over-clustering, decisively.** A/B (4 seeds, 450 steps): peak single-cell occupancy collapses
+172/305/209/240 → **48/46/38/60** (−72 to −85%); land-use TRIPLES (0.5–1.5% → 2.5–3.3%). The spread holds even
+at scale — peak stays ~70 at population 5,000.
+
+**But it is NOT adopted, because it uncaps the population.** The density-disease hazard at packed cells was the
+DE-FACTO Malthusian brake — packing → high `density_mult` → death capped BOTH clustering and population.
+Spreading the bodies removes that cull, and population RUNS AWAY: a 1,200-step run climbs 571 → **5,134 and
+accelerating**, land-use still only 11%, density still below the Tallavaara anchor, no plateau. This is the R-104
+lesson again: removing a ceiling reveals whether another one binds, and here none does within the window.
+
+**The finding that matters: over-clustering and the population ceiling are the SAME mechanism**, coupled through
+the density-disease channel. You cannot disperse the villages without also releasing the brake that dispersal
+removes. The mechanism is HELD (default-off, in the C_ALLON `_skip` set and the sync-test allowed-dark set,
+audit TYPE T, ladder tier 1-settlement) until a REPLACEMENT brake is built — a food ceiling that binds at the
+regional scale, or a density penalty that survives the spread — so we get dispersed settlement at a stationary
+population. That replacement brake is the next arc.
+
+## Addendum 59 — The density gap is a colonization trap, and the population brake IS the over-clustering (2026-09-03, R-106)
+
+**The question (supervisor).** The canonical model plateaus at ~0.006 persons/km² — ~8× below the Tallavaara
+regional anchor (0.05). Why so sparse, and is it founding, spacing, or capacity?
+
+**Budget check — the world is RICH, not poor.** Σ Tallavaara local capacity over the land = 329,331 people
+(0.35/km²); the model plateau (~5,585) is **2% of the terrain's own carrying capacity**. Three single-lever
+probes (storability bar, village cap ×2, search radius) each FAILED to raise density — lowering the bar settles
+poorer cells and REDUCES it; a bigger cap just packs one cell to 864. So the population is **trapped, not
+starved** — 94% of the rich land is empty.
+
+**The trap is `enable_bud_requires_occupancy`.** It was adopted (Addendum 53) to fix village spacing, but by
+forbidding establishment: a shed faction relocates and must re-aggregate 40 people, which never happens on empty
+land, so the parent grows to 300–500 and the excess dies of crowding-disease in place. Probe (seed 1, 1,800
+steps): turning it off lifts population 4× (4,400→18,131), villages 22× (32→720), density 4× toward the anchor —
+but village spacing collapses to 1.0 cell (adjacent, mutual-subsidy). The real tension is **colonization vs
+spacing**, one fork, not two bugs.
+
+**Literature (2026-09-03).** Village size 250–1,500 (NW Coast; the model's 300–500 is already in range —
+village COUNT, not size, was wrong). No clean published km-spacing table; DERIVED from density + size, villages
+sit ~10–35 km apart (~10–20 km rich aquatic, ~30–35 km sparse/cold), clustering at resource NODES. The model's
+own biomes give a MODEST ~1.6–3.5-cell gradient; biome sparseness lives in the ELIGIBLE-LAND FRACTION (coastal
+18% → boreal 2%), not the spacing constant. Aquatic cap `AQUATIC_DENSITY_MAX=80` reaches ~124 persons/cell vs
+the observed forager MAX 494.9 (Tallavaara Dataset_4) — undercalibrated ~4× at the top end (secondary lever).
+
+**Built: `enable_colonizing_budding`** (docs/DESIGN_colonization_spacing.md; CTB test_colonizing_budding_ctb.py,
+4 tests). An over-threshold village sheds a VIABLE emigrant bloc (topped up to settle_min_pool, led by the
+rival — not the median-2 kinship sliver that made 2-person villages) which FOUNDS a daughter directly on the
+nearest open storable cell, spaced by a DENSITY-SCALED separation `d = clamp(round(sqrt(V_target/K_local)),1,3)`
+cells (~1.6 rich → 3 poor). Supersedes bud_requires_occupancy. Default OFF ⇒ bit-exact.
+
+**Validation — the design WORKS spatially but RUNS AWAY demographically.** Coastal/temperate, colonizing on:
+village spacing holds at 2.2–3.3 cells (density-scaled, NOT the 1.0 packing), median village ~86 (in range),
+villages multiply to 300+, and density reaches the anchor 0.05 at step 3,000. **But it does not plateau** — it
+crosses 0.05 and keeps climbing to 0.078 and accelerating at step 4,000, heading for the food ceiling (0.35).
+Boreal reached a stationary ~0.0024 but bootstrapped ZERO villages (its 2% eligible land never seeds a first
+village for budding); savanna is the known-degenerate world.
+
+**THE FINDING (confirmed three ways now — catchment-spread A.58, budocc-off, colonizing budding).** The model's
+ONLY effective Malthusian brake is **crowding-disease in packed single cells**. Any mechanism that disperses the
+population — bodies OR villages — drops per-cell occupancy, releases the disease brake, and the population runs
+away to the food ceiling (which sits ~7× above the anchor, so food never binds near 0.05). Over-clustering and
+the population ceiling are the SAME phenomenon; you cannot fix the first without replacing the second.
+
+**The keystone (next arc).** The density-disease hazard reads `occ_count[cell]` (single-cell). It must scale
+with **village population / local regional density** instead — epidemiologically truer (a community of 470
+carries a village-scale disease load however its dwellings are spread) and it makes the brake bind at a
+realistic density REGARDLESS of dwelling spread. That single change unlocks BOTH colonizing budding and
+catchment-spread to give dispersed settlement at a stationary ~0.05. Colonizing budding stays HELD until then.
+
+## Addendum 60 — Juvenile productivity recalibrated to Kaplan; the dependent-load channel unblocked (2026-09-04, R-106)
+
+**The defect (long filed).** Foragers' children are net energy CONSUMERS until ~15–20 yr (Kaplan/Hill/Lancaster/
+Hurtado 2000), the anchor human life-history rests on. But the model's juvenile production ramp was LINEAR
+(`lh_eta_juvenile_exponent = 1.0`) with a high birth floor (`eta_min = 0.2`), so a child gathering at η·1.7×burn
+out-produced its consumption (`cons_min = 0.3`): only ~1% of juveniles ran any deficit, `enable_dependent_load`
+was inert (a strict-xfail), and children added ~18% PHANTOM food that inflated carrying capacity.
+
+**Diagnosis + the instrument bug it exposed.** A first sweep read the age wrong — `agent.age` is in MONTHS and
+`forage_age_min` is 180 months (15 yr), but the script compared `age < 15`, so it measured infants < 15 MONTHS
+and mapped the ramp on the wrong scale ([[feedback_validate_the_instrument]]). Corrected: the population is a
+YOUNG pyramid (frac_child 0.56, median 13 yr — too young vs anchors 0.40 / 20), so the phantom child production
+is real and large.
+
+**The 2-D calibration sweep (overnight, 24 runs).** `lh_eta_juvenile_exponent {1,2,3,4} × lh_eta_min
+{0.20,0.10,0.05}`, 2 seeds, canonical, 1,800 steps, scored on distance to the age anchors subject to viable +
+children-net-consuming. Winner **(exponent 3.0, eta_min 0.10)**: frac_child **0.42** (≈0.40), median **19.2 yr**
+(≈20), **81%** of juveniles net-consuming (analytic; ~35% realized deficit), population viable and near-
+stationary. Reading the grid: the EXPONENT drives the net-consumer share (convex ramp), and dropping `eta_min`
+0.20→0.10 (newborns forage ~nothing) is what actually pulls the age structure onto the anchor — the youngest
+are net producers under any exponent while `eta_min·1.7 > cons_min`. Pushing further (exp 4 / eta_min 0.05)
+over-corrects and gets noisier.
+
+**Adopted CANONICAL: `lh_eta_juvenile_exponent = 3.0`, `lh_eta_min = 0.10`** (provenance Kaplan 2000). Effects:
+children are net consumers, the ~18% phantom carrying-capacity inflation drops to ~4%, and the dependent-load
+fertility channel is now MATERIAL (~35% of juveniles run a real deficit, was ~1%). Cost: ~11% lower plateau
+population (carrying capacity corrected). Tests: the intake-fertility blocker test is FLIPPED (children now net
+consumers), the dependent-load materiality test is UN-XFAILED (a real pass), and the fragile intake-fertility
+liveness test's horizon moved 300→700 steps (the recalibration binds the fertility gate later); 214 demography/
+life-history/coverage/sync tests green. Added `lh_eta_min` passthrough (demography → LifeHistoryConfig).
+
+**Why it mattered here.** This was found while auditing that inequality/demography/genealogy are wired + CTB'd
+(all green, 544 tests). It was fixed BEFORE the colonizing-budding + village-disease confirmation run, because
+phantom child production would have inflated that run's equilibrium density — so the density plateau is now
+measured on a demographically honest base (age structure on the anchors, children net-consuming).
+
+## Addendum 61 — The settlement pair is adopted; the colonization arc closes (2026-09-05, R-106)
+
+**The result.** The model reached the goal of the arc. Two mechanisms together give dispersed settlement at a
+stationary population. The pair is `enable_colonizing_budding` and `enable_village_density_disease`. Both are now
+canonical. `enable_bud_requires_occupancy` is superseded and retired.
+
+**Why the pair, not one mechanism.** `enable_colonizing_budding` founds daughter villages on empty rich land.
+Alone it runs away, because it disperses the population and releases the single-cell disease brake (Addendum 59).
+`enable_village_density_disease` keys the disease hazard on the VILLAGE population over the village territory, not
+on single-cell occupancy. Alone it stays trapped and sparse, because it needs colonization to fill the land.
+Together they close the loop. The disease term caps the village SIZE. The eligibility bar and the density-scaled
+spacing cap the village COUNT. The product is a bounded regional density.
+
+**The plateau is confirmed.** A small fast world (patch 40) reached a stationary state near step 3,000. The
+population held near 8,900. The growth rate oscillated around zero (+3.1, -1.1, +0.1, -3.6 per step). The village
+count held near 80. The spacing held at 2.3 cells. So the pair does NOT run to the food ceiling. The big world
+(patch 80) climbs far longer only because its carrying capacity is much larger.
+
+**The validated markers.** Spacing 2.3 cells (density-scaled, not the 1-cell packing). Median village 74 (small
+world) to 153 (rich world), inside the Bar-Yosef / Ames 250-1,500 house range. Genealogy is sound: ~60 effective
+lineages, stable, no dynastic collapse. Inequality is moderate: material Gini ~0.17, wealth Gini ~0.3-0.5.
+
+**Two caveats, both filed for separate work.** First, the panel run did NOT plateau in its window, so its age
+structure is a growth transient (frac_child 0.52, median 13 yr), not the stationary value. Second, the society
+mix reads 0% egalitarian and ~37% stratified chiefdoms. This over-counts stratification. It is the R-103
+classifier defect (the classifier keys on the surplus level, not on the inequality). Do not read it as real
+stratification.
+
+**Adoption record.** `gen_runconfig` + `make_runconfig full_campaign` regenerated. The resolved canonical config
+audits `enable_colonizing_budding = true`, `enable_village_density_disease = true`, `enable_bud_requires_occupancy
+= false`. The `_skip` set and the sync-test allowed-dark set are updated. The pair CTBs, the sync tests, and the
+demography suites are green. The corrected juvenile calibration of Addendum 60 stays canonical.
+
+**Next.** Two follow-ups: the R-103 stratification-classifier fix, and a per-biome density-target calibration if
+a specific density number is wanted.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

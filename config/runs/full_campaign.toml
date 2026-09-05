@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-08-31
+# generated 2026-09-05
 
 [meta]
 name = "full_campaign"
@@ -42,12 +42,14 @@ enable_biome_meat_cv = true
 enable_biome_meat_frac = true
 enable_bonded_mating = true
 enable_bud_hazard = false
-enable_bud_requires_occupancy = true
+enable_bud_requires_occupancy = false
 enable_bud_site_separation = false
 enable_capacity_scaled_grouping = true
 enable_caribou_swing = false
 enable_catchment_ceiling = true
+enable_catchment_depletion = true
 enable_climate_lottery = false
+enable_colonizing_budding = true
 enable_condition = true
 enable_cred_renorm = true
 enable_cred_status = true
@@ -67,9 +69,11 @@ enable_eta_weighted_shares = true
 enable_exclusive_village_membership = false
 enable_exogamy = true
 enable_forage_cap = true
+enable_founding_delay = false
 enable_game = true
 enable_genealogy_log = false
 enable_genome = true
+enable_hunger_dispersal = false
 enable_improved_land = true
 enable_intake_fertility = true
 enable_interannual = false
@@ -126,6 +130,8 @@ enable_terrain_pathogen = false
 enable_terrain_risk = true
 enable_tier2_shock = true
 enable_village_budding = true
+enable_village_catchment_spread = false
+enable_village_density_disease = true
 enable_village_identity = true
 enable_village_resentment = true
 enable_village_scaling = true
@@ -164,6 +170,7 @@ bonded_mate_radius = 1
 bud_hazard_b0 = -18.636
 bud_hazard_b1 = 0.147
 bud_hazard_per_yr = 0.005
+bud_spacing_village_target = 300.0
 bud_steps_per_year = 12.0
 bud_w_capital = 1.0
 bud_w_depletion = 1.0
@@ -215,6 +222,7 @@ group_safety_max = 8.0
 group_safety_scale = 15.0
 homogenize_cred = false
 homogenize_prowess = false
+hunger_flee_reserve_frac = 0.35
 ibi_refractory_months = 30
 intake_ema_alpha = 0.04
 intake_fert_hi = 1.2
@@ -232,7 +240,8 @@ legit_rel_multiplier = 2.0
 legit_threshold = 0.15
 leveling_share = 0.8
 leveling_strength = 0.79
-lh_eta_juvenile_exponent = 1.0
+lh_eta_juvenile_exponent = 3.0
+lh_eta_min = 0.1
 lineage_branch_rate = 0.05
 lineage_reversion = 0.1
 lineage_split_min_segment = 8
@@ -318,6 +327,7 @@ resent_threshold = 0.5
 resent_years_to_revolt = 80.0
 risk_cap = 3.0
 settle_catchment_radius = 1
+settle_founding_delay_steps = 180
 settle_min_pool = 40
 settle_persist_threshold = 0.3
 settle_radius = 2

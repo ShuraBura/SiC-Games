@@ -166,7 +166,25 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
                "enable_density_reference",
                # A CANDIDATE under evaluation: it changes the fertility of every run (2026-08-14).
-               "enable_energetic_refractory"}
+               "enable_energetic_refractory",
+               # ACUTE-DISPERSAL / FOUNDING-DELAY candidates under evaluation (R-106, 2026-08-28..09-02),
+               # built and CTB'd but EQUIVOCAL, so held dark until the supervisor adopts them. Reasons live
+               # in run_campaign.py's C_ALLON `_skip` set (not repeated here — one copy to keep true):
+               #   hunger_dispersal  improves the demography markers but roughly halves population and
+               #                     empties the degenerate savanna; the loss is fertility, not death.
+               #   founding_delay    marginal; trips the age-structure CTB through a startup transient; no
+               #                     literature anchor for the delay length yet.
+               "enable_hunger_dispersal", "enable_founding_delay",
+               # VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02): fixes over-clustering but removes the
+               # density-disease Malthusian brake -> population runaway; held until a replacement brake is
+               # built. Reason lives in run_campaign.py _skip.
+               "enable_village_catchment_spread",
+               # BUD-REQUIRES-OCCUPANCY superseded + retired (R-106, 2026-09-05, Addendum 61). The colonizing-
+               # budding pair replaces it (founds daughters directly with density-scaled spacing); it trapped the
+               # population at 2% of carrying capacity, so it is now dark. Reason in run_campaign.py _skip.
+               # (colonizing_budding and village_density_disease were ADOPTED here -> canonically ON, so they are
+               # deliberately absent from this allowed-dark set.)
+               "enable_bud_requires_occupancy"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

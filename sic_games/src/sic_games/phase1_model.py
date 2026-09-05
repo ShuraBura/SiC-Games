@@ -298,6 +298,7 @@ class TerrainWorld(mesa.Model):
             # construct an lh_cfg themselves.
             self._lh_cfg = LifeHistoryConfig(
                 forage_age_min=180, forage_age_max_offset=120,
+                eta_min=getattr(demography_cfg, "lh_eta_min", 0.2),
                 eta_juvenile_exponent=getattr(demography_cfg, "lh_eta_juvenile_exponent", 1.0))
         self._carbon_cfg = carbon_cfg
         self._placement_positions = placement_positions
@@ -329,6 +330,9 @@ class TerrainWorld(mesa.Model):
         self._settlement_hardship: dict[tuple[int, int], float] = {}  # emergent abandonment: per-SITE EMA of remembered hardship (the village's memory)
         self._aggl_R_cache = None                                 # agglomeration: cached intensive catchment-resource field R(c) = tier2·Σ_catchment S_pot (catchment mode)
         self._aggl_point_cache = None                             # agglomeration: cached POINT base A_cell = tier2·S_pot·cv_ref (point-superlinear mode, Branch A)
+        self._village_home_cache = None                           # catchment spread: per-step cache site → (cells, cum-weights, total) for the home-cell lottery
+        self._village_pop_cache = None                            # village-scaled disease: per-step cache site → village population
+        self._village_pop_step = -1
         self._forage_cap_cache = None                             # per-person forage cap field = forage_kcal · forage_cap_hours (absent ⇒ no cap)
         self._village_band: dict[tuple[int, int], int] = {}       # settlement site → its stable village band_id (village identity)
         self._village_bands: set[int] = set()                     # band_ids that ARE settled villages → exempt from band fission
@@ -856,6 +860,50 @@ class TerrainWorld(mesa.Model):
                 return (nx, ny)
         return pos
 
+    def _village_home_cell(self, agent, site: tuple[int, int]) -> tuple[int, int]:
+        """CATCHMENT SPREAD (`enable_village_catchment_spread`): a deterministic HOME cell for a settled member,
+        inside the village's membership territory (settle_radius), drawn ∝ each land cell's yield so richer cells
+        hold more dwellings. STABLE per agent (a fixed hash of unique_id ⇒ the same home every step, so the member
+        converges to it and stays — no thrashing). Every home is within settle_radius, so `_nearest_settlement`
+        still returns this site next step and membership is preserved. Purely a POSITION: the harvest regroups the
+        member back to the site, so food is untouched — only the physical footprint / density spreads."""
+        if self._village_home_cache is None:
+            self._village_home_cache = {}
+        entry = self._village_home_cache.get(site)
+        if entry is None:
+            rad = self._demog.settle_radius
+            tf = self._harvest_field
+            water = self._fields.isWater
+            sx, sy = site
+            cells = []
+            cum = []
+            acc = 0.0
+            for dy in range(-rad, rad + 1):
+                for dx in range(-rad, rad + 1):
+                    cx = (sx + dx) % N
+                    cy = (sy + dy) % N
+                    if water[cy, cx] != 0:
+                        continue
+                    w = tf.level(cx, cy)
+                    acc += w if w > 0.0 else 0.0
+                    cells.append((cx, cy))
+                    cum.append(acc)
+            if not cells or acc <= 0.0:                       # degenerate: no land yield in reach → keep the site
+                entry = ([site], [1.0], 1.0)
+            else:
+                entry = (cells, cum, acc)
+            self._village_home_cache[site] = entry
+        cells, cum, tot = entry
+        if len(cells) == 1:
+            return cells[0]
+        # deterministic ∝-weight pick: a fixed hash of the agent id into [0, tot)
+        h = (int(agent.unique_id) * 2654435761 + 1013904223) & 0xFFFFFFFF
+        x = (h / 4294967296.0) * tot
+        for i, c in enumerate(cum):                           # first bucket whose cumulative weight exceeds x
+            if x < c:
+                return cells[i]
+        return cells[-1]
+
     def _s_pot_field(self):
         """RESOURCE-AGNOSTIC settlement-resource potential S_pot. = aquatic_food (fishery); with enable_agriculture,
         = max(aquatic_food, cultivability) so FARMING villages form on fertile land via the same machinery. Cached
@@ -1286,6 +1334,36 @@ class TerrainWorld(mesa.Model):
                 tot += tf.level((sx + dx) % W, (sy + dy) % H)
         return self._demog.catchment_ceiling_mult * tot
 
+    def _catchment_foraging_pressure(self, occ_count: dict) -> dict:
+        """CATCHMENT-FORAGING DEPLETION (`enable_catchment_depletion`): the depletion pressure map that follows
+        where food is TAKEN, not where agents stand. A settled villager (a member within settle_radius of a
+        site) forages the site's catchment, so its one forager-unit is spread over the catchment cells ∝ each
+        cell's yield (richer cells hunted harder); a mobile agent forages the cell it stands on. So a big
+        village hunts down its catchment, the depletable stock there falls, and the carrying-capacity ceiling
+        (Σ depletable cell yield) drops with it — the central-place depletion the standing-occupancy map lacks."""
+        if not self._settlement_sites:
+            return occ_count
+        tf = self._harvest_field
+        rad = self._demog.settle_catchment_radius
+        weights: dict = {}                                   # site -> [(cell, normalized yield weight), ...]
+        for s in self._settlement_sites:
+            cells, tot = [], 0.0
+            for dy in range(-rad, rad + 1):
+                for dx in range(-rad, rad + 1):
+                    c = ((s[0] + dx) % N, (s[1] + dy) % N)
+                    y = float(tf.level(c[0], c[1])); cells.append((c, y)); tot += y
+            weights[s] = ([(c, y / tot) for c, y in cells] if tot > 0.0
+                          else [(c, 1.0 / len(cells)) for c, _ in cells])
+        fmap: dict = {}
+        for a in self.agent_list:
+            s = self._nearest_settlement(a.pos)
+            if s is not None:                                # a settled villager forages the catchment
+                for (c, w) in weights[s]:
+                    fmap[c] = fmap.get(c, 0.0) + w
+            else:                                            # a mobile band forages where it stands
+                fmap[a.pos] = fmap.get(a.pos, 0.0) + 1.0
+        return fmap
+
     def _maintain_settlements(self) -> None:
         """Aggregation-sedentism lifecycle: an active settlement PERSISTS while ≥ settle_min_pool people are within
         settle_radius of its site (membership is emergent proximity — robust to band fission/fusion); otherwise its
@@ -1440,6 +1518,7 @@ class TerrainWorld(mesa.Model):
         """Stage-6.0a multi-occupancy substrate on the terrain field (forage-only).
         Diffusion movement (per-capita yield) → per-cell harvest split → metabolism."""
         self._nearest_map = None                      # PERF: rebuild the cell→nearest-settlement map fresh this step
+        self._village_home_cache = None               # catchment spread: rebuild the home-cell lottery fresh (yields drift with depletion)
         sc = self._substrate_cfg
         kappa = sc.contest_exponent
         phi_eps = sc.phi_epsilon
@@ -1556,6 +1635,12 @@ class TerrainWorld(mesa.Model):
         settle_ss_on = settle_on and getattr(self._demog, "enable_settlement_scalar_stress", False)
         abandon_on = settle_on and getattr(self._demog, "enable_emergent_abandonment", False)
         abandon_gain = self._demog.abandon_hardship_gain if abandon_on else 0.0
+        # ACUTE FAMINE DISPERSAL: a starving settler breaks the residence pin THIS step (Colson 1979).
+        hunger_flee_on = settle_on and getattr(self._demog, "enable_hunger_dispersal", False)
+        hunger_flee_frac = self._demog.hunger_flee_reserve_frac if hunger_flee_on else 0.0
+        # CATCHMENT SPREAD: settled members pin to a HOME cell across the catchment (physical footprint spreads),
+        # while the harvest regroups them at the site (food bit-exact). See `enable_village_catchment_spread`.
+        spread_on = settle_on and getattr(self._demog, "enable_village_catchment_spread", False)
         settle_pop: dict = {}
         if settle_ss_on:
             srad = self._demog.settle_radius
@@ -1650,6 +1735,15 @@ class TerrainWorld(mesa.Model):
                 att = 1.0 - abandon_gain * self._settlement_hardship.get(site, 0.0)
                 if att < 1.0 and agent.random.random() > att:
                     site = None
+            if site is not None and hunger_flee_on:
+                # ACUTE FAMINE DISPERSAL (Colson 1979): a low reserve breaks the pin THIS step so the agent's
+                # IFD drive can take the better per-capita cell one stride away (diagnosed: 99% of the hungry
+                # have one). The chronic abandonment valve above is too slow for the one-step crash that kills.
+                _flr = agent.reserve_floor * agent.reserve_scale()
+                _cap = self._reserve_full * agent.reserve_scale()
+                _rfrac = (agent.wealth - _flr) / (_cap - _flr) if _cap > _flr else 1.0
+                if _rfrac < hunger_flee_frac:
+                    site = None
             if site is not None and settle_ss_on:
                 # Johnson scalar stress: an over-crowded settlement repels this agent (prob rises with village pop,
                 # dissipated by the site's society). Repelled ⇒ fall through to normal diffusion (leave/don't join).
@@ -1659,7 +1753,8 @@ class TerrainWorld(mesa.Model):
                 if ss > 0.0 and agent.random.random() < ss:
                     site = None
             if site is not None:
-                target = self._toward(agent.pos, site)
+                dest = self._village_home_cell(agent, site) if spread_on else site
+                target = self._toward(agent.pos, dest)
                 if target != agent.pos and self._fields.isWater[target[1], target[0]] == 0:
                     _shift(agent, agent.pos, target)
                 continue
@@ -1743,7 +1838,16 @@ class TerrainWorld(mesa.Model):
         # 3. per-cell harvest split (forage-only; S = cell total return rate, flow)
         occ_lists: dict[tuple[int, int], list[BaseAgent]] = {}
         for a in self.agent_list:
-            occ_lists.setdefault(a.pos, []).append(a)
+            key = a.pos
+            if spread_on:
+                # CATCHMENT SPREAD: a settled member's dwelling is on a catchment cell (its `pos`), but the village
+                # forages its catchment as ONE economic unit — so for the harvest it is regrouped to its site. This
+                # reproduces the no-spread grouping (everyone at the site) EXACTLY ⇒ food/society/mating bit-exact;
+                # only occ_count (physical density, built from `pos` above) carries the spread.
+                s = self._nearest_settlement(a.pos)
+                if s is not None:
+                    key = s
+            occ_lists.setdefault(key, []).append(a)
         # ABLATION (lumping = band-as-unit): flatten the within-BAND status DISTRIBUTION to the band mean. The band
         # is the mate-gate NEIGHBOURHOOD, not a single 100 km² cell — on the IFD substrate a band spreads ~1/cell
         # over its territory, so a per-cell flatten would be a no-op (`_band_groups` partitions occupied cells into
@@ -2378,7 +2482,9 @@ class TerrainWorld(mesa.Model):
         # if present (growing-season pulse), else aseasonal.
         if hasattr(tf, "deplete_and_regrow"):
             season = tf.season() if hasattr(tf, "season") else 1.0
-            tf.deplete_and_regrow(occ_count, season)
+            press = (self._catchment_foraging_pressure(occ_count)
+                     if getattr(self._demog, "enable_catchment_depletion", False) else occ_count)
+            tf.deplete_and_regrow(press, season)
 
     def _note_starvation_state(self, a, occ_count: dict, age_i: int) -> None:
         """Record the state of an agent AT THE MOMENT IT STARVES (pure observer).
@@ -4590,6 +4696,11 @@ class TerrainWorld(mesa.Model):
         to the pools it just built. Reuses the identical gates (settle_persist_threshold / settle_min_pool /
         settle_radius / settle_release_steps) and the top-S_pot min-separated candidate set, so the two paths agree.
         No RNG → the daily _maintain_settlements handles hold/release exactly as for the gathering path."""
+        # FOUNDING DELAY: no NEW settlement before the startup wander period ends (existing sites unaffected —
+        # maintenance/holding is in `_maintain_settlements`). Lets the founders spread before villages nucleate.
+        if (getattr(self._demog, "enable_founding_delay", False)
+                and self.step_count < self._demog.settle_founding_delay_steps):
+            return
         cfg = self._demog
         aqf = self._founding_pot_field()  # FOUNDING judgement -> storability-weighted (see _founding_pot_field)
         if aqf is None:
@@ -4713,7 +4824,9 @@ class TerrainWorld(mesa.Model):
                 self._pair_from_pool(females, males, cfg.aggregation_residence, cfg.aggregation_rank_homogamy, band_sizes)
         # Aggregation-sedentism (Layer 1): a pool at a PERSISTENT-ABUNDANT site that reaches settle_min_pool FOUNDS /
         # refreshes a settlement — the gathering that stops dispersing. Held + released each step by _maintain_settlements.
-        if getattr(cfg, "enable_aggregation_sedentism", False):
+        # FOUNDING DELAY: suppressed during the startup wander period (no sites exist yet then, so nothing to refresh).
+        _fdelay = getattr(cfg, "enable_founding_delay", False) and self.step_count < cfg.settle_founding_delay_steps
+        if getattr(cfg, "enable_aggregation_sedentism", False) and not _fdelay:
             aqf = self._founding_pot_field()  # FOUNDING judgement -> storability-weighted (see _founding_pot_field)
             rad = cfg.settle_radius
             for si in pools:                      # sites that pooled ≥1 band this gathering
@@ -5126,6 +5239,19 @@ class TerrainWorld(mesa.Model):
         minf = cfg.village_bud_min_faction
         R = cfg.village_bud_search_radius; persist = cfg.settle_persist_threshold; sep = cfg.settle_radius
         hf = self._harvest_field; W = getattr(hf, "width", N); H = getattr(hf, "height", N)
+        # COLONIZING BUDDING (see enable_colonizing_budding): found daughters on empty land, spaced by a
+        # density-scaled separation d(K)=clamp(round(sqrt(V_target/K_local)),1,3) cells. K_local is the cell's
+        # Tallavaara carrying capacity (persons/cell). If the field has none, fall back to a fixed 2-cell sep.
+        colonize = getattr(cfg, "enable_colonizing_budding", False)
+        _Kf = getattr(getattr(hf, "_base", hf), "_K_persons", None) if colonize else None
+        _Vt = cfg.bud_spacing_village_target if colonize else 0.0
+        def _bud_sep(xx, yy):
+            if not colonize:
+                return (2 * sep + 1) if getattr(cfg, "enable_bud_site_separation", False) else (sep + 1)
+            if _Kf is None:
+                return 2
+            k = float(_Kf[yy, xx])
+            return 3 if k <= 0.0 else int(min(3, max(1, round(math.sqrt(_Vt / k)))))
         cell_agents: dict = {}
         for a in self.agent_list:
             cell_agents.setdefault(a.pos, []).append(a)
@@ -5178,6 +5304,18 @@ class TerrainWorld(mesa.Model):
             # carry a fission; `village_bud_min_faction` (default 0) can impose a share requirement on top.
             if len(faction) < 2 or len(faction) < minf * len(village):
                 continue                                            # no rival bloc to carry a fission
+            if colonize:
+                # VIABLE EMIGRANT BLOC: the median kinship faction is ~2 (most villagers are equidistant from the
+                # two leaders), too small to seed a village and the source of the 2-person-village churn. Top the
+                # bloc up to a viable founding party — the villagers most drawn to the rival (kin first), sized to
+                # the EXCESS above the fission threshold, floored at settle_min_pool, capped at half the village so
+                # the parent keeps a majority. So budding sheds a real emigrant party that founds a viable daughter.
+                _ranked = sorted(village, key=lambda a: (self._kin_affinity(a, rival) - self._kin_affinity(a, head),
+                                                         a.unique_id), reverse=True)
+                _bloc = min(len(village) // 2, max(cfg.settle_min_pool, len(village) - thr_base))
+                faction = _ranked[:_bloc]
+                if len(faction) < cfg.settle_min_pool:
+                    continue                                        # cannot seed a viable daughter → no bud
             # NEAREST open storable daughter site (its distance = the relocation cost that drives circumscription)
             # MINIMUM SEPARATION. The original `sep + 1` = 3 cells is SMALLER than the hold window, which is the
             # (2·settle_radius+1) = 5-cell block `_maintain_settlements` counts for `settle_min_pool`. Two sites
@@ -5188,17 +5326,17 @@ class TerrainWorld(mesa.Model):
             # (2026-08-12 investigation). With `enable_bud_site_separation` the daughter must sit at least
             # 2·settle_radius+1 away, so the two catchments are DISJOINT and a daughter has to hold its own
             # pool to survive. Default OFF ⇒ `sep + 1` ⇒ bit-exact.
-            _minsep = (2 * sep + 1) if getattr(cfg, "enable_bud_site_separation", False) else (sep + 1)
             best, bestd = None, R + 1
             for yy in range(max(0, sy - R), min(H, sy + R + 1)):
                 for xx in range(max(0, sx - R), min(W, sx + R + 1)):
                     d = max(abs(xx - sx), abs(yy - sy))
-                    if d < _minsep or d >= bestd or float(aqf[yy, xx]) < persist:
+                    _ms = _bud_sep(xx, yy)                          # density-scaled when colonizing; else the legacy sep
+                    if d < _ms or d >= bestd or float(aqf[yy, xx]) < persist:
                         continue                                    # own catchment, farther than best, or not storable
                     if (xx, yy) in self._settlement_sites or occ.get((xx, yy), 0) >= cfg.settle_min_pool:
                         continue                                    # already an occupied settlement → not open
-                    if _minsep > sep + 1 and any(
-                            max(abs(xx - ox), abs(yy - oy)) < _minsep
+                    if (colonize or _ms > sep + 1) and any(
+                            max(abs(xx - ox), abs(yy - oy)) < _ms
                             for (ox, oy) in self._settlement_sites):
                         continue    # DISJOINTNESS IS GLOBAL, NOT JUST PARENT-DAUGHTER. The first version of
                         #             this rule constrained only the distance back to the PARENT, so a daughter
@@ -5289,7 +5427,10 @@ class TerrainWorld(mesa.Model):
             # ON ⇒ the bud RELOCATES its faction and splits the band, but founds no site. The daughter becomes
             # a settlement only if people actually gather there, through the existing occupancy rule — so
             # SPACING IS EMERGENT and no distance constant is introduced anywhere. Default OFF ⇒ bit-exact.
-            if not getattr(cfg, "enable_bud_requires_occupancy", False):
+            # COLONIZING BUDDING founds the daughter DIRECTLY (it supersedes enable_bud_requires_occupancy) — the
+            # viable emigrant bloc + the density-scaled spacing above are what keep it from the 2-person-village
+            # runaway that made direct founding unusable before.
+            if colonize or not getattr(cfg, "enable_bud_requires_occupancy", False):
                 if best not in self._settlement_sites:
                     self.settle_formed_this_step += 1
                 self._settlement_sites[best] = cfg.settle_release_steps
@@ -5322,6 +5463,21 @@ class TerrainWorld(mesa.Model):
             bands.setdefault(find(c), []).extend(occ)
         return [m for m in bands.values() if len(m) > 1]
 
+    def _village_pop(self, site: tuple[int, int], occ_count: dict) -> int:
+        """VILLAGE-SCALED DISEASE: the population within settle_radius of `site` (the settled community). Cached
+        per step (many agents share a site), keyed by the model's step counter."""
+        if self._village_pop_cache is None or self._village_pop_step != self.step_count:
+            self._village_pop_cache = {}
+            self._village_pop_step = self.step_count
+        v = self._village_pop_cache.get(site)
+        if v is None:
+            rad = self._demog.settle_radius
+            sx, sy = site
+            v = sum(occ_count.get(((sx + dx) % N, (sy + dy) % N), 0)
+                    for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
+            self._village_pop_cache[site] = v
+        return v
+
     def _a2_mult(self, a, occ_count) -> float:
         """Step-2 baseline-mortality (a2) multiplier from the live modulators (1.0 if all flags off) —
         the only Siler term the world modulates. Capped (red-team n-1). Pathogen OFF in 2b.
@@ -5339,7 +5495,19 @@ class TerrainWorld(mesa.Model):
             _f_risk = risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
             m *= _f_risk
         if cfg.enable_density_disease:
-            rho = occ_count.get(a.pos, 1) / _CELL_KM2           # agents/km²
+            # VILLAGE-SCALED (spread-invariant) disease for a settled agent: its density is the VILLAGE population
+            # over the village territory, so dispersing dwellings does not evade the brake. Mobile agents keep the
+            # single-cell form. Default OFF ⇒ single-cell everywhere ⇒ bit-exact.
+            if getattr(cfg, "enable_village_density_disease", False):
+                _site = self._nearest_settlement(a.pos)
+                if _site is not None:
+                    _rad = cfg.settle_radius
+                    _area = ((2 * _rad + 1) ** 2) * _CELL_KM2
+                    rho = self._village_pop(_site, occ_count) / _area
+                else:
+                    rho = occ_count.get(a.pos, 1) / _CELL_KM2
+            else:
+                rho = occ_count.get(a.pos, 1) / _CELL_KM2       # agents/km²
             # `dens_rho_ref` only when the flag is on; 0.0 reproduces the historical form bit-exactly.
             _rref = cfg.dens_rho_ref if getattr(cfg, "enable_density_reference", False) else 0.0
             _f_dens = density_mult(rho, cfg.dens_delta, cfg.dens_rho_half, _rref)

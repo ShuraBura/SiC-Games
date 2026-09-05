@@ -654,6 +654,18 @@ Carneiro 1970 circumscription/saturation is the missing keystone. This is why th
 (originally scoped as GAME depletion of `game_kcal`) is realized here as GENERAL resource depletion of the NPP
 capacity stock.
 
+**Catchment-foraging pressure (`enable_catchment_depletion`; added 2026-09-02, R-106; RESULTS Addendum 57).**
+The hook above keys on `occ_count` — where an agent STANDS. A settled village forages its whole catchment
+(tier-2, pooled) yet stands on the site cell, so a foraged-but-unoccupied catchment cell never depletes. When
+on, `_catchment_foraging_pressure` replaces `occ_count` with a FORAGING map: each settled villager's unit is
+spread over its catchment ∝ each cell's yield (Σ conserved = population); a mobile band forages the cell it
+stands on. So the catchment depletes ∝ how hard it is foraged, and its carrying-capacity ceiling falls with it.
+A/B (4 seeds) is baseline-dependent: it drops median village size but its net demographic effect is a wash
+with tail risk (one −39% seed = the ceiling biting an over-hunted catchment) — it corrects the resource economy without a large behavioural swing, because the
+adopted `village_identity` / `bud_requires_occupancy` fixes already tamed the peak crowding. It confirms
+catchment inexhaustibility is NOT the over-clustering engine; the point-mode agglomeration return (β=1.15)
+is. Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact; adopted ON in canonical.
+
 ---
 
 ## Resource-Ecology economy methods (added 2026-06-20; RESULTS R-6…R-8)
