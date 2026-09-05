@@ -7554,6 +7554,35 @@ The within-band gate (v1) stays default-off as the superseded control.
 sedentism IBI both read the society label) is not separately measured yet. The benchmark on the canonical worlds
 is the next check.
 
+## Addendum 63 — Per-biome density is sound; the over-clustering / density-gap arc closes (2026-09-05, R-106)
+
+**The question.** After the settlement pair, does each biome equilibrate at its Tallavaara-anchored density, or
+does a knob need tuning?
+
+**The measurement (analytic ceiling per biome; validated against the temperate run, which reached 0.078 and
+climbed toward the analytic 0.095).** The regional equilibrium density spans the biomes:
+
+  boreal 0.011 · subtropical-coast 0.046 · tropical 0.048 · savanna 0.056 · montane-savanna 0.085 ·
+  temperate-coast 0.095   (persons/km²)
+
+**The verdict: no tuning is needed.** Three properties make this correct, not a coincidence. (1) The densities
+SPAN the global anchor (0.05), not a single flat number. (2) They scale with productivity — the Tallavaara law.
+(3) They ALSO scale with storability — the Testart/Woodburn pattern: tropical (0.048, immediate-return) and
+temperate coast (0.095, storable/aquatic) have similar local capacity, but the storable coast sustains ~2× the
+sedentary density. The model reproduces this on its own. Every biome is far above the pre-fix TRAPPED density
+(0.006) that opened the arc. Forcing a single target number would erase the ethnographic signal — the diagnosis
+says do NOT tune.
+
+**Arc closed.** The over-clustering / density-gap arc that ran from Addendum 57 is complete:
+  - catchment_depletion (57): depletion follows foraging.
+  - the diagnosis (58-59): over-clustering, the disease ceiling, and the sparse equilibrium are ONE phenomenon,
+    coupled through the density channel; the terrain is rich, the population was trapped, not starved.
+  - the settlement pair (61): colonizing budding + village-scaled disease → dispersed settlement at a
+    stationary population.
+  - the Kaplan juvenile calibration (60): honest age structure, a live dependent-load channel.
+  - R-103 relational stratification (62): biome-appropriate chiefdoms.
+  - per-biome density (this addendum): biome-appropriate, anchor-centred, no defect.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
