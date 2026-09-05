@@ -7523,6 +7523,37 @@ demography suites are green. The corrected juvenile calibration of Addendum 60 s
 **Next.** Two follow-ups: the R-103 stratification-classifier fix, and a per-biome density-target calibration if
 a specific density number is wanted.
 
+## Addendum 62 — R-103 stratification: the relational, between-band criterion (2026-09-05, R-106)
+
+**The defect.** The society classifier called a band a `stratified_chiefdom` on `packed (density ≥ Binford) AND
+surplus ≥ 0.7` — pure affluence, with no measure of inequality. In the rich adopted world it read 36% of bands
+stratified while the between-band cred Gini was only 0.14. So the stratified label ran opposite to the measured
+inequality. The R-103 v1 gate added a WITHIN-band Gini test, but the within-band Gini is ~uniform (0.29) and
+cannot separate a chiefdom from a rich, internally-equal band; the gate was off in canonical.
+
+**The fix.** `enable_relational_stratification`. Stratification is a relation BETWEEN bands, not a property of
+one band — a chiefdom is a hierarchy of settlements where a few centres dominate. The stratified verdict now
+needs (a) the regional BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top quartile of
+per-band mean cred (`strat_top_quantile` = 0.75). A rich but between-band-equal world is affluent-egalitarian ⇒
+complex.
+
+**The calibration.** A 3,000-step run measured the between-band Gini as it matures: it climbs 0.13 → 0.33 as the
+elite inequality accumulates, then plateaus near 0.33. So the proposed 0.35 threshold was unreachable (it would
+read 0% forever). The threshold is set to **0.30** — above the affluent-egalitarian baseline (0.21) and crossed
+only at full maturity. So stratification emerges LATE, in a dense unequal world, which is archaeologically
+correct. (BHM 2009 puts the forager whole-population Gini at 0.25; the between-band Gini is a lower, different
+quantity, so it is calibrated to the model's own range, not to the BHM number directly.)
+
+**Validated + adopted.** The A/B: the level-only classifier reads 36% stratified; the relational gate reads 0%
+in the affluent-egalitarian world (between-band Gini 0.21 < 0.30), and the top quartile of bands only once the
+region crosses 0.30 at maturity. CTB `test_relational_stratification_ctb.py`: the classifier needs an unequal
+region AND a top band; off is bit-exact. The gate is adopted canonical (removed from the C_ALLON `_skip` set).
+The within-band gate (v1) stays default-off as the superseded control.
+
+**Caveat, filed.** The downstream effect of the corrected labels on demography (the contest exponent κ and the
+sedentism IBI both read the society label) is not separately measured yet. The benchmark on the canonical worlds
+is the next check.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

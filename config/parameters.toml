@@ -694,22 +694,46 @@ type  = "float"
 # lack of water; only SEASONAL-WATERY bands (montane salmon rivers) morph COMPLEX. SEPARATES
 # survival-storage from complexity. Default OFF ⇒ bit-exact.
 
+[between_band_gini_min]
+value = 0.3
+owner = "DemographyConfig"
+type  = "float"
+# regional between-band cred Gini for a stratified region. CALIBRATED (R-106, 2026-09-05): the model's
+# between-band Gini climbs 0.13->0.33 as elite inequality matures; 0.30 sits above the
+# affluent-egalitarian baseline (0.21) and is crossed only at maturity, so stratification emerges late.
+# 0.35 was unreachable (max 0.336). BHM 2009 forager whole-pop Gini 0.25. — (channel note, inherited)
+# R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads
+# ~uniform (0.29) and cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation
+# BETWEEN bands: a chiefdom is a hierarchy of settlements. When on, the stratified verdict needs (a) the
+# regional BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top `1 −
+# strat_top_quantile` of per-band mean cred. Measured: the affluent-egalitarian world reads between-band
+# Gini 0.144 (below the forager anchor 0.25), yet the level-only classifier calls it 36% stratified.
+# Default OFF ⇒ bit-exact.
+
+[strat_top_quantile]
+value = 0.75
+owner = "DemographyConfig"
+type  = "float"
+# a band must sit above this quantile of per-band mean cred to be a chiefly centre (top quarter) —
+# (channel note, inherited) R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The
+# within-band gate above reads ~uniform (0.29) and cannot separate a chiefdom from a rich-but-equal band.
+# Stratification is a relation BETWEEN bands: a chiefdom is a hierarchy of settlements. When on, the
+# stratified verdict needs (a) the regional BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this
+# band in the top `1 − strat_top_quantile` of per-band mean cred. Measured: the affluent-egalitarian world
+# reads between-band Gini 0.144 (below the forager anchor 0.25), yet the level-only classifier calls it
+# 36% stratified. Default OFF ⇒ bit-exact.
+
 [stratification_gini_min]
 value = 0.4
 owner = "DemographyConfig"
 type  = "float"
-# BHM 2009 Table 2 α-weighted Gini: forager 0.25, — (channel note, inherited) SOCIETY CLASSIFIER ON
-# REGIONAL DENSITY (R-106, 2026-08-24). The morph classifier asks "is this band packed past Binford's
-# threshold?" -- and Binford's 0.091/km2 is a REGIONAL figure (persons per 100 km2 of RANGE). The
-# classifier was fed the band's members over its OCCUPIED cells, which is a LOCAL density: a band crowded
-# onto 1.9 cells reads 0.167/km2 = 1.8x packing = STRATIFIED, while the same population over its true
-# range is 0.025/km2 = 0.28x packing = egalitarian. Because the model crowds everyone onto ~14% of the
-# land (the packing paradox), EVERY band read as packed, 57% came out stratified in a pure forager world,
-# SEDENTISM_IBI_MONTHS gave chiefdoms a 14-month refractory, and TFR ran ~10 against a 5-8 anchor. This is
-# a UNITS error: local density fed to a threshold defined regionally. When on, the classifier density =
-# members / (habitable_km2 / n_bands) -- the band's fair share of the whole range, which equals the true
-# regional density and is the scale Binford's number means. The DISEASE hazard (density_disease) still
-# uses LOCAL per-cell density, correctly: contagion is a local quantity. Default OFF => bit-exact.
+# BHM 2009 Table 2 α-weighted Gini: forager 0.25, — (channel note, inherited) R-103 RELATIONAL
+# STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform (0.29) and
+# cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation BETWEEN bands: a
+# chiefdom is a hierarchy of settlements. When on, the stratified verdict needs (a) the regional
+# BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top `1 − strat_top_quantile`
+# of per-band mean cred. Measured: the affluent-egalitarian world reads between-band Gini 0.144 (below the
+# forager anchor 0.25), yet the level-only classifier calls it 36% stratified. Default OFF ⇒ bit-exact.
 
 [morph_npp_floor]
 value = 500.0

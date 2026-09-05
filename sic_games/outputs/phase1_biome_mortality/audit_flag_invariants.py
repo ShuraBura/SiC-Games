@@ -142,6 +142,9 @@ TYPES = {
     "enable_resentment_accumulator": "C",          # PROVISIONAL — ditto, accumulating rather than tracking
     "enable_village_resentment": "C",              # PROVISIONAL — ditto, held by the village unit
     "enable_stratification_inequality_gate": "C",  # inequality state → society label (label feeds κ, so not O)
+    # R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05): the BETWEEN-band inequality gate that replaces the
+    # within-band one. Same type: inequality state -> society label (label feeds kappa).
+    "enable_relational_stratification": "C",
     "enable_lineage_branching": "H",               # copies a lineage tag across a BIRTH event
     "enable_lineage_split": "A",                   # segments the lineage graph; must move no quantity
     "enable_bud_hazard": "A",                      # fission rule for the settlement graph (2026-07-27)
@@ -284,6 +287,7 @@ PREREQ = {
     "enable_bud_hazard": ("enable_village_budding",),
     "enable_wealth_obligation": ("enable_material_capture",),
     "enable_stratification_inequality_gate": ("enable_morph",),
+    "enable_relational_stratification": ("enable_morph",),
 }
 
 # conserved-quantity fields: an A-typed flag must NOT move these

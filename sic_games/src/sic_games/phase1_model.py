@@ -310,6 +310,7 @@ class TerrainWorld(mesa.Model):
         self._cell_society: dict[tuple[int, int], str] = {}    # S.4 per-cell morphed society type (absent ⇒ egalitarian_forager)
         self._cell_settle: dict[tuple[int, int], int] = {}     # S.4 per-cell settlement timer (hysteresis)
         self._band_society: dict[int, str] = {}                # F.3c-2 per-BAND society type (keyed by band_id)
+        self._between_band_gini: float | None = None           # R-103 relational: regional between-band cred Gini (set in morph when on)
         self._band_settle: dict[int, int] = {}                 # F.3c-2 per-band settlement timer (hysteresis)
         self._band_surplus: dict[int, float] = {}              # F.3c-3 per-band surplus_frac (from the morph detector)
         self._band_cred_gini: dict[int, float] = {}            # R-103 per-band cred Gini (inequality gate; empty unless on)
@@ -2171,15 +2172,17 @@ class TerrainWorld(mesa.Model):
             band_members: dict[int, int] = {}
             band_cells: dict[int, set] = {}
             band_cell_n: dict[tuple, int] = {}              # (bid, cell) → THIS band's members on that cell
-            ineq_gate = getattr(self._demog, "enable_stratification_inequality_gate", False)   # R-103
-            band_creds: dict[int, list] = {} if ineq_gate else {}   # per-band cred sample for the inequality gate
+            ineq_gate = getattr(self._demog, "enable_stratification_inequality_gate", False)   # R-103 v1 (within-band)
+            relational = getattr(self._demog, "enable_relational_stratification", False)       # R-103 v2 (between-band)
+            _collect_cred = ineq_gate or relational
+            band_creds: dict[int, list] = {}                       # per-band cred sample for either inequality gate
             for (cx, cy), occ in occ_lists.items():
                 for a in occ:
                     bid = a._group.band_id
                     band_members[bid] = band_members.get(bid, 0) + 1
                     band_cells.setdefault(bid, set()).add((cx, cy))
                     band_cell_n[(bid, (cx, cy))] = band_cell_n.get((bid, (cx, cy)), 0) + 1
-                    if ineq_gate:
+                    if _collect_cred:
                         band_creds.setdefault(bid, []).append(getattr(a, "cred", 1.0))
             land_pack = getattr(self._demog, "enable_landscape_packing", False)   # R-61: landscape vs band-member density
             self._band_surplus = {}
@@ -2202,6 +2205,18 @@ class TerrainWorld(mesa.Model):
             reg_dens_on = getattr(self._demog, "enable_society_regional_density", False)
             _hab_km2 = getattr(self, "_habitable_cells", 0) * _CELL_KM2
             _range_km2 = (_hab_km2 / len(band_members)) if (reg_dens_on and band_members and _hab_km2 > 0) else 0.0
+            # R-103 RELATIONAL: the regional BETWEEN-band inequality (Gini of per-band mean cred) and the top-
+            # quantile threshold, computed ONCE. A band is a chiefly centre only in an unequal region AND at its top.
+            _band_mean_cred: dict = {}
+            _between_gini = None
+            _top_thr = None
+            if relational and band_creds:
+                _band_mean_cred = {b: (sum(v) / len(v)) for b, v in band_creds.items()}
+                _means = sorted(_band_mean_cred.values())
+                _between_gini = _gini(_means)
+                self._between_band_gini = _between_gini              # diagnostic (regional inequality this step)
+                _qi = min(len(_means) - 1, int(self._demog.strat_top_quantile * len(_means)))
+                _top_thr = _means[_qi]
             for bid, n in band_members.items():
                 footprint_km2 = len(band_cells[bid]) * _CELL_KM2
                 # LANDSCAPE population density (all agents on the band's cells / area = the Binford quantity) when on;
@@ -2222,7 +2237,13 @@ class TerrainWorld(mesa.Model):
                 cap_band = store_cap_mult * self._reserve_full * n
                 surplus_frac = store_share / cap_band if cap_band > 0.0 else 0.0
                 self._band_surplus[bid] = surplus_frac          # F.3c-3: feeds assabiyah + tolerable size
-                if ineq_gate:                                   # R-103: stratified requires UNEQUAL cred, not just high surplus
+                if relational:                                  # R-103 v2: stratified needs an UNEQUAL region + a top band
+                    _bm = _band_mean_cred.get(bid, 0.0)
+                    target = society_from_character(
+                        density, surplus_frac,
+                        between_gini=_between_gini, between_gini_min=self._demog.between_band_gini_min,
+                        band_is_top=(_top_thr is None or _bm >= _top_thr))
+                elif ineq_gate:                                 # R-103 v1: stratified requires UNEQUAL within-band cred
                     _wg = _gini(band_creds.get(bid, ()))
                     self._band_cred_gini[bid] = _wg
                     target = society_from_character(density, surplus_frac,

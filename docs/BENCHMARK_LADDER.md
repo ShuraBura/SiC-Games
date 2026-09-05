@@ -114,7 +114,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `village_identity`, `storable_founding`, `worked_land_yield`, `village_catchment_spread`, `colonizing_budding`
 - **10 Surplus & material** — `material_capture`, `material_inheritance`, `wealth_obligation`, `standing`,
   `cred_status`, `cred_renorm`, `prowess_facet`
-- **11 Stratification** — `morph`, `rank_hierarchy`, `stratification_inequality_gate`
+- **11 Stratification** — `morph`, `rank_hierarchy`, `stratification_inequality_gate`, `relational_stratification`
 - **12 Elite** — `leveling`, `legitimacy`, `relative_legitimacy`, `delegitimation`, `leader_office`,
   `leader_share`, `lineage_tribute`, `resentment_accumulator`, `relative_resentment`,
   `village_resentment`, `noble_leveling_exemption`

@@ -507,6 +507,18 @@ type  = "bool"
 # Binford's number means. The DISEASE hazard (density_disease) still uses LOCAL per-cell density,
 # correctly: contagion is a local quantity. Default OFF => bit-exact.
 
+[enable_relational_stratification]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads
+# ~uniform (0.29) and cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation
+# BETWEEN bands: a chiefdom is a hierarchy of settlements. When on, the stratified verdict needs (a) the
+# regional BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top `1 −
+# strat_top_quantile` of per-band mean cred. Measured: the affluent-egalitarian world reads between-band
+# Gini 0.144 (below the forager anchor 0.25), yet the level-only classifier calls it 36% stratified.
+# Default OFF ⇒ bit-exact.
+
 [enable_landscape_packing]
 value = true
 owner = "DemographyConfig"

@@ -956,6 +956,10 @@ def main():
             # founds daughters directly with its own density-scaled spacing, so occupancy-gating is retired here
             # (it trapped the population at 2% of carrying capacity).
             "enable_bud_requires_occupancy",
+            # R-103 RELATIONAL STRATIFICATION adopted (R-106, 2026-09-05, Addendum 62). Removed from this set
+            # -> canonically ON. The between-band inequality gate replaces the level-only classifier that
+            # over-counted stratified villages (36% at between-band Gini 0.14). Stratification now emerges only
+            # at maturity, when the regional between-band Gini crosses 0.30 (calibrated to the model's range).
             # A MODEL CORRECTION UNDER EVALUATION (2026-08-13). `enable_density_reference` re-references
             # density_mult so the anchor density returns 1.0 -- the invariant risk_mult and pathogen_mult
             # already hold and this one silently broke. It is measured and principled, but adopting it

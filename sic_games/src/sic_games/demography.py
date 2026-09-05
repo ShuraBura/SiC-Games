@@ -879,6 +879,15 @@ class DemographyConfig(BaseModel):
     # Default OFF => bit-exact.
     enable_society_regional_density: bool = False
     enable_stratification_inequality_gate: bool = False
+    # R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform
+    # (0.29) and cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation BETWEEN
+    # bands: a chiefdom is a hierarchy of settlements. When on, the stratified verdict needs (a) the regional
+    # BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top `1 − strat_top_quantile` of
+    # per-band mean cred. Measured: the affluent-egalitarian world reads between-band Gini 0.144 (below the
+    # forager anchor 0.25), yet the level-only classifier calls it 36% stratified. Default OFF ⇒ bit-exact.
+    enable_relational_stratification: bool = False
+    between_band_gini_min: float = Field(0.30, ge=0.0, le=1.0)   # regional between-band cred Gini for a stratified region. CALIBRATED (R-106, 2026-09-05): the model's between-band Gini climbs 0.13->0.33 as elite inequality matures; 0.30 sits above the affluent-egalitarian baseline (0.21) and is crossed only at maturity, so stratification emerges late. 0.35 was unreachable (max 0.336). BHM 2009 forager whole-pop Gini 0.25.
+    strat_top_quantile: float = Field(0.75, ge=0.0, le=1.0)      # a band must sit above this quantile of per-band mean cred to be a chiefly centre (top quarter)
     stratification_gini_min: float = Field(0.40, ge=0.0, le=1.0)  # BHM 2009 Table 2 α-weighted Gini: forager 0.25,
     #   horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40.
     #   PROVISIONAL: within-band Gini runs below whole-population Gini, so calibrate on the validated baseline.
@@ -2247,7 +2256,9 @@ def biome_default_society(biome_code: int | None = None, aquatic_rich: bool = Fa
 
 
 def society_from_character(density_per_km2: float, surplus_frac: float,
-                           wealth_gini: float | None = None, gini_min: float | None = None) -> str:
+                           wealth_gini: float | None = None, gini_min: float | None = None,
+                           between_gini: float | None = None, between_gini_min: float | None = None,
+                           band_is_top: bool = True) -> str:
     """Morph hook — map a band's measured CHARACTER (density vs Binford packing; surplus = Testart storage
     enabler) onto the complexity ladder. surplus_frac = mean reserve fraction above subsistence (0..1).
       below packing & no defendable surplus → egalitarian (mobile, leveled);
@@ -2267,7 +2278,15 @@ def society_from_character(density_per_km2: float, surplus_frac: float,
         return "egalitarian_forager"
     if packed and surplus_frac >= 0.7:
         if gini_min is not None and (wealth_gini is None or wealth_gini < gini_min):
-            return "complex_forager"          # packed + affluent but EQUAL ⇒ not stratified (Testart's missing step)
+            return "complex_forager"          # WITHIN-band gate (R-103 v1): packed + affluent but internally EQUAL
+        # R-103 RELATIONAL GATE (`between_gini_min` not None ⇒ ON; None ⇒ bit-exact). Stratification is a
+        # relation BETWEEN bands, not a property of one band: a chiefdom is a hierarchy of settlements where a
+        # few centres dominate. So the stratified verdict needs an UNEQUAL region (between-band cred Gini ≥
+        # between_gini_min) AND this band at the TOP of it (`band_is_top`). A rich but between-band-EQUAL world
+        # is affluent-egalitarian ⇒ complex. This replaces the within-band gate, which read ~uniform (0.29) and
+        # could not discriminate; the between-band signal (0.14 in the affluent-egalitarian world) can.
+        if between_gini_min is not None and (between_gini is None or between_gini < between_gini_min or not band_is_top):
+            return "complex_forager"
         return "stratified_chiefdom"
     return "complex_forager"
 
