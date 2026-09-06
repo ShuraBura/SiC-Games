@@ -956,6 +956,11 @@ def main():
             # founds daughters directly with its own density-scaled spacing, so occupancy-gating is retired here
             # (it trapped the population at 2% of carrying capacity).
             "enable_bud_requires_occupancy",
+            # DENSITY-DEPENDENT FERTILITY adopted (R-106, 2026-09-06, Addendum 65). Removed from this set ->
+            # canonically ON at exponent 6. Birth probability falls as a village nears its food ceiling, moving
+            # regulation from starvation DEATHS to fewer BIRTHS: e0 25.4 -> 36.0 (the anchor), starvation share
+            # 0.51 -> ~0.33. The lever-sensitivity sweep found it dominates e0 (+14 vs +2 for food, ~0 for the
+            # rest); exp 6 is the frontier's best e0-density balance.
             # AGE-GRADED NUTRITION SYNERGY adopted (R-106, 2026-09-05, Addendum 64). Removed from this set ->
             # canonically ON. Adults use the attenuated malnutrition-mortality synergy (community-dwelling adult
             # HR ~1.3 vs Pelletier child 2.5). A/B: adult mortality 15-45 fell 21%, e0 +0.8; the rest is absorbed

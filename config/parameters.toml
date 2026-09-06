@@ -339,6 +339,24 @@ type  = "float"
 # the realised INTERVAL overshoots the filed maximum by ~2 months (measured: implied IBI spans 38.3 to
 # 51.4 against a filed 34.4 to 49.4).]
 
+[density_fert_exponent]
+value = 6.0
+owner = "DemographyConfig"
+type  = "float"
+# shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106,
+# 2026-09-06 lever-sensitivity sweep): the e0-density frontier's best balance — e0 36.0 (at anchor) at the
+# highest density of the high-e0 set. Lower values over-suppress density. — (channel note, inherited)
+# pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
+# DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05, docs/RESULTS). The intake-fertility brake reads the
+# intake EMA, which RE-SATURATES (median 2.3x requirement even in a population dying 51% of starvation),
+# so it barely bites (15% of women) and STARVATION does the regulating — which holds e0 low. Density does
+# NOT re-saturate: it rises as the population fills the food ceiling, so it is the honest Malthusian
+# stress. When on, birth probability is scaled by f = clamp(1 - (fill)^exponent, 0, 1), fill = village
+# population / village carrying capacity (Σ K_persons over the village territory); a mobile mother uses
+# her cell occupancy / cell K. So births fall as a village approaches its carrying capacity — regulation
+# moves from DEATHS to BIRTHS (the NDT / K-regulation; forager birth spacing lengthens with density).
+# Default OFF ⇒ bit-exact.
+
 [standing_tenure_rate]
 value = 0.083
 owner = "DemographyConfig"

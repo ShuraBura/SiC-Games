@@ -2722,6 +2722,33 @@ class TerrainWorld(mesa.Model):
         # Resolved here as well as in `_step_rivalrous` (which uses it to switch the intake EMA on) because
         # the two live in different methods; a name defined in one is not visible in the other.
         refrac_on = getattr(cfg, "enable_energetic_refractory", False)
+        # DENSITY-DEPENDENT FERTILITY precompute (see enable_density_fertility): the FILL fraction (population /
+        # carrying capacity) a mother experiences — village-scaled for a settled mother, cell-scaled for a mobile
+        # one. Fill does not re-saturate (unlike the intake EMA), so it tracks the Malthusian stress. Computed
+        # once here; the per-mother brake below reads it. Off ⇒ never computed ⇒ bit-exact.
+        dens_fert_on = getattr(cfg, "enable_density_fertility", False)
+        _fill_cell: dict = {}
+        _fill_village: dict = {}
+        if dens_fert_on:
+            # FILL = food NEED / food CAPACITY, so fill→1 as the group reaches the point where its food just
+            # feeds it — i.e. the STARVATION threshold. A village's capacity is its catchment ceiling (the food
+            # it can sustainably yield); a mobile cell's is the cell's own yield. This is the denominator the
+            # population actually hits (villages sit far below their Tallavaara K_persons, so K is the wrong scale).
+            tf = self._harvest_field
+            occ_c: dict = {}
+            for _a in self.agent_list:
+                occ_c[_a.pos] = occ_c.get(_a.pos, 0) + 1
+            rad = cfg.settle_radius
+            for cell, n in occ_c.items():
+                food = tf.level(cell[0], cell[1])
+                _fill_cell[cell] = (n * self._burn / food) if food > 0.0 else 1.0
+            for site in self._settlement_sites:
+                sx, sy = site
+                cap = self._settlement_carrying_capacity(site)          # kcal/step the catchment sustains
+                vpop = sum(occ_c.get(((sx + dx) % N, (sy + dy) % N), 0)
+                           for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
+                _fill_village[site] = (vpop * self._burn / cap) if cap > 0.0 else 1.0
+        self._dens_fert_fill_village = _fill_village    # diagnostic: last step's per-village fill fraction
         newborns: list[BaseAgent] = []
         for a in self.agent_list:
             if a.sex != "female":
@@ -2765,6 +2792,13 @@ class TerrainWorld(mesa.Model):
             elif cfg.enable_energetic_fertility:               # births scale with NUTRITIONAL status (post-harvest)
                 _rs = a.reserve_scale()                        # C.2a age-scaled floor/full
                 p_birth *= energetic_fertility_factor(a._fed_reserve, a.reserve_floor * _rs, self._reserve_full * _rs)
+            if dens_fert_on:
+                # DENSITY brake: births fall as the mother's village/cell approaches its carrying capacity. Fill
+                # does not re-saturate, so this checks the population BEFORE starvation (regulation deaths→births).
+                _site = self._nearest_settlement(a.pos)
+                _fill = _fill_village.get(_site, 1.0) if _site is not None else _fill_cell.get(a.pos, 1.0)
+                _fd = 1.0 - (_fill ** cfg.density_fert_exponent if _fill > 0.0 else 0.0)
+                p_birth *= 0.0 if _fd < 0.0 else _fd
             # Realised fertility schedule (pure observer). Sampled HERE — past the age gate, the IBI gate and
             # the mate gate — so the denominator is "women actually at risk of conception this step", which is
             # what makes the multiplier interpretable. Sampling over all women would dilute it with the

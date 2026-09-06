@@ -616,6 +616,16 @@ class DemographyConfig(BaseModel):
     intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
     intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
     #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
+    # DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05, docs/RESULTS). The intake-fertility brake reads the intake
+    # EMA, which RE-SATURATES (median 2.3x requirement even in a population dying 51% of starvation), so it barely
+    # bites (15% of women) and STARVATION does the regulating — which holds e0 low. Density does NOT re-saturate:
+    # it rises as the population fills the food ceiling, so it is the honest Malthusian stress. When on, birth
+    # probability is scaled by f = clamp(1 - (fill)^exponent, 0, 1), fill = village population / village carrying
+    # capacity (Σ K_persons over the village territory); a mobile mother uses her cell occupancy / cell K. So
+    # births fall as a village approaches its carrying capacity — regulation moves from DEATHS to BIRTHS (the NDT
+    # / K-regulation; forager birth spacing lengthens with density). Default OFF ⇒ bit-exact.
+    enable_density_fertility: bool = False
+    density_fert_exponent: float = Field(6.0, gt=0.0)   # shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106, 2026-09-06 lever-sensitivity sweep): the e0-density frontier's best balance — e0 36.0 (at anchor) at the highest density of the high-e0 set. Lower values over-suppress density.
     # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
     # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
     # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning

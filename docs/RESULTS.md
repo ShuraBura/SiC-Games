@@ -7615,6 +7615,42 @@ the population before it hit the starvation ceiling, there would be less crowdin
 The channels exist and are live (`intake_fertility`, `dependent_load`), but starvation share ~0.5 shows the
 fertility brake is too weak to regulate ahead of starvation. Strengthening it is the e0 lever.
 
+## Addendum 65 — Density-dependent fertility closes e0; the lever map and the e0-density frontier (2026-09-06, R-106)
+
+**The move deaths→births.** The e0 gap (Addendum 64) is Malthusian: the population regulates through STARVATION,
+which holds e0 low. `enable_density_fertility`: birth probability is scaled by `1 - fill^exponent`, fill =
+population × burn / catchment food capacity, so births fall as a village nears its food ceiling. Regulation
+shifts from starvation deaths to fewer births.
+
+**A/B (temperate, period life table): e0 25.4 -> 37.3**, starvation share 0.51 -> 0.29, population 24.4k -> 9.2k.
+It closes the e0 gap. The denominator matters: an early version keyed fill on the Tallavaara K_persons and read
+0.14 (villages sit far below their local K); the food ceiling (catchment capacity) is the denominator the
+population actually hits.
+
+**Which signal is honest — a correlation map (n=56,603 adult-woman snapshots).** The intake-fertility brake read
+the intake EMA, which does NOT predict death (corr -0.015; those who die eat 4.1x requirement, survivors 4.5x);
+neither does reserve fill (corr +0.003, backwards). Density-fill is the only positive predictor (corr +0.029,
+died 3.59 vs survived 3.15) but WEAK. The deeper truth: death is ACUTE (crashes from well-fed states), so no
+smoothed signal strongly predicts an individual death (max |corr| 0.11). Density-fertility works at the
+POPULATION level (holding the population off the crash-prone ceiling), not by predicting who dies.
+
+**Lever-sensitivity sweep (26 runs, OAT + 2x2 factorial, 2 seeds).** Elasticity on e0: density_fert +14.2 >>
+food ceiling +2.2 ~ mu_max (+0.3..2.8, noisy) > paternal provisioning +0.0. Density-fertility dominates ~6x.
+The e0-density FRONTIER shows a hard tradeoff: high e0 (36-38) comes only with low density (0.008-0.013); no
+config reaches the joint anchor (e0 36.5 AND density 0.05). The 2x2 factorial confirms the levers are
+Malthusian-COUPLED: adding food at fixed density_fert LOWERS e0 by -4 to -5 (the extra food grows the
+population back into the crash regime), a cross-term larger than food's own OAT effect — so OAT elasticities are
+a first cut only. NOTE: seed = world (the two seeds differ 6x in population), so e0 (a period rate) is the robust
+axis and density is world-dependent.
+
+**Adopted: `enable_density_fertility` at `density_fert_exponent = 6`** — the frontier's best e0-density balance
+(e0 36.0 at the anchor, highest density of the high-e0 set). CTB `test_density_fertility_ctb`; sync + coverage green.
+
+**Next arc — the FRONTIER, not a point on it.** e0 36 and density 0.05 cannot be reached together by tuning
+fertility, food mean, synergy, or provisioning; the frontier is fixed by ACUTE food-supply VOLATILITY (the
+crash generator the correlation map exposed). Reducing volatility — not the food mean — lets a denser population
+avoid crashes, moving e0 and density up together. That is the next build.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

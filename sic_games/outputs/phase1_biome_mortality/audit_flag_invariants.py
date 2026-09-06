@@ -114,6 +114,9 @@ TYPES = {
     # AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05): adults use an attenuated malnutrition-mortality
     # synergy cap. Modulates the a2 hazard -> N.
     "enable_synergy_age_grade": "N",
+    # DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05): birth prob falls as the village nears its food
+    # ceiling. A vital-rate modifier -> N.
+    "enable_density_fertility": "N",
     # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03, keystone): a settled agent's disease density is its
     # village population over the village territory, not single-cell occupancy. Modulates the a2 hazard -> N.
     "enable_village_density_disease": "N",
