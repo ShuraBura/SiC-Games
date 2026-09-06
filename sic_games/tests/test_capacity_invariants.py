@@ -33,11 +33,15 @@ from sic_games.phase1_model import TerrainWorld
 from sic_games.terrain import generate_world, world_lottery_climate
 
 STEPS = 400          # long enough for crowding to bind, short enough to stay a test
-# N0 IS CALIBRATED, NOT GUESSED. At 900 founders the gap-open and fixed runs were indistinguishable and the
-# power test below failed — correctly, because the regime was too mild rather than because the fix was wrong.
-# Measured separation at patch 18 (probe, 400 steps): pop 2908 (gap open) vs 2588 (fixed) = 1.12x, and
-# starvation 1147 vs 1402 = the fixed run kills 1.22x more. Thresholds below sit under those measurements.
-N0 = 2500
+# N0/patch ARE CALIBRATED, NOT GUESSED. The gap-open and fixed runs must SEPARATE or the power test is vacuous.
+# RE-CALIBRATED 2026-09-06 (R-106): after the density-fertility / settlement-pair / Kaplan-juvenile adoptions
+# shifted the regime, patch 18 no longer separated — the catchment ceiling (on in BOTH arms) caps the milder
+# window on its own, so toggling the aggl ceiling did nothing (measured: density 0.98x, starvation 0.81x, the
+# power test correctly failing). A tighter circumscription restores the aggl-ceiling runaway signature.
+# Measured (probe, 400 steps, N0=6000 patch=10): density 1.28x (gap open 1057 vs fixed 825 over 100 cells);
+# starvation no longer separates (~1.0x) — the bug is now DENSITY-dominated, so the power test rides the density
+# limb. Thresholds below sit under the density measurement.
+N0 = 6000
 
 
 def _preset():
@@ -49,7 +53,7 @@ def _preset():
     return emergent_village_demog()
 
 
-def _crowded_world(ceiling=True, seed=0, n=N0, patch=18):
+def _crowded_world(ceiling=True, seed=0, n=N0, patch=10):
     """A deliberately CIRCUMSCRIBED world (small capacity window) with the village stack on — the regime where
     the R-105 gap ran away. `patch` bounds capacity to a sub-window with ZERO outside, so the population cannot
     disperse out of the pressure."""
@@ -144,8 +148,8 @@ def test_the_set_has_power_the_gap_open_run_violates_it(buggy_run, fixed_run):
     btraj, cells = buggy_run
     ftraj, _ = fixed_run
     b_dens, f_dens = btraj[-1]["pop"] / cells, ftraj[-1]["pop"] / cells
-    # Thresholds sit UNDER the measured effect (density 1.12x, starvation 1.22x) so the test has headroom
-    # without being vacuous. They are calibration, and the numbers they came from are in the header.
+    # Thresholds sit UNDER the measured effect (density 1.28x; starvation no longer separates, ~1.0x — see the
+    # header re-calibration) so the DENSITY limb has headroom without being vacuous. Numbers are in the header.
     violations = []
     if b_dens > f_dens * 1.05:
         violations.append(f"density {b_dens:.1f} vs fixed {f_dens:.1f}/cell")

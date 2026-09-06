@@ -106,12 +106,18 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # change to assabiyah, measured and defensible but NOT adopted (Addendum 23). C_ALLON must
                # not adopt a model change by side effect.
                "enable_leaky_assabiyah",
-               # SETTLEMENT-RUNAWAY CANDIDATES that failed on measurement (2026-08-12) and are retained only
-               # as ablation controls. Full reasons are in run_campaign.py's C_ALLON `_skip` set — one copy.
-               # `enable_emergent_village_founding` (the rule that replaced them), `bud_requires_occupancy`
-               # (Addendum 53) and `village_identity` (Addendum 54, after its multi-biome A/B) are all
-               # canonically ON and so are deliberately absent from this list.
+               # SETTLEMENT-RUNAWAY / HELD CANDIDATES retained as ablation controls. Full reasons are in
+               # run_campaign.py's C_ALLON `_skip` set — one copy. `enable_emergent_village_founding` (the rule
+               # that replaced them) and `enable_village_identity` (Addendum 54) are canonically ON and so absent.
                "enable_bud_site_separation", "enable_exclusive_village_membership",
+               # `enable_bud_requires_occupancy` (adopted Addendum 53) is now SUPERSEDED by the settlement pair
+               # (Addendum 61) and retired to dark — the colonizing path founds daughters with its own spacing.
+               "enable_bud_requires_occupancy",
+               # BUILT-but-HELD candidates (R-106), each with a measured hold reason in the _skip set:
+               # hunger_dispersal (Colson famine flight; halves population, empties savanna), founding_delay
+               # (marginal, trips the age-structure CTB via a startup transient, no lit anchor), and
+               # village_catchment_spread (fixes over-clustering but the population runs away without a brake).
+               "enable_hunger_dispersal", "enable_founding_delay", "enable_village_catchment_spread",
                # A model CORRECTION under evaluation: it changes realised mortality in every
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
                "enable_density_reference",

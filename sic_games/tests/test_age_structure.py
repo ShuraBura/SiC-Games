@@ -121,12 +121,25 @@ def test_the_pyramid_is_young_but_the_child_share_is_now_anchored(markers):
     cliff (15-30 : 30-45) is 2.71x and has not gone away. The Siler schedule was never the cause — integrated
     it gives e₀ = 36.5 yr against the Aché ~37 — see `test_tier3_demography_ctb.py`.
 
-    WHAT THIS NOW PINS is the improved-but-unfinished regime, in BOTH directions: the child share must stay
-    inside the forager range (a regression that re-inflates it fails here), and median age must stay short of
-    the anchor (when THAT starts failing the engine has improved again — re-score the #16 family together, as
-    MARKER_MATRIX requires, and update R-106)."""
+    RE-SCORED 2026-09-06 (R-106 Addendum 65) when `enable_density_fertility` was adopted (it closes the e0 gap,
+    deaths→births). The median-age tripwire above fired, as designed. The #16 family moved together again, on
+    this same fixture, and now sits AT the Aché anchor:
+
+        frac_child        0.414 -> 0.371   still inside 0.287-0.454 (toward mid-range, from the Aché 0.419 top)
+        dependency_ratio  0.907 -> 0.813   now BELOW the Aché 0.899
+        sex_ratio_m_f     0.987 -> 1.089   still inside 0.896-1.368
+        median_age_yr      17.1 -> 19.33   REACHED the ~20 anchor's neighbourhood — the open gap is closed
+        frac_motherless   0.036 -> 0.006   below the Aché ~0.02
+        early-adult ratio  2.71 -> 2.32    the cliff has SOFTENED but persists (> 2)
+
+    WHAT THIS NOW PINS is the anchored regime, in BOTH directions: the child share stays inside the forager
+    range, and median age stays in the anchor's neighbourhood — a regression that drops it back toward the old
+    pathology (12.8) or the pre-density-fertility 17.1 fails the floor, and implausible over-aging fails the
+    ceiling. If either bound starts failing, re-score the #16 family together, as MARKER_MATRIX requires, and
+    update R-106."""
     assert 0.287 < markers["frac_child"] < 0.454, (
         "the child share has left the Hill & Hurtado forager range (0.287-0.454) — re-score MARKER #16")
-    assert markers["median_age_yr"] < 19.0, "median age has reached the Aché anchor's neighbourhood"
+    assert 18.0 < markers["median_age_yr"] < 21.0, (
+        "median age has left the Aché anchor's neighbourhood (~20) — re-score MARKER #16 and update R-106")
     assert markers["age_15_30"] > 2.0 * markers["age_30_45"], (
         "the early-adult mortality cliff has softened — the pyramid is no longer collapsing at 30")
