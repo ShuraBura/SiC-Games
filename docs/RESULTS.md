@@ -7651,6 +7651,52 @@ fertility, food mean, synergy, or provisioning; the frontier is fixed by ACUTE f
 crash generator the correlation map exposed). Reducing volatility — not the food mean — lets a denser population
 avoid crashes, moving e0 and density up together. That is the next build.
 
+## Addendum 66 — Food volatility is a density-ceiling lever, not an e0 lever; the volatility build is FALSIFIED (2026-09-06, R-106)
+
+**The prediction under test.** Addendum 65 named the next build: reduce food-supply VOLATILITY (the crash
+generator), and a denser population avoids crashes, so e0 and density rise together. This addendum tests that
+prediction before any build. It fails.
+
+**The method — a volatility decomposition.** The model draws food variance from three sources: the
+mean-preserving meat lognormal draw (`game_meat_cv`), catchment depletion/regrow, and seasonality
+(`ClimateField a_seas`). The canonical world (density-fertility at exponent 6, all adopted mechanisms on) ran
+five ways: ALL (every source on), noMeatCV, noDeplete, noSeason, and noneVar (all three off). Two biomes ran:
+coastal-temperate and coastal-boreal. The regime was N=600, patch=24, 1400 steps, burn-in 600. Each arm reported
+the period-life-table e0 over the post-burn window, the starvation share, and the acute-crash fraction.
+
+**The result — removing variance raises population and does NOT raise e0.** In temperate the seed-0 gradient is
+monotone: as variance falls, the population rises (ALL 1169 -> noneVar 2150) and e0 FALLS (36.9 -> 25.3), while
+starvation rises (0.28 -> 0.54). The ten arm-points (2 biomes x 5 arms) lie on ONE downward Malthusian curve:
+e0 is set by population relative to the food ceiling, and volatility only moves you ALONG that curve.
+
+**Seed-robustness (endpoint contrast ALL vs noneVar, seeds 0-3).** Temperate: mean e0 31.2 -> 25.1 (-6.1 yr),
+population 1377 -> 1790; e0 falls in 3 of 4 world-pairs (one mild reversal +2.2). Boreal: mean e0 25.1 -> 23.5,
+population swings ~8x across seeds (seed = world). In NO world-pair does removing volatility raise BOTH e0 and
+density. The promised joint gain never appears.
+
+**The interpretation — a density lever, not a welfare lever.** Food variance sets HOW MANY the world holds, not
+HOW WELL they live. The density-fertility brake reads the MEAN fill, so it lets the population grow to the mean
+ceiling; the population Malthusian-relocates into any headroom that a calmer food supply opens, then re-starves.
+This is the same Malthusian coupling Addendum 65 measured for food, now shown for volatility itself.
+
+**The death mode changed under the brake.** The acute one-step-crash fraction is small in this regime
+(`frac_acute` 0.001-0.02; agents die at ~42% reserve, a sub-acute grind). Density-fertility converted the
+pre-brake one-step crash (Addendum 65's "death is ACUTE") into a slow decline. So the crash generator that
+Addendum 65 pointed at no longer dominates once the birth brake is on — which is why smoothing the supply cannot
+help.
+
+**Decision — DO NOT build a volatility-reduction mechanism.** It would lower e0, not raise it. The canonical
+temperate world already sits at the e0 anchor (ALL, seed 0: e0 36.9 vs Ache-forest 36.5), and the volatility is
+part of the regulation that holds it there. This negative result is the diagnose-before-tuning rule paying for
+itself: the build was wrong before it started.
+
+**The one lever left open.** e0 rises only if the population stays BELOW the ceiling. The candidate is a birth
+brake that binds against the seasonal TROUGH, not the mean fill. That is a future arc, not a build; it needs its
+own diagnosis first.
+
+**Provenance.** Instrument only (`volatility_decomp.py`, seed-robustness `conf_*.log`); no model code changed; no
+CTB, because a negative result adopts no mechanism.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
