@@ -7697,6 +7697,46 @@ own diagnosis first.
 **Provenance.** Instrument only (`volatility_decomp.py`, seed-robustness `conf_*.log`); no model code changed; no
 CTB, because a negative result adopts no mechanism.
 
+## Addendum 67 — Sedentism is the seasonal-biome e0 lever; the birth brake and the fishery-bootstrap fixes are FALSIFIED (2026-09-06, R-106)
+
+**The birth brake is falsified.** Addendum 66 left one candidate for raising e0: a birth brake that binds against
+the seasonal TROUGH, not the mean fill. A death-timing diagnostic kills it. In temperate the starvation deaths are
+ASEASONAL — they do not track the season curve, at a sub-ceiling world (fill 0.60) or a near-ceiling one (0.92) —
+so they are local, stochastic crashes, not a population overshoot a brake could hold back. The canonical config has
+NO interannual variability, so the one slow scale a slow brake (inter-birth interval ~ years) could chase does not
+exist. A birth brake acts on the aggregate population; these deaths are local.
+
+**Sedentism IS the seasonal-biome e0 lever (+10 yr).** The boreal deaths DO cluster at the seasonal trough (a 6x
+month-of-year swing), but boreal forms no villages, so the density-fertility brake never engages. Across four
+boreal worlds (coastal, seed = world): the worlds that FORM villages reach e0 ~30 (seeds 1,2: 6 and 30
+settlements); the worlds that form NONE stall at e0 ~20 (seeds 0,3). Same biome, +10 yr from sedentism. Sedentism
+site-anchors the granary, so the village survives the trough; a mobile band cannot.
+
+**Why some boreal worlds do not sediment — the fishery bootstrap trap.** A settlement founds where >= 40 people
+cluster on a cell whose founding potential (`aquatic_food`) >= 0.30. All four boreal worlds HAVE the fishery
+(shore cells, sea-connected cold rivers, aqf up to 1.0), but the tier-2 yield that turns `aquatic_food` into food
+is GATED to settlement sites — so a mobile band on a fish-rich but terrestrially barren reach gets ~0 food, never
+clusters there, and no village bootstraps. That inverts the real sequence: the salmon run DRAWS the aggregation
+that founds the village (Testart/Ames).
+
+**Both proposed fixes are falsified and reverted.** (1) A pre-settlement tier-1 fishery (mobile bands can eat the
+reach) — even at 4x strength, the blocked worlds form ZERO villages, and the extra food LOWERS e0 in the worlds
+that already sediment (seed 1: 29.6 -> 24.1; Malthusian relocation, the Addendum-66 lesson). (2) Stronger site
+appraisal (attraction to the fishery) — even at 10x gain, ZERO villages, and it harms temperate. (3) Both together
+— ZERO villages. Neither food, nor attraction, nor their combination gathers 40 people onto a fishery cell. The
+block is STRUCTURAL: the point-founding gate (40 packed in a 5x5 block on one aqf cell) cannot represent a
+DISPERSED coastal/riverine fishery, and no knob changes that spatial packing. Every food/attraction lever also
+Malthusian-harms the already-anchored main world (temperate e0 36.9 = the Ache-forest anchor 36.5).
+
+**Decision — no mechanism adopted; the refinement is deferred.** The main world sits at the e0 anchor, so this is a
+boreal-specific refinement, not a headline gap. Raising boreal e0 needs a FOUNDING-MODEL redesign (a dispersed,
+logistical settlement that a point-founding gate cannot express), a large separate arc with uncertain payoff — not
+a knob and not this branch.
+
+**Provenance.** Instruments only (`death_timing.py`, `sedentism_diag.py`, `founding_pot_probe.py`, `aqf_seeds.py`,
+`bootstrap_test.py`, `site_gain_sweep.py`, `combo_test.py`); the two fix attempts were built, measured, and
+REVERTED (tree bit-exact); no CTB, because no mechanism is adopted.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
