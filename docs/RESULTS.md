@@ -7737,6 +7737,56 @@ a knob and not this branch.
 `bootstrap_test.py`, `site_gain_sweep.py`, `combo_test.py`); the two fix attempts were built, measured, and
 REVERTED (tree bit-exact); no CTB, because no mechanism is adopted.
 
+## Addendum 68 — Savanna degeneracy is a storage-gate defect; the union gate (cold OR seasonal) fixes it (2026-09-07, R-106)
+
+**The defect.** The savanna world was known to near-collapse in a start-up transient (pop 600 -> ~110). A
+start-up diagnostic falsifies the obvious reading: savanna has HIGHER mean food than temperate (occupied-cell
+yield 1.6-3.5M vs 1.3-2.9M) and its agents are well-fed on average (intake ~8x requirement), yet the population
+declines while temperate is stable. The deaths cluster at the seasonal DRY TROUGH.
+
+**The cause.** The overwintering store is gated PURELY on temperature (cell mean temp <= 15.25 C, Binford ET).
+The whole savanna is too hot (mean 19.5 C), so ZERO cells qualify and it can NEVER build a granary — the stored
+buffer is 0 at every step. With no buffer for its deep dry season, the population is culled to the unbuffered
+dry-trough capacity (~110), far below what the mean food allows. Temperate (9.7 C) and boreal (2.0 C) store
+massively (~1e9, ~3e8) and hold higher populations. This is the volatility=density-lever result (Addendum 66)
+biting hardest where the buffer is absent.
+
+**The fix — a union gate, not the existing seasonality gate.** The existing `storage_seasonality_gated` flag
+gates on seasonal amplitude INSTEAD of temperature; it fixes savanna (pop 111 -> 362) but DESTROYS boreal (cold
+but low-amplitude -> loses its store -> e0 1.7). The two limbs are exclusive and neither serves both biomes. They
+store DIFFERENT things: cold enables MEAT storage (Binford), a seasonal glut enables storable PLANT-food storage
+(Testart; Ju/'hoansi mongongo through the dry season). `enable_storage_seasonal_union` makes the overwintering
+zone the UNION — store where cold ENOUGH OR seasonal ENOUGH.
+
+**A/B (500 steps, plateau pop / e0).** Savanna 111/18.4 -> 362/23.8 (stores 2.0e8); temperate 640/37.0 and boreal
+351/15.5 both BIT-IDENTICAL (their temperature limb already fired). Seed-robust across savanna 0-3: every seed
+improves, and the near-collapse seeds are rescued (seed 2: 170/8.5 -> 367/18.4; seed 3: 177/4.8 -> 218/16.1).
+
+**Adopted: `enable_storage_seasonal_union`** — canonical ON via C_ALLON, class default False (bit-exact off).
+CTB `test_storage_seasonal_union_ctb`; sync + coverage green; full suite green.
+
+**The RESIDUAL e0 (~24 vs the !Kung ~30) is Malthusian, not a redistribution failure.** A driver breakdown finds
+the residual gap is ALL infant/early-child mortality (m(0-1) 0.29 vs temperate 0.10; adults 15-60 match
+temperate), driven by dry-season CHILD starvation and amplified by the nutrition-synergy (correct per Pelletier).
+The buffer reaches adults (who forage and hold reserves) but not children (maternal provisioning needs harvest
+OVERFLOW, gone in the dry season; the granary draw is cred-weighted, so low-cred children draw last). A
+`enable_child_first_buffer` mechanism (fill dependents' reserves from the granary BEFORE adults) was BUILT and
+tested — and FALSIFIED and REVERTED: it saves children short-term, so the population grows and re-starves at the
+same dry-season ceiling (mean savanna e0 23.6 -> 22.6; m(0-1) often RISES), and it pushes the anchored temperate
+world above the Ache anchor (37 -> 41). The third confirmation of the Malthusian-relocation law (Addenda 65-66):
+feeding people better does not raise e0; only raising the food CEILING or holding N below it does. Savanna e0 ~24
+is the Malthusian equilibrium of the model's dry-season food ceiling — within the real forager range (Hiwi ~27,
+above the 21 floor).
+
+**The dry-season-CEILING lever is also Malthusian-blocked (tested, no build).** Before building a fallback-food
+mechanism (tubers / waterhole refugia), the extreme case was tested directly: savanna with `a_seas = 0` (perfectly
+FLAT food = an infinite dry-season fallback). It cuts infant mortality in every seed (m(0-1) 0.29 -> 0.18) — so
+the SEASONAL trough IS the infant killer — but Malthusian relocation eats it: the population grows 60-125% and
+mean e0 moves only 23.6 -> 26.4 (noisy; one seed FALLS), nowhere near !Kung ~30. A partial (realistic) fallback
+would do less. FOURTH confirmation of the Malthusian-relocation law: no food or redistribution lever raises e0
+without breaking the Malthusian dynamics the project keeps by design. Savanna e0 ~24-26 is accepted as the model's
+Malthusian equilibrium for that world; the storage-union gate (which removed the COLLAPSE) is the deliverable.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

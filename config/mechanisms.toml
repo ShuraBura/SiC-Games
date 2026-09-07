@@ -483,6 +483,23 @@ type  = "bool"
 # accumulate granaries → sedentism/ complexity, while fresh-forage cells can't store → stay mobile (the
 # Testart distinction). Default OFF ⇒ scalar, bit-exact.
 
+[enable_storage_seasonal_union]
+value = true
+owner = "DemographyConfig"
+type  = "bool"
+# STORAGE UNION GATE (R-106, 2026-09-07). The two gates above are EXCLUSIVE: the temperature gate
+# (default) excludes a hot-but-seasonal savanna (mean 19.5 °C > 15.25), which then cannot store its
+# wet-season glut and COLLAPSES to the unbuffered dry-trough capacity (pop 600 -> ~110 despite high mean
+# food); the seasonality gate excludes a cold-but-low-amplitude boreal, which then collapses the other way
+# (e0 -> 1.7). Neither biome is wrong — they store DIFFERENT things: cold enables meat storage (Binford
+# ET), a seasonal glut enables storable PLANT-food storage (Testart; Ju/'hoansi mongongo through the dry
+# season). A forager stores if EITHER holds. This flag makes the overwintering zone the UNION (cold ENOUGH
+# OR seasonal ENOUGH), fixing savanna without breaking boreal. ADOPTED canonical ON (R-106, 2026-09-07)
+# via C_ALLON — the class default stays False so the flag is bit-exact when off. Savanna pop 111->362 and
+# e0 18.4->23.8 (seed 0; the near-collapse seeds 2,3 rescued from e0 8.5/4.8 to 18.4/16.1), while
+# temperate and boreal are BIT-IDENTICAL (their temperature limb already fired). CTB
+# test_storage_seasonal_union_ctb.
+
 [enable_aggl_ceiling]
 value = true
 owner = "DemographyConfig"

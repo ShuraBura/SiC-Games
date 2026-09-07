@@ -1894,6 +1894,10 @@ class TerrainWorld(mesa.Model):
         # than the constant-placeholder temperature. Cache the per-cell amplitude field once.
         store_seas_gated = store_on and getattr(demog, "storage_seasonality_gated", False)
         store_seas_thr = demog.storage_seasonality_threshold if store_seas_gated else 0.0
+        # STORAGE UNION GATE: store where cold ENOUGH (Binford ET, meat) OR seasonal ENOUGH (Testart, plant glut).
+        # Fixes hot-but-seasonal savanna without breaking cold-but-low-amplitude boreal. See demography.py.
+        store_union = store_on and getattr(demog, "enable_storage_seasonal_union", False)
+        store_union_seas_thr = demog.storage_seasonality_threshold if store_union else 0.0
         # SEASONAL-AQUATIC-GLUT MORPH (§4.5.10 v3): storage stays a broad survival BUFFER (marginal biomes cache for
         # the lean season → survive), but COMPLEXITY (surplus→complex) requires a dense STORABLE resource = a SEASONAL
         # AQUATIC GLUT — high water access (coast/river/lake) AND high seasonality (the anadromous run / seasonal
@@ -1904,7 +1908,7 @@ class TerrainWorld(mesa.Model):
         morph_aq_gated = demog is not None and demog.enable_morph and getattr(demog, "morph_aquatic_gated", False)
         morph_aq_thr = demog.morph_aquatic_threshold if morph_aq_gated else 0.0
         morph_npp_floor = demog.morph_npp_floor if morph_aq_gated else 0.0
-        if (store_seas_gated or morph_aq_gated) and self._seasonal_amp is None:
+        if (store_seas_gated or morph_aq_gated or store_union) and self._seasonal_amp is None:
             from sic_games.climate import seasonal_amplitude_field
             self._seasonal_amp = seasonal_amplitude_field(self._fields.biome)
         if store_decay > 0.0 and self._cell_store:
@@ -2077,7 +2081,10 @@ class TerrainWorld(mesa.Model):
                 n_f = sum(1 for a in occ if a.sex == "female" and a.age >= adult)
                 male_credit = (meat_pool / n_m) if n_m else 0.0
                 female_credit = ((1.0 - meat_frac) * S / n_f) if n_f else 0.0
-            if store_seas_gated:
+            if store_union:
+                in_owz = (self._fields.temperature[cy, cx] <= store_temp_thr        # cold → meat (Binford ET) OR
+                          or self._seasonal_amp[cy, cx] >= store_union_seas_thr)     # seasonal → plant glut (Testart)
+            elif store_seas_gated:
                 in_owz = self._seasonal_amp[cy, cx] >= store_seas_thr   # storability: seasonal biome → store (Testart)
             else:
                 in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)

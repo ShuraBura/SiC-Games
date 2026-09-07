@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-09-06
+# generated 2026-09-07
 
 [meta]
 name = "full_campaign"
@@ -125,6 +125,7 @@ enable_soil_depletion = true
 enable_standing = true
 enable_storable_founding = true
 enable_storage = true
+enable_storage_seasonal_union = true
 enable_store_anchor = true
 enable_stratification_inequality_gate = false
 enable_synergy_age_grade = true
