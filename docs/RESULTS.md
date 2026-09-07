@@ -7765,6 +7765,20 @@ improves, and the near-collapse seeds are rescued (seed 2: 170/8.5 -> 367/18.4; 
 **Adopted: `enable_storage_seasonal_union`** — canonical ON via C_ALLON, class default False (bit-exact off).
 CTB `test_storage_seasonal_union_ctb`; sync + coverage green; full suite green.
 
+**The RESIDUAL e0 (~24 vs the !Kung ~30) is Malthusian, not a redistribution failure.** A driver breakdown finds
+the residual gap is ALL infant/early-child mortality (m(0-1) 0.29 vs temperate 0.10; adults 15-60 match
+temperate), driven by dry-season CHILD starvation and amplified by the nutrition-synergy (correct per Pelletier).
+The buffer reaches adults (who forage and hold reserves) but not children (maternal provisioning needs harvest
+OVERFLOW, gone in the dry season; the granary draw is cred-weighted, so low-cred children draw last). A
+`enable_child_first_buffer` mechanism (fill dependents' reserves from the granary BEFORE adults) was BUILT and
+tested — and FALSIFIED and REVERTED: it saves children short-term, so the population grows and re-starves at the
+same dry-season ceiling (mean savanna e0 23.6 -> 22.6; m(0-1) often RISES), and it pushes the anchored temperate
+world above the Ache anchor (37 -> 41). The third confirmation of the Malthusian-relocation law (Addenda 65-66):
+feeding people better does not raise e0; only raising the food CEILING or holding N below it does. Savanna e0 ~24
+is the Malthusian equilibrium of the model's dry-season food ceiling — within the real forager range (Hiwi ~27,
+above the 21 floor). Pulling it toward !Kung ~30 needs a higher dry-season CEILING (a fallback-food mechanism:
+tubers / waterhole refugia), a separate arc — not redistribution.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
