@@ -7776,8 +7776,16 @@ same dry-season ceiling (mean savanna e0 23.6 -> 22.6; m(0-1) often RISES), and 
 world above the Ache anchor (37 -> 41). The third confirmation of the Malthusian-relocation law (Addenda 65-66):
 feeding people better does not raise e0; only raising the food CEILING or holding N below it does. Savanna e0 ~24
 is the Malthusian equilibrium of the model's dry-season food ceiling — within the real forager range (Hiwi ~27,
-above the 21 floor). Pulling it toward !Kung ~30 needs a higher dry-season CEILING (a fallback-food mechanism:
-tubers / waterhole refugia), a separate arc — not redistribution.
+above the 21 floor).
+
+**The dry-season-CEILING lever is also Malthusian-blocked (tested, no build).** Before building a fallback-food
+mechanism (tubers / waterhole refugia), the extreme case was tested directly: savanna with `a_seas = 0` (perfectly
+FLAT food = an infinite dry-season fallback). It cuts infant mortality in every seed (m(0-1) 0.29 -> 0.18) — so
+the SEASONAL trough IS the infant killer — but Malthusian relocation eats it: the population grows 60-125% and
+mean e0 moves only 23.6 -> 26.4 (noisy; one seed FALLS), nowhere near !Kung ~30. A partial (realistic) fallback
+would do less. FOURTH confirmation of the Malthusian-relocation law: no food or redistribution lever raises e0
+without breaking the Malthusian dynamics the project keeps by design. Savanna e0 ~24-26 is accepted as the model's
+Malthusian equilibrium for that world; the storage-union gate (which removed the COLLAPSE) is the deliverable.
 
 ---
 
