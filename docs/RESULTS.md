@@ -7737,6 +7737,34 @@ a knob and not this branch.
 `bootstrap_test.py`, `site_gain_sweep.py`, `combo_test.py`); the two fix attempts were built, measured, and
 REVERTED (tree bit-exact); no CTB, because no mechanism is adopted.
 
+## Addendum 68 — Savanna degeneracy is a storage-gate defect; the union gate (cold OR seasonal) fixes it (2026-09-07, R-106)
+
+**The defect.** The savanna world was known to near-collapse in a start-up transient (pop 600 -> ~110). A
+start-up diagnostic falsifies the obvious reading: savanna has HIGHER mean food than temperate (occupied-cell
+yield 1.6-3.5M vs 1.3-2.9M) and its agents are well-fed on average (intake ~8x requirement), yet the population
+declines while temperate is stable. The deaths cluster at the seasonal DRY TROUGH.
+
+**The cause.** The overwintering store is gated PURELY on temperature (cell mean temp <= 15.25 C, Binford ET).
+The whole savanna is too hot (mean 19.5 C), so ZERO cells qualify and it can NEVER build a granary — the stored
+buffer is 0 at every step. With no buffer for its deep dry season, the population is culled to the unbuffered
+dry-trough capacity (~110), far below what the mean food allows. Temperate (9.7 C) and boreal (2.0 C) store
+massively (~1e9, ~3e8) and hold higher populations. This is the volatility=density-lever result (Addendum 66)
+biting hardest where the buffer is absent.
+
+**The fix — a union gate, not the existing seasonality gate.** The existing `storage_seasonality_gated` flag
+gates on seasonal amplitude INSTEAD of temperature; it fixes savanna (pop 111 -> 362) but DESTROYS boreal (cold
+but low-amplitude -> loses its store -> e0 1.7). The two limbs are exclusive and neither serves both biomes. They
+store DIFFERENT things: cold enables MEAT storage (Binford), a seasonal glut enables storable PLANT-food storage
+(Testart; Ju/'hoansi mongongo through the dry season). `enable_storage_seasonal_union` makes the overwintering
+zone the UNION — store where cold ENOUGH OR seasonal ENOUGH.
+
+**A/B (500 steps, plateau pop / e0).** Savanna 111/18.4 -> 362/23.8 (stores 2.0e8); temperate 640/37.0 and boreal
+351/15.5 both BIT-IDENTICAL (their temperature limb already fired). Seed-robust across savanna 0-3: every seed
+improves, and the near-collapse seeds are rescued (seed 2: 170/8.5 -> 367/18.4; seed 3: 177/4.8 -> 218/16.1).
+
+**Adopted: `enable_storage_seasonal_union`** — canonical ON via C_ALLON, class default False (bit-exact off).
+CTB `test_storage_seasonal_union_ctb`; sync + coverage green; full suite green.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

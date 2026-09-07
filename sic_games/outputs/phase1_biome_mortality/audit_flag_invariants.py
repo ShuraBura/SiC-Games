@@ -81,6 +81,11 @@ TYPES = {
     "enable_storable_founding": "T", "enable_worked_land_yield": "T",
     "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
     "enable_leader_share": "X",
+    # STORAGE UNION GATE (R-106, 2026-09-07): the overwintering zone becomes cold ENOUGH OR seasonal ENOUGH, so a
+    # hot-but-seasonal savanna can store its wet-season glut (Testart) as well as a cold biome its meat (Binford).
+    # A rule on the STORAGE subsystem — which cells may hold the granary — so type X, like enable_storage. No
+    # magnitude of its own (it reuses storage_temp_threshold_c and storage_seasonality_threshold).
+    "enable_storage_seasonal_union": "X",
     "enable_cred_status": "C", "enable_prowess_facet": "C", "enable_ascribed_mate_choice": "C",
     "enable_material_capture": "C", "enable_standing": "C",
     "enable_cred_renorm": "GAUGE",
@@ -252,6 +257,7 @@ PREREQ = {
     "enable_leader_office": ("enable_band_affiliation",), "enable_improved_land": ("enable_economic_defensibility",),
     "enable_alluvial_renewal": ("enable_soil_depletion",), "enable_soil_depletion": ("enable_agriculture",),
     "enable_density_reference": ("enable_density_disease",),
+    "enable_storage_seasonal_union": ("enable_storage",),   # the union only matters where the granary exists
     "enable_village_budding": ("enable_aggregation_sedentism",),
     "enable_emergent_village_founding": ("enable_aggregation_sedentism",),
     "enable_storable_founding": ("enable_aggregation_sedentism", "enable_resource_storability"),
