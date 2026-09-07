@@ -7787,6 +7787,41 @@ would do less. FOURTH confirmation of the Malthusian-relocation law: no food or 
 without breaking the Malthusian dynamics the project keeps by design. Savanna e0 ~24-26 is accepted as the model's
 Malthusian equilibrium for that world; the storage-union gate (which removed the COLLAPSE) is the deliverable.
 
+## Addendum 69 — e0 is biome-dependent but miscalibrated; per-biome seasonality fixes the tropical defect (2026-09-07, R-106)
+
+**Is e0 independent of biome? No — and the model's dependence is miscalibrated.** A matched-condition biome
+sweep (same seeds/N/patch/config, coastal, vary only climate; 4 seeds) gives realised e0: temperate 36.1, boreal
+25.8, subtropical 26.7, tropical 25.1, savanna 23.0 — a 13-year spread, so e0 clearly tracks biome. But only
+temperate hits its anchor. The e15 (adult) panel is the tell: e15 is 45-48 in the harsh biomes vs the real ~38
+everywhere — so biome harshness lands almost ENTIRELY on child starvation (e0 down) and adults actually
+under-die (e15 too high). The Ache are a tropical-forest people (anchor 37), yet coastal-tropical realises 23.
+
+**The per-biome lever map (7 levers x 4 biomes x 3 seeds).** The only lever that raises e0 in the below-anchor
+biomes is `mu_max` (the child nutrition-synergy) down 2.5->1.5: tropical +3.8, savanna +5.2 (closes 67% of its
+gap), temperate -1.2, boreal -1.5. It is SELF-TARGETING (bites where children are over-starved; barely moves the
+anchored biomes). Killing adults (higher `siler_a2`/`synergy_mu_max_adult`) LOWERS e0 (it is child-dominated)
+though it does pull the too-high e15 toward 38. Boreal (26.1) and temperate (36.4) are already at anchor.
+
+**The tropical defect is imposed seasonality, not harshness.** Coastal-tropical is a genuine food-rich rainforest
+(95% FOREST, NPP 2243, forage 2583 — the richest biome), yet has the WORST e0 (23) and HIGHEST starvation (0.58)
+and the LOWEST population (449 vs temperate 1164) DESPITE double the food. Cause: `ClimateField.season()` applies
+the scalar `a_seas` (0.5) UNIFORMLY to every cell, but a rainforest is aseasonal (real amplitude 0.05). The fake
+dry season starves the richest biome. Test: a_seas 0.5->0 lifts tropical e0 23->32.5 (pop 449->1170; both up, so
+it removes an error, not Malthusian). Over-clustering is ruled out (occ_at_death/occ_of_living 1.2, vs 0.38 in
+temperate). ("Subtropical" is a DESERT — 153 mm rain, 100% DESERT — so its low e0 is correct, not a defect.)
+
+**Adopted: `enable_biome_seasonality`.** `level(x,y)` now swings the food capacity by the CELL's own biome
+amplitude (`seasonal_amplitude_field`: forest 0.05, savanna 0.40, grass 0.60) about the shared time-of-year wave,
+instead of the uniform scalar. A/B (per-biome vs scalar 0.5): tropical e0 +6.6 (23.2->29.8), savanna +2.9
+(bonus), temperate -0.7 and boreal -0.6 (stay at anchor). It un-calibrates NOTHING — it uses the model's own
+per-biome amplitudes — and corrects the seasonality physics. Canonical ON in the Earth baseline (ClimateConfig
+class default False for bit-exactness); CTB `test_biome_seasonality_ctb`; suite green.
+
+**Residual (a follow-on, not this build).** Tropical is still ~7 short of 37 and savanna ~5 short of 31 — that is
+the `mu_max` child-synergy territory: 2.5 (Pelletier's MILD RR) is applied at the empty-reserve (severe) end to
+chronically under-provisioned children. Whether to recalibrate it is Malthusian-fraught (child-first was
+falsified, Addendum 68) and is left open.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

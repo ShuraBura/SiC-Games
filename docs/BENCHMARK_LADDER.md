@@ -91,7 +91,7 @@ A tier is validated when **all four** hold. Anything less is stated as partial, 
 Assigned 2026-08-07. Where a mechanism could sit in two tiers it is placed at the **lowest** one it depends
 on, because the ladder is about prerequisites rather than about subject matter.
 
-- **1 Physical world** — `climate_lottery`, `seasonality`, `eccentricity_mean`, `interannual`, `regime_shift`,
+- **1 Physical world** — `climate_lottery`, `seasonality`, `biome_seasonality`, `eccentricity_mean`, `interannual`, `regime_shift`,
   `caribou_swing`, `llanos_flood`, `intercept_hunting`, `terrain_risk`, `terrain_move_cost`, `soil_depletion`,
   `alluvial_renewal`, `resource_storability`, `catchment_depletion`, `village_density_disease`
 - **2 Energetics** — `game`, `biome_meat_frac`, `biome_meat_cv`, `forage_cap`, `provisioning`,

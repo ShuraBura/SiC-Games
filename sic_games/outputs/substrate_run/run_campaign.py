@@ -743,6 +743,13 @@ def main():
     # reading as "built" — including four separate searches for Malthusian and secular cycles conducted with
     # the slow environmental driver switched off. A control has to be CHOSEN, not inherited by default.
     clim = ClimateConfig()
+    # PER-BIOME SEASONALITY is part of the EARTH BASELINE, not an opt-in variability channel (R-106, 2026-09-07,
+    # docs/RESULTS Addendum 69). Earth's biomes have very different seasonal amplitudes (rainforest ~0.05, savanna
+    # ~0.40, grassland ~0.60); the scalar `a_seas` applied uniformly imposes a fake dry season on the aseasonal
+    # rainforest and starves the richest biome (tropical e0 23 vs anchor 37). This is a CORRECTION to the baseline
+    # seasonality, so it is on for the canonical Earth run (the ClimateConfig class default stays False for
+    # bit-exactness). A/B: tropical e0 +6.6, savanna +2.9, temperate/boreal -0.6/-0.7 (stay at anchor).
+    clim = clim.model_copy(update={"enable_biome_seasonality": True})
     # EARTH CLIMATE IS THE DEFAULT (2026-08-22, supervisor: "let's set Earth climate as a default condition
     # for now. The variations belong to a later stage, when everything works well already.")
     # This default was "1" -- every climate channel ON -- on the reasoning quoted above that a control must be
