@@ -40,6 +40,7 @@ enable_band_affiliation = true
 enable_band_family_knobs = true
 enable_biome_meat_cv = true
 enable_biome_meat_frac = true
+enable_biome_seasonality = true
 enable_bonded_mating = true
 enable_bud_hazard = false
 enable_bud_requires_occupancy = false

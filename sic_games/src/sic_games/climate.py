@@ -351,6 +351,14 @@ class ClimateConfig(BaseModel):
     # Peak-normalised seasonal amplitude A_seas = 1 - s_min. 0.40 = Hadza savanna [LIT, A_SEAS_EARTH]; it is
     # the value every campaign has used. Under the lottery this is drawn from obliquity instead.
     a_seas: float = Field(0.40, ge=0.0, le=1.0)
+    # PER-BIOME SEASONALITY (R-106, 2026-09-07). The scalar `a_seas` above is applied UNIFORMLY to every cell,
+    # so an aseasonal rainforest (real amplitude ~0.05) gets the same seasonal swing as a savanna (~0.40) — a
+    # fake dry season that STARVES the richest biome (tropical e0 23 vs anchor 37; a_seas 0->0.5 drops it
+    # 32.5->23.2). When on, level(x,y) swings by the CELL's own biome amplitude (`seasonal_amplitude_field`:
+    # forest 0.05, savanna 0.40, grass 0.60, ...) about the shared time-of-year wave. A/B: tropical e0 +6.6,
+    # savanna +2.9, temperate/boreal -0.6/-0.7 (stay at anchor). Needs enable_seasonality. Default OFF => the
+    # scalar path (bit-exact).
+    enable_biome_seasonality: bool = False
 
     # ── C.2a ECCENTRICITY annual-mean brightening ────────────────────────────────────────────────────
     # A scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no effect. [Spiegel 2010 envelope]
@@ -422,9 +430,17 @@ class ClimateField:
                  regime_driver=None,
                  caribou_amp: float = 0.0, caribou_period: int = 0, caribou_phase: float = 0.0,
                  steppe_mask=None, llanos_flood_amp: float = 0.0, llanos_mask=None,
-                 water_weight=None, agg_mask=None, intercept_on: bool = True):
+                 water_weight=None, agg_mask=None, intercept_on: bool = True,
+                 biome_amp_field=None):
         self._base = base
         self.a_seas = max(0.0, min(1.0, a_seas))
+        # PER-BIOME SEASONALITY (R-106, 2026-09-07). When a per-cell amplitude field is supplied, level(x,y) swings
+        # the food capacity by the CELL's OWN seasonal amplitude (rainforest ~0.05 aseasonal, savanna ~0.40, grass
+        # ~0.60) instead of the single scalar `a_seas` applied uniformly to every cell. The uniform scalar imposes
+        # a fake dry season on an aseasonal rainforest, which starves the richest biome (e0 23 vs anchor 37;
+        # a_seas 0->0.5 drops tropical e0 32.5->23.2). The global time-of-year WAVE is shared; only the amplitude
+        # is per-cell. None ⇒ the scalar path (bit-exact).
+        self._biome_amp = biome_amp_field
         self.phase = phase
         self.period = period
         # C.2 layers:
@@ -471,14 +487,23 @@ class ClimateField:
         self.t = t
         self._season_cached = None      # PERF: invalidate the per-step GLOBAL (cell-independent) temporal caches;
         self._regime_cached = None      # level(x,y) recomputes these ~n×candidates/step otherwise (profile hot spot)
+        self._wave_cached = None         # the shared time-of-year wave (per-biome seasonality reuses it per cell)
         self._observe()                 # health accounting; AFTER the invalidation so it reads the new step
+
+    def _season_wave(self) -> float:
+        """The shared time-of-year wave ∈ [0,1]: 0 at the lean trough, 1 at the peak. Amplitude-free, so both the
+        scalar `season()` and the per-biome level() path scale it by their own amplitude. Cached per step."""
+        w = getattr(self, "_wave_cached", None)
+        if w is None:
+            w = 0.5 * (1.0 + math.cos(2.0 * math.pi * self.t / self.period - self.phase))
+            self._wave_cached = w
+        return w
 
     def season(self) -> float:
         c = getattr(self, "_season_cached", None)
         if c is not None:
             return c
-        c = 1.0 if self.a_seas <= 0.0 else ((1.0 - self.a_seas) + self.a_seas * 0.5 * (
-            1.0 + math.cos(2.0 * math.pi * self.t / self.period - self.phase)))
+        c = 1.0 if self.a_seas <= 0.0 else ((1.0 - self.a_seas) + self.a_seas * self._season_wave())
         self._season_cached = c
         return c
 
@@ -697,8 +722,13 @@ class ClimateField:
         # mean_factor (eccentricity brightening) is the per-world baseline scalar (outside the [0,1] temporal mult).
         # Uses interannual_at(x,y) (C.4c llanos flood; == generic off-llanos). C.5 intercept hunting is a MEAT-
         # channel boost (meat_factor), NOT a forage/capacity change — so level() (forage capacity) is unchanged.
+        if self._biome_amp is not None:
+            amp = float(self._biome_amp[y, x])                     # this cell's own seasonal amplitude (by biome)
+            seas = (1.0 - amp) + amp * self._season_wave()        # per-cell swing, shared time-of-year wave
+        else:
+            seas = self.season()                                  # scalar path (bit-exact)
         return (self._base.level(x, y) * self.mean_factor
-                * self.season() * self.interannual_at(x, y) * self.regime())
+                * seas * self.interannual_at(x, y) * self.regime())
 
     def __getattr__(self, name):
         if name.startswith("_"):
@@ -771,6 +801,13 @@ def build_climate_field(base, cfg: "ClimateConfig | None" = None, fields=None, s
             agg = agg | (gs == GRASS_LLANOS)
         kw.update(agg_mask=agg, water_weight=wacc)
     kw["a_seas"] = val("a_seas") if need("enable_seasonality", "a_seas") else 0.0
+    if cfg.enable_seasonality and getattr(cfg, "enable_biome_seasonality", False):
+        # PER-BIOME seasonal amplitude: swing each cell by its own biome amplitude instead of the scalar a_seas.
+        biome = getattr(fields, "biome", None) if fields is not None else None
+        if biome is None:
+            raise ValueError("ClimateConfig.enable_biome_seasonality needs the world's `biome` field; pass "
+                             "fields= to build_climate_field(). Without it the per-cell amplitude is undefined.")
+        kw["biome_amp_field"] = seasonal_amplitude_field(biome)
     kw["mean_factor"] = val("mean_factor") if need("enable_eccentricity_mean", "mean_factor") else 1.0
 
     if need("enable_interannual", "interannual_amp", "interannual_period"):

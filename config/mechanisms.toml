@@ -1727,6 +1727,18 @@ owner = "ClimateConfig"
 type  = "bool"
 # ── C.1 SEASONALITY (validated: R-6 run_2d form) ─────────────────────────────────────────────────
 
+[enable_biome_seasonality]
+value = true
+owner = "ClimateConfig"
+type  = "bool"
+# PER-BIOME SEASONALITY (R-106, 2026-09-07). The scalar `a_seas` above is applied UNIFORMLY to every cell,
+# so an aseasonal rainforest (real amplitude ~0.05) gets the same seasonal swing as a savanna (~0.40) — a
+# fake dry season that STARVES the richest biome (tropical e0 23 vs anchor 37; a_seas 0->0.5 drops it
+# 32.5->23.2). When on, level(x,y) swings by the CELL's own biome amplitude (`seasonal_amplitude_field`:
+# forest 0.05, savanna 0.40, grass 0.60, ...) about the shared time-of-year wave. A/B: tropical e0 +6.6,
+# savanna +2.9, temperate/boreal -0.6/-0.7 (stay at anchor). Needs enable_seasonality. Default OFF => the
+# scalar path (bit-exact).
+
 [enable_eccentricity_mean]
 value = false
 owner = "ClimateConfig"
