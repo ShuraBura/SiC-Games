@@ -137,6 +137,7 @@ def eta(
     forage_age_max_offset: int,
     eta_min: float,
     eta_old: float,
+    eta_juvenile_exponent: float = 1.0,
 ) -> np.ndarray:
     """Piecewise-linear η(a) ∈ [eta_min, 1.0], vectorised to match BaseAgent.eta().
 
@@ -155,7 +156,10 @@ def eta(
     if a_min == 0.0:
         juv = np.ones_like(a)
     else:
-        juv = eta_min + (1.0 - eta_min) * a / a_min
+        _t = a / a_min
+        if eta_juvenile_exponent != 1.0:   # must track BaseAgent.eta()'s Kaplan-convex branch
+            _t = _t ** eta_juvenile_exponent
+        juv = eta_min + (1.0 - eta_min) * _t
     # elder branch (guard offset<=0 → eta_old)
     if forage_age_max_offset <= 0:
         elder = np.full_like(a, eta_old)

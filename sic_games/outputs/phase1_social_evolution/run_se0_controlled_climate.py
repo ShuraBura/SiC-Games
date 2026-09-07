@@ -42,7 +42,20 @@ def realistic_forager_demog() -> DemographyConfig:
     society-gated ASCRIBED mate-choice), matching run_3m/run_3o + the ascribed-mate-choice recalibration
     (PARAMETERS §18). Stage 1+ flip on their own extra flag and pass an edited copy."""
     return DemographyConfig(
-        polygyny_rate=0.3, max_wives=3,
+        # POLYGYNY CALIBRATED TO MARLOWE (adopted 2026-07-27). R-76/R-77 diagnosed polygyny as a stock that only
+        # FILLS — `polygyny_rate` gates who is considered, but a polygynous bond never ended, so a 150x change in
+        # the rate moved the level only 2.8x and Marlowe's 4% was unreachable. R-76 built `polygyny_attrition`
+        # as the missing outflow and calibrated the pair to rate 0.005 / attrition 0.02.
+        # THE FIX WAS NEVER ADOPTED: `polygyny_attrition` sat at 0.0 in the default AND in both presets, while
+        # `max_wives=3` kept the inflow on. Measured here before adoption: 60.2% of married men polygynous,
+        # 15x Marlowe's ~4%. With the calibrated pair: 4.2%, i.e. 1.0x the anchor. Attrition alone gives 37% —
+        # both knobs are needed, which is R-76's inflow/attrition equilibrium.
+        # ANCHOR [Marlowe, The Hadza, VERIFIED]: "there are usually only about 4% of men with 2 wives", and the
+        # outflow from the same page: "polygynous marriages are less enduring".
+        # CONSEQUENCE, recorded so it is not read as a regression — R-77 showed the old status→RS was an
+        # ARTIFACT of the excess: correcting polygyny takes status→RS from +0.170 to ~+0.019 against von
+        # Rueden's 0.19. The high value was being carried by polygyny that should not have been there.
+        polygyny_rate=0.005, max_wives=3, polygyny_attrition=0.02,
         siler_a1=NAT.a1, siler_b1=NAT.b1, siler_a2=NAT.a2, siler_a3=NAT.a3, siler_b3=NAT.b3,
         enable_density_disease=True, dens_delta=3.0, dens_rho_half=0.2,
         enable_game=True, game_meat_frac=0.55, game_meat_cv=0.73,
@@ -92,7 +105,15 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_bonded_mating=True, bonded_mate_radius=1, enable_pair_bonds=True,
         enable_band_affiliation=True, band_cohesion=0.3, band_split_size=45, band_merge_size=10,
         enable_storage=True, storable_fraction=0.7, store_capacity_reserves=12.0,   # LIT-CALIBRATED (storage survey): 0.7 stored frac; 12≈16mo≈1-2yr granary (was 0.5/3=4mo)
-        storage_temp_threshold_c=100.0, storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
+        # storage_temp_threshold_c REMOVED 2026-08-24 -> falls to the class default 15.25 (Binford ET). The
+        # override was 100.0, which put EVERY cell on the planet in the "overwintering zone", so storage fired
+        # even in a tropical world with no winter (measured: coastal-tropical 100% of cells stored, surplus
+        # 0.62, 70% of bands read complex_forager -> 22-month birth spacing). 100.0 was an un-annotated
+        # test convenience ("overwintering everywhere") that leaked into the production preset, sitting among
+        # otherwise lit-calibrated values -- the same override-defeats-anchored-default class as the
+        # SubstrateConfig **GRP and a_seas-lottery breaches. At 15.25 only genuinely cold worlds store, which
+        # is Testart's distinction (warm/aseasonal -> immediate-return -> egalitarian).
+        storage_decay=0.02, enable_morph=True, morph_settle_steps=60,   # decay 0.05→0.02/mo (~22%/yr, lit 10-30%)
         enable_band_family_knobs=True, enable_dynamic_bands=True, band_base_tolerable=25,
         assabiyah_gain=0.05, assabiyah_decay=0.02)
 

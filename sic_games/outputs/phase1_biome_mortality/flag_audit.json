@@ -1,0 +1,997 @@
+{
+ "baseline": {
+  "pop_traj": "(298, 254, 234, 225, 204, 204, 203, 200, 206, 206, 208, 210)",
+  "final_pop": "213",
+  "tot_wealth": "9192394.444444",
+  "tot_material": "950062732.114421",
+  "band_sig": "(10, 12, 17, 18, 21, 29, 31, 36, 39)",
+  "n_bonds": "70",
+  "n_settlements": "0",
+  "births": "129",
+  "deaths": "216",
+  "pos_hash": "-6093281894886686410"
+ },
+ "rows": [
+  {
+   "flag": "enable_adaptive_connubium",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_aggl_ceiling",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_agglomeration",
+   "type": "P",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_aggregation_sedentism",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_agriculture",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_alluvial_renewal",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": [
+    "enable_soil_depletion"
+   ]
+  },
+  {
+   "flag": "enable_ascribed_mate_choice",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_band_affiliation",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_band_family_knobs",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_band_risk",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_bonded_mating",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_catchment_ceiling",
+   "type": "P",
+   "baseline_on": true,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_condition",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_cred_renorm",
+   "type": "GAUGE",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_cred_status",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_delegitimation",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_density_disease",
+   "type": "N",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_dynamic_bands",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_economic_defensibility",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_emergent_abandonment",
+   "type": "T",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_emergent_band_size",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_energetic_fertility",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_exogamy",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_forage_cap",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_game",
+   "type": "P",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_genealogy_log",
+   "type": "O",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_genome",
+   "type": "H",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_improved_land",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_infanticide",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_landscape_packing",
+   "type": "T",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_leader_coherence",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_leader_office",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_leader_share",
+   "type": "X",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_legitimacy",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_leveling",
+   "type": "X",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_life_history",
+   "type": "N",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_lineage_branching",
+   "type": "H",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_lineage_split",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_lineage_tribute",
+   "type": "X",
+   "baseline_on": false,
+   "changed": [
+    "tot_material"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_local_ascription",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_malnutrition_fission",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_marriage_aggregation",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_material_capture",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_material_inheritance",
+   "type": "X",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_morph",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_noble_leveling_exemption",
+   "type": "X",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "n_bonds",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_nutrition_synergy",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_orphan_mortality",
+   "type": "N",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_pair_bonds",
+   "type": "A",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_paternity",
+   "type": "H",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_productivity_mobility",
+   "type": "T",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_provisioning",
+   "type": "X",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_prowess_facet",
+   "type": "C",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_rank_hierarchy",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_relative_legitimacy",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_relative_resentment",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_resentment_accumulator",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_resource_directed_fusion",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_resource_storability",
+   "type": "P",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_sedentism_fertility",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_settlement_scalar_stress",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_site_appraisal",
+   "type": "T",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_size_repulsion",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_soil_depletion",
+   "type": "D",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": [
+    "enable_agriculture"
+   ]
+  },
+  {
+   "flag": "enable_standing",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_storage",
+   "type": "X",
+   "baseline_on": true,
+   "changed": [
+    "band_sig",
+    "deaths",
+    "final_pop",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_store_anchor",
+   "type": "X",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_stratification_inequality_gate",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_terrain_move_cost",
+   "type": "T",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_terrain_pathogen",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_terrain_risk",
+   "type": "N",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "births",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_tier2_shock",
+   "type": "F",
+   "baseline_on": false,
+   "changed": [
+    "band_sig",
+    "deaths",
+    "final_pop",
+    "n_bonds",
+    "pop_traj",
+    "pos_hash",
+    "tot_material",
+    "tot_wealth"
+   ],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_village_budding",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_village_resentment",
+   "type": "C",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  },
+  {
+   "flag": "enable_village_scaling",
+   "type": "A",
+   "baseline_on": false,
+   "changed": [],
+   "unmet_prereq": []
+  }
+ ]
+}

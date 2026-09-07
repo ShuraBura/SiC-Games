@@ -73,6 +73,188 @@
 
 **Status / superseded by:** replaced by the **POINT** form (Bettencourt-correct, R-54): the cell's OWN output scales super-linearly with its occupancy, per-capita premium `A_cell·(n^(β−1)−1)` *rises* with co-location and composes with (reinforces) GRP+cap packing. `aggl_mode="catchment"` is KEPT for comparison only (default `"point"`). The village-scale concentration ultimately comes from **forage cap + GRP + hierarchy-gated fission ceiling + catchment site-appraisal × resource scarcity** (R-54/R-55), not from any single co-location term.
 
+## DE-12 - "Wide-net -> scatter": connubium REACH as the driver of the boom-bust (REFUTED 2026-07-13, R-67)
+
+**What was tried:** Cut-2 (adaptive exogamous ring-search mating) robustly broke R-66's winner-take-all patriline
+fixation (top 0.89 -> 0.21-0.31), proving that fixation was a MATING-STRUCTURE artifact - but every reach setting
+boom-busted. The hypothesis was that a WIDE marriage net scatters people across the landscape and collapses the
+population, so narrowing the reach should fix it.
+**Why it fails:** REFUTED by direct test - **narrower reaches busted HARDER**, the opposite of the prediction. The
+real driver is skew-flattening: Cut-2 drops childless males 37% -> 23-28%, which removes the Malthusian brake.
+Reach width is not the lever. **Do not retune reach to cure a boom-bust.**
+**Status:** connubium arc CLOSED. Cut-2 stays default-OFF on branch `connubium-cut2` (not adopted). A separate
+skew-preservation fix is the open option, deferred.
+
+## DE-13 - The m*=25 "recovery" as a secular-cycle seed (NEGATIVE 2026-07-13, R-67)
+
+**What was tried:** at connubium m*=25 the population showed a peak-then-recover shape that looked like the first
+period of a Turchin secular cycle. Tested properly: 45k steps x 2 seeds.
+**Why it fails:** a **one-off founder-overshoot transient, not cycling** - single peak ~yr170, then a flat low
+plateau (~2000, vs Cut-1's 6400 over 43k steps); both seeds concordant. Dynasties slowly re-concentrate
+(top 0.02 -> 0.3-0.4) but never fixate and never cycle. **A single peak in a short window is not a cycle** - always
+run to multiple would-be periods before calling one.
+
+## DE-14 - Secular cycles from the SUBSISTENCE BASE (three independent negatives; standing as of 2026-07-15)
+
+**What was tried, three times, from three different directions:** (i) mating structure / connubium (R-67);
+(ii) the substrate's own attractor dynamics (R-68); (iii) agricultural soil depletion -> abandonment -> re-settle,
+the most promising candidate since it is a genuine oscillator in principle (R-71).
+**Why it fails:** all three are stable or transient. R-71 is the sharpest: emergent abandonment CURED the
+population ratchet (collapse -> equilibrium ~14,421 +/- 4.5%, 25 settlements churning) but produced **no cycles** -
+rotating swidden is a STABLE regime, which is also ethnographically correct.
+**Conclusion (load-bearing):** **secular cycles are NOT in the subsistence base.** They require either exogenous
+shocks (`enable_tier2_shock`, default-OFF) or the explicit Turchin elite/instability layer. **Do not attempt a
+fourth subsistence-side route to cycles without a new argument for why it differs from these three.**
+
+**REVISION 2026-07-21 (R-97) — the second half of that conclusion is SUPERSEDED.** The elite/instability layer
+was subsequently built and made to work (R-86...R-96: a sustained noble minority AND ongoing revolts, in a
+patchwork of ranked and egalitarian villages). **It still does not cycle** — all four arms score below R-87's
+calibrated noise floor (ac_peak 0.068 / 0.083 / 0.078 / -0.008 against p95 0.13), on a detector re-validated at
+that resolution first (9/9 injected cycles detected, down to amplitudes smaller than the observed variation).
+**A FOURTH independent negative, this one from the elite side.**
+The elite layer is therefore **necessary-but-not-sufficient**. The mechanism of the failure is visible: villages
+each keep their own grudge and revolt on their own clock, and uncoupled oscillators sum to a flat aggregate.
+What is missing is a **superordinate polity** — Turchin's cycles are a property of STATES (taxation, standing
+armies, elite overproduction competing for finite OFFICES), and this model tops out at autonomous villages.
+**We built the Kachin; Turchin was writing about kingdoms.**
+
+**REVISION 2026-07-30 (R-106) — a FIFTH negative, and a mechanism-level reason that is not about scale.** Asking
+why Malthusian dynamics never appear produced a structural answer that applies at ANY scale: **every feedback in
+this model is fast.** Instantaneous density-dependence yields a stable equilibrium; **only DELAYED**
+density-dependence oscillates. `enable_intake_fertility` demonstrates both halves — it is the first working
+density-dependent fertility response in the model, and it *reduced* population variability (CV 7.9% → 1.9%),
+because a 1.4-yr feedback damps deviations rather than overshooting them. Two further obstacles were measured:
+the population never approaches the resource base (agents occupy ~1% of a 94%-habitable world, and the clumping
+persists with agglomeration AND sedentism off), and the per-capita gradient is flattened ~5× (elasticity −0.195
+vs −1.062 with mechanisms off). A positive control at all three gradients produced **no oscillation at any of
+them** — so steepening scarcity is not the lever either. **The standing instruction extends: do not seek cycles
+by increasing the STRENGTH of any feedback. Seek a SLOW variable** (soil degradation under settlement,
+accumulated structural load) that introduces a LAG. *(That control used an ad-hoc periodogram rather than
+`probe_hcycles.period_of`; the negative is PROVISIONAL until re-run on the approved detector — see R-106.)*
+
+The standing instruction is unchanged for the
+subsistence side, and now extends: **do not attempt a fifth route to cycles at VILLAGE scale either.** The next
+legitimate attempt is at the supra-village rung (ROADMAP already records this as a prerequisite).
+
+## DE-15 - Band size as an ENVIRONMENT-DEPENDENT emergent quantity (FAILED 2026-07-17, R-72)
+
+**What was tried:** `enable_emergent_band_size` v3 - derive band size from risk-pooling against environmental
+variance, so that Marlowe's 25-50 range emerges from biome rather than being hardcoded at 25.
+**Why it fails:** the environment-dependence does not appear - seeded correlation r = +0.165, n.s. Three separate
+explanations for the null were each falsified by measurement. The measured `cchunts` hunting CV (2.11) carries
+**no biome signal**, so there is no environmental variance gradient for band size to track in the first place.
+**Status:** ARC CLOSED. The mechanism remains but does not deliver environment-dependence; band size stays
+effectively ~25. Note the flag is default-OFF, so band size is currently HARDCODED 25 across all biomes - a known
+limitation whenever biomes are compared.
+
+## DE-16 - status->RS r~0.19 as a robust standing result (RE-CLASSIFIED as artifact 2026-07-17, R-76/R-77)
+
+**What it was:** R-19/R-20's headline "lineage of chiefs" result - status -> reproductive success at r ~ 0.19,
+matching von Rueden's cross-cultural figure.
+**Why it is not what it looked like:** the skew was carried by **~6x too much polygyny**. The polygyny mechanism
+had no outflow, so the rate knob never actually worked and the realized rate ran far above the configured one. At
+a realistic ~4% rate the correlation caps at ~0.07. Wife quality closes only about a third of the gap (0.07 vs
+0.19).
+**What survives:** von Rueden's 0.19 is a CROSS-CULTURAL average inflated by polygynous societies; the
+monogamy-dominant family model should target ~0.13-0.15, which it reaches. **Do not cite 0.19 as a matched
+target for a monogamous configuration.**
+
+## DE-17 - The FERTILITY channel for wife quality (structurally inert 2026-07-17, R-80)
+
+**What was tried:** route the wife-quality effect through fertility, so that higher-status men's wives have higher
+birth rates.
+**Why it fails:** structurally inert - overflow and need are anti-correlated in this economy, so the channel has
+no purchase regardless of coefficient. **This is a specification problem, not a tuning problem**; a bigger
+coefficient cannot rescue it.
+
+## DE-18 - Aggrandizer capture at the CELL unit (wrong unit 2026-07-17, R-82 -> R-83)
+
+**What was tried:** Hayden-style aggrandizer capture of redistributed output, executed per CELL.
+**Why it fails:** a cell holds 1-2 agents under forager dispersal - **there is no group to skim.** Capture stayed
+inert at 1.14x even at 80% capture, which reads as "the mechanism does not work" but is really "the unit is
+wrong."
+**Superseded by R-83:** the same mechanism at the BAND unit (~25) gives leader/other 3.68x. **General lesson:
+before concluding a social mechanism is inert, check the SIZE of the group it operates on.**
+
+## DE-19 - `succession_dissolve` measured against the band MEAN (vacuous 2026-07-18, R-84)
+
+**What was tried:** Sahlins' big-man dissolution regime, implemented as "a successor must exceed the band MEAN
+merit by `office_challenge_margin` (+25%), else the band stays leaderless."
+**Why it fails:** the maximum of ~25 lognormal-ish merit draws clears +25% over the mean essentially always, so
+the flag had **literally zero effect** - identical output, zero vacancies, ON and OFF. A mechanism that PASSES
+WHILE DOING NOTHING (same failure class as the R-74 vacuous test that asserted `1.0 == 1.0`).
+**Fixed, not abandoned:** re-specified against the NEAREST RIVAL rather than the mean - 2/18 bands leaderless,
+which is the intended interregnum. **Standing check: if a flag's ON/OFF output is indistinguishable, treat that as
+a specification bug, not a small effect size.**
+
+## DE-20 - Per-birth SINGLETON lineage branching (wrong shape 2026-07-20, R-90 -> R-92)
+
+**What it was:** with probability `lineage_branch_rate`, a newborn founds a whole new `_lineage` - the standard
+infinite-allele device, already used by `genome_mutation`.
+
+**Why it failed:** a new line starts with exactly ONE member, and a lineage of one usually leaves no
+descendants. So it produced a churning tail of ephemeral names: at campaign scale n_lineages rose 5 -> 32 while
+`eff_lineages` FELL 3.4 -> 1.8 and `top_share` ROSE 0.42 -> 0.73, and `lineages_per_band` barely moved
+(2.14 -> 2.33 against a target of ~7). **Count up, substance down.** Judged on `n_lineages` alone it looked
+like a success - the failure is only visible on the effective-diversity measure.
+
+**Superseded by** R-92 segmentation: branching now seeds a heritable `_subclan` tag (singletons harmless at
+sub-branch level) and a separate operator promotes one to a full lineage only once it HAS grown. The device is
+therefore not dead, only relocated - which is why the flag and rate survive with changed meaning.
+
+## DE-21 - Splitting a lineage by walking ANCESTOR CHAINS (not computable 2026-07-21, R-92)
+
+**What it was:** the textbook definition of a sub-clade - pick a living apical ancestor, split off exactly its
+live patrilineal descendants. The first cut of R-92.
+
+**Why it failed, and it is a fact about the model rather than the idea:** MEASURED, live `_father` chains reach
+a MAXIMUM DEPTH OF 2 (median 1) even after 400 steps. A chain terminates at the first ancestor born without an
+assigned father, and early births largely lack one (father-link rate 19% at step 80, rising to 74% by step 400).
+So "the descendants of an ancestor" can never be more than a handful, and the mechanism silently did nothing.
+Deep ancestry exists only in the offline genealogy CSV stream, never in memory.
+
+**Superseded by** the heritable `_subclan` tag, which CARRIES the sub-clade instead of reconstructing it - and
+which is, conveniently, exactly what a Y-haplogroup label is. **Revive only if** per-agent ancestry is ever
+retained in memory; note that was presumably avoided deliberately, since retaining the full ancestry graph over
+a 45,000-step run is unbounded.
+
+---
+
+## DE-22 - Fertility keyed to RESERVE LEVEL, and the four demography hypotheses it took to kill it (2026-07-30, R-106)
+
+**What it was:** `enable_energetic_fertility` — birth probability scaling with the mother's stored reserve,
+0 at the starvation floor → 1 at the cap. The intent was right; the state variable cannot carry it.
+
+**Why it can never work, and it is a fact about the ECONOMY rather than the rule:** burn is ~68% of the
+floor-to-full span **per step**, so an agent either re-saturates at the cap or dies within a step. The trough
+margin is **0.46 burn-steps** — nobody survives one missed harvest, so there is no persistent intermediate
+state for a reserve reading to detect. Measured across a 5× density range: post-harvest reserve **0.996** of
+full, post-burn trough **0.318**, both with spread ~0.002 and **zero** density response. The factor returns
+~0.995 always. Any rule reading reserve LEVEL is dead on arrival — which is the same finding §21.9 reached for
+`enable_condition` on the mortality side. **Superseded by** `enable_intake_fertility` (flux, not level).
+
+**FOUR HYPOTHESES FALSIFIED EN ROUTE**, filed so they are not re-run:
+1. **"Young population = a GROWTH artefact."** Starts of 3k/12k/20k converge on the same ~4.8k with the same age
+   structure; dense starts crash. It is the equilibrium demography.
+2. **"Everyone is pinned at the reserve cap."** Only 0.6–0.8% are. *(The metric that suggested otherwise divided
+   by `reserve_scale()`, which scales with wealth — the normalisation manufactured the flatness. Hidden-denominator
+   class again.)*
+3. **"Mortality MULTIPLIERS are stacking."** Ablating density-disease / terrain-risk / orphan-mortality each moves
+   e₀ by <0.5 yr; `a2_cap` never binds (0 hits).
+4. **"Agglomeration inverts the SIGN of density-dependence."** Fitting S ~ n^γ gives γ = 0.805 — decreasing
+   returns. Crowding does not pay. *(The real problem is that the gradient is FLATTENED ~5×, not inverted.)*
+
+**TWO MEASUREMENTS THAT COULD NOT ANSWER THEIR QUESTION** (design faults, not results):
+- **Starting density as a density contrast.** n=3000 vs n=15000 both converge to ~4.7–4.9k, so starting density
+  washes out entirely. Population must be the VARYING quantity (within-run), never a starting condition.
+- **Deaths per CELL as a spatial risk measure.** Population is concentrated by agglomeration, so the top cells
+  hold most deaths regardless. Normalised by agent-step exposure, the worst 5% of cells carry 10.7–29.6× the
+  world-mean rate but only 0.2–0.5% of exposure — far too little to be the main driver.
+
+**Revive only if** the metabolic step is ever made fine-grained relative to the reserve (so a graded, persistent
+hunger state can exist), or the reserve span is enlarged — but note the span is anchored (110k kcal usable ≈ 44
+days total starvation, Cahill 1970) and step length is LOCKED at one month (ARCH §9.3), so both are closed.
+
 ---
 
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*

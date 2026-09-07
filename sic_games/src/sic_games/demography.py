@@ -19,8 +19,9 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 MONTHS_PER_YEAR = 12
 
@@ -79,6 +80,260 @@ class SilerParams:
 # Aché forest-period (Gurven & Kaplan 2007, Table 2; both sexes; the M-1 anchor).
 # VALIDATED: reproduces e₀=36.5, e₁₅=38.3, e₄₅=21.3, l(15)=0.66, l(45)=0.43, modal adult death=71.
 ACHE_FOREST = SilerParams(a1=0.157, b1=0.721, a2=0.013, a3=4.80e-5, b3=0.103)
+
+# ── THE DEMOGRAPHY MONITOR'S ANCHOR REGISTRY (R-106, 2026-08-14, supervisor request) ──────────────────────
+# "We cannot expect social dynamics to work when the demography is skewed."
+#
+# THE CASE THAT PROVES IT. `band_med` read 23 against Birdsell's ~25 and looked like a PASS, on a population
+# that was 54% children — about 11 ADULTS against Hill et al. 2011's 28.2 ADULTS. A marker read as passing
+# while failing 2.5-fold, because nothing scored the age structure beside it. `docs/MARKER_MATRIX.md` #1
+# already recorded this ("the 23/25 all-ages pass is carried by excess children") and it was still missed.
+#
+# EVERY BAND HERE IS COPIED FROM A FILED SOURCE. Nothing is invented. Two kinds of entry:
+#   ("band", lo, hi, src)   a RANGE that exists in the literature. A hard PASS / OUT-OF-BAND verdict.
+#   ("point", v, tol, src)  a single published value. `tol` is a REPORTING tolerance for flagging a
+#                           DEVIATION — it is a display choice, NOT a calibration target, and no parameter
+#                           is ever fitted to it. The reported quantity is the ratio to the anchor.
+#
+# DENOMINATOR TRAPS ARE ENCODED IN THE KEY NAMES. `surv_to_45` is l(45) FROM BIRTH, which is what Gurven &
+# Kaplan's "survival 15→45 = 0.43" actually means; `surv_15_to_45_cond` is the conditional (0.65) and is
+# deliberately NOT scored against it. `band_med_adults`, not `band_med`, carries Hill's 28.2. Five of this
+# project's retractions were a real number read against the wrong denominator, so the names carry the unit.
+_GK07 = "Gurven & Kaplan 2007 PDR 33(2) Table 2, Aché forest [VERIFIED]"
+_HH44 = "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM]"
+_HH8 = "Hill & Hurtado 1996 Tables 8.1/8.2, forest/contact/reservation [VERIFIED]"
+DEMOG_ANCHORS: dict[str, tuple] = {
+    # ---- age structure: the GATE. If these are out of band, everything above them is provisional. ----
+    "frac_child": ("band", 0.287, 0.454, _HH44 + " — %<15 = 28.7 !Kung / 45.4 Yanomamö / 41.9 Aché"),
+    "dependency_ratio": ("band", 0.598, 0.899, _HH44 + " — 0.598 !Kung / 0.866 Yanomamö / 0.899 Aché"),
+    "sex_ratio_m_f": ("band", 0.896, 1.368, _HH44 + " — 0.896 / 1.202 / 1.368"),
+    # ---- mortality. e15 is the HEADLINE, not e0: e0 is dominated by infant mortality, which is why the
+    #      cross-forager e0 range is 21-37 while e15 sits near 38 everywhere. ----
+    "realised_e0": ("band", 21.0, 37.0, _GK07 + " — cross-HG e0 range 21-37"),
+    "e15": ("point", 38.5, 0.20, _GK07 + " — e15 = 38.5 REMAINING years at exact age 15"),
+    "e45": ("point", 21.1, 0.25, _GK07 + " — e45 = 21.1 remaining years"),
+    "surv_to_15": ("point", 0.66, 0.20, _GK07 + " — l(15) from birth"),
+    "surv_to_45": ("point", 0.43, 0.25, _GK07 + " — l(45) FROM BIRTH, not conditional on reaching 15"),
+    "modal_adult_death": ("band", 68.0, 78.0, _GK07 + " — adaptive lifespan 68-78; cross-HG modal avg 72"),
+    # ---- fertility ----
+    "realised_tfr": ("band", 4.69, 8.03, _HH8 + " — TFR 8.03 forest / 4.69 contact / 6.86 reservation"),
+    "realised_ibi_med": ("band", 34.4, 49.4, _HH8 + " — IBI 37.6 / 49.4 / 34.4 months"),
+    # ---- family ----
+    "frac_motherless": ("point", 0.02, 0.50, "Hill & Hurtado Table 13.1 covariate — mother alive 0.98"),
+    "frac_fatherless": ("point", 0.05, 0.50, "Hill & Hurtado Table 13.1 covariate — father alive 0.95"),
+    # ---- group size: the marker the whole exercise is guarding ----
+    "band_med_adults": ("point", 28.2, 0.25,
+                        "Hill et al. 2011, 32 societies [VERIFIED, PDF read] — 28.2 ADULTS, NOT all-ages"),
+    # ---- added from the 2026-08-14 literature survey ----
+    # AGE AT FIRST BIRTH. Walker et al. 2006 Table 2 gives 15 forager societies between 16.2 (Wichi) and
+    # 20.5 (Hiwi), median ~18.6. Gainj 25.7 and Turkana 22.2 are EXCLUDED — New Guinea highland
+    # horticulturalists and pastoralists respectively, not foragers. A second, independent tie exists:
+    # AFR = menarche + 4.5 yr (SD 1.6, n=14), so with menarche_months = 180 the model's own configuration
+    # implies ~19.5. CAUTION from the survey: W06's figure is a mean over ALL adult women and is biased
+    # UPWARD by age-estimation error — for the Hiwi it is 20.5 over all women but 17.9 over mothers under
+    # 35, where ages are reliable. Prefer the LOW end. Measured here: 22.4-24.9, above every forager in
+    # the sample.
+    "age_first_birth_yr": ("band", 16.2, 20.5,
+                           "Walker et al. 2006 AJHB 18(3) Table 2, 15 forager societies [VERIFIED]"),
+    # MID-CHILDHOOD HAZARD. GK07 p.330 verbatim: "The mortality hazard has slowed to 0.01 by age 10,
+    # doubled to about 0.02 by age 40". Ages 5-15 is the LOWEST-mortality band in a human life table and
+    # the trough is broad. The tolerance is wide because the source states one significant figure.
+    "m_5_15": ("point", 0.010, 0.50,
+               "Gurven & Kaplan 2007 p.330 [VERIFIED VERBATIM] — hazard ~0.01/yr at age 10, cross-HG"),
+}
+# Markers deliberately NOT scored, because no anchor is filed. Reported as NO-ANCHOR rather than silently
+# omitted, so the gap stays visible: a marker nobody scores is a marker nobody fixes.
+DEMOG_UNANCHORED = ("srb_male_frac", "frac_double_orphan",
+                    "frac_never_partnered_30", "frac_widowed_adult", "completed_parity_mean",
+                    "cbr", "cdr", "e0_gap_f_minus_m")
+# The age-structure markers that GATE everything above them in the benchmark ladder.
+DEMOG_GATE = ("frac_child", "dependency_ratio")
+
+
+def isogrowth_check(tfr: float, l15: float, r_measured_pct: float,
+                    srb_male: float = 0.512, gen_length: float = 28.0) -> dict:
+    """The GURVEN & KAPLAN ISO-GROWTH IDENTITY — a HARD consistency constraint, not another anchor.
+
+    GK07 endnote 5 [VERIFIED via literature survey 2026-08-14]:
+
+        R0  = (TFR / 2.06) · l25
+        l25 = 0.9973·l15 − 0.0422        (their regression, R² = 0.98, p < 0.0001)
+        R0  = exp(r · T),  T = 28 yr
+
+    GIVEN ANY TWO OF {TFR, l15, r} THE THIRD IS FIXED. There is no freedom. That makes this the check the
+    project has lacked: a run can be scored against its own internal consistency rather than only against
+    point values. The identity reproduces GK07's own published claims — at l15 = 0.55 it returns TFR = 4.069
+    for r = 0, which is the number they state.
+
+    THE 2.06 IS A SEX-RATIO ASSUMPTION, NOT A CONSTANT. It converts TFR to daughters and embeds 1.06 males
+    per female. This model configures `srb_male` (0.512 ⇒ 2.049), so the divisor is derived from the model's
+    own value rather than hard-coded — importing 2.06 blind would be exactly the kind of borrowed constant
+    that has cost this project five retractions.
+
+    WHY THE IMPLIED GENERATION LENGTH IS RETURNED. T = 28 yr is GK07's forager value. A model whose age at
+    first birth is late carries a LONGER generation, which lowers r for the same R0 — so a mismatch here can
+    mean an inconsistent run OR simply a different T. Reporting `implied_gen_length` separates the two: if it
+    comes back near 28 the discrepancy is real, and if it comes back at 35 the run's fertility SCHEDULE is
+    displaced rather than its arithmetic being wrong. Measured 2026-08-14: this model's age at first birth is
+    22-25 yr against a forager bracket of 16.2-20.5 (Walker 2006), so a long implied T is expected and is the
+    same defect seen from another side.
+    """
+    nan = float("nan")
+    if not (tfr and tfr > 0.0) or l15 is None or l15 != l15:
+        return {"r_predicted_pct": nan, "R0": nan, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    l25 = 0.9973 * l15 - 0.0422
+    if l25 <= 0.0:                      # l25 hits zero at l15 ≈ 0.0423; the regression is invalid below it
+        return {"r_predicted_pct": nan, "R0": nan, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    R0 = tfr * (1.0 - srb_male) * l25
+    if R0 <= 0.0:
+        return {"r_predicted_pct": nan, "R0": R0, "implied_gen_length": nan,
+                "r_measured_pct": r_measured_pct, "consistent": None}
+    r_pred = math.log(R0) / gen_length
+    implied_T = nan
+    if r_measured_pct is not None and r_measured_pct == r_measured_pct and abs(r_measured_pct) > 1e-9:
+        implied_T = math.log(R0) / (r_measured_pct / 100.0)
+    ok = None
+    if r_measured_pct is not None and r_measured_pct == r_measured_pct:
+        ok = abs(r_pred * 100.0 - r_measured_pct) <= 0.5      # within half a percent per year
+    return {"r_predicted_pct": r_pred * 100.0, "R0": R0, "l25": l25,
+            "implied_gen_length": implied_T, "r_measured_pct": r_measured_pct, "consistent": ok}
+
+
+# ── THE SPATIAL SANITY CHECK (R-106, 2026-08-16) ──────────────────────────────────────────────────────────
+# WHY THIS EXISTS. For a week this arc chased mortality, then fertility, on a population that was using 14% of
+# its land, at 4.8x BELOW Binford's packing threshold regionally while sitting 1.4x ABOVE it locally, with the
+# median agent eating 2.7x requirement. Every one of those numbers was already being logged. Nobody multiplied
+# `pop` by anything and compared it to the map. The supervisor's verdict was blunt and correct: "Copious
+# amount of time and tokens was wasted not doing just that."
+#
+# IT INTRODUCES NO NEW NUMBER. Every check below is built from anchors already filed in LITERATURE.md, and the
+# central one uses a single filed number TWICE rather than adding a second:
+#   Binford 2001 packing threshold      0.091 persons/km²   [FILED, cross-checked in LITERATURE.md:1099]
+#   Vita-Finzi & Higgs 1970 catchment   10 km radius = 314 km²   [FILED, cited at phase1_model.py:1302]
+#
+# THE PACKING PARADOX is the check that would have caught this arc on day one. A forager population cannot be
+# simultaneously PACKED (local density above Binford's threshold, i.e. dense enough to intensify) and SPARSE
+# (regional density below it, i.e. nowhere near filling its range). If both hold at once, the population is not
+# food-limited — it is failing to disperse, and every carrying-capacity conclusion drawn from it is void.
+SPATIAL_ANCHORS = {
+    "binford_packing_per_km2": (0.091, "Binford 2001 Constructing Frames of Reference — 9.098 persons/100 km²; "
+                                       "the threshold ABOVE which foragers intensify, i.e. a CEILING for "
+                                       "simple foragers, not a target [FILED, cross-checked]"),
+    "catchment_km2": (314.0, "Vita-Finzi & Higgs 1970 — the 10 km site catchment (two-hour walk); a band must "
+                             "command at least its own foraging radius [FILED]"),
+}
+
+
+def spatial_health(pop: float, habitable_cells: float, cells_occupied: float,
+                   n_bands: float, cell_km2: float = 100.0) -> dict:
+    """Check a population against the MAP it lives on. Pure function of four numbers already in every row.
+
+    Returns regional/local density, land use, km² per band, and the verdicts. `paradox` is the one that
+    matters: True means the population is packed and sparse AT THE SAME TIME, which no real forager
+    population can be, and which voids any carrying-capacity reading of the run.
+    """
+    pack = SPATIAL_ANCHORS["binford_packing_per_km2"][0]
+    catch = SPATIAL_ANCHORS["catchment_km2"][0]
+    hab_km2 = habitable_cells * cell_km2
+    occ_km2 = cells_occupied * cell_km2
+    regional = (pop / hab_km2) if hab_km2 > 0 else float("nan")
+    local = (pop / occ_km2) if occ_km2 > 0 else float("nan")
+    land_use = (cells_occupied / habitable_cells) if habitable_cells > 0 else float("nan")
+    km2_band = (occ_km2 / n_bands) if n_bands > 0 else float("nan")
+    # A DEADBAND, not a knife edge. Without it a population sitting exactly AT packing reads as "sparse"
+    # because 14414/158400 = 0.09099 < 0.091 by one part in 10,000 — caught by this module's own CTB
+    # (`test_a_genuinely_full_world_is_not_flagged_as_a_paradox`) before the checker was ever wired in. The
+    # +-10% band means neither verdict fires near the threshold, so the paradox needs a REAL separation
+    # between local and regional density rather than rounding noise on a filed number.
+    margin = 1.10
+    packed = local > pack * margin        # locally dense enough that Binford says foragers would intensify
+    sparse = regional < pack / margin     # regionally nowhere near filling the available range
+    return {
+        "regional_per_km2": regional,
+        "local_per_km2": local,
+        "land_use_frac": land_use,
+        "km2_per_band": km2_band,
+        "habitable_km2": hab_km2,
+        "packed_locally": packed,
+        "sparse_regionally": sparse,
+        # THE PARADOX: packed and sparse at once ⇒ a dispersal failure, not a food limit.
+        "paradox": bool(packed and sparse),
+        # A band packed tighter than its own site catchment cannot be a forager band — territories would
+        # have to overlap completely.
+        "band_below_catchment": bool(km2_band == km2_band and km2_band < catch),
+    }
+
+
+def expected_population(habitable_cells: float, cell_km2: float = 100.0,
+                        band_size: float = 25.0) -> list[tuple]:
+    """The population/band table a map of this size SHOULD carry, as a BRACKET across forager densities.
+
+    This is a reference bracket, NOT a target: only 0.091 is a filed anchor (Binford's packing CEILING). The
+    other rows are round densities spanning the ethnographic forager range and are labelled as such, so nobody
+    later cites 0.05 as though this project had filed it.
+    """
+    hab = habitable_cells * cell_km2
+    rows = [(0.010, "arid / sparse [ROUND, illustrative]"),
+            (0.030, "boreal-temperate [ROUND, illustrative]"),
+            (0.050, "temperate generalist [ROUND, illustrative]"),
+            (0.091, "BINFORD PACKING CEILING [FILED ANCHOR]"),
+            (0.150, "rich coastal [ROUND, illustrative]")]
+    return [(d, lab, d * hab, d * hab / band_size) for d, lab in rows]
+
+
+def demography_health(row: dict) -> dict:
+    """Score a trajectory row against DEMOG_ANCHORS and return verdicts. Pure function of the row.
+
+    MODELLED ON `ClimateField.health()`, which returns UNREACHABLE / NEVER-FIRED verdicts and found three
+    dark climate channels on its first real run. Every demographic failure of 2026-08-13/14 was visible in
+    numbers already being printed; what was missing was something that said OUT-OF-BAND without a human
+    going to look for it.
+
+    THE GATE. `structure_ok` is False when frac_child or dependency_ratio is out of band. When it is False
+    every marker ABOVE demography in the benchmark ladder — band size, connubium, marriage, settlement — is
+    provisional, because it is being read on a population with the wrong age composition. That is not a
+    stylistic warning: `band_med` 23 against Birdsell's ~25 read as a PASS on a population that was 54%
+    children, i.e. ~11 adults against Hill's 28.2 ADULTS.
+
+    Returns verdicts as a list of dicts and a one-line `banner` for the run log.
+    """
+    verdicts = []
+    for key, spec in DEMOG_ANCHORS.items():
+        v = row.get(key)
+        if v is None or (isinstance(v, float) and v != v):        # missing or NaN
+            verdicts.append({"marker": key, "value": v, "verdict": "NO-DATA", "src": spec[-1]})
+            continue
+        if spec[0] == "band":
+            _, lo, hi, src = spec
+            ok = lo <= v <= hi
+            verdicts.append({"marker": key, "value": v, "lo": lo, "hi": hi, "src": src,
+                             "verdict": "PASS" if ok else "OUT-OF-BAND",
+                             "ratio": (v / lo if v < lo else (v / hi if v > hi else 1.0))})
+        else:
+            _, anchor, tol, src = spec
+            ratio = (v / anchor) if anchor else float("nan")
+            # DEVIATION, not FAIL: `tol` is a reporting threshold for display, never a calibration target.
+            ok = abs(ratio - 1.0) <= tol
+            verdicts.append({"marker": key, "value": v, "anchor": anchor, "tol": tol, "src": src,
+                             "verdict": "PASS" if ok else "DEVIATION", "ratio": ratio})
+    for key in DEMOG_UNANCHORED:
+        if key in row:
+            verdicts.append({"marker": key, "value": row.get(key), "verdict": "NO-ANCHOR",
+                             "src": "no filed anchor — reported so the gap stays visible"})
+    bad = [x for x in verdicts if x["verdict"] in ("OUT-OF-BAND", "DEVIATION")]
+    gate = [x for x in verdicts if x["marker"] in DEMOG_GATE]
+    structure_ok = all(x["verdict"] == "PASS" for x in gate) and bool(gate)
+    n_scored = sum(1 for x in verdicts if x["verdict"] in ("PASS", "OUT-OF-BAND", "DEVIATION"))
+    worst = sorted(bad, key=lambda x: -abs(x.get("ratio", 1.0) - 1.0))[:4]
+    parts = ", ".join(f"{x['marker']}={x['value']:.3g}({x.get('ratio', float('nan')):.2f}x)" for x in worst)
+    banner = (f"demography: {n_scored - len(bad)}/{n_scored} in band"
+              + ("" if structure_ok else "  !! AGE STRUCTURE OUT OF BAND -> every marker above"
+                                         " demography in the ladder is PROVISIONAL")
+              + (f"  worst: {parts}" if parts else ""))
+    return {"verdicts": verdicts, "n_scored": n_scored, "n_out": len(bad),
+            "structure_ok": structure_ok, "banner": banner}
 
 # M-3 sex split (Hill & Hurtado 1996, Ch. 6, forest period): documented sex mortality-risk ratios
 # male:female = 0.71 in CHILDHOOD (Aché have HIGHER female child mortality — sex-biased
@@ -157,14 +412,25 @@ class DemographyConfig(BaseModel):
 
     All modulator flags OFF → pure Aché schedule + IBI fertility (the Step-1 calibration world).
     Siler coefficients are FIXED constants from the published Aché fit (M-1) — NOT free knobs.
+
+    `extra="forbid"` (added 2026-08-06). Pydantic's default is to SILENTLY IGNORE an unknown keyword, which
+    means a harness can pass `band_risk_penalty=0.05` to a config that no longer has the field and run happily
+    with a setting that does nothing — the run reports success, the manifest looks right, and the mechanism is
+    absent. That is the precise failure this whole audit arc has been chasing, sitting one line from being
+    impossible. It was found while deleting two dead knobs: the deletion itself would have been the trap,
+    turning every stale call site into a silent no-op instead of an error.
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     # --- mortality: Siler, FIXED from Gurven & Kaplan 2007 (both-sexes; M-1) ---
     siler_a1: float = 0.157
-    siler_b1: float = 0.721
+    siler_b1: float = Field(0.721, gt=0.0)   # DIVISOR in the Siler cumulative hazard, (a1/b1)(1-exp(-b1*t)):
+    #   zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every parameter
+    #   at its declared bounds and discovered this one had NO declared bounds at all.
     siler_a2: float = 0.013
     siler_a3: float = 4.80e-5
-    siler_b3: float = 0.103
+    siler_b3: float = Field(0.103, gt=0.0)   # DIVISOR in (a3/b3)(exp(b3*t)-1); same finding as siler_b1
     # M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood)
     childhood_ratio_mf: float = Field(0.71, gt=0.0)
     adult_ratio_mf: float = Field(1.47, gt=0.0)
@@ -182,6 +448,20 @@ class DemographyConfig(BaseModel):
     # --- modulator flags (Step-2; neutral/off in Step-1 calibration) ---
     enable_terrain_risk: bool = False
     enable_density_disease: bool = False
+    # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone).
+    # THE DEFECT the whole density arc kept hitting: the density-disease hazard reads occ_count[cell] — SINGLE-CELL
+    # occupancy — so it is the ONLY Malthusian brake, and it is defeated by any dispersal (catchment-spread A.58,
+    # colonizing budding A.59): spread the people and per-cell occupancy falls, the brake releases, and the
+    # population runs away to the food ceiling (~7× the anchor). Epidemiologically the single-cell form is also
+    # wrong: airborne crowd disease scales with the SETTLED COMMUNITY's size and density, not the exact dwelling
+    # spacing — a village of 470 carries a village-scale load whether its houses sit on one cell or spread over
+    # nine. WHEN ON, a SETTLED agent's disease density is its VILLAGE population over the village territory
+    # ((2·settle_radius+1)² cells), so the brake keys on village size and is SPREAD-INVARIANT; a MOBILE agent
+    # keeps the single-cell form. With dens_rho_ref = 0.091 (Binford packing) over the 25-cell / 2500 km²
+    # territory, a village faces rising disease above ~227 people — the Bar-Yosef/Bandy realistic ceiling. This is
+    # the brake that lets colonizing budding / catchment-spread disperse the population WITHOUT a runaway.
+    # Default OFF ⇒ single-cell form ⇒ bit-exact.
+    enable_village_density_disease: bool = False
     enable_terrain_pathogen: bool = False
     enable_nutrition_synergy: bool = False
     # ── KIN/ORPHAN CHILD MORTALITY (Hill & Hurtado 1996 Table 13.1; MODEL_SPEC §4.6.4; R-74) ──────────
@@ -224,18 +504,128 @@ class DemographyConfig(BaseModel):
     # "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our
     # sample" — an unweaned infant cannot survive its mother's loss. Small n; kept flaggable.
     orphan_infant_mother_lethal: bool = True
-    # SUPERSEDED by enable_orphan_mortality (R-74) — never implemented; no logic reads it. Scoped in the Siler
-    # blueprint §4.1 as birth-spacing/sex-biased infanticide, but Table 5.1 shows parental infanticide is only
-    # 5.3% of Aché infant deaths, and infancy is nearly sex-SYMMETRIC (38% of male vs 41% of female infant
-    # deaths are homicide/neglect) — the sex bias is at ages 4–14 (28% F vs 6% M) and comes from grave
-    # accompaniment (80% of children buried with a deceased adult are female), not from infanticide.
-    enable_infanticide: bool = False    # [UNIMPLEMENTED STUB — no logic reads this.] Baseline infanticide is ALREADY
-    # folded into the Siler infant-mortality curve (fit to observed HG infant deaths — "infanticide KEPT"). An explicit
-    # mechanism would only add CONDITIONAL infanticide (birth-spacing enforcement / sex-selective); the resource-stress
-    # channel overlaps enable_energetic_fertility, sex-selection is a separate future scoping. Documented stub, not built.
+    # `enable_infanticide` WAS HERE AND IS DELETED (2026-08-06). It was a declared flag that no line of code
+    # ever read — three separate audits had to re-discover that and write "UNIMPLEMENTED STUB" next to it, and
+    # `C_ALLON` had to carry a special case to skip it. A switch that does nothing is not documentation, it is a
+    # standing invitation to believe the mechanism exists.
+    # THE SCIENCE IT ENCODED, KEPT: baseline infanticide is ALREADY inside the Siler infant curve, which was fit
+    # to observed Aché deaths with "infanticide KEPT". An explicit mechanism would only add CONDITIONAL
+    # infanticide, and Table 5.1 says parental infanticide is 5.3% of Aché infant deaths while infancy is nearly
+    # sex-SYMMETRIC (38% of male vs 41% of female infant deaths are homicide/neglect). The sex bias is at ages
+    # 4-14 (28% F vs 6% M) and comes from grave accompaniment, not infanticide. R-74's `enable_orphan_mortality`
+    # is the mechanism that actually carries this channel, and it is built, anchored and ON.
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
+    # INTAKE-based energetic fertility (supersedes the reserve-based branch above when ON). Measured
+    # 2026-07-30: the reserve-based version is INERT by construction. Burn is ~68% of the floor-to-full span
+    # per step, so an agent either re-saturates at the cap or dies within a step; there is no persistent
+    # intermediate state. Post-harvest reserve reads 0.996 of full and the post-burn trough 0.318, each with
+    # spread ~0.002 and ZERO response across a 5x density range, so the factor returns ~0.995 always and
+    # fertility cannot respond to scarcity. Regulation therefore falls entirely on mortality (CDR +59% while
+    # CBR moves 3%), which forces e0 = 1/CDR ~ 20.7 yr, median age 13 and 8-11% motherless.
+    # INTAKE is the live signal the reserve level cannot be: p10 0.93 to p90 4.26 of requirement. Ellison's
+    # energetics is the mechanism — fecundity tracks energy FLUX, not stored reserve.
+    enable_intake_fertility: bool = False
+    intake_ema_alpha: float = Field(0.04, gt=0.0, le=1.0)  # half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr:
+    #   slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze
+    # METABOLIC DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 Minnesota Starvation, LITERATURE.md;
+    # full doc MODEL_SPEC §4.6.7). The reserve is spent at a FLAT burn, so any sustained intake below 100% is
+    # inexorably fatal (even 70% kills in ~5 months) and there is no thin-but-alive state; measured, 96% of
+    # starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4x requirement, and realised
+    # e0 is 23.5 vs schedule 36.5. Under deficit a real body turns its metabolism down (Keys: ~10-25% adaptive
+    # over weeks, ~40% total incl. mass loss at ~25% weight loss). Triggered on the RESERVE LEVEL — low fat
+    # stores drive down-regulation (the physiological trigger, leptin), and it buffers the acute crash AS it
+    # happens, and applies at every age (the intake-EMA is adult-only and, being high on average, would never
+    # fire for the crash it must stop). burn_eff = burn*(1 - d), d = downreg_max*clamp((1 - frac)/downreg_span, 0, 1),
+    # frac = (wealth - floor)/(full - floor). Full reserve -> d=0, so bit-exact when off AND inert for the
+    # well-fed when on. It buffers TRANSIENT crashes without saving a CHRONICALLY starving agent (a true mean
+    # deficit below the reduced burn still kills), so the Malthusian ceiling for real scarcity is preserved
+    # (contrast the subsistence floor, Addendum 55, which only relocated death and was reverted).
+    enable_metabolic_downreg: bool = False
+    metabolic_downreg_max: float = Field(0.40, ge=0.0, le=0.9)  # Keys total BMR drop at ~25% wt loss; bracket [0.25 adaptive-only, 0.40 total]
+    metabolic_downreg_span: float = Field(0.5, gt=0.0, le=1.0)  # full down-reg reached at ~half reserve depletion (Keys ~25% wt loss)
+    # DEPENDENT LOAD (requires enable_intake_fertility). A mother's energy budget is not her own maintenance —
+    # she must also cover what her juveniles cannot produce. Counting only her own needs understates the cost of
+    # a further birth for a woman who already has dependents, which is the anchored driver of forager birth
+    # spacing (Blurton Jones, Hadza; Kaplan's provisioning model). Denominator becomes own requirement + the sum
+    # of her living juveniles' UNMET need (their requirement minus what they gathered themselves), so a child who
+    # increasingly feeds itself costs her less — the load falls as they age, without any explicit schedule.
+    # BUILT BUT CURRENTLY INERT — and the reason is a finding, not a wiring bug (2026-07-30, R-106).
+    # Life-history IS on in the village/elite presets (eta_min 0.2, cons_min 0.3, mother-links 91%), yet only
+    # 1.0% of juveniles run any deficit: measured juvenile eta med 0.529 against consumption_factor med 0.588,
+    # and with adults harvesting ~1.7x their own burn a juvenile still gathers ~1.5x its requirement. So
+    # CHILDREN IN THIS MODEL ARE NET FOOD PRODUCERS, which contradicts the Kaplan 2000 net-deficit anchor that
+    # `consumption_factor` itself cites — the anchor human life-history theory rests on (long juvenile period,
+    # provisioning, grandmothering). There are no dependents to load. Same root cause as the fertility brake:
+    # at ~1.7x surplus intake everyone over-produces, including seven-year-olds.
+    # UNBLOCK BY: recalibrating the juvenile eta ramp against Kaplan's production/consumption curves (foragers
+    # do not break even until ~18-20 yr), NOT by tuning this mechanism. Kept default-OFF and bit-exact.
+    enable_dependent_load: bool = False
+    # PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig
+    # .eta_juvenile_exponent` — see config.py). 1.0 = the legacy LINEAR ramp; >1 bends it toward Kaplan 2000's
+    # CONVEX curve. ADOPTED CANONICAL 3.0 (R-106, 2026-09-04): the 2-D juvenile-calibration sweep (exponent ×
+    # eta_min, docs/RESULTS) found (3.0, 0.10) lands the age structure on both anchors (frac_child 0.42≈0.40,
+    # median 19.2≈20 yr) with 81% of juveniles net-consuming (Kaplan/Hill/Lancaster/Hurtado 2000). The linear
+    # 1.0 made children net PRODUCERS (0% deficit) — an ~18% phantom inflation of carrying capacity and a dead
+    # dependent-load channel. Set 1.0 to recover the legacy ramp.
+    lh_eta_juvenile_exponent: float = Field(3.0, gt=0.0)
+    # PASSTHROUGH to the auto-built LifeHistoryConfig.eta_min (juvenile foraging efficiency at birth). ADOPTED
+    # CANONICAL 0.10 (R-106, 2026-09-04, same sweep): the exponent alone leaves the YOUNGEST as net producers,
+    # because eta_min·share (0.2·1.7=0.34) exceeds cons_min (0.30); dropping eta_min below cons_min/share≈0.176
+    # makes newborns near-zero producers (Kaplan: infants forage nothing) and is what actually pulls the age
+    # structure onto the anchor. 0.2 = the legacy value.
+    lh_eta_min: float = Field(0.10, ge=0.0, le=1.0)
+    # ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ──
+    # WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 established the identity
+    #     TFR = span / (refractory + 1/(fecundability x brake))
+    # which reproduces both measured arms to within 1%. The existing brake multiplies `fecundability`, and
+    # 1/(fecundability x brake) is only 22% of the birth interval — so even at its ABSOLUTE ceiling (measured
+    # mean factor 0.767 over 240 steps and 331 women) it reaches TFR 7.93 where about 4.5 is needed. The
+    # REFRACTORY is the term with leverage, and it is also the correct physiology: lactational amenorrhea IS
+    # the refractory period.
+    #
+    # THE MECHANISM IS ANCHORED, NOT ASSUMED. Ellison 2008 (PaleoAnthropology 2008:172-200, filed) reports for
+    # the Toba that C-peptide rises in the one to two months before menstruation resumes, correlates with
+    # maternal weight and urinary estrogen, and shows "no correlations ... with any indices of nursing pattern
+    # or frequency" [VERIFIED VERBATIM]. So ENERGY sets the length of amenorrhea and suckling frequency does
+    # not — the competing pathway is ruled out in the same dataset.
+    #
+    # IT COMPOSES WITH `enable_sedentism_fertility` RATHER THAN FIGHTING IT. Sedentism sets the BASE refractory
+    # (SEDENTISM_IBI_MONTHS: 30 egalitarian → 22 complex, storable weaning foods shorten it); energy STRETCHES
+    # whatever base applies. A sedentary woman who is hungry should still space births further than a sedentary
+    # woman who is not, and multiplying leaves both mechanisms independently ablatable.
+    #
+    # NO NEW THRESHOLD. The energy signal is read through the SAME FAO/IOM window `[intake_fert_lo,
+    # intake_fert_hi]` = [1.0, 1.2] the fecundability brake already uses (pregnancy +11%, lactation +20%).
+    #
+    # THE STRETCH IS A FILED RATIO, AND IT IS A BRACKET. Hill & Hurtado Table 8.2 gives realised IBI across
+    # three Aché periods: 34.4 reservation / 37.6 forest / 49.4 contact [VERIFIED]. The default 1.436 is
+    # 49.4/34.4 — the full span of that filed range, i.e. the most a real Aché population's spacing is
+    # observed to move. It is a BRACKET ENDPOINT to sweep, NOT a fitted value, and the contact period carries
+    # disease and social disruption as well as energy stress, so the true energy-only span is probably
+    # SMALLER. Sweep downward from here; do not adopt 1.436 because a run happens to like it.
+    enable_energetic_refractory: bool = False
+    refractory_stretch_max: float = Field(1.436, ge=1.0)   # x base refractory at zero energy surplus
+    #   [PROVISIONAL — a BRACKET ENDPOINT awaiting its sweep, not a fitted value. Hill & Hurtado 1996
+    #   Table 8.2: 49.4/34.4 = the full filed span of Aché realised IBI across the forest, contact and
+    #   reservation periods. Sweep DOWNWARD from here: the contact period carries disease and social
+    #   disruption as well as energy stress, so the energy-only span is probably smaller, and applying the
+    #   ratio to the REFRACTORY while the anchor sits on the realised INTERVAL overshoots the filed maximum
+    #   by ~2 months (measured: implied IBI spans 38.3 to 51.4 against a filed 34.4 to 49.4).]
+    intake_fert_lo: float = Field(1.00, ge=0.0)   # intake = maintenance ⇒ no surplus for gestation/lactation
+    intake_fert_hi: float = Field(1.20, gt=0.0)   # + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM;
+    #   pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance)
+    # DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05, docs/RESULTS). The intake-fertility brake reads the intake
+    # EMA, which RE-SATURATES (median 2.3x requirement even in a population dying 51% of starvation), so it barely
+    # bites (15% of women) and STARVATION does the regulating — which holds e0 low. Density does NOT re-saturate:
+    # it rises as the population fills the food ceiling, so it is the honest Malthusian stress. When on, birth
+    # probability is scaled by f = clamp(1 - (fill)^exponent, 0, 1), fill = village population / village carrying
+    # capacity (Σ K_persons over the village territory); a mobile mother uses her cell occupancy / cell K. So
+    # births fall as a village approaches its carrying capacity — regulation moves from DEATHS to BIRTHS (the NDT
+    # / K-regulation; forager birth spacing lengthens with density). Default OFF ⇒ bit-exact.
+    enable_density_fertility: bool = False
+    density_fert_exponent: float = Field(6.0, gt=0.0)   # shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106, 2026-09-06 lever-sensitivity sweep): the e0-density frontier's best balance — e0 36.0 (at anchor) at the highest density of the high-e0 set. Lower values over-suppress density.
     # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
     # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
     # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning
@@ -291,7 +681,43 @@ class DemographyConfig(BaseModel):
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
     dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
-    mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994) [PROVISIONAL]
+    # ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ────────────────────────────────────────
+    # THE DEFECT. `a2_mult` multiplies three modulators into Siler's Makeham term. TWO of them are
+    # reference-normalised so that the ANCHOR CONDITION returns exactly 1.0 — `risk_mult` divides by
+    # `risk_ref` ("≈1 in average-risk terrain") and `pathogen_mult` is "mean-normalised so
+    # pathogen_mult(npp_ref) = 1 (the Aché-forest reference biome is neutral)". `density_mult` is NOT. It
+    # returns 1.0 only at ρ = 0, an EMPTY WORLD.
+    #
+    # WHY THAT IS A DOUBLE-COUNT. Gurven & Kaplan 2007 fitted a2 = 0.0130 on Aché foragers who were LIVING AT
+    # A REAL DENSITY, so that coefficient already contains whatever density-dependent disease those people
+    # experienced. Multiplying it again at the same density charges for it twice.
+    #
+    # MEASURED SIZE. `dens_rho_half` = 0.2/km² sits ABOVE the whole ethnographic range (Binford packing
+    # 0.091/km²; Tallavaara observed HG median 0.119/km²; this model's own Tallavaara capacity at its terrain
+    # median NPP ≈ 0.053/km²), so every real forager density lies on the steep rising limb. At Binford's own
+    # anchor the unnormalised term already returns 1.94x. The measured non-starvation hazard runs 1.56x the
+    # configured Siler, and realised e0 is 17.7 yr against a configured 36.6.
+    #
+    # AND THE DYNAMICS AMPLIFY IT. `aggl_beta` = 1.15 gives increasing returns to crowding, so agents pack
+    # into cells of ~71 (0.714/km², EIGHT times the Binford anchor and 3.6x past half-saturation), which drives
+    # the term to 3.34x against its 4.0 ceiling. The error is in the maths; the agglomeration makes it large.
+    #
+    # THE FIX INTRODUCES NO NEW NUMBER. `dens_rho_ref` defaults to Binford 2001's packing threshold, which is
+    # already filed (LITERATURE.md: "forager packing threshold 9.098 persons/100 km² = 0.091/km²"). Default
+    # OFF ⇒ every prior run stays bit-exact.
+    enable_density_reference: bool = False
+    dens_rho_ref: float = Field(0.091, gt=0.0)  # agents/km² at which density_mult == 1 [ANCHORED, Binford 2001]
+    mu_max: float = Field(2.5, ge=1.0)          # nutrition-synergy max (Pelletier 1994, CHILD data — mild RR 2.5) [PROVISIONAL]
+    # AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD
+    # malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), but it is applied at full strength
+    # to every age. Adults are far more malnutrition-robust: community-dwelling adults >50 at risk of
+    # malnutrition run HR ~1.14-1.29 (PMC11634492), not 2.5. The e0 driver breakdown (Addendum 64) showed the
+    # 15-45 band at 2.6x the schedule with the synergy at a mean 2.0x — an over-amplification of adult deaths.
+    # WHEN ON, an agent past menarche_months (15 yr) uses `synergy_mu_max_adult` instead of `mu_max`; children
+    # keep the full Pelletier value. It cuts the adult excess WITHOUT touching the food ceiling (an amplifier,
+    # not the food), so it raises e0 without relocating death. Default OFF ⇒ single mu_max at all ages ⇒ bit-exact.
+    enable_synergy_age_grade: bool = False
+    synergy_mu_max_adult: float = Field(1.3, ge=1.0)   # adult malnutrition-mortality synergy [ANCHORED, community-dwelling >50 HR 1.14-1.29]
     a2_cap: float = Field(5.0, ge=1.0)          # cap on the a2_eff multiplier (red-team n-1)
     # Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2.
     pathogen_gamma: float = Field(0.0, ge=0.0)  # BRACKETED strength (NPP exponent); 0 = OFF/flat. Sweep low/mid/high.
@@ -315,6 +741,102 @@ class DemographyConfig(BaseModel):
     # — fresh every step, per cell. The old anchor understated forest 2.7× and desert 10×. Runs predating R-72
     # (R-18/19/20, society benchmark, paternal calib) hardcode 0.73 = the mis-anchored forest value.
     game_meat_cv: float = Field(0.0, ge=0.0)
+    # ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ────────────────────────────────
+    # Until this date both quantities above were SCALARS, so a campaign gave every biome the same diet split and
+    # the same meat variance. MODEL_SPEC §4.5.5 said so ("`mf` is a scalar config ... the per-biome
+    # `terrain.MEAT_FRAC` dict is the home for a future per-cell wiring"), and Addendum 36 measured the
+    # consequence: no biome signal reached the harvest at all, because `game_kcal` is not read either.
+    #
+    # Each flag reads the cell's biome from an ALREADY ANCHORED dict. Neither introduces a new number.
+    #   enable_biome_meat_frac → `terrain.MEAT_FRAC`  (Cordain 2000 Table 2, terrestrial-renormalized)
+    #   enable_biome_meat_cv   → `terrain.MEAT_CV`    (cchunts day-to-day CV; Hawkes 1991 for the Hadza)
+    #
+    # ABSENT BIOMES FALL BACK, AND THE FALLBACK DIFFERS BY DICT — because the two dicts document different
+    # reasons for absence. `MEAT_FRAC` omits WETLAND deliberately ("a gap, not a measured zero" — a 0.0 there
+    # would assert that wetland foragers eat no meat), so an absent biome takes the SCALAR `game_meat_frac`.
+    # `MEAT_CV` omits GRASS/MOUNTAIN/WETLAND for want of a calibration people, and terrain.py's own rule for
+    # that case is `HUNT_CV` = 2.11, the biome-INVARIANT measured hunting CV — so an absent biome takes it.
+    # Do not "fix" either fallback to 0.0; both zeros would be claims that no source supports.
+    #
+    # Both default False ⇒ every prior run stays bit-exact. `enable_game` and `game_meat_frac > 0` still gate
+    # the whole two-stream path, so the scalar remains the master switch as well as the fallback value.
+    enable_biome_meat_frac: bool = False
+    enable_biome_meat_cv: bool = False
+    # ── VILLAGE IDENTITY: co-residence dissolves band identity (2026-08-12) ────────────────────────────────
+    # THE GAP THIS FILLS. Birdsell's nesting is already filed in LITERATURE.md — band ~25 → horde/local group
+    # ~40 → dialectal tribe ~500 — and the model implements ONLY the band level. Nothing above it exists, so
+    # co-residence has no effect on identity anywhere in the code. MEASURED consequence: a 204-person
+    # settlement contains **45 distinct bands** of ~4-5 co-resident members each. A "village" is a spatial
+    # coincidence of strangers, not a community, which is why every fission-cleavage rule tested returns a
+    # 1-4 person splinter (see the budding investigation, 2026-08-12).
+    #
+    # `_maintain_bands` cannot do this: its FUSION branch fires only below `band_merge_size` (10), a rescue
+    # rule for dying remnants. Bands sit at equilibrium between merge 10 and split 45 and never combine.
+    #
+    # THE RULE. An agent accrues co-residence at whichever settlement it is within `settle_radius` of (the
+    # model's own `_nearest_settlement`). Past `village_identity_months` it adopts that village's identity.
+    # Leaving resets the clock — so this is per-agent tenure, not a global timer, and it degrades gracefully
+    # when a settlement dissolves.
+    #
+    # THE TIMESCALE IS THE MODEL'S OWN COMING-OF-AGE CONSTANT, not a new number: 180 months = 15 yr =
+    # `menarche_months`. Mechanism — identity is inherited at birth, so a merged identity consolidates when
+    # the first cohort born after aggregation reaches adulthood. Half a generation (the model's mean age at
+    # reproduction is ~28 yr from the Table 8.2 schedule). Supervisor decision 2026-08-12, after the
+    # alternatives (~1 yr Wiessner hxaro = a DYADIC partnership, wrong quantity; ~28 yr full generation =
+    # slower than the 42-yr window in which the settlement bifurcation is decided) were costed.
+    enable_village_identity: bool = False
+    village_identity_months: int = Field(180, ge=1)   # = menarche_months; NOT an independent number
+    # ── BUD SITE SEPARATION: a daughter village's catchment must not overlap its parent's (2026-08-12) ─────
+    # THE ASYMMETRY. `_maintain_settlements` holds a site while >= `settle_min_pool` (40) people are inside its
+    # (2·settle_radius+1) = 5-cell block, but budding only required a daughter 3 cells away. Two sites 3 apart
+    # share 10 of their 25 catchment cells, so each counts the OTHER's residents toward its own survival test.
+    # MEASURED: ~110 settlements at mean spacing 3.79 cells, mean on-site occupancy 15.8 against a 40-person
+    # requirement — individually unviable sites propping each other up. Combined with a fission cleavage that
+    # sheds a median of TWO people (the kinship comparison excludes the 97% who are equidistant), every
+    # micro-splinter founded a settlement that survived on its neighbours. That is the budding runaway.
+    # ON ⇒ minimum separation 2·settle_radius+1, so catchments are DISJOINT and a daughter must hold its own
+    # pool. Default OFF ⇒ bit-exact.
+    enable_bud_site_separation: bool = False
+    # ── EXCLUSIVE VILLAGE MEMBERSHIP: settlement spacing becomes EMERGENT (2026-08-12) ─────────────────────
+    # THE SAME DEFECT, TREATED AT ITS CAUSE INSTEAD OF ITS GEOMETRY. `_maintain_settlements` counts every
+    # person inside a site's (2*settle_radius+1) window, and those windows overlap whenever sites are closer
+    # than that, so neighbouring villages each count the SAME people toward their own survival threshold.
+    # ON => each agent is counted for exactly ONE village, the nearest. Villages COMPETE for members rather
+    # than sharing them, so a village sited too close to another cannot assemble its own pool and dissolves.
+    # SPACING IS THEN AN OUTCOME, NOT A CONSTANT -- supervisor directive 2026-08-12, "we need that distance
+    # emergent", after the geometric rule above was found to hard-code 5 cells = 50 km against a filed anchor
+    # of ~20 km for disjoint forager catchments (Vita-Finzi & Higgs 1970: ~10 km site exploitation radius, the
+    # two-hour walk; Lee's !Kung agree). `enable_bud_site_separation` is retained default-OFF purely as the
+    # ablation control for "geometry alone" vs "competition". Default OFF => bit-exact.
+    enable_exclusive_village_membership: bool = False
+    # ── EMERGENT VILLAGE FOUNDING: one rule for every village (supervisor spec 2026-08-12) ─────────────────
+    # "They travel until they find a suitable place for a village that is more attractive than being a roving
+    #  band -- just like any village forms. So a fitting cell with proto-ag or fishing potential, out of
+    #  catchment range of other villages."
+    # Replaces the ranked-candidate scan, which was measured to be a MAP-COVERAGE parameter wearing a spacing
+    # parameter's name: it sorts storable cells by S_pot descending and stops at 40, so `aggregation_site_sep`
+    # governed how much of the map was eligible. At sep=2 (20 km, the ethnographic value) all 40 candidates sat
+    # in a 9x79 sliver of the single best ridge and ZERO villages formed. Founding is now evaluated where
+    # people ACTUALLY ARE: fitting cell + settle_min_pool within settle_radius + outside every existing
+    # village's catchment (anchored to settle_catchment_radius = Vita-Finzi & Higgs 1970's ~10 km forager site
+    # exploitation territory, [VERIFIED]). No candidate list, no site cap, no separation constant.
+    enable_emergent_village_founding: bool = False
+    # ── BUD-FOUNDING BYPASS REMOVED: settlement founding is occupancy-gated for EVERY path (2026-08-12) ────
+    # `_found_settlements_by_occupancy` already requires settle_min_pool (40) people within settle_radius
+    # before a settlement exists -- an emergent, occupancy-gated rule. Budding SKIPPED it and created a site
+    # outright, so a faction of TWO (the measured median: the kinship cleavage excludes the 97% of villagers
+    # equidistant from both leaders) founded a full settlement. ~1,700 settlements manufactured out of pairs
+    # of people in 400 steps. That asymmetry is the generator of the runaway, and no downstream rule could
+    # absorb it -- five were built and measured, all five failed (min-faction share silenced budding entirely;
+    # village identity was inert against the churn; parent-only separation changed nothing; global separation
+    # worked but imposed 50 km against a ~20 km filed anchor, Vita-Finzi & Higgs 1970; exclusive membership
+    # raised churn rather than spacing).
+    # ON => a bud RELOCATES its faction and splits the band, but founds NO site. The daughter becomes a
+    # settlement only where people actually gather, via the rule every other path already obeys. Settlement
+    # SPACING IS THEN EMERGENT and no distance constant exists anywhere in the model -- supervisor directive
+    # 2026-08-12, "we need that distance emergent". This REMOVES a rule rather than adding one.
+    # Default OFF => bit-exact.
+    enable_bud_requires_occupancy: bool = False
     # ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982,
     # Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp ≤ storage_temp_threshold_c ≈ Binford's
     # Effective-Temperature 15.25 °C storage threshold) an agent banks a `storable_fraction` of its harvest
@@ -349,6 +871,46 @@ class DemographyConfig(BaseModel):
     # (montane salmon rivers) morph COMPLEX. SEPARATES survival-storage from complexity. Default OFF ⇒ bit-exact.
     morph_aquatic_gated: bool = False
     morph_aquatic_threshold: float = Field(0.15, ge=0.0, le=1.0)  # complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL]
+    # R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus
+    # (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence — Testart's own chain
+    # is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped the differentials step.
+    # Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45% stratified while having the
+    # LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality. When ON, a would-be stratified
+    # band must also show within-band cred concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact.
+    # R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR
+    # occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 carrying-capacity ceiling was gated on
+    # `(cx,cy) in _settlement_sites`. So a NON-settlement cell got unbounded increasing returns: more crowding →
+    # superlinearly more food → more people. Diagnosed R-104: a run sat at pop ~3000 for 1750 steps, then
+    # surplus_med saturated at 1.0 and pop went 3259→97551 with ZERO starvation at 61 agents/cell. ON ⇒ the
+    # ceiling also applies wherever the agglomeration bonus is applied. Default OFF ⇒ bit-exact with every
+    # pre-R-105 result (which were all run with the gap open).
+    enable_aggl_ceiling: bool = False
+    # SOCIETY CLASSIFIER ON REGIONAL DENSITY (R-106, 2026-08-24). The morph classifier asks "is this band
+    # packed past Binford's threshold?" -- and Binford's 0.091/km2 is a REGIONAL figure (persons per 100 km2
+    # of RANGE). The classifier was fed the band's members over its OCCUPIED cells, which is a LOCAL density:
+    # a band crowded onto 1.9 cells reads 0.167/km2 = 1.8x packing = STRATIFIED, while the same population
+    # over its true range is 0.025/km2 = 0.28x packing = egalitarian. Because the model crowds everyone onto
+    # ~14% of the land (the packing paradox), EVERY band read as packed, 57% came out stratified in a pure
+    # forager world, SEDENTISM_IBI_MONTHS gave chiefdoms a 14-month refractory, and TFR ran ~10 against a
+    # 5-8 anchor. This is a UNITS error: local density fed to a threshold defined regionally.
+    # When on, the classifier density = members / (habitable_km2 / n_bands) -- the band's fair share of the
+    # whole range, which equals the true regional density and is the scale Binford's number means. The DISEASE
+    # hazard (density_disease) still uses LOCAL per-cell density, correctly: contagion is a local quantity.
+    # Default OFF => bit-exact.
+    enable_society_regional_density: bool = False
+    enable_stratification_inequality_gate: bool = False
+    # R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform
+    # (0.29) and cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation BETWEEN
+    # bands: a chiefdom is a hierarchy of settlements. When on, the stratified verdict needs (a) the regional
+    # BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top `1 − strat_top_quantile` of
+    # per-band mean cred. Measured: the affluent-egalitarian world reads between-band Gini 0.144 (below the
+    # forager anchor 0.25), yet the level-only classifier calls it 36% stratified. Default OFF ⇒ bit-exact.
+    enable_relational_stratification: bool = False
+    between_band_gini_min: float = Field(0.30, ge=0.0, le=1.0)   # regional between-band cred Gini for a stratified region. CALIBRATED (R-106, 2026-09-05): the model's between-band Gini climbs 0.13->0.33 as elite inequality matures; 0.30 sits above the affluent-egalitarian baseline (0.21) and is crossed only at maturity, so stratification emerges late. 0.35 was unreachable (max 0.336). BHM 2009 forager whole-pop Gini 0.25.
+    strat_top_quantile: float = Field(0.75, ge=0.0, le=1.0)      # a band must sit above this quantile of per-band mean cred to be a chiefly centre (top quarter)
+    stratification_gini_min: float = Field(0.40, ge=0.0, le=1.0)  # BHM 2009 Table 2 α-weighted Gini: forager 0.25,
+    #   horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40.
+    #   PROVISIONAL: within-band Gini runs below whole-population Gini, so calibrate on the validated baseline.
     # PACKING MEASURE (R-61 fix): the morph "packed" test vs Binford 0.091/km². Default = a band's members / its
     # footprint area (a band's density over its own range ~0.017 = a NORMAL forager → never packs). Binford's 0.091 is
     # a LANDSCAPE population density, so `enable_landscape_packing` uses (all agents on the band's cells / area) — is the
@@ -397,6 +959,65 @@ class DemographyConfig(BaseModel):
     # (the gathering) + enable_band_affiliation. Default OFF ⇒ no settlements ⇒ bit-exact.
     enable_aggregation_sedentism: bool = False
     settle_min_pool: int = Field(40, ge=2)                     # min people to found/hold a settlement — minimum-viable-hamlet threshold (Bar-Yosef 1998: Natufian settlements range small ~dozens → medium 100–150; 40 = the small-settlement lower bound) [ANCHORED-lower-bound]
+    # FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were founded in
+    # the FIRST 200 steps — the founders bunch and settle at t=0 and the settlement pattern then FREEZES, so the
+    # empty good land (55% of the top forage decile) never gets a village. No settlement may be FOUNDED before
+    # this step, so the founders SPREAD (via IFD / hunger dispersal) for a startup period before "where to
+    # settle" is decided; existing settlements are unaffected (holding is separate). 0 ⇒ no delay ⇒ bit-exact.
+    # ~180 = one generation (menarche_months), the ethnographic "wander then settle" interval. Measured a clean
+    # demographic gain (e0 26.4 -> 27.5, l15 -> 0.566, pop up) by letting the founders spread before the pattern
+    # locks in. Default OFF ⇒ bit-exact; magnitude 180 when on.
+    enable_founding_delay: bool = False
+    settle_founding_delay_steps: int = Field(180, ge=0)
+    # ── FOUNDING ON STORABLE SURPLUS, AND YIELD ON WORKED LAND (R-106, 2026-08-15) ──────────────────────
+    # ONE DEFECT, TWO SYMPTOMS. `_s_pot_field()` = max(aquatic_food, cultivability) on RAW TERRAIN is asked
+    # three different questions, and conflates a wild cereal stand with a ploughed field in two of them:
+    #     is this worth settling?      -> raw S_pot                       CONFLATED
+    #     what does settling yield?    -> raw S_pot over the catchment    CONFLATED
+    #     can you own it?              -> aquatic anywhere; cultivable ONLY where worked      CORRECT
+    # `_update_defensibility_claims` already gets the third right -- "You own what you've cleared (Testart),
+    # not any fertile wilderness cell" -- so the FOUNDING rule permits founding on land the OWNERSHIP rule
+    # says cannot be claimed until a settlement is already there. The two layers contradict each other.
+    #
+    # WHY NOT AQUATIC-ONLY FOUNDING, WHICH WAS THE FIRST PROPOSAL. The 2026-08-15 site-suitability survey
+    # contradicted it with two published cases. (a) MESOAMERICA: Ranere & Piperno PNAS 2009, verbatim --
+    # "small groups moved around the countryside seasonally ... by farming along river and lake shores";
+    # maize and squash domesticated 8,990-8,610 cal BP by MOBILE people, sedentary villages only ~3,000 BP,
+    # so the lag runs ~5,700 yr the WRONG WAY in one of the three primary domestication centres.
+    # (b) THE LEVANT, the best case FOR sedentism-first, did not found on a fishery: Natufian base camps sat
+    # in oak-pistachio woodland on wild cereals, nuts and gazelle (Bar-Yosef, filed), and Bar-Yosef records
+    # that "storage installations are rare in Natufian sites".
+    #
+    # SO THE CRITERION IS STORABLE SURPLUS, NOT WATER. Hayden 1995 (filed) names the mechanism: villages form
+    # where someone can control "spatially restricted resource locations or productive facilities -- fishing
+    # rocks, weirs, boats, deer fences, drying sheds". A dense oak or wild-cereal stand qualifies; a salmon
+    # choke point qualifies; open water does not. That covers the Levant AND Mesoamerica, and it needs no
+    # unlock times and no technology tree -- the ordering falls out of the terrain.
+    #
+    # NO NEW NUMBER. The founding test becomes S_pot x `_storable_frac_field()`, the per-cell storable
+    # fraction ALREADY computed from the local {grain, fish, forage, game} mix with Testart's
+    # STORABILITY_BY_RESOURCE (grain 0.85 / fish 0.80 / forage 0.15 / game 0.35). Its own docstring already
+    # states the intent: "Grain/fishing cells -> high (accumulate granaries -> sedentism); fresh-forage cells
+    # -> low (can't store -> mobile)."
+    enable_storable_founding: bool = False
+    # THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants
+    # settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no clearing, no
+    # soil development, no ramp -- and its docstring says it is "RESOURCE-AGNOSTIC", so a fishing village and
+    # a farming village get the identical instant unlock. Founding is therefore costless and instantly
+    # profitable, every qualifying site is occupied immediately and permanently, and settlement is a lookup
+    # rather than a decision under uncertainty.
+    #
+    # ON => the tier-2 yield is summed only over cells this settlement's band actually OWNS (`_cell_owner`),
+    # so it RAMPS as claims mature at +1/step to `defensibility_claim_dwell` and spreads outward as the
+    # village grows. The lag is EMERGENT from the clearing process rather than a parameter anybody has to
+    # anchor. Settling on a wild stand still pays immediately through tier-1 -- which is why the Natufians
+    # settled -- while CULTIVATED returns accrue only as land is worked.
+    #
+    # IT ALSO MATTERS FOR THE ELITE LAYER. Hayden's aggrandizer needs a surplus that is controllable and
+    # unevenly held. A flat catchment-wide tier-2 yield hands every occupant the same thing, so there is
+    # nothing to monopolise; worked land is spatially uneven AND owned, which is the substrate the mechanism
+    # requires. Default OFF => bit-exact.
+    enable_worked_land_yield: bool = False
     settle_persist_threshold: float = Field(0.3, ge=0.0)      # site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL]
     settle_radius: int = Field(2, ge=1)                       # Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells)
     settlement_cohesion: float = Field(1.5, ge=0.0)          # (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation)
@@ -417,6 +1038,29 @@ class DemographyConfig(BaseModel):
     # scalar stress caps size; rich (aquatic/arable) catchments carry more → surplus → stratify. Default OFF ⇒ bit-exact.
     enable_catchment_ceiling: bool = False
     catchment_ceiling_mult: float = Field(1.0, gt=0.0)       # ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity
+    # CATCHMENT-FORAGING DEPLETION (R-106, 2026-09-02). Diagnosed: the depletable stock `deplete_and_regrow`
+    # keys on where agents STAND (`occ_count`), but a settled village FORAGES its whole catchment (tier-2,
+    # pooled) — so a hunted-out catchment cell that nobody stands on is never depleted, and a village lives on
+    # an inexhaustible catchment (43 people eating 3.11× requirement with no dispersal pressure). This is the
+    # central-place depletion the over-clustering lacks (supervisor 2026-09-02: "all the cells where agents
+    # hunt/forage should be depleted accordingly — an exact map of how much each is foraged"). When on, the
+    # depletion pressure becomes a FORAGING map: each settled villager's take is spread over its catchment ∝
+    # each cell's yield (richer cells foraged harder); mobile agents forage where they stand. So a village
+    # hunts down its catchment, the ceiling (Σ depletable cell yield) falls, per-capita drops, and it must
+    # spread or split. Regrows when the take eases. Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact.
+    enable_catchment_depletion: bool = False
+    # VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02). Diagnosed: the over-clustering is NOT the agglomeration economy
+    # (already ceiling-bound, R-105) — it is the residence pin stacking every village member onto the SINGLE site
+    # cell. Measured: 100% of the people on big (n≥40) cells are settled/pinned; a "village of 150–300" is 150–300
+    # bodies on one 100 km² cell, eating LESS per head than a loner. A real village's dwellings spread over its
+    # territory. When on, each settled member is pinned to a deterministic HOME cell within settle_radius (∝ cell
+    # yield, so richer cells hold more dwellings) instead of the site point, so the PHYSICAL footprint and the
+    # density-disease hazard (which reads occ_count[pos], Binford 0.091 reference) follow the spread. FOOD stays
+    # bit-exact: the harvest regroups a village's members at its site (the village forages its catchment as one
+    # economic unit — tier-2 pool + ceiling unchanged), so a spread villager's share equals a stacked one's. The
+    # split is principled: physical crowding disperses, social/economic coordination does not. Default OFF ⇒ the pin
+    # targets the site cell ⇒ bit-exact.
+    enable_village_catchment_spread: bool = False
     # SETTLEMENT SCALAR STRESS (Johnson 1982, dissipated by hierarchy) — the missing cost that caps VILLAGE size. The
     # residence pin otherwise pulls every nearby agent into a settlement unconditionally ⇒ villages grow to the food
     # ceiling with no cap (R-63). Here an over-crowded settlement REPELS agents (prob = size_repulsion(village_pop))
@@ -478,6 +1122,18 @@ class DemographyConfig(BaseModel):
     enable_emergent_abandonment: bool = False
     settlement_memory_yr: float = Field(12.0, gt=0.0)       # the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range]
     abandon_hardship_gain: float = Field(1.0, ge=0.0)       # how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema)
+    # ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor, LITERATURE.md — "the breakup into small
+    # family groups which comb the region"). The residence pin holds a settled agent on its crowded site cell,
+    # where it eats the CRASHING pooled share; the emergent-abandonment valve above releases it only on CHRONIC
+    # remembered hardship, far too slow for the one-step crash that kills (96% of starvation deaths are acute).
+    # Diagnosed (R-106 dispersal): 98% of the hungriest decile are pinned settlers, and 99% would eat >1.3x
+    # better by stepping to an ADJACENT cell one stride away — it is a RETENTION failure, not a reach failure,
+    # so the fix RELEASES the pin (no stride change). When a settled agent's reserve fill fraction falls below
+    # `hunger_flee_reserve_frac`, it breaks the pin THIS step and its ordinary IFD drive takes the better
+    # per-capita cell. The crowd thins, per-capita rises, and the acute crash is averted; villages re-form when
+    # the lean passes (the abandonment/budding cycle). Default OFF ⇒ pin never released on hunger ⇒ bit-exact.
+    enable_hunger_dispersal: bool = False
+    hunger_flee_reserve_frac: float = Field(0.35, ge=0.0, le=1.0)  # reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5]
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so
@@ -510,6 +1166,44 @@ class DemographyConfig(BaseModel):
     # cred-transmitted embodied capital — Walker 2002 / Gurven 2006 / Koster 2020, pending fetch.)
     enable_forage_cap: bool = False
     forage_cap_hours: float = Field(100.0, ge=0.0)          # foraging work-hours/period; cap = forage_kcal·hours (~1.6× BURN at hours=100) [PROVISIONAL — Hadza time-budget]
+    # ── THE CLAIM WEIGHT ON THE CELL SPLIT (R-106, 2026-08-15) ────────────────────────────────────────────
+    # THE DEFECT. `compute_harvest_shares` gives every occupant S/n at κ=0. 59% of a canonical population is
+    # under 15 (measured age_0_5 26.0%, age_5_15 33.2%), so a newborn claims exactly what a 30-year-old
+    # hunter claims. The consequence is measurable and it is the reason the demography will not move: the
+    # realised hazard is FLAT at ~0.06/yr from age 1 to 60 (m_1_5 0.069, m_5_15 0.057, m_15_30 0.060,
+    # m_30_45 0.059, m_45_60 0.064) while Siler ACHE_FOREST gives 0.0141/yr at age 30. An excess of
+    # ~0.045/yr that does not vary with age cannot come from starvation, which kills the small and the old
+    # first. It comes from an age-blind split. This also resolves the paradox that the median agent eats
+    # 2.8× requirement while starv_share is 0.51: only ~3% sit below the floor at any instant, and the flux
+    # through that state carries the deaths at every age at once.
+    #
+    # TWO SEPARATE ASSERTIONS, TWO FLAGS. Measure each alone. Turning both on first is how one fails to
+    # learn which worked. Both default OFF only so the pre-fix split stays runnable as the negative control;
+    # the adoption decision is made on measurement in the same session, never deferred.
+    enable_need_weighted_shares: bool = False
+    #   Claim ∝ `consumption_factor(a)` — a person claims in proportion to what they need. [ANCHORED —
+    #   Kaplan 2000, already the citation on `BaseAgent.consumption_factor`: human childhood is a long net
+    #   CONSUMER period subsidised by adult production. The model already holds the number and throws it
+    #   away at the one place that decides who eats.] Introduces NO new parameter: the ramp is the existing
+    #   cons_min 0.3 → 1.0 over forage_age_min. Population-mean consumption_factor over the measured age
+    #   structure is ~0.771, so an adult share rises ~1.30×.
+    enable_eta_weighted_shares: bool = False
+    #   Claim ∝ `eta(a)` — a person claims what they can actually harvest. The module contract in
+    #   substrate.py states shares are PRE-efficiency and the caller applies η when banking, so today a
+    #   juvenile removes a full adult share from the pool and converts only η of it (phase1_model
+    #   `intake = a.eta() * sh`). Population-mean η over the measured age structure is ~0.737, so ~26% of
+    #   every cell pool is claimed by someone who cannot take it. Introduces NO new parameter: the ramp is
+    #   the existing eta_min 0.2 → 1.0. [DERIVED from the existing η contract, not a new anchor.]
+    #
+    # WHEN BOTH ARE ON the weights MULTIPLY (claim what you can take, scaled to what you need). That is a
+    # THIRD condition with its own size, so it is reported as its own arm and never as evidence for either.
+    # The κ contest composes on top of the claim in every case, so Carbon keeps its ordering within an age
+    # class and κ=0 stays the pure claim split.
+    #
+    # THE FORAGE CAP DOES NOT NULLIFY THIS, and the reason decides whether the mechanism can work at all:
+    # `enable_forage_cap` clips the FORAGE stream only, while the meat stream (game_meat_frac 0.55) is split
+    # flat and uncapped. And in the crowded cells where agents actually die, S/n is far below the cap. The
+    # cap binds in rich empty cells; the claim weight bites in the starving ones.
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)
@@ -522,21 +1216,23 @@ class DemographyConfig(BaseModel):
     # rarely on the mother's EXACT cell. radius=0 = the original per-cell gate (a loner with no neighbours can't
     # reproduce); radius≥1 = an unrelated adult male anywhere within the band territory (Chebyshev r) qualifies.
     bonded_mate_radius: int = Field(0, ge=0)
-    # F.2 band risk-dilution (safety-in-numbers on the EXOGENOUS biome hazard). The lit biome accident/incident
-    # rate (the terrain-risk channel, anchored on people LIVING IN BANDS — Hill/Hurtado/Walker 2007) is the
-    # band-level baseline; a SUB-band group loses that mitigation → elevated a2 mortality, SCALED by the biome's
-    # own incident rate (being alone is dangerous in a risky biome, ~harmless in a safe one — Hamilton 1971
-    # selfish-herd / domain-of-danger). A full band (size ≥ band_risk_size, summed over bonded_mate_radius)
-    # faces the anchored baseline (factor → 1, so the validated biome-mortality calibration is unchanged). With
-    # density-disease (which RISES with crowding) this was hypothesized to give an emergent OPTIMAL band size.
-    # ⚠ CAVEAT (F.2 prototype, run_3i, 2026-06-29 — KEEP OFF): it does NOT. Mortality doesn't cause aggregation
-    # (that is the E.1 movement safety-drive's job); a loner-mortality penalty just CULLS the population, which
-    # lowers density → smaller bands → more loners → more penalty = a DEATH SPIRAL, not a stabilizing optimum
-    # (penalty 0→6: pop 281→64, mean band 56→5). Risk-dilution is properly expressed in MOVEMENT (E.1), and
-    # banding already has fitness teeth via the F.1 mate-gate. Left in (default OFF) for future experiments only.
-    enable_band_risk: bool = False
-    band_risk_penalty: float = Field(0.0, ge=0.0)   # max extra a2 multiplier for a LONER in a mean-risk biome
-    band_risk_size: int = Field(25, ge=1)           # band size at which the biome risk is fully mitigated (Wobst ~25)
+    # `enable_band_risk` / `band_risk_penalty` / `band_risk_size` WERE HERE AND ARE DELETED (2026-08-06).
+    # F.2 band risk-dilution: a sub-band group loses the safety-in-numbers mitigation on the exogenous biome
+    # hazard → elevated a2 mortality, scaled by the cell's own incident rate (Hamilton 1971 selfish-herd). With
+    # density-disease rising in crowding, this was hypothesised to produce an emergent OPTIMAL band size.
+    # ⚠ THE FINDING, WHICH IS THE POINT AND IS KEPT: **it does not, and it cannot.** Mortality does not cause
+    # aggregation — that is the E.1 movement safety-drive's job. A loner-mortality penalty just CULLS: fewer
+    # people → lower density → smaller bands → more loners → more penalty. A DEATH SPIRAL, not a stabilising
+    # optimum (F.2 prototype run_3i, 2026-06-29; penalty 0→6 took pop 281→64 and mean band 56→5).
+    # WHY DELETED RATHER THAN LEFT OFF: the gain defaulted to 0.0 and the code was guarded by `> 0.0`, so the
+    # flag could read ON in a config dump while the mechanism was INERT — it survived a whole ablation battery
+    # as a fake positive. The only two states available were "does nothing" and "kills the population", and a
+    # knob with no useful setting is not a knob. Risk-dilution belongs in MOVEMENT (E.1); banding already has
+    # fitness teeth via the F.1 mate-gate.
+    # RECOVERY: the mechanism, and the `run_3i_band_risk_proto.py` sweep that killed it, are both at commit
+    # daa7194 ("F.2: risk-dilution mortality SHELVED (negative result) + band life-cycle diagnostics"). The
+    # prototype was deleted with the fields — it could not have run again, and a script that cannot run is the
+    # same kind of lie as a flag that does nothing.
     # F.3a/b PERSISTENT FAMILIES (the deferred "C"; core of FD-1). `enable_pair_bonds`: a female forms a DURABLE
     # monogamous bond with a band male (prowess-weighted by mate_choice_strength), persisting across births (vs the
     # per-conception lottery); births default to the living co-resident partner; the bond dissolves on partner
@@ -594,6 +1290,13 @@ class DemographyConfig(BaseModel):
     # men. The status↔wife-youth assortment EMERGES from mutual choice rather than being imposed as a
     # correlation. 0 = random pairing order (bit-exact).
     wife_quality_strength: float = Field(0.0, ge=0.0)
+    # ⚠ UNIT WARNING on the "~25, Hill 2011" below (Addendum 28; propagated here 2026-08-06, Addendum 29).
+    # Hill et al. 2011's verified number is **28.2 ADULTS** per band (32 societies). The all-ages ~25 (and the
+    # [18–35] band this project scored for years) is a MIS-ATTRIBUTION of it. That matters because the model
+    # carries too many children: on the adults unit `band_med` reads 11.8 against 28.2 and FAILS 16/16, while
+    # the all-ages reading "passes" 23/25 on the strength of the surplus children. Birdsell's ~25 stands on its
+    # own; Hill's does not support an all-ages 25. Treat the split/merge sizes below as tuned to Birdsell, not
+    # to Hill, until `band_med` is re-scored on adults.
     # F.3c-1 BAND AFFILIATION (the collective-identity vector's band_id cell). A persistent band membership that
     # families AFFILIATE into → multi-family bands (~25, Hill 2011 / Birdsell), the stable handle per-band society
     # attaches to. Newborns inherit the mother's band; at marriage the incoming spouse JOINS the larger/richer band
@@ -627,6 +1330,11 @@ class DemographyConfig(BaseModel):
     # independently anchored, so it is calibrated — but ONLY to place the MEAN band at Hill 2011's ~25–30
     # (mean RETURN_CV 1.017 / 27.5 = 0.037), never the spread. Predicted g*: wetland 19, mountain 23,
     # savanna 25, desert 28, forest 33, grass 38 (mean 27.5, spread 2.0× = Marlowe's 25–50). [CALIBRATED]
+    # ⚠ CALIBRATED TO AN ALL-AGES TARGET THAT IS A MIS-READING (Addendum 28; noted here 2026-08-06). Hill 2011
+    # gives **28.2 ADULTS**, not an all-ages 25–30, so the 27.5 this was fitted to is not the paper's quantity.
+    # The R-106 re-fit against the corrected target was attempted and FALSIFIED (the mechanism cannot reach it
+    # from this direction), so the fit is left standing and the target is left labelled — an honest mismatch
+    # beats a second fit to a number that is still the wrong unit. See the band-affiliation note above.
     cv_safe: float = Field(0.037, gt=0.0)
     # F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at
     # band_split_size, a band fissions only above its CONDITION-DEPENDENT `tolerable_size` = base + (hard_cap −
@@ -638,6 +1346,29 @@ class DemographyConfig(BaseModel):
     band_base_tolerable: int = Field(25, ge=2)           # tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline)
     assabiyah_gain: float = Field(0.05, ge=0.0)          # solidarity gained per step per unit band surplus
     assabiyah_decay: float = Field(0.02, ge=0.0)         # baseline solidarity decay per step (luxury/turnover erosion)
+    # ── THE COHESION BUDGET HAS NO HEADROOM (R-106 Addendum 22) — two flagged candidates ──────────────
+    # MEASURED: `cohesion_frac = clamp01(assabiyah + leader − repulsion − malnutrition)` is pinned at 1.0 for
+    # every band that has a leader, so `split_thr` collapses to the constant `band_split_size` and g* (hence
+    # `cv_safe`) drops out. corr(g*, band size) = −0.077; a cv_safe sweep over +22/+41/+62% moved `band_med`
+    # by −1.9/−3.5/−8.4%, an elasticity of −0.14 against the law's −1.0. Four mechanisms feed that one
+    # saturated expression — emergent band size, dynamic bands, size repulsion, malnutrition fission — and
+    # are structurally inert at ANY magnitude.
+    #
+    # (1) LEAKY ASSABIYAH. The update above is `a += gain·s − decay`: a pure integrator with a CONSTANT leak,
+    #     so it has no interior fixed point at all. If `gain·s > decay` it climbs to the clamp and stays;
+    #     otherwise it falls to 0. It is bang-bang BY CONSTRUCTION, and no choice of gain/decay makes it
+    #     graded — only the share of bands at each end changes. Measured: 95.7% of bands sit above the
+    #     switchover `s = decay/gain = 0.40` (band surplus runs 0.35–0.99, median 0.69), and assabiyah's
+    #     median is exactly 1.000 from step 100 onward.
+    #     Making the leak proportional to the level — `a += gain·s·(1−a) − decay·a` — gives the interior
+    #     fixed point `a* = gain·s / (gain·s + decay)`, which TRACKS surplus: 0.47 at s=0.35, 0.63 at the
+    #     median 0.69, 0.71 at s=0.99. That is what F.3c-3's premise needs ("a rich, high-solidarity band
+    #     STAYS TOGETHER larger; a poor one fissions at the base") — the band has to be able to be poor.
+    enable_leaky_assabiyah: bool = False
+    # (2) LEADER WEIGHT. Even an ungraded assabiyah leaves the leader term (0.41–1.64, median 0.78) ADDED on
+    #     top, which re-saturates the sum on its own. This scales the leader's contribution INTO the budget
+    #     without touching `leader_gain`, which the diagnostics report separately. 1.0 = today, bit-exact.
+    cohesion_leader_weight: float = Field(1.0, ge=0.0)
     # (RETIRED 2026-07-01, DE-7: `season_aggregation` coupled tolerable_size to seasonal abundance → lean-season
     # fission. Mis-signed (moderate lean should not fission) + inert (dormant threshold, R-31). Superseded by M2
     # malnutrition fission. Field removed; configs that set it will now error — intended, it is retired.)
@@ -718,8 +1449,112 @@ class DemographyConfig(BaseModel):
     # morph → hierarchy handles it). Requires enable_band_affiliation. Default OFF ⇒ no-op (bit-exact).
     enable_village_budding: bool = False
     village_fission_threshold: int = Field(170, ge=10)        # BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index 157–186); =Alberti N≈127–158 / Yanomamö ~200 range [ANCHORED, Bandy 2004 p.330]
-    village_bud_min_faction: float = Field(0.25, ge=0.0, le=1.0)  # the rival (2nd) lineage bloc must be ≥ this fraction of the village to carry a fission (else too leader-dominated to split)
+    village_bud_min_faction: float = Field(0.0, ge=0.0, le=1.0)   # minimum rival-bloc share to carry a fission.
+    #   WAS 0.25, which silently disabled budding: measured, a 475-person village held 126 lineages with the
+    #   largest at 8.2%, so no bloc could ever reach a quarter. That 0.25 was the ONE budding parameter with no
+    #   [ANCHORED] tag, and it is absent from the load-bearing source — Bandy 2004 (filed) models fission as
+    #   scaling with village SIZE and relocation COST and never mentions faction size; "lineage" appears in it
+    #   once, in a bibliography entry. The lineage-cleavage premise came from Chagnon, which LITERATURE.md
+    #   records as NOT OBTAINED / corroborating only. Default 0 ⇒ the kinship cleavage below decides the split;
+    #   raise it to re-impose a minimum-bloc rule. [DESIGN — deliberately unanchored, was blocking an anchored
+    #   mechanism]
     village_bud_search_radius: int = Field(8, ge=1)           # cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range
+    # COLONIZING BUDDING (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md). Diagnosed: the population sits
+    # at 2% of the terrain's carrying capacity — trapped, not starved — because a shed faction cannot ESTABLISH on
+    # empty rich land. `enable_bud_requires_occupancy` (adopted, Addendum 53) fixed village spacing but by
+    # forbidding establishment: the faction relocates and must re-aggregate 40 people, which never happens on
+    # empty land, so the parent grows to 300–500 and the excess dies of crowding-disease in place. Probe (4 seeds):
+    # freeing establishment lifts density 4× toward the anchor but packs villages to 1-cell spacing.
+    # WHEN ON, budding (a) sheds a VIABLE emigrant bloc (topped up to settle_min_pool, led by the rival, seeded by
+    # his kin — not the median-2 kinship sliver that made 2-person "villages"), (b) FOUNDS the daughter directly
+    # on the nearest open storable cell, (c) spaced by a DENSITY-SCALED separation d = clamp(round(sqrt(V_target /
+    # K_local)), 1, 3) cells — ~1.6 on rich/aquatic land, ~3 on poor land (the ethnographic gradient), replacing
+    # both the rejected fixed 50 km rule and the 1-cell overlap. It SUPERSEDES enable_bud_requires_occupancy (folds
+    # it in as the OFF path). Default OFF ⇒ the occupancy/legacy path ⇒ bit-exact.
+    enable_colonizing_budding: bool = False
+    bud_spacing_village_target: float = Field(300.0, gt=0.0)  # V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED, Ames 2003]
+    # ── EMERGENT FISSION HAZARD (2026-07-27) ────────────────────────────────────────────────────────
+    # Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. Bandy 2004 is explicit that the
+    # threshold is not a constant — "if the cost of fissioning is low ... fissioning may be expected to occur
+    # frequently and at a VERY LOW population threshold" — and that the outcome is a RACE: Johnson's growth →
+    # conflict resolves "in only one of two ways: (1) the village fissions or (2) institutions ... emerge ...
+    # in such a way that fissioning is not necessary", the latter opening the way to "greater social group
+    # sizes, and spiraling social inequality". A village whose economy works therefore does NOT split, and
+    # large stable centres become an OUTCOME rather than something suppressed by hand.
+    enable_bud_hazard: bool = False        # OFF ⇒ the old size-threshold path, bit-exact
+    # SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress | size).
+    # Read from the filed PDF: slope 0.147 (95% CI 0.098–0.196), intercept −18.636 (95% CI −24.76…−12.51),
+    # which reproduce his stated inflection at size 127 (−b0/b1 = 126.8) and max stress ~158. [ANCHORED]
+    bud_hazard_b0: float = Field(-18.636)
+    bud_hazard_b1: float = Field(0.147, ge=0.0)
+    # BASE RATE — Bandy 2004's own event counts. Three fission events, and in ALL THREE the village was the
+    # largest of its phase: Chiaramaya + Cerro Choncaya (top two of Early Chiripa, a 500-yr phase) and Sonaji
+    # (largest of Middle Chiripa, 200 yr) ⇒ ~2–5 × 10⁻³ per large-village-year. This is the CEILING hazard, for
+    # a maximally-stressed village with every modifier at maximum and an open site next door. [ANCHORED —
+    # bracket, not a point; the realised rate is an output to compare back against 2–5e-3.]
+    bud_hazard_per_yr: float = Field(0.005, ge=0.0)
+    bud_steps_per_year: float = Field(12.0, gt=0.0)           # model calendar (2000 steps ≈ 167 yr)
+    # MODIFIER WEIGHTS — Bandy names the DIRECTIONS ("factors favouring fissioning include resource depletion
+    # and a high level of internal conflict"; "factors discouraging ... high levels of investment in landscape
+    # (nonportable) capital, and social circumscription") but gives no coefficients. Each weight w mixes its
+    # factor in as (1−w) + w·factor, so w=0 ablates that factor and w=1 applies it fully. [DESIGN — deliberately
+    # not dressed up as anchored. Their COMBINED effect has a validation target instead: Bandy's regional
+    # signature of early frequent fissioning followed by cessation as integration appears.]
+    bud_w_depletion: float = Field(1.0, ge=0.0, le=1.0)       # granaries empty ⇒ fission (favours)
+    bud_w_capital: float = Field(1.0, ge=0.0, le=1.0)         # owned/improved land ⇒ stay (discourages)
+    bud_w_integration: float = Field(1.0, ge=0.0, le=1.0)     # complex/stratified ⇒ stay (Bandy's branch 2)
+    # ── POLARIZATION (2026-07-27) ───────────────────────────────────────────────────────────────
+    # Bandy's factors FAVOURING fission are "resource depletion AND A HIGH LEVEL OF INTERNAL CONFLICT". Only
+    # depletion was wired; conflict was left out although the model already carries the grievance state. These
+    # add the conflict side, from the sources that name each driver:
+    #   MATE COMPETITION  Alvard 2009 on the Yanomamö: villages "splinter for reasons often related to mate
+    #                     competition", and the axe fight itself began in a dispute over a woman.
+    #   LEADERSHIP RIVALRY Chagnon: a large village "develops SEVERAL competing headmen and cleaves between
+    #                     them". Measured as how close the rival is to the incumbent — one dominant man is a
+    #                     settled village, two near-equals is one about to split. Uses the SAME pair the
+    #                     cleavage already identifies, so it costs nothing extra.
+    #   GRIEVANCE         the existing per-band resentment stock (privilege measured as an effect size, so it
+    #                     is a wealth/status GAP rather than a level — the supervisor's point).
+    # COMBINATION RULE — these are ALTERNATIVE SUFFICIENT CAUSES in Bandy, not joint requirements: a village
+    # splits because it is hungry OR riven OR led by two rivals. They therefore combine as a MAX, not a
+    # product. Multiplying them (as the first version did with depletion alone) would drive the hazard toward
+    # zero as factors were added, i.e. adding causes of fission would make fission rarer. The DISCOURAGING
+    # factors stay multiplicative, since each genuinely damps whatever the cause. [DESIGN — Bandy names the
+    # directions, not the coefficients.]
+    bud_w_mate_competition: float = Field(1.0, ge=0.0, le=1.0)
+    bud_w_rivalry: float = Field(1.0, ge=0.0, le=1.0)
+    bud_w_grievance: float = Field(1.0, ge=0.0, le=1.0)
+    # ── WEALTH → OBLIGATION → PRODUCTION (2026-07-27) ───────────────────────────────────────────
+    # TYPE **C (Conversion)** · UNIT **agent pair** · INVARIANT **DEBITED** (the grant SPENDS material) ·
+    # ANCHOR [Sahlins 1963, VERIFIED, already filed in LITERATURE.md].
+    #
+    # THE DIAGNOSIS THIS FIXES. Material never concentrated in the elite - noble_material_lift 0.87-1.04 -
+    # and it survived every explanation tried: not decay (zeroing it changed nothing), not leveling (off
+    # changed nothing), not elite breadth (narrowing 51% -> 16% doubled the PEOPLE lift and left material at
+    # 0.99). The cause is structural: `material` is a TERMINAL STOCK. It is produced from hunting, it sits,
+    # it decays, and it cannot buy anything. A stock with no investment channel cannot compound, so
+    # per-capita concentration stays flat however well it is protected. That is also why the model's elite is
+    # in PEOPLE - followers are the only asset that compounds, so they are the only elite we ever see.
+    #
+    # Sahlins on the Melanesian big-man: "Deploying his resources carefully, the emerging leader USES WEALTH
+    # TO PLACE OTHERS IN HIS DEBT ... he constructs a following whose production may be harnassed to his
+    # ambition." Wealth's function is conversion - into obligation, and obligation into others' production.
+    #
+    # MECHANISM: a creditor spends `material` to feed a band-mate in deficit (the grant is debited from the
+    # creditor and arrives as kcal, which is what a hungry agent can use). In return he holds a claim on that
+    # agent's future durable output until the debt is discharged. Conversion rate is NOT invented: it is the
+    # inverse of the model's own production relation, material = material_hide_frac x meat kcal.
+    # FEAST CADENCE (2026-07-27). Sacrifices are events at gatherings, not a per-step bleed. Applying
+    # `legit_feast_frac` every step drained ~97%/yr of the durable stock and made the elite the set of agents
+    # who had spent their wealth on rank (measured: 673:1 against tribute). Legitimacy is a SHARE of band
+    # feasting, so scaling everyone's spend leaves the status outcome alone — the cadence was free for status
+    # and decisive for wealth. 12 = annual, matching `aggregation_period`. 0 = the old per-step behaviour.
+    feast_every: int = Field(12, ge=0)
+    enable_wealth_obligation: bool = False        # default OFF ⇒ bit-exact
+    obligation_grant_frac: float = Field(0.10, ge=0.0, le=1.0)    # share of the creditor's stock per grant
+    obligation_return_frac: float = Field(0.25, ge=0.0, le=1.0)   # share of a debtor's output redirected
+    obligation_premium: float = Field(1.2, ge=1.0)                # claim per unit granted (>1 = the gift binds)
+    obligation_min_ratio: float = Field(2.0, ge=1.0)              # creditor needs this multiple of band-mean
     village_circumscription_gain: float = Field(0.6, ge=0.0)  # the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ +60% ⇒ gain 0.6 [ANCHORED, Bandy 2004 p.330]
     # Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain
     # `cost` field ∈[0.15,1], slope/elev-driven, water=1). Realized cost = move_cost_kcal·cost[dest] DRAINED at
@@ -773,6 +1608,118 @@ class DemographyConfig(BaseModel):
     enable_genome: bool = False
     genome_loci: int = Field(32, ge=1)                    # number of neutral loci (relatedness resolution ~1/L)
     genome_mutation: float = Field(0.0, ge=0.0, le=1.0)   # per-locus per-birth mutation prob (0 = pure drift / infinite-allele)
+    # ⚠ THE "~7 LINEAGES/BAND, DOMINANT SHARE 0.38" TARGET CITED BELOW DOES NOT EXIST (retracted 2026-08-04,
+    # RESULTS Addendum 28; propagated to the point of use 2026-08-06, Addendum 29 — Charter P3). The string
+    # "lineage" occurs ZERO times in Hill et al. 2011. Its unit is co-residence of PRIMARY KIN (brothers,
+    # sisters, parents, offspring); the three "0.38"s are Table 1 cells (Nunamuit, Hadza, a column average).
+    # The R-90/R-92/R-93 REASONING below is untouched by this — an absorbing lineage process really does
+    # fixate, and a share really does have a hidden denominator — but the NUMBER those arguments are aimed at
+    # is not a literature target, so nothing here is calibrated and none of it should be scored. `legit_threshold`
+    # = 0.15 and `rank_hierarchy_frac` = 0.15 were both DERIVED as ~1/7 from it and are therefore UNANCHORED
+    # until a real forager lineage-concentration source is found (MARKER_MATRIX #6 — none exists in the folder).
+    # Values deliberately left as they are: re-deriving them is a calibration decision, not a doc fix.
+    # ── LINEAGE BRANCHING (R-90). `_lineage` (the named patriline/patriclan — the exogamy unit AND the dynasty unit)
+    # was founder-seeded and only ever LOST by extinction, never created: an ABSORBING process that fixates with
+    # probability 1. Measured (R-89): 3000 founding lines drifted to 5 by step 1950 and stuck there, which (a) breaks
+    # the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage share 0.38 that R-25 already passed, and
+    # (b) freezes the elite layer, since with no non-ascribed lineage left the gumsa→gumlao reversion cannot fire.
+    # Real named descent groups both die AND branch. Same INFINITE-ALLELE device genome_mutation already uses.
+    # Deliberately NOT size-triggered segmentation: capping lineage size would make `top_share` an artifact of the
+    # cap, destroying the very statistic T-9 measures against Zerjal/Yan. Rate 0.0 ⇒ no RNG draw ⇒ bit-exact.
+    enable_lineage_branching: bool = False
+    lineage_branch_rate: float = Field(0.0, ge=0.0, le=1.0)   # per-BIRTH prob the child founds a new named line
+    # ── LINEAGE SEGMENTATION (R-92) — the CORRECTED SHAPE of the above. Per-birth branching mints SINGLETONS,
+    # and a lineage of one usually leaves no descendants, so it adds a churning tail of ephemeral names that
+    # inflates the COUNT while the dominant line keeps its mass untouched. Measured (R-90, campaign scale):
+    # n_lineages 5→32 but eff_lineages (inverse-Simpson) FELL 3.4→1.8 and top_share ROSE 0.42→0.73 — diversity
+    # up on paper, down in substance, and lineages_per_band barely moved (2.14→2.33 against a target of ~7).
+    # Real Y-haplogroup trees do not sprout singletons at the tip; an existing line SEGMENTS into sub-clades
+    # that inherit real membership. So: pick a living member as the apical ancestor and split off ALL of its
+    # live patrilineal descendants as a new named line. Both halves are viable and both stay spread across
+    # bands, which is what lifts per-band diversity toward the Hill 2011 target.
+    # [RETRACTED 2026-08-06 — there is no Hill 2011 lineage target; the paper has no lineage data at all
+    # (Addendum 28). The SEGMENTATION MECHANISM is unaffected and still correct; only the number it was
+    # aimed at is void, so this is not calibrated to anything and must not be scored.]
+    # NB this is NOT the size-CAPPED segmentation rejected in R-90: hazard scales with size (a Yule process,
+    # which is what generates realistic skewed haplogroup distributions) but nothing bounds a lineage's size,
+    # so `top_share` stays a free measurement rather than an artifact of a threshold.
+    # ── RELATIVE legitimacy (R-93) — `legit_threshold` compares a lineage's SHARE of its band's feasting to a
+    # CONSTANT, and a share has a hidden denominator: the mean share is 1/lineages_per_band, so the test only
+    # discriminates while lineages_per_band > 1/legit_threshold. At the campaign's 0.15 that boundary is 6.67,
+    # against a ~~Hill 2011 target of ~7~~ — a FIVE PERCENT margin against NOTHING: the target does not
+    # exist (RETRACTED 2026-08-06, Addendum 28). The hidden-denominator ARGUMENT stands on its own; the
+    # 6.67-vs-7 coincidence that made it look calibrated does not. Nobody changed the parameter; the substrate
+    # drifted under it (measured lpb 2.14-3.69), at which point the AVERAGE lineage clears the bar and
+    # "nobility" becomes universal by arithmetic rather than by competition. R-92 confirmed a healthier
+    # substrate does NOT rescue it: the DOMAIN violation still fires at step ~650 with segmentation on.
+    # Fix: normalise the share by the number of lineages actually competing in that band, so the stored stock is
+    # a RELATIVE share where 1.0 means "exactly an average lineage" — scale-free, and Friedman's logic anyway
+    # ("one lineage convinces all the others" is about standing out from your neighbours, not clearing a fixed bar).
+    # ── SCALE-FREE resentment (R-94) — the SAME bug class as legit_threshold, one layer down. Privilege was
+    # `(mean_cred_ascribed − mean_cred_other)/mean_cred_other ÷ resent_privilege_ref`, with ref=10.0 chosen while
+    # ascription was UNIVERSAL and cred saturated toward 1+legit_cred_gain=11. Once R-93 made nobility a real 6%
+    # minority the gap shrank, privilege peaked at 0.166 against a 0.5 threshold, and reversions NEVER fired
+    # (0 vs 5,741). The reverse mechanism had been tuned against the BROKEN forward mechanism, so repairing the
+    # forward one moved the regime out from under it. Per charter D15, the fix is a scale-free measure rather
+    # than a re-tuned constant: privilege becomes an EFFECT SIZE — the noble/commoner cred gap divided by the
+    # band's own pooled spread — which has no denominator left to drift AND lets the threshold be anchored on
+    # Cohen's conventions (0.2 small / 0.5 medium / 0.8 large) instead of invented.
+    # ── RESENTMENT AS A TRUE ACCUMULATOR, HELD BY THE VILLAGE (R-95). Two flags, separable but ENTANGLED —
+    # neither works alone, and there is a test asserting exactly that.
+    #
+    # (a) ACCUMULATOR. `_do_delegitimation`'s own docstring says in capitals that resentment ACCUMULATES, after
+    #     Leach — *"prestige-seeking only increased their followers' resentment and hastened their overthrow"*.
+    #     The code implemented an EMA, which does not accumulate: it TRACKS, converging to whatever it is fed.
+    #     So a threshold at or above the typical privilege can NEVER be crossed at any horizon. Measured (R-94):
+    #     the grudge rose to 0.796 against a threshold of 0.800 and stopped — 1 revolt in 3000 years.
+    #     Accumulating instead makes the TIME-TO-REVOLT the anchored quantity, which is what Leach actually
+    #     claims, and removes the threshold as a free parameter (it is fixed at 1.0 by construction).
+    # (b) VILLAGE UNIT. R-88 measured band lifetime at 10.2 yr median / 17.5 mean, while the grudge needed
+    #     700-1600 yr to mature — the memory outlived its container by ~40-100x, and band fission resets it to
+    #     zero. Leach's gumlao premises describe VILLAGES ("villages autonomous", headmen, councils of elders),
+    #     not 25-person residential bands, so the settlement is both the lit-correct unit AND the one that
+    #     persists. Follows R-71's per-SITE precedent exactly: the place remembers, the members churn.
+    # ── LOCAL ascription (R-96). `_lineage_ascribed` was a GLOBAL set while every mechanism acting on it is
+    # LOCAL, so one village's revolt de-ranked that lineage in EVERY other village at once. Measured (R-95):
+    # ~7% of all lineages stripped per revolt, and nobility went from 82% of villages to 3% — annihilated
+    # rather than cycled. It contradicts the anchor directly: Leach's observation is that communities sit in
+    # DIFFERENT states simultaneously ("shifting back and forth"), which a single global set cannot represent.
+    # With this on, rank is held per (community, lineage): a lineage is noble IN A PLACE, and a revolt touches
+    # only the community that revolted. The community is the settlement when village resentment is on, else
+    # the band. Rank is NOT portable — a family that moves must earn standing where it arrives, which is what
+    # "villages autonomous" implies.
+    # ── RANK UNLOCKS HIERARCHY (R-98). `society_from_character(density, surplus_frac)` decides a band's society
+    # from CROWDING and SURPLUS only — it never asks whether anyone is actually ranked. So a village where every
+    # lineage is hereditary nobility is still labelled `egalitarian_forager` if it is sparse and poor, and since
+    # LEADER_SOCIETY_WEIGHT is 0.0 there, its nobility has NO structural consequence: it cannot grow past the
+    # band cap, sheds no scalar stress, and the whole elite layer is decorative with respect to settlement size.
+    # The model has surplus→hierarchy but not rank→hierarchy.
+    # THE ANCHOR SAYS RANK CAN COME FIRST. Leach's gumsa were rain-fed SWIDDEN HILL FARMERS without a storable
+    # glut — no aquatic gate, no great surplus — yet had ranked lineages, chiefs, tribute, and "all settlements
+    # under one chief". Testart's preconditions are one route to hierarchy, not the only one.
+    # So a band holding ranked lineages is promoted ONE rung on the ladder, and deliberately only one: this
+    # opens the route, it does not hand out chiefdoms.
+    enable_rank_hierarchy: bool = False
+    rank_hierarchy_frac: float = Field(0.15, ge=0.0, le=1.0)   # ascribed head-count share that counts as "ranked"
+    # ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011
+    # target is ~7 lineages per band, so one ranked lineage among them is ~0.14 of heads … tied to a target the
+    # model already carries rather than picked freely." **Hill et al. 2011 contains no lineage data at all** —
+    # the word does not appear in it — so there is no ~7, and 0.15 was not tied to anything. It is a free
+    # parameter that has been reading as a derived one. Left at 0.15 (changing it is a calibration decision, and
+    # `enable_rank_hierarchy` is default-OFF), but it must not be presented or scored as anchored.
+    enable_local_ascription: bool = False
+    enable_resentment_accumulator: bool = False
+    resent_years_to_revolt: float = Field(80.0, gt=0.0)   # yr to revolt at UNIT privilege (effect size 1.0);
+    # [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then
+    # collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the time.
+    enable_village_resentment: bool = False
+    enable_relative_resentment: bool = False
+    resent_effect_threshold: float = Field(0.8, ge=0.0)   # sustained effect size that triggers reversion (Cohen "large")
+    enable_relative_legitimacy: bool = False
+    legit_rel_multiplier: float = Field(2.0, ge=0.0)      # cross at this MULTIPLE of an average lineage's share
+    enable_lineage_split: bool = False
+    lineage_split_rate: float = Field(0.0, ge=0.0, le=1.0)    # per-MEMBER per-step hazard (lineage hazard = rate·n)
+    lineage_split_min_segment: int = Field(8, ge=1)           # both halves must reach this, else the split is skipped
     # ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo
     # instead of the blind spatial aggregation_radius. A ~25-band is too small to self-mate under a real prohibition →
     # marriage must reach across bands → the pool self-organizes to ~connubium scale. blueprint …_Connubium. Default OFF
@@ -793,12 +1740,35 @@ class DemographyConfig(BaseModel):
     # r = clamp(round(base·(npp_ref/max(local_npp, npp_floor))**exp), base, r_max). Default OFF / base=1 ⇒ bit-exact.
     # Calibration (ref/exp/max) PROVISIONAL — mechanism ships ablatable; locking the law for canonical runs needs
     # supervisor sign-off. (§4.8.19; R-39.)
+    # AGGLOMERATION ATTRACTION/PRODUCTION SPLIT (R-106 Addendum 13, 2026-07-31). The point-superlinear
+    # agglomeration term is applied TWICE from one parameter set: as a per-capita premium in the movement
+    # scorer (`substrate.diffusion_select_target`, it ATTRACTS) and as realized output in the harvest
+    # (`phase1_model`, `S += aggl_R·(n^β − n)`, it FEEDS). Addendum 10 measured the consequence: ablating
+    # agglomeration drops population to x0.20–0.45 because it supplies over half the economy, while max cell
+    # occupancy falls 159 → 10 — so the concentration defect could not be addressed without destroying
+    # subsistence. This weight scales the PERCEIVED premium alone, leaving realized production untouched, so
+    # the two functions become independently tunable. 1.0 ⇒ bit-exact (the shipped behaviour).
+    aggl_attraction_weight: float = Field(1.0, ge=0.0)
     enable_productivity_mobility: bool = False
     mobility_base_radius: int = Field(1, ge=1)               # stride at/above npp_ref
     mobility_max_radius: int = Field(6, ge=1)                # cap on stride (bounds cost + jump-over risk); PROVISIONAL
     mobility_npp_ref: float = Field(900.0, gt=0.0)           # forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL
     mobility_npp_floor: float = Field(50.0, gt=0.0)          # denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL
     mobility_exponent: float = Field(1.0, ge=0.0)            # Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket)
+    # PRESSURE-AWARE MOBILITY (R-106 Addendum 6, 2026-07-31): the NPP-driven stride above is STATIC/geographic —
+    # a cell packed with 40+ occupants still reads as "rich" (raw local_npp unchanged), so `mobility_radius`
+    # never expands for an agent stuck in a crowded cluster (measured 2026-07-30: r_used==1 in 100% of
+    # equilibrium decisions, Addendum 4). Kelly/Binford's actual packing claim is density-dependent — mobility
+    # responds to REALIZED pressure, not nominal biome fertility. `source="intake"` swaps the driving variable
+    # to the agent's own `_intake_ema` (the SAME live intake/requirement EMA `enable_intake_fertility` computes,
+    # R-106 — reused, not duplicated), which is occupancy-diluted by construction. Auto-enables the EMA update
+    # loop even when `enable_intake_fertility` itself is off (`phase1_model.py`), so the two mechanisms stay
+    # independently ablatable while sharing one signal. `source="npp"` (default) is the ORIGINAL formula,
+    # bit-exact — this is a pure additive mode, not a replacement.
+    mobility_pressure_source: Literal["npp", "intake"] = "npp"
+    mobility_intake_ref: float = Field(1.00, gt=0.0)         # ratio at/above which stride=base; reuses the
+    #   maintenance anchor `intake_fert_lo` already carries (§21.10) rather than inventing a new number
+    mobility_intake_floor: float = Field(0.15, gt=0.0)       # denom floor so a near-starving ratio doesn't → ∞ range
     # CENTRAL-PLACE FORAGING fixes (blueprint …_CoMovementCentralPlace; R-41): family co-movement snaps the whole
     # family onto the mother's (root's) single cell → she extracts S/(n+family) not S/(n+1) → energetic-fertility
     # collapse in marginal biomes. Real foragers CO-RESIDE but forage DISPERSED and SHARE (Isaac 1978 central-place;
@@ -849,6 +1819,207 @@ class DemographyConfig(BaseModel):
     # Prerequisite for the elite/material layer (a leaking homeostat can't be made state-dependent, Stage D).
     # Default OFF ⇒ bit-exact.
     enable_cred_renorm: bool = False
+    # ── ELITE LAYER, STAGE A (R-82): MATERIAL as a third capital cell ───────────────────────────────
+    # The status vector is [cred (ascribed), prowess (achieved), MATERIAL (durable)]. cred/prowess couple to
+    # the food contest and mating, but BOTH wash out materially — measured corr(cred, wealth) ≈ 0, because the
+    # sharing economy feeds everyone to their reserve cap each step. **Durability is the stratifying property**:
+    # a small per-step capture advantage integrates into a large stock gap only if the stock PERSISTS.
+    #
+    # ANCHORS (all [VERIFIED] in LITERATURE.md): **Sahlins 1968** — foragers deliberately "run below capacity"
+    # (~20–30%), so surplus is a SOCIAL outcome, not a technical given; **Boehm 1993** — that baseline is held
+    # by active leveling (38/48 societies remove an over-assertive individual; triggers include "lack of
+    # generosity or MONOPOLIZING RESOURCES"); **Testart 1982** — STORABLE surplus is the escape route, because
+    # a granary cannot be shared out the way a carcass can; **Hayden** (aggrandizer / control-of-redistribution,
+    # TO-GRAB) — the driver: the aggrandizer claims MORE THAN HE NEEDS and converts it to durable goods.
+    #
+    # MECHANISM — capture the granary LEFTOVER. The S.2 draw is deficit-capped, so weight-rich but near-full
+    # claimants leave surplus in the store ("any leftover … stays in the granary"). That leftover is exactly
+    # what an aggrandizer takes beyond need: it is claimed status^κ-weighted into a DURABLE `material` stock
+    # (not `wealth`, which is burned and capped). High cred ⇒ bigger claim ⇒ material stratification that does
+    # NOT wash out. Requires enable_storage (the granary) + the overwintering/seasonal zone.
+    enable_material_capture: bool = False
+    # SOURCE = GAME, not the granary (supervisor correction, R-82b). Durable goods in a forager economy are the
+    # BYPRODUCT OF HUNTING — hides, furs, bone, antler, sinew — produced in proportion to game taken. Stored
+    # food is EATEN or rots; turning granary grain into durable wealth conflated subsistence with capital.
+    # (Testart's storable-food route drives inequality by BUFFERING SUBSISTENCE, which is a different channel.)
+    # Bonus: hides ∝ meat couples material to the hunting economy, hence to `prowess` — the achieved facet.
+    material_hide_frac: float = Field(0.0, ge=0.0)              # durable yield per unit meat taken (sets UNITS only)
+    material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the cell's hide pool claimed by aggrandizers
+    material_decay: float = Field(0.0, ge=0.0, le=1.0)          # per-step depreciation of the durable stock (0 = imperishable)
+    # R-103d MATERIAL INHERITANCE — bequeath durable capital at death, the missing 'bequeathing' step (Flannery
+    # ch.10: big men "had no way of bequeathing renown to their offspring") that converts a lifetime OFFICE
+    # advantage into a heritable LINEAGE estate. Rule is regime-dependent [Goody 1976 diverging devolution;
+    # D-PLACE EA075×EA028 cross-tab, LITERATURE.md]. Default OFF ⇒ material dissolves at death (bit-exact).
+    enable_material_inheritance: bool = False
+    material_inheritance_rule: str = Field("primogeniture")     # none|primogeniture|partible_equal|patrilineal_sons
+    #   primogeniture   → whole estate to the ELDEST surviving child (concentrates; the extensive-agri pattern)
+    #   partible_equal  → split equally among ALL surviving children (dissipates; Goody's intensive-agri devolution)
+    #   patrilineal_sons→ split equally among surviving SONS (the EA-modal 43-61% rule)
+    # R-103e — HEIR COUPLED TO STATUS. Estate+rank should pass TOGETHER (Flannery ch.16 chiefly primogeniture),
+    # not to a random child. ON ⇒ primogeniture picks the highest-CRED (status) child, so wealth follows rank.
+    material_heir_by_status: bool = False
+    # R-103e — LEGITIMACY EXEMPTS THE NOBLE FROM LEVELING. The load-bearing device (Flannery ch.16 "how to turn
+    # rank into stratification"; Friedman: a legitimated lineage's holding is "his by right… entitled to tribute",
+    # NOT overreach-grievance). Without it, the model's Boehm overreach mechanism DEPOSES any material accumulator,
+    # so an elite can never lock in. ON ⇒ an ASCRIBED (noble) leader's material-overreach grievance is scaled by
+    # (1 - noble_exemption_frac); his FAILURE-TO-DELIVER grievance is untouched (a noble is still deposed for
+    # famine, just not for wealth). Default OFF ⇒ bit-exact.
+    enable_noble_leveling_exemption: bool = False
+    noble_exemption_frac: float = Field(1.0, ge=0.0, le=1.0)    # 1.0 = full waiver of the wealth-grievance for nobles
+    # R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE and cannot
+    # make a hereditary estate (R-103e benchmark: leader_material_lift rose to 1.26 but noble_material_lift stayed
+    # 1.10 — the levy concentrates in the office, not the lineage). This is the LINEAGE channel: in each band the
+    # locally-dominant ASCRIBED lineage's head (the CHIEF, by legitimacy+rank, NOT by winning the office contest)
+    # levies `lineage_tribute_frac` of every non-chief-lineage member's durable production. The estate therefore
+    # persists across office turnover and is bequeathed WITHIN the lineage — Friedman "the legitimated lineage
+    # controls resources and is entitled to tribute"; Earle wealth finance. Rate anchor: gumsa "a thigh from every
+    # animal" ≈ 0.10–0.15 of a kill (DM-F6; no % levy rate exists in the lit — D'Altroy&Earle verified neg — so
+    # this is calibrated to OUTCOME: noble_material_lift > 1). Default OFF ⇒ bit-exact.
+    enable_lineage_tribute: bool = False
+    lineage_tribute_frac: float = Field(0.15, ge=0.0, le=1.0)
+    # WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an
+    # "ambitious, accumulative aggrandizer" — "the best and most highly motivated minds of an epoch" — i.e. a
+    # PERSONALITY/STRATEGY TYPE held by a MINORITY, present in every society. It is NOT a rank in an inherited
+    # status order. (R-82's first cut weighted capture by cred^κ and measured corr(cred, material) = −0.018:
+    # a SPECIFICATION error, not a tuning one — the wrong variable.) Aggrandizers exist everywhere; what varies
+    # is whether conditions let them act — which is the gate below. That separation is the testable core of
+    # Hayden's thesis: hold the trait constant, vary the gate, and inequality should appear only under abundance.
+    aggrandizer_frac: float = Field(0.0, ge=0.0, le=1.0)        # share of agents who are aggrandizer-type
+    # WHEN capture is possible — the ABUNDANCE + INVULNERABILITY gate. [Hayden 1995 Fig. 6, p.77 VERIFIED] the
+    # top trait row is "Resource Abundance and Resources Invulnerable to Overexploitation or Degradation",
+    # running from MINIMUM expression among Egalitarian to MAXIMAL among Entrepreneurs/Chiefs. Extraction can
+    # only persist where it does not endanger the stock — otherwise Boehm leveling crushes the aggrandizer.
+    # Implemented against the GD-1 stock fraction B ∈ [0,1] (1.0 = at ceiling ⇒ invulnerable; low = overexploited).
+    material_invulnerability_min: float = Field(0.0, ge=0.0, le=1.0)   # min local stock fraction B for capture to fire
+    # ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ──────────────────────────────────────────
+    # R-82's first working cut had capture with NO opposition and ran to material Gini 0.909 while sitting in
+    # Hayden's EGALITARIAN density band — chiefdom inequality at forager density, the opposite of his Fig. 6.
+    # Hayden's thesis needs BOTH: aggrandizers push, the group pushes back, and ABUNDANCE decides who wins.
+    # Boehm: egalitarian societies run a "reverse dominance hierarchy" — the rank and file act as a coalition to
+    # suppress upstarts. Of ~47 sanctioned behaviours he tabulates, "lack of generosity or MONOPOLIZING
+    # RESOURCES" is an explicit trigger (5); the majority involve dominance/self-assertion. The recurring
+    # sanction against a monopolizer is DESERTION and forced disgorging — the Chaco desert a chief "who was
+    # stingy", the Nambicuara leave one "too exacting", and "often it is in fact the entire group that leaves".
+    # MECHANISM: a co-resident coalition sanctions whoever holds conspicuously more material than the local
+    # norm, forcing him to redistribute the excess to his cell-mates (Boehm's sanction executed as Hayden's
+    # competitive feast — the two authors' mechanisms are the same act seen from either side).
+    # NOTE the deliberate asymmetry with capture: leveling is NOT abundance-gated. Capture is (it needs an
+    # invulnerable surplus); leveling always operates. So abundance alone decides the balance — under scarcity
+    # capture is gated off while leveling still bites (egalitarian); under abundance capture outruns it
+    # (stratified). That emergent competition IS Hayden's thesis, and it is what makes it falsifiable here.
+    # ── LEADER SHARE — "managerial rights" over CORPORATE product (R-83, elite-layer step 1) ──────────
+    # THE MISSING RUNG between corporate property and personal stratification. Cell ownership in this model is
+    # CORPORATE (`_cell_owner` maps a cell to a band_id), but stratification needs PERSONS to differ. The bridge
+    # is not ownership — it is AUTHORITY OVER corporate property. [Hayden 1995 VERIFIED]: on the NW Coast
+    # aggrandizers "control access to spatially restricted resource locations or productive facilities (fishing
+    # rocks, weirs, boats, deer fences, drying sheds)"; that class "had MANAGERIAL RIGHTS over the resource
+    # locations and facilities of the group". Managerial rights, not title — the Big-Man/chiefly position.
+    # WHY BAND-LEVEL: R-82b's aggrandizer capture was applied per CELL, where 1–2 agents sit, so there was no
+    # group to skim and the effect was 1.14×. Bands are ~25 agents and already tracked (`band_id`), so the
+    # corporate unit is the band. Wrong level, not wrong mechanism.
+    # NOT HEREDITARY, and that is anchored [Boehm 1993 VERIFIED]: leaders are DEPOSABLE — Iroquois sachems were,
+    # and among the Yokuts even "a HEREDITARY chief ... suspected of too much self-aggrandizement was ... ignored
+    # in favor of another chief". Councils of elders act as the brake (Navajo, Fox, Yokuts, Tupinamba, Cuna).
+    # So the office is held on CONTINGENT merit: `band_leaders()` recomputes it each step from cred·prowess, and
+    # Boehm leveling still bites the holder. Hereditary succession is a LATER rung, and Hayden says it appears
+    # only where resource locations are spatially restricted (NW Coast) — not where land is ubiquitous (New Guinea).
+    enable_leader_share: bool = False
+    leader_share_frac: float = Field(0.0, ge=0.0, le=1.0)      # share of the BAND's per-step durable output taken as managerial right
+    enable_leveling: bool = False
+    # ANCHOR [Boehm 1993, VERIFIED]: "Ousting or ostracizing the individual or removing him from a leadership
+    # role involved **38 of the 48 societies**" reporting deliberate control of over-assertive leaders — i.e.
+    # a DECISIVE sanction is applied in 38/48 = **0.79** of societies (a further 28 instances used softer
+    # social pressure; 11/48 report assassination, the top rung). So a conspicuous monopolizer should draw a
+    # sanction with probability ≈0.79, not rarely: leveling is the NORM, not the exception. `leveling_strength`
+    # is the per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
+    leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess [0.79 = Boehm 38/48]
+    leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned [DESIGN]
+    # ── R-84 CHALLENGE-SUCCESSION: leadership as a TENURED OFFICE, and the two ways it is LOST ───────────
+    # DEFECT this fixes: `band_leaders()` recomputes argmax(cred·prowess) EVERY step ⇒ zero incumbency. There is
+    # no office, no tenure, and a leader is never *removed* — he merely stops being the maximum. The ethnography
+    # is the reverse: leadership is HELD, and lost to a SANCTION.
+    # ANCHOR [Boehm 1993 Table I, VERIFIED — columns counted from the 48-society world survey]:
+    #   Public opinion 10 · Criticism 6 · Ridicule 5 · Disobedience 7 · **DEPOSITION 9** · **DESERTION 17** ·
+    #   Exile 2 · Execution 10.
+    # DESERTION outnumbers DEPOSITION ≈2:1 — the commonest end of a bad leader is that his following WALKS AWAY,
+    # not a challenge-and-defeat duel ("if a bad chief was not deposed he might be deserted gradually" — Iban,
+    # Freeman 1970:114; "an entire dissatisfied lineage might simply go away" — Mandari, Buxton). And the split is
+    # structural, not arbitrary: DEPOSITION societies are the centralized ones (Iroquois sachems, Yap chiefs,
+    # Somali sultans, Iban, Assiniboin, Coeur d'Alene, Yokuts) while DESERTION societies are mobile/dispersed
+    # (Batek, Mendrig, Apache, Kutchin, Ute, Nambicuara, Yanomamö, Patagonia) — i.e. Sahlins' Nootka-vs-Siuai and
+    # Hayden's restricted-vs-ubiquitous resources, showing up as a sanction frequency.
+    # TRIGGERS [Boehm 1993, the 47 coded motivations for negative sanctioning]: "dominating others as leader" (14)
+    # + "lack of generosity or monopolizing resources" (5) = OVERREACH (19); "ineffectiveness, partiality, or
+    # unresponsiveness in a leadership role" (10) = FAILURE TO DELIVER. Hence `office_overreach_weight` = 19/29.
+    # THE LOOP THIS CLOSES: overreach is read off the leader's OWN material relative to his band — which is exactly
+    # what `leader_share_frac` inflates. A greedier levy raises the sanction hazard on the man taking it. Boehm's
+    # reverse dominance hierarchy as a feedback loop, not a constant.
+    enable_leader_office: bool = False
+    office_challenge_margin: float = Field(0.25, ge=0.0)       # challenger must exceed the incumbent's merit by this factor [DESIGN]
+    office_deposition_share: float = Field(9.0 / 26.0, ge=0.0, le=1.0)   # 0.346 = Boehm deposition 9 / (9 deposition + 17 desertion)
+    office_overreach_weight: float = Field(19.0 / 29.0, ge=0.0, le=1.0)  # 0.655 = Boehm (14 dominating + 5 monopolizing) / 29 leadership motivations
+    office_grievance_gain: float = Field(1.0, ge=0.0)          # per-step sanction hazard at unit grievance [DESIGN — calibrated on tenure]
+    # SUCCESSION ON THE HOLDER'S DEATH — two regimes [Sahlins 1972:209, VERIFIED]. The Nootka chief "is an
+    # officeholder in a lineage (house group), his following is this corporate group, and his central economic
+    # position is ascribed by right of chiefly due" ⇒ "centricity is built into the structure" and the office
+    # OUTLIVES him. The Siuai big-man's following "is an achievement — a result of generosity bestowed — the
+    # leadership an achievement, and the whole structure will as such DISSOLVE with the demise of the pivotal
+    # big-man." True ⇒ big-man regime (vacancy until someone re-earns it); False ⇒ chiefly office (filled at once).
+    succession_dissolve: bool = False
+    # ── DM-F1 / R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ────────────────
+    # WHY THIS EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our elite layer's premise is insufficient:
+    # "if feasting were all it took to produce hereditary inequality, there would have been no
+    # achievement-based societies left for anthropologists to study" — competitive feasting "produced
+    # individual Big Men who had no way of bequeathing renown to their offspring." That is EXACTLY what the
+    # model measures (R-83/R-84: leaders 3.68× ahead, father-was-leader only 53–69%, no transmission), i.e. the
+    # model is a correct ACHIEVEMENT-BASED society and hereditary rank needs a different mechanism.
+    # THE MECHANISM [Friedman's endogenous scenario, via Flannery ch.10 VERIFIED]: rank is created by a
+    # REINTERPRETATION of success, not by accumulation. Successful lineages were not credited with hard work —
+    # "they believed that one only obtained good harvests through proper sacrifices to the nats. The key shift
+    # in social logic was therefore from 'They must have pleased the nats' to 'They must be descended from
+    # higher nats than we are.'" Once a lineage is held to descend from the ruling spirits it controls the
+    # region's land and "was also entitled to receive tribute from other lineages".
+    # CHARTER DECLARATION (MECHANISM_CHARTER §3.1):
+    #   TYPE      C (Conversion) — material → heritable cred, gated on a legitimating belief. An OFF-DIAGONAL
+    #             of the capital matrix: the achieved→ascribed cell.
+    #   UNIT      LINEAGE (patriline `_lineage`), competing WITHIN a band. Friedman's unit is explicit: "one
+    #             lineage convinces all the others". NOT the band, and not the agent (cf. R-82's unit error).
+    #   INVARIANT DEBITED, not catalytic — sponsoring the sacrifice SPENDS material ("could sponsor the most
+    #             prestigious sacrifices and feed the most visitors"); belief is bought, not merely asserted.
+    #   ANCHOR    [VERIFIED Flannery & Marcus 2012 ch.10] for the mechanism; the four rates are [DESIGN],
+    #             calibrated against TARGETS T-6 (Hayden's 75% father-was-leader) and T-5 (BHM composite Gini).
+    # NOTE on the seam: MECHANISM_CHARTER §9.2 named `GroupVector.religion` as the carrier. On inspection that
+    # cell is an int RELIGION ID, while legitimacy is a continuous per-LINEAGE stock — so it lives on the model
+    # as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for actual religion ids.
+    enable_legitimacy: bool = False
+    legit_feast_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of a lineage's material spent on sacrifices/feasts each step
+    legit_decay: float = Field(0.02, ge=0.0, le=1.0)       # legitimacy fades without renewal (~1/0.02 = 50-step memory)
+    legit_threshold: float = Field(0.5, ge=0.0, le=1.0)    # above this share of the band's feasting, the lineage is "descended from higher nats"
+    legit_cred_gain: float = Field(0.0, ge=0.0)            # per-step heritable-cred boost to a legitimated lineage's members
+    # ── DM-F1 stage 2 / R-87: DELEGITIMATION — the gumsa → gumlao collapse ───────────────────────────────
+    # NOT optional polish. R-86 built the ascription RATCHET and it works (father-was-leader 76% vs Hayden's
+    # 75%), but a ratchet with no reverse HAS NO EQUILIBRIUM: `ascribed_frac_pop` reaches 0.70–0.85, at which
+    # point "descended from higher nats" stops being a distinction. The model derived the need for a collapse.
+    # ANCHOR [Leach via Flannery ch.10, VERIFIED]: Kachin society shifts between ranked (**gumsa**) and
+    # egalitarian (**gumlao**) modes — "hereditary inequality was repeatedly created, lasted for a few
+    # generations, and then collapsed." The driver is accumulated RESENTMENT, not an instantaneous check:
+    # ambitious leaders' prestige-seeking "only increased their followers' resentment and HASTENED THEIR
+    # OVERTHROW." gumlao premise 1 is "All lineages are considered equal" — a WHOLE-COMMUNITY reversion, which
+    # is why the flip is per-BAND rather than per-lineage.
+    # THIS IS THE H-CYCLES TEST. MECHANISM_CHARTER §5: every feedback in the model so far is INSTANTANEOUS
+    # negative feedback ⇒ a stable node ⇒ exponential return, never oscillation (three independent negatives,
+    # DE-14). A DELAYED negative feedback is what admits a complex eigenvalue pair. `resent_alpha` IS that
+    # delay, and it is the one parameter the hypothesis actually rides on.
+    # Ethnographic period to hit: "a few generations" ≈ 60–100 yr ≈ 720–1200 steps.
+    enable_delegitimation: bool = False
+    resent_alpha: float = Field(0.004, gt=0.0, le=1.0)     # EMA weight on privilege; 1/240 ≈ a 20-yr generational memory
+    resent_threshold: float = Field(0.5, ge=0.0)           # accumulated resentment that triggers the gumlao reversion
+    resent_privilege_ref: float = Field(1.0, gt=0.0)       # cred-advantage ratio treated as unit privilege [DESIGN]
+    # VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a
+    # CONSTANT per unit here. Stage E replaces this with an endogenous, exchange-set value (anchored to a real
+    # exchange system — Kula/cattle/bride-price — NOT a price-setting market, which Polanyi puts far later).
+    # Keeping it a separate scalar now means Stage E swaps one function, with no rearchitecting.
+    material_unit_value: float = Field(1.0, ge=0.0)
     # Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS
     # facet (achieved) joins the contest weight multiplicatively (Cobb–Douglas, equal within-domain exponents):
     # weight = ((cred+ε)·(prowess+ε))^κ. Default off → lineage-only = R-18 exact. Build step 1 ships the seam;
@@ -1024,18 +2195,46 @@ def size_repulsion(n: int, gain: float, midpoint: float, width: float, society: 
     return gain * repulsion_society_factor(society) * logistic
 
 
-def mobility_radius(local_npp: float, cfg) -> int:
+def mobility_radius(value: float, cfg) -> int:
     """Productivity-scaled movement STRIDE (Kelly 1995 / Binford 2001: mobility ∝ 1/productivity).
 
-    r = clamp(round(base · (npp_ref / max(local_npp, npp_floor))**exponent), base, r_max).
-    Low local NPP → long stride (spread over sparse land); high NPP → r=base (=1 by default, bit-exact).
+    r = clamp(round(base · (ref / max(value, floor))**exponent), base, r_max).
+    Low `value` → long stride (spread out); high `value` → r=base (=1 by default, bit-exact).
     Returns `base` unconditionally when the flag is off. `cfg` is a DemographyConfig (or any object with the
-    mobility_* fields). Calibration (ref/exp/max) PROVISIONAL pending supervisor sign-off."""
+    mobility_* fields).
+
+    `cfg.mobility_pressure_source` selects what `value` MEANS (R-106 Addendum 6):
+      - "npp" (default, bit-exact): `value` = static geographic local NPP (§4.8.19 original). ref/floor =
+        `mobility_npp_ref`/`mobility_npp_floor`. Calibration PROVISIONAL pending supervisor sign-off.
+      - "intake": `value` = the agent's own live intake/requirement EMA (`_intake_ema`, R-106) — density-aware,
+        since a crowded cell dilutes it regardless of the cell's nominal fertility. ref/floor =
+        `mobility_intake_ref`/`mobility_intake_floor`. Caller is responsible for passing the right `value`."""
     base = cfg.mobility_base_radius
     if not cfg.enable_productivity_mobility:
         return base
-    denom = max(local_npp, cfg.mobility_npp_floor)
-    ratio = cfg.mobility_npp_ref / denom
+    # UNIT GUARD (2026-08-07, tier-4 CTB). The two sources live on scales three orders of magnitude apart —
+    # NPP is g/m²/yr in the hundreds, intake is a requirement RATIO around 1 — and the docstring put the
+    # burden of matching them on the caller. Both mismatches were SILENT and failed in opposite directions:
+    #   source="intake" fed an NPP value  -> ratio ~1/900 -> r pinned to `base`, the mechanism INERT while ON
+    #   source="npp"    fed an intake one -> ratio ~900/50 -> r pinned to `max`, every agent at full stride
+    #                                        regardless of productivity, i.e. Kelly/Binford exactly inverted
+    # ⚠ NOT GUARDABLE FROM THE VALUE, and two attempts to do so both failed against real data:
+    #     attempt 1 rejected small values under "npp"    -> broke 4 tests: an arid or near-water cell
+    #               genuinely has NPP below 20 g/m²/yr, which is exactly what `mobility_npp_floor` is for
+    #     attempt 2 rejected large values under "intake" -> broke 2 tests: a well-fed agent genuinely has an
+    #               intake ratio of 27, early in a run when few agents sit on rich land
+    # The two scales OVERLAP across their whole useful ranges, so no threshold separates them. The mismatch
+    # is real and silent in both directions — `source="intake"` fed NPP pins the stride to `base` (inert while
+    # reading ON); `source="npp"` fed an intake ratio pins it to `max` (Kelly/Binford inverted) — but it can
+    # only be caught at the CALL SITE, by passing the value the source names. `test_pressure_mobility.py`
+    # covers the call sites; `test_tier4_movement_ctb.py` documents the hazard.
+    # A guard that fires on legitimate input is worse than none: it gets switched off, and nothing replaces it.
+    if getattr(cfg, "mobility_pressure_source", "npp") == "intake":
+        ref, floor = cfg.mobility_intake_ref, cfg.mobility_intake_floor
+    else:
+        ref, floor = cfg.mobility_npp_ref, cfg.mobility_npp_floor
+    denom = max(value, floor)
+    ratio = ref / denom
     r = base * (ratio ** cfg.mobility_exponent)
     return int(max(base, min(cfg.mobility_max_radius, round(r))))
 
@@ -1076,7 +2275,10 @@ def biome_default_society(biome_code: int | None = None, aquatic_rich: bool = Fa
     return "complex_forager" if aquatic_rich else "egalitarian_forager"
 
 
-def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
+def society_from_character(density_per_km2: float, surplus_frac: float,
+                           wealth_gini: float | None = None, gini_min: float | None = None,
+                           between_gini: float | None = None, between_gini_min: float | None = None,
+                           band_is_top: bool = True) -> str:
     """Morph hook — map a band's measured CHARACTER (density vs Binford packing; surplus = Testart storage
     enabler) onto the complexity ladder. surplus_frac = mean reserve fraction above subsistence (0..1).
       below packing & no defendable surplus → egalitarian (mobile, leveled);
@@ -1085,11 +2287,26 @@ def society_from_character(density_per_km2: float, surplus_frac: float) -> str:
     Note: this ladder is the storage/packing (complexity) axis only — the patrilineal/matrilineal DESCENT types
     are set by history/biome, not reached by density. And in the current forage-only model the equilibrium
     density (~0.065–0.1/km²) sits AT/below packing, so a band stays egalitarian until a carrying-capacity boost
-    (storage/aquatic/agriculture — the deferred surplus mechanic) lifts it past the threshold."""
+    (storage/aquatic/agriculture — the deferred surplus mechanic) lifts it past the threshold.
+
+    R-103 INEQUALITY GATE (`gini_min` not None ⇒ ON; None ⇒ bit-exact with the level-only classifier). When on,
+    the stratified verdict additionally requires `wealth_gini ≥ gini_min` — a packed, affluent, but EQUAL band is
+    complex (affluent-egalitarian), not stratified. Closes the diagnosed decoupling where the stratified LABEL
+    ran opposite to measured inequality (a uniformly-rich world read 45% stratified at cred-Gini 0.29)."""
     packed = density_per_km2 >= BINFORD_PACKING_PER_KM2
     if not packed and surplus_frac < 0.5:
         return "egalitarian_forager"
     if packed and surplus_frac >= 0.7:
+        if gini_min is not None and (wealth_gini is None or wealth_gini < gini_min):
+            return "complex_forager"          # WITHIN-band gate (R-103 v1): packed + affluent but internally EQUAL
+        # R-103 RELATIONAL GATE (`between_gini_min` not None ⇒ ON; None ⇒ bit-exact). Stratification is a
+        # relation BETWEEN bands, not a property of one band: a chiefdom is a hierarchy of settlements where a
+        # few centres dominate. So the stratified verdict needs an UNEQUAL region (between-band cred Gini ≥
+        # between_gini_min) AND this band at the TOP of it (`band_is_top`). A rich but between-band-EQUAL world
+        # is affluent-egalitarian ⇒ complex. This replaces the within-band gate, which read ~uniform (0.29) and
+        # could not discriminate; the between-band signal (0.14 in the affluent-egalitarian world) can.
+        if between_gini_min is not None and (between_gini is None or between_gini < between_gini_min or not band_is_top):
+            return "complex_forager"
         return "stratified_chiefdom"
     return "complex_forager"
 
@@ -1109,6 +2326,24 @@ SEDENTISM_IBI_MONTHS = {
 def sedentism_ibi(society: str | None, base: int) -> int:
     """Society-dependent lactational refractory (NDT). Unknown/None → the base (config) value."""
     return SEDENTISM_IBI_MONTHS.get(society, base)
+
+
+def energetic_refractory(base_months: float, intake_ratio: float, cfg: DemographyConfig) -> float:
+    """Stretch a lactational refractory by the energy shortfall. See `enable_energetic_refractory`.
+
+        f = clamp((intake − lo) / (hi − lo), 0, 1)        0 at maintenance, 1 at full reproductive capacity
+        refractory = base × (1 + (stretch_max − 1)·(1 − f))
+
+    `f` uses the FAO/IOM window the fecundability brake already reads, so no new threshold is introduced.
+    `base` is whatever `sedentism_ibi` returned, so this composes with the NDT mechanism instead of
+    overriding it. At full energy the function is the IDENTITY — that is what keeps the flag bit-exact when
+    every woman is well fed, and it is also why the mechanism can only ever LENGTHEN spacing, never shorten
+    it below the society's own base.
+    """
+    span = cfg.intake_fert_hi - cfg.intake_fert_lo
+    f = 1.0 if span <= 0.0 else (intake_ratio - cfg.intake_fert_lo) / span
+    f = 0.0 if f < 0.0 else (1.0 if f > 1.0 else f)
+    return base_months * (1.0 + (cfg.refractory_stretch_max - 1.0) * (1.0 - f))
 
 
 def is_fertile(age_months: float, months_since_birth: int, cfg: DemographyConfig) -> bool:
@@ -1134,10 +2369,22 @@ def risk_mult(risk_cell: float, risk_ref: float, cap: float) -> float:
     return min(cap, risk_cell / risk_ref)
 
 
-def density_mult(density_per_km2: float, delta: float, rho_half: float) -> float:
+def density_mult(density_per_km2: float, delta: float, rho_half: float,
+                 rho_ref: float = 0.0) -> float:
     """Density-dependent disease: `1 + δ·ρ/(ρ+ρ_half)`, ρ in **agents/km²** (red-team m-3). Endemic /
-    zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever."""
-    return 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+    zoonotic — modest (Dunn 1968 / Houldcroft & Underdown 2023), NOT crowd-epidemic. The free lever.
+
+    `rho_ref > 0` divides through by the value at that density, so the multiplier is exactly 1.0 there and
+    the term becomes a RELATIVE excess above the reference rather than above an empty world. This is the
+    same invariant `risk_mult` and `pathogen_mult` already hold, and the one this function silently broke:
+    Siler's a2 was fitted on a population living at a real density, so charging it again at that density
+    double-counts. `rho_ref = 0` reproduces the historical unnormalised form exactly (bit-exact default).
+    See `DemographyConfig.enable_density_reference` for the measurement that motivated it.
+    """
+    raw = 1.0 + delta * density_per_km2 / (density_per_km2 + rho_half)
+    if rho_ref <= 0.0:
+        return raw
+    return raw / (1.0 + delta * rho_ref / (rho_ref + rho_half))
 
 
 def pathogen_mult(npp_cell: float, npp_ref: float, gamma: float, cap: float) -> float:

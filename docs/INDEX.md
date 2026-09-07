@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-06-16 (unified **Resource Return-Rate Table** created — forage + game in one derived view; the game-only table retired to a stub). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
+**Last updated:** 2026-07-18 (**MECHANISM_CHARTER.md adopted** — the operator discipline; now a 12th home). Prior: 2026-06-16 (unified **Resource Return-Rate Table** created — forage + game in one derived view; the game-only table retired to a stub). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
 
 ---
 
@@ -13,6 +13,7 @@
 | Where am I, what's next, what's been tried/deferred | **ROADMAP.md** | Stage sequence, status, pending/deferred items, open questions (Q-list) |
 | What mechanics are agreed but deferred (seam placed, literature anchor exists) | **DEFERRED_MECHANICS.md** | Named deferred mechanics with seam + literature anchor + status |
 | The big-picture structure / seams / how the pieces fit | **ARCHITECTURE.md** | System decomposition, module seams, data flow, design-decisions log |
+| What a mechanism is ALLOWED to be; its type, unit, invariant | **MECHANISM_CHARTER.md** | The operator discipline: the 11 types (S F T P D X C A N H O), the invariant each must satisfy, the retrofit classification of all 60 flags, and the vectorization strategy each type implies |
 | How a specific mechanism *works* (the rule/equation) | **MECHANISMS.md** | Per-construct definitions, ranges, inheritance channels, mechanism logic, C/Si classification |
 | What is parameter X, its value, when it was locked, sweep history | **PARAMETERS.md** | The authoritative value + lock/sweep/retire history of every parameter |
 | What we *aspire* to show (no falsification spec yet) | **TARGETS.md** | Aspirations; each graduates to HYPOTHESES when it gets a test spec |

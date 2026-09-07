@@ -1,0 +1,3135 @@
+{
+ "full": {
+  "enable_marriage_aggregation": true,
+  "enable_aggregation_sedentism": true,
+  "enable_catchment_ceiling": true,
+  "enable_aggl_ceiling": true,
+  "settle_catchment_radius": 1,
+  "enable_settlement_scalar_stress": true,
+  "enable_landscape_packing": true,
+  "enable_cred_status": true,
+  "cred_seed_sigma": 0.5,
+  "cred_inherit_sigma": 0.1,
+  "enable_paternity": true,
+  "divorce_rate": 0.004,
+  "enable_morph": true,
+  "enable_material_capture": true,
+  "material_hide_frac": 0.07,
+  "material_decay": 0.002,
+  "aggrandizer_frac": 0.15,
+  "enable_leader_share": true,
+  "leader_share_frac": 0.2,
+  "enable_leveling": true,
+  "leveling_strength": 0.79,
+  "leveling_share": 0.8,
+  "enable_leader_office": true,
+  "office_grievance_gain": 0.05,
+  "enable_legitimacy": true,
+  "legit_feast_frac": 0.25,
+  "legit_cred_gain": 10.0,
+  "legit_threshold": 0.15,
+  "legit_decay": 0.02,
+  "enable_delegitimation": true,
+  "resent_alpha": 0.001,
+  "resent_threshold": 0.5,
+  "resent_privilege_ref": 10.0,
+  "enable_relative_legitimacy": true,
+  "legit_rel_multiplier": 2.0,
+  "enable_relative_resentment": true,
+  "resent_effect_threshold": 0.8,
+  "enable_resentment_accumulator": true,
+  "enable_village_resentment": true,
+  "resent_years_to_revolt": 80.0,
+  "enable_local_ascription": true,
+  "enable_rank_hierarchy": true,
+  "rank_hierarchy_frac": 0.15,
+  "enable_lineage_branching": true,
+  "lineage_branch_rate": 0.05,
+  "enable_lineage_split": true,
+  "lineage_split_rate": 3e-05,
+  "lineage_split_min_segment": 8,
+  "enable_material_inheritance": true,
+  "material_inheritance_rule": "primogeniture",
+  "material_heir_by_status": true,
+  "enable_lineage_tribute": true,
+  "lineage_tribute_frac": 0.15,
+  "enable_noble_leveling_exemption": true,
+  "noble_exemption_frac": 1.0,
+  "enable_ascribed_mate_choice": true,
+  "ascribed_mate_strength": 2.5,
+  "band_risk_penalty": 0.05,
+  "provision_self_keep": 0.6,
+  "enable_agriculture": true,
+  "enable_soil_depletion": true,
+  "enable_alluvial_renewal": true,
+  "enable_economic_defensibility": true,
+  "enable_band_risk": true,
+  "enable_village_budding": true,
+  "enable_bud_hazard": true
+ },
+ "world": {
+  "n": 800,
+  "patch": 24,
+  "terr": "flat",
+  "clim": "temperate"
+ },
+ "steps": 250,
+ "rows": [
+  {
+   "stage": "S2",
+   "param": "a2_cap",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 726
+  },
+  {
+   "stage": "S2",
+   "param": "a2_cap",
+   "at": "max",
+   "value": 50.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "abandon_hardship_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "abandon_hardship_gain",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "adult_ratio_mf",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 677
+  },
+  {
+   "stage": "S2",
+   "param": "adult_ratio_mf",
+   "at": "max",
+   "value": 14.7,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 688
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_alpha",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_alpha",
+   "at": "max",
+   "value": 11.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_beta",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 232
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_beta",
+   "at": "max",
+   "value": 11.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 627
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_catchment_radius",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_catchment_radius",
+   "at": "max",
+   "value": 10,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_half",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_half",
+   "at": "max",
+   "value": 1000.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_tier2",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 232
+  },
+  {
+   "stage": "S2",
+   "param": "aggl_tier2",
+   "at": "max",
+   "value": 20.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 649
+  },
+  {
+   "stage": "S2",
+   "param": "aggrandizer_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 616
+  },
+  {
+   "stage": "S2",
+   "param": "aggrandizer_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_period",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 680
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_period",
+   "at": "max",
+   "value": 120,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 434
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_radius",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 301
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_radius",
+   "at": "max",
+   "value": 80.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 776
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_rank_homogamy",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_rank_homogamy",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 736
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_season_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_season_threshold",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_site_sep",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 615
+  },
+  {
+   "stage": "S2",
+   "param": "aggregation_site_sep",
+   "at": "max",
+   "value": 100.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 403
+  },
+  {
+   "stage": "S2",
+   "param": "alluvial_renew_per_yr",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "alluvial_renew_per_yr",
+   "at": "max",
+   "value": 30.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 784
+  },
+  {
+   "stage": "S2",
+   "param": "ascribed_mate_strength",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 681
+  },
+  {
+   "stage": "S2",
+   "param": "ascribed_mate_strength",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 731
+  },
+  {
+   "stage": "S2",
+   "param": "assabiyah_decay",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 671
+  },
+  {
+   "stage": "S2",
+   "param": "assabiyah_decay",
+   "at": "max",
+   "value": 0.2,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 744
+  },
+  {
+   "stage": "S2",
+   "param": "assabiyah_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 744
+  },
+  {
+   "stage": "S2",
+   "param": "assabiyah_gain",
+   "at": "max",
+   "value": 0.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 716
+  },
+  {
+   "stage": "S2",
+   "param": "assortative_strength",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "assortative_strength",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "band_base_tolerable",
+   "at": "min",
+   "value": 2,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 506
+  },
+  {
+   "stage": "S2",
+   "param": "band_base_tolerable",
+   "at": "max",
+   "value": 250,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 641
+  },
+  {
+   "stage": "S2",
+   "param": "band_cohesion",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 554
+  },
+  {
+   "stage": "S2",
+   "param": "band_cohesion",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 817
+  },
+  {
+   "stage": "S2",
+   "param": "band_merge_size",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 718
+  },
+  {
+   "stage": "S2",
+   "param": "band_merge_size",
+   "at": "max",
+   "value": 100,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 694
+  },
+  {
+   "stage": "S2",
+   "param": "band_risk_penalty",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "band_risk_penalty",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 596
+  },
+  {
+   "stage": "S2",
+   "param": "band_risk_size",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "band_risk_size",
+   "at": "max",
+   "value": 250,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 750
+  },
+  {
+   "stage": "S2",
+   "param": "band_split_size",
+   "at": "min",
+   "value": 2,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 691
+  },
+  {
+   "stage": "S2",
+   "param": "band_split_size",
+   "at": "max",
+   "value": 450,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 711
+  },
+  {
+   "stage": "S2",
+   "param": "bonded_mate_radius",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 737
+  },
+  {
+   "stage": "S2",
+   "param": "bonded_mate_radius",
+   "at": "max",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_b0",
+   "at": "min",
+   "value": -186.35999999999999,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_b0",
+   "at": "max",
+   "value": -186.35999999999999,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_b1",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_b1",
+   "at": "max",
+   "value": 1.47,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_per_yr",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_hazard_per_yr",
+   "at": "max",
+   "value": 0.05,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "bud_steps_per_year",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "bud_steps_per_year",
+   "at": "max",
+   "value": 120.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_capital",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_capital",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_depletion",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_depletion",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_integration",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "bud_w_integration",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "catchment_ceiling_mult",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "EXTINCT"
+  },
+  {
+   "stage": "S2",
+   "param": "catchment_ceiling_mult",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 889
+  },
+  {
+   "stage": "S2",
+   "param": "childhood_ratio_mf",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 748
+  },
+  {
+   "stage": "S2",
+   "param": "childhood_ratio_mf",
+   "at": "max",
+   "value": 7.1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 737
+  },
+  {
+   "stage": "S2",
+   "param": "comove_footprint",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "comove_footprint",
+   "at": "max",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 721
+  },
+  {
+   "stage": "S2",
+   "param": "comove_footprint_max",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "comove_footprint_max",
+   "at": "max",
+   "value": 30,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "condition_alpha",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "condition_alpha",
+   "at": "max",
+   "value": 2.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "cred_inherit_sigma",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 758
+  },
+  {
+   "stage": "S2",
+   "param": "cred_inherit_sigma",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 782
+  },
+  {
+   "stage": "S2",
+   "param": "cred_seed_sigma",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 538
+  },
+  {
+   "stage": "S2",
+   "param": "cred_seed_sigma",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 753
+  },
+  {
+   "stage": "S2",
+   "param": "cv_safe",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "cv_safe",
+   "at": "max",
+   "value": 0.37,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_claim_dwell",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 781
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_claim_dwell",
+   "at": "max",
+   "value": 60,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 698
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_claim_min",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 741
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_claim_min",
+   "at": "max",
+   "value": 30,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 698
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_exclusion",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 747
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_exclusion",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 819
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_min",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 727
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_min",
+   "at": "max",
+   "value": 1.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 698
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_tether",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 720
+  },
+  {
+   "stage": "S2",
+   "param": "defensibility_tether",
+   "at": "max",
+   "value": 60.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 740
+  },
+  {
+   "stage": "S2",
+   "param": "dens_delta",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 733
+  },
+  {
+   "stage": "S2",
+   "param": "dens_delta",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 602
+  },
+  {
+   "stage": "S2",
+   "param": "dens_rho_half",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 578
+  },
+  {
+   "stage": "S2",
+   "param": "dens_rho_half",
+   "at": "max",
+   "value": 2.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 807
+  },
+  {
+   "stage": "S2",
+   "param": "divorce_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 713
+  },
+  {
+   "stage": "S2",
+   "param": "divorce_rate",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 464
+  },
+  {
+   "stage": "S2",
+   "param": "exogamy_relatedness",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "exogamy_relatedness",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "family_maturity_months",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 840
+  },
+  {
+   "stage": "S2",
+   "param": "family_maturity_months",
+   "at": "max",
+   "value": 1800,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 735
+  },
+  {
+   "stage": "S2",
+   "param": "fecundability",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 319
+  },
+  {
+   "stage": "S2",
+   "param": "fecundability",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 787
+  },
+  {
+   "stage": "S2",
+   "param": "forage_cap_hours",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 75
+  },
+  {
+   "stage": "S2",
+   "param": "forage_cap_hours",
+   "at": "max",
+   "value": 1000.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 795
+  },
+  {
+   "stage": "S2",
+   "param": "fusion_search_radius",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "fusion_search_radius",
+   "at": "max",
+   "value": 250.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "game_meat_cv",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 679
+  },
+  {
+   "stage": "S2",
+   "param": "game_meat_cv",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 708
+  },
+  {
+   "stage": "S2",
+   "param": "game_meat_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 581
+  },
+  {
+   "stage": "S2",
+   "param": "game_meat_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 608
+  },
+  {
+   "stage": "S2",
+   "param": "genome_loci",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "genome_loci",
+   "at": "max",
+   "value": 320,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "genome_mutation",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "genome_mutation",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "ibi_refractory_months",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 1330
+  },
+  {
+   "stage": "S2",
+   "param": "ibi_refractory_months",
+   "at": "max",
+   "value": 300,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 438
+  },
+  {
+   "stage": "S2",
+   "param": "leader_coherence_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 742
+  },
+  {
+   "stage": "S2",
+   "param": "leader_coherence_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "leader_share_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 715
+  },
+  {
+   "stage": "S2",
+   "param": "leader_share_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 736
+  },
+  {
+   "stage": "S2",
+   "param": "legit_cred_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "legit_cred_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "legit_decay",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 812
+  },
+  {
+   "stage": "S2",
+   "param": "legit_decay",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 680
+  },
+  {
+   "stage": "S2",
+   "param": "legit_feast_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 684
+  },
+  {
+   "stage": "S2",
+   "param": "legit_feast_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 655
+  },
+  {
+   "stage": "S2",
+   "param": "legit_rel_multiplier",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 776
+  },
+  {
+   "stage": "S2",
+   "param": "legit_rel_multiplier",
+   "at": "max",
+   "value": 20.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 812
+  },
+  {
+   "stage": "S2",
+   "param": "legit_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "legit_threshold",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "leveling_share",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 791
+  },
+  {
+   "stage": "S2",
+   "param": "leveling_share",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 672
+  },
+  {
+   "stage": "S2",
+   "param": "leveling_strength",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 791
+  },
+  {
+   "stage": "S2",
+   "param": "leveling_strength",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 730
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_branch_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 608
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_branch_rate",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_reversion",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 703
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_reversion",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 775
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_split_min_segment",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 811
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_split_min_segment",
+   "at": "max",
+   "value": 80,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 776
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_split_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 776
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_split_rate",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_tribute_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 837
+  },
+  {
+   "stage": "S2",
+   "param": "lineage_tribute_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 725
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_ema_alpha",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 735
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_ema_alpha",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 756
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_fission_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_fission_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_starv_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "malnutrition_starv_rate",
+   "at": "max",
+   "value": 0.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mate_choice_strength",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 795
+  },
+  {
+   "stage": "S2",
+   "param": "mate_choice_strength",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 731
+  },
+  {
+   "stage": "S2",
+   "param": "mate_search_max_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mate_search_max_radius",
+   "at": "max",
+   "value": 150,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mate_search_min_eligible",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mate_search_min_eligible",
+   "at": "max",
+   "value": 30,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_capture_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_capture_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 797
+  },
+  {
+   "stage": "S2",
+   "param": "material_decay",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 799
+  },
+  {
+   "stage": "S2",
+   "param": "material_decay",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 698
+  },
+  {
+   "stage": "S2",
+   "param": "material_hide_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 685
+  },
+  {
+   "stage": "S2",
+   "param": "material_hide_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_invulnerability_min",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_invulnerability_min",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_unit_value",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "material_unit_value",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "maternal_mortality_per_birth",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "maternal_mortality_per_birth",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "max_wives",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 669
+  },
+  {
+   "stage": "S2",
+   "param": "max_wives",
+   "at": "max",
+   "value": 10,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 657
+  },
+  {
+   "stage": "S2",
+   "param": "menarche_months",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 1303
+  },
+  {
+   "stage": "S2",
+   "param": "menarche_months",
+   "at": "max",
+   "value": 1800,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 303
+  },
+  {
+   "stage": "S2",
+   "param": "menopause_months",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 323
+  },
+  {
+   "stage": "S2",
+   "param": "menopause_months",
+   "at": "max",
+   "value": 5040,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 931
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_base_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_base_radius",
+   "at": "max",
+   "value": 10,
+   "declared_range": false,
+   "verdict": "EXTINCT"
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_exponent",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_exponent",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 708
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_max_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_max_radius",
+   "at": "max",
+   "value": 60,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_npp_floor",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_npp_floor",
+   "at": "max",
+   "value": 500.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_npp_ref",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mobility_npp_ref",
+   "at": "max",
+   "value": 9000.0,
+   "declared_range": false,
+   "verdict": "EXTINCT"
+  },
+  {
+   "stage": "S2",
+   "param": "morph_aquatic_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "morph_aquatic_threshold",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "morph_npp_floor",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "morph_npp_floor",
+   "at": "max",
+   "value": 5000.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "morph_settle_steps",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 633
+  },
+  {
+   "stage": "S2",
+   "param": "morph_settle_steps",
+   "at": "max",
+   "value": 3000,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 738
+  },
+  {
+   "stage": "S2",
+   "param": "move_cost_kcal",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 714
+  },
+  {
+   "stage": "S2",
+   "param": "move_cost_kcal",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 714
+  },
+  {
+   "stage": "S2",
+   "param": "mu_max",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "mu_max",
+   "at": "max",
+   "value": 25.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "noble_exemption_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 755
+  },
+  {
+   "stage": "S2",
+   "param": "noble_exemption_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "office_challenge_margin",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 800
+  },
+  {
+   "stage": "S2",
+   "param": "office_challenge_margin",
+   "at": "max",
+   "value": 2.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 797
+  },
+  {
+   "stage": "S2",
+   "param": "office_deposition_share",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 746
+  },
+  {
+   "stage": "S2",
+   "param": "office_deposition_share",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 741
+  },
+  {
+   "stage": "S2",
+   "param": "office_grievance_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 681
+  },
+  {
+   "stage": "S2",
+   "param": "office_grievance_gain",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 599
+  },
+  {
+   "stage": "S2",
+   "param": "office_overreach_weight",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 626
+  },
+  {
+   "stage": "S2",
+   "param": "office_overreach_weight",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 739
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_e_mult",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_e_mult",
+   "at": "max",
+   "value": 14.990000000000002,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_max_age_years",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 673
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_max_age_years",
+   "at": "max",
+   "value": 90.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 726
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_divorced",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 775
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_divorced",
+   "at": "max",
+   "value": 29.700000000000003,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 676
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_father_dead",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 707
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_father_dead",
+   "at": "max",
+   "value": 30.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 736
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_mother_dead",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 758
+  },
+  {
+   "stage": "S2",
+   "param": "orphan_mult_mother_dead",
+   "at": "max",
+   "value": 50.9,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 798
+  },
+  {
+   "stage": "S2",
+   "param": "paternal_provision_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "paternal_provision_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 861
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_cap",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_cap",
+   "at": "max",
+   "value": 30.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_gamma",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_gamma",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_npp_ref",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "pathogen_npp_ref",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "patriline_weight",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 734
+  },
+  {
+   "stage": "S2",
+   "param": "patriline_weight",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 683
+  },
+  {
+   "stage": "S2",
+   "param": "polygyny_attrition",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "polygyny_attrition",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 736
+  },
+  {
+   "stage": "S2",
+   "param": "polygyny_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 669
+  },
+  {
+   "stage": "S2",
+   "param": "polygyny_rate",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 637
+  },
+  {
+   "stage": "S2",
+   "param": "provision_self_keep",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 764
+  },
+  {
+   "stage": "S2",
+   "param": "provision_self_keep",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 810
+  },
+  {
+   "stage": "S2",
+   "param": "prowess_decay",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 722
+  },
+  {
+   "stage": "S2",
+   "param": "prowess_decay",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 774
+  },
+  {
+   "stage": "S2",
+   "param": "rank_hierarchy_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "rank_hierarchy_frac",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 660
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 797
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_midpoint",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_midpoint",
+   "at": "max",
+   "value": 250.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 660
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_width",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "repulsion_width",
+   "at": "max",
+   "value": 60.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_alpha",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_alpha",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_effect_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_effect_threshold",
+   "at": "max",
+   "value": 8.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_privilege_ref",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_privilege_ref",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_threshold",
+   "at": "max",
+   "value": 5.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "resent_years_to_revolt",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "resent_years_to_revolt",
+   "at": "max",
+   "value": 800.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "risk_cap",
+   "at": "min",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 739
+  },
+  {
+   "stage": "S2",
+   "param": "risk_cap",
+   "at": "max",
+   "value": 30.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settle_catchment_radius",
+   "at": "min",
+   "value": 0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 390
+  },
+  {
+   "stage": "S2",
+   "param": "settle_catchment_radius",
+   "at": "max",
+   "value": 20,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 935
+  },
+  {
+   "stage": "S2",
+   "param": "settle_min_pool",
+   "at": "min",
+   "value": 2,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 881
+  },
+  {
+   "stage": "S2",
+   "param": "settle_min_pool",
+   "at": "max",
+   "value": 400,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 731
+  },
+  {
+   "stage": "S2",
+   "param": "settle_persist_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 671
+  },
+  {
+   "stage": "S2",
+   "param": "settle_persist_threshold",
+   "at": "max",
+   "value": 3.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 731
+  },
+  {
+   "stage": "S2",
+   "param": "settle_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 730
+  },
+  {
+   "stage": "S2",
+   "param": "settle_radius",
+   "at": "max",
+   "value": 20,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 595
+  },
+  {
+   "stage": "S2",
+   "param": "settle_release_steps",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settle_release_steps",
+   "at": "max",
+   "value": 120,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settle_tier2_yield",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settle_tier2_yield",
+   "at": "max",
+   "value": 400.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 787
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_cohesion",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_cohesion",
+   "at": "max",
+   "value": 15.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_memory_yr",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_memory_yr",
+   "at": "max",
+   "value": 120.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 515
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_midpoint",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 610
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_midpoint",
+   "at": "max",
+   "value": 1500.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 582
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_width",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "settlement_ss_width",
+   "at": "max",
+   "value": 500.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 587
+  },
+  {
+   "stage": "S2",
+   "param": "sex_division",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 451
+  },
+  {
+   "stage": "S2",
+   "param": "sex_division",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "shock_cv",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "shock_cv",
+   "at": "max",
+   "value": 6.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "shock_rho",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "shock_rho",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a1",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 655
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a1",
+   "at": "max",
+   "value": 1.57,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 351
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a2",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 806
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a2",
+   "at": "max",
+   "value": 0.13,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 77
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a3",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 662
+  },
+  {
+   "stage": "S2",
+   "param": "siler_a3",
+   "at": "max",
+   "value": 0.00048,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 793
+  },
+  {
+   "stage": "S2",
+   "param": "siler_b1",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "siler_b1",
+   "at": "max",
+   "value": 7.21,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 712
+  },
+  {
+   "stage": "S2",
+   "param": "siler_b3",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "CRASH",
+   "error": "ZeroDivisionError: division by zero"
+  },
+  {
+   "stage": "S2",
+   "param": "siler_b3",
+   "at": "max",
+   "value": 1.03,
+   "declared_range": false,
+   "verdict": "EXTINCT"
+  },
+  {
+   "stage": "S2",
+   "param": "site_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 695
+  },
+  {
+   "stage": "S2",
+   "param": "site_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 705
+  },
+  {
+   "stage": "S2",
+   "param": "site_lambda",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 609
+  },
+  {
+   "stage": "S2",
+   "param": "site_lambda",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 795
+  },
+  {
+   "stage": "S2",
+   "param": "site_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 695
+  },
+  {
+   "stage": "S2",
+   "param": "site_radius",
+   "at": "max",
+   "value": 20,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 751
+  },
+  {
+   "stage": "S2",
+   "param": "soil_carry_per_cell",
+   "at": "min",
+   "value": 0.1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "soil_carry_per_cell",
+   "at": "max",
+   "value": 80.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 784
+  },
+  {
+   "stage": "S2",
+   "param": "soil_deplete_frac",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 784
+  },
+  {
+   "stage": "S2",
+   "param": "soil_deplete_frac",
+   "at": "max",
+   "value": 6.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "soil_regrow_per_yr",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "soil_regrow_per_yr",
+   "at": "max",
+   "value": 0.44999999999999996,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "srb_male",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "srb_male",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 733
+  },
+  {
+   "stage": "S2",
+   "param": "standing_floor",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "standing_floor",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "standing_leave_penalty",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "standing_leave_penalty",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "standing_tenure_rate",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "standing_tenure_rate",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "storable_fraction",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 429
+  },
+  {
+   "stage": "S2",
+   "param": "storable_fraction",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "storage_decay",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 760
+  },
+  {
+   "stage": "S2",
+   "param": "storage_decay",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 502
+  },
+  {
+   "stage": "S2",
+   "param": "storage_seasonality_threshold",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "storage_seasonality_threshold",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "storage_temp_threshold_c",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 429
+  },
+  {
+   "stage": "S2",
+   "param": "storage_temp_threshold_c",
+   "at": "max",
+   "value": 152.5,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "store_anchor_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "store_anchor_gain",
+   "at": "max",
+   "value": 10.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "store_anchor_horizon",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "store_anchor_horizon",
+   "at": "max",
+   "value": 240.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "store_capacity_reserves",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 503
+  },
+  {
+   "stage": "S2",
+   "param": "store_capacity_reserves",
+   "at": "max",
+   "value": 120.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 724
+  },
+  {
+   "stage": "S2",
+   "param": "stratification_gini_min",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "stratification_gini_min",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_bud_min_faction",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_bud_min_faction",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": true,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_bud_search_radius",
+   "at": "min",
+   "value": 1,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_bud_search_radius",
+   "at": "max",
+   "value": 80,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "village_circumscription_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 786
+  },
+  {
+   "stage": "S2",
+   "param": "village_circumscription_gain",
+   "at": "max",
+   "value": 6.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_fission_threshold",
+   "at": "min",
+   "value": 10,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_fission_threshold",
+   "at": "max",
+   "value": 1700,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "village_gain",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 780
+  },
+  {
+   "stage": "S2",
+   "param": "village_gain",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "wife_quality_strength",
+   "at": "min",
+   "value": 0.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 783
+  },
+  {
+   "stage": "S2",
+   "param": "wife_quality_strength",
+   "at": "max",
+   "value": 1.0,
+   "declared_range": false,
+   "verdict": "OK",
+   "pop": 728
+  }
+ ]
+}

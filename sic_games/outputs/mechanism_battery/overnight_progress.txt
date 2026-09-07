@@ -1,0 +1,93 @@
+[07:15] ======================================================================
+[07:15] UNATTENDED RUN 2026-07-27 — plan + pre-registered predictions in PLAN_overnight_2026-07-27.md
+[07:15] STAGE A1 — interference null distribution (5 seeds)
+[07:20]     seed 0 done (55 combinations)
+[07:27]     seed 1 done (55 combinations)
+[07:33]     seed 2 done (55 combinations)
+[07:36]     seed 3 done (55 combinations)
+[07:41]     seed 4 done (55 combinations)
+[07:41]   A1 RESULT: 0 of 18 candidate pairs survive the null (PREDICTED: fewer than 5)
+[07:41]   elapsed 0.4 h
+[07:41] STAGE A2 — ascribed_frac sweep vs EA true-elite 3.6-7.8%
+[07:41]     launched _ov_asc_t015_s0
+[07:41]     launched _ov_asc_t015_s1
+[07:41]     launched _ov_asc_t025_s0
+[07:41]     launched _ov_asc_t025_s1
+[09:12]     finished _ov_asc_t015_s0 rc=0
+[09:12]     finished _ov_asc_t015_s1 rc=0
+[09:12]     finished _ov_asc_t025_s0 rc=0
+[09:12]     finished _ov_asc_t025_s1 rc=0
+[09:12]     launched _ov_asc_t04_s0
+[09:12]     launched _ov_asc_t04_s1
+[09:12]     launched _ov_asc_t06_s0
+[09:12]     launched _ov_asc_t06_s1
+[10:42]     finished _ov_asc_t04_s0 rc=0
+[10:42]     finished _ov_asc_t04_s1 rc=0
+[10:42]     finished _ov_asc_t06_s0 rc=0
+[10:42]     finished _ov_asc_t06_s1 rc=0
+[10:42]     legit_threshold 0.15: ascribed_frac 0.07725 (IN BAND), lineage lift 2.4395 (elite alive)
+[10:42]     legit_threshold 0.25: ascribed_frac 0.07725 (IN BAND), lineage lift 2.4395 (elite alive)
+[10:42]     legit_threshold 0.4: ascribed_frac 0.07775 (IN BAND), lineage lift 2.42975 (elite alive)
+[10:42]     legit_threshold 0.6: ascribed_frac 0.07775 (IN BAND), lineage lift 2.42975 (elite alive)
+[10:42]   A2 RESULT: 4 setting(s) hit the EA band WITH the elite intact (PREDICTED: 0 — the two targets are in tension)
+[10:42]   elapsed 3.4 h
+[10:42] STAGE B — budding A/B on the engineered world set
+[10:42]     launched _ov_b5_P_flat_boreal_bud0_s0
+[10:42]     launched _ov_b5_P_flat_boreal_bud0_s1
+[10:42]     launched _ov_b5_P_flat_boreal_bud1_s0
+[10:42]     launched _ov_b5_P_flat_boreal_bud1_s1
+[10:42]     launched _ov_b5_P_flat_temperate_bud0_s0
+[10:42]     launched _ov_b5_P_flat_temperate_bud0_s1
+[10:46]     finished _ov_b5_P_flat_boreal_bud0_s1 rc=0
+[10:46]     finished _ov_b5_P_flat_boreal_bud1_s1 rc=0
+[10:46]     launched _ov_b5_P_flat_temperate_bud1_s0
+[10:46]     launched _ov_b5_P_flat_temperate_bud1_s1
+[10:51]     finished _ov_b5_P_flat_boreal_bud0_s0 rc=0
+[10:51]     finished _ov_b5_P_flat_boreal_bud1_s0 rc=0
+[10:51]     launched _ov_b5_P_flat_tropical_bud0_s0
+[10:51]     launched _ov_b5_P_flat_tropical_bud0_s1
+[11:09]     finished _ov_b5_P_flat_tropical_bud0_s1 rc=0
+[11:09]     launched _ov_b5_P_flat_tropical_bud1_s0
+[11:11]     finished _ov_b5_P_flat_tropical_bud0_s0 rc=0
+[11:11]     launched _ov_b5_P_flat_tropical_bud1_s1
+[11:29]     finished _ov_b5_P_flat_temperate_bud0_s0 rc=0
+[11:29]     launched _ov_b5_S_hilly_temperate_bud0_s0
+[11:42]     finished _ov_b5_P_flat_temperate_bud0_s1 rc=0
+[11:42]     launched _ov_b5_S_hilly_temperate_bud0_s1
+[11:44]     finished _ov_b5_S_hilly_temperate_bud0_s0 rc=0
+[11:44]     launched _ov_b5_S_hilly_temperate_bud1_s0
+[12:15]     finished _ov_b5_S_hilly_temperate_bud0_s1 rc=0
+[12:15]     launched _ov_b5_S_hilly_temperate_bud1_s1
+[12:17]     finished _ov_b5_P_flat_temperate_bud1_s0 rc=0
+[12:17]     finished _ov_b5_P_flat_temperate_bud1_s1 rc=0
+[12:17]     launched _ov_b5_S_coastal_temp_bud0_s0
+[12:17]     launched _ov_b5_S_coastal_temp_bud0_s1
+[12:39]     finished _ov_b5_P_flat_tropical_bud1_s0 rc=0
+[12:39]     launched _ov_b5_S_coastal_temp_bud1_s0
+[12:41]     finished _ov_b5_P_flat_tropical_bud1_s1 rc=0
+[12:41]     launched _ov_b5_S_coastal_temp_bud1_s1
+[12:43]     finished _ov_b5_S_hilly_temperate_bud1_s0 rc=0
+[12:45]     finished _ov_b5_S_coastal_temp_bud0_s0 rc=0
+[13:15]     finished _ov_b5_S_coastal_temp_bud0_s1 rc=0
+[13:45]     finished _ov_b5_S_hilly_temperate_bud1_s1 rc=0
+[14:09]     finished _ov_b5_S_coastal_temp_bud1_s0 rc=0
+[14:11]     finished _ov_b5_S_coastal_temp_bud1_s1 rc=0
+[14:11]   B RESULT (sustained medians):
+[14:11]       P_flat_boreal_bud0           settle_med 0.0 n_settle 0.0 band 19.75 top_share 0.0665 asc 0.38
+[14:11]       P_flat_boreal_bud1           settle_med 0.0 n_settle 0.0 band 19.75 top_share 0.0665 asc 0.38
+[14:11]       P_flat_temperate_bud0        settle_med 94.5 n_settle 58.5 band 29.75 top_share 0.089 asc 0.3245
+[14:11]       P_flat_temperate_bud1        settle_med 30.75 n_settle 426.25 band 32.0 top_share 0.0192 asc 0.0815
+[14:11]       P_flat_tropical_bud0         settle_med 87.5 n_settle 18.0 band 23.5 top_share 0.0565 asc 0.3195
+[14:11]       P_flat_tropical_bud1         settle_med 27.0 n_settle 412.0 band 31.875 top_share 0.0217 asc 0.085
+[14:11]       S_hilly_temperate_bud0       settle_med 98.5 n_settle 43.0 band 25.5 top_share 0.078 asc 0.363
+[14:11]       S_hilly_temperate_bud1       settle_med 28.75 n_settle 207.5 band 29.25 top_share 0.046 asc 0.1615
+[14:11]       S_coastal_temp_bud0          settle_med 104.0 n_settle 80.5 band 30.0 top_share 0.073 asc 0.1975
+[14:11]       S_coastal_temp_bud1          settle_med 21.0 n_settle 530.25 band 32.0 top_share 0.016 asc 0.0755
+[14:11]       P_flat_temperate: settle_med 94.5 -> 30.75, n_settle 58.5 -> 426.25, band 29.75 -> 32.0
+[14:11]       P_flat_tropical: settle_med 87.5 -> 27.0, n_settle 18.0 -> 412.0, band 23.5 -> 31.875
+[14:11]       S_hilly_temperate: settle_med 98.5 -> 28.75, n_settle 43.0 -> 207.5, band 25.5 -> 29.25
+[14:11]       S_coastal_temp: settle_med 104.0 -> 21.0, n_settle 80.5 -> 530.25, band 30.0 -> 32.0
+[14:11]   elapsed 6.9 h
+[14:11] STAGE C — deep time, budding ON, 91m per arm, LOGEVERY=100
+[14:11]     launched _ov_deep_s0
+[14:11]     launched _ov_deep_s1

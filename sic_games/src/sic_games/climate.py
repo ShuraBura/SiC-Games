@@ -8,6 +8,10 @@ isolation). Later steps (C.2–C.4) fold interannual / regime-shift / catastroph
 """
 from __future__ import annotations
 import math
+import random
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 OBLIQUITY_EARTH_DEG = 23.4            # Earth axial tilt
 OBLIQUITY_HABITABLE_MAX_DEG = 60.0    # conservative habitable envelope (Spiegel 2009: broad band, no clean
@@ -68,23 +72,62 @@ STELLAR_FLUX_MIN = 0.34              # Kopparapu 2013 max-greenhouse outer edge 
 STELLAR_FLUX_MAX = 1.05             # moist/runaway inner edge
 T_EFF_EARTH_K = 255.0               # Earth effective (blackbody) temperature
 T_SURFACE_EARTH_C = 14.0            # §4.3.2 anchor: S=1 → 14°C surface (a fixed effective-greenhouse offset)
-ENSO_PERIOD_MIN_YR, ENSO_PERIOD_MAX_YR = 2.0, 7.0   # Timmermann 2018
-ENSO_AMP_MIN, ENSO_AMP_MAX = 0.20, 0.40             # Timmermann 2018 (±20–40% CC, marginal biomes)
+# PERIOD [LIT, SYNTHESIS of two printed bands — verified 2026-08-06 against the PDF]. Timmermann 2018 does not
+# print "2–7 yr" as one range; it reports TWO observed ENSO modes and our band is their union:
+#   EOF1 (classical EP El Niño): "quasi-quadrennial timescales (3-7 years)"
+#   EOF2 (zonal dipole, 25% of EOF1's variance): "quasi-biennial and decadal timescales"; the coupled-eigenmode
+#        section pins the pair at "timescales of approximately four and two years, respectively"
+# So the 2 yr floor is EOF2 and the 7 yr ceiling is EOF1. Union, not quotation — hence SYNTHESIS.
+ENSO_PERIOD_MIN_YR, ENSO_PERIOD_MAX_YR = 2.0, 7.0
+
+# AMPLITUDE [INTERPRETIVE — NOT Timmermann]. RETRACTED ATTRIBUTION 2026-08-06 (Addendum 29). This was carried as
+# "Timmermann 2018 (±20–40% CC)"; Timmermann is an SST-dynamics review and states NO production or
+# carrying-capacity amplitude anywhere — the words checked for are simply not in the paper. The number is a
+# modelling judgement, and it is now labelled as one, exactly as its sibling REGIME_AMP already was.
+# What BOUNDS it, from a paper we do hold: Sarmiento 2004 measured a −37 to −56% ANPP drop in an EXCEPTIONAL
+# flood year (see LLANOS_FLOOD_AMP below, verified). An ordinary interannual excursion must be milder than an
+# exceptional one, so [0.20, 0.40] sitting below [0.37, 0.56] is coherent — a bound, not an anchor.
+ENSO_AMP_MIN, ENSO_AMP_MAX = 0.20, 0.40
 
 # ── C.3: regime-shift (Layer 3) — a two-state Markov / telegraph excursion ──────
 # v2 red-team: this is a REGIME-SWITCHING / step process (a sustained multi-generational PLATEAU), NOT a
 # mean-reverting OU wiggle, and excursion DURATION (~100–500 yr) ≠ RECURRENCE (~1000–2000 yr).
-REGIME_AMP_MIN, REGIME_AMP_MAX = 0.10, 0.15         # Wanner 2008: LIA global-mean ~0.5°C → central ±10–15% CC
+# [LIT for the °C, INTERPRETIVE for the CC%]. Wanner 2008 verified verbatim 2026-08-06: EMICs "simulate
+# relatively modest changes during the period AD 1000-1850, with peak to peak variations in the order of 0.5 C".
+# Note that is PEAK-TO-PEAK over the whole millennium, not an LIA-vs-baseline anomaly. The °C→CC% step has no
+# transfer function and never had one; LITERATURE.md has always said so, and now this line does too.
+REGIME_AMP_MIN, REGIME_AMP_MAX = 0.10, 0.15
 REGIME_AMP_TAIL = 0.30                              # reserve ±30% / ~1°C for explicitly-flagged 8.2-kyr/YD tails
 REGIME_DURATION_MIN_YR, REGIME_DURATION_MAX_YR = 100.0, 500.0   # excursion length (LIA ≈ 500 yr; Wanner/Mayewski)
 REGIME_RECURRENCE_MIN_YR, REGIME_RECURRENCE_MAX_YR = 1000.0, 2000.0   # onset spacing (Bond ~1500; Mayewski RCC)
 
 # ── C.4b: caribou herd-swing — a quasi-periodic depression on GRASS_STEPPE *meat* only ──────────
-# St. John 2022 (43-herd database): migratory-tundra cycles, amplitude 0.871 standardized about the mean
-# (⇒ peak 1.871× / trough 0.129× mean → ~93% peak-to-trough drawdown), median period 40.5 yr (range 40–90 yr).
-# Vors & Boyce 2009 corroborate ~57% (modern, confounded). Hits the meat channel on the steppe sub-biome only.
-CARIBOU_AMP_ABOUT_MEAN = 0.871                  # St. John 2022 cyclic amplitude (fraction of the mean)
-CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
+# [LIT — thesis filed and READ 2026-08-06; verified verbatim, and it CORRECTED the period band. Addendum 32.]
+# St. John, Jack R. (2022) "Understanding Caribou Population Cycles", University of Montana ScholarWorks.
+#
+# ⚠ IT IS AN **UNDERGRADUATE** THESIS ("Undergraduate Theses, Professional Papers, and Capstone Artifacts"),
+# not the M.Sc. our citation claimed. Not peer-reviewed. It is the weakest anchor in the climate layer and the
+# first that should be replaced if a published herd-cycle source is found.
+#
+# WHAT THE PAPER ACTUALLY SAYS (Figures 9 and 10, quoted): 43 herds were collected but **only 19 were deemed
+# cyclic via periodogram analysis** — so 56% of the database is NOT cyclic, and the cited "43-herd" framing
+# overstated it. Both distributions are over those 19:
+#     period    Min=23  Q1=33  Median=40.5  Q3=50  Max=67   (years)
+#     amplitude Min=.406 Q1=.700 Median=.871 Q3=1.126 Max=1.570  (standardized about the mean)
+#
+# THE PERIOD BAND WAS WRONG ON BOTH ENDS. We carried 40–90 yr, attributed to Bergerud. **Bergerud is not cited
+# anywhere in this thesis** (zero occurrences), and the observed range is 23–67. The old band excluded
+# everything below the median and ran 23 years past the largest cycle ever measured, so nearly every drawn
+# world got a period longer than the median herd. Corrected to the observed Min–Max.
+CARIBOU_AMP_ABOUT_MEAN = 0.871                  # the MEDIAN of 19 cyclic herds, not a universal constant
+CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 23.0, 67.0
+# Reference quartiles, for anyone who later draws the amplitude per-world instead of pinning the median.
+CARIBOU_AMP_QUARTILES = (0.406, 0.700, 0.871, 1.126, 1.570)   # Min, Q1, Median, Q3, Max
+CARIBOU_PERIOD_QUARTILES_YR = (23.0, 33.0, 40.5, 50.0, 67.0)
+# ⚠ AMPLITUDES > 1.0 BREAK THE PEAK-PINNED FORM. `_caribou_factor` is (1 + a·cos)/(1 + a), whose trough is
+# (1−a)/(1+a) — NEGATIVE for a > 1, i.e. negative meat. The observed Q3 (1.126) and Max (1.570) are both above
+# 1, so a per-world draw from this distribution MUST clamp at a ≤ 1. Pinning the median avoids it today; this
+# note exists so the hazard is found before the draw is written, not after.
 
 # ── C.4c: llanos flood — a TWO-SIDED interannual-tail depression on GRASS_LLANOS *forage* ──────────
 # Hamilton et al. 2004: Llanos del Orinoco inundated area 1,278–105,454 km² (median 25,374) — BOTH a failed
@@ -96,7 +139,10 @@ CARIBOU_PERIOD_MIN_YR, CARIBOU_PERIOD_MAX_YR = 40.0, 90.0
 #   lower 0.15 = Castello et al. 2015 (Lower Amazon flood-pulse fishery): climate explains ~18% of yield var,
 #               per-extreme single-species swings ~15–20% — a MODERATE extreme year (protein channel). Their
 #               "high and low waters exert EQUAL forcing" is the empirical basis for the TWO-SIDED form.
-#   upper 0.45 = Sarmiento et al. 2004 (Apure llanos) MEASURED above-ground production drop in an exceptional-
+#   upper 0.45 = [LIT — verified 2026-08-06 verbatim; the table reads "Total ANPP (*) 236±36 265±38 428±71
+#               601±58 / Total ANPP (**) 352±45 418±43 601±82 659±68" for grazed/ungrazed 1996 vs 1997, and the
+#               ungrazed ratios 265/601 and 418/659 give exactly the −56% / −37% quoted below.]
+#               Sarmiento et al. 2004 (Apure llanos) MEASURED above-ground production drop in an exceptional-
 #               flood year: TotalANPP 1996 (dyke-breach flood, 3 mo under water) 265–418 vs 1997 (normal)
 #               601–659 g/m² (ungrazed) → −37 to −56%, central ~45%; their "both drought and water excess limit
 #               production, even more in wet years" also confirms the two-sided form. Corroborated by Welcomme
@@ -113,7 +159,17 @@ LLANOS_FLOOD_AMP = LLANOS_FLOOD_AMP_MAX          # Sarmiento-anchored severe-end
 # becomes viable — a high-return mode that switches on only in the late dry season (§4.1.5; NOT continuous).
 # It is a meat-channel BOOST (not a cost / not a redistribution), on the savanna+llanos aggregation biomes,
 # scaled by water proximity. Anchor (Hawkes 1991, §4.1.5 / game return-rate table):
-INTERCEPT_RETURN_RATIO = 745.0 / 518.0           # Hadza intercept (water blinds, ~745 kcal/hr, late dry) vs encounter (~518) hunting
+# [LIT, CONVERTED — verified 2026-08-06 against the PDF, arithmetic reproduced to the unit]. The paper reports
+# MASS, not calories: Table 2's kg/hr column gives encounter/scavenge all-seasons **0.71 kg/hr** and night
+# intercept **1.02 kg/hr** (footnote a fixes the denominator: "mean number of hours spent by adult men in
+# day-time foraging was about 4.5 hours ... We use this number to calculate an hourly rate").
+# The return-rate table's LOCKED constants (edible_fraction 0.50 × energy_density 1460 kcal/kg = 730) convert:
+#     0.71 × 730 = 518.3 → 518        1.02 × 730 = 744.6 → 745
+# so 518 and 745 are DERIVED, not quoted, and the ratio is a per-HOUR ratio — which is the right one here
+# because GAME_KCAL_TARGETS is a kcal/hr rate field. (The per-SESSION ratio is much larger, 7.488 kg/night ÷
+# 3.181 kg/day = 2.35×, because a night in a blind is a longer session; using it would be a unit error.)
+# Derivation home: docs/SiC_Games_Resource_Return_Rate_Table.md §1.1 + §3.
+INTERCEPT_RETURN_RATIO = 745.0 / 518.0           # ≡ 1.02 / 0.71 kg·hr⁻¹, Hawkes 1991 Table 2
 INTERCEPT_BOOST = INTERCEPT_RETURN_RATIO - 1.0   # ≈ +0.439 (+44%) game premium AT the waterhole in the late dry season
 INTERCEPT_DRY_THRESHOLD = 0.75                   # threshold-like (§4.1.5): switches on only when normalized dryness
                                                  # (1−season)/A_seas ≥ this → ~late-dry quarter (≈ Hadza Aug–Oct)
@@ -254,6 +310,100 @@ class ClimateDriver:
         return cls(f, f"piecewise({len(bps)}bp)")
 
 
+class ClimateConfig(BaseModel):
+    """Every climate channel as a switch and a value, on the same footing as `DemographyConfig`.
+
+    WHY THIS EXISTS (R-106, 2026-08-04). `draw_world_climate()` above produces a full per-world climate
+    lottery — orbital seasonality, eccentricity mean factor, ENSO interannual, the regime telegraph, caribou
+    herd swings, llanos floods, temperature from stellar flux. It is unit-tested. **Its only callers were
+    those tests.** Every `ClimateField` in the project, including `run_campaign.py`, was built as
+    `ClimateField(base, a_seas=0.4, regime_driver=None)` and took the constructor default — 0.0 — for every
+    other channel. So every experiment this project has run had a fixed seasonal sine and white noise, and no
+    multi-year environmental variability at any timescale.
+
+    That is material for the repeated no-cycles findings: Malthusian and secular dynamics were looked for in a
+    world with no slow environmental variable. Those results are not wrong, but they say "no endogenous cycles
+    under a flat climate", which is narrower than how they were recorded. It probably began as a deliberate
+    control (`run_se0_controlled_climate`) that became the permanent default.
+
+    DEFAULTS REPRODUCE THE OLD BEHAVIOUR EXACTLY — `a_seas = 0.4`, every variability channel off — so adopting
+    this config changes no prior result. Each channel is INDEPENDENTLY ablatable, so a channel can be turned
+    on and checked on its own, which is the whole point.
+
+    `extra="forbid"` (2026-08-06) for the same reason as `DemographyConfig`: a mistyped or retired channel name
+    must raise, not vanish. A climate channel that silently fails to be set is indistinguishable from one that
+    was never wired, and that confusion is the entire reason this class exists.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    # ── MASTER ───────────────────────────────────────────────────────────────────────────────────────
+    # Draw the per-world parameters from `draw_world_climate()` (the orbital + ENSO + regime + herd lottery)
+    # instead of using the fixed values below. A drawn value is applied ONLY if its own channel flag is also
+    # on, so the lottery never silently switches a layer on.
+    enable_climate_lottery: bool = False
+    # Which biome's Earth reference amplitude the obliquity draw is scaled against (A_SEAS_EARTH). The world
+    # is a mix of biomes and `a_seas` is a scalar, so this names the reference explicitly rather than picking
+    # one implicitly. "savanna" (0.40) is the Hadza mid-range and matches the fixed default below.
+    lottery_a_earth_biome: Literal["forest", "savanna", "llanos"] = "savanna"
+
+    # ── C.1 SEASONALITY (validated: R-6 run_2d form) ─────────────────────────────────────────────────
+    enable_seasonality: bool = True
+    # Peak-normalised seasonal amplitude A_seas = 1 - s_min. 0.40 = Hadza savanna [LIT, A_SEAS_EARTH]; it is
+    # the value every campaign has used. Under the lottery this is drawn from obliquity instead.
+    a_seas: float = Field(0.40, ge=0.0, le=1.0)
+
+    # ── C.2a ECCENTRICITY annual-mean brightening ────────────────────────────────────────────────────
+    # A scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no effect. [Spiegel 2010 envelope]
+    enable_eccentricity_mean: bool = False
+    mean_factor: float = Field(1.0, ge=1.0)
+
+    # ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ───────────────────────────
+    # PERIOD 2-7 yr [Timmermann 2018, SYNTHESIS]: the union of EOF1 "quasi-quadrennial (3-7 years)" and EOF2
+    # quasi-biennial (~2 yr) — verified against the PDF 2026-08-06.
+    # AMPLITUDE 0.20-0.40 of CC [INTERPRETIVE — NOT Timmermann; attribution RETRACTED 2026-08-06, Addendum 29].
+    # The paper is an SST-dynamics review and states no production or carrying-capacity amplitude. The value is
+    # a modelling judgement, bounded above by Sarmiento 2004's measured -37..-56% exceptional-flood-year ANPP
+    # drop (an ordinary bad year must be milder than an exceptional one). See ENSO_AMP_MIN/MAX.
+    # This is the FAST environmental variability the model has never had.
+    enable_interannual: bool = False
+    interannual_amp: float = Field(0.0, ge=0.0, le=1.0)
+    interannual_period: int = Field(0, ge=0)        # steps (yr x 12); 0 = off
+    interannual_phase: float = 0.0
+
+    # ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ───────────
+    # [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; excursion DURATION 100-500 yr (LIA ~500)
+    # is distinct from RECURRENCE 1000-2000 yr (Bond ~1500; Mayewski RCC). This is the SLOW variable a
+    # secular-cycle test needs, and it has been off in every run.
+    enable_regime_shift: bool = False
+    regime_amp: float = Field(0.0, ge=0.0, le=1.0)
+    regime_duration: int = Field(0, ge=0)          # mean excursion length in steps; P(end) = 1/duration
+    regime_recurrence: int = Field(0, ge=0)        # mean onset spacing in steps; P(onset) = 1/recurrence
+
+    # ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ────────────────
+    # [St. John 2022 — thesis FILED AND READ 2026-08-06; verified verbatim] amplitude 0.871 about the mean
+    # (peak 1.871x / trough 0.129x), median period 40.5 yr over an observed 23-67. Both are MEDIANS over the
+    # 19 herds of 43 that were actually cyclic. The old 40-90 period band was wrong on both ends and is
+    # corrected; see CARIBOU_PERIOD_MIN_YR. Undergraduate thesis, not peer-reviewed — the weakest anchor here.
+    # Needs `steppe_mask`; without it the layer is inert whatever the amplitude.
+    enable_caribou_swing: bool = False
+    caribou_amp: float = Field(0.0, ge=0.0)
+    caribou_period: int = Field(0, ge=0)
+    caribou_phase: float = 0.0
+
+    # ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ───────────
+    # [Sarmiento 2004 / Castello 2015] 0.15-0.45; both a failed flood and an over-flood hurt the forager, so
+    # the form is `1 - amp*|sin theta|`. Rides the C.2b clock (the flood IS the llanos ENSO), so it needs
+    # `enable_interannual` for a period. Needs `llanos_mask`.
+    enable_llanos_flood: bool = False
+    llanos_flood_amp: float = Field(0.0, ge=0.0, le=1.0)
+
+    # ── C.5 INTERCEPT HUNTING — late-dry-season game boost at water ──────────────────────────────────
+    # [Hawkes 1991] Hadza water-blind intercept ~745 vs encounter ~518 kcal/hr => +44% at the waterhole,
+    # switching on only when normalised dryness >= 0.75. ClimateField's own default is ON, so this default
+    # keeps it on and bit-exact.
+    enable_intercept_hunting: bool = True
+
+
 class ClimateField:
     """Wrap a base carrying-capacity field (any object exposing `.level(x,y)`; width/height/consume/etc. are
     delegated) with the time-varying climate multiplier M(t). **C.1 = the seasonal layer only:**
@@ -321,6 +471,7 @@ class ClimateField:
         self.t = t
         self._season_cached = None      # PERF: invalidate the per-step GLOBAL (cell-independent) temporal caches;
         self._regime_cached = None      # level(x,y) recomputes these ~n×candidates/step otherwise (profile hot spot)
+        self._observe()                 # health accounting; AFTER the invalidation so it reads the new step
 
     def season(self) -> float:
         c = getattr(self, "_season_cached", None)
@@ -370,6 +521,140 @@ class ClimateField:
         self._regime_cached = c
         return c
 
+    # ── HEALTH ACCOUNTING ───────────────────────────────────────────────────────────────────────────────
+    # WHY THIS EXISTS. A climate channel can fail in three ways that all look identical in a config dump:
+    #   (1) CONFIGURED OFF        — the flag is false. Visible already.
+    #   (2) ON BUT UNREACHABLE    — the flag is true and the mask is empty, so it can never touch a cell.
+    #                               The llanos splitter produced a provably-empty mask for months this way.
+    #   (3) ON, REACHABLE, NEVER FIRED — the flag is true, the mask is populated, and the run is too SHORT
+    #                               for the channel's own clock. The regime telegraph draws a recurrence of
+    #                               ~1500 yr; a 200-yr campaign has a ~13% chance of seeing a single onset,
+    #                               so it reports "on" and contributes nothing to almost every run.
+    # (3) is the one nothing in this project could previously see, and it is the one that matters most for the
+    # repeated no-cycles findings — the slow driver being switched on is not the same as it having driven.
+    #
+    # COST: seven scalar evaluations per STEP (not per cell, not per agent) — the same cached values `level()`
+    # already computes. It is always on because a diagnostic you have to remember to enable is one you will
+    # not have when the surprising run happens.
+    _CHANNELS = ("season", "eccentricity", "interannual", "regime", "llanos", "caribou", "intercept")
+
+    def _channel_factors(self) -> dict:
+        """Each channel's CURRENT representative multiplier, 1.0 meaning 'did nothing this step'.
+
+        Spatial channels are reported at the cell where they bite hardest (their mask's max water weight, or
+        simply their temporal driver), because the question this answers is 'did this channel do anything
+        anywhere', not 'what was the field average'."""
+        out = {"season": self.season(), "eccentricity": self.mean_factor, "regime": self.regime(),
+               "interannual": self.interannual(), "llanos": 1.0, "caribou": 1.0, "intercept": 1.0}
+        # A SPATIAL CHANNEL WITH AN EMPTY MASK REPORTS NEUTRAL, NOT ITS FORMULA. The first version computed
+        # the llanos flood factor whenever the mask OBJECT existed, so a run on a temperate world reported
+        # `llanos: active 1.0, min 0.699` beside `reach 0` — a depression faithfully described and applied to
+        # nothing. The verdict was right and the numbers underneath it were fiction, which is worse than a
+        # wrong verdict because the detail looks like corroboration.
+        if self.interannual_period > 0 and self.llanos_flood_amp > 0.0 and self._reach("llanos") > 0:
+            theta = 2.0 * math.pi * self.t / self.interannual_period + self.interannual_phase
+            # the two-sided flood form, which REPLACES the one-sided ENSO on llanos cells
+            out["llanos"] = 1.0 - self.llanos_flood_amp * abs(math.sin(theta))
+        if self.caribou_amp > 0.0 and self.caribou_period > 0 and self._reach("caribou") > 0:
+            a = self.caribou_amp
+            out["caribou"] = (1.0 + a * math.cos(
+                2.0 * math.pi * self.t / self.caribou_period + self.caribou_phase)) / (1.0 + a)
+        if self.intercept_on and self._water_weight is not None and self.a_seas > 0.0 \
+                and self._reach("intercept") > 0:
+            if (1.0 - self.season()) / self.a_seas >= INTERCEPT_DRY_THRESHOLD:
+                out["intercept"] = 1.0 + INTERCEPT_BOOST * self._max_water_on_agg
+        return out
+
+    def _observe(self) -> None:
+        h = getattr(self, "_health", None)
+        if h is None:
+            # min/max SEEDED FROM THE FIRST OBSERVATION, not from the neutral 1.0. Seeding at 1.0 silently
+            # clamps any channel that only ever moves in one direction: `eccentricity` is a brightening whose
+            # every value is ~1.12, and it reported `min 1.0` — a value it never took. Depressions escaped
+            # the bug only by luck, because for them the neutral value really is the upper bound.
+            h = self._health = {c: {"steps": 0, "active": 0, "min": None, "max": None, "sum": 0.0}
+                                for c in self._CHANNELS}
+        for name, f in self._channel_factors().items():
+            r = h[name]
+            r["steps"] += 1
+            r["sum"] += f
+            r["min"] = f if r["min"] is None else min(r["min"], f)
+            r["max"] = f if r["max"] is None else max(r["max"], f)
+            if abs(f - 1.0) > 1e-12:
+                r["active"] += 1
+
+    def health(self) -> dict:
+        """Per-channel verdict for the run so far. `reach` is how many CELLS the channel can touch — 0 means
+        structurally inert whatever the amplitude; `active_frac` is how often it actually moved."""
+        h = getattr(self, "_health", None) or {}
+        out = {}
+        for name in self._CHANNELS:
+            r = h.get(name)
+            if not r or not r["steps"]:
+                out[name] = {"verdict": "never-stepped", "reach": self._reach(name)}
+                continue
+            reach = self._reach(name)
+            active = r["active"] / r["steps"]
+            # OFF IS A STATEMENT ABOUT THE CONFIG, NOT ABOUT THE OBSERVATION. The first version of this
+            # decided OFF from "never moved the field", which collapsed `configured off` and `configured on
+            # but never fired` into one verdict — the exact distinction the diagnostic exists to draw. Its own
+            # CTB caught it within a minute of being written (test_climate_health_ctb.py).
+            out[name] = {
+                "reach": reach,
+                "active_frac": round(active, 4),
+                "mean": round(r["sum"] / r["steps"], 4),
+                "min": round(r["min"], 4),
+                "max": round(r["max"], 4),
+                "verdict": ("OFF" if not self._configured(name) else
+                            "UNREACHABLE" if reach == 0 else
+                            "NEVER-FIRED" if active == 0 else
+                            "RARE" if active < 0.01 else "LIVE"),
+            }
+        return out
+
+    def _configured(self, name: str) -> bool:
+        """Was this channel ASKED to do anything — a live amplitude AND a live clock? Read from the settings,
+        never from what was observed, so 'you did not switch it on' stays distinguishable from 'you switched it
+        on and it never got a chance to act'."""
+        if name == "season":
+            return self.a_seas > 0.0
+        if name == "eccentricity":
+            return self.mean_factor != 1.0
+        if name == "interannual":
+            return self.interannual_amp > 0.0 and self.interannual_period > 0
+        if name == "regime":
+            return self.regime_driver is not None or (
+                self.regime_amp > 0.0 and self.regime_duration > 0 and self.regime_recurrence > 0)
+        if name == "llanos":
+            return self.llanos_flood_amp > 0.0 and self.interannual_period > 0
+        if name == "caribou":
+            return self.caribou_amp > 0.0 and self.caribou_period > 0
+        if name == "intercept":
+            return bool(self.intercept_on) and self.a_seas > 0.0
+        return False
+
+    def _reach(self, name: str) -> int:
+        """Cells this channel can touch. A global channel reaches everything (-1 = 'not mask-limited')."""
+        if name == "llanos":
+            return 0 if self._llanos_mask is None else int(self._llanos_mask.sum())
+        if name == "caribou":
+            return 0 if self._steppe_mask is None else int(self._steppe_mask.sum())
+        if name == "intercept":
+            return 0 if self._agg_mask is None else int(self._agg_mask.sum())
+        return -1
+
+    @property
+    def _max_water_on_agg(self) -> float:
+        """The strongest water weight on an aggregation cell — cached, since the masks never change."""
+        v = getattr(self, "_max_water_cached", None)
+        if v is None:
+            try:
+                v = float(self._water_weight[self._agg_mask].max()) if self._agg_mask.any() else 0.0
+            except Exception:
+                v = 0.0
+            self._max_water_cached = v
+        return v
+
     def mult(self) -> float:
         # temporal [0,1] layers: seasonal × interannual × regime-shift
         return self.season() * self.interannual() * self.regime()
@@ -382,8 +667,11 @@ class ClimateField:
         return self._caribou_factor(x, y) * self._intercept_factor(x, y)
 
     def _caribou_factor(self, x: int, y: int) -> float:
-        """C.4b: 40–90 yr quasi-periodic megafauna depression on GRASS_STEPPE meat (steppe_mask). Peak-pinned to
-        1.0; trough (1−a)/(1+a) (a=0.871 ⇒ ~0.069 = ~93% peak-to-trough). 1.0 off-steppe / when off."""
+        """C.4b: 23–67 yr quasi-periodic megafauna depression on GRASS_STEPPE meat (steppe_mask). Peak-pinned to
+        1.0; trough (1−a)/(1+a) (a=0.871 ⇒ ~0.069 = ~93% peak-to-trough). 1.0 off-steppe / when off.
+
+        The band read "40–90 yr" until the thesis was filed and read (2026-08-06, Addendum 32); St. John's
+        Figure 9 gives Min=23, Q1=33, Median=40.5, Q3=50, Max=67."""
         if self.caribou_amp <= 0.0 or self.caribou_period <= 0 or self._steppe_mask is None:
             return 1.0
         if not self._steppe_mask[y, x]:
@@ -416,3 +704,102 @@ class ClimateField:
         if name.startswith("_"):
             raise AttributeError(name)
         return getattr(self._base, name)   # delegate width / height / consume / ...
+
+
+def build_climate_field(base, cfg: "ClimateConfig | None" = None, fields=None, seed: int = 0):
+    """Construct a `ClimateField` from a `ClimateConfig` — the ONE place a run's climate is assembled.
+
+    Before this existed every harness hand-wrote `ClimateField(base, a_seas=0.4, regime_driver=None)` and
+    silently took the 0.0 default for every other channel, so the ENSO / regime / herd / flood layers were
+    built, tested, and never once in a run (R-106). Assembling it from a config means the channels appear in
+    `config/mechanisms.toml` alongside the social ones and can be ablated one at a time.
+
+    `fields` is a `WorldFields` (for the GRASS sub-biome masks C.4b/C.4c need); `seed` makes both the lottery
+    draw and the regime telegraph deterministic per world.
+
+    Defaults reproduce the historical call exactly: `a_seas=0.4`, everything else off.
+    """
+    # Imported here, not at module scope: terrain.py does not import climate.py today, but a module-level
+    # import would create the cycle the moment it does, and the sub-biome codes are needed only on the two
+    # GRASS paths.
+    from sic_games.terrain import GRASS_LLANOS, GRASS_STEPPE
+
+    cfg = cfg or ClimateConfig()
+    drawn: dict = {}
+    if cfg.enable_climate_lottery:
+        drawn = draw_world_climate(random.Random(seed), A_SEAS_EARTH[cfg.lottery_a_earth_biome])
+
+    def val(name):
+        """The drawn value when the lottery is on, else the configured one."""
+        return drawn[name] if name in drawn else getattr(cfg, name)
+
+    # A CHANNEL ON WITH A ZERO MAGNITUDE IS THE DEFECT THIS PROJECT KEEPS FINDING — it reads as live in the
+    # config dump and does nothing in the world, and every ablation of it scores INERT. Refuse it.
+    # A channel's NEUTRAL value is not always 0: `mean_factor` is a multiplier whose no-op is 1.0, so a bare
+    # `if not value` check would wave it through as configured while it did nothing.
+    neutral = {"mean_factor": 1.0}
+
+    def need(flag, *names):
+        if not getattr(cfg, flag):
+            return False
+        dead = [n for n in names if val(n) == neutral.get(n, 0)]
+        if dead:
+            raise ValueError(
+                f"ClimateConfig.{flag} is on but {', '.join(dead)} is at its neutral value — the channel "
+                f"would run and do nothing. Set the value(s), or turn on enable_climate_lottery to draw "
+                f"them.")
+        return True
+
+    kw: dict = dict(intercept_on=cfg.enable_intercept_hunting)
+    if cfg.enable_intercept_hunting:
+        # C.5 needs BOTH an aggregation-biome mask and a water weight; `_intercept_factor` returns 1.0 on the
+        # spot if either is None. They were passed only by unit tests, so intercept hunting had never been in
+        # a run either — the campaign-scale check found turning it OFF changed nothing at all. The mask is the
+        # savanna + llanos aggregation biomes of the docstring (llanos = the tropical GRASS sub-biome, so the
+        # steppe half of GRASS is deliberately excluded); the weight is `wateracc`, already normalised to
+        # [0,1] by the generator.
+        from sic_games.terrain import BIOME_SAVANNA
+        biome = getattr(fields, "biome", None) if fields is not None else None
+        wacc = getattr(fields, "wateracc", None) if fields is not None else None
+        if biome is None or wacc is None:
+            raise ValueError("ClimateConfig.enable_intercept_hunting needs the world's `biome` and "
+                             "`wateracc` fields; pass `fields=` to build_climate_field(). Without them "
+                             "`_intercept_factor` short-circuits to 1.0 and the layer is inert.")
+        gs = getattr(fields, "grass_subtype", None)
+        agg = (biome == BIOME_SAVANNA)
+        if gs is not None:
+            agg = agg | (gs == GRASS_LLANOS)
+        kw.update(agg_mask=agg, water_weight=wacc)
+    kw["a_seas"] = val("a_seas") if need("enable_seasonality", "a_seas") else 0.0
+    kw["mean_factor"] = val("mean_factor") if need("enable_eccentricity_mean", "mean_factor") else 1.0
+
+    if need("enable_interannual", "interannual_amp", "interannual_period"):
+        kw.update(interannual_amp=val("interannual_amp"),
+                  interannual_period=int(val("interannual_period")),
+                  interannual_phase=val("interannual_phase"))
+    if need("enable_regime_shift", "regime_amp", "regime_duration", "regime_recurrence"):
+        kw.update(regime_amp=val("regime_amp"), regime_duration=int(val("regime_duration")),
+                  regime_recurrence=int(val("regime_recurrence")),
+                  rng=random.Random(seed ^ 0x5EED))       # the telegraph needs its own stream
+    if need("enable_caribou_swing", "caribou_amp", "caribou_period"):
+        kw.update(caribou_amp=val("caribou_amp"), caribou_period=int(val("caribou_period")),
+                  caribou_phase=val("caribou_phase"),
+                  steppe_mask=_grass_mask(fields, GRASS_STEPPE, "enable_caribou_swing"))
+    if need("enable_llanos_flood", "llanos_flood_amp"):
+        # The llanos flood rides the C.2b clock — it IS the llanos ENSO, not a parallel process — so without
+        # an interannual period it has no clock and would be inert.
+        if not kw.get("interannual_period"):
+            raise ValueError("ClimateConfig.enable_llanos_flood needs enable_interannual for its clock — the "
+                             "flood rides the ENSO period rather than having one of its own.")
+        kw.update(llanos_flood_amp=val("llanos_flood_amp"),
+                  llanos_mask=_grass_mask(fields, GRASS_LLANOS, "enable_llanos_flood"))
+    return ClimateField(base, **kw)
+
+
+def _grass_mask(fields, subtype: int, flag: str):
+    """(N,N) bool mask of a GRASS sub-biome, from `WorldFields.grass_subtype`."""
+    gs = getattr(fields, "grass_subtype", None) if fields is not None else None
+    if gs is None:
+        raise ValueError(f"ClimateConfig.{flag} needs the world's `grass_subtype` field to build its mask; "
+                         f"pass `fields=` to build_climate_field(). Without it the layer is inert.")
+    return gs == subtype

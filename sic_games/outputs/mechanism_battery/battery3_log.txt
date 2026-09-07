@@ -1,0 +1,36 @@
+BATTERY 3 — resuscitation of 13 inert mechanisms | 400 steps | 7 workers
+  1/13 enable_genealogy_log               BY-DESIGN      <- BY-DESIGN: charter type O (Observer) - zero mutation IS its invariant
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  2/13 enable_band_risk                   REVIVED      12 fields  <- zero-default gain: band_risk_penalty=0.0
+  3/13 enable_provisioning                REVIVED      12 fields  <- provision_self_keep=1.0 -> the mother keeps everything, so nothing is 
+  4/13 enable_alluvial_renewal            REVIVED      1 fields  <- prereq enable_soil_depletion was OFF
+  5/13 enable_improved_land               STILL-INERT    <- prereq enable_economic_defensibility was OFF
+  6/13 enable_nutrition_synergy           STILL-INERT    <- needs the energetic-fertility pathway live
+  7/13 enable_soil_depletion              REVIVED      12 fields  <- coastal sites are AQUATIC-dominant and exempt from soil (R-53) - retes
+  8/13 enable_village_budding             STILL-INERT    <- Bandy budding needs a village at the fission threshold
+  9/13 enable_rank_hierarchy              REVIVED      12 fields  <- needs a band whose ascribed head-share clears rank_hierarchy_frac=0.15
+ 10/13 enable_emergent_abandonment        STILL-INERT    <- needs settlements under hardship to abandon
+ 11/13 enable_bonded_mating               STILL-INERT    <- needs a denser mate pool than the baseline regime
+ 12/13 enable_condition                   STILL-INERT    <- condition needs life-history + a nutritional gradient
+ 13/13 enable_infanticide                 STILL-INERT    <- needs births under resource stress
+
+==============================================================================
+REVIVED       5  enable_band_risk, enable_provisioning, enable_alluvial_renewal, enable_soil_depletion, enable_rank_hierarchy
+STILL-INERT   7  enable_improved_land, enable_nutrition_synergy, enable_village_budding, enable_emergent_abandonment, enable_bonded_mating, enable_condition, enable_infanticide
+BY-DESIGN     1  enable_genealogy_log
+CRASH         0  
+
+150s -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery3_results.json

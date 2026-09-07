@@ -1,0 +1,274 @@
+{
+ "arms": {
+  "P_flat_boreal": {
+   "pop": 1217.0,
+   "pct_stratified": 0.0,
+   "gini_cred": 0.206,
+   "band_med": 19.75,
+   "settle_med": 0.0,
+   "settle_max": 0.0,
+   "n_settle": 0.0,
+   "connubium_med": 32.5,
+   "lineage_size_gini": 0.506,
+   "lin_top_share": 0.0665,
+   "ascribed_frac": 0.38,
+   "noble_lineage_size_lift": 2.5975,
+   "noble_material_lift": 1.015,
+   "surplus_med": 0.3915,
+   "axis": "P"
+  },
+  "P_flat_temperate": {
+   "pop": 11320.0,
+   "pct_stratified": 3.2,
+   "gini_cred": 0.4105,
+   "band_med": 29.75,
+   "settle_med": 94.5,
+   "settle_max": 265.0,
+   "n_settle": 58.5,
+   "connubium_med": 139.5,
+   "lineage_size_gini": 0.5435,
+   "lin_top_share": 0.089,
+   "ascribed_frac": 0.3245,
+   "noble_lineage_size_lift": 3.417,
+   "noble_material_lift": 1.0655,
+   "surplus_med": 0.4945,
+   "axis": "P"
+  },
+  "P_flat_tropical": {
+   "pop": 3798.0,
+   "pct_stratified": 1.15,
+   "gini_cred": 0.2415,
+   "band_med": 23.5,
+   "settle_med": 87.5,
+   "settle_max": 160.0,
+   "n_settle": 18.0,
+   "connubium_med": 78.75,
+   "lineage_size_gini": 0.504,
+   "lin_top_share": 0.0565,
+   "ascribed_frac": 0.3195,
+   "noble_lineage_size_lift": 3.0955,
+   "noble_material_lift": 1.0675,
+   "surplus_med": 0.4215,
+   "axis": "P"
+  },
+  "S_flat_temperate": {
+   "pop": 11320.0,
+   "pct_stratified": 3.2,
+   "gini_cred": 0.4105,
+   "band_med": 29.75,
+   "settle_med": 94.5,
+   "settle_max": 265.0,
+   "n_settle": 58.5,
+   "connubium_med": 139.5,
+   "lineage_size_gini": 0.5435,
+   "lin_top_share": 0.089,
+   "ascribed_frac": 0.3245,
+   "noble_lineage_size_lift": 3.417,
+   "noble_material_lift": 1.0655,
+   "surplus_med": 0.4945,
+   "axis": "S"
+  },
+  "S_hilly_temperate": {
+   "pop": 5840.0,
+   "pct_stratified": 3.6,
+   "gini_cred": 0.372,
+   "band_med": 25.5,
+   "settle_med": 98.5,
+   "settle_max": 245.5,
+   "n_settle": 43.0,
+   "connubium_med": 71.75,
+   "lineage_size_gini": 0.548,
+   "lin_top_share": 0.078,
+   "ascribed_frac": 0.363,
+   "noble_lineage_size_lift": 3.496,
+   "noble_material_lift": 1.063,
+   "surplus_med": 0.462,
+   "axis": "S"
+  },
+  "S_coastal_temp": {
+   "pop": 9254.5,
+   "pct_stratified": 6.5,
+   "gini_cred": 0.302,
+   "band_med": 30.0,
+   "settle_med": 104.0,
+   "settle_max": 256.5,
+   "n_settle": 80.5,
+   "connubium_med": 79.0,
+   "lineage_size_gini": 0.463,
+   "lin_top_share": 0.073,
+   "ascribed_frac": 0.1975,
+   "noble_lineage_size_lift": 2.901,
+   "noble_material_lift": 1.0855,
+   "surplus_med": 0.5185,
+   "axis": "S"
+  },
+  "S_coastal_nodefend": {
+   "pop": 10183.5,
+   "pct_stratified": 7.35,
+   "gini_cred": 0.37,
+   "band_med": 29.0,
+   "settle_med": 109.0,
+   "settle_max": 259.5,
+   "n_settle": 80.5,
+   "connubium_med": 133.5,
+   "lineage_size_gini": 0.4675,
+   "lin_top_share": 0.0935,
+   "ascribed_frac": 0.1875,
+   "noble_lineage_size_lift": 3.4125,
+   "noble_material_lift": 1.081,
+   "surplus_med": 0.504,
+   "axis": "S"
+  }
+ },
+ "t7": {
+  "pct_stratified": {
+   "productivity_range": 3.2,
+   "structure_range": 4.1499999999999995,
+   "ordering_holds": true
+  },
+  "gini_cred": {
+   "productivity_range": 0.2045,
+   "structure_range": 0.10849999999999999,
+   "ordering_holds": false
+  },
+  "lineage_size_gini": {
+   "productivity_range": 0.03949999999999998,
+   "structure_range": 0.08500000000000002,
+   "ordering_holds": true
+  }
+ },
+ "scorecard": {
+  "band_med": {
+   "target": 25.0,
+   "lo": 18.0,
+   "hi": 35.0,
+   "source": "Johnson scalar stress / R-72",
+   "hits": 7,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 19.75,
+    "P_flat_temperate": 29.75,
+    "P_flat_tropical": 23.5,
+    "S_flat_temperate": 29.75,
+    "S_hilly_temperate": 25.5,
+    "S_coastal_temp": 30.0,
+    "S_coastal_nodefend": 29.0
+   }
+  },
+  "settle_med": {
+   "target": 100.0,
+   "lo": 50.0,
+   "hi": 150.0,
+   "source": "Bar-Yosef 50-150; R-63/R-64",
+   "hits": 6,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 0.0,
+    "P_flat_temperate": 94.5,
+    "P_flat_tropical": 87.5,
+    "S_flat_temperate": 94.5,
+    "S_hilly_temperate": 98.5,
+    "S_coastal_temp": 104.0,
+    "S_coastal_nodefend": 109.0
+   }
+  },
+  "connubium_med": {
+   "target": 475.0,
+   "lo": 300.0,
+   "hi": 700.0,
+   "source": "Wobst ~475",
+   "hits": 0,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 32.5,
+    "P_flat_temperate": 139.5,
+    "P_flat_tropical": 78.75,
+    "S_flat_temperate": 139.5,
+    "S_hilly_temperate": 71.75,
+    "S_coastal_temp": 79.0,
+    "S_coastal_nodefend": 133.5
+   }
+  },
+  "lineage_size_gini": {
+   "target": 0.6,
+   "lo": 0.51,
+   "hi": 0.68,
+   "source": "BHM 2009 stratified range; R-103g",
+   "hits": 3,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 0.506,
+    "P_flat_temperate": 0.5435,
+    "P_flat_tropical": 0.504,
+    "S_flat_temperate": 0.5435,
+    "S_hilly_temperate": 0.548,
+    "S_coastal_temp": 0.463,
+    "S_coastal_nodefend": 0.4675
+   }
+  },
+  "lin_top_share": {
+   "target": 0.16,
+   "lo": 0.08,
+   "hi": 0.3,
+   "source": "T-9 Karmin et al. 2015",
+   "hits": 3,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 0.0665,
+    "P_flat_temperate": 0.089,
+    "P_flat_tropical": 0.0565,
+    "S_flat_temperate": 0.089,
+    "S_hilly_temperate": 0.078,
+    "S_coastal_temp": 0.073,
+    "S_coastal_nodefend": 0.0935
+   }
+  },
+  "ascribed_frac": {
+   "target": 0.057,
+   "lo": 0.036,
+   "hi": 0.078,
+   "source": "EA true-elite 3.6-7.8%",
+   "hits": 0,
+   "n": 7,
+   "values": {
+    "P_flat_boreal": 0.38,
+    "P_flat_temperate": 0.3245,
+    "P_flat_tropical": 0.3195,
+    "S_flat_temperate": 0.3245,
+    "S_hilly_temperate": 0.363,
+    "S_coastal_temp": 0.1975,
+    "S_coastal_nodefend": 0.1875
+   }
+  }
+ },
+ "config": {
+  "steps": "3000",
+  "seeds": [
+   "0",
+   "1"
+  ],
+  "maxmin": "75",
+  "stack": {
+   "C_ELITE": "1",
+   "C_BRANCH": "0.05",
+   "C_SPLIT": "0.00003",
+   "C_SPLITMIN": "8",
+   "C_RELLEGIT": "1",
+   "C_RELMULT": "2.0",
+   "C_RELRES": "1",
+   "C_RESACC": "1",
+   "C_RESVIL": "1",
+   "C_RESYTR": "80",
+   "C_LOCASC": "1",
+   "C_RANKHIER": "1",
+   "C_GENEA": "0",
+   "C_RESIDENCE": "virilocal",
+   "C_MATINHERIT": "1",
+   "C_MATRULE": "primogeniture",
+   "C_HEIRSTAT": "1",
+   "C_LINTRIBUTE": "1",
+   "C_TRIBFRAC": "0.15",
+   "C_NOBLEXEMPT": "1"
+  }
+ }
+}

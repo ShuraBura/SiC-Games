@@ -330,6 +330,15 @@ No new tunable threshold beyond the A-1 placeholders. Risk-sensitivity (variance
 
 ### 9a.5 forage_kcal and game_kcal computation (terrain.py)
 
+> **Load-bearing status first (measured by perturbation 2026-08-08 — Return-Rate Table §0, RESULTS Addendum 36,
+> `tests/test_field_load_bearing_ctb.py`).** These fields are **not** the food supply; `NPPCapacityField` is.
+> `forage_kcal` is live through exactly three surfaces — founder band placement, the per-person forage cap
+> (`enable_forage_cap`), and the agglomeration base (`enable_agglomeration`) — and is inert in-model with those
+> two flags off. **`game_kcal` is live through none**: zeroing it or multiplying it by 1000 leaves a campaign
+> bit-identical, because its only consumer (`game_level` ← `_step_agent`) needs the substrate disabled *and*
+> `game_stream=True`, which no harness sets. The construction rules below are correct; what they build is
+> currently consumed by placement and agglomeration, not by the harvest.
+
 Each biome's cell values are drawn from a **literature-anchored distribution** with a per-biome `(mean, std)`. Two regimes, by whether the std is anchored:
 
 **(a) std anchored in literature → terrain-coupled lognormal (the §9a.6 mechanic).**
@@ -598,6 +607,14 @@ The settlement hierarchy is EMERGENT — each rung a prediction of a mechanism (
 - **17.4 Sedentism fertility / NDT** (`enable_sedentism_fertility`) — society-dependent lactational refractory
   (`SEDENTISM_IBI_MONTHS` 30/22/14) → ~2× birth rate with sedentism (Bocquet-Appel/Sellen-Mace). Multiplies with
   `energetic_fertility` (nutritional-stress suppression stays on top).
+- **17.4b Intake-based energetic fertility** (`enable_intake_fertility`; R-106) — births scale with a slow EMA
+  (α=0.04, half-life ≈1.4 yr) of **intake ÷ requirement**, 0 at maintenance → 1 at maintenance + the lactation
+  increment (1.20, FAO/IOM). **Supersedes `enable_energetic_fertility`** when ON, because the reserve-based
+  version is inert BY CONSTRUCTION: burn is ~68% of the floor-to-full span per step, so every survivor
+  re-saturates at the cap and both reserve readings are constants with zero density response. Ellison: fecundity
+  tracks energy **flux**, not stored reserve. Accumulates only from menarche (a juvenile's *gathered* intake
+  understates what it *eats*). Moves regulation from deaths to births (population CV 7.9% → 1.9%); does NOT
+  produce cycles — a 1.4-yr feedback damps rather than overshoots. PARAMETERS §21.10; R-106.
 - **17.5 Landscape packing** (`enable_landscape_packing`) — the morph "packed" test uses LANDSCAPE population density
   (agents on the band's cells / area) vs Binford 0.091, not band-members/footprint (which never reaches it). Fires
   stratification on realistic worlds (R-61).

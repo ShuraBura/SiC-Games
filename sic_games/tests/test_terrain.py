@@ -693,14 +693,31 @@ def test_climate_seam_temperature_gradient_and_humidity():
     assert not _W.temperature.flags.writeable and not _W.humidity.flags.writeable
 
 
-def test_grass_subtype_tag_splits_by_isotherm():
-    """C.4a: BIOME_GRASS splits into tropical-llanos (warm) vs temperate-steppe (cool) by the 18 °C isotherm;
-    every non-grass cell is GRASS_NONE; the split is exhaustive over grass cells."""
+def test_grass_subtype_tags_steppe_on_grass_and_llanos_on_savanna():
+    """C.4a sub-biome tags: STEPPE on BIOME_GRASS (C.4b caribou), LLANOS on the flooded part of BIOME_SAVANNA
+    (C.4c llanos flood); GRASS_NONE everywhere else.
+
+    THIS TEST ASSERTED THE BUG until R-106. It required the tag to live only on BIOME_GRASS, and split it by
+    the 18 °C isotherm — but `whittaker_biome` sends warm grass-zone cells to BIOME_SAVANNA, so
+    `BIOME_GRASS & (T >= 18)` is EMPTY for every possible (T, P) (verified exhaustively over a 451k-point
+    grid). GRASS_LLANOS was therefore never assigned in any world, the C.4c flood layer could never act, and
+    this test passed throughout — because "no llanos cells" satisfies every clause of the old invariant
+    vacuously.
+
+    The llanos is warm SEASONALLY-FLOODED grassland, which Whittaker calls savanna, so it is a savanna
+    sub-type selected by the WETLAND GEOMETRY (`dist <= 2`, `slope < 0.12` — the wetland test's own
+    constants). What BIOME_WETLAND has not already claimed is the drier seasonally-inundated floodplain."""
     gs = _W.grass_subtype
     assert gs is not None and gs.shape == (N, N) and not gs.flags.writeable
     is_grass = (_W.biome == BIOME_GRASS)
-    assert np.all(gs[~is_grass] == GRASS_NONE)                            # tag only lives on grass
-    assert np.all((gs[is_grass] == GRASS_LLANOS) | (gs[is_grass] == GRASS_STEPPE))   # exhaustive on grass
-    # consistency with the isotherm
-    assert np.all(_W.temperature[gs == GRASS_LLANOS] >= GRASS_TROPICAL_THRESHOLD_C)
-    assert np.all(_W.temperature[gs == GRASS_STEPPE] < GRASS_TROPICAL_THRESHOLD_C)
+    is_sav = (_W.biome == BIOME_SAVANNA)
+    # Every GRASS cell is steppe, and steppe lives nowhere else.
+    assert np.all(gs[is_grass] == GRASS_STEPPE)
+    assert np.all(is_grass[gs == GRASS_STEPPE])
+    # Llanos lives only on savanna — a llanos tag on a GRASS cell is the old bug returning.
+    assert np.all(is_sav[gs == GRASS_LLANOS])
+    assert not np.any(gs[is_grass] == GRASS_LLANOS)
+    # Nothing tagged outside those two parents.
+    assert np.all(gs[~(is_grass | is_sav)] == GRASS_NONE)
+    # The flooded-minority geometry the llanos was selected by.
+    assert np.all(_W.slope[gs == GRASS_LLANOS] < 0.12)

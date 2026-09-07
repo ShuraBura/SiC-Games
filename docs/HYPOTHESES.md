@@ -163,3 +163,114 @@ Result: mtn_ceiling = 0.317. Best knobs: rough=1.0, waterK=0.99, forestK=0.5, ar
 ---
 
 *End of HYPOTHESES — consolidated 2026-06-05; §H1ii-RETEST appended 2026-06-13. Append-only; graduate targets in by moving them from TARGETS.md with a test spec.*
+
+---
+
+## H-CYCLES — Secular cycles require a DELAYED negative feedback, not a stronger one
+
+> **VERDICT 2026-07-21 (R-97): the delayed feedback was BUILT, WORKS, and is NOT SUFFICIENT.** The lag now
+> exists as the hypothesis asked (R-95: resentment accumulates on a village-held memory, time-to-revolt anchored
+> to Leach's few generations), revolts fire in every arm, and villages genuinely flip between ranked and
+> egalitarian. **There are still no cycles** — ac_peak 0.068/0.083/0.078/-0.008 against a calibrated 0.13 noise
+> floor, on a detector re-validated at this resolution (9/9 injected cycles found). The hypothesis is therefore
+> answered in the negative AS STATED: a delayed negative feedback at VILLAGE scale is not what produces secular
+> cycles. The uncoupled-oscillator diagnosis says why — and points at a superordinate polity, not a better lag.
+> **Restate before re-testing:** H-CYCLES should be re-scoped to the supra-village rung or retired.
+
+**Status:** OPEN — pre-registered 2026-07-18. **Origin:** supervisor (architecture discussion, the field/operator
+framing). **Home of the criterion:** `MECHANISM_CHARTER.md` §5.
+
+**Claim.** The model has failed three times to produce secular cycles — connubium (R-67), substrate attractor
+(R-68), soil/swidden (R-71) — and these are not three facts but **one**: every feedback in the model is
+INSTANTANEOUS negative feedback, whose linearization has a real negative eigenvalue and therefore a stable node.
+A stable node returns to equilibrium exponentially; it cannot oscillate. Boehm leveling is the clearest case — it
+corrects excess *within the same step*, which is exactly why it CAPS inequality (3.68x -> 2.21x, R-83) rather
+than overshooting it.
+
+**Prediction (falsifiable).** Introducing a **lag** between a quantity and the correction that removes it, of
+order the measured relaxation time (~250 steps, from R-68's kill-half recovery), will produce sustained
+oscillation where no amount of strengthening an instantaneous feedback does. Specifically: elite NUMBERS
+responding to elite WEALTH with a generational (~20 yr = 240 step) delay.
+
+**How it could fail (and what each failure teaches):**
+- Oscillation appears but is damped -> the delay is too short relative to relaxation, or the loop gain too low.
+- Oscillation appears at the wrong period -> the delay is the wrong length; period should scale with it.
+- No oscillation at any delay -> the loop gain is below the Hopf threshold; the elite feedback is too weak to
+  matter regardless of timing, which would be a genuine and interesting negative.
+- Runaway instead -> the feedback is net positive, not delayed-negative (an R-66-class failure).
+
+**Test protocol.** Cheap first: linearize a mean-field reduction around the measured equilibrium and locate the
+Hopf boundary in (delay, gain) analytically. Only then build. **The mean-field reduction is an ANALYSIS TOOL for
+this hypothesis only** — explicitly NOT a replacement for the ABM (charter §5), which must keep the
+individual-level outputs (RS skew, dynasties, kinship).
+
+**ETHNOGRAPHIC ANCHOR ADDED 2026-07-18 (Flannery & Marcus ch. 10, [VERIFIED]).** The hypothesis was
+pre-registered on a purely dynamical argument. It now has a documented case: **Kachin gumsa/gumlao cycling**,
+where societies shift back and forth between ranked and egalitarian modes and *"hereditary inequality was
+repeatedly created, lasted for a few generations, and then collapsed."*
+- **The period is given: "a few generations" (~60–100 yr).** That is the target for any oscillation the model
+  produces, and it is ~3–5× the ~250-step relaxation time measured in R-68 — a plausible Hopf regime.
+- **The mechanism is explicitly a LAG:** leaders' prestige-seeking *"only increased their followers' resentment
+  and hastened their overthrow"* — resentment ACCUMULATES over generations, where our Boehm leveling corrects
+  within the step. This is direct field support for the delay, not just the dynamical argument.
+- **REFINEMENT to the prediction:** the lagged variable should be a **legitimacy/resentment stock**, not only
+  elite material wealth. Friedman's endogenous account makes rank a *legitimacy reinterpretation* ("they pleased
+  the nats" → "they descend from higher nats"), so both the rise AND the collapse run through legitimacy. The
+  model's `GroupVector.religion` cell — currently a **stub** — is the natural carrier.
+- **A second, DISTINCT cycling mode is named and should not be conflated:** Polynesian *status rivalry* among
+  near-equal heirs (assassination/overthrow/usurpation), which cycles *incumbents* without cycling the
+  ranked/unranked *regime*. Our R-84 challenge-succession already models something close to this — so the model
+  may already contain the Polynesian mode while lacking the Kachin one.
+
+**Resolution (2026-07-18, R-87): PREDICTION NOT MET — but partially supported, and the hypothesis is REFINED
+rather than refuted.**
+
+A delayed negative feedback was built explicitly to supply the missing complex eigenvalue pair (the gumsa→gumlao
+resentment/reversion mechanism, R-87). Swept across lag memories of 4, 83 and 167 years, it produced **no
+periodic behaviour at any lag** — a fourth independent negative for secular cycles.
+
+Two results keep the hypothesis alive in refined form:
+- **The lag acts in the predicted direction.** Autocorrelation peak rises monotonically with lag length
+  (0.03 → 0.13 → 0.19). The mechanism behaves as the theory says; it does not reach cycle amplitude.
+- **Large-amplitude system-wide regime switching now exists**, where the three prior negatives had none:
+  sd(frac_gumsa) = 0.428 vs an independent-bands null of 0.056–0.112, i.e. **3.8–7.7× the null**, so bands
+  switch together. The model alternates between ranked and egalitarian across nearly the full range.
+
+**Refined statement:** a delayed negative feedback is apparently sufficient for **recurrent regime alternation**
+but not for **periodicity**.
+
+**AND THE PREDICTION WAS MIS-SPECIFIED — by me, not by the source.** The literature check was run the same day:
+Flannery's Kachin are "created, overthrown, and **periodically reinstated**", "this **repetitive cycle**",
+"**oscillated between**", with the duration claim "lasted for **a few generations**". **A fixed period is
+nowhere asserted; recurrence plus a characteristic SPELL DURATION is.** The autocorrelation test therefore
+measured a property the ethnography does not claim, and H-CYCLES' "period ~60–100 yr" should be restated as
+**"mean dwell time in the ranked regime ~60–100 yr"**.
+
+**On the corrected metric the model still misses, but differently and by a diagnosable amount:** estimated mean
+gumsa dwell is **3.9 / 10.2 / 4.8 yr** at the three lags, i.e. **one to two orders short** of the anchor. The
+model alternates far too fast. The likely cause is no longer "missing lag" (the lag is built and acts in the
+right direction) but that the reversion trigger — a hard threshold on a noisy quantity — is crossed
+stochastically rather than by clean build-up.
+
+**RESOLVED NEGATIVE 2026-07-18 (R-87d), on fixed and control-validated instruments.** Both detectors were
+re-specified (reject periods beyond window/3; require a genuine local maximum) and re-validated against a
+positive control — a real 75 yr cycle is still recovered at 75.3 yr. On the real series the autocorrelation
+peaks are NEGATIVE (−0.021, −0.028) and the sinusoid explains 5–14% of variance. The raw trace, plotted and
+inspected, is one build-and-collapse episode followed by ~150 yr pinned at zero: not oscillatory in any form.
+**A delayed negative feedback is NOT sufficient for secular cycles.** Fourth independent negative, and the first
+on validated instruments. Reported quantity is now CORRELATION TIME (15–33 yr), which does rise with the lag,
+and DWELL TIME — both 2–6× short of the 60–100 yr ethnographic anchor.
+
+**RESOLVED FURTHER (R-88, 2026-07-20): the non-monotonicity is explained, and the governor is identified.**
+Band lifetime (median 10.2 yr, mean 17.5 yr) is IDENTICAL across the 83-yr and 4-yr-control arms - band churn
+is exogenous, driven by `band_split_size`/`band_merge_size`, not by resentment. Mean band lifetime (17.5 yr)
+sits almost exactly on the measured correlation time (~20-22 yr) uniform across ALL THREE tested memories
+(4/83/167 yr): `_maintain_bands()` FISSION mints a fresh `band_id` whose `_band_resentment` entry defaults to
+0.0 (a silent reset never counted in `reversions_this_step`), and FUSION abandons the absorbed band's entry
+entirely. **A delayed social feedback cannot express a memory longer than the unit carrying it survives** - the
+band does not live long enough for `resent_alpha` to matter at 83 or 167 yr, and even the 4-yr control's own
+short memory is itself governed by band turnover rather than by its own alpha.
+
+**Next step:** either move the slow social state to a longer-lived unit (LINEAGE or SETTLEMENT instead of BAND)
+before re-testing periodicity, or treat this as the standing explanation and move on - re-running H-CYCLES on
+the band unit without addressing this would re-measure the same ceiling.

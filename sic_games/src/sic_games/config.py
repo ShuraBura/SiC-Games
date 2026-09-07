@@ -41,15 +41,34 @@ class DecisionConfig(BaseModel):
 
 
 class CarbonConfig(BaseModel):
+    """Carbon-agent (Si Cred) parameters — the last block in the run config with no provenance at all.
+
+    AUDITED 2026-08-06 (Addendum 29). This class was 9-of-10 undocumented, the worst block in
+    `config/parameters.toml`, and none of these names appear in `PARAMETERS.md` either — so the values had no
+    home anywhere. Before writing provenance, the reachability was checked, and it changes the answer: FIVE OF
+    THE NINE CANNOT BE REACHED FROM A CAMPAIGN RUN. `phase1_model.py` (the campaign engine) imports neither
+    `oracle.py` nor `joint_task.py`, so the fields only those two read are dead in every substrate run.
+
+    That is the project's recurring "validated in one stack, dead in another" class, and it means the useful
+    fact to record here is WHERE EACH FIELD IS LIVE, not a literature citation the value never had. Chasing an
+    anchor for a parameter no campaign can read would be effort spent on the wrong five.
+
+    Fill in the anchors for the four LIVE ones when Si Cred is next touched; the dead five need a decision
+    (keep for the Oracle engine, or delete) before they are worth documenting at all.
+    """
+    # Field order is UNCHANGED by the 2026-08-06 audit — only comments were added. Reordering a pydantic model
+    # changes serialization order, and run manifests are diffed between runs.
+    # [UNANCHORED, LIVE] Si Cred exploration temperature + its Cred coupling; locked by scan, not by literature
+    # (Stage 5.1 redesign, k_cred_band=1.0). Read at phase1_model.py:452-458.
     sigma_base: float = Field(0.5, gt=0.0)
-    kappa: float = Field(2.0, ge=0.0)
-    cred_scale: float = Field(10.0, gt=0.0)
-    cred_decay: float = Field(0.01, gt=0.0, lt=1.0)
-    matthew_alpha: float = Field(2.0, gt=0.0)
-    epsilon: float = Field(0.01, gt=0.0)
-    cred_bonus_per_participant: float = Field(1.0, ge=0.0)
-    velocity_tau: int = Field(10, ge=0)
-    velocity_scale: float = Field(1.0, gt=0.0)
+    kappa: float = Field(2.0, ge=0.0)                   # [UNANCHORED, LIVE] the only one with real traffic
+    cred_scale: float = Field(10.0, gt=0.0)             # [UNANCHORED, LIVE]
+    cred_decay: float = Field(0.01, gt=0.0, lt=1.0)     # [UNANCHORED, DEAD in campaign — oracle.py:135 only]
+    matthew_alpha: float = Field(2.0, gt=0.0)           # [UNANCHORED, DEAD in campaign — joint_task.py:21,150]
+    epsilon: float = Field(0.01, gt=0.0)                # [UNANCHORED, DEAD in campaign — joint_task.py:21]
+    cred_bonus_per_participant: float = Field(1.0, ge=0.0)  # [UNANCHORED, DEAD — joint_task.py:174]
+    velocity_tau: int = Field(10, ge=0)                 # [UNANCHORED, DEAD in campaign — oracle.py:136,730]
+    velocity_scale: float = Field(1.0, gt=0.0)          # [UNANCHORED, LIVE] phase1_model.py:458
     f_C: float = Field(0.25, ge=0.0, le=1.0)  # newborn Cred endowment fraction
     status_amplification_beta: float = Field(0.0, ge=0.0)  # β — Stage 3.2
 
@@ -127,6 +146,11 @@ class SubstrateConfig(BaseModel):
     # (no mates) — a lone agent's cell value is multiplied by group_mate_floor, rising to 1 at group_mate_min.
     group_mate_min: float = Field(0.0, ge=0.0)         # g_mate: band size at/above which no mating penalty; 0 = off
     group_mate_floor: float = Field(0.3, ge=0.0, le=1.0)  # cell-value multiplier for a LONE agent (g=1)
+    # CAPACITY-SCALED GROUPING (R-106, 2026-08-22): cap the group size that earns an E.1/E.2 benefit at what
+    # the cell can actually feed (S/BURN). Without it the grouping drives reward aggregation identically at
+    # every productivity -- fine at forest capacity 36.3 people/cell, fatal at arid 2.0, where a stable cell
+    # needs occ <= K/(1+DEPLETE_FRAC) = 1.33 and the agents sat at 1.40. Default OFF => bit-exact.
+    enable_capacity_scaled_grouping: bool = False
 
 
 class RunConfig(BaseModel):
@@ -256,6 +280,14 @@ class LifeHistoryConfig(BaseModel):
     forage_age_min: int = Field(15, ge=0)           # active foraging window start
     forage_age_max_offset: int = Field(10, ge=0)    # a_forage_max = tau_max - offset
     eta_min: float = Field(0.2, ge=0.0, le=1.0)     # juvenile efficiency at birth
+    # CURVATURE of the juvenile production ramp: η = eta_min + (1−eta_min)·(a/a_min)**exponent.
+    # 1.0 = the original LINEAR ramp (bit-exact default). Kaplan/Hill/Lancaster/Hurtado 2000 describe a CONVEX
+    # curve — forager children produce very little until ~10 yr, then rise steeply, and are net energy consumers
+    # until ~15–18 yr. A linear ramp makes a 7.5-yr-old half as productive as an adult, which measured out as
+    # children being net food PRODUCERS (only 1.0% of juveniles ran any deficit): with cell shares at ~1.7× burn
+    # a child needs η/c < 0.588 to run an absolute deficit, but the linear ramp never takes η/c below 0.67.
+    # See R-106 addendum. >1 bends the curve toward Kaplan's shape.
+    eta_juvenile_exponent: float = Field(1.0, gt=0.0)
     eta_old: float = Field(0.4, ge=0.0, le=1.0)     # elder efficiency at max_age
     # Stage 4.3: Si fission offspring start fully capable (no juvenile ramp)
     eta_fission_offspring: float = Field(1.0, ge=0.0, le=1.0)

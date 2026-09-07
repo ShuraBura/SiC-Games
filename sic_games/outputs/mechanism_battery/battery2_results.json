@@ -1,0 +1,497 @@
+{
+ "steps": 400,
+ "rows": [
+  {
+   "flag": "enable_band_risk",
+   "type": "N",
+   "baseline_on": false,
+   "secs": 12.4,
+   "base_secs": 12.9,
+   "cost_delta_s": -0.5,
+   "cost_pct": -3.9,
+   "moved": [
+    "final_pop",
+    "pop_hash",
+    "tot_wealth",
+    "tot_material",
+    "tot_cred",
+    "pos_hash",
+    "bonds",
+    "n_ascribed_lineages",
+    "n_villages",
+    "n_lineages",
+    "births",
+    "deaths"
+   ],
+   "deltas": {
+    "final_pop": {
+     "base": 816,
+     "flip": 838,
+     "delta": 22,
+     "pct": 2.7
+    },
+    "pop_hash": "changed",
+    "tot_wealth": {
+     "base": 35877251.5037,
+     "flip": 36625125.2005,
+     "delta": 747873.6967,
+     "pct": 2.08
+    },
+    "tot_material": {
+     "base": 3084164589.6134,
+     "flip": 2780707606.8591,
+     "delta": -303456982.7543,
+     "pct": -9.84
+    },
+    "tot_cred": {
+     "base": 816.0,
+     "flip": 838.0,
+     "delta": 22.0,
+     "pct": 2.7
+    },
+    "pos_hash": "changed",
+    "bonds": {
+     "base": 190,
+     "flip": 191,
+     "delta": 1,
+     "pct": 0.53
+    },
+    "n_settlements": {
+     "base": 7,
+     "flip": 7,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_ascribed": {
+     "base": 0,
+     "flip": 0,
+     "delta": 0,
+     "pct": null
+    },
+    "n_ascribed_lineages": {
+     "base": 27,
+     "flip": 33,
+     "delta": 6,
+     "pct": 22.22
+    },
+    "n_villages": {
+     "base": 5,
+     "flip": 6,
+     "delta": 1,
+     "pct": 20.0
+    },
+    "n_lineages": {
+     "base": 206,
+     "flip": 217,
+     "delta": 11,
+     "pct": 5.34
+    },
+    "births": {
+     "base": 1046,
+     "flip": 1057,
+     "delta": 11,
+     "pct": 1.05
+    },
+    "deaths": {
+     "base": 830,
+     "flip": 819,
+     "delta": -11,
+     "pct": -1.33
+    }
+   },
+   "invariant_flags": []
+  },
+  {
+   "flag": "enable_provisioning",
+   "type": "X",
+   "baseline_on": true,
+   "secs": 11.1,
+   "base_secs": 12.4,
+   "cost_delta_s": -1.3,
+   "cost_pct": -10.5,
+   "moved": [
+    "final_pop",
+    "pop_hash",
+    "tot_wealth",
+    "tot_material",
+    "tot_cred",
+    "pos_hash",
+    "bonds",
+    "n_ascribed_lineages",
+    "n_villages",
+    "n_lineages",
+    "births",
+    "deaths"
+   ],
+   "deltas": {
+    "final_pop": {
+     "base": 906,
+     "flip": 816,
+     "delta": -90,
+     "pct": -9.93
+    },
+    "pop_hash": "changed",
+    "tot_wealth": {
+     "base": 39538871.2176,
+     "flip": 35877251.5037,
+     "delta": -3661619.7138,
+     "pct": -9.26
+    },
+    "tot_material": {
+     "base": 3061345267.5337,
+     "flip": 3084164589.6134,
+     "delta": 22819322.0797,
+     "pct": 0.75
+    },
+    "tot_cred": {
+     "base": 906.0,
+     "flip": 816.0,
+     "delta": -90.0,
+     "pct": -9.93
+    },
+    "pos_hash": "changed",
+    "bonds": {
+     "base": 211,
+     "flip": 190,
+     "delta": -21,
+     "pct": -9.95
+    },
+    "n_settlements": {
+     "base": 7,
+     "flip": 7,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_ascribed": {
+     "base": 0,
+     "flip": 0,
+     "delta": 0,
+     "pct": null
+    },
+    "n_ascribed_lineages": {
+     "base": 35,
+     "flip": 27,
+     "delta": -8,
+     "pct": -22.86
+    },
+    "n_villages": {
+     "base": 7,
+     "flip": 5,
+     "delta": -2,
+     "pct": -28.57
+    },
+    "n_lineages": {
+     "base": 219,
+     "flip": 206,
+     "delta": -13,
+     "pct": -5.94
+    },
+    "births": {
+     "base": 1104,
+     "flip": 1046,
+     "delta": -58,
+     "pct": -5.25
+    },
+    "deaths": {
+     "base": 798,
+     "flip": 830,
+     "delta": 32,
+     "pct": 4.01
+    }
+   },
+   "invariant_flags": [
+    "X moved TOTAL tot_wealth by -9.3% \u2014 an exchange should redistribute, not create",
+    "X moved TOTAL tot_cred by -9.9% \u2014 an exchange should redistribute, not create"
+   ]
+  },
+  {
+   "flag": "enable_alluvial_renewal",
+   "type": "P",
+   "baseline_on": false,
+   "secs": 12.0,
+   "base_secs": 11.6,
+   "cost_delta_s": 0.4,
+   "cost_pct": 3.4,
+   "moved": [
+    "tot_material"
+   ],
+   "deltas": {
+    "final_pop": {
+     "base": 747,
+     "flip": 747,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "pop_hash": "same",
+    "tot_wealth": {
+     "base": 32976152.5009,
+     "flip": 32976152.5009,
+     "delta": 0.0,
+     "pct": 0.0
+    },
+    "tot_material": {
+     "base": 1439074252.8165,
+     "flip": 1439074917.7238,
+     "delta": 664.9073,
+     "pct": 0.0
+    },
+    "tot_cred": {
+     "base": 747.0,
+     "flip": 747.0,
+     "delta": 0.0,
+     "pct": 0.0
+    },
+    "pos_hash": "same",
+    "bonds": {
+     "base": 130,
+     "flip": 130,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_settlements": {
+     "base": 11,
+     "flip": 11,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_ascribed": {
+     "base": 0,
+     "flip": 0,
+     "delta": 0,
+     "pct": null
+    },
+    "n_ascribed_lineages": {
+     "base": 20,
+     "flip": 20,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_villages": {
+     "base": 5,
+     "flip": 5,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_lineages": {
+     "base": 184,
+     "flip": 184,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "births": {
+     "base": 1233,
+     "flip": 1233,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "deaths": {
+     "base": 1386,
+     "flip": 1386,
+     "delta": 0,
+     "pct": 0.0
+    }
+   },
+   "invariant_flags": []
+  },
+  {
+   "flag": "enable_soil_depletion",
+   "type": "D",
+   "baseline_on": false,
+   "secs": 12.0,
+   "base_secs": 12.5,
+   "cost_delta_s": -0.5,
+   "cost_pct": -4.0,
+   "moved": [
+    "final_pop",
+    "pop_hash",
+    "tot_wealth",
+    "tot_material",
+    "tot_cred",
+    "pos_hash",
+    "bonds",
+    "n_ascribed_lineages",
+    "n_villages",
+    "n_lineages",
+    "births",
+    "deaths"
+   ],
+   "deltas": {
+    "final_pop": {
+     "base": 772,
+     "flip": 747,
+     "delta": -25,
+     "pct": -3.24
+    },
+    "pop_hash": "changed",
+    "tot_wealth": {
+     "base": 33950924.3451,
+     "flip": 32976152.5009,
+     "delta": -974771.8443,
+     "pct": -2.87
+    },
+    "tot_material": {
+     "base": 1460391920.6299,
+     "flip": 1439074252.8165,
+     "delta": -21317667.8134,
+     "pct": -1.46
+    },
+    "tot_cred": {
+     "base": 772.0,
+     "flip": 747.0,
+     "delta": -25.0,
+     "pct": -3.24
+    },
+    "pos_hash": "changed",
+    "bonds": {
+     "base": 160,
+     "flip": 130,
+     "delta": -30,
+     "pct": -18.75
+    },
+    "n_settlements": {
+     "base": 11,
+     "flip": 11,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_ascribed": {
+     "base": 0,
+     "flip": 0,
+     "delta": 0,
+     "pct": null
+    },
+    "n_ascribed_lineages": {
+     "base": 24,
+     "flip": 20,
+     "delta": -4,
+     "pct": -16.67
+    },
+    "n_villages": {
+     "base": 3,
+     "flip": 5,
+     "delta": 2,
+     "pct": 66.67
+    },
+    "n_lineages": {
+     "base": 191,
+     "flip": 184,
+     "delta": -7,
+     "pct": -3.66
+    },
+    "births": {
+     "base": 1247,
+     "flip": 1233,
+     "delta": -14,
+     "pct": -1.12
+    },
+    "deaths": {
+     "base": 1375,
+     "flip": 1386,
+     "delta": 11,
+     "pct": 0.8
+    }
+   },
+   "invariant_flags": []
+  },
+  {
+   "flag": "enable_rank_hierarchy",
+   "type": "C",
+   "baseline_on": true,
+   "secs": 17.9,
+   "base_secs": 18.8,
+   "cost_delta_s": -0.9,
+   "cost_pct": -4.8,
+   "moved": [
+    "final_pop",
+    "pop_hash",
+    "tot_wealth",
+    "tot_material",
+    "tot_cred",
+    "pos_hash",
+    "bonds",
+    "n_ascribed_lineages",
+    "n_villages",
+    "n_lineages",
+    "births",
+    "deaths"
+   ],
+   "deltas": {
+    "final_pop": {
+     "base": 1502,
+     "flip": 1567,
+     "delta": 65,
+     "pct": 4.33
+    },
+    "pop_hash": "changed",
+    "tot_wealth": {
+     "base": 64545847.863,
+     "flip": 68029055.5502,
+     "delta": 3483207.6872,
+     "pct": 5.4
+    },
+    "tot_material": {
+     "base": 4169528920.3083,
+     "flip": 4255210650.7534,
+     "delta": 85681730.4451,
+     "pct": 2.05
+    },
+    "tot_cred": {
+     "base": 1502.0,
+     "flip": 1567.0,
+     "delta": 65.0,
+     "pct": 4.33
+    },
+    "pos_hash": "changed",
+    "bonds": {
+     "base": 338,
+     "flip": 368,
+     "delta": 30,
+     "pct": 8.88
+    },
+    "n_settlements": {
+     "base": 14,
+     "flip": 14,
+     "delta": 0,
+     "pct": 0.0
+    },
+    "n_ascribed": {
+     "base": 0,
+     "flip": 0,
+     "delta": 0,
+     "pct": null
+    },
+    "n_ascribed_lineages": {
+     "base": 57,
+     "flip": 53,
+     "delta": -4,
+     "pct": -7.02
+    },
+    "n_villages": {
+     "base": 10,
+     "flip": 9,
+     "delta": -1,
+     "pct": -10.0
+    },
+    "n_lineages": {
+     "base": 368,
+     "flip": 383,
+     "delta": 15,
+     "pct": 4.08
+    },
+    "births": {
+     "base": 2022,
+     "flip": 2021,
+     "delta": -1,
+     "pct": -0.05
+    },
+    "deaths": {
+     "base": 1720,
+     "flip": 1654,
+     "delta": -66,
+     "pct": -3.84
+    }
+   },
+   "invariant_flags": []
+  }
+ ]
+}

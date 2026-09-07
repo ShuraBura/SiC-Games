@@ -1,0 +1,50 @@
+[
+ {
+  "rate": 0.0,
+  "pop": 3490,
+  "lineages_per_band": 7.08,
+  "dom_lineage_share": 0.367,
+  "n_lineages": 22,
+  "top_share": 0.104,
+  "eff_lineages": 15.1,
+  "ascribed_frac": 1.0,
+  "revs": 0,
+  "revs_late": 0
+ },
+ {
+  "rate": 0.01,
+  "pop": 1674,
+  "lineages_per_band": 6.39,
+  "dom_lineage_share": 0.387,
+  "n_lineages": 36,
+  "top_share": 0.161,
+  "eff_lineages": 9.9,
+  "ascribed_frac": 0.992,
+  "revs": 0,
+  "revs_late": 0
+ },
+ {
+  "rate": 0.03,
+  "pop": 1627,
+  "lineages_per_band": 7.41,
+  "dom_lineage_share": 0.397,
+  "n_lineages": 82,
+  "top_share": 0.146,
+  "eff_lineages": 11.8,
+  "ascribed_frac": 0.95,
+  "revs": 0,
+  "revs_late": 0
+ },
+ {
+  "rate": 0.08,
+  "pop": 635,
+  "lineages_per_band": 8.83,
+  "dom_lineage_share": 0.359,
+  "n_lineages": 75,
+  "top_share": 0.173,
+  "eff_lineages": 14.2,
+  "ascribed_frac": 0.893,
+  "revs": 0,
+  "revs_late": 0
+ }
+]

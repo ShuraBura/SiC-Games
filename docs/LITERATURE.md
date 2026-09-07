@@ -595,6 +595,7 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 **What was lifted — Aché forest-period coefficients (Table 2; both sexes; ANNUAL, x in years):**
 - a1 = 0.157, b1 = 0.721, a2 = 0.013, a3 = 4.80×10⁻⁵, b3 = 0.103 (MRDT = ln2/b3 ≈ 6.7 yr).
 - Realized: e₀ = 37, **e₁₅ = 38.5 remaining yr**, e₄₅ = 21.1, survival-to-15 = 0.66, survival 15→45 = 0.43, modal adult death = 71 (forest) / 78 (settled). Adult baseline ~1%/yr to age ~40, then Gompertz. Aché a1 ≈ half of other foragers (higher child survivorship).
+- **DENOMINATOR NOTE (R-106, 2026-08-13) — "survival 15→45 = 0.43" is `l(45)` FROM BIRTH, not conditional on reaching 15.** Fed these exact coefficients, the model's `life_table()` returns `l(15) = 0.66` (matching to 2 dp) and a CONDITIONAL 15→45 of **0.65**; `0.66 × 0.65 = 0.43` recovers the published figure. Scoring the conditional against 0.43 would mark a correct schedule as wrong by ~50%. `life_table()` therefore returns `surv_to_45` and `surv_15_to_45_cond` as separately named fields — compare **`surv_to_45`** against this 0.43. Same failure class as the four earlier "right number, wrong denominator" retractions.
 - Cross-HG: e₀ 21–37; modal adult death avg 72; adaptive lifespan 68–78.
 
 **Use:** Siler coefficients FIXED as constants (M-1), converted per-month (÷12). G&K Table 2 is both-sexes; sex-specific + maternal-removed (M-3) fits to come from Hill & Hurtado.
@@ -678,8 +679,10 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 **Citation tag:** [USED — stellar-flux draw bounds + S→T̄ map (§4.1.9 C.2)]
 
 ### Timmermann, A., An, S.-I., Kug, J.-S., et al. (2018). "El Niño–Southern Oscillation complexity." *Nature* 559:535–545.
-**What was lifted — interannual (ENSO) layer (C.2):** ENSO quasi-period 2–7 yr → `interannual_period`; ±20–40% CC swing in marginal biomes → `interannual_amp`. Implemented as a one-sided depression (bad years only). **Rejected:** stochastic/irregular ENSO realism — a single drawn period is used (refinement deferred).
-**Citation tag:** [USED — interannual ENSO period+amplitude (§4.1.9 C.2)]
+**What was lifted — interannual (ENSO) layer (C.2):** the **PERIOD only**. `interannual_period` ∈ [2, 7] yr is the **union of the paper's two observed modes**, not a range it prints: EOF1 (classical EP El Niño) has "quasi-quadrennial timescales (3-7 years)", EOF2 (zonal dipole, 25% of EOF1's variance) has "quasi-biennial and decadal timescales", and the coupled-eigenmode section pins the pair at "timescales of approximately four and two years, respectively". So 7 yr is EOF1's ceiling and 2 yr is EOF2's floor. `[SYNTHESIS]` — both quotations verified against the PDF 2026-08-06.
+**RETRACTED 2026-08-06 (Addendum 29) — the amplitude was never in this paper.** This entry previously read "±20–40% CC swing in marginal biomes → `interannual_amp`". Timmermann 2018 is an **SST-dynamics review**: it discusses ENSO amplitude only qualitatively (skewness, "a wide range of amplitudes" in palaeo-reconstructions) and states **no production or carrying-capacity amplitude anywhere**. `ENSO_AMP_MIN/MAX = 0.20/0.40` is therefore a **modelling judgement**, now tagged `[INTERPRETIVE]` in `climate.py` — the same treatment its sibling `REGIME_AMP` (Wanner) has always carried. It is **bounded**, not anchored: Sarmiento 2004 measures −37…−56% ANPP in an *exceptional* flood year, and an ordinary interannual excursion must be milder, so [0.20, 0.40] below [0.37, 0.56] is coherent. Found by `tools/verify_anchor.py`; it was believed because the code comment was trusted instead of the paper (the Bar-Yosef pattern, MECHANISM_CHARTER P1).
+**Rejected:** stochastic/irregular ENSO realism — a single drawn period is used (refinement deferred).
+**Citation tag:** [USED — interannual ENSO **period only** (§4.1.9 C.2); the amplitude is NOT from this source]
 
 ### Wanner, H., Beer, J., Bütikofer, J., et al. (2008). "Mid- to Late Holocene climate change: an overview." *Quaternary Science Reviews* 27:1791–1828.
 **What was lifted — regime-shift amplitude (C.3):** Little Ice Age global-mean cooling ~0.5 °C (p.1793) → an *interpretive* central ±10–15% CC depression (`regime_amp∈[0.10,0.15]`); LIA excursion duration ≈ 500 yr → `regime_duration` upper bound. **Rejected:** °C→CC% as a calibrated transfer (no NPP transfer fn — flagged interpretive); the ±30% / ~1 °C tail is RESERVED for explicitly-flagged 8.2-kyr/YD catastrophe events (C.4), not the routine lottery.
@@ -689,8 +692,19 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 **What was lifted — regime-shift recurrence (C.3):** Holocene Rapid Climate Change events recur on ~1500 / ~2000–2800 yr pacing (Bond ~1500 yr) → `regime_recurrence∈[1000,2000]` yr. The two-state Markov **telegraph** dwell/recurrence split (DURATION ≠ RECURRENCE) is anchored here. **Rejected:** glacial-cycle (10⁴–10⁵ yr) timescales — out of scope; an OU/mean-reverting process (v2 red-team: these are sustained regime shifts, not wiggles).
 **Citation tag:** [USED — regime recurrence + step-process justification (§4.1.9 C.3)]
 
-### St. John, J.R. (2022). "Understanding Caribou Population Cycles." M.Sc. thesis, University of Montana. & Bergerud, A.T. (various) / Vors, L.S. & Boyce, M.S. (2009). "Global declines of caribou and reindeer." *Global Change Biology* 15:2626–2633.
-**What was lifted — caribou herd-swing magnitude + period (C.4b, NOT yet wired):** St. John assembled the largest caribou population database (43 herds) and found migratory-tundra population cycles with **median period 40.5 yr (range ~40–90 yr)** and **amplitude 0.871 standardized about the mean** ⇒ peak ≈1.87× / trough ≈0.13× mean → a **~93% peak-to-trough (~87%-about-mean) drawdown**. Bergerud established the 40–90 yr quasi-cycle (predator/forage-driven). Vors & Boyce 2009 corroborate a **~57% decline from max** across 58 circumpolar herds (modern, anthropogenically confounded → corroboration only, not the cycle anchor). **How used:** a 40–90 yr quasi-periodic DEPRESSION on `GRASS_STEPPE` **game** (the high-mobility migratory biome), peak-pinned. **Rejected:** Usher's 50–66% human-famine figure as the herd input (category error, v2 red-team); Vors & Boyce as the *cycle* amplitude (it's a secular decline).
+### St. John, Jack R. (2022). "Understanding Caribou Population Cycles." **UNDERGRADUATE thesis**, University of Montana (ScholarWorks: *Undergraduate Theses, Professional Papers, and Capstone Artifacts*). & Vors, L.S. & Boyce, M.S. (2009). "Global declines of caribou and reindeer." *Global Change Biology* 15:2626–2633.
+**STATUS `[VERIFIED, PDF READ]` — filed by the supervisor and read 2026-08-06 (Addendum 32).** It was `[UNSOURCED]` for one morning. Reading it produced **four corrections**, only one of which was a confirmation:
+
+1. **AMPLITUDE CONFIRMED.** *"the amplitude, standardized about the mean population size, was .871"* — and Figure 10 gives the full distribution: **Min=.406, Q1=.700, Median=.871, Q3=1.126, Max=1.570**. Our 0.871 is the MEDIAN of a wide spread, not a constant.
+2. **PERIOD BAND FALSIFIED.** We carried **40–90 yr**, credited to Bergerud. Figure 9: **Min=23, Q1=33, Median=40.5, Q3=50, Max=67**, and **Bergerud is not cited anywhere in the thesis** (zero occurrences). The old band excluded everything below the median and ran 23 years past the longest cycle ever measured, so nearly every drawn world got a period longer than the median herd. **Corrected to 23–67.**
+3. **"43-herd database" OVERSTATED.** 43 herds were collected; *"of the 43 herds, I only 19 were deemed cyclic via periodogram analysis."* **Both distributions are over 19 herds, and 56% of the database is NOT cyclic** — a fact that matters for a model applying a cycle to all steppe.
+4. **IT IS AN UNDERGRADUATE THESIS, not the M.Sc. this entry claimed.** Not peer-reviewed. It is now the weakest anchor in the climate layer and the first that should be replaced if a published herd-cycle source is found.
+
+**⚠ HAZARD THE DISTRIBUTION EXPOSES.** `_caribou_factor` is peak-pinned `(1 + a·cos)/(1 + a)`, whose trough `(1−a)/(1+a)` goes **NEGATIVE for a > 1**. The thesis's Q3 (1.126) and Max (1.570) are both above 1, so **half the observed herds sit above the value at which our form breaks.** Pinning the median is safe; a per-world draw from this distribution must clamp at a ≤ 1. Constructed as a test (`test_climate_health_ctb.py`) so the clamp is a known requirement, not a later bug report.
+
+**Vors & Boyce 2009 remains ABSENT and is corroboration only** — a ~57% secular decline, not a cycle amplitude. Usher 2022 (which we do hold) stays rejected for this purpose: a human-famine figure, not a herd cycle.
+
+**What was lifted — caribou herd-swing magnitude + period (C.4b, wired 2026-08-04, ON since 2026-08-06):** St. John assembled the largest caribou population database (**43 herds collected, 19 cyclic**) and found migratory-tundra population cycles with **median period 40.5 yr (observed range 23–67 yr — NOT the 40–90 this entry carried until the thesis was read)** and **amplitude 0.871 standardized about the mean** ⇒ peak ≈1.87× / trough ≈0.13× mean → a **~93% peak-to-trough (~87%-about-mean) drawdown**. ~~Bergerud established the 40–90 yr quasi-cycle (predator/forage-driven).~~ **RETRACTED 2026-08-06:** Bergerud is not cited in the thesis at all, and no Bergerud work was ever identified or filed. The 40–90 band had no source. Vors & Boyce 2009 corroborate a **~57% decline from max** across 58 circumpolar herds (modern, anthropogenically confounded → corroboration only, not the cycle anchor). **How used:** a 23–67 yr quasi-periodic DEPRESSION on `GRASS_STEPPE` **game** (the high-mobility migratory biome), peak-pinned. **Rejected:** Usher's 50–66% human-famine figure as the herd input (category error, v2 red-team); Vors & Boyce as the *cycle* amplitude (it's a secular decline).
 **Citation tag:** [USED — caribou quasi-cycle period+amplitude (§4.1.9 C.4b, WIRED to GRASS_STEPPE meat)]
 
 ### Hamilton, S.K., Sippel, S.J., Melack, J.M. (2004). "Seasonal inundation patterns in two large savanna floodplains of South America: the Llanos de Moxos (Bolivia) and the Llanos del Orinoco (Venezuela and Colombia)." *Hydrological Processes* 18:2103–2116.
@@ -758,6 +772,18 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 **What was lifted — marriage system + residence (F.3a, §4.8.7):** foragers are predominantly **monogamous** (modest polygyny among high-status males, ~the von Rueden 4–11%), with **serial monogamy** (re-pairing after death/divorce) and **MULTILOCAL / flexible** post-marital residence (not rigidly patri- or matrilocal — the classic "patrilocal band" is overstated). **How used:** sets the F.3a model — **monogamy + serial re-pairing** (widow/divorce → re-pair), the chosen pair-bond model; polygyny deferred to a later knob; residence handled as nuclear-family co-residence (the unit co-locates) rather than a fixed patri/matri rule.
 **Citation tag:** [USED — F.3a monogamy + serial re-pairing (§4.8.7)]
 
+### Ellison, P.T. (2008). "Energetics, reproductive ecology, and human evolution." *PaleoAnthropology* 2008:172–200. (Open-access via Harvard DASH; PDF filed `literature/Ellison - 2008 - Energetics Reproductive Ecology and Human Evolution...pdf`, **text layer extracts**.) `[VERIFIED VERBATIM]`
+**THE GAP THIS CLOSES (R-106, 2026-08-14).** `demography.py` has named "Ellison's energetics" as the mechanism behind `enable_intake_fertility` since it was written, with **no Ellison source filed anywhere in the project** and no timescale. The 2026-08-14 literature survey flagged this as its single most important gap, because the response timescale is a live model parameter (`intake_ema_alpha`).
+
+**(1) THE TIMESCALE — verbatim, p.44 of the DASH PDF:** *"Ovarian function responds to changes in energy availability on a relatively short time scale on the order of individual ovarian cycles (Figure 11). As a result, when energetic conditions in the environment change seasonally, as in many subsistence agricultural societies, conceptions become seasonal as well with a nadir that is temporally correlated with the nadir in energy availability."*
+**⇒ the response is ON THE ORDER OF ONE OVARIAN CYCLE, i.e. ~1 month** — and it is sharp enough to produce a SEASONAL conception signal, so it must track within-year variation. The model shipped `intake_ema_alpha = 0.04`, a half-life of **~17 months**, which smooths away exactly the variation Ellison says the physiology tracks. Measured consequence (RESULTS Addendum 42): the brake acted on 6.2% of woman-steps at the shipped value against 27.8% with no memory at all.
+
+**(2) ENERGY DRIVES THE LENGTH OF LACTATIONAL AMENORRHEA, NOT SUCKLING — verbatim, p.34:** *"in the one to two months immediately prior to the resumption of menstruation, C-peptide levels are significantly higher on average than they are after menstruation resumes… there is also a close correlation between increasing C-peptide levels, increasing maternal weight, and increasing urinary estrogen levels during the months preceding menstrual resumption. On the other hand, **there are no correlations between C-peptide levels and any indices of nursing pattern or frequency**… We interpret these data as indicating that variation in the duration of lactational amenorrhea within the Toba population is sensitive to differences in energy availability."*
+**⇒ this is the DIRECT ANCHOR for task #70's proposal** — that the energetic condition belongs on the REFRACTORY period (lactational amenorrhea), not on fecundability. RESULTS Addendum 42 showed by arithmetic that the refractory is the term with leverage (fecundability is only 22% of the birth interval); Ellison supplies the mechanism, and rules out the competing "nursing frequency" pathway in the same data.
+
+**How used:** `intake_ema_alpha` — anchored at a half-life of ~1 month (one ovarian cycle) rather than the shipped 17. The refractory route (task #70) gains its mechanism. **CAUTION:** Ellison's Toba are forager-horticulturalists, and the seasonality evidence is drawn from *subsistence agricultural* societies; the timescale claim is about human ovarian physiology and transfers, but any MAGNITUDE taken from these populations would not.
+**Citation tag:** [ANCHOR — fecundity response timescale ≈ 1 ovarian cycle; energy→amenorrhea-duration pathway]
+
 ### Kaplan, H., Hill, K., Lancaster, J., Hurtado, A.M. (2000). "A theory of human life history evolution: Diet, intelligence, and longevity." *Evolutionary Anthropology* 9(4):156–185.
 **What was lifted — juvenile dependence span (F.3b maturity, §4.8.7):** the human "embodied-capital" life history has a **long juvenile dependence** — children are net energy consumers, provisioned by parents/kin, until ~**15–18 yr**, when foraging return rates reach adult levels. **How used:** `family_maturity_months ≈ 180` (15 yr) — the age at which a child **detaches** from the co-moving family unit (becomes an independent forager + enters the mating pool → exogamous dispersal). Complements the η(age) production ramp (§4.5.1) and the C.2b/B+ provisioning (§4.5.4/§4.5.7).
 **Citation tag:** [USED — F.3b family-maturity / child-detachment age (§4.8.7)]
@@ -795,6 +821,41 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 ### Chagnon, N.A. (1975). "Genealogy, Solidarity, and Relatedness: Limits to Local Group Size and Patterns of Fissioning in an Expanding Population." *Yearbook of Physical Anthropology* 19:95–110.
 **What is being lifted (SCOPING):** the canonical Yanomamö fission ethnography — villages fission along LINEAGE/LEADERSHIP cleavages; intra-village conflict rises sharply above **~200 inhabitants** → split; a large village develops SEVERAL competing headmen (from the largest patrilineages) and cleaves between them. Grounds the "internal leadership competition drives fission" mechanism (supervisor's hypothesis, confirmed). **Status: NOT OBTAINED (paywalled, no DOI). CORROBORATING ONLY — the ~200 threshold + leadership-cleavage driver are cited from secondary ethnographic summaries; the load-bearing fission anchors (Bandy 2004 + Alberti 2014) are FILED. Not a blocker.**
 **Citation tag:** [SCOPING — Yanomamö fission ~200 / leadership-cleavage driver; secondary-cited]
+**[SUPERSEDED IN PART, 2026-07-27 — see Alvard 2009 below.]** The "cleaves along LINEAGE lines" half of this entry
+is contradicted by the one paper on this fight we actually hold. The ~200 size figure stands.
+
+### Alvard, M. (2009). "Kinship and Cooperation: The Axe Fight Revisited." *Human Nature* 20:394–416.
+**Status: FILED and READ (`literature/AlvardPaper2.pdf`; text at `literature/_alvard_text.txt`).** Obtained
+2026-07-27 while checking the budding cleavage axis. **[VERIFIED — read directly, not summarised.]**
+
+**What was lifted — THE CLEAVAGE AXIS OF VILLAGE FISSION.** Matrix-regression reanalysis of Chagnon's data on
+the Mishimishimaböwei-teri axe fight (a village that had itself recently fissioned; the splinter group was
+visiting when the fight broke out). Who sides with whom:
+
+| predictor of faction affiliation | variance explained |
+|---|---|
+| **genetic kinship** | **~15%** |
+| lineage membership | ~3% (p=0.01) |
+| affinal (in-law) ties | ~2% (p<0.000) |
+
+**The decisive result:** entered together, **lineage is no longer significant (p=0.281)** and adds no variance
+over kinship alone — its univariate effect was covariance with relatedness ("lineage members are more closely
+related than expected by chance"). The paper's own abstract: *"genetic kinship was the primary organizing
+principle in the axe fight; affinal relations were also important, whereas lineage identity explained nothing."*
+The CONTRAST case in the same paper — Lamalera whaling crews — is the reverse: there lineage explains ~10% and
+kinship drops out. So lineage-assorted factions are real, but they are the Lamalera pattern, **not** the
+Yanomamö fission pattern.
+
+**Also lifted (village demography):** Yanomamö villages run **50 to ~250 individuals**; "solidarity begins to
+deteriorate as village populations grow beyond 250 or so, and village fissioning often occurs"; splits are
+"often related to mate competition". NOTE: the paper does **not** state a count of lineages per village — an
+earlier "~2 major patrilineages" claim in this project came from a PNAS *profile* piece, not a paper, and is
+**withdrawn as unsourced**.
+
+**How used (PARAMETERS §21.8):** village budding now cleaves on KINSHIP (genome identity-by-state, genealogical
+fallback) between the two highest-standing men, replacing the 2nd-largest-lineage split. Independent check: the
+resulting village-size distribution moved into this paper's stated 50–250 band without being tuned for it.
+**Citation tag:** [ANCHOR — village fission cleaves on kinship, NOT lineage; village size 50–250; VERIFIED]
 
 ### Forge, A. (1972). "Normative Factors in the Settlement Size of Neolithic Cultivators (New Guinea)." In P.J. Ucko, R. Tringham & G.W. Dimbleby (eds.), *Man, Settlement and Urbanism*, Duckworth, London, pp. 363–376.
 **What is being lifted (SCOPING):** the classic face-to-face village size ceiling (~150–400 before segmentation is forced), a companion anchor to Alberti's logistic (P=0.5 at N≈127, 0.99 at N≈158, already FILED) and Yanomamö ~200 for the fission threshold. **Status: NOT OBTAINED (edited-volume chapter). REDUNDANT — superseded for our use by Alberti (N≈127–158, filed) + Yanomamö ~200. Not a blocker.**
@@ -822,9 +883,55 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 **What was lifted:** !Kung wet-season aggregation at permanent waterholes (mate-finding + exchange) [Lee]; the archaeological signature of periodic large aggregations [Conkey — Altamira as an aggregation locus]. **How used:** corroborating breadth for the seasonal-aggregation mechanic (not Basin-specific). **Status: REFERENCE; INLINE — PDFs not filed.**
 **Citation tag:** [REFERENCE — !Kung/Altamira aggregation corroboration (§4.8.18)]
 
-### Ember, M. & Ember, C.R. (1971). "The Conditions Favoring Matrilocal versus Patrilocal Residence." *American Anthropologist* 73(3):571–594. — with Marlowe, F.W. (2004) & Hill et al. (2011) [filed above, §4.8.7].
-**What was lifted — residence direction (§4.8.18):** the cross-cultural conditions that select virilocal (patrilocal) vs uxorilocal (matrilocal) post-marital residence (warfare pattern, subsistence-labour division). Marlowe 2004 gives forager residence frequencies; Hill 2011 the bilateral/flexible modern-forager pattern. **How used:** grounds the three wired residence options (`aggregation_residence` ∈ virilocal/uxorilocal/flexible) and the standing long-term study of residence→society; the egalitarian-floor ascribed-mate weight (0.25) also rests on family-swayed marriage being universal. **Status: REFERENCE; INLINE — Ember&Ember PDF not filed (Marlowe/Hill filed §4.8.7). NO parametric anchor (residence is a toggle, comparisons deferred).**
-**Citation tag:** [REFERENCE — marital residence direction (§4.8.18)]
+### Ember, M. & Ember, C.R. (1971). "The Conditions Favoring Matrilocal versus Patrilocal Residence." *American Anthropologist* 73(3):571–594. DOI 10.1525/aa.1971.73.3.02a00040. — with Marlowe, F.W. (2004) & Hill et al. (2011) [filed above, §4.8.7].
+**What was lifted — residence direction (§4.8.18):** the cross-cultural conditions that select virilocal (patrilocal) vs uxorilocal (matrilocal) post-marital residence. Marlowe 2004 gives forager residence frequencies; Hill 2011 the bilateral/flexible modern-forager pattern. **How used:** grounds the three wired residence options (`aggregation_residence` ∈ virilocal/uxorilocal/flexible) and the standing long-term study of residence→society; the egalitarian-floor ascribed-mate weight (0.25) also rests on family-swayed marriage being universal.
+
+**CORRECTED 2026-07-22 — this entry previously named "warfare pattern, subsistence-labour division" as the conditions, as though both were supported. They are not co-equal, and the labour half is the paper's headline NEGATIVE.** Ember & Ember's result is that the traditional division-of-labour explanation was **not** supported; the determinant is WARFARE TYPE — **internal warfare favours patrilocal, purely external warfare favours matrilocal** (the latter conditional on matridominant labour division). Verified against the HRAF Explaining Human Culture summary "Residence and Kinship", which states outright that higher male subsistence contribution does *not* generally predict patrilocality. **Caveat that matters for this project specifically:** the labour effect DOES hold in the hunter-gatherer subset — among foragers and Native North American societies, higher male subsistence contribution does predict patrilocality. So for an HG→proto-agricultural model the labour route is live at the forager end and fades as subsistence intensifies.
+**Consequence for the model:** an endogenous residence rule should key on CONFLICT PATTERN, not subsistence shares. We do not currently distinguish internal from external warfare (`claim_events` is cell contest, not war between vs within communities), so that distinction is the missing substrate, not the residence toggle itself.
+
+**PARAMETRIC ANCHOR (added 2026-07-22, from the filed PDF — the "comparisons deferred" note is now discharged).** Verbatim abstract: the division-of-labour assumption — "The results did not support that assumption" — measured at φ = .05 (n.s.) for matrilocal and φ = .04 for patrilocal, worldwide (Tables II, III). The warfare result, Table XI (p.589), **controlling on level of political integration**:
+
+| Political integration | Warfare | Matrilocal | Patrilocal |
+|---|---|---|---|
+| Local | purely external | 4 | 2 |
+| Local | internal, or internal+external | **0** | **15** |
+| Multilocal | purely external | 3 | 1 |
+| Multilocal | internal, or internal+external | 1 | 14 |
+
+Local: φ = .74, p = .003. Multilocal: φ = .68, p = .016 (both one-tail, Fisher's Exact). **Internal warfare → 29/30 patrilocal across both levels; purely external → 7/10 matrilocal.**
+
+**THE EFFECT IS NOT SCALE-GATED — and a first reading here claimed it was.** The PDF text layer renders the local φ as ".14", which would have meant the mechanism barely operates at the acephalous scale this project models, and would have looked like a neat convergence with R-97's "cycles are state-scale". Rendering p.589 as an image shows **.74**: the association is if anything STRONGER at the local level. Recorded because the near-miss is the lesson — a garbled digit produced a conclusion that flattered an existing result, and the only thing that caught it was the φ/p pair being mutually impossible at the visible n.
+
+**Consequence for SiC Games specifically:** the model implements ONLY internal conflict — `claim_events` is contest between neighbouring groups inside one world, with no external enemy. By Ember & Ember's finding that regime predicts patrilocal/virilocal residence at 15/15 (local integration), which is exactly the model's default `aggregation_residence="virilocal"`. **The default is the ethnographically correct rule for the conflict regime the substrate implements.** The R-102 uxorilocal arms are therefore a MECHANISM test (does the residence lever work, and what does it change downstream), NOT a realism comparison — an uxorilocal world under purely-internal warfare is a case the ethnographic record contains zero instances of.
+**Status: REFERENCE → **ANCHORED**; PDF FILED 2026-07-22 (`literature/American Anthropologist - June 1971 - EMBER - ...pdf`). Table XI values verified by IMAGE render, not text extraction.**
+**Citation tag:** [ANCHOR — marital residence from warfare pattern, not labour (§4.8.18; R-102)]
+
+### Murdock, G.P., Textor, R., Barry, H. III, White, D.R., Gray, J.P. & Divale, W.T. (1999). *Ethnographic Atlas.* World Cultures 10:24–136 (codebook). — machine-readable via **D-PLACE** [Kirby, K.R. et al. (2016). "D-PLACE: A Global Database of Cultural, Linguistic and Environmental Diversity." *PLoS ONE* 11(7):e0158391. DOI 10.1371/journal.pone.0158391].
+**What was lifted — THE CROSS-CULTURAL CATEGORISATION SCHEME (filed 2026-07-22, for #48):** coded ethnographic variables for **1,291 societies**, replacing this project's homegrown 3-way society classifier with the standard scheme. The variables that bear on open questions:
+- **EA033 jurisdictional hierarchy beyond the local community** — the political-complexity TIERS, the scheme the project had been missing: Acephalous 45.5% / One level, petty chiefdoms 29.5% / Two levels, larger chiefdoms 14.0% / Three levels, states 7.2% / Four levels, large states 3.8% (n=1155).
+- **EA043 descent major type** (n=1274): Patrilineal 46.3%, Bilateral 28.4%, Matrilineal 12.6%, Duolateral 4.1%, Mixed 3.9%, Ambilineal 3.8%.
+- **EA012 marital residence** (n=1267): Patrilocal 50.4%, Virilocal 21.0%, Ambilocal 6.6%, Uxorilocal 6.5%, Neolocal 4.9%, Matrilocal 4.6%, Avunculocal 4.3% (+1.3% avuncu-variants).
+- **EA042 dominant subsistence × EA043 descent** — the cross-tab that gives the classifier its missing third input: hunting 77% bilateral, gathering 70% bilateral, fishing 55% bilateral; extensive agriculture 51% patrilineal **and matriliny's peak at 19%**; intensive agriculture 55% patrilineal; **pastoralism 77% patrilineal** (the strongest single association in the table).
+- **EA074/EA076 inheritance rule** (land n=856 / movable n=909) — for #47: land is Patrilineal-by-sons 41.4%, no inheritance of real property 26.1%, patrilineal-by-heirs 10.5%, matrilineal-by-heirs 7.0%, children 6.4%, children-less-for-daughters 5.0%, matrilineal-by-sister's-sons 3.6%.
+- **EA073 hereditary succession** (n=937): Nonhereditary 34.0%, Son 32.8%, absence of office 11.6%, patrilineal heir 10.8%, matrilineal heir 6.8%, sister's son 3.9%.
+- **EA066 class differentiation** (n=1109): absence of distinctions 48.5%, dual stratification 20.6%, wealth distinctions 19.6%, complex 7.8%, elite 3.6%.
+
+**How used:** (1) anchors #48 — subsistence mode predicts descent strongly enough to be the classifier's third input, and the 19% matrilineal peak under *extensive* agriculture independently vindicates the existing `matrilineal_horticulturalist` preset's name; (2) EA033 places the model empirically — a world of villages and big men with no authority beyond the community is **Acephalous, 45.5% of the ethnographic record**, while states (EA033 3–4) are 11.0%, which is the cross-cultural warrant for R-97's "Turchin's cycles are a STATE-scale phenomenon, we built the Kachin"; (3) EA074/EA076 supersede BHM 2009's single β as the anchor for material inheritance, giving RULE and DISTRIBUTION by society rather than one transmission coefficient; (4) the avunculate is real but rare — avunculocal residence 5.6%, sister's-son succession 3.9%, sister's-son land inheritance 3.6% — supporting its treatment as a refinement rather than a prerequisite for matriliny.
+**Status: DATA FILED — `literature/dplace_ea/` (variables/codes/societies/data.csv, D-PLACE dataset v3.0, CC-BY-NC-4.0, 121,355 data points). Kirby et al. 2016 PDF FILED (open access). Murdock 1967 *Ethnology* 6(2):109–236 summary FILED 2026-07-22 (`literature/murdock1967.pdf`). The World Cultures 1999 codebook is NOT filed and is NOT needed — it is the canonical citation for the code definitions, and those definitions are already carried in `dplace_ea/codes.csv`.**
+**Citation tag:** [ANCHOR — cross-cultural categorisation: descent/residence/subsistence/hierarchy tiers (#48, #47)]
+
+### Goody, J. (1976). *Production and Reproduction: A Comparative Study of the Domestic Domain.* Cambridge University Press (Cambridge Studies in Social Anthropology 17), pp. xiii+157.
+**What it anchors — the DETERMINANT of the inheritance rule (#47, filed 2026-07-23).** Goody's thesis of **diverging devolution**: property transmitted to children of BOTH sexes (dowry-like, partible/equal) is tied to the **intensive** exploitation of land (plough/irrigation), stratification, and complex states; where land is worked **extensively** (hoe/swidden) property devolves **homogeneously** within a lineage/same-sex (bridewealth, consolidated). So the inheritance rule is not free — it is **regime-dependent on land intensity**. Goody built this on **Murdock's Ethnographic Atlas** — the same dataset filed above — so the D-PLACE cross-tab run here is a re-execution of his analysis on the modern coded version.
+
+**EMPIRICAL VERIFICATION [VERIFIED — cross-tab computed 2026-07-23 on `dplace_ea/`]:** inheritance DISTRIBUTION for land (EA075) × agriculture intensity (EA028), and × dominant subsistence (EA042):
+- **No agriculture / casual (foragers):** land is NOT inherited — *no inheritance of real property* 77–89%. Land is not property; nothing to bequeath. (Directly relevant: SiC Games at its forage stage should show ~no land inheritance — the model's "big men who can't bequeath" is ethnographically correct until land ownership exists.)
+- **Extensive / shifting (abundant land, low investment):** **Primogeniture 49%** (concentrate to one heir), equal 33%.
+- **Intensive:** **Equally distributed 55%**, primogeniture 31%.  **Intensive irrigated:** **Equal 70%**, primogeniture 21%.
+- **Pastoral:** patrilineal-by-sons / equal-less-for-daughters (livestock = movable; BHM 2009 β_material 0.67, the MOST heritable wealth class).
+
+**COUNTERINTUITIVE DIRECTION worth stating:** the naive "scarce land → primogeniture to avoid fragmentation" is BACKWARDS in the data — primogeniture is the EXTENSIVE (land-abundant) pattern; intensive/scarce land goes EQUAL/partible (Goody: diverging devolution provisions all heirs incl. daughters to hold status). So the concentrating "chiefly estate" route ethnographically is **extensive agriculture + primogeniture**, not intensive.
+**Status: REFERENCE (theory) — PDF NOT filed; anchored by the D-PLACE cross-tab (in hand, [VERIFIED]). Goody used the same Murdock data, so the cross-tab IS the anchor.**
+**Citation tag:** [ANCHOR — inheritance rule is regime-dependent on land intensity; diverging devolution (#47)]
 
 ### Binford, L.R. (2001). *Constructing Frames of Reference.* University of California Press. — with Kelly, R.L. (1995/2013) [filed above].
 **What was lifted — the mobility ∝ 1/productivity gradient (R-39, mobility stage seam):** Binford's cross-cultural regularity that residential mobility (moves/yr, distance/move, annual range) SCALES INVERSELY with environmental productivity — foragers in marginal (low-NPP) habitats range farther and move more; Kelly's Foraging Spectrum gives the forager/collector logistical–residential axis. **How used:** the literature warrant for the NEXT stage — productivity-scaled movement range (`move_radius ≈ clamp(base·NPP_ref/local_NPP, 1, max)`) — diagnosed as the root cause of the savanna collapse (fixed r=1 diffusion cannot spread agents over sparse territory). **Status: REFERENCE (framing for the mobility stage); Kelly PDF filed, Binford INLINE. Parametric anchor TBD at build.**
@@ -971,6 +1078,26 @@ bust; the exact quantity the substrate run measures). **Status: SEARCH-VERIFIED 
 filed). Anchor: full 130k / floor 20k / ~44 d runway.**
 **Citation tag:** [PARAMETER — starvation reserve full/floor] — BUILT (`KcalEconomyConfig`); PARAMETERS §13.
 
+### Keys, A., Brožek, J., Henschel, A., Mickelsen, O. & Taylor, H.L. (1950). *The Biology of Human Starvation.* Univ. of Minnesota Press. (The Minnesota Starvation Experiment, 1944–45.)
+**What was lifted — adaptive metabolic down-regulation under sustained deficit (`enable_metabolic_downreg`):**
+36 men held at **~50% of requirement (~1,570 kcal) for 6 months lost ~25% of body weight and SURVIVED** — the
+"diminished but not dead" state the model lacks. Resting metabolic rate fell **~40%** by week 24, of which
+~65% is tissue loss (a smaller body) and **~35% is ADAPTIVE hypometabolism** — a true turn-down of the engine,
+independent of mass. The adaptive component **RAMPS over time: ~10% (wk 4) → ~20% (wk 12) → ~25% (wk 24)** of
+prestarvation BMR. **How used:** under a sustained intake deficit an agent DOWN-REGULATES its burn toward a
+floor (**~0.75, i.e. −25% adaptive**, reached at ≤50% intake, on the agent's own intake-EMA horizon), so a
+transient per-capita crash no longer kills an agent who is well-fed on average. Measured defect it addresses:
+96% of starvation deaths were ACUTE one-step crashes with the reserve still half-full, and realised e₀ sat at
+23.5 vs a schedule 36.5, because the model burns FLAT — exactly the gap the Cahill entry above flags. It
+COMPLEMENTS, does not replace, the Cahill body reserve: Cahill sets how much fuel there is, Keys sets how fast
+it is spent under famine. **Cross-the-board impacts (documented, for the diminishment coupling if built):**
+strength/endurance ~halved; heart rate, blood pressure, temperature down; cold intolerance; oedema; libido→0
+and amenorrhea ⇒ fertility suppressed (already the Ellison/Toba C-peptide anchor + `enable_energetic_refractory`);
+maternal undernutrition ⇒ low birth weight ⇒ raised infant mortality (Dutch Hunger Winter is the human anchor).
+**Status: SEARCH-VERIFIED** (the ~40% / adaptive-35% split and the 10/20/25% wk-4/12/24 ramp are widely cited;
+primary volume not filed). **Anchor: adaptive down-regulation ~10–25% over 1–6 months, saturating at ~50% intake.**
+**Citation tag:** [PARAMETER + MECHANISM — adaptive metabolic down-regulation under deficit] — BUILT (`enable_metabolic_downreg`); MODEL_SPEC §4.6.7.
+
 ### Bar-Yosef, O. (1998). "The Natufian culture in the Levant, threshold to the origins of agriculture." *Evolutionary Anthropology* 6:159–177.
 **What was lifted — minimum-viable-settlement size (`settle_min_pool`):** Natufian settlements span **small (~dozens)
 → medium (100–150 people) → large**, the largest permanent hamlets up to several hundred. **How used:** `settle_min_pool
@@ -1063,11 +1190,63 @@ Elites can only emerge where this leveling is **defeated** (storable/defensible 
 circumscription, or scale beyond gossip-policing). Complements Testart 1982 (storage as the enabler) and Hayden
 (aggrandizers as the driver). NB the model already has a "Boehm gate" (`leader_society_weight`) — this is its anchor.
 
+### FAO / FAOSTAT land-use statistics, via Our World in Data — **the denominator reference for `cultivability`**
+**Status: [SECONDARY] — read via OWID's land-use pages 2026-08-15, not from FAOSTAT directly.**
+
+**What was lifted — the CEILING on any early-agriculture site fraction (MODEL_SPEC §4.3.12).**
+- Global **arable land 10.9%** (2011, ~1.4 billion ha) — denominator is **FAO "land area" = 13.0 billion ha**,
+  which **EXCLUDES inland water AND Antarctica**.
+- Permanent crops **1.2%**; permanent pasture **26.3%**; all agricultural land **~37%** — same denominator.
+
+**⚠ THIS IS THE DENOMINATOR TRAP THE MODEL WALKS INTO.** Three different quantities are all called "land":
+FAO **land area** 13.0 Bha; **total land** 14.9 Bha (with Antarctica); **habitable land** ~10.4 Bha (also
+excluding glaciers and barren). The model measures against the THIRD. Arable is 10.9% of the first but
+**~13.5% of the third** — so quoting "about 11%" against a habitable-land denominator under-counts by ~25%.
+OWID's own two pages disagree on habitable land (71% vs 76% of land) and on agriculture's share of it (44% vs
+50%); pick one, record which, never mix.
+
+**⚠ AND IT IS A CEILING, NEVER A TARGET.** The 13.5% is the product of the plough, irrigation, drainage,
+fertiliser and 10,000 years of expansion. Early rain-fed pre-plough agriculture must fall **strictly below**
+it. The model's measured 39.6% (coastal-temperate) EXCEEDS the modern industrial figure by ~3×, which is
+impossible on its face.
+
+**⚠ FAO S1/S2/S3/N land-suitability studies are NOT usable for this.** They almost always condition on land
+that is **already agricultural** — one states outright that "37.6% of *the agricultural land* was highly
+suitable (S1)". Read as a landscape fraction that would inflate a cultivability target five-fold or more.
+
+**How used:** the ceiling and the provisional 5–12% / 3–10% / 0–2% targets in MODEL_SPEC §4.3.12. **Low
+confidence — to be SWEPT, not fitted.** Bar-Yosef [filed] supplies the qualitative bound that matters more:
+the earliest Levantine farming communities sat on a LINE, "along today's boundary between the Mediterranean
+and the Irano-Turanian steppic vegetational belts".
+**Citation tag:** [CEILING — modern arable as an upper bound on early-agriculture site fraction; denominator-critical]
+
 ### Testart, A. (1982). "The Significance of Food Storage among Hunter-Gatherers: Residence Patterns, Population Densities, and Social Inequalities [and Comments and Reply]." *Current Anthropology* 23(5):523–537.
 **Status: FILED + [VERIFIED] — full text read 2026-07-17** (`literature/Testart - 1982 - The Significance of Food Storage Among Hunter-Gatherers.pdf`, 15 pp). **Obtained from the author's own site**
 (`alaintestart.com/UK/documents/storage.pdf` — self-archived OA; note the host's TLS cert mismatches, fetched over
 plain HTTP). **This closes the long-standing "TO-GRAB (paywalled)" flag on Testart in this file** — every prior
 Testart citation in the docs was SEARCH-VERIFIED only; they can now be checked against the primary text.
+
+**ADDED 2026-08-15 — THE SITE-RARITY NUMBERS, and the denominator correction that makes them usable
+(MODEL_SPEC §4.3.12).** p.529 counts **10 storing societies out of 40** hunter-gatherer societies drawn from the
+SCCS 186 — Ainu, Gilyak, Aleut, Eyak, Haida, Bellacoola, Twana, Yurok, Pomo, Yokuts (11 with the doubtful
+Kutenai). **8 of the 10 are aquatic**; Pomo and Yokuts are acorn-based. `[VERIFIED]` He also gives a hard
+exclusion: **>35% dependence on land hunting precludes a storing economy** `[VERIFIED]`, and density codes
+**A <0.2, B 0.2–1, C 1.1–5, D 5.1–25 persons per SQUARE MILE** (Murdock & Wilson 1972) `[VERIFIED]`.
+
+**⚠ DENOMINATOR — DO NOT READ 25% AS A LAND FRACTION.** The 10/40 is a count **of societies**. Storing
+societies sit at codes C–D and non-storing at A–B, so they hold **5–25× less land each**. Converting to a land
+fraction divides by roughly three: **25% of societies ≈ 5–14% of land.** This is the correction that makes the
+model's measured 5.9% aquatic pass-fraction defensible rather than apparently four times too low. Cross-check:
+Cunningham 2020 [filed] gives 7/36 SCCS foragers at medium/high density, 6 of them fished — the same
+correction takes 16.7% of societies to roughly 3–8% of land.
+
+**⚠ UNITS.** Testart's codes are per SQUARE MILE; Binford's packing threshold of 9.1 persons/100 km² is
+**0.091/km²**. The two published thresholds differ in units by a factor of ~259 and ~100 respectively. Convert
+before comparing.
+
+**NO TROPICAL STORER APPEARS IN THE 40.** Consistent with Binford's ET = 15.25 storage threshold, and the basis
+for the §4.3.12 recommendation that the model's TROPICAL aquatic pass-fraction (measured 4.2%) should fall to
+0.5–2% — the constraint is storability, not fishery productivity.
 
 **What was lifted — the STORAGE prime-mover (the enabling condition of the elite layer).** Testart's thesis is that
 *storing* hunter-gatherers form a distinct economic type from *non-storing* ones, and that three traits covary with
@@ -1085,3 +1264,526 @@ trigger, the overwintering granary). For the **elite layer** it supplies the *en
 what lets accumulation escape the sharing norm — i.e. the thing that **defeats Boehm's leveling** (see the Boehm 1993
 entry above). Chain: **storable surplus (Testart) → accumulation escapes sharing → leveling defeated (Boehm) →
 aggrandizer capture of redistribution (Hayden, TO-GRAB) → durable elite.**
+
+### Sahlins, M. (1968). "Notes on the Original Affluent Society." In Lee & DeVore (eds.), *Man the Hunter*, pp. 85–89 (discussion 9b).
+**Status: [VERIFIED] — full text read 2026-07-17.** **No new PDF needed: it is a chapter of the *Man the Hunter*
+volume ALREADY filed** (`literature/richard-b-lee-irven-devore-man-the-hunter.pdf`, 602 pp; Sahlins' contribution at
+the "Notes on the Original Affluent Society / Speaker: Sahlins" section).
+
+**What was lifted — the BASELINE the elite layer has to overturn.** Sahlins' point is not that foragers are rich but
+that they **deliberately run below productive capacity**: he sets out to explain "the inner meaning of **running below
+capacity**" — picking up Washburn's suggestion that "a 20–30 per cent use of productive capacity may prove quite
+adaptive over the long run" — against the textbook orthodoxy in which "the **specter of starvation stalks the
+stalker**." Foragers *could* produce more and do not.
+
+**Why it matters for the elite layer:** surplus is therefore **not a technical given that appears whenever resources
+allow** — it is a social outcome. An aggrandizer must actively *mobilise production past the customary level*, and
+Boehm 1993 supplies the enforcement that holds it at the customary level (leveling), while Testart 1982 supplies the
+escape route (storable surplus that cannot be shared out). **Sahlins = the baseline · Boehm = the enforcement ·
+Testart = the escape · Hayden = the driver.** Corrects a naive "resources → surplus → elites" chain: the resources
+were already there.
+
+
+---
+
+### Borgerhoff Mulder, M., Bowles, S., Hertz, T., et al. (2009). "Intergenerational Wealth Transmission and the Dynamics of Inequality in Small-Scale Societies." *Science* 326(5953):682–688. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — Table 1 & Table 2 read 2026-07-18** (NIH-PA author manuscript, 18 pp; extracted with
+`pymupdf`, Table 2 recovered by POSITIONAL extraction — the landscape table transposes under linear text dump).
+
+**Why it is the anchor for the elite layer's levy rate.** No source gives a chiefly-due PERCENTAGE — Sahlins 1972
+and Ames 1994 were both read directly for one and neither has it (a verified negative). So `leader_share_frac` is
+anchored on its OUTCOME, the way `leveling_strength` is on Boehm 38/48 and status→RS on von Rueden r≈0.19.
+
+**The mapping is unusually clean: BHM's three wealth classes ARE the model's three status facets,** and their
+Table 1 confirms it by what was actually measured per class —
+| BHM wealth class | What they measured (Table 1, HG rows) | Model facet |
+|---|---|---|
+| **Embodied** | Aché hunting returns, Aché/Hadza body weight, Hadza grip strength, Hadza foraging returns | `prowess` |
+| **Relational** | Ju/'hoansi exchange partners, Lamalera food-share partners | `cred` |
+| **Material** | Lamalera quality of housing, Lamalera boat shares | `material` |
+
+**Table 2 — importance (α), transmission (β) and inequality by economic system:**
+| System | α embodied | α relational | α material | β material | **α-weighted Gini** |
+|---|---|---|---|---|---|
+| Hunter-gatherer | 0.46 | 0.39 | **0.15** | 0.17 | **0.25** (SE 0.04) |
+| Horticultural | 0.53 | 0.26 | 0.21 | 0.09 | 0.27 (SE 0.03) |
+| Pastoral | 0.26 | 0.14 | **0.61** | 0.67 | 0.42 (SE 0.05) |
+| Agricultural | 0.27 | 0.14 | **0.59** | 0.55 | 0.48 (SE 0.04) |
+
+**What was lifted:** (1) the **α weights** — the empirical importance of each status facet BY SOCIETY TYPE, which
+is the coupling-weight row of the capital/operator matrix; (2) the **Gini targets** for the α-weighted composite;
+(3) the **β material** gradient (0.17 forager → 0.55–0.67 pastoral/agricultural) as the future anchor for material
+heritability. **The load-bearing caution: for foragers material carries only 15% of the weight** — so an elite
+layer that stratifies on material alone is over-weighting the one class the ethnography says matters least at that
+stage. BHM's own thesis is that inequality tracks *which* wealth class matters and *how heritable* it is, not how
+much any one man takes. NB their headline Ginis are the α-weighted COMPOSITE; per-class Ginis live in their Table
+S5 (supplementary, not in the author manuscript) — so the model must be compared on the composite, not on
+material alone. Their own note: "material wealth types ... display higher Gini coefficients."
+
+### Sahlins, M. (1972). *Stone Age Economics*. Aldine-Atherton. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — read 2026-07-18** (`literature/Sahlins - Stone Age Economics.pdf`, 363 pp, full text
+layer). Distinct from the already-filed Sahlins 1968 "Notes on the Original Affluent Society" (Lee & DeVore).
+
+**What was lifted — the OFFICE-vs-ACHIEVEMENT distinction (p.209), which is the succession model.** Contrasting a
+Melanesian big-man economy (Siuai) with a Northwest Coast chiefdom (Nootka): *"The thin line of difference is this:
+the Nootka leader is an officeholder in a lineage (house group), his following is this corporate group, and his
+central economic position is ascribed by right of chiefly due and chiefly obligation. So centricity is built into
+the structure. In Siuai, it is a personal achievement. The following is an achievement — a result of generosity
+bestowed — the leadership an achievement, and the whole structure will as such dissolve with the demise of the
+pivotal big-man."* ⇒ the two succession regimes coded as `succession_dissolve` (see MODEL_SPEC §4.9.2).
+
+**Corollary that constrains the levy itself (p.136–137):** the Melanesian big-man does NOT levy — he *mobilises*.
+*"Deploying his resources carefully, the emerging leader uses wealth to place others in his debt ... he constructs
+a following whose production may be harnassed to his ambition."* Whereas *"A Northwest Coast chieftain is a lineage
+head, and in this capacity is necessarily accorded a certain right to group resources. He is not obliged to
+establish a personal claim by the dynamic of an autoexploitation put at the others' disposal."* **So a levy on
+band output (`leader_share_frac` > 0) is by construction the CHIEFLY regime, not the big-man one** — which is why
+the same flag pairs naturally with `succession_dissolve=False`.
+
+### Smith, E.A. & Codding, B.F. (2021). "Ecological variation and institutionalized inequality in hunter-gatherer societies." *PNAS* 118(13):e2016134118. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — full text read 2026-07-18** (open access via PMC8020663). Sample: **89 Pacific-coast
+North American hunter-gatherer societies** (34 Northwest Coast + 55 California), scored on a Hierarchy Index (HI,
+0–3) and a Resource Index (RI).
+
+**Headline correlation CONFIRMED:** *"the correlation between HI and RI was nearly as high (r = 0.766, n = 17) as
+for the full sample (**r = 0.881, n = 89**)"* — the second figure is the one this project cites. (Recorded because
+a first pass over a summarised fetch reported the figure as ABSENT; it is present. One fetch summary is not
+verification — read the numbers.)
+
+**Full result set:**
+| Statistic | Value | What it measures |
+|---|---|---|
+| **r (HI ~ RI), full sample** | **0.881** (n=89) | resource structure ↔ institutionalized hierarchy |
+| r (HI ~ RI), high-fish California | 0.766 (n=17) | the same within a sub-sample |
+| Random-forests variance explained | 86% | six-variable model |
+| GAM deviance explained | 71% | best model |
+| pSEM: RI → hierarchy | β_std **2.16**, P<0.0001 | direct effect |
+| pSEM: fishing-site ownership → hierarchy | β_std **0.96**, P=0.043 | direct effect |
+| pSEM: RI indirect (via fishing ownership) | 0.70, P=0.317 | n.s. — RI acts DIRECTLY |
+| Effect size: Resource Index | **0.37** | largest predictor |
+| Effect size: latitude / longitude | 0.35 / −0.22 | |
+| Effect size: fishing-site OWNERSHIP | 0.13 | |
+| Effect size: **NPP productivity** | **0.04** | essentially nil |
+| Effect size: offensive raiding | −0.01 | essentially nil |
+
+**Two findings that bear directly on this model.** (1) **NPP productivity has an effect size of 0.04 — raw
+productivity does almost nothing**, while resource STRUCTURE (RI) carries the result. This independently
+corroborates R-65's correction that *storability, not NPP, is the axis* (a claim that had over-reached on
+cross-world %stratified). (2) **Fishing-site OWNERSHIP is a significant direct predictor** (β_std 0.96, P=0.043) —
+the economic-defensibility channel (`enable_economic_defensibility`) measured in the ethnographic record, and the
+same phenomenon as Hayden 1995's "spatially restricted resource locations ... fishing rocks, weirs" precondition
+for a hereditary managerial class. Converges with Dyson-Hudson & Smith 1978 (already filed).
+
+**Note on offensive raiding (−0.01):** warfare does NOT predict hierarchy in this sample — relevant if a future
+stage reaches for a conflict-driven stratification route.
+
+---
+
+### D'Altroy, T.N. & Earle, T.K. (1985). "Staple Finance, Wealth Finance, and Storage in the Inka Political Economy [and Comments and Reply]." *Current Anthropology* 26(2):187–206. `[VERIFIED]`
+**Status: FILED + [VERIFIED] — full text searched 2026-07-18** (`literature/408830614-Staple-Finance-Wealth-
+Finance-and-Storag-pdf.pdf`, 21 pp, text layer). Obtained specifically to test whether a **direct levy rate**
+exists that would supersede R-84b's outcome-based anchoring of `leader_share_frac`.
+
+**VERIFIED NEGATIVE on the levy rate — this was the best remaining candidate and it does not carry one.** The
+paper's contribution is *structural*, not rate-based: it dichotomises state finance into **staple finance** (the
+mobilisation of subsistence/utilitarian goods) and **wealth finance** (manufacture and procurement of valuables
+and primitive money), and shows the Inka state shifting between them. Obligation is expressed as **corvée labour
+(mit'a) assessed per household on a rotating basis**, *not* as a percentage of a household's product — so there
+is no "the chief takes X%" figure to lift. **`leader_share_frac`'s anchor therefore stands as R-84b left it**
+(BHM composite Gini). Record this so the source is not re-fetched for the same purpose.
+
+**What it DOES supply — a storage-decay anchor we currently mark [DESIGN]:** *"the loss rate for maize is about
+30% per year"*. Our stored-food/`material_decay` handling is unanchored (0.002/step ≈ 2.4%/yr). Note the 30%
+figure is for **stored grain**, so it anchors the granary/food-store sink, NOT durable prestige goods (hides,
+boat shares), which should decay far more slowly — the two must not share a constant. Also: ~**79%** of storage
+in the Upper Mantaro Valley is accounted for by state finance, and ~**50%** of that storage sits away from
+settlements — relevant if a later stage models storage as a *sited* facility rather than a per-agent stock.
+
+**Charter note (`MECHANISM_CHARTER.md`):** staple-vs-wealth finance is precisely a **Conversion (C)** distinction
+— staple finance moves subsistence (an X operator on food), wealth finance converts production into durable
+valuables (a C operator, production → material). That the ethnography draws the same line the type system does is
+a useful corroboration of the typing.
+
+### Borgerhoff Mulder et al. (2009) — Supporting Online Material `[VERIFIED]`
+**Status: FILED + [VERIFIED] — Table S4 read 2026-07-18** (`literature/borgerhoff-mulder.som.pdf`, 46 pp).
+Supplies the **per-wealth-type Ginis** that the main-text Table 2 aggregates away, which is what makes a
+FACET-BY-FACET comparison possible instead of only the α-weighted composite.
+
+**Table S4 — forager populations (Gini, SE, N):**
+| Population | Wealth type | Class | Gini | Model facet |
+|---|---|---|---|---|
+| Aché | Hunting returns | E | 0.237 | `prowess` |
+| Aché | Weight | E | 0.064 | — |
+| Hadza | Weight | E | 0.079 | — |
+| Hadza | Hunting & gathering returns | E | 0.339 | `prowess` |
+| Hadza | Grip strength | E | 0.191 | — |
+| Ju/'hoansi | Social networks | R | 0.216 | `cred` |
+| Lamalera | Food-sharing partners | R | 0.263 | `cred` |
+| Lamalera | **Quality of housing** | M | **0.241** | `material` |
+| Lamalera | **Boat shares** | M | **0.474** | *no analogue* |
+| Lamalera | RS | E | 0.296 | — |
+
+**Model comparison (R-84b config, leveling ON, `leader_share_frac`=0.20):** `prowess` 0.24–0.26 vs the
+returns-based embodied measures 0.237/0.339 ✓; `cred` 0.27 vs relational 0.216/0.263 ✓; `material` **0.237 vs
+housing 0.241** ✓ — a near-exact match on the comparable category.
+
+**The sharpened diagnosis this permits.** R-84b recorded model material Gini as "low" against the composite. It
+is not: it matches **housing** (a consumption good) almost exactly. The entire gap is **boat shares (0.474) — a
+PRODUCTIVE ASSET**, which the model has no analogue for. `material` is currently a consumption/prestige stock
+only. **A means-of-production capital that raises its owner's yield is therefore a specific, identified gap** —
+and the likely missing piece behind TARGETS T-5's agricultural arm (0.435 vs 0.48), since a productive asset is
+also the natural thing to make heritable (BHM material β 0.17 forager → 0.55–0.67 agricultural).
+
+### Hawkes et al. 1991 — text-layer copy filed (2026-07-18)
+`literature/Hawkes-HuntingIncomePatterns-1991.pdf` and `literature/hawkes-1991-pdf.pdf` both carry full text
+(~50k chars), replacing the image-only original for search purposes. The original scan is retained. No values
+re-derived yet — the pooled savanna return rates in the Resource Return-Rate Table stand.
+
+### Flannery, K. & Marcus, J. (2012). *The Creation of Inequality: How Our Prehistoric Ancestors Set the Stage for Monarchy, Slavery, and Empire*. Harvard University Press. `[FILED — all 24 chapters, text layers verified]`
+**Status: FILED 2026-07-18** — supervisor supplied all 24 chapters individually (`literature/Flannery-*.pdf`,
+591 pp total). **Text layers verified on every file; zero image-only**, so all are greppable (Rule 16 applies —
+grep the specs first, then these).
+
+**Not yet read.** Priority order for extraction when the elite layer next advances, with why:
+1. **`Flannery-InequalitywithoutAgriculture-2012.pdf`** (ch. 5, p.66, 24 pp) — inequality among foragers WITHOUT
+   farming. This is the stage the model is currently at; the direct check on R-83/R-84.
+2. **`Flannery-RiseFallHereditary-2012.pdf`** (ch. 10, p.187, 24 pp) — hereditary inequality in farming
+   societies, and note the **FALL**: documented cases of hereditary inequality COLLAPSING, which is the
+   ethnographic counterpart to **H-CYCLES** (charter §5) and to DE-14's three negatives.
+3. **`Flannery-TurnRankStratification-2012.pdf`** (ch. 16, p.313, 27 pp) — the rank→stratification mechanism,
+   i.e. exactly what TARGETS **T-5's agricultural arm** (0.435 vs 0.48) is failing to produce.
+4. **`Flannery-ThreeSourcesPower-2012.pdf`** (ch. 11, p.208, 22 pp) — a three-way power typology; a live test of
+   whether the MECHANISM_CHARTER's operator categories match an independent anthropological decomposition.
+5. **`Flannery-PrestigeEqualityFour-2012.pdf`** (ch. 9, p.153, 33 pp) — four Native American comparative cases;
+   bears on **T-8**'s untested structural split (deposition in centralized vs desertion in mobile societies).
+
+Remaining 19 chapters (Parts IV–V, kingdoms/empires/resistance) are beyond the model's current horizon and are
+filed for later stages, not queued.
+
+### Flannery & Marcus 2012 — EXTRACTION from the 5 priority chapters (read 2026-07-18) `[VERIFIED]`
+
+**Ch. 11, "Three Sources of Power in Chiefly Societies" — Goldman's Polynesian triad, an INDEPENDENT
+decomposition that matches the model's facets and then splits one of them.**
+- **mana** — sacred life-force. *"people of high rank were automatically born with more mana"* ⇒ **ASCRIBED,
+  heritable** = `cred`. The chief is the man with the most; so much that he is *tapu*.
+- **tohunga** — *"expertise"*: administrative, diplomatic, ritual, or craft. *"individuals could increase their
+  expertise through education, training, or apprenticeship"* ⇒ **ACHIEVED, learnable, SPECIALISED**.
+- **toa** — bravery/martial prowess. Critically: *"A key aspect of toa was that it allowed for a certain degree
+  of social mobility. A warrior of humble birth could rise in prominence to the point where he had to be taken
+  seriously, even by chiefly individuals."* ⇒ **the COMMONER'S MOBILITY CHANNEL.**
+
+⇒ **The model's single `prowess` scalar conflates tohunga and toa.** Goldman/Flannery separate them, and give
+them different *social functions*: expertise is cultivated and attaches to a role; martial prowess is the route
+by which low birth is overridden. This is the empirical basis for the specialization design (charter §8) and it
+says a warrior facet is not decoration — it is the mobility mechanism. Emphasis varies by society (Maori/Tikopia
+lean mana; Samoa/Easter Island lean expertise + force; Tonga/Hawaii, *the most unequal*, use "the entire
+playbook") — i.e. the WEIGHTS differ by society type, exactly as BHM's α does.
+
+**Ch. 10, "The Rise and Fall of Hereditary Inequality in Farming Societies" — the ethnographic anchor for
+H-CYCLES, and a warning about our own elite layer.**
+- **Kachin gumsa/gumlao cycling** (Leach): societies *"shifting back and forth"* between ranked (**gumsa**) and
+  egalitarian (**gumlao**) modes. Flannery: *"hereditary inequality was repeatedly created, **lasted for a few
+  generations**, and then collapsed."* ⇒ **a documented secular cycle, with a PERIOD of a few generations
+  (~60–100 yr).**
+- **The mechanism is a DELAYED negative feedback.** Ambitious leaders adopt prestige behaviour, and *"it only
+  increased their followers' resentment and hastened their overthrow."* Resentment **accumulates** and the
+  overthrow comes generations later — not the within-step correction our Boehm leveling applies. **This is
+  precisely the lag H-CYCLES predicts, observed in the field.**
+- **Friedman's ENDOGENOUS scenario** (Flannery prefers it to Leach's, which needs Shan princes to intervene):
+  hereditary rank is created by a **LEGITIMACY REINTERPRETATION**, not by accumulation. Successful lineages were
+  not credited with hard work — *"they believed that one only obtained good harvests through proper sacrifices to
+  the nats. The key shift in social logic was therefore from 'They must have pleased the nats' to 'They must be
+  descended from higher nats than we are.'"* Once descended from the ruling nats, the lineage controls the land
+  and is *entitled to tribute*.
+- **THE WARNING, aimed straight at our elite layer:** *"if feasting were all it took to produce hereditary
+  inequality, there would have been no achievement-based societies left for anthropologists to study."*
+  Competitive feasting *"instead of creating hereditary rank ... produced individual Big Men who had no way of
+  bequeathing renown to their offspring."*
+- **The gumlao vs gumsa premise lists are effectively two config states.** gumlao: all lineages equal; villages
+  autonomous; **no tribute owed to the headman**; equal bride-price; all siblings equal; splits produce no
+  senior/junior; **"Each headman is to be advised by a council of elders."** gumsa: lineages ranked; all
+  settlements under one chief; **"Everyone who does not belong to the chief's lineage must pay him tribute,
+  usually in the form of a thigh from every animal sacrificed"**; elite bride-price higher; **ultimogeniture**
+  (all property to the youngest son, to push older sons out to found new lineages); splits produce senior/junior.
+- **A third path: DEBT SLAVERY** via the mayu-dama bride-price system (a groom owed cattle, slit-gongs, swords).
+
+**Ch. 16, "How to Turn Rank into Stratification" — power-balance devices, as an explicit premise list.**
+Tongan premises 13–17: *"No Tongan dares assassinate his own chief, owing to the latter's high levels of mana"*;
+assassins can be **hired from other islands**; *"Dividing authority, by creating a line of secular chiefs that
+will coexist with sacred chiefs, makes political assassination more difficult"*; but *"Secular chiefs, however,
+pose the threat of usurpation"*; and *"To reduce the risk of usurpation, the sacred chief should limit the land
+(and other resources) allocated to the secular chief."* ⇒ a **sacred/secular office split** as an explicit
+anti-assassination + anti-usurpation control, with **resource allocation as the balancing knob.** Compare
+Tikopia (ch. 11): *"The simultaneous presence of four chiefs acted as a system of checks and balances,
+preventing one ambitious leader from taking over all of Tikopia."*
+
+**Ch. 5, "Inequality without Agriculture"** — the NW Coast/Nootka case at our current stage: salmon surplus
+beyond immediate consumption, and a social ladder whose **bottom rung is slaves** (*"could be bought, sold,
+mistreated, or even killed"*), acquired by raiding and by **debt** (enslaving women and children from debtor
+villages). Not yet extracted in detail; queued with ch. 9 (T-8's untested deposition/desertion split).
+
+### Big-man BASE RATE search — VERIFIED NEGATIVE (2026-07-20)
+
+**Question:** R-86v found the model's father->son leadership LIFT (1.43) cannot be compared to Hayden's 75%
+without knowing what fraction of New Guinea men were big men — Hayden reports a raw fraction, not a rate
+relative to a base. Searched for that base rate across the sources most likely to carry it.
+
+**Checked, all negative:**
+- **Hayden 1995 itself** (`literature/hayden1995.pdf`, full text, 72pp) — the source of the 75% figure. No
+  population-level base rate given anywhere in the paper; the only proportions present are unrelated (violent
+  death rates, subsistence percentages).
+- **Sahlins, *Stone Age Economics*** (full text, 363pp) — extensive QUALITATIVE big-man material (the
+  "rubbish man" contrast; "the success of only a FEW and the inevitable failure of the MANY"; the Kapauku
+  "fish-tail" bifurcate household distribution) but no quantified fraction. The Botukebo village table
+  (Table 3.4, Pospisil 1963) is 16 HOUSEHOLDS' sweet-potato production intensity, not a census of big-men vs
+  commoners.
+- **Flannery & Marcus ch. 6** ("Agriculture and Achieved Renown") and **ch. 9** ("Prestige and Equality in Four
+  Native American Societies") — both read in full; neither contains proportion/percentage language for
+  achievement-based leadership frequency.
+- **Web search** — no secondary source states the figure either. Sahlins' foundational 1963 paper ("Poor Man,
+  Rich Man, Big-man, Chief") is the most likely original home of such a number but is paywalled
+  (JSTOR/Cambridge); not pursued via a mirror (project policy on copyrighted works).
+
+**Read as a finding, not just a gap:** anthropologists describe big-man status as a GRADIENT (poor man ->
+rubbish man -> ordinary man -> big man; Sahlins) rather than a threshold category, which is plausibly WHY no
+source quantifies "the base rate" — there is no agreed population to divide by. **Qualitatively, every source
+that touches the question agrees big men were a small minority** ("only a few" vs "the many," Sahlins), which
+bounds the true lift ABOVE our model's 1.43 without fixing a value — consistent with, not contradicting, R-86v's
+finding that the model under-produces concentration relative to the ethnography, but not something a number
+can be anchored to.
+
+**Standing conclusion for T-6:** the raw-fraction comparison (age-matched model 0.769 vs Hayden's 0.75) remains
+the only available like-for-like check. Do not re-search for this base rate without a new source; log this as
+the prior attempt.
+
+### Karmin, M., et al. (2015). "A recent bottleneck of Y chromosome diversity coincides with a global change in culture." *Genome Research* 25(4):459-466. `[VERIFIED, FILED]`
+
+**Why this was sought:** R-86v found Hayden's 75% father-was-leader figure has no stated base rate, so no lift
+is computable against it (verified negative, logged 2026-07-20). Searched for a DIFFERENTLY-anchored source on
+leadership/lineage concentration - one with real quantitative statistics rather than a raw ethnographic
+fraction.
+
+**What it is:** a population-GENETICS study, not an ethnographic one - 456 Y-chromosome sequences from diverse
+world populations, reconstructing male effective population size (Ne) through time via coalescent methods.
+Categorically different evidence from anything else anchoring this project: hard demographic inference from DNA,
+not observer report.
+
+**The verified statistic** (confirmed via two independent fetches converging on the same figure - the general
+web search and a direct WebFetch of the PMC full text, which returned the quote verbatim): *"a reduction at
+around 8-4 kya when the female Ne is up to 17-fold higher than the male Ne."* I.e. at the bottleneck's peak,
+**female effective population size ran up to 17x male effective population size** - a small number of male
+lineages produced a hugely disproportionate share of descendants, while female-mediated lineages did not
+collapse the same way. Regionally staggered, tracking "the earlier spread of farming in the Near East, East
+Asia, and South Asia than in Europe." Explicitly NOT limited to one or a few haplotypes - a general pattern
+across the male line, not a single dynasty's fluke.
+
+**THE CONVERGENCE, found by checking our own prior results rather than assumed:** this is the SAME signature
+already reported, independently and before this literature search, in the SiC Games Carbon-civilization deep-
+time campaign (R-66, 2026-07-13): *"patriline-name-fixation not equal to genetic"* and *"autosomal genome stays
+diverse (H about 0.88): non-patrilineal maternal alleles keep flowing even as one surname dominates."* Karmin's
+whole point is the same shape - the collapse is MALE-LINEAGE-SPECIFIC, not a general population bottleneck
+(which would show in autosomal/maternal signal too). The model produced this qualitative pattern on its own,
+unprompted, months before this source was found to anchor it.
+
+**Companion citations, not yet followed up:** Balaresque et al. 2015 ("Y-chromosome descent clusters and male
+differential reproductive success") and Poznik et al. 2016 (*Nat Genet* 48:593-599) - both cited alongside
+Karmin in von Rueden & Jaeggi 2016 for the same bottleneck literature; may sharpen the number or extend it to
+specific societies rather than a global average.
+
+**STATUS: FILED 2026-07-20** (`literature/Genome Res.-2015-Karmin-459-66.pdf`, supervisor-supplied) **and
+PRIMARY-SOURCE VERIFIED** - the extracted PDF text was checked directly against the quote above, word for word:
+*"the Y chromosome plot suggested a reduction at around 8-4 kya... when the female Ne is up to 17-fold higher
+than the male Ne."* Confirms the two independent fetches used to first find this were both accurate.
+
+**Two bonus citations found in Karmin's own bibliography while verifying - SHARPER statistics than the aggregate
+17x Ne ratio, each a direct "top lineage(s) -> % of population" number:**
+
+- **Zerjal, T., et al. (2003). "The Genetic Legacy of the Mongols." *American Journal of Human Genetics*
+  72(3):717-721.** DOI 10.1086/367774. `[VERIFIED, FILED 2026-07-21]`
+  (`literature/Zerjal et al. - 2003 - The Genetic Legacy of the Mongols.pdf`, 5 pp, supervisor-supplied after an
+  automated fetch failed: PMC serves a bot-detection interstitial, which was not worked around; Cell Press
+  returns HTML; and Europe PMC holds no XML full text since 2003 AJHG predates structured deposit.)
+
+  **PRIMARY-SOURCE VERIFIED**, checked against the extracted text: *"It was found in **16 populations**
+  throughout a large region of Asia, stretching from the Pacific to the Caspian Sea, and was present at high
+  frequency: **~8% of the men** in this region carry it"*; *"a single male line, probably originating in
+  Mongolia, has spread in the last **~1,000 years** to represent ~8% of the males in a region stretching from
+  northeast China to Uzbekistan"*; *"about **16 million men, ~0.5% of the world's total**"*.
+
+  **A UNIT DISTINCTION THAT MATTERS FOR T-9, and it is NOT the same statistic as Yan's.** Zerjal's 8% is ONE
+  NAMED lineage — notable for its recent, rapid, geographically vast expansion — and is **not claimed to be the
+  largest** in that region. Yan's 16% (Oα) IS the modal clade. So:
+  - **Yan 16% -> `top_share`** (largest lineage share). Like-for-like.
+  - **Zerjal 8% -> NOT `top_share`.** It anchors a different quantity: how far and how fast a SINGLE elite line
+    can expand — 0 to ~8% of a continent in ~1,000 years. The model's comparable measurement is the growth
+    trajectory of one ascribed lineage, not the maximum over lineages.
+  Quoting Zerjal against `top_share` would repeat the top-1/top-3 mismatch this file already had to correct
+  once. Three sources, three DIFFERENT measurements: Karmin = aggregate Ne ratio; Yan = modal clade share;
+  Zerjal = single-dynasty expansion rate and reach. - ONE Y-chromosome lineage, dated to
+  ~1000 years ago and attributed to Genghis Khan, is carried by **~8% of men across 16 populations spanning the
+  Pacific to the Caspian Sea** (~0.5% of the world total). A single elite dynasty's capture, at continental
+  scale and with a named historical figure - about as close as population genetics gets to a Hayden-style
+  "one aggrandizer's lineage" statistic, but with a real percentage attached.
+- **Yan, S., et al. (2014). "Y chromosomes of 40% Chinese descend from three Neolithic super-grandfathers."
+  *PLoS ONE* 9(8):e105691.** `[VERIFIED, FILED 2026-07-21]`
+  (`literature/yan2014_three_neolithic_super_grandfathers_PLoSONE.pdf`, 7 pp, fetched from PLoS open access and
+  checked directly against the extracted text.)
+
+  **PRIMARY-SOURCE VERIFIED, and it supplies a BETTER statistic than the headline.** Verbatim: *"three strong
+  star-like Neolithic expansions at ~6 kya ... indicates that ~40% of modern Chinese are patrilineal descendants
+  of only three super-grandfathers at that time"*, and crucially the **PER-CLADE BREAKDOWN**: *"encompass more
+  than 40% of the present Han Chinese in total (estimated **16% for Oα, 11% for Oβ, and 14% for Oγ**)"*.
+
+  **THIS RESOLVES A UNIT MISMATCH (D6) that had made the target unusable as stated.** The headline 40% is the
+  top-THREE combined, while the model's `dynasties()["top_share"]` is the top-ONE — not interchangeable, and an
+  earlier plot of ours drew 40% as a line against top-one before the mismatch was caught and the line removed.
+  The breakdown gives the correctly-matched number: **largest single clade = 16%**. For reference the model's
+  measured `top_share` is 0.154 (R-93/R-94) and 0.192 (R-96) — the same order, on a like-for-like unit. - **three founder
+  lineages account for ~40% of Chinese men**, from star-like expansions dated to ~6000 years ago (Neolithic,
+  linked to the spread of agriculture). A small-founder-set dominance statistic, one level up from Zerjal's
+  single dynasty.
+
+**Together the three give three anchors at three scales of the SAME phenomenon** (patrilineal fixation under
+social stratification), all hard genetic data: one elite lineage's continental capture (Zerjal, ~8%), a
+small founder set's national capture (Yan, 3 lineages -> 40%), and the aggregate population-wide Ne collapse
+(Karmin, 17x). None require guessing a base rate the way Hayden's 75% did.
+
+**Proposed use:** see TARGETS T-9 - a replacement/supplement for T-6 that compares the model's OWN existing
+`dynasties()` diagnostic against these three, at the level each is actually comparable: `top_share` (largest
+single lineage's fraction) against Zerjal's ~8%; the summed share of the top 3 lineages against Yan's ~40%;
+and `eff_lineages` (inverse-Simpson effective count), egalitarian vs stratified, against Karmin's ~17x Ne ratio.
+
+---
+
+### Budyko 1974 — mean annual water balance (the runoff term in the terrain generator)
+
+**Fetched and verified 2026-08-22**, after the supervisor asked whether it had been fetched or written from
+memory. It had been written from memory and shipped unverified; that was wrong, and the check is recorded here
+so the claim never rests on recollection again.
+
+**What was lifted — the evaporation-ratio curve:**
+
+    E/P = [ AI · tanh(1/AI) · (1 − exp(−AI)) ]^(1/2)      AI = Ep/P (aridity index)
+    Q   = P · (1 − E/P)                                    (runoff, the complement)
+
+Budyko carried out an empirical analysis of long-term mean annual water balances across a large number of
+environments worldwide and showed that catchments in different climatic regions fit this curve. Note it is
+**PARAMETER-FREE** — Fu 1981 / Zhang et al. 2004 add a shape parameter ω (traditional Budyko ≈ ω 2.6), which
+this project does NOT use, so no new constant enters.
+
+**How used:** `terrain.py`, `knobs["runoff_rivers"]`. The generator's river pass allocated `flow = ones()` —
+one unit per cell regardless of rainfall — so `isRiver` was pure drainage AREA with no water balance, and
+deserts came out 1.63x WETTER than forests across 20 worlds. Weighting the accumulation by Budyko runoff
+reverses that to 0.49. Actual ET is water-limited rather than equal to POTENTIAL ET, which is why the cruder
+`Q = max(0, P − PET)` was wrong: it returns exactly zero wherever P < PET and so drains every steppe and
+prairie, and prairie rivers are real.
+
+**Status: [VERIFIED — formula confirmed against the published form, 2026-08-22].** The PDF is not in
+`literature/`; the confirmation is from the secondary literature reporting Budyko's equation verbatim.
+
+**Citation tag:** [ANCHORED — mean-annual runoff partitioning; parameter-free]
+Sources: [HESS technical note](https://hess.copernicus.org/articles/26/4575/2022/) ·
+[Understanding the Budyko Equation](https://www.researchgate.net/publication/315928327_Understanding_the_Budyko_Equation)
+
+---
+
+### Pre-contact hunter-gatherer density in the Australian Western Desert — the ARID calibration target
+
+**Fetched 2026-08-22.** The project had no arid density anchor; the figure previously used in discussion
+(0.01/km²) was from memory and is roughly **twice** the published values.
+
+**What was lifted — three independent estimates that converge:**
+
+| source | figure | density |
+|---|---|---|
+| Long 1971 | 1 person per **200 km²** (Western Desert generally) | 0.0050 /km² |
+| Cane 1990 | 1 person per **170 km²** (Great Sandy Desert) | 0.0059 /km² |
+| Ngaatjatjarra | ~500 people over ~100,000 km² | 0.0050 /km² |
+
+**⚠ DO NOT confuse with the 0.05 /km² figure** that a general search returns for "arid Australia" — that is an
+order of magnitude higher and does not refer to pre-contact foragers. The three above agree at **~0.005 /km²**,
+i.e. one person per 170–200 km², and that is the number to score against.
+
+**How used:** the target for a canonical ARID world (`flat-subtropical`, 100% desert). On the 158,400 km²
+capacity patch it implies **~790 people**, and in this model's 100 km² cells it is **~0.5 people per cell**.
+The model currently produces **ZERO** — every arid run goes extinct in under 60 steps, 95% of deaths from
+starvation, with no births at all.
+
+**WHY THAT IS NOT A REGROWTH-RATE PROBLEM, and this matters because it was nearly mis-calibrated:** the
+depletion model equilibrates at
+
+    B* = 1 − DEPLETE_FRAC · pressure ,   pressure = occupants / cell capacity
+
+which contains **no r**. `R_BIOME_PER_YR` sets only the SPEED of approach, never the equilibrium stock, so
+tuning desert regrowth cannot fix the collapse. The measured cause is that arid is habitable at ≤2 people per
+cell (B* 0.75, yield 1.5) and the agents cluster at ~14 per cell — the density that is comfortable at
+temperate capacity 24.6 and lethal at arid capacity 2.0. **Aggregation does not scale to local carrying
+capacity.** That is the same clustering pathology as the packing paradox, seen in a world with no slack.
+
+**Citation tag:** [ANCHORED — arid forager density target ~0.005/km²; Long 1971, Cane 1990]
+Sources: [Aboriginal subsistence in the Western Desert](https://link.springer.com/article/10.1007/BF00887998) ·
+[Precontact foraging habitats, Western Desert](https://www.nature.com/articles/s41598-021-89642-1)
+
+---
+
+### Hunter-gatherer storage MODES, and why Binford's ET gate is incomplete rather than wrong
+
+**Fetched 2026-08-22**, after the arid world was measured to die in its first seasonal trough with no buffer,
+and the ET storage gate was suspected of being the wrong criterion. It is not the wrong criterion. It is one
+criterion out of three.
+
+**What was lifted — Binford's ET threshold is specifically about WINTER:** *"At latitudes with ET below the
+15.25 storage threshold, hunter-gatherers remain highly dependent on the ability to procure a large food
+surplus during the growing season to get through the winter."* ET was designed to reflect both the warmth and
+the LENGTH of the growing season; higher ET = higher productivity = slower depletion and fewer moves.
+Companion threshold: plant dependence possible where ET ≥ 12.75 °C. So `store_temp_thr = 15.25` correctly
+gates *overwintering* storage — and a hot desert genuinely does not overwinter.
+
+**What was lifted — THE THREE MODES (Modeling Modes of Hunter-Gatherer Food Storage):**
+
+| mode | what it copes with |
+|---|---|
+| **central-place storage** | *"single-year seasonal variability and sedentary overwintering strategies"* |
+| **dispersed caching** | multi-year environmental **unpredictability** + **seasonal residential moves** |
+| **dispersed bulk caching** | as above; *"faster storage rates and better chance to maximize storage capacity when seasonality and scheduling conflicts limit storing opportunities"* |
+
+**⇒ THE GAP.** The model implements ONLY central-place overwintering storage, gated on ET. The mode that
+applies to arid Australia — dispersed caching, keyed to multi-year unpredictability and residential mobility —
+has no representation at all. That is why a desert forager in this model has no lean-season buffer: not
+because the ET gate is miscalibrated, but because the applicable mode was never built.
+
+**That deserts DO store is not in question:** Australian arid-zone seed grinding is attested from ~30,000 BP,
+over 200 plant-seed varieties were traditionally ground, grass seeds served as a fall-back "when more easily
+harvested plants had been locally exhausted", and Western Desert grindstones show seed-processing
+intensification over the last ~4,000 years.
+
+**How used:** NOT yet used. Recorded so that the next attempt on arid survival starts from "add the missing
+mode" rather than from "re-tune `store_temp_thr`", which would have been the wrong repair. Adding dispersed
+caching is a NEW MECHANISM keyed to UNPREDICTABILITY, not a gate fix, and it needs its own design and CTB.
+
+**Citation tag:** [ANCHORED — storage-mode taxonomy; Binford ET 15.25 confirmed as an OVERWINTERING criterion]
+Sources: [Modeling Modes of Hunter-Gatherer Food Storage](https://www.researchgate.net/publication/233987517_Modeling_Modes_of_Hunter-Gatherer_Food_Storage) ·
+[Testart, The Significance of Food Storage Among Hunter-Gatherers](http://www.alaintestart.com/UK/documents/storage.pdf) ·
+[Pleistocene seed-grinding implements from the Australian arid zone](https://www.cambridge.org/core/journals/antiquity/article/abs/pleistocene-seedgrinding-implements-from-the-australian-arid-zone/8E700F3D53F14CC122E1A266ABC9E44D)
+
+---
+
+### Yengoyan on sparse-population marriage systems — ALREADY SATISFIED by the model
+
+**Fetched 2026-08-22** (Yengoyan, in Lee & DeVore, *Man the Hunter*), to decide whether the connubium needed a
+sparse-population relaxation. It does not — the model already behaves as the ethnography describes.
+
+**What was lifted:** a tribe of **1,100** operates an eight-subsection system without difficulty, *"since each
+of the eight divisions would contain about 25 eligible mates"*. A tribe of **200 or less** cannot arrange
+marriages *"without considerable deviation from the stated rules"*, and few small tribes in his sample
+exhibited eight-section organisation at all. **The ethnographic response to sparsity is that the RULES RELAX,
+not that the population fails to reproduce.**
+
+**How used — as a CHECK that passed, which is why no code changed.** `_do_connubium` expands its search
+ring-by-ring to `mate_search_max_radius`; if it meets `mate_search_min_eligible` it stops early, and if it
+exhausts the radius with FEWER than m* but at least one candidate it **still pairs from what it found** —
+skipping only on a completely empty pool. Graceful degradation is already implemented. Confirmed in the arid
+world, which reaches `frac_partnered_adult = 0.667` despite a population under 120.
+
+**Citation tag:** [ANCHORED — sparse-population marriage-rule relaxation; verifies existing behaviour]
+Source: [Man the Hunter, Lee & DeVore](https://www.thetedkarchive.com/library/richard-b-lee-irven-devore-man-the-hunter)

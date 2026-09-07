@@ -1744,4 +1744,5999 @@ The elite layer now builds on a homeostat that actually holds.
 
 ---
 
+### R-82 - Material wealth stratifies where food cannot; the captor is a TYPE, not a rank (2026-07-17)
+**Question.** Cred already skews the food draw, yet equilibrium inequality stays flat. Can a DURABLE stock do what
+a burned one cannot? **Build.** `material` as a stock (hides from game; `material_hide_frac`), `material_decay`,
+aggrandizer capture, Boehm leveling. **Result.** Durability alone stratifies - food is consumed, `material`
+persists, so small per-step differences integrate. **Two corrections, both mine:** (i) keying capture on `cred^k`
+gave corr -0.018 - Hayden's captor is an ambition TYPE (`aggrandizer_frac`), and re-keying gave +0.780;
+(ii) [SUPERVISOR-CAUGHT] material was drawn from the GRANARY, i.e. from food. Reworked to come from GAME as hides.
+Boehm leveling cuts the top decile 90% -> 28%. **Aggrandizer capture stayed inert at forager dispersal (1.14x even
+at 80% capture) - it needs co-residence.** That negative is what R-83 explains.
+
+### R-83 - Elite step 1: leader "managerial rights" over BAND corporate output -> 3.68x (2026-07-17)
+**The missing rung** [SUPERVISOR]: `_cell_owner` is CORPORATE (band_id), but stratification needs PERSONS to
+differ. The bridge is not ownership, it is AUTHORITY OVER corporate property - controlling the product of property
+one does not own. **Anchor** [Hayden 1995 VERIFIED]: NW-Coast aggrandizers "control access to spatially restricted
+resource locations or productive facilities" and that class "had MANAGERIAL RIGHTS over the resource locations and
+facilities of the group"; contrast New Guinea, where "more ubiquitous access to productive land probably limited
+the development of social stratification". **Result** (2 seeds x 600):
+
+| share | leveling | material Gini | leader/other | top-10% |
+|---|---|---|---|---|
+| 0.00 | OFF | 0.416 | 1.18x | 25.3% |
+| 0.20 | OFF | 0.487 | 2.11x | 34.1% |
+| 0.50 | OFF | 0.636 | **3.68x** | 53.6% |
+| 0.50 | ON | 0.281 | 2.21x | 24.2% |
+
+**The R-82 negative was the WRONG UNIT, not the wrong mechanism** - a cell holds 1-2 agents, a band ~25, and you
+cannot skim a group of one. Leveling does not abolish the leader's advantage, it CAPS it (3.68x -> 2.21x): the Big
+Man as the ethnography has him - ahead, but held there.
+
+### R-84 - Challenge-succession: DESERTION, not the duel, is how a leader goes (2026-07-18)
+**Origin** [SUPERVISOR]: "I am not sure that chief is hereditary yet ... in tribes chief holds office until he dies
+or challenged and defeated (vikings) ... perhaps council of elders (north american) ... need lit." **The lit
+confirms the correction and then corrects the mechanism.**
+
+**(a) NOT hereditary** [Boehm 1993 VERIFIED]: leaders are deposable (Iroquois sachems; Coeur d'Alene and Assiniboin
+for "remarkable meanness, parsimony"); even a *hereditary* Yokuts chief "suspected of too much self-aggrandizement
+was ... ignored in favor of another chief"; councils of ELDERS are the documented brake and are specifically North
+American (Navajo, Fox, Yokuts) plus Tupinamba, Cuna, Mandari; Boehm even has "incipient chiefdoms ... egalitarian
+despite hereditary leadership". **Every part of the supervisor's correction holds.**
+
+**(b) But the challenge-and-defeat duel is the MINORITY channel.** Boehm Table I columns, counted over the
+48-society survey: Public opinion 10 - Criticism 6 - Ridicule 5 - Disobedience 7 - **DEPOSITION 9** -
+**DESERTION 17** - Exile 2 - Execution 10. Followers walking away outnumbers deposition ~2:1 ("if a bad chief was
+not deposed he might be deserted gradually" - Iban; "an entire dissatisfied lineage might simply go away" -
+Mandari). And the split is STRUCTURAL: deposition societies are the centralized ones (Iroquois, Yap, Somali, Iban,
+Assiniboin, Coeur d'Alene, Yokuts), desertion societies the mobile/dispersed ones (Batek, Mendrig, Apache, Kutchin,
+Ute, Nambicuara, Yanomamo, Patagonia) - i.e. Sahlins' Nootka-vs-Siuai and Hayden's restricted-vs-ubiquitous
+resources, surfacing as a sanction frequency. The supervisor's biome hunch is right, with resource structure as the
+real axis.
+
+**(c) Two triggers** [Boehm's 47 coded motivations]: OVERREACH = "dominating others as leader" (14) + "lack of
+generosity or monopolizing resources" (5) = 19; FAILURE TO DELIVER = "ineffectiveness, partiality, or
+unresponsiveness in a leadership role" (10). **This closes a loop:** overreach is read off the leader's own
+material relative to his band - which `leader_share_frac` is what inflates - so a greedier levy raises the sanction
+hazard on the man taking it. Measured: 24 -> 82 -> 103 sanction attempts as the levy goes 0 -> 0.2 -> 0.5.
+
+**(d) Succession on death, two regimes** [Sahlins 1972:209]: Nootka office "ascribed by right of chiefly due" =>
+"centricity is built into the structure" and outlives him; the Siuai big-man's following "will as such dissolve
+with the demise of the pivotal big-man". Coded as `succession_dissolve` - ON leaves 2/18 bands leaderless (and
+levying nothing); OFF fills every office.
+
+**THREE DEFECTS THE BUILD EXPOSED, each found by measurement not inspection:**
+1. **Tenure was capped ~4 yr with sanctions OFF** - so it was not politics ending careers. The office was keyed to
+   `band_id`, and band_ids churn on every fusion/fission. Re-keyed the tenure clock to the MAN.
+2. **Collisions ended 106 of 135 tenures** (death only 29): when two bands fused, the surviving office-holder was
+   picked by dict order. Now resolved by MERIT.
+3. **Mean leader age 23.5 yr against an adult mean of 34.1 - leaders were YOUNGER than average**, inverting every
+   source. Cause: `max(ms, ...)` ranged over ALL band members, so a high-cred CHILD (inherited cred, default
+   prowess 1.0) could hold office. Gated on `menarche_months`. Leader age -> 34.0.
+
+**Validated after the fixes** (2 seeds x 600): desertion 62-74% of attempts vs the 65% that went in [OK]; leader
+age 34.0 vs adult 34.1 [OK]; father-was-a-leader 53-69% (centred ~60%) against **Hayden's 75% of New Guinea
+Entrepreneur Big Men** - same order, somewhat low, and EMERGENT (the office is never inherited here; any continuity
+comes from heritable cred, which is Hayden's own mechanism - he transmits moka partners and wives, not the
+position).
+
+**HONEST LIMIT:** band-level tenure settles at **4-6 yr**, bounded by band fusion rather than by the leader's life.
+A 20-year chief is a CHIEFDOM phenomenon and would need the office attached to the SETTLEMENT, not the band -
+which is exactly Hayden's precondition (spatially restricted resources) and the next rung.
+
+### R-84b - `leader_share_frac` anchored on BHM 2009, and the levy turns out to be nearly powerless (2026-07-18)
+**Verified negative first:** no chiefly-due PERCENTAGE exists in Sahlins 1972 or Ames 1994 - both read directly for
+one. So the levy is anchored on its OUTCOME, as `leveling_strength` was on Boehm 38/48. **Anchor** [Borgerhoff
+Mulder et al. 2009 Table 2]: their three wealth classes ARE the model's three facets (embodied=prowess,
+relational=cred, material=material - confirmed by what their Table 1 measures), with forager alpha = (0.46, 0.39,
+**0.15**) and an alpha-weighted Gini target of **0.25 +/- 0.04**; agricultural alpha = (0.27, 0.14, **0.59**),
+Gini **0.48**.
+
+| share | leveling | G_prowess | G_cred | G_material | **HG composite** | agri-weighted |
+|---|---|---|---|---|---|---|
+| 0.00 | ON | 0.241 | 0.281 | 0.181 | **0.248** | 0.211 |
+| 0.20 | ON | 0.257 | 0.267 | 0.237 | **0.258** | 0.247 |
+| 0.50 | ON | 0.243 | 0.275 | 0.281 | 0.261 | 0.270 |
+| 0.50 | OFF | 0.250 | 0.251 | 0.563 | 0.298 | **0.435** |
+| | | | | **BHM target** | **0.25** | **0.48** |
+
+**`leader_share_frac = 0.20` -> composite 0.258 vs 0.25 +/- 0.04 = the anchored forager value.**
+
+**THE REAL RESULT IS THE FLATNESS.** Across the whole levy range 0 -> 0.5 the forager composite moves only
+0.248 -> 0.261, because material carries just **15%** of the forager weight. **A levy cannot by itself make a
+forager society unequal** - the agricultural 0.48 is approached (0.435) only by removing leveling AND shifting the
+weight to material. That is BHM's own thesis (inequality tracks WHICH wealth class matters and how heritable it
+is, not how much any one man takes) and it is Testart's chain. **Standing caution for the elite layer: stratifying
+on material alone over-weights the one class the ethnography says matters least at the forager stage.**
+
+---
+
+### R-85 - Charter retrofit: the flag audit finds a crash in its own author's code, refutes a charter claim, and exposes five dead knobs (2026-07-18)
+
+**What was run.** The MECHANISM_CHARTER (adopted the same day) types every mechanism and gives each type an
+invariant. `audit_flag_invariants.py` implements the black-box half: for each of the 60 `enable_*` flags, run an
+ENRICHED baseline (prerequisite chains satisfied) and the same config with that one flag flipped, same seed, and
+diff a signature (population trajectory, totals, band structure, bonds, positions, births/deaths). Every
+no-change flag is then re-tested at a second seed and a longer horizon before being called a defect.
+
+**Why the baseline had to be enriched:** the realistic preset has the entire elite layer OFF, so flipping
+`enable_leveling` alone would do nothing for want of MATERIAL and read as vacuous. That is exactly the
+prerequisite false-negative that made R-82's capture look inert. The audit encodes the prerequisite chains
+explicitly and reports "prereq unmet" separately from "vacuous".
+
+**FINDING 1 - a live crash in code committed hours earlier.** `enable_leader_office` with
+`enable_band_affiliation=False` raised `AttributeError: 'TerrainWorld' object has no attribute '_next_band_id'`.
+R-84 deliberately placed `_maintain_leader_office` OUTSIDE the affiliation guard so the office could stand alone,
+but its desertion branch allocates a new band id from a counter initialised only INSIDE that guard. **All ten
+R-84 tests set `enable_band_affiliation=True`, so none could see it.** Fixed by initialising `_next_band_id`
+unconditionally (the affiliation seeding block re-zeroes it => bit-exact); regression test added.
+
+**FINDING 2 - `enable_cred_renorm` is NOT gauge fixing; the charter's own worked example was wrong.** The
+charter argued (same day) that renorm changes no observable because every downstream use of cred is relative.
+Measured: it moves population, deaths, wealth, material and band structure. **Root cause:** the cred inheritance
+homeostat reverts toward a **fixed 1.0 anchor**, so rescaling cred changes each agent's distance to that anchor
+and hence its children's cred - not scale-invariant. Not a bug (restoring the anchor was R-81's whole purpose),
+but not a gauge. Re-typed as a new category **R - Regulator**. The surviving rule is sharper: *a regulator is a
+gauge only if nothing downstream reads an absolute scale, and that is an empirical question* - measure it, do
+not assert it from the code.
+
+**FINDING 3 - a new defect class: FLAG ON, MAGNITUDE ZERO.** Of 11 flags inert at both seeds with prerequisites
+satisfied and a live reader present, **five are gated by a companion gain of exactly 0**:
+
+| Flag | Dead knob |
+|---|---|
+| `enable_leader_coherence` | `leader_coherence_gain = 0.0` |
+| `enable_malnutrition_fission` | `malnutrition_fission_gain = 0.0` |
+| `enable_size_repulsion` | `repulsion_gain = 0.0` |
+| `enable_terrain_pathogen` | `pathogen_gamma = 0.0` |
+| `enable_village_scaling` | `village_gain = 0.0` |
+
+They read as ON in any flag-level audit while contributing nothing. **This invalidates the 2026-07-15 config
+audit's conclusion that "all built mechanisms + prerequisites are correctly ON"** - five of those were dead.
+**New standing check: `flag is True` is not evidence a mechanism is live; inspect the magnitude too.**
+
+**CONFIRMED INDEPENDENTLY:** `enable_infanticide` has no reader outside the config (the known stub, now
+detected mechanically rather than by memory); `enable_genealogy_log` [O] mutates nothing - **the observer
+invariant HOLDS**, which is the first positive confirmation that a charter type is real rather than imposed.
+
+**METHODOLOGICAL LIMIT (recorded so it is not re-attempted).** A black-box differential audit **cannot** test
+conservation invariants. Over a long coupled run, changing the band graph changes who forages together and hence
+wealth - so an A-typed flag legitimately moves conserved quantities *in the trajectory* while its operator still
+conserves them *within its own step*. Conservation needs instrumentation **around the call**. The black-box
+audit soundly decides only vacuity, observer violations, crashes, and magnitude-zero gating.
+
+**RESIDUAL - 6 flags inert at both seeds, live reader, non-zero magnitude, no explanation yet:**
+`enable_bonded_mating`, `enable_condition`, `enable_energetic_fertility`, `enable_landscape_packing`,
+`enable_site_appraisal`, `enable_terrain_move_cost`. These are the remaining charter §6 candidates and need
+individual inspection - NOT yet claimed as defects.
+
+**Regime-gated and correctly inert (not defects), each already documented:** settlement machinery inactive in
+this world config (`enable_aggregation_sedentism`, `..._scalar_stress`, `enable_village_budding`,
+`enable_catchment_ceiling`); `enable_economic_defensibility` + `enable_improved_land` (DE-10: the claim gate
+never fires on unsaturated land); `enable_agriculture`/`enable_soil_depletion`/`enable_alluvial_renewal` (wrong
+world, R-70/R-71); `enable_band_risk` (shelved, DE-4).
+
+---
+
+### R-85b - The six residual flags: the dead-knob class is bigger than it looked, and it hides one level deeper (2026-07-18)
+
+**Closing R-85's residual.** Six flags were inert at both seeds despite a live reader and a non-zero magnitude at
+the reader site. Each had a specific hypothesis tested empirically rather than by reading. **All six are now
+explained, and none is a spec bug - but the dead-knob count rises from 5 to 7 (+1 chained).**
+
+| Flag | Diagnosis | Class |
+|---|---|---|
+| `enable_terrain_move_cost` | `move_cost_kcal = 0.0` | **DEAD KNOB** (hidden inside the field builder) |
+| `enable_site_appraisal` | `site_gain = 0.0` | **DEAD KNOB** (hidden inside the field builder) |
+| `enable_condition` | its EMA's only live consumer is the pathogen term, and `pathogen_gamma = 0.0` | **DEAD DOWNSTREAM** (chained) |
+| `enable_bonded_mating` | gated `if bonded and not pair_bonds`; the preset sets pair-bonds ON | **SUPERSEDED BY DESIGN** (F.3a replaced F.1) |
+| `enable_energetic_fertility` | factor = 1.0 for **99.75%** of birth-eligible draws; the rest span 0.9954-1.0 | **REGIME-GATED** (no food stress at this density) |
+| `enable_landscape_packing` | both density definitions give the SAME society target in **8 of 8** bands | **REGIME-GATED** (below threshold resolution) |
+
+**METHODOLOGICAL FINDING - the magnitude can be one level deeper than the flag.** R-85's gate scan looked for a
+companion parameter NEAR THE READER LINE and found five zeros. It MISSED `move_cost_kcal` and `site_gain`
+because those live inside the *field builders* (`_move_cost_field`, `_site_suitability_field`), not at the call
+site. The give-away was measurable and general: **the terrain `cost` layer has real spread (std 0.188) while the
+fields built from it have std EXACTLY 0.0** - a builder that multiplies a varying input by zero. **New check:
+scan for zero magnitudes along the whole dependency chain, and flag any derived field whose std is 0 while its
+input's is not.**
+
+**A SUBSTANTIVE consequence, not just bookkeeping.** `enable_energetic_fertility` is ON in the preset and reads
+as a live nutrition->fertility coupling, but on the population that actually uses it the factor is 1.0 in 99.75%
+of draws and never falls below 0.9954. **So the model's fertility is effectively NOT nutrition-modulated at
+current densities.** Any result that assumes energetic fertility is doing work needs re-reading in that light -
+it will only bite under real food stress, which this regime does not produce.
+
+**Two are correctly inert and should NOT be "fixed":** `enable_bonded_mating` is superseded by the pair-bond path
+(F.3a) and is dead whenever `enable_pair_bonds` is on - that is the intended supersession, not a defect;
+`enable_landscape_packing` is wired correctly and simply does not change the society target at ~0.011 agents/km2
+(both definitions read `complex_forager`). It would separate at higher density, which is what R-61 built it for.
+
+**The dead-knob list for decision (7 + 1 chained):**
+`leader_coherence_gain`, `malnutrition_fission_gain`, `repulsion_gain`, `pathogen_gamma`, `village_gain`,
+`move_cost_kcal`, `site_gain` - plus `enable_condition`, alive but feeding only the zero-gain pathogen term.
+Each needs a per-knob judgement: is the zero DELIBERATE (mechanism built and parked) or an OVERSIGHT?
+
+---
+
+### R-85c - RETRACTION: the "dead knobs" were an artifact of my own audit harness (2026-07-18)
+
+**Origin:** the supervisor asked whether a zeroed knob's job might already be done by ANOTHER mechanism. Checking
+that meant looking outside the single preset the audit had been using - and the answer overturned R-85's and
+R-85b's headline finding.
+
+**WHAT WAS WRONG.** R-85 reported "five flags enabled in the preset but multiplied by a gain of exactly 0", and
+R-85b added two more. **None of those seven flags is enabled in `realistic_forager_demog()`.** That preset
+enables 17 flags and none of the seven is among them. The audit harness flipped each flag `False -> True` while
+its companion gain stayed at the **zero DEFAULT**, so the mechanism stayed inert - and I read that inertness as a
+property of the configuration rather than of my own test.
+
+**They are also not dead anywhere.** All seven run at live values in `emergent_village_demog()` and the stage
+harnesses: `leader_coherence_gain=2.0`, `repulsion_gain=0.3`, `village_gain=5.0`, `site_gain=0.3`,
+`move_cost_kcal=750.0` (0.01·BURN, in the SAME FILE at line 113), `malnutrition_fission_gain=2.0`,
+`pathogen_gamma` swept in `run_2m_multibiome.py`. They are **preset-scoped village/scarcity-arc mechanisms,
+correctly absent from a forager preset** - not defects.
+
+**PROOF.** Re-running the audit with a MAGNITUDE map (each flag turned on at the value the project actually uses)
+makes **five of the seven active immediately**: `malnutrition_fission`, `size_repulsion`, `site_appraisal`,
+`terrain_move_cost`, `terrain_pathogen`. The other two (`leader_coherence`, `village_scaling`) remain inert for
+regime reasons - `village_scaling` needs villages, and the discrete settlement machinery is inactive in this
+world config.
+
+**RETRACTED:**
+- "Five dead knobs" (R-85) and "seven dead knobs, magnitude hides one level deeper" (R-85b). **Withdrawn.**
+- "This invalidates the 2026-07-15 config audit's claim that all built mechanisms are correctly ON."
+  **That retraction was itself wrong and is withdrawn.** The 2026-07-15 audit was not shown to be in error.
+- The per-knob supervisor decision this generated is **moot**; there is nothing to decide.
+
+**WHAT SURVIVES, and why each is unaffected:**
+| Finding | Status | Why it holds |
+|---|---|---|
+| `_next_band_id` crash under `enable_leader_office` + no band affiliation | **HOLDS** | a real AttributeError, reproduced and fixed, regression-tested |
+| `enable_cred_renorm` is NOT gauge fixing | **HOLDS** | it IS enabled in the forager preset, so this was a genuine ON->OFF test |
+| `enable_infanticide` is an unimplemented stub | **HOLDS** | established by reader search, independent of magnitudes |
+| `enable_genealogy_log` [O] mutates nothing | **HOLDS** | observer invariance; a magnitude would not change it |
+| `enable_bonded_mating` superseded by pair-bonds | **HOLDS** | enabled in the preset; a genuine ON->OFF test |
+| Black-box audits cannot test conservation | **HOLDS** | methodological, independent of this error |
+| `enable_energetic_fertility` factor ~1.0 in 99.75% of eligible draws | **HOLDS** | measured directly on the eligible population, not inferred from a flip |
+| `enable_landscape_packing` gives the same society target in 8/8 bands | **HOLDS** | measured directly |
+
+**THE REAL FINDING, correctly stated.** *A boolean flip is not enabling a mechanism.* Most flags are paired with
+a gain that **defaults to zero**, so `enable_X=True` alone leaves X inert. That is a genuine trap - it caught me,
+running a harness built specifically to catch this class of thing - but it is a trap for **whoever enables a
+flag**, not evidence that any preset is misconfigured. The harness now carries a MAGNITUDE map and sets a live
+gain whenever it turns a flag on, and its output records `baseline_on` so that only `True` rows are read as
+genuine tests of a running mechanism.
+
+**METHOD LESSON (the one that generalises).** The audit conflated "this flag does nothing when I turn it on" with
+"this flag does nothing". The distinguishing question is **what was the baseline state**, and I did not record it
+prominently enough to notice. A differential audit must report the baseline value beside every verdict.
+Second-order: I grepped `enable_*=True` across a FILE that contains two presets and attributed the union to one
+of them. **Scope a config audit to the function, not the file.**
+
+---
+
+### R-86 - The LEGITIMACY channel: the RATCHET is the mechanism, and it hits Hayden's 75% (2026-07-18)
+
+**Origin:** DM-F1, the first item from the Flannery digest. Flannery ch.10 says our elite layer's premise cannot
+produce hereditary rank - *"if feasting were all it took to produce hereditary inequality, there would have been
+no achievement-based societies left for anthropologists to study"*; feasting *"produced individual Big Men who
+had no way of bequeathing renown to their offspring."* R-83/R-84 measured exactly that. Friedman's endogenous
+scenario supplies the missing mechanism as a **reinterpretation**, not an accumulation.
+
+**BUILD** (charter-declared: **type C** Conversion, **unit LINEAGE**, **invariant DEBITED**, anchor Flannery
+ch.10 `[VERIFIED]`): lineages spend material on sacrifices; legitimacy is an EMA of a lineage's SHARE of its
+band's ritual expenditure (bounded [0,1] by construction, so the threshold is interpretable); crossing the
+threshold converts into heritable `cred`.
+
+**THREE CUTS, and the first two were wrong in instructive ways.**
+
+**Cut 1 - the feast destroyed material.** Material Gini jumped 0.237 -> 0.416 from the debit alone, a pure drain
+with nothing to do with legitimacy. Flannery is explicit that the sponsor *"could sponsor the most prestigious
+sacrifices AND FEED THE MOST VISITORS"* - a feast is an EXCHANGE. Fixed: the spend is redistributed to the
+band's guests, conserving material (now asserted as the X invariant in tests). **With the feast conserved,
+material Gini goes DOWN, 0.237 -> ~0.10** - competitive feasting is a material LEVELLER, which is Boehm and
+Sahlins and precisely why it yields Big Men rather than dynasties.
+
+**Cut 2 - an unbounded multiplicative cred boost.** Measured cred Gini **0.968-0.988**: one lineage holding
+essentially everything, the R-66 winner-take-all failure mode. A sustained multiplicative push beats the
+homeostat's contraction - **the same lesson as R-81**. Fixed by relaxing toward a legitimacy-set target
+(`LEGIT_RELAX`), which is bounded by construction.
+
+**Cut 3 - THE RATCHET, which is the actual mechanism.** With a DECAYING legitimacy stock the result was a flat
+negative: father-was-leader stayed at baseline (59-67% vs 65%) at every gain up to 20, and the agricultural
+composite got WORSE. The diagnosis is conceptual and it was a misreading of the source. Friedman's key shift is
+*"from 'They must have **PLEASED** the nats' to 'They must be **DESCENDED FROM** higher nats than we are.'"* A
+stock that decays and must be re-earned by feasting **is still "pleased the nats"** - i.e. I had built the
+achievement-based mechanism Flannery says does not produce heredity. Crossing the threshold must **ASCRIBE the
+lineage permanently**: descent, once believed, is not contingent on this year's harvest.
+
+**RESULT with the ratchet** (2 seeds x 600, `feast=0.25`, `legit_cred_gain=20`, `threshold=0.15`):
+
+| | father-was-leader | agricultural composite |
+|---|---|---|
+| baseline (no legitimacy) | 65% | 0.247 |
+| decaying stock (cut 2) | 59-67% | 0.147-0.200 |
+| **RATCHET (cut 3)** | **76%** | 0.189 |
+| **TARGET** | **75% (Hayden)** | **0.48 (BHM)** |
+
+**T-6 IS MET: 76% vs Hayden's "about 75% of New Guinea Entrepreneur Big Men had fathers that were also Big
+Men"** - and it is EMERGENT, since the office is never inherited in the model and the target was never fitted.
+
+**T-5 IS NOT MET, and the reason is structural rather than a calibration shortfall.** The agricultural composite
+is 59% MATERIAL-weighted, and this mechanism *equalises* material (the feast redistributes) while concentrating
+CRED. It therefore moves the forager composite up and the agricultural composite down. **Legitimacy is not the
+route to material stratification** - it is the route to heritable RANK. Those are different things, and BHM's
+alpha weights make the difference measurable.
+
+**THE OPEN PROBLEM, and it is not optional polish: SATURATION.** `ascribed_frac_pop` reaches **0.70-0.85** - over
+600 steps most lineages eventually cross, so "descended from higher nats" stops being a distinction. A pure
+ratchet with no reverse has no equilibrium. **This is exactly why the Kachin cycle requires the gumsa -> gumlao
+COLLAPSE**: Flannery's *"hereditary inequality was repeatedly created, lasted for a few generations, and then
+collapsed."* The two halves are structurally coupled - **delegitimation is not Stage 2 polish, it is required
+for Stage 1 to remain meaningful**, and it is the same lagged resentment stock H-CYCLES predicts. Building it is
+the next step.
+
+**Also fixed in passing:** the ratchet was first recorded BELOW the `legit_cred_gain <= 0` guard, so the
+`n_ascribed` diagnostic read 0 whenever the conversion gain was 0 - whether a lineage is believed to descend
+from the nats is a fact about the society, not about how strongly we convert that belief. Regression-tested.
+
+**Status:** default-OFF, bit-exact. 7 new tests including the X-conservation assertion on the feast and the
+ratchet-does-not-leak assertion. The four rates remain `[DESIGN]`, calibrated against T-6.
+
+---
+
+### R-87 - Delegitimation (gumsa -> gumlao): regime SWITCHING appears, periodicity does not. H-CYCLES partly supported, prediction NOT met (2026-07-18)
+
+**Origin:** R-86 derived the need for this. The ascription ratchet works (father-was-leader 76% vs Hayden's 75%)
+but has no equilibrium - `ascribed_frac_pop` runs to 0.70-0.85 and nobility becomes universal. Leach's Kachin
+cycle supplies the reverse, and it is a LAG: prestige-seeking *"only increased their followers' resentment and
+hastened their overthrow"*, so hereditary inequality *"lasted for a few generations, and then collapsed."*
+
+**BUILD** (charter-declared: type **C reverse**, unit **BAND** - Leach's gumlao premise 1 is "All lineages are
+considered equal", a whole-community reversion - invariant: changes ascription and cred only). Resentment is a
+slow EMA of the ascribed lineages' cred advantage over commoners; crossing the threshold de-ascribes every
+lineage in the band and resets. Hysteresis comes from having to rebuild legitimacy from zero.
+
+**THE EXPERIMENT WAS BROKEN ON THE FIRST PASS, and the failure is worth recording.** `resent_privilege_ref` was
+left at 1.0 while ascription confers a cred advantage of ~`legit_cred_gain` = 10 - so privilege ran at **20x the
+threshold** and even a nominal "40-year" EMA crossed in ~12 steps. All three arms of the lag sweep were
+therefore effectively INSTANTANEOUS, and the sweep tested nothing. Symptom: `mean_gumsa` 0.03-0.11 with ~1500
+reversions - hierarchy squashed the moment it formed, in every arm. **Third time this session that a sweep
+varied a parameter that was not the operative one** (cf. R-85c). Fixed by normalising privilege so the EMA time
+constant governs.
+
+**CORRECTED RESULT** (1 seed x 3600 steps = 300 yr, privilege normalised, crossing times ~115 / ~58 / ~3 yr):
+
+| lag memory | reversions | mean gumsa | sd gumsa | autocorr peak | verdict |
+|---|---|---|---|---|---|
+| 167 yr | 2576 | 0.258 | 0.353 | **0.19** | weak/none |
+| 83 yr | 1609 | 0.476 | 0.428 | 0.13 | weak/none |
+| 4 yr (control) | 2047 | 0.269 | 0.389 | **0.03** | weak/none |
+
+**H-CYCLES: PREDICTION NOT MET. This is a FOURTH independent negative for secular cycles** (after connubium
+R-67, substrate R-68, soil R-71). A delayed negative feedback, built explicitly to supply the missing complex
+eigenvalue pair, does **not** produce periodic behaviour at any lag from 4 to 167 years.
+
+**But it is NOT a null result, and two things distinguish it from the three prior negatives.**
+
+1. **The lag pushes in the PREDICTED DIRECTION.** Autocorrelation peak rises monotonically with lag length:
+   0.03 (4 yr control) -> 0.13 (83 yr) -> 0.19 (167 yr). The mechanism does what the theory says; it simply
+   never reaches an amplitude that constitutes a cycle.
+2. **Large-amplitude SYSTEM-WIDE regime switching now exists where nothing switched before.** `sd_gumsa` = 0.428
+   against a mean of 0.476 - the society swings across nearly the full range from mostly-ranked to
+   mostly-egalitarian. **Tested against the independent-bands null**: if ~N bands flipped independently,
+   sd(frac_gumsa) = sqrt(p(1-p)/N) = 0.112 / 0.079 / 0.056 for N = 20 / 40 / 80. Measured 0.428 is **3.8-7.7x
+   that null**, so bands are switching TOGETHER, not averaging out. The prior negatives had no switching at all.
+
+**So the honest summary: the model now produces APERIODIC BISTABLE SWITCHING between ranked and egalitarian
+regimes, not a limit cycle.** Leach's Kachin are described as cycling; this reproduces the *alternation* and the
+*amplitude* but not the *regularity*. Whether real gumsa/gumlao alternation is genuinely periodic or merely
+recurrent is itself worth checking before treating the missing periodicity as a model defect - "repeatedly
+created, lasted for a few generations, then collapsed" describes recurrence, and does not by itself assert a
+fixed period.
+
+**THE SOURCE WAS RE-READ, AND I HAD MEASURED THE WRONG QUANTITY (R-87b, same day).** Flannery's Kachin are
+*"created, overthrown, and **periodically reinstated**"*, *"this **repetitive cycle**"*, *"**oscillated
+between**"* - and the duration claim is *"lasted for **a few generations**"*. **Periodicity in the strict
+(fixed-interval) sense is nowhere asserted; RECURRENCE plus a characteristic SPELL DURATION is.** The
+autocorrelation test above therefore measures a property the ethnography never claims. **The right metric is
+DWELL TIME in gumsa**, and my H-CYCLES prediction over-specified the source.
+
+**Dwell time, estimated from the aggregate counts** (dwell = band-steps in gumsa / exits; band count assumed
+~25 agents/band, so this is an estimate, not a measurement):
+
+| lag memory | ~bands | mean gumsa dwell |
+|---|---|---|
+| 167 yr | 128 | **3.9 yr** |
+| 83 yr | 115 | **10.2 yr** |
+| 4 yr | 121 | **4.8 yr** |
+
+**Against the anchor of ~60-100 yr, dwell is one to two orders SHORT.** So there IS still a real gap - the model
+alternates far too fast - but it is a different gap from the one the autocorrelation test reported, and it has a
+different likely cause: the reversion trigger fires too easily, not that the feedback lacks a lag.
+
+**Open leads, re-ordered after that correction:**
+- **Measure dwell time directly** (per-band spell lengths, not inferred from aggregate counts) and calibrate
+  `resent_threshold` against the ~60-100 yr anchor. This is now the primary metric for H-CYCLES, replacing the
+  autocorrelation period.
+- **The reversion trigger is a hard threshold on a noisy quantity**, so bands cross it stochastically rather
+  than by clean build-up - the likely reason spells are short and irregular. A smooth hazard, or hysteresis on
+  the reversion itself (a band that just reverted resisting immediate re-ranking), is the natural next cut.
+- Coupling between bands is NOT the missing piece - the null test above shows they are already correlated.
+- Note the non-monotonicity: the 83-yr lag gives the LONGEST dwell (10.2 yr), longer than the 167-yr lag
+  (3.9 yr). That is not what a simple lag story predicts and should be explained before more tuning.
+
+**Status:** default-OFF, bit-exact. 13 tests on the legitimacy/delegitimation pair, including that
+delegitimation BOUNDS the ascribed fraction (R-86's open problem, closed), that resentment resets on reversion,
+and that the ratchet stays monotone when the reverse is disabled. `resent_*` remain `[DESIGN]`.
+
+---
+
+### R-87d - H-CYCLES resolved NEGATIVE, on instruments that were fixed twice and validated against controls (2026-07-18)
+
+**This supersedes the verdicts in R-87 and R-87c, both of which were instrument artifacts.** The supervisor
+asked two questions that broke the analysis open: *"how good is the SNR of cycle diagnostics?"* and *"plot the
+solution over the data and I will judge."* Neither verdict survived being looked at.
+
+**THE THREE INSTRUMENT FAILURES, in order.**
+1. **R-87 (autocorrelation, uncalibrated).** Reported "no cycles" against an INVENTED threshold of 0.2, with no
+   positive control, no null floor, and no detrending on a series whose population grew 500 -> 3200.
+2. **R-87c (autocorrelation, calibrated).** Measured the null (white-noise peak mean 0.088 / max 0.138) and
+   found the 0.19 measurement ABOVE it - so the negative was withdrawn as underpowered. **Also wrong**: that
+   null was computed at a different series length than some comparisons used, and length changes the floor
+   substantially (n=900 -> 0.138 max; n=225 -> 0.197 p95).
+3. **Sinusoid fit (new instrument, still mis-specified).** Built to report an amplitude and a curve that could
+   be drawn on the data. It returned amplitude 0.260, "period" 250 yr, r2 0.301, clearing its null - **and it
+   was fitting the grid ceiling.** A 250 yr period in a 300 yr window is 1.2 cycles: a trend wearing a
+   sinusoid's clothes.
+
+**WHAT THE RAW DATA ACTUALLY SHOWS (plotted for the supervisor, and decisive).** `frac_gumsa(t)` is not
+oscillatory in any form. It is: a build-up to ~90% ranked over ~25 yr; a sustained ranked phase; a violent spiky
+collapse around yr 75-125; then **~150 yr pinned at zero** (28% of samples exactly 0); then a terminal jump to
+1.0. **One episode, then the mechanism dies.** No fit of any periodic model is appropriate, which is why two
+different periodic instruments both produced confident wrong answers.
+
+**TWO DETECTOR FIXES (supervisor-approved), then re-validated per charter D1:**
+- **Reject any period beyond window/3.** A fit that cannot complete three cycles is describing a trend. Both
+  instruments had happily returned ~250-270 yr from a 300 yr window.
+- **Require a genuine LOCAL MAXIMUM in the autocorrelation**, not merely the largest value in a wandering tail.
+  The unfixed code took `argmax` unconditionally, so pure drift always produced a "peak".
+
+**POSITIVE CONTROL AFTER THE FIXES (D1) - the fixes tighten without blinding:** a real 75 yr cycle injected into
+a 300 yr window is still recovered at 75.3 yr (autocorrelation) and 74.5 yr (fit) at every amplitude >= 0.10;
+pure noise returns fit amplitude 0.029 against a null p95 of 0.034.
+
+**FINAL RESULT on the real series, both instruments fixed and validated:**
+
+| lag memory | n | AC period | AC peak | fit amp (null p95) | r2 | correlation time | verdict |
+|---|---|---|---|---|---|---|---|
+| 167 yr | 900 | 69.0 yr | **-0.021** | 0.174 (0.061) | 0.140 | 22.2 yr | NO CYCLE |
+| 83 yr | 900 | 59.0 yr | **-0.028** | 0.130 (0.074) | 0.051 | 22.6 yr | NO CYCLE |
+| 4 yr (control) | 900 | 59.3 yr | **-0.122** | 0.135 (0.067) | 0.079 | 20.7 yr | NO CYCLE |
+
+(correlation time from a log-linear fit to the ACF decay, not the 1/e crossing — see the correction below)
+
+The autocorrelation "peaks" are **NEGATIVE** - a turning point inside a negative region, which is definitively
+not recurrence. The sinusoid explains 5-14% of variance.
+
+**A DIAGNOSTIC RULE THIS PRODUCED:** `fit_amp` clears its null in BOTH arms (0.174 vs 0.061; 0.130 vs 0.074)
+while explaining 14% and 5% of variance. **An amplitude-versus-null test alone would have declared a cycle in
+both.** Goodness-of-fit is the discriminator, and a verdict rule must require BOTH: amplitude above the null AND
+r2 above a floor. Added to the charter.
+
+**H-CYCLES: RESOLVED NEGATIVE.** A delayed negative feedback, built explicitly to supply the missing complex
+eigenvalue pair, does not produce cycles. This is the fourth independent negative (R-67, R-68, R-71, R-87d) and
+the first one measured on validated instruments.
+
+**AND THE THIRD ARM KILLS THE ONE POSITIVE I HAD CLAIMED.** An earlier draft claimed "correlation time rises
+with the lag" from the first two arms; the control arm refutes it. Fifth time in one day a pattern read off a
+partial sweep dissolved when the full sweep landed - **do not draw a trend from two points when a third is
+still running.**
+
+**CORRECTION (self-check, `verify_numbers.py`): the correlation-time FIGURES were estimator noise.** Reported as
+15 / 33 / 32 yr from the ACF's **1/e crossing** - a SINGLE POINT on a noisy curve. An independent
+**log-linear fit to the whole ACF decay** gives **22.2 / 22.6 / 20.7 yr**, i.e. essentially IDENTICAL across
+lags of 167 / 83 / 4 yr. The two estimators disagree by 30-50%, so the crossing figures should not be quoted.
+**Use ~22 yr, uniform.** This strengthens rather than weakens the conclusion: on the robust estimator every arm
+has the same memory regardless of the lag, which refutes lag-governance more cleanly than the
+non-monotonicity did.
+
+**DWELL TIME, measured directly instead of estimated.** The earlier 3.9 / 10.2 / 4.8 yr were INFERRED from
+aggregate reversion counts assuming ~25 agents/band. Measured as run-lengths of the thresholded series:
+mean ranked spell **2.7 / 3.6 / 4.6 yr** over 32 / 41 / 14 spells. **But the distribution is heavily skewed -
+maximum spells reach 17.7 / 81.0 / 58.7 yr.** Occasional spells DO land in the ethnographic 60-100 yr range;
+they are rare among many short ones, and reporting only the mean hid that. Any future calibration against the
+"few generations" anchor must use the spell-length DISTRIBUTION, not its mean.
+
+**So the lag parameter is not governing the dynamics.** Combined with the dwell-time inversion (10.2 yr at the
+83 yr lag vs 3.9 yr at 167 yr), two independent metrics agree the mechanism's timescale is set by something
+OTHER than `resent_alpha` - most likely the band fission/fusion churn that R-84 already showed dominates
+leader tenure (106 of 135 tenures ended by band collision, not politics). **That is the thing to identify
+before any further cycle work**: a delayed feedback cannot govern a system whose own substrate turns over
+faster than the delay.
+
+**What does survive:** large-amplitude regime switching exists where the three prior negatives had none. The
+mechanism does something real - it is neither periodic nor lag-governed.
+
+**Reported quantity going forward is CORRELATION TIME (15-33 yr) and DWELL TIME, not period** - the ethnography
+claims spell duration ("lasted for a few generations"), never a fixed period, and the model is 2-6x short of
+that 60-100 yr anchor.
+
+---
+
+### R-86v - The 76% SURVIVES validation, but it measures CONCENTRATION, not TRANSMISSION (2026-07-20)
+
+**Why this was run.** R-86's father-was-leader = 76% was the elite arc's one positive result, was written into
+TARGETS T-6 as MET, and had never been held to the standard R-87d established. It is a **single summary
+statistic over a possibly-skewed population** - exactly the shape that failed in R-87d, where a mean dwell of
+2.7 yr described almost none of the actual spells.
+
+**D1 POSITIVE CONTROL passes.** A synthetic population with known father-son transmission returns the lift it
+was built with: 1.0 -> 1.02, 1.5 -> 1.52, 2.0 -> 2.01, 2.5 -> 2.51. The statistic can measure heredity.
+
+**D2 NULL: the feared artifact is NOT present.** `father_was_leader` = P(father ever led | self ever led). If a
+large share of the population ever led, leaders having leader fathers would be arithmetic. The measured base
+rate P(father ever led) is **0.44**, not ~0.70, and the measured value sits far in the right tail of a 2000-shuffle
+permutation null (**z = 3.1 to 4.9** at every age gate). **The 76% is a genuine signal.**
+
+**BUT THE UNGATED LIFT WAS AGE-INFLATED.** The comparison pool averages **17.7 yr** while leaders average
+**36.0 yr** - the pool is full of agents who have not yet had their chance to lead, which deflates the base rate
+and inflates the ratio. Age-matching fixes it:
+
+| arm | age gate | n | measured | base rate | **lift** | z |
+|---|---|---|---|---|---|---|
+| legitimacy ON | none | 52 | 0.757 | 0.439 | **1.72** | 4.87 |
+| legitimacy ON | >= 25 yr | 43 | 0.769 | 0.536 | **1.43** | 3.36 |
+| legitimacy ON | >= 35 yr | 30 | 0.767 | 0.537 | **1.43** | 3.06 |
+| baseline OFF | none | 50 | 0.655 | 0.427 | 1.54 | 3.34 |
+| baseline OFF | >= 25 yr | 38 | 0.627 | 0.439 | **1.43** | 2.63 |
+| baseline OFF | >= 35 yr | 22 | 0.614 | 0.393 | 1.58 | 2.50 |
+
+**THE FINDING THAT CHANGES THE INTERPRETATION: age-matched, the two arms have the SAME LIFT (1.43 vs 1.43).**
+The legitimacy channel raises the raw fraction (0.769 vs 0.627) **by raising the base rate in step**
+(0.536 vs 0.439). It concentrates leadership into fewer lineages, so fathers AND sons within those lineages both
+lead more often - **but the father->son ASSOCIATION is not strengthened at all.**
+
+**So the ratchet produces CONCENTRATION, not TRANSMISSION.** R-86 framed it as "achieved success becomes ascribed
+rank"; the transmission ratio was already present in the baseline, supplied by `cred` inheritance. What
+legitimacy adds is that more of a favoured lineage's members hold office. That is a real effect and it is what
+moves the raw fraction toward Hayden's number, but it is not a new heredity channel.
+
+**T-6 STATUS: MET on Hayden's own metric, with a caveat that cannot currently be removed.** Hayden reports
+"about 75% of New Guinea Entrepreneur Big Men had fathers that were also Big Men" - a RAW FRACTION whose base
+rate he does not give. Without it we cannot compute HIS lift, so the raw-fraction comparison (0.769 vs 0.75) is
+the only like-for-like available, and **it cannot distinguish concentration from transmission**. If big-man
+status in New Guinea was rare (say 10% of men), Hayden's 75% implies a lift near 7 and our 1.43 is nowhere near
+it. **Finding Hayden's base rate is now the single highest-value literature question for this target.**
+
+**Method notes for reuse:** the age gate matters and should be standard for any statistic conditioned on a
+life-course event - an ungated pool mixes agents who have had their chance with those who have not. And report
+the LIFT beside the raw fraction always; the fraction alone moved 0.655 -> 0.757 (looks like a large mechanism
+effect) while the lift did not move at all.
+
+---
+
+### R-88 - BAND CHURN, not resent_alpha, sets the delegitimation timescale (2026-07-20)
+
+**Origin.** R-87d found the delegitimation mechanism's correlation time (~20-22 yr) was IDENTICAL across three
+resentment-memory settings spanning 4 to 167 years - the lag parameter measurably did not govern the dynamics.
+R-84 had already found something structurally similar: 106 of 135 leader tenures ended by band COLLISION, not
+by politics. This tests whether the same substrate churn is the common cause.
+
+**MECHANISM, confirmed by reading the code (not inferred).** `_maintain_bands()` FISSION mints a fresh
+`band_id` (`new_id = self._next_band_id; self._next_band_id += 1`) for roughly half a splitting band's members;
+`self._band_resentment.get(new_id, 0.0)` then returns 0.0 - a SILENT reset, independent of `resent_alpha`,
+regardless of what had accumulated. FUSION moves every agent onto the surviving `band_id` and simply abandons
+the smaller band's resentment entry. Neither event passes through `_do_delegitimation()`, so neither is counted
+in `reversions_this_step` - these are resets nobody was tracking.
+
+**MEASURED** (`probe_band_churn.py`, 2 arms x 3600 steps, band lifetime = first-seen to last-seen span for
+every band_id that ever existed):
+
+| | 83 yr lag | 4 yr control |
+|---|---|---|
+| band lifetime, median | 10.2 yr | 10.2 yr |
+| band lifetime, mean | 17.5 yr | 17.5 yr |
+| bands created | 2,277 | 2,407 |
+
+**Band lifetime is IDENTICAL across both arms** (median AND mean, to one decimal place) - confirming band churn
+is exogenous to delegitimation, driven purely by `band_split_size`/`band_merge_size` and population dynamics,
+not coupled to resentment at all.
+
+**THE MATCH: mean band lifetime (17.5 yr) sits almost exactly on R-87d's measured correlation time (~20-22 yr),
+uniform across resentment memories of 4, 83 AND 167 years.** For the long memories (83, 167 yr) band churn caps
+the observed timescale far below the nominal setting; for the short control (4 yr, nominal memory ~4.2 yr),
+band identity itself OUTLASTS the resentment memory, so the band substrate sets the pace either way. **Band
+churn, not `resent_alpha`, is the governor** - a delayed social feedback cannot express a memory longer than the
+unit carrying it survives.
+
+**A SAMPLING-BIAS FINDING IN THE PROBE ITSELF, recorded so it is not mistaken for a second effect.** The same
+probe's "age" statistic (age of a currently-live band, sampled at random timepoints) reported median 54 yr /
+mean ~78 yr - roughly 5x the lifetime figures. This is NOT a second timescale; it is the inspection paradox
+(the bus-waiting-time problem): sampling at random timepoints oversamples long-lived bands, the same way asking
+riders at a stop "how long is your commute" oversamples people on the longest routes. **Lifetime (unbiased,
+computed over the full population of band_ids that ever existed) is the correct statistic; age (sampled at
+timepoints) is confounded and should not be quoted as a timescale.**
+
+**PERFORMANCE, checked in passing (the supervisor asked).** Today's additions (R-86 legitimacy + R-87
+delegitimation) cost ~9% extra per step at matched population (11.7 -> 12.7 ms/step, N~500, both pure Python
+per-agent loops, unvectorized - consistent with the model's existing style, charter types A/N/C are the loop-
+legitimate categories). The perceived slowness of the H-CYCLES/band-churn runs is population size, not these
+mechanisms: those runs grew to 6,800-7,500 agents (15-20x the N=500 these were tuned at), and per-step cost
+scales with population throughout the model, not specifically here. The band-churn probe's own instrumentation
+(a full-population band_id scan every step) added further overhead on top, separate from the model's own cost.
+
+**CONSEQUENCE for the elite/legitimacy arc.** A delayed social feedback (resentment, or any future slow social
+mechanism) cannot express a memory longer than ~15-20 yr while attached to the BAND as its unit, because the
+band itself does not survive longer than that on average. Two paths forward, not mutually exclusive:
+(a) attach slow social state to something with a longer natural lifetime - the LINEAGE (already used for
+ascription) or the SETTLEMENT rather than the band; (b) reduce band churn itself, e.g. widen
+`band_split_size`/`band_merge_size` so bands persist longer - but this changes the substrate's calibrated
+demography (R-58...R-64) and should not be done casually to chase a cycle result.
+
+---
+
+### R-89 - The delegitimation trap: full ascription is an ABSORBING state, not an equilibrium (2026-07-20)
+
+**Origin.** T-9 pilot (2 arms, 4000 steps / 3000 founders, stratified arm = full R-82...R-87 elite stack) run
+to check whether dynastic concentration (`eff_lineages`/`lin_top_share`) diverges from baseline before
+committing to the full 15,000-step campaign. The stratified arm's tail showed `ascribed_frac`/`frac_gumsa`
+pinned at exactly 1.0 and `leader_tenure` frozen at 9.2-9.3yr across 39+ consecutive checkpoints (950 steps) -
+too clean to be a converged steady state.
+
+**BUG 1, confirmed by reading the code.** `_do_legitimacy()`'s cred-conversion step relaxes EVERY ascribed
+agent's cred toward one fixed target:
+```
+a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)   # cg = legit_cred_gain, the SAME constant for every lineage
+```
+Once ascription reaches 100% of the population, everyone relaxes toward the same number, so cred stops
+differentiating between lineages. Measured: `gini_cred` collapses from a peak of 0.67 (step 150) to a
+permanent 0.006-0.010 from step 2625 on.
+
+**BUG 2, confirmed by reading the code - the one that matters.** `_do_delegitimation()`'s resentment update
+requires a live non-ascribed "oth" group WITHIN THE SAME BAND to compute privilege:
+```
+if not asc or not oth:
+    self._band_resentment[bid] = self._band_resentment.get(bid, 0.0) * (1.0 - alpha)   # decay only, never rebuild
+    continue
+```
+Once every lineage present in a band is ascribed, `oth` is empty, resentment can only decay, and reversion
+(`r >= thr`) can never fire again for that band. **This is a one-way door**: nothing in the mechanism can push
+a fully-saturated band back out. Ascription is a per-lineage ratchet that only grows (R-86), so any band will
+eventually random-walk into full saturation given enough time - and once there, it is stuck permanently.
+
+**MEASURED, directly from the pilot's logged trajectory** (`campaign_trajectory_t9_stratified.json`, plotted
+in `plots/r89_ascription_trap.png` / `_zoom.png`):
+- Steps 1-2600: genuine oscillation. `ascribed_frac` ranges from 0.0 up to 0.68 and back down to 0.03-0.13
+  repeatedly; `frac_gumsa` swings 0.3-1.0. This is the intended Leach gumsa<->gumlao dynamic, and it is real for
+  the first 65% of the pilot.
+- Step 2600 -> 2625 (one 25-step window): `ascribed_frac` jumps 0.651 -> 1.0 population-wide; `frac_gumsa`
+  hits 1.0 simultaneously.
+- Steps 2625-4000 (remaining 1375 steps, 34% of the pilot): `ascribed_frac`/`frac_gumsa` pinned at exactly
+  1.0, zero deviation across 39 checkpoints. `leader_tenure` frozen 9.2-9.3yr. No reversions.
+
+**T-9's actual metrics are computed from lineage counts, not cred - confirmed by reading `dynasties()`.**
+`eff_lineages`/`lin_top_share`/`size_gini` are computed purely from `sizes = [len(v) for v in groups.values()]`
+(population count per patriline); no `cred` term appears anywhere in that calculation, so BUG 1 cannot
+contaminate them directly.
+
+**BUG 2's effect on T-9's metrics, in THIS pilot, is small and continuous with the pre-trap trend, not a
+discontinuity.** Directly measured (excluding the initial 1200-step founder shakeout, which is ordinary
+finite-population lineage extinction, same process R-66/connubium-cut2 already characterized):
+
+| | pre-trap (step 1200-2625) | post-trap (step 2625-4000) |
+|---|---|---|
+| eff_lineages, mean | 3.39 (range 2.9-4.4) | 3.00 (range 2.9-3.1) |
+| lin_top_share, mean | 0.430 (range 0.406-0.450) | 0.444 (range 0.407-0.472) |
+
+Both continue the same slow-consolidation direction they were already on (n_lineages itself falls 8 -> 5 across
+steps 2400-2800, smoothly through the trap boundary) - a modest further tightening, not a jump timed to the
+trap.
+
+**BUT this pilot cannot clear the full campaign.** The trap had only 1375 of 4000 steps (34%) to act here. A
+15,000-step campaign (3.75x longer, same population-scale dynamics) would be expected to hit the same trap at a
+similarly early step and then spend roughly 12,000+ steps - 80%+ of the run - frozen in a state the mechanism
+was never designed to reach. Whether the modest post-trap drift seen above stays modest over 10,000+ additional
+trapped steps, rather than compounding, is not established by a 1375-step window. Running the full campaign on
+the mechanism as-is means the "stratified" arm's headline numbers would mostly describe a broken-oscillator
+end-state, not the Leach cycle R-87/88 were built to produce.
+
+**RECOMMENDATION, ACTIONED.** Fixed BUG 2: `_do_delegitimation()` now falls back to the population-wide
+commoner mean when a band has ascribed members but none of its own commoners left (`sic_games/phase1_model.py`,
+`_do_delegitimation`), so a fully-ascribed band remains capable of reverting. Bands that still have live
+commoners of their own are untouched — confirmed byte-for-byte, see validation below. Two new regression tests
+(`test_saturation_trap_is_fixed_by_the_population_fallback`, `test_fully_ascribed_band_can_still_revert`) force
+the exact broken state directly and check resentment builds/fires. Full suite: 812 passed, 1 xfailed (was 810
+before the two new tests). BUG 1 (fixed cred-relaxation target) left as-is per plan — see validation below for
+whether it still matters.
+
+**VALIDATION, part 1: the fix is inert on unaffected bands.** Re-ran the stratified arm at the pilot's own
+scale (`campaign_progress_t9_stratified_fix.txt`, 6000 steps, 50% longer than the original pilot). Steps 1-200
+are reproduced BIT-FOR-BIT against the original pre-fix pilot (every logged field, to the printed decimal) -
+exactly as expected, since the fix only changes behaviour in the specific edge case (`not oth` while `asc` is
+non-empty) that does not arise that early.
+
+**VALIDATION, part 2: at full campaign scale, still no recovery within 6000 steps - the fix looked dead on
+arrival.** `ascribed_frac` saturated even earlier this time (step 1950 vs. 2625) and then stayed pinned at
+exactly 1.0 for the remaining 4050 steps (67.5% of the run), same as the unfixed pilot. Zero reversions logged.
+This is NOT a sign the fix doesn't work (see part 3) - `run_campaign.py` was never logging
+`mean_resentment`/`max_resentment`, so there was no way to see whether resentment was climbing toward threshold
+and simply hadn't arrived yet, or was genuinely inert.
+
+**VALIDATION, part 3: a small, per-step-instrumented probe (`probe_r89_fix.py`, N=500, the campaign's actual
+ELITE_KW values - `resent_alpha=0.001`, `resent_threshold=0.5`, `resent_privilege_ref=10.0`, nothing
+hair-triggered) settles it directly: the fix works, and the pre-fix code could not possibly have produced
+this under any parameter setting.** Plotted in `plots/r89_fix_validation.png`:
+
+- Steps ~400-2650: `max_resent` (the most-resentful band) sits flat at 0.225 for ~2250 steps - unremarkable;
+  R-88 already established band churn resets most bands' resentment long before a slow (alpha=0.001, ~1000-step
+  time-constant) EMA matures, so individual bands plateau at whatever their local privilege gap supports.
+- Step ~2650 on (population-wide `ascribed_frac` locks near 1.0): `max_resent` and `mean_resent` both start
+  climbing in a sustained way for the first time - the population-wide fallback engaging exactly where it
+  should.
+- **Step 3102: `max_resent` reaches 0.5 and a reversion FIRES.** `ascribed_frac` drops 1.000 -> 0.611 in a
+  single step - "every lineage present loses ascription", exactly the reversion code's documented behaviour.
+  Under the pre-fix code this was mathematically impossible: `oth` was empty, so resentment could only decay,
+  never reach the threshold, ever, regardless of `resent_alpha`/`resent_threshold`/any other parameter. This is
+  a structural difference, not a tuning one.
+- After the reversion: `max_resent` snaps to 0.489 (a DIFFERENT band, one that did not revert) and sits there
+  for the remaining 2400 steps without crossing again, while `ascribed_frac` climbs back to ~0.97-0.98 and
+  `mean_resent` decays 0.20 -> 0.02. Plausible mechanism, not yet directly confirmed: the reverted band's
+  ex-nobles carry residual high cred (cred is not reset on reversion, only status is), so they raise the
+  population-wide commoner baseline everyone else's fallback compares against, damping the remaining stuck
+  band's privilege signal just below threshold.
+
+**READING THE TIMESCALE.** One full cycle (climb, cross, partial recovery) took ~3100 of 5500 probed steps at
+N=500; the real campaign-scale run got 4050 post-saturation steps without completing one. Slow and irregular is
+consistent with what R-87/88 set out to model in the first place - Leach's own claim is that hereditary
+inequality "lasted for A FEW GENERATIONS, and then collapsed" (generational, not a fast flicker), and R-88
+already established that no band-attached social memory can express a timescale the band substrate itself
+outlives. **What changed is not the speed of the cycle - it is that a cycle can now complete AT ALL.** The
+open question this does not resolve: whether the full 15,000-step campaign (roughly 3x this probe's horizon,
+and with ~13,000 steps of runway past a saturation onset around step 2000) sees multiple reversions, one, or
+lands in another multi-thousand-step plateau like the 2400-step one observed here. Not settled by current
+evidence either way.
+
+### R-90 - Lineage BRANCHING: the mechanism was necessary, the SHAPE was wrong (2026-07-20)
+
+*(Documented retroactively 2026-07-21 - the mechanism was built and committed at the time, the RESULTS entry
+was missed. Superseded in shape by R-92; recorded because the FAILURE is the instructive part.)*
+
+**Origin.** R-89 established `_lineage` was founder-seeded and only ever LOST by extinction, never created - an
+absorbing Markov chain, so fixation has probability 1. Measured: 3000 founding patrilines -> 5 by step 1950,
+then frozen at exactly 5 for the next 5,650 steps. That breaks the FILED Hill 2011 target R-25 already passed
+(~7 lineages/band is impossible with 5 worldwide) and freezes the elite layer.
+
+**Built:** the standard infinite-allele device already used by `genome_mutation` - with probability
+`lineage_branch_rate` a newborn founds a new named line. Default OFF, no RNG draw when off, bit-exact.
+
+**MEASURED, and it FAILED on the statistic that matters.** Campaign scale, 3000 founders x 3000 steps:
+n_lineages rose 5 -> 32, but `eff_lineages` (inverse-Simpson) FELL 3.4 -> 1.8 and `top_share` ROSE 0.42 -> 0.73.
+`lineages_per_band` barely moved (2.14 -> 2.33 against a target of ~7). **Diversity up on paper, down in
+substance.** Cause: a per-birth branch mints a SINGLETON, and a lineage of one usually leaves no descendants, so
+the mechanism adds a churning tail of ephemeral names while the dominant lineage keeps its mass untouched.
+
+**It DID fix the R-89 trap** (1,089 reversions in the final third vs 0 for the control), which is why the
+diagnosis needed BOTH statistics - judged on `n_lineages` alone it looked like a success.
+
+**THREE METHOD ERRORS, all caught before they shipped a number, all recorded because they recur:**
+- the presence test was UNDERPOWERED: at rate 0.05 the world gives ~51 births in 60 steps => ~2.6 expected
+  events => P(zero) ~ 7%, and seed 0 drew zero, failing a test whose mechanism was working.
+- the first calibration sweep had NO POSITIVE CONTROL (D1/D4): on the plain substrate the Hill target was
+  already met AT RATE 0.0 (7.34 lin/band), so the swept parameter was not rate-limiting and the sweep could
+  only ever have said "change nothing". The collapse requires the ELITE STACK, where male_rs_gini ~0.70.
+- a monotone population drop across that sweep (3490 -> 635) was checked and is NOT real: 3 seeds x 2 rates x
+  elite on/off gives 631 vs 634 and 329 vs 328. Single-seed RNG-stream divergence; within-condition spread
+  (802/647/444) exceeds any between-condition difference.
+
+**Interpretation that survives.** Male-lineage collapse under an inequality layer is what Karmin 2015 REPORTS
+(female Ne up to 17x male Ne, 8-4 kya). The model reproducing a Y-bottleneck is CORRECT; what is wrong is that
+it cannot RECOVER from one, because named lines could only die. See R-92 for the corrected shape.
+
+---
+
+### R-91 - CONSISTENCY INVARIANTS: complaining when two numbers cannot both be true (2026-07-20)
+
+*(Documented retroactively 2026-07-21; tool committed at the time.)*
+
+**Why it exists, and why it is not more D-series.** D1-D14 ask *"is this measurement trustworthy?"* and they
+work - in one session they caught an underpowered test, a sweep with no positive control, and a fake population
+crash. They do NOT catch the failure behind R-89/R-90's worst errors, where every number was INDIVIDUALLY
+CORRECT and the RELATIONSHIP between them was impossible. `ascribed_frac=1.0` sat beside `pct_stratified=11.5`
+in the SAME log line for hours, unnoticed. **More FIELDS do not help - that line already carried ~20. Passive
+reporting is exactly what failed.** `sic_games/invariants.py` is ACTIVE: it returns violations and the harness
+prints them, so a 90-minute run says something is incoherent at minute 3.
+
+**Four rule classes**, each generalised from a real failure rather than invented: CONTRADICTION (two fields
+mutually impossible) - DOMAIN (a threshold on a share whose hidden denominator drifted) - FROZEN (a cumulative
+counter that stopped while its driver is live) - STUCK (a field that should fluctuate, pinned).
+
+**Validated as an INSTRUMENT (D1 applied reflexively).** Every rule is exercised first on a reconstruction of
+the actual observed failure, then on a healthy trajectory that must stay silent - the null is asserted before
+any positive is trusted. It also must NOT fire when high ascription is accompanied by genuinely ranked
+societies, i.e. it keys on the contradiction, not on one field being large.
+
+**EARLINESS, the whole point.** Replayed on the R-90 control arm it names the ROOT CAUSE (share threshold
+degenerate) at **step 475**, against step 1950 where the collapse first became visible by eye - about 2.5
+minutes into a 16-minute run.
+
+**IT SURFACED A FINDING NOBODY HAD LOOKED FOR.** Replayed over all 15 archived campaign trajectories, **every
+historical run reached the absorbing lineage state**: the R-66 deep-time arms froze at step ~5,700-5,800 of
+15,000 (61-62% of the run); the R-67 45,000-step cycling tests at 11,525 and 14,850 (74% and 67%). Those runs'
+DYNASTY numbers were therefore measured in a pool that could no longer change. It discriminates rather than
+firing everywhere: `t9_baseline` (no elite stack) and both swidden runs come back clean.
+
+**R-66 RE-CHECK, done from the archived trajectories (no re-runs needed).** Dynasty metrics AT the freeze point
+vs at end-of-run: `off` top_share 0.317 -> 0.886 (eff_lineages 6.6 -> 1.3); `on` 0.630 -> 0.453 (eff 2.4 -> 3.3).
+**R-66's DIRECTION survives and is real** - with defensibility off one patriline runs away, with it on the
+system resists, and eff_lineages RISING under `on` is not something drift alone produces. **What does not
+survive is the headline NUMBER:** 88.6% is the endpoint of a closed pool, where fixation is near-guaranteed
+given enough time, not a measured property of defensibility. R-67's claims (no cycling; connubium breaking
+fixation) hold at BOTH the freeze point and the end, and stand unchanged.
+
+**Two defects in the checker itself, found later by running it on R-93's fix** - see R-93.
+
+---
+
+### R-92 - Lineage SEGMENTATION works; the per-band target is blocked by a CEILING, not by the mechanism (2026-07-21)
+
+**Origin.** R-90's per-birth branching had the wrong shape: it minted SINGLETON lineages, which mostly die, so
+it inflated the lineage COUNT while concentration got worse (n_lineages 5->32 but eff_lineages 3.4->1.8,
+top_share 0.42->0.73). Replaced by a PAIR - branching now seeds a heritable `_subclan` tag (singletons harmless
+there), and `_do_lineage_split` promotes a sub-branch to a full lineage only once it has grown.
+
+**A DESIGN CONSTRAINT DISCOVERED BY MEASUREMENT, not assumed.** The first cut split off "the live patrilineal
+descendants of an apical ancestor" - the textbook sub-clade. It is not computable here: live `_father` chains
+reach a MAXIMUM DEPTH OF 2 (median 1) even after 400 steps, because a chain terminates at the first ancestor
+born without an assigned father and early births largely lack one (father-link rate 19% at step 80 -> 74% by
+step 400). Deep ancestry exists only in the offline genealogy CSV, never in memory. Hence the inherited tag,
+which is in any case what a Y-haplogroup label actually is.
+
+**MEASURED at campaign scale** (3000 founders x 3000 steps, elite stack ON, all arms identical otherwise):
+
+| arm | n_lineages | eff_lineages | top_share | lineages/band |
+|---|---|---|---|---|
+| control (no mechanism) | 5 | 3.4 | 0.422 | 2.14 |
+| R-90 singleton branching | 32 | 1.8 | 0.733 | 2.33 |
+| **R-92 segmentation, rate 3e-5** | 28 | **5.9** | **0.235** | **3.69** |
+| R-92 segmentation, rate 1.5e-4 | 82 | 4.1 | 0.347 | 3.51 |
+
+**RATE IS NOT THE LEVER, and pushing it reproduces the pathology it was built to fix.** 5x the rate gives 3x
+the lineages but LOWER effective diversity and HIGHER concentration - splitting faster shatters lineages into
+fragments quicker than they can grow. The LOW rate is adopted as the better setting.
+
+**INDEPENDENT CONFIRMATION from R-91.** The consistency checker - written before these runs existed and not
+touched for them - drops from SIX violations on the control (frozen lineage pool, dead reversion mechanism,
+ascription pinned at 1.0, frac_gumsa pinned, rank-vs-society contradiction, absorbing state) to exactly ONE on
+both segmentation arms. The R-89 trap and the absorbing state are gone.
+
+**THE HILL TARGET IS STILL MISSED (3.69 vs ~7), and the reason is a CEILING the mechanism cannot lift.**
+Computed null, two independent routes agreeing to 2dp: for a band of size b drawn at random from a distribution
+with inverse-Simpson E, expected distinct lineages = E*(1-(1-1/E)^b) ~ E, because b (~29) >> E. **So
+`lineages_per_band` is bounded above by `eff_lineages`** - 7 per band is arithmetically impossible while the
+effective count worldwide is 5.9, at any rate. Two separate deficits therefore remain, NEITHER of them the
+segmentation rate:
+  (a) eff_lineages must exceed ~7 - needs a more EVEN lineage-size distribution, and raising the split rate
+      moves it the wrong way (5.9 -> 4.1);
+  (b) observed lpb is only 63% of even that ceiling (3.69 vs 5.87) - bands over-represent locally-resident
+      lineages. This is SPATIAL, i.e. the marriage-relocation/connubium machinery (cf. R-67/R-68 on Cut-2's
+      spatial effects), not the descent mechanism.
+
+**CAVEAT ON THAT NULL, recorded so the 63% is not over-read.** It assumes equal-sized lineages, so it
+UNDER-estimates expected distinct for a skewed distribution - which is why the R-90 arm reads a nonsensical
+129%. For the segmentation arms the true shortfall is therefore WORSE than 63%; the clustering conclusion is
+conservative.
+
+**Single seed per arm.** The large contrasts (eff 5.9 vs 1.8) are far beyond noise; the smaller ones are not
+defended without replication.
+
+### R-93 - Relative legitimacy: fixing one hidden denominator immediately exposes the next (2026-07-21)
+
+**The fix.** `legit_threshold` compared a lineage's SHARE of its band's feasting to a CONSTANT. Mean share is
+1/lineages_per_band, so the test discriminated only above 1/0.15 = 6.67 lineages/band, against a FILED Hill 2011
+target of ~7 - a FIVE PERCENT margin. Measured lpb was 2.14-3.69, so the AVERAGE lineage cleared the bar and
+nobility was universal by arithmetic. Now normalised by the competing-lineage count: 1.0 means "exactly an
+average lineage". Scale-free, and Friedman's own logic.
+
+**MEASURED at campaign scale** (3000 founders x 3000 steps, elite stack ON, segmentation ON in both R-92/R-93):
+
+| arm | n_lineages | eff_lineages | top_share | lineages/band | ascribed | strat% |
+|---|---|---|---|---|---|---|
+| control | 5 | 3.4 | 0.422 | 2.14 | 1.000 | 11.5 |
+| R-92 segmentation | 28 | 5.9 | 0.235 | 3.69 | 0.581 | 7.8 |
+| **R-93 + relative** | **96** | **18.1** | **0.154** | **6.66** | **0.063** | **23.3** |
+
+**lineages_per_band 6.66 against the Hill target of ~7 - essentially met**, from 2.14 at the start of this arc.
+R-92 alone could not get there because lpb is bounded above by eff_lineages; relative legitimacy lifted
+eff_lineages to 18.1, which raised the ceiling. Nobility is now a real 6% minority rather than everyone.
+
+**BUT: the reversion mechanism now NEVER FIRES.** cum_reversions = 0 across all 3000 steps, against 5,741 in the
+R-92 arm. Diagnosed: resentment peaks at 0.166 against `resent_threshold` 0.5, where R-92 peaked at 0.499.
+Privilege is `(mean_cred_ascribed - mean_cred_other)/mean_cred_other / resent_privilege_ref`, and
+`resent_privilege_ref=10.0` was implicitly calibrated in the regime where ascription was UNIVERSAL and cred
+saturated toward 1+legit_cred_gain=11. With nobility a genuine minority the privilege signal is much smaller and
+the threshold sits out of range.
+
+**THE SAME BUG CLASS, ONE LAYER DOWN.** `resent_privilege_ref` is a normaliser and `resent_threshold` a
+threshold on the normalised quantity - the identical structure to the bug just fixed, calibrated against the
+BROKEN version of the mechanism upstream. Fixing the forward mechanism moved the regime out from under the
+reverse one. Any threshold on a normalised quantity has a validity domain; this is the third instance in three
+results (legit_threshold, resent_privilege_ref, and R-92's rate/eff interaction).
+
+**TWO DEFECTS IN THE R-91 CHECKER ITSELF, found by running it on the fix:**
+- it reported the quiet reversion counter as *"the reversion mechanism is dead"* at step 475, when at that point
+  a resent_alpha=0.001 EMA (~1000-step constant) had simply not matured. The outcome was right, the stated cause
+  wrong - and a checker that misattributes a cause sends the reader hunting in the wrong place. Now separates
+  STOPPED (was firing, died) from NEVER-FIRED (longer window, and points at the threshold's range).
+- the OFFLINE CLI re-check produced a false DOMAIN positive on an already-fixed run, because trajectory `meta`
+  did not record the mode while the live harness passed it correctly. `meta` now carries it.
+
+**Not yet done:** re-anchor `resent_privilege_ref`/`resent_threshold` for the minority-elite regime, then re-test
+whether the gumsa<->gumlao cycle returns. Single seed.
+
+### R-94 - Scale-free resentment: privilege as an EFFECT SIZE (2026-07-21)
+
+*(Documented retroactively 2026-07-21 with R-95/R-96/R-98; all four were committed at the time.)*
+
+**Third instance of charter D15 in three consecutive results.** Privilege was
+`(m_asc - m_oth)/m_oth / resent_privilege_ref`, and ref=10.0 had been chosen while ascription was UNIVERSAL and
+cred saturated toward `1+legit_cred_gain`=11. When R-93 made nobility a real 6% minority the gap shrank,
+resentment peaked at 0.166 against a 0.5 threshold, and reversions NEVER fired - 0 in 3000 steps against 5,741
+before. **The reverse mechanism had been calibrated against the BROKEN forward mechanism**, so repairing the
+forward one moved the regime out from under it.
+
+**Fix, per D15: scale-free rather than re-tuned.** Privilege is now the gap in units of the band's OWN pooled
+spread - an effect size, with no denominator left to drift - and the threshold is ANCHORED on Cohen's
+conventions (0.8 = "large") instead of invented. Guards: sd≈0 yields zero privilege rather than dividing by
+zero, and the value is capped so one near-uniform band cannot dominate the accumulator off a tiny absolute gap.
+
+**A PERFORMANCE BUG introduced and fixed here, recorded because the symptom was misleading:** the first cut
+rebuilt `asc + pop_oth_cred` per band whenever a band had no commoners of its own - O(pop) per band per step,
+~1.4M operations/step at campaign scale. The run went 3-4x slower at a LOWER population, which is what exposed
+it. Replaced with running sums hoisted once per step.
+
+---
+
+### R-95 - Resentment ACCUMULATES, and the VILLAGE holds it (2026-07-21)
+
+**Two paired fixes; neither works alone, and a test asserts that rather than leaving it as a claim.**
+
+**(a) The mechanism never accumulated.** `_do_delegitimation`'s own docstring says in capitals that resentment
+ACCUMULATES, after Leach. The code was an EMA, which does not accumulate - it TRACKS, converging to whatever it
+is fed. **A threshold at or above the typical privilege can therefore NEVER be crossed, at any horizon.**
+Measured: the grudge rose to **0.796 against a threshold of 0.800** and stopped there; 1 revolt in 3000 years.
+The irony worth recording is that 0.8 was correctly ANCHORED (Cohen "large") and the real effect sizes genuinely
+are ~0.8 - a good anchor pointed at the wrong quantity, because a running average cannot exceed its own mean.
+
+**(b) The memory outlived its container by ~40-100x.** R-88 measured band lifetime at 10.2 yr median / 17.5
+mean; the grudge needed 700-1600 yr to mature, and band fission resets it to zero. Leach's gumlao premises
+describe VILLAGES ("villages autonomous", headmen, councils of elders), not 25-person residential bands. Now
+held by the SETTLEMENT, following R-71's per-site precedent exactly: the place remembers, the members churn.
+
+**What is now anchored, and what stopped being free:** the crossing threshold is FIXED AT 1.0 by construction -
+it is no longer a knob. What is calibrated instead is a TIME, `resent_years_to_revolt`=80, from Flannery ch.10's
+*"lasted for a few generations, and then collapsed"*. Privilege scales it: twice the gap, half the wait.
+
+**RESULT: revolts fire (323 vs 0 and 1) but nobility is EXTERMINATED rather than cycled** - villages holding
+nobility fell 82% -> 3%, and the revolt curve flattened for want of anything left to overthrow. That exposed
+R-96.
+
+---
+
+### R-96 - Rank is LOCAL: a lineage is noble in a place, not in the world (2026-07-21)
+
+**A SCOPE MISMATCH present since R-86.** `_lineage_ascribed` was a single GLOBAL set while every mechanism
+acting on it is local, so `discard(lineage)` at a revolt de-ranked that lineage in EVERY other village at the
+same instant. Measured: ~7% of all lineages stripped per revolt, which is why R-95 annihilated nobility instead
+of cycling it. **It contradicts the anchor head-on** - Leach's observation is that communities sit in DIFFERENT
+states simultaneously; a single global set cannot represent that at any parameter setting.
+
+**Invisible until now for the recurring reason:** before R-93 the ascription threshold was degenerate, so status
+was re-earned within a few years and the global strip was undone before anyone could notice the scope was wrong.
+Fixing the threshold made status genuinely hard to earn, at which point the same strip became permanent.
+
+**Rank is now keyed per (community, lineage).** The key is polymorphic - a bare lineage id when off, a pair when
+on - so ONE code path serves both and OFF stays bit-exact (the 15 existing legitimacy tests pass unchanged).
+
+**RESULT - the first arm where nobility and revolts COEXIST:**
+
+| arm | ascribed | revolts | frac_gumsa |
+|---|---|---|---|
+| R-93 | 0.063 | 0 | decaying (nobility permanent, never overthrown) |
+| R-95 global rank | 0.006 | 323 | 0.03 (nobility annihilated) |
+| **R-96 local rank** | **0.365** | **678** | **0.58-0.99 (a patchwork)** |
+
+Also eff_lineages 10.0, lineages_per_band 6.12, gini_cred 0.508, strat 19.9%.
+
+**A TEST FAILED USEFULLY and became a finding:** with rank keyed to BANDS nobody is ever ennobled at all,
+because the legitimacy stock resets on band fission (~10 yr) while needing ~50 to mature - R-95's container
+churn reappearing one level up, in the FORWARD mechanism. Local rank therefore REQUIRES a persistent community;
+that dependency is now a standing test.
+
+---
+
+### R-98 - RANK unlocks HIERARCHY (2026-07-21)
+
+**The gap.** `society_from_character(density, surplus_frac)` reads CROWDING and SURPLUS only and never asks
+whether anyone is ranked. So a village where every lineage is hereditary nobility stayed labelled
+`egalitarian_forager` if sparse and poor - and since `LEADER_SOCIETY_WEIGHT` is **0.0** there, that nobility had
+NO structural consequence: no growth past the band cap, no scalar-stress relief (Johnson 1982), the entire elite
+layer decorative with respect to settlement size. **The model had surplus->hierarchy but not rank->hierarchy.**
+This is what the R-91 checker flags as the rank-vs-society CONTRADICTION.
+
+**The anchor says rank can come first.** Leach's gumsa were rain-fed SWIDDEN HILL FARMERS - no storable glut, no
+great surplus - yet had ranked lineages, chiefs, tribute and "all settlements under one chief". Testart's
+storable-surplus route is ONE road to hierarchy, not the only one. The promotion is therefore applied AFTER the
+aquatic gate, deliberately overriding it.
+
+**A band holding ranked lineages climbs ONE rung** (egalitarian -> complex -> stratified, stratified a fixed
+point), converting leader weight 0.0 -> 0.5. Rank opens the route; it does not hand out chiefdoms.
+
+**Threshold DERIVED, not picked:** 0.15 ~ 1/7, because the FILED Hill 2011 target is ~7 lineages/band, so one
+ranked lineage among them is ~0.14 of heads. It means "at least one lineage here is ranked".
+
+**INHERITANCE LIT AUDIT (asked 2026-07-21), recorded here since it scopes the next mechanism:**
+- **by SOCIETY - QUANTIFIED.** BHM 2009 Table 2 `beta material`: hunter-gatherer 0.17, horticultural 0.09,
+  pastoral 0.67, agricultural 0.55. Filed + verified, and the same table the alpha weights already come from.
+- **by RANK - ATTESTED, NOT QUANTIFIED.** gumsa "elite bride-price higher" vs gumlao "equal bride-price";
+  "splits produce senior/junior" vs "no senior/junior". Direction anchored, magnitude would be [DESIGN].
+- **by GEOGRAPHY - NOTHING NEW NEEDED.** BHM's categories are economic systems, and terrain acts THROUGH
+  subsistence; biome->society already exists, so plains vs mountain differ by supporting different economies.
+
+---
+
+### R-97 - The elite layer WORKS and still does not cycle. Turchin's cycles are not at this SCALE (2026-07-21)
+
+**The question this arc existed to answer.** R-67/R-68/R-71 gave three independent negatives for secular cycles
+from the subsistence base, and the standing conclusion (DE-14) was that cycles REQUIRE the explicit Turchin
+elite/instability layer. That layer now works: R-96 sustains a real noble minority AND ongoing revolts, in a
+patchwork of ranked and egalitarian villages (ascribed 0.365, 678 revolts, frac_gumsa ranging 0.58-0.99). So:
+does it cycle?
+
+**INSTRUMENT REUSED, NOT REBUILT.** `probe_hcycles.period_of` — the detector fixed twice and supervisor-approved
+in R-87c/d (linear detrend; period capped at window/3; a genuine local maximum required). Null floor from R-87's
+own white-noise calibration: ac_peak mean 0.03, **p95 0.13**, max 0.19. Compared against 0.13, not an invented
+cut-off (using an invented 0.2 was R-87c's original error).
+
+**D1 FIRST — the detector was re-validated at THIS resolution before any negative was read.** Campaign snapshots
+are 121 points at 25-step spacing, far coarser than the series R-87 validated on, so an underpowered detector
+would have produced a worthless negative. Injecting known cycles into noise matched to the observed magnitude
+(sd 0.143): **9/9 DETECTED**, down to amplitude 0.08 — i.e. smaller than the variation actually present in the
+arms. The instrument is adequate; a negative is interpretable.
+
+**RESULT — all four arms below the noise floor** (`probe_r97_cycles.py`, series `frac_gumsa`):
+
+| arm | sd | period reported | ac_peak | vs null 0.13 |
+|---|---|---|---|---|
+| coastal (R-96) | 0.172 | 375 yr | 0.068 | BELOW |
+| tropical, no soil | 0.131 | 500 yr | 0.083 | BELOW |
+| tropical, rotation OFF | 0.131 | 500 yr | 0.078 | BELOW |
+| TRUE swidden (rotation ON) | 0.137 | 825 yr | **-0.008** | BELOW |
+
+**NO CYCLES. A FOURTH independent negative, and the first from the elite side.**
+
+**WHY, and it is visible in the mechanism rather than inferred.** Villages DO flip — thousands of revolts in
+every arm. But each village keeps its own grudge against its own nobles and revolts when its own threshold is
+crossed. **Nothing couples one village's timing to its neighbours'.** Independent oscillators with no coupling
+sum to a flat aggregate, which is exactly what the series show.
+
+**THE REFRAME, which is the actual finding.** The missing ingredient is not a better elite mechanism — it is a
+LEVEL OF POLITICAL ORGANISATION this model does not have. Turchin's secular cycles are a property of STATES:
+taxation, standing armies, elite overproduction competing for a finite number of OFFICES, fiscal crisis. What
+synchronises local rise-and-fall into an aggregate cycle is a superordinate polity that all the villages belong
+to. **We built the Kachin; Turchin was writing about kingdoms.** Autonomous villages with big men and hereditary
+rank produce exactly what Leach describes — local, unsynchronised rise and fall — and that is what the model now
+reproduces. The negative is therefore evidence about SCALE, not a failure of the elite layer.
+
+**This was already flagged twice and proceeded past.** ROADMAP's Dynamic Social Evolution stage says the Ibn
+Khaldun dynastic cycle *"needs a large settled/stratified polity (a keystone chief + succession crisis); the
+current model tops out at mobile-forager bands ~25, so the settlement/high-tier-resource substrate is a
+PREREQUISITE."* The prerequisite was recorded and the elite layer was built at village scale anyway.
+
+**Where the next rung is already visible in filed sources:** the gumsa premises describe *"all settlements under
+one chief"* with tribute flowing upward; Flannery ch.16 (Tonga) gives sacred/secular chief splits, assassination
+constrained by mana, and resource allocation as the balancing knob — filed, extracted, and unbuilt. R-64 already
+produces stratified CENTRES above ordinary villages, so the substrate has the beginnings of a hierarchy that the
+political layer was never attached to.
+
+**CONSEQUENCE for DE-14:** its conclusion ("cycles require the explicit Turchin elite layer") is now SUPERSEDED —
+the elite layer is necessary-but-not-sufficient. See the dated revision there.
+
+---
+
+### R-106 - The demography and the missing Malthus are ONE defect: nothing in this model can be HUNGRY (2026-07-30)
+
+**The question.** Two standing complaints: the population is far too young (median age 13 vs ~20) with too many
+motherless children (8-11% vs Ache ~2%), and no Malthusian/secular cycles ever emerge. Asked to fix the
+demography as an EMERGENT property, not by forcing a rate.
+
+**FOUR OF MY OWN HYPOTHESES WERE FALSIFIED BEFORE THE REAL ONE SURVIVED.** Recorded because each was plausible
+and each cost a measurement:
+1. *"It is a GROWTH artefact - the population is still climbing."* NO. Starts of 3k/12k/20k all converge on the
+   same ~4.8k with the same age structure; the dense starts CRASH. This is the equilibrium demography.
+2. *"Everyone is pinned at the reserve cap."* NO. Only 0.6-0.8% are at the cap. (My `wealth/floor` metric had
+   divided by `reserve_scale()`, which scales with wealth - the normalisation manufactured the flatness.)
+3. *"Mortality MULTIPLIERS are stacking."* NO. Ablating density-disease, terrain-risk or orphan-mortality each
+   moves e0 by <0.5 yr, and `a2_cap` never binds (0 hits).
+4. *"Agglomeration gives INCREASING returns, so density-dependence has the wrong SIGN."* NO. Fitting S ~ n^gamma
+   gives gamma 0.805 - decreasing returns. Crowding does not pay.
+
+**THE CHAIN, every link measured (coastal/temperate, 900-1200 steps, 5x density range):**
+1. Burn is ~68% of the floor-to-full reserve span per step, so an agent either re-saturates at the cap or dies
+   within a step. Margin at the trough: **0.46 burn-steps** - nobody survives one missed harvest.
+2. Both fertility-brake candidates are therefore CONSTANTS: post-harvest reserve 0.996 of full, post-burn trough
+   (`_condition`) 0.318, each with spread ~0.002 and ZERO density response.
+3. So `energetic_fertility_factor` returns ~0.995 always. The brake is inert BY CONSTRUCTION.
+4. Births cannot respond: CBR 53.8 -> 52.0 across 5x density (-3%).
+5. Regulation falls entirely on mortality: CDR 48.5 -> 77.0 (+59%), starvation 46% -> 61% of deaths.
+6. A stationary population has e0 = 1/CDR, hence **e0 20.7**, median age 13, motherless 8-11%.
+7. The young population and the orphan rate are ONE symptom with ONE cause, seven links upstream.
+
+Deaths before age 1 are 11.5% of deaths (~= q(0) in a stationary population), MATCHING the Ache ~12%. The excess
+is in ages 1-5 (29.7% vs ~20%) and it is not in the multipliers - it is the mortality-only regulation.
+
+**This partially re-derives R-12/R-13 ("starvation-dominated, unrealistically strong") from the fertility side,
+and it is consistent with R-16/R-17:** at r=0 e0 is FERTILITY-pinned, with a documented stationary e0 ~28. Our
+20.7 sits ~7 yr below even that, and the fact that mortality does 100% of the regulating is the defect.
+
+**WHY NO MALTHUS - two independent obstacles.**
+- **The world is 99% EMPTY.** 4.8k agents occupy **88-100 of 10,000 cells** while **94.1% of cells could feed at
+  least one forager** (median cell cv = 1.62x burn). The population never approaches the resource base, so
+  aggregate scarcity is impossible. This clumping PERSISTS with agglomeration AND sedentism both off (109
+  cells), so band co-residence drives it independently. **OPEN.**
+- **The gradient is flattened ~5x.** Per-capita elasticity: full stack **-0.195**, aggl off -0.387, aggl+sedentism
+  off **-1.062** (textbook sharing). Doubling a cell's population costs each occupant only 13%. The third arm
+  doubles as a SELECTION CONTROL - with no mechanism adding S, gamma ~ 0 shows richer cells are not drawing
+  proportionally larger crowds, so the cross-sectional fit is not badly confounded.
+
+Regulation is **distributional, not Malthusian**: in crowded cells the MEAN occupant gets 2.10x subsistence
+while 11-15% fall below it. The average agent never experiences scarcity.
+
+**POSITIVE CONTROL (gradient is NOT the lever).** Ran 500 model-yr at all three elasticities. No oscillation at
+any of them; population CV non-monotonic (10.9 / 4.5 / 16.1%); deaths out-swung births in ALL arms (CV ratio
+0.56 / 0.46 / 0.45). Steepening scarcity does not move regulation to the birth side - it just kills more people
+(equilibrium 5258 -> 763 -> 261).
+> **INSTRUMENT CAVEAT - this result is PROVISIONAL.** I wrote an ad-hoc periodogram instead of reusing
+> `probe_hcycles.period_of`, the detector fixed and approved in R-87c/d, and hit the failure it was fixed for:
+> mean-only detrending, so drift loaded onto the lowest scanned frequency and two arms reported a "period" of
+> exactly window/2. Re-running with linear detrend still pegged all three arms at the scan floor (=> red noise,
+> no characteristic timescale; 36-49 turning points = ~8-10 yr noise; residual CV 3.7-8.3% vs the 30-50% swings
+> of real secular cycles). **Must be re-run against `period_of` and its calibrated null floor (ac_peak p95
+> 0.13) before the negative is filed as firm.**
+
+**THE FIX - `enable_intake_fertility` (MECHANISMS; PARAMETERS §21.10).** Fertility reads a slow EMA of
+intake/requirement instead of a reserve level that cannot vary. Intake IS the live signal (p10 0.93 to p90 4.26
+of requirement) and is the biologically correct one - Ellison: fecundity tracks energy FLUX, not stored reserve.
+Thresholds ANCHORED, not tuned: 0 at maintenance, full at maintenance + the lactation increment (~+500 kcal/d on
+~2500, FAO/IOM => 1.2x). Accumulates only from menarche, because a juvenile's GATHERED intake understates what
+it EATS (juveniles are provisioned).
+
+**WHAT IT BOUGHT** (off -> on):
+
+| | n=3000 | n=15000 |
+|---|---|---|
+| e0 | 18.5 -> 20.5 | 19.1 -> **21.4** |
+| median age | 13.6 -> 15.2 | 13.4 -> **15.2** |
+| child frac | 53.6 -> 49.5% | 54.5 -> **49.6%** |
+| motherless | 6.1 -> 7.2% | 11.8 -> **7.9%** |
+| CBR | 54.3 -> 48.9 | 52.3 -> 47.1 |
+| CDR | 50.0 -> 44.5 | 73.6 -> 68.7 |
+
+**26-40% of the gap to the anchors closed**, and regulation MOVED from deaths to births: population CV over
+400 yr **7.9% -> 1.9%**. Births fall, deaths fall to match - the stationary identity working as predicted.
+
+**WHAT IT DID NOT BUY, and why.** No cycles. A working negative feedback with a **1.4-yr half-life is
+effectively instantaneous** on demographic timescales, so it DAMPS deviations (hence the CV collapse) rather
+than overshooting them. Standard population dynamics: instantaneous density-dependence => stable equilibrium;
+**DELAYED** density-dependence => oscillation. **Every feedback in this model is fast.** That is a sharper
+statement of R-97's negative: cycles need a SLOW variable, not merely an elite layer.
+
+**A DENSITY TEST THAT COULD NOT WORK, recorded so it is not repeated.** Comparing n=3000 vs n=15000 for a
+density response is void: both converge to the SAME equilibrium (~4.7-4.9k), so starting density washes out and
+there is no contrast to measure. Population must be the VARYING quantity (within-run), not a starting condition.
+
+**NEXT (agreed order):** (1) count DEPENDENTS in the requirement - a mother provisioning 3 children needs 2-3x
+her own maintenance, which is the anchored driver of forager birth spacing (Blurton Jones, Hadza) and should
+close more of the gap without tuning; (2) find a SLOW variable for lagged feedback (soil degradation under
+settlement; accumulated structural load) - the cycles question, now well-posed; (3) the clumping.
+
+**ADDENDUM (same day) — step (1) is BLOCKED, and the blocker is a bigger finding than the feature.**
+`enable_dependent_load` was built as planned: a mother's requirement widens by her juveniles' UNMET need, so a
+child who increasingly feeds itself costs her less with no explicit weaning schedule. It is **wired correctly
+and finds nothing**, because there are no dependents to find:
+
+| measured (village/elite preset, 300 steps) | value |
+|---|---|
+| life-history active | **yes** (`eta_min` 0.2, `cons_min` 0.3, auto-built) |
+| juveniles with a living mother-link | 91% |
+| juvenile `eta` (production) | median **0.529** |
+| juvenile `consumption_factor` (need) | median **0.588** |
+| juvenile deficit | median **−1.24 burn units** |
+| juveniles running ANY deficit | **1.0%** |
+
+**Children in this model are net food PRODUCERS**, clearing roughly 1.5× their own requirement. This
+contradicts **Kaplan 2000** — the net child deficit cited in `consumption_factor()`'s own docstring, and the
+anchor beneath human life-history theory (the long juvenile period, provisioning, grandmothering all exist
+*because* children run a deficit until ~18–20 yr). It is the same root cause as the fertility brake: at ~1.7×
+surplus intake **everyone** over-produces, including seven-year-olds.
+
+**Consequence:** the mechanism stays default-OFF and bit-exact, with the materiality test marked `xfail(strict)`
+so it TRIPS the moment children become dependent. **Unblock by recalibrating the juvenile `eta` ramp against
+Kaplan's production/consumption curves — not by tuning the load.** The current ramp is linear from `eta_min`
+over 0→180 months, giving a 7.5-yr-old eta ≈ 0.5, where Kaplan's foragers produce a small fraction of what
+they eat at that age. This also plausibly bears on the age structure directly: children who feed themselves
+neither die as dependents nor constrain their mothers.
+
+**ADDENDUM 2 — the Kaplan recalibration: mechanism FIXED, demography barely moves (2026-07-30).**
+The blocker above was diagnosed as the juvenile production ramp. It is LINEAR (η 0.2→1.0 over 0→180 months)
+against a linear consumption ramp (0.3→1.0), so η/c runs **0.67→1.0** — a *relative* deficit at every juvenile
+age, exactly as `consumption_factor()`'s docstring claims. But an ABSOLUTE deficit needs η/c < **0.588** at
+~1.7× cell shares, so the ratio never gets there. Kaplan's curves are **convex** (production near zero to ~10 yr,
+then steep); the model's are straight lines. Added `LifeHistoryConfig.eta_juvenile_exponent` (1.0 = the original
+linear ramp, **bit-exact default**), mirrored in the vectorised `soa_tier1.eta`.
+
+| arm (coastal/temperate, 1200 steps, brake ON) | pop | e₀ | deaths <5yr | med age | child | mless |
+|---|---|---|---|---|---|---|
+| linear (baseline) | 4688 | 20.5 | 27.8% | 15.2 | 49.5% | 7.2% |
+| convex exp=2 | 4779 | 19.3 | — | 14.6 | 51.0% | 6.1% |
+| convex exp=3 | 4326 | 19.0 | — | 14.6 | 50.9% | 7.0% |
+| convex exp=3 + dependent load | 4375 | 19.6 | 30.6% | **15.7** | **48.1%** | 7.0% |
+| + `provision_self_keep` 0.7 | 4038 | 20.3 | 28.7% | **15.7** | 48.6% | 8.0% |
+| + `provision_self_keep` 0.5 | 4804 | **21.0** | **27.6%** | 15.3 | 49.1% | **6.0%** |
+
+1. **Convexity DOES create dependency** — juveniles running a deficit rise **10% → 35%** as η@7.5yr falls
+   0.60 → 0.30. The Kaplan net-consumer anchor is met, and `enable_dependent_load` UNBLOCKS and works.
+2. **But it first made things worse** (e₀ 20.5 → 19.0): children who cannot feed themselves simply died. The
+   cause is that `enable_provisioning` was already ON with its load-bearing half OFF — `provision_self_keep`
+   defaults to **1.0**, so a mother gives only overflow she would have wasted and never draws on her own
+   reserve. **Provisioning was "on but dead" for the SAME root reason as everything else in R-106: no child
+   ever ran a deficit to provision.** Restoring tier 2 recovers e₀ 19.6 → 21.0 and under-5 deaths 30.6 → 27.6%.
+3. **Net against the linear baseline: e₀ +0.5 yr, motherless −1.2 pts, median age +0.1.** Mechanically the
+   model is now correct — real dependants, live provisioning, working dependent load — but **the remaining gap
+   to the anchors is NOT explained by juvenile production.** It is still the abundance/regulation problem.
+
+**NOT ADOPTED AS DEFAULTS.** `eta_juvenile_exponent` stays 1.0 and `provision_self_keep` stays 1.0. The
+exponent has a SHAPE anchor (Kaplan convexity) but no published value, and 0.5 for self-keep is a swept
+number with no anchor at all — adopting either on the strength of a sweep would be fitting to our own artefact,
+particularly since the deficit threshold (0.588) is itself set by the ~1.7× surplus that is the defect.
+**Revisit once the abundance is fixed**, when the required curvature can be derived rather than swept.
+
+**ADDENDUM 3 — METHODOLOGY CORRECTION: the "world is 99% empty" figure compared occupancy against an
+UNREACHABLE denominator (2026-07-30, caught by supervisor question).** Every diagnostic in this entry that
+measured world-scale land use (`diag_field.py`, the S~n^γ fit, the Malthusian positive control) built its
+world through `battery1_liveness._build()` — a helper designed for FAST, BOUNDED liveness/ablation tests, not
+world-scale questions. It passes `patch=24` into `NPPCapacityField`, which **zeroes harvest capacity outside a
+576-cell (24×24) window** (`capacity.py`: `E[~mask] = 0.0`). But `_forage_cap_field()`, used to compute "94.1%
+of cells habitable," reads `self._fields.forage_kcal` — the **raw, unpatched** terrain field for the full
+10,000-cell grid, a **different object** than `self._harvest_field`. So "88 occupied cells" was divided by a
+10,000-cell count that included ~9,000 cells the harness had already made unreachable. **Corrected: within the
+576 cells actually reachable, occupancy was 88/576 = 15.3%,** not 88/10,000 = 0.9%.
+
+**Re-run on the TRUE unconfined grid (`patch=None`, all ~9,600 habitable cells genuinely reachable), testing
+the supervisor's proposed fix directly — seed agents spread across the whole map instead of clustered:**
+
+| seeding | pop | occupied cells | % of 9604 habitable | mean occ/cell |
+|---|---|---|---|---|
+| clustered (old patch window) | 3189 | 335 | 3.5% | 9.5 |
+| **spread across the full grid** | **6299** | **230** | **2.4%** | **27.4** |
+
+**Spreading the seed made concentration WORSE, not better** — fewer cells used, ~3× the density per cell, and
+a larger total population. This DISPROVES "just seed them further apart" as a fix and rules out plain seed-
+position artefact as the driver. Wherever agents start, the dynamics pull them back into a small number of
+dense cells — which points at the mechanism ITSELF (the crowding/agglomeration bonus, or band cohesion
+resisting split) outweighing whatever pull the empty richer-per-capita land should exert, rather than at
+movement range or initial placement.
+
+**What this does and does not overturn.** The core R-106 chain is unaffected — intake/burn ratios, the S~n^γ
+elasticity fit, and the cycle positive control all compare cells or years AGAINST EACH OTHER within the same
+world, so they do not depend on the 10,000-cell denominator. What changes is the FRAMING of "obstacle 2": the
+unused-land fraction is a real and now CONFIRMED-NOT-A-SEED-ARTEFACT phenomenon, but its magnitude was
+overstated (≥85% of reachable land unused, not ~99% of the world), and the mechanism is now narrowed to
+agglomeration/cohesion rather than left as an open field-vs-terrain question.
+
+**STANDING WARNING for future diagnostics:** `battery1_liveness._build()` defaults to a small `patch` window
+built for cheap ablation checks. **Do not reuse it for any question about world-scale land use, dispersal, or
+carrying capacity without passing `patch=None`** and checking what `NPPCapacityField.patch` actually masks.
+
+**NEXT to finish diagnosing this:** compare, per agent, food where they stand against the best EMPTY reachable
+cell, and measure actual movement distances — to isolate whether the pull is the agglomeration bonus
+specifically or band-cohesion resistance to fissioning, before proposing a fix.
+
+**ADDENDUM 4 — the crowding pull IS the agglomeration bonus, not band cohesion; and it is compounded by a
+second, independent search-horizon defect (2026-07-30).** Ran the comparison Addendum 3 called for, on the
+TRUE unconfined world (`patch=None`, per the STANDING WARNING above): monkeypatched the live
+`diffusion_select_target` with a read-only replica that logs its full per-candidate breakdown (no RNG draws,
+so the model's dynamics and determinism are untouched), plus a whole-world scan for the best EMPTY habitable
+cell, at two regimes — early growth (step ~50-60, mean **5** occupants/cell) and true equilibrium (step
+700-900, mean **32-47** occupants/cell, population 5,030 → 6,511).
+
+1. **SEARCH HORIZON (structural, independent of any bonus).** `mobility_radius()` scales the movement stride
+   with the standing cell's RAW local NPP, not the agent's REALIZED per-capita share — so a cell packed with
+   40+ people still reads as "rich" and the radius never expands past the `enable_productivity_mobility`
+   floor. Measured: **`r_used == 1` in 143/143 (100%) of equilibrium decisions.** The world's actual best
+   empty cell sits a mean **33.6 cells away** and was inside an agent's evaluated candidate set **0/143 times
+   (0%)**. No mechanism downstream of perception can fix this — the opportunity is invisible, full stop.
+2. **LOCAL RETENTION (the agglomeration bonus, not cohesion).** Even when a genuinely empty cell sits directly
+   adjacent — true in 75.5% of equilibrium decisions — it still loses to staying crowded in 67.6% of those.
+   Decomposed by term (mean advantage of the crowded HERE cell over the losing empty candidate):
+
+   | term | early growth (n≈5) | equilibrium (n≈32) |
+   |---|---|---|
+   | raw per-capita split (pre-bonus) | +5,818 | **−35,810** |
+   | **agglomeration bonus** (`aggl_beta`, point mode) | **+103,375** | **+387,290** |
+   | band cohesion | +3,977 | +383 |
+   | site appraisal | +723 | +779 |
+
+   At equilibrium the raw food math already FAVORS the empty cell (crowding dilutes the split more than the
+   empty cell's lower absolute yield costs) — the agglomeration term alone overturns that by >10x and is
+   effectively the entire reason agents stay. **Band cohesion is not a meaningful lever here**: at equilibrium
+   its contribution is ~0.1% the size of the agglomeration term, well within noise of the other minor terms.
+
+**What this resolves.** Addendum 3 narrowed the mechanism to "agglomeration/cohesion or band-cohesion
+resistance to fissioning" and left it open. This closes it: **the fix, if pursued, targets the agglomeration
+bonus's functional form** (currently point-mode `S ~ n^β`, β=1.15, unbounded in local occupancy n) — band
+cohesion and fission thresholds were not implicated and are not where the leverage is. The search-horizon
+defect is separate and additive: a corrected agglomeration term alone cannot make agents discover land 30+
+cells away; `mobility_radius` reading raw NPP instead of realized crowding needs its own fix.
+
+**NOT YET ACTED ON.** This is measurement only — no code changed, no default flipped. Two candidate next
+moves identified, neither started: (a) bound/reshape the point-mode agglomeration bonus so it saturates
+instead of rewarding co-location indefinitely; (b) make `mobility_radius` respond to local occupancy pressure
+(e.g. per-capita share vs. requirement) rather than raw cell NPP. Which to do first, and how, is undecided.
+
+**Origin:** diagnostic-only, `diag_crowding.py` (scratchpad; monkeypatches
+`sic_games.phase1_model.diffusion_select_target` with a read-only instrumented replica of
+`substrate.diffusion_select_target`, built on the corrected `patch=None` world construction from Addendum 3).
+No source files changed, no tests added. Raw per-decision log: `diag_crowding_log.json` (scratchpad).
+
+**Origin (R-106 core):** `sic_games/src/sic_games/{demography,phase1_model,config,soa_tier1}.py`,
+`agents/base.py`, `tests/test_intake_fertility.py` (11 tests);
+diagnostics in scratchpad (`diag_mortality/brake/condition/surplus/malthus/returns/cycles`, `eval_brake`,
+`eval_feedback`). Branches `diag/intake-instrumentation` (305b2ba, 8c921c9 - diagnostic-only) and
+`demog/intake-fertility-brake` (f2e839e…b15017e). Suite 1,024 passed / 2 xfailed (one strict, intentional).
+Default OFF, bit-exact when off.
+
+**ADDENDUM 5 — village budding (Bandy 2004) exists, was off in every measurement to date, and measurably
+changes the picture; `bud_events` was silently blind to it; and dispersed pre-settlement newborns range much
+closer to the ethnographic envelope than settled agents do (2026-07-30).**
+
+**1. A directed relocation mechanism already exists and was never engaged.** `_maintain_village_budding`
+(`phase1_model.py:4103`), grounded in Bandy 2004/Chagnon 1975: a village past `village_fission_threshold`
+(170) sheds its rival kinship faction, searches up to `village_bud_search_radius` (8 cells, "~a day's
+relocation range") for the nearest open storable site, and **teleports** the faction there (`a.pos = best`) —
+a real "go find a new place" behaviour, categorically different from the ordinary band split
+(`_maintain_bands`, size 45), which is a pure in-place relabel that moves nobody. `enable_village_budding`
+defaults **OFF** and was OFF in the entire R-106 chain and in Addendum 4's crowding diagnostic — every
+measurement of "the world is mostly empty" to date was made with this mechanism dormant.
+
+**2. Ablation (same seed/preset/world otherwise, N=3000, 900 steps, `patch=None`):**
+
+| | budding OFF (R-106 preset) | budding ON |
+|---|---|---|
+| population (step 900) | 6,511 | **7,836** (+20%) |
+| occupied cells | 277 / 9,449 (2.93%) | 382 / 9,449 (4.04%) |
+| settlements (villages) | 81 | **319** (+294%) |
+| mean village size | 607.8 | 291.8 |
+| `bud_events` (relocations) | 0 | **733** |
+
+Budding quadruples the number of villages and lifts population ~20% (plausibly less local-crowding mortality
+when spread across more, smaller settlements — not independently isolated here), but only modestly expands the
+footprint (2.9% → 4.0%). **Why it can't do more:** its own search radius (8 cells) is itself far short of the
+~34-cell average distance to the world's best truly unclaimed land (Addendum 4). It relieves local crowding by
+founding nearby daughter villages, not by reaching the rich, empty far side of the map.
+
+**3. `bud_events` was silently blind to the path actually used.** The counter only incremented inside the
+`enable_bud_hazard` branch (unused here); the legacy threshold path — the one `enable_village_budding=True`
+alone exercises — relocated factions without ever counting them, so the counter read 0 in the table above
+before the fix even though 733 relocations demonstrably occurred (inferred from the settlement-count/population
+divergence, since the mechanism is deterministic and RNG-neutral when truly inert — confirmed directly once
+fixed). **FIXED:** moved the increment to the shared relocation code so both paths count
+(`phase1_model.py`, `_maintain_village_budding`). Full suite re-run clean: 1,024 passed / 2 xfailed, no
+regressions.
+
+**4. An instrument flaw in the diagnostics themselves, caught and fixed before trusting the numbers.** The
+travel-distance tracking scripts (this addendum and Addendum 4's would-be follow-up) originally keyed tracked
+agents by Python `id()`. CPython recycles a garbage-collected object's `id()`, so a tracked agent's death
+followed by an unrelated birth landing at the same address would silently splice two different agents'
+histories together — exactly the kind of instrument bug [[feedback_validate_the_instrument]] warns about.
+Switched to the model's own stable `unique_id`. Re-running the travel-distance measurement below with the
+fix produced **identical numbers to the unfixed version** — the flaw didn't happen to bite this particular
+run — but it was a real risk, not a hypothetical one, and the fix is now in place for future use.
+
+**5. Post-settlement residual travel** (300 agents sampled live at step 700, tracked to step 900 = 200
+steps/16.7 yr; `unique_id`-based): baseline mean cumulative path 34.1 cells (~341 km, ~20 km/yr) but mean *net*
+displacement only 3.2 cells — once settled, agents shuffle locally and go nowhere. Budding ON: even less
+churn (mean 8.4 cells / ~84 km, ~5 km/yr) — smaller villages apparently have less internal crowding pressure
+to escape. Both are far below the Binford/Kelly ethnographic ~150-175 km/yr total annual travel (external
+literature search, not yet filed in LITERATURE.md) — consistent with the project's own R-8 finding
+(0.93 moves/yr vs Binford's ~10-40/yr envelope) that the model is under-mobile independent of anything else
+in this investigation.
+
+**6. Pre-settlement travel — the real answer to "how far do dispersed bands travel before settling."**
+Tracked newborns from birth (steps 100-700 warmup+run), but only those born OUTSIDE any settlement's
+`settle_radius` (i.e. genuinely dispersed at birth — most are not: 77-80% of all newborns are already born to
+an already-settled mother and never face this question):
+
+| (of 300 dispersed-at-birth newborns tracked) | budding OFF | budding ON |
+|---|---|---|
+| eventually settled | 144 (48.0%) | 161 (53.7%) |
+| died before ever settling | 123 (41.0%) | 116 (38.7%) |
+| still unsettled at run end | 33 (11.0%) | 23 (7.7%) |
+| *of those that settled:* time from birth to settling | mean 159 mo (~13.3 yr) | mean 180.5 mo (~15 yr) |
+| *of those that settled:* cumulative path traveled | mean 130.2 cells (~1,302 km) | mean 147.9 cells (~1,479 km) |
+| *of those that settled:* net displacement, birth→settling | mean 10.0 cells (~100 km) | mean 8.6 cells (~86 km) |
+
+**This is the real mobility signal, and it's much closer to the ethnographic envelope than #5 above:** ~1,300
+km over ~13 years ≈ **~98 km/yr** while dispersed — not the ~20 km/yr of post-settlement churn. The model
+isn't uniformly under-mobile; it's specifically *settled* agents who go nearly stationary (matching real
+ethnography reasonably well — people who've found their village mostly stop wandering), while *dispersed*
+agents genuinely range, just via an undirected, backtracking radius-1 random walk (net displacement is only
+~8% of cumulative path) rather than anything resembling directed exploration.
+
+**A new, unflagged connection to the R-106 demography gap:** 39-41% of dispersed newborns **die before ever
+settling** — a large, previously unmeasured mortality channel tied specifically to dispersal status, not
+age/orphaning/starvation-multiplier as measured so far. Whether this is a meaningful piece of the e0 gap
+(~21 vs anchor ~28) is untested — flagged, not chased, this session.
+
+**NOT YET ACTED ON.** No default changed. `enable_village_budding` remains OFF; whether to adopt it, and
+whether to also address the search-horizon/agglomeration findings from Addendum 4, is undecided.
+
+**Origin:** diagnostic-only additions this session — `diag_bands_travel.py`, `diag_birth_cohort.py`
+(scratchpad, both reused the Addendum 3/4 `patch=None` world construction). One source fix:
+`phase1_model.py::_maintain_village_budding` (`bud_events` counter, ~2 lines). No new tests added; existing
+suite re-verified green (1,024 passed / 2 xfailed) from the repo root after the fix.
+
+**ADDENDUM 6 — pressure-aware mobility BUILT and tested; calibration MISSES the Binford/Kelly moves/yr target
+honestly; combined with budding it breaks the historical population ceiling (unvalidated); the cycle test is
+INCONCLUSIVE, not negative, because the world never reached stationarity (2026-07-31, overnight session).**
+
+**1. The mechanism, as scoped in conversation.** `mobility_radius()`'s NPP-driven stride (§4.8.19) is
+static/geographic — a cell packed with 40+ occupants still reads as "rich," so it never expands (Addendum 4:
+`r_used==1` in 100% of equilibrium decisions). New `mobility_pressure_source: Literal["npp","intake"]="npp"`
+(pure additive mode, `"npp"` is bit-exact with the original). `source="intake"` drives the SAME formula off the
+agent's own `_intake_ema` (R-106's live intake/requirement EMA) instead of raw NPP — density-aware by
+construction, and reusing an existing signal rather than adding a new one. `_intake_ema`'s update loop is now
+gated by `intake_fert_on OR mobility_wants_intake` (`phase1_model.py`) so the two mechanisms share the
+computation while staying independently ablatable (flip either flag alone; verified by test). New fields
+`mobility_intake_ref` (default 1.00, reuses the already-anchored `intake_fert_lo` maintenance threshold — not
+a new number) and `mobility_intake_floor` (0.15, a pure numerical clamp, same role as `mobility_npp_floor`).
+14 new tests (`tests/test_pressure_mobility.py`): shape parity with the NPP-mode tests, bit-exactness when off
+or at the default source, and the EMA-liveness/independent-ablatability guarantees. Full suite: 1,038 passed
+(1,024 + 14) / 2 xfailed, no regressions.
+
+**2. Calibration sweep 1 (exponent, ref fixed at 1.0) — a mathematically GUARANTEED null, confirmed
+empirically.** N=3000, 900 steps, `patch=None`, budding ON, exponent ∈ {0.5,1.0,1.5,2.0,3.0}: moves/yr never
+exceeds 1.62, km/yr never exceeds 20 — no trend. This is not noise: when `intake_ema >= ref`, `ratio<=1` for
+any exponent ≥0, and `max(base,...)` floors the radius back to `base` regardless of the exponent's value. Since
+R-106/Addendum 4 already established crowded occupants average 2.1x subsistence, most of the tracked population
+sits above `ref=1.0` most of the time, so the exponent literally cannot matter there. **The real lever is the
+threshold, not the response steepness** — diagnosed from the formula's structure before spending the full sweep
+budget confirming it.
+
+**3. Calibration sweep 2 (ref, exponent fixed at 1.5) — an honest MISS against the target.** ref ∈
+{1.0,1.2,1.5,1.7,2.0,2.5}: best result **ref=1.7 → moves/yr=1.45, km/yr=18.5** — roughly **7-27x short** of the
+Binford/Kelly band (10-40 moves/yr, 150-175 km/yr), and the sweep is noisy/non-monotonic across both dimensions
+(0.79-1.62 moves/yr, no clean curve), not a smooth calibration surface with an obvious better setting further
+out.
+
+| ref | pop | moves/yr | km/yr | occ% | settlements | bud_events |
+|---|---|---|---|---|---|---|
+| 1.00 | 7051 | 1.10 | 12.5 | 3.80% | 269 | 480 |
+| 1.20 | 7385 | 1.06 | 13.0 | 3.45% | 292 | 527 |
+| 1.50 | 7519 | 0.79 | 11.0 | 4.13% | 386 | 1043 |
+| **1.70** | 7273 | **1.45** | **18.5** | 3.73% | 247 | 312 |
+| 2.00 | 6951 | 1.19 | 14.7 | 4.18% | 213 | 315 |
+| 2.50 | 7482 | 0.81 | 12.4 | 3.06% | 170 | 123 |
+
+**Why, diagnosed rather than shrugged off:** the mechanism correctly targets the food-STRESSED minority (real
+forager logic — you don't relocate camp because you're comfortable), but Binford/Kelly's ~10-40 moves/yr is a
+POPULATION-WIDE ethnographic average that includes plenty of well-fed foragers moving for reasons this
+mechanism was never built to capture (seasonal rounds, social visiting, camp rotation independent of current
+hunger). Addendum 4's own finding applies again here: "the average agent never experiences scarcity" — so an
+average taken across the whole tracked population is diluted by the majority who are fine. **Not pursued
+further tonight:** pushing `ref` past 2.5 to force more of the population below threshold would fit the
+benchmark by construction, exactly the kind of ad hoc tuning the project rejects (cf. Addendum 2's refusal to
+adopt an unanchored `provision_self_keep`=0.5). Closing this gap for real needs either a second, non-hunger
+mobility driver, or accepting the ethnographic moves/yr figure doesn't transfer cleanly onto this specific
+mechanism's scope. **`ref=1.7` carried forward as the best-available setting, not a validated calibration.**
+
+**4. The unplanned, MUCH bigger result: combined with budding, the historical population ceiling breaks —
+unvalidated.** Full run: N=3000, ref=1.7, exponent=1.5, budding ON, 1500 steps (125 yr):
+
+| | Addendum 5 baseline (900 steps) | this run (1500 steps) |
+|---|---|---|
+| population | 6,511 (budding off) / 7,836 (budding only) | **15,947** |
+| occupied cells | 277/9449 (2.93%) / 382/9449 (4.04%) | **848/9449 (8.97%)** |
+| settlements | 81 / 319 | **809** |
+| moves/yr | — | 0.47 (LOWER, see below) |
+
+Every prior R-106 measurement found population converging to the SAME ~4.7-4.9k equilibrium regardless of
+starting size (Addendum to R-106 core: "starting density washes out"). Here, at step 1500, population is
+**3x that historical ceiling and still accelerating** — growth increments per 200 steps (467→977→1750→2396→
+2711→3111) are still rising, though their SECOND difference is shrinking (+510,+773,+646,+315,+400,+107),
+consistent with early-stage logistic growth approaching, not yet at, an inflection — not confirmed. Occupied
+land nearly TRIPLED and settlement count went **10x**. **This is flagged as a major but UNVALIDATED finding**:
+it could be a genuine unlock of previously-inaccessible carrying capacity (more land finally reachable via
+budding's 8-cell site search + the intake-driven radius bump), or it could indicate `enable_village_budding`'s
+relocation is now firing too permissively once combined with a second mobility mechanism — no time tonight to
+check this population against an independent density/carrying-capacity anchor. **Do not adopt either mechanism
+as a default on the strength of this run alone.**
+
+**Moves/yr going DOWN (1.45→0.47) despite MORE spreading is not a contradiction**, it's the mechanism working
+as intended interacting with the averaging methodology: budding minted 809 settlements by step 1500 (vs 247 at
+900 steps in the sweep), so a much larger share of the tracked population is freshly settled at any snapshot —
+and post-settlement agents barely move (Addendum 5). Success at settling more people mechanically lowers the
+population-wide average mobility, the same dilution effect noted in §3.
+
+**5. The Malthusian-cycle stretch goal: INCONCLUSIVE, not negative — the world never reached stationarity.**
+Ran `probe_hcycles.period_of` (the canonical, validated instrument — R-97's own detector, not an ad-hoc
+periodogram) on population, occupied-cell-count, and mean-per-capita-wealth series (sampled every 4 steps,
+matching R-87/R-97 convention) over the full 1500-step run. **All three: `ac_peak=0.000`, no period found** —
+the autocorrelation never even crosses negative, which `period_of` reports specifically when a series is
+monotonically drifting rather than oscillating. **This is not a valid cycle test.** With population still
+accelerating at step 1500 (see §4), the world hasn't reached anything resembling stationarity — R-87/R-97's own
+cycle tests were run on populations that had already stabilized or were fluctuating around a mean, not ones in
+unresolved exponential-ish growth. Testing for oscillation before there's an equilibrium to oscillate around is
+a category error, not a finding. **Consistent with, and does not update, R-97's standing diagnosis** that a
+delayed feedback needs to out-govern the substrate's own churn timescale — and today's budding-driven explosion
+in settlement count (81→809) plausibly SHORTENS that churn timescale further, working against rather than
+toward the cycle goal, if anything.
+
+**NOT YET ACTED ON.** `enable_village_budding` and `mobility_pressure_source="intake"` both remain OFF as
+defaults. Nothing here should be adopted without: (a) validating the step-1500 population against an
+independent carrying-capacity anchor, (b) a much longer run (several thousand steps) to see whether growth
+ever plateaus, and (c) a decision on the calibration miss in §3 (accept it, find a second mobility driver, or
+re-scope the target).
+
+**Origin:** `sic_games/src/sic_games/demography.py` (`mobility_pressure_source`, `mobility_intake_ref`,
+`mobility_intake_floor` fields; `mobility_radius()` signature `local_npp`→`value`, source-dispatch),  
+`sic_games/src/sic_games/phase1_model.py` (`mobility_source` at the movement call site; `intake_signal_on`
+gating). New: `sic_games/tests/test_pressure_mobility.py` (14 tests). Diagnostics in scratchpad:
+`diag_calibrate_mobility.py` (exponent + ref sweeps), `diag_final_combined.py` (long-run validation + cycle
+test, reuses `probe_hcycles.period_of`). Suite 1,038 passed / 2 xfailed. Both new knobs default OFF/`"npp"`,
+bit-exact when off.
+
+**ADDENDUM 7 — CORRECTION to Addendum 6 §3: the mobility "7-27x miss" was mostly a HIDDEN-DENOMINATOR error.
+The model's MOBILE foragers move at 8.4 moves/yr against a hard structural ceiling of 12. The real defects are
+a stride collapse, a residence pin that bypasses the mover entirely, and a saturated-but-BLOCKED push
+(2026-07-31).**
+
+**What prompted it.** Two of this session's own measurements contradicted each other and I had not reconciled
+them: `diag_crowding.py` found **75% of agents MOVED per decision** at equilibrium (~9/yr if that were
+population-wide), while `diag_calibrate_mobility.py` reported **0.47-1.45 moves/yr**. Both were correct
+measurements *of different populations*.
+
+**The mechanism.** `phase1_model.py:1435` pins any agent within `settle_radius` of an active settlement:
+`_toward(pos, site)` returns `pos` unchanged once the agent stands ON the site (line 754), and the movement
+loop `continue`s **before `diffusion_select_target` is ever called**. A settled agent on its site is therefore
+structurally FROZEN — zero moves, permanently, independent of hunger, depletion, or any mobility knob. The
+crowding wrapper only ever observed the *unsettled remainder*; the calibration averaged that remainder together
+with a pinned majority.
+
+**Measured (N=2000, 700 steps, 120-step window, `patch=None`, budding ON, mobility-intake ON, ref=1.7;
+per-agent per-step state attribution so each transition is credited to the state it began in):**
+
+| | moves/yr | km/yr |
+|---|---|---|
+| POPULATION-WIDE (what Addendum 6 §3 reported) | 1.76 | 19.6 |
+| **MOBILE steps — Binford's own denominator** | **8.39** | **86.3** |
+| settled steps | 0.74 | — |
+| of which fully pinned ON-SITE | 0.47 | — |
+
+agent-steps: 245,378 total; **212,782 settled (86.7%)**, of which **207,511 (84.6%) fully on-site**; 32,596
+mobile (13.3%). Per-agent settled fraction: mean 0.867, **median 1.000**; 1,714/2,062 agents *always* settled,
+240/2,062 *never*.
+
+**1. The denominator was wrong, and the benchmark's own scope says so.** Binford's mobility dataset covers
+"all groups that move at least once per year" (n=314) — MOBILE foragers by construction; sedentary groups are
+excluded from his denominator. Averaging our ~87% pinned villagers into that comparison is the
+**HIDDEN-DENOMINATOR bug class already on this project's record** (R-97 et al.: any ratio compared against a
+benchmark has a validity domain and fails silently when the denominator drifts). Corrected, the model's mobile
+foragers sit at **8.39 moves/yr vs a reachable band of 10-12** — near-validation, not a 7-27x failure.
+
+**2. A STRUCTURAL CEILING nobody had stated: 12 moves/yr, by construction.** Diffusion movement resolves once
+per model step and 1 step = 1 month, so no configuration can exceed 12 residential moves/yr. (Village budding
+can add rare extra relocations, so 12 is an approximate rather than strict bound.) **Binford's upper range —
+40/yr, i.e. relocating every ~9 days — is unreachable without a sub-monthly timestep.** Every prior framing of
+this benchmark, including R-8's original "0.93 vs ~10-40/yr" and Addendum 5's, compared against a band whose
+top ~70% the architecture cannot reach. The honest target is **10-12**.
+
+**3. The real remaining gap is DISTANCE, and it appears only as the world fills.** Mobile agents average
+86.3 km/yr = **10.3 km per move ≈ 1.03 cells** — the `r>1` glide is not firing, exactly matching Addendum 4's
+`r_used==1` in 100% of equilibrium decisions. But in an early, uncrowded world (N=400, 80 steps, zero
+settlements formed) the same configuration gives **9.16 moves/yr and 179.8 km/yr — at the Kelly anchor**, with
+~2 cells per move. **Stride collapses as the world fills.** That is the tractable mechanism defect, and the
+intake-pressure mode of Addendum 6 does not fix it because the agents who would need a long stride are not
+hungry enough to trigger one.
+
+**4. The PUSH driver is NOT missing — it saturates where it matters and is BLOCKED from acting.** Depletion has
+a deterministic equilibrium `B* = 1 − 0.5·(occ/K)` (`capacity.py`, `DEPLETE_FRAC=0.5`), so measured B pins
+occupancy exactly. Occupied cells (n=218): mean B 0.905, **median 0.974**, p10 0.723, **min 0.05 (the
+`B_FLOOR`)**; unoccupied 0.999; 8/218 below B=0.5.
+- median B 0.974 ⇒ pressure ≈ 0.052 ⇒ **~1.3 agents on a cell of K≈25** — most "occupied" cells hold a single
+  forager on pristine land;
+- B at the 0.05 floor ⇒ pressure ≥ 1.9 ⇒ those cells are **hunted out at ≥1.9x carrying capacity**.
+
+So the landscape is bimodal, precisely as Addendum 4's concentration finding predicts. **Patch depletion — the
+ethnographic prime mover of forager residential mobility (MVT) — is present and firing hard in exactly the
+cells that are overcrowded.** Its output simply cannot reach the movement decision: those agents are either
+settlement-pinned (never call the scorer) or held by the agglomeration bonus (Addendum 4: +387,290 vs a
+−35,810 raw-food disadvantage). **The failure is a disconnected response, not an absent stimulus.**
+
+**5. Carrying capacity is NOT inflated** (checked because a mis-scaled K would have made depletion dormant by
+construction): land-cell `K_persons` median **24.7/cell = 0.247 persons/km²**, p10 7.1, p90 51.5, max 116.9 —
+inside the Tallavaara ethnographic band (0.1-0.5/km²), with 80.1% of land above Binford packing (0.091/km²) as
+the aquatic-subsidy design intends. My first estimate of "K≈236/cell" was inferred from B and was wrong;
+measured directly, K is sound.
+
+**WHAT IS GENUINELY MISSING (drivers, as opposed to the blockers above) — all already documented as deferred
+seams in this project's own spec, none of them the binding constraint:**
+- **Seasonal transhumance.** §4.8.19 (MODEL_SPEC line 1706) states the stride reads STATIC `npp_gm2` by design
+  "so the *range* doesn't oscillate with the season; transhumance is a deferred extension."
+- **Game/herd-following.** §4.1.8 wires `game_mobility` as a parameter with the **MECHANIC DEFERRED**
+  (`GRASS/steppe 1.0` = Nunamiut caribou / plains bison logistical herd-following).
+- **Logistical (collector) mobility.** The model has residential moves only; Binford's forager↔collector
+  continuum has collectors *reducing* residential moves while running long logistical forays.
+- **Social/scheduling relocation** (death in camp, disputes, vermin/sanitation) — routine relocation triggers
+  in the ethnography (e.g. Amazonian villages relocating every few years), with no analogue in the model.
+
+**Adding any of these on top of a blocked response would produce motion without meaning.** Order of work
+implied: (a) report mobility conditioned on mobile state — free, and turns a reported failure into a
+near-validation; (b) test whether the **86.7% sedentary fraction** is itself the defect — plausible for
+coastal/temperate (NW-Coast storage foragers really were largely sedentary) but this is exactly the
+[[feedback_check_biome_dependence]] case: if flat_boreal / savanna / desert also come out ~87% sedentary, then
+sedentism is biome-independent and THAT is the bug; (c) fix the equilibrium stride collapse; (d) only then
+consider new drivers.
+
+**INSTRUMENT NOTE.** The diagnostic's own per-agent settled-fraction line initially read
+`sum(1 for (_, s, _) in h)` (missing the `if s`), reporting "always-settled 329/329" while the agent-step
+counter directly beneath it read 0% settled. Caught because the two disagreed, fixed before any number here was
+used — the same class of self-check that [[feedback_validate_the_instrument]] exists for.
+
+**Origin:** diagnostic-only; `diag_mobility_denominator.py` (scratchpad) + a direct `K_persons` percentile
+check. No source files changed by this addendum. Numbers above supersede Addendum 6 §3's population-wide
+framing; Addendum 6's mechanism, tests and §4 population-ceiling finding are unaffected.
+
+**ADDENDUM 8 — BIOME BATTERY: sedentism IS biome-dependent (the bug tested for is NOT present), but mobile
+mobility is biome-INVARIANT — the model reproduces the ethnographic MAGNITUDE while failing to produce the
+ethnographic LAW, and the monthly timestep makes that law unrepresentable through move frequency at all
+(2026-07-31).**
+
+**The test.** Addendum 7's 86.7%-sedentary baseline was measured on ONE world (coastal/temperate). Per
+[[feedback_check_biome_dependence]] — a mechanism validated in one world is a claim about that world — six
+biomes were run identically (N=1500, 600 steps, 120-step window, `patch=None`, plain village/elite preset:
+budding OFF, mobility-intake OFF, so this is the CANONICAL stack, not Addendum 6's experimental one).
+Prediction if sedentism were correctly biome-gated: coastal/temperate high (NW-Coast storage foragers),
+flat/boreal low (Nunamiut caribou-followers), tropical/interior low-moderate.
+
+| biome | pop | settled % | moves/yr (pop) | moves/yr (MOBILE) | km/yr (MOBILE) | settlements | mean NPP | med K/cell |
+|---|---|---|---|---|---|---|---|---|
+| mountainous/boreal | 223 | **66.3%** | 4.23 | 9.31 | 115.3 | 2 | **458** | **3.2** |
+| coastal/temperate | 1584 | 64.1% | 3.31 | 8.63 | 92.2 | 30 | 1004 | 24.7 |
+| flat/temperate | 695 | 48.5% | 5.15 | 9.41 | 101.1 | 8 | 1083 | 28.6 |
+| hilly/temperate | 832 | 24.9% | 7.17 | 9.35 | 99.3 | 9 | 1002 | 21.4 |
+| flat/tropical | 1472 | 0.9% | 9.16 | 9.22 | 110.2 | 1 | **2291** | 35.5 |
+| flat/boreal | 3693 | **0.0%** | 9.74 | 9.74 | 106.7 | 0 | 795 | 11.4 |
+
+**1. VERDICT ON THE TESTED HYPOTHESIS: NEGATIVE — sedentism is NOT biome-independent.** Spread **0.0% → 66.3%
+(sd 27.4 pts)**, correlation with mean aquatic food **+0.616** (`AQUATIC_R_PER_YR=0.80` is `capacity.py`'s
+documented "sedentism enabler"). So **Addendum 7's coastal baseline stands as a legitimately coastal-specific
+result**, and its central claim survives: the mobility "miss" is a COMPOSITION artifact, not a broken mobility
+mechanism. (The exact figure differs — 64.1% here vs 86.7% in Addendum 7 — because that run used
+budding+mobility-intake at N=2000/700 steps; within-battery comparisons are apples-to-apples.)
+
+**2. BUT THE GRADIENT'S ORDER IS PARTLY BACKWARDS.** `mountainous/boreal` — the POOREST world on every measure
+(mean NPP 458, median K 3.2/cell, total K 74,697, all lowest by a wide margin) — is the **MOST sedentary
+(66.3%)**. Kelly/Binford have mobility ∝ 1/productivity, so the most marginal environment should be the most
+MOBILE. **Circumscription is ruled out as the explanation**: all six worlds have 9,449–9,994 habitable cells,
+i.e. land is not scarce anywhere. The apparent mechanism is that poverty makes the few viable cells the ONLY
+viable cells, population concentrates onto them, the settlement threshold is met, and the residence pin
+(Addendum 7) then freezes everyone — **poverty producing nucleation instead of dispersal.** With pop 223 this
+is also the noisiest cell in the battery; worth re-running at larger N before treating the inversion as firm.
+
+**3. THE SHARPER FINDING — MOBILE MOBILITY IS BIOME-INVARIANT.** Across a **5x productivity range** (NPP
+458→2291, median K 3.2→35.5), mobile-agent mobility is **flat: 8.63–9.74 moves/yr (12% spread) and 92–115
+km/yr**. `enable_productivity_mobility` is ON in this preset and exists precisely to implement Kelly 1995 /
+Binford 2001's ∝1/productivity law (§4.8.19) — **it produces no realized gradient whatsoever.** This is the
+same defect Addendum 4 found from the other side (`r_used==1` in 100% of equilibrium decisions): the stride
+never expands, so the biome gradient encoded in the stride formula never reaches behaviour. R-40 already
+recorded this mechanism as "NOT the biome→society fix" and retained it for "its own uses (mobility
+gradients)" — this measures that those uses are also not being served.
+
+**So the model reproduces the ethnographic MAGNITUDE and fails to reproduce the ethnographic LAW.** ~9.3
+moves/yr and ~100 km/yr sit close to the anchors (Binford 158 / Kelly 174 km/yr; reachable move band 10-12,
+per Addendum 7's ceiling) — but the anchor is not only a number, it is a SLOPE, and we produce a flat line.
+
+**4. THE CEILING MAKES THE LAW UNREPRESENTABLE THROUGH MOVE FREQUENCY.** Addendum 7 established a hard 12
+moves/yr ceiling (one movement resolution per monthly step). Tropical foragers already sit at **9.22/yr = 77%
+of that ceiling**. Kelly's law anchored there would put mountainous/boreal at ~46 moves/yr — nearly 4x above
+what the architecture can express. **Even a perfectly working productivity-mobility mechanism could not fit the
+ethnographic gradient into move COUNT.** The only channel with headroom is **distance per move (stride)**,
+which is currently also flat (~10 km/move ≈ 1 cell everywhere, Addendum 7 §3). **Conclusion: the
+productivity-mobility law must be delivered through stride, and stride is exactly the thing that is broken.**
+That converges with Addendum 4's search-horizon finding and Addendum 7 §3's stride-collapse finding from a
+third independent direction.
+
+**5. AN INCIDENTAL, CONFOUNDED OBSERVATION (flagged, not established).** Population as a fraction of nominal
+total K is 0.24–0.6% in every biome EXCEPT `flat/boreal` — the one world where **zero settlements formed** —
+which reaches 2.6%, ~5x the others, and the largest absolute population (3,693) despite only the 4th-highest
+total K. Consistent with R-106's chain (settlement/agglomeration concentrate people, and concentration kills),
+but **confounded**: these are 600-step runs and not all arms are at equilibrium (some grew, some shrank), so
+this is a hypothesis for a controlled test, not a result. Separately, every biome running at **<3% of nominal
+carrying capacity** re-confirms R-106's "nobody can be hungry" root cause as biome-general rather than
+coastal-specific.
+
+**Origin:** diagnostic-only; `diag_biome_sedentism.py` + a direct per-biome land/NPP/K check (scratchpad). No
+source files changed. Supersedes nothing; extends Addendum 7 §3's stride diagnosis with the biome-gradient
+evidence and adds the dynamic-range argument.
+
+**ADDENDUM 9 — TWO SUPERVISOR CHALLENGES ANSWERED: the biome stride is INERT BY CALIBRATION (not broken);
+depletion is CORRECT TO SPEC and too gentle to evict anyone; and a genuine dimensional bug — the settlement
+tier-2 food layer contributes 0.005% of cell food (2026-07-31).**
+
+**Challenge (A): "the biome-adapted stride was lit-sourced and built — did it not happen? did it break?"**
+It happened, it is ON, and it is not broken. `enable_productivity_mobility=True` in the canonical preset;
+`mobility_radius` computes correctly. It is **inert by CALIBRATION**:
+`r = clamp(round(base·(npp_ref/max(npp,floor))^exp), base, r_max)` with `npp_ref=900, exp=1.0, base=1` requires
+`900/npp ≥ 1.5`, i.e. **npp ≤ 600 g/m²/yr, before r even reaches 2**. Measured on coastal/temperate:
+
+| | value |
+|---|---|
+| land-cell NPP | mean 1004, median 1054 |
+| NPP where agents actually are | mean **769** |
+| fraction of LAND below the r≥2 threshold (600) | **3.2%** |
+| fraction of AGENTS below it | **0.9%** |
+| stride actually computed for agents | **r=1: 1570, r=2: 14 (99.1% at r=1)** |
+
+`npp_ref=900` is documented as the Tallavaara forager-median NPP, but this project's canonical worlds average
+**1004–2291** (only mountainous/boreal 458 and flat/boreal 795 sit below it), so the reference lands beneath
+the landscape and the mechanism returns base almost everywhere. **The source itself flags
+`ref/exp/max` as "PROVISIONAL — locking the scaling law for canonical runs needs supervisor sign-off"
+(§4.8.19). That sign-off never happened, yet `emergent_village_demog()` turns the flag ON** — so it ships as
+if adopted while being calibrated into inertness. This is the direct mechanical cause of Addendum 4's
+`r_used==1` and Addendum 8's flat biome gradient.
+
+**MY OWN HYPOTHESIS FALSIFIED (recorded per the R-106 house rule).** I proposed that agents *self-select into
+high-NPP cells*, so a cell-keyed law would cancel itself. **Measured: agents sit at NPP 769 vs a landscape mean
+of 1004 — 0.77x, i.e. POORER than average, the opposite of my prediction.** The self-selection story is dead;
+the parameter-range story is the whole explanation. (The separate *scope* critique — that Kelly/Binford's law
+is regional while the model applies it per-cell — remains untested and is now unsupported by any measurement.)
+
+**Challenge (B): "populations survive and grow sourcing the same cell for a long time — the cell resource is
+not depleting correctly."** The intuition is right about the OUTCOME and wrong about the CAUSE, and **my own
+proposed cause was also wrong.**
+
+**FALSIFIED (mine, from the same session):** I claimed the residence pin puts *every* villager on the single
+site cell, so pressure lands on 1 cell while food is drawn from 9 — "a village hunts out its plaza while its
+fields stay pristine." **Measured: catchment-ring occupancy is 148.8 vs 35.3 on the site cell.** Villagers are
+spread across the catchment; foraging pressure does reach the ring. The story is dead.
+
+**What is actually happening (30 settlements, coastal/temperate, 600 steps):**
+
+| | site cell | catchment ring |
+|---|---|---|
+| stock fraction B | mean 0.805, median 0.789, **min 0.535** | mean 0.895, min 0.813 |
+| occupancy | mean 35.3, max 85 | mean 148.8 total |
+| K at the cell | **87.5 persons** | — |
+| sites hunted below B=0.2 | **0/30** | — |
+
+**Depletion is working exactly as specified.** The spec is `B* = 1 − DEPLETE_FRAC·(occ/K)` with
+`DEPLETE_FRAC=0.5`; measured pressure is 35.3/87.5 = **0.403**, predicting B* = **0.799** against a **measured
+0.805**. The model is not failing to run its own equation. Two structural facts explain why the resource never
+runs out:
+1. **The law caps drawdown at 50% by construction.** Even at FULL carrying capacity (occ = K) the stock only
+   falls to B=0.5 — half the pristine yield. **A patch can never be hunted out at any realistic occupancy.**
+   Real forager mobility is driven by returns falling far enough to beat the cost of moving (MVT); this law
+   cannot produce that.
+2. **Villages sit on the richest cells, whose assumed capacity is ~10x Binford packing.** Settlement sites have
+   **K = 87.5 persons/cell = 0.875 persons/km²** (vs landscape median 0.247, Tallavaara band 0.1–0.5, Binford
+   packing 0.091). That is the aquatic subsidy working as designed (`AQUATIC_DENSITY_MAX=80`, MODEL_SPEC:
+   the super-density "that lets a concentrated band cross Binford packing") plus site-appraisal selecting the
+   best cells. **So 35 people on a cell rated for 87 is a 40% load, and a 20% yield haircut is the *correct*
+   answer to that load.** The village persists indefinitely because the model believes that cell can feed
+   87 people.
+
+**A GENUINE BUG FOUND — the settlement tier-2 food layer is dimensionally inert.**
+`_settlement_catchment_yield = settle_tier2_yield · Σ_catchment S_pot`, where `S_pot = max(aquatic_food,
+cultivability)` is a **normalized 0–1 static field** and `settle_tier2_yield = 40.0`. Measured at settlement
+cells: **tier-2 = 2.68e2 kcal against tier-1 = 5.28e6 kcal — 0.0051%.** The entire Layer-2 "settlement unlocks
+intensive food" mechanism — the thing that is supposed to make being a village pay — contributes five
+thousandths of one percent of the cell's food. Villages in this configuration are fed **essentially entirely by
+ordinary depletable tier-1 forage**. Whether `settle_tier2_yield=40` was calibrated against a differently
+scaled tier-1 (the `burn=75000` normalisation sets tier-1's magnitude) is not established here; what is
+measured is that in the CURRENT canonical configuration the layer does nothing. **This needs a unit audit
+before any settlement/agriculture conclusion that assumed tier-2 was load-bearing is trusted.**
+
+The R-63 ceiling (`_settlement_carrying_capacity`, the one path that *does* read the depletable field) **binds
+in 8/28 = 28.6% of settlement cells** (S/cap mean 0.621, max 1.002), so depletion does throttle villages some
+of the time — via the cap, not via the tier-2 term.
+
+**NOTE ON A CONFIG DIFFERENCE.** Addendum 7 reported min occupied-cell B = 0.05 (the hunted-out floor); here no
+settlement site falls below 0.535. Different configurations (Addendum 7: budding + mobility-intake ON,
+N=2000/700 steps; here: plain canonical preset, N=1500/600) — the floor-hitting cells in Addendum 7 were not
+necessarily settlement sites. Not reconciled; flagged.
+
+**IMPLICATION FOR THE MOBILITY WORK.** Addendum 8 concluded the productivity gradient must be carried by
+stride. Addendum 9 says the stride mechanism *already exists and is simply calibrated below its own operating
+range* — so the first move is a **calibration decision on `npp_ref`/`exponent`/`r_max` against the Kelly/Binford
+range data (the sign-off §4.8.19 has been waiting for), not new mechanism.** Separately, `DEPLETE_FRAC=0.5`
+capping drawdown at 50% is the reason no amount of mobility tuning will produce eviction-driven movement.
+
+**Origin:** diagnostic-only; `diag_depletion_catchment.py` (scratchpad), reading `_diag_pool`, `capacity._B`,
+`_K_persons`, and the model's own `_settlement_catchment_yield`/`_settlement_carrying_capacity`. No source
+files changed. Two of my own hypotheses falsified by this run and recorded above.
+
+**ADDENDUM 10 — THE DENSITY MISS AND THE SPATIAL CONCENTRATION ARE ONE DEFECT; FOUR CANDIDATE CAUSES
+FALSIFIED BY MEASUREMENT (three of them mine, two INVERTED); and the agglomeration term is structurally
+entangled — it is the concentrator AND the food supply at once (2026-07-31).**
+
+**How the question changed.** Under the supervisor directive *"generally the anchor wins, but practically it
+means something else is missing or not working, so it would have to be found — everything is on but the pop
+is not moving,"* the investigation moved off mobility and onto the DENSITY anchor, which is the larger miss:
+
+| | measured (ALL-ON preset) | anchor |
+|---|---|---|
+| population density | **0.0018 persons/km²** | Tallavaara **0.1–0.5**; Binford packing 0.091 |
+| population vs the landscape's own K | **0.65%** of 253,887 | — |
+
+**THE ARITHMETIC THAT REFRAMES IT.** density = (crowding-limited population per OCCUPIED cell) × (fraction of
+land occupied). Measured: 1657 agents on 254 of 9449 habitable cells = **6.5/cell over 2.69% of the land**.
+Spread that SAME per-cell density over all habitable land: 6.5 × 9449 / 944,900 km² = **0.065 persons/km²** —
+essentially the Binford packing anchor. **So the density shortfall is not a separate problem from the
+concentration; it is the arithmetic consequence of it.** Population sits at its crowding-limited equilibrium
+*for the tiny area it actually uses*.
+
+**FOUR CANDIDATES FALSIFIED (all measured on the ALL-ON preset, coastal/temperate, N=1500, 600 steps):**
+
+1. **Dark mechanisms — NO.** A full audit found 27 of 79 `enable_*` flags off in the canonical preset; 23 were
+   turned on (4 excluded with stated reasons: an unimplemented stub, an observer, a mutually-exclusive
+   alternate path, and R-103's known-wrong criterion). Per-flag liveness ablating FROM all-on: **20/23 LIVE**,
+   3 inert (`band_risk`, `malnutrition_fission`, `terrain_pathogen`). The mechanisms work — and all-on moved
+   land use only **2.62% → 2.69%**.
+2. **The contest split — NO, and INVERTED.** Removing status-weighted sharing makes it *worse*:
+   κ=1.5→0 gives pop ×0.81 (1657→1341) and agents below maintenance **7.0% → 15.3%**. Inequality is
+   PROTECTIVE at the population level here — an even split spreads the shortage across everybody instead of
+   keeping some agents robustly above the floor. My hypothesis (a permanently-starved underclass sets the
+   death rate) is not merely falsified, its sign is backwards.
+3. **Food limitation — NO.** Median realized intake is **2.47–4.41× requirement**; only 3–15% of agents fall
+   below maintenance in any arm. The population is not subsistence-limited. This re-confirms R-106's core
+   finding from a new direction.
+4. **The forage cap — REAL BUT MINOR.** Clean ablation: pop ×1.23, land 2.69% → **4.09%** (+52% more cells,
+   the single largest land-use effect measured). It is the main *dispersal* blocker — a lone agent on a rich
+   empty cell perceives only `cv`, exactly what a crowded cell still delivers, so there is no gradient to
+   disperse along — but it is nowhere near sufficient.
+   **CONFOUND RECORDED:** the `forage_cap_hours ×5/×20` arms must NOT be cited as cap tests. `cv_ref =
+   forage_kcal · forage_cap_hours` (`phase1_model` 1078/1098) ALSO sets the agglomeration base scale, so those
+   arms were 5×/20× agglomeration subsidies. That is why "cap OFF" (2046) came out BELOW "hours ×20" (3674).
+
+**THE AGGLOMERATION ABLATION — INVERTED TOO, AND IT EXPOSES A DESIGN ENTANGLEMENT.**
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² |
+|---|---|---|---|---|---|---|
+| aggl ON, cap ON (shipped) | 1657 | 254 | 2.69 | 6.5 | **159** | 0.0018 |
+| **aggl OFF**, cap ON | **331 (×0.20)** | 141 | 1.49 | 2.3 | 21 | 0.0004 |
+| aggl ON, cap OFF | 2046 (×1.23) | **386** | **4.09** | 5.3 | 158 | 0.0022 |
+| aggl OFF, cap OFF | 742 (×0.45) | 285 | 3.02 | 2.6 | **10** | 0.0008 |
+| aggl β=1.0, cap OFF | 742 | 285 | 3.02 | 2.6 | 10 | 0.0008 |
+
+Agglomeration IS the concentrator — max cell occupancy **10 → 159** — exactly as Addendum 4's decomposition
+predicted (+387,290 premium against a −35,810 raw-food disadvantage). **But turning it off COLLAPSES the
+population (×0.20 to ×0.45)**, because the premium is not merely perceptual: it is realized in the harvest as
+`S += aggl_R·(n^β − n)` (`phase1_model` 1633-1641), i.e. it is a genuine production subsidy supplying over
+half the economy's output. **The same term does two jobs — spatial attraction and food creation — so it cannot
+be tuned for one without wrecking the other.** Any future attempt to fix concentration by weakening
+agglomeration will crash the population; the two functions must be separated first.
+(*Instrument check passed:* the β=1.0 arm reproduced the OFF arm bit-identically, as the algebra requires
+since `n^(β−1) − 1 → 0`.)
+
+**WHERE THIS LEAVES THE DENSITY GAP — no single cause, and still short.** Best measured arm (aggl ON, cap OFF)
+reaches 0.0022/km², **46× below the low anchor**. Its projected density at FULL land occupancy is **0.053/km²**
+— within ~2× of Binford packing but still under the Tallavaara band. So even perfect spreading does not close
+the gap alone: it needs BOTH ~full land occupancy AND ~10 agents/cell (against a median cell K of 24.7, i.e.
+40% load — comfortably feasible). The system is in a **low-level trap**: agents harvest only the cells they
+stand on, so realized food ≈ (occupied cells) × (per-cell yield); few agents ⇒ few cells harvested ⇒ little
+food ⇒ few agents. The capacity field's 253,887-person K is unreachable because 97% of it is never touched.
+
+**MARKER-MATRIX GAP (flagged).** `docs/MARKER_MATRIX.md` scores 16 markers and **has no population-density
+marker**, despite density having a documented band (Tallavaara 0.1–0.5/km², MODEL_SPEC §4.3.1) and being the
+single largest quantitative miss in the model. Nothing has ever been looking at it — the same failure mode
+that let polygyny sit 15× off Marlowe unnoticed (MARKER_MATRIX's own note). **Proposed as marker #17.**
+
+**Origin:** diagnostic-only; `diag_forage_cap.py`, `diag_pop_suppressor.py`, `diag_agglomeration_ablation.py`,
+`diag_liveness_allon.py`, `diag_all_on.py` (scratchpad). No source files changed by this addendum. Three of my
+own hypotheses falsified here (contest split, agglomeration-as-suppressor, and earlier the self-selection
+story), two of them with the sign inverted — recorded per the R-106 house rule.
+
+**ADDENDUM 11 — `settle_tier2_yield` IS dimensionally inert, but the settlement economy is CEILING-GOVERNED,
+so correcting it changes almost nothing — and R-63's Bar-Yosef village benchmark SURVIVES the correction
+(2026-07-31).**
+
+**The bug, confirmed.** At settlement cells (coastal/temperate, ALL-ON preset):
+`tier-2 = settle_tier2_yield · Σ_catchment S_pot = 40 × ~6.7 ≈ 2.7e2 kcal` against
+`tier-1 = tf.level(site) ≈ 5.3e6 kcal` — **0.012% of the cell's food.** To supply ~1× a village's own need
+(100 people × 75,000 kcal) against Σ S_pot ≈ 6.7 needs `settle_tier2_yield ≈ 1.1e6`; the "~7×" claimed in
+PARAMETERS.md needs ≈ 7.8e6. The shipped value is **40** — four to six orders of magnitude short.
+
+**PROVENANCE CONFLICT RESOLVED.** PARAMETERS.md §517 claimed 40 = "~7× a village's need ⇒ fisheries never
+food-stressed (R-53)". R-63 §836 separately measured `settle_tier2_yield ∈ {1,2,5}` as **byte-identical** and
+attributed that to `S_pot = max(aquatic, cultivability) ≈ 0` on the forest cells where villages formed. Both
+cannot hold here: on coastal/temperate settlement cells S_pot ≈ 0.75/cell, so the term is **not** gated to
+zero — on this biome the cause is purely SCALE. R-63's explanation was correct for its own (forest) regime;
+the PARAMETERS.md claim is false at this value and has been corrected in place.
+
+**THE PREDICTION I MADE WAS WRONG.** I expected a dimensionally-correct tier-2 to blow village size through
+the Bar-Yosef band, which would have meant R-63's headline ("village size lands EXACTLY at Bar-Yosef 50–150,
+median 88, 100% in band, with no fitting") passed only because the mechanism was dead. Swept instead:
+
+| `settle_tier2_yield` | tier2/tier1 | pop | %land | sites | village med | in 50–150 | in 50–250 |
+|---|---|---|---|---|---|---|---|
+| **40** (shipped) | 0.012% | 1657 | 2.69 | 17 | 63 | 52.9% | 64.7% |
+| 4e3 | 1.30% | 1659 | 2.68 | 28 | 104 | 75.0% | 96.4% |
+| 4e4 | 33.5% | 1498 | 2.68 | 8 | 94 | 62.5% | 87.5% |
+| 4e5 | 224% | 1608 | 2.78 | 6 | 108 | 50.0% | 66.7% |
+| 1.1e6 (~1× need) | 819% | 1557 | 2.55 | 15 | 75 | **80.0%** | 86.7% |
+| 7.8e6 (claimed 7×) | **4673%** | 1407 | 1.96 | 14 | 118 | 78.6% | **100%** |
+
+**Across a 200,000× change in the parameter, village median moves only 63 → 118 and population 1657 → 1407.**
+The in-band score *improves* (52.9% → ~78-80%). **R-63's benchmark is not an artefact of the dead mechanism —
+it survives the correction.**
+
+**WHY — the settlement economy is CEILING-GOVERNED, not tier-2-governed.** `phase1_model` line 1648 applies
+`S = min(S, self._settlement_carrying_capacity((cx, cy)))` — the R-63 catchment ceiling, which reads the
+DEPLETABLE harvest field over the catchment. However large the (static, un-depletable) tier-2 term becomes, the
+realized cell pool is clamped to what the catchment can actually yield. That is why `tier2/tier1` can reach
+4673% with almost no behavioural consequence, and why `settle_tier2_yield` reads as a **dead parameter over
+five-plus orders of magnitude**. It also means the ceiling — not the tier-2 term — is the load-bearing piece of
+the settlement economy, and the one that carries depletion into village food (Addendum 9 measured it binding in
+28.6% of settlement cells).
+
+**NOT ADOPTED.** Raising the value mildly improves the Bar-Yosef in-band score, but that is a single seed with
+only 14–17 villages, and MARKER_MATRIX binding rule 3 ("seeds must beat the variance") forbids adopting on it.
+Queued for the multi-seed battery. The DOCUMENTATION error is corrected regardless, since it was asserting a
+food supply that does not exist.
+
+**Origin:** diagnostic-only; `diag_tier2_scale.py` (scratchpad). `docs/PARAMETERS.md` §517 corrected in place
+(a false claim, not a calibration change). No source files changed. Fourth of my own hypotheses falsified by
+measurement today.
+
+**ADDENDUM 12 — "ALL MECHANISMS ON" SCORES MATERIALLY WORSE AGAINST THE MARKER MATRIX than the curated
+preset (run-length-matched, 5 worlds × 5 seeds); plus a direct confirmation of Addendum 10's density
+arithmetic, and no long-horizon runaway (2026-07-31).**
+
+**Why this run.** The supervisor rule is that every BUILT mechanism runs unless deliberately off for an
+ablation. An audit found **27 of 79 `enable_*` flags dark** in the canonical preset (`emergent_village_demog`
++ VILLAGE + ELITE), and `run_campaign.py` exposed a `C_*` knob for only ~10 of them, so a campaign could not
+exercise the rest at all. Added `C_ALLON` (enables every remaining built mechanism except four, each with a
+stated reason) and `L_TAGSUF` (a tag namespace, see the instrument note below), then ran the canonical
+`battery6_long` S4 envelope — the project's own harness, with its runtime anchor guard — at 5 worlds × 5 seeds
+× 2000 steps. `ascribed_frac` was correctly SKIPPED by the anchor guard as undocumented.
+
+**TWO INSTRUMENT FAULTS CAUGHT, ONE OF THEM MINE.**
+1. **My own tag bug.** `L_TAGSUF` was applied to arm CONSTRUCTION but not to the four places that
+   re-derive tags during SCORING (`battery6_long` lines 169/198/199/218). The battery therefore *ran* 25 new
+   all-on arms (5.3 h of compute, files written correctly) and then **scored the 25 pre-existing baseline
+   trajectories** — reporting numbers identical to those already in MARKER_MATRIX.md. Caught only because six
+   markers matching the recorded values to four decimal places (0.2515, 0.296) is not plausible. Fixed; the
+   all-on arms were rescored from disk at zero compute cost. **This is the same silent-no-op class as the
+   `bud_events` counter and the `battery1_liveness` patch window — the third such fault this arc.**
+2. **A run-length confound.** The historical baseline arms on disk ran **3000** steps; the all-on arms ran
+   **2000**. `sustained()` medians over the LAST 50%, so baseline covered steps 1500-3000 and all-on
+   1000-2000. `connubium_med`, `lineage_size_gini` and `lin_top_share` are structure-ACCUMULATION markers that
+   grow with time, so the shorter run scores lower for free. Corrected by TRUNCATING every baseline trajectory
+   to step ≤ 2000 and rescoring with identical `sustained()` semantics — no re-simulation. The uncorrected
+   comparison would have overstated the degradation (baseline connubium reads 15/25 at 3000 steps, 13/25 at
+   2000; lineage Gini 17/25 → 12/25).
+
+**PAIRED RESULT (both arms at an identical 2000-step horizon, 25 arms each):**
+
+| marker | band | baseline | ALL-ON | delta |
+|---|---|---|---|---|
+| `band_med` | [18–35] | 23/25 | **20/25** | −12% |
+| `settle_med` | [50–150] Bar-Yosef | 21/25 | 21/25 | 0 |
+| `settle_med` | [50–250] Alvard | 21/25 | 21/25 | 0 |
+| `connubium_med` | [79–332] | 13/25 | **3/25** | **−40%** |
+| `lineage_size_gini` | [0.51–0.68] | 12/25 | **3/25** | **−36%** |
+| `lin_top_share` | [0.08–0.30] | 1/25 | 2/25 | +4% |
+| T-7 hierarchy ordering | 3 proxies | 2 of 3 hold | **0 of 3** | — |
+
+**Turning on all built mechanisms makes the model fit the ethnographic record substantially WORSE on three of
+six markers, with two unchanged and one (the weakest, already 1/25) marginally better.** `band_med`'s observed
+range widens 15.5–32 → 8–37, i.e. band sizes become more variable in both directions, which points at the
+band-size/fission group (`enable_emergent_band_size`, `enable_malnutrition_fission`,
+`enable_resource_directed_fusion`) as candidate culprits — **not yet bisected; 23 flags cannot be attributed
+from one contrast.**
+
+**INTERPRETATION, stated carefully.** This does NOT show the dark mechanisms are wrong, and it does not settle
+whether they should be on. It shows that the canonical preset's curation is load-bearing for the current
+marker scores, and that "everything on" is a materially different model that has never been calibrated. The
+honest options are (a) keep the curated preset as canonical and treat all-on as a research configuration,
+(b) bisect the degradation, fix or re-calibrate the offending mechanisms, and then adopt all-on, or (c) accept
+worse marker fit in exchange for mechanistic completeness. **(b) is the only one that does not discard
+information; it is the recommended next step and is not yet done.**
+
+**DENSITY — ADDENDUM 10'S ARITHMETIC CONFIRMED.** The campaign harness runs a capacity sub-window, so these
+worlds have **1584 habitable cells** (not 9449). Final coastal/temperate population **7909 on 1584 cells =
+4.99 agents/cell ⇒ 0.0499 persons/km²**. Addendum 10 projected **0.053/km²** for full land occupancy from the
+per-cell equilibrium — measured 0.0499. **The density decomposition holds**: when agents occupy essentially
+all of the available land, density lands where the arithmetic said it would. It remains **~2× below Binford
+packing (0.091)** and 2–10× below the Tallavaara band, so a residual per-cell deficit survives the spatial
+one — the two deficits are separable and both real.
+
+**S6 LONG-HORIZON DRIFT — NO RUNAWAY.** Two 30k-step-budget arms reached 15,402 and 11,708 steps: population
+×1.73/×1.76 with **late-acceleration 0.833/0.745 (decelerating)**, settlements ×2.26/×2.20 (late-accel
+0.745/0.719), `mean_material` flat (×0.913/×0.992), `gini_cred` stable. R-105's late-onset runaway does not
+recur under all-on. **Fission rate 5.0e-4/settlement-yr against Bandy's 2–5e-3 — out of band (≈10× low)**,
+where MARKER_MATRIX previously recorded 5.6e-3 ✓; whether that is the all-on config or the shorter horizon is
+not established.
+
+**Origin:** `sic_games/outputs/mechanism_battery/battery6_long.py` (`L_TAGSUF` + the four scoring-tag fixes),
+`sic_games/outputs/substrate_run/run_campaign.py` (`C_ALLON`), both default-off/no-op; paired rescoring via
+`score_paired.py` (scratchpad). Results: `battery6_long_results.json` (all-on), baseline arms rescored from
+their existing trajectories.
+
+**ADDENDUM 13 — THE ATTRACTION/PRODUCTION SPLIT IS BUILT AND THE HYPOTHESIS BEHIND IT IS FALSIFIED: the
+concentration comes from REAL superlinear production, not from perception. Agents are behaving correctly; the
+economics they read are what concentrate them (2026-07-31).**
+
+**What was built.** `aggl_attraction_weight` (default 1.0, bit-exact) scales the PERCEIVED co-location premium
+in `substrate.diffusion_select_target` alone, leaving realized harvest production untouched. Motivated by
+Addendum 10's entanglement finding: one term, `aggl_R·(n^β − n)`, both ATTRACTS movers and FEEDS them, so
+ablating it broke the concentration (max cell occupancy 159 → 10) while cutting population to ×0.20–0.45.
+The weight was supposed to let those be tuned separately. 7 unit tests, including a quantitative one that
+reads the premium back out of the scorer by bisecting the balancing move cost and confirms it equals
+`wt·R·(n^(β−1) − 1)` to 2%.
+
+**THE PREDICTION: a lowered weight should give aggl-OFF's DISPERSAL while keeping aggl-ON's POPULATION.
+FALSIFIED.** (ALL-ON preset, coastal/temperate, N=1500, 600 steps, `patch=None`.)
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² | intake<1× |
+|---|---|---|---|---|---|---|---|
+| attract 1.0 (shipped) | 1657 | 254 | 2.69 | 6.5 | 159 | 0.0018 | 7.0% |
+| attract 0.5 | 1463 | 223 | 2.36 | 6.6 | 205 | 0.0015 | 13.1% |
+| attract 0.25 | 1508 | 223 | 2.36 | 6.8 | 191 | 0.0016 | 9.5% |
+| attract 0.1 | 1413 | 227 | 2.40 | 6.2 | 86 | 0.0015 | 7.4% |
+| **attract 0.0** | 1379 | **199** | **2.11** | **6.9** | 128 | 0.0015 | 7.5% |
+| **agglomeration fully OFF** | **331** | 141 | 1.49 | **2.3** | **21** | 0.0004 | 7.9% |
+
+**Zeroing the perceived premium does essentially nothing to the concentration.** Mean occupancy is flat at
+**6.2–6.9 across every weight** — and 2.3 only when agglomeration is fully off. Occupied cells go DOWN
+(254 → 199), not up. `max_occ` is non-monotone (159/205/191/86/128), i.e. noise. Population falls modestly
+(×0.83), so the knob is not perfectly inert, but it is nowhere near the lever.
+
+**WHAT THIS MEANS — Addendum 4's decomposition was right and my reading of it was wrong.** Addendum 4 measured
+the perceived agglomeration premium at **+387,290** against a **−35,810** raw-food disadvantage, and I treated
+that as agents being *lured* into crowding against their interest. They are not. That premium is a FAITHFUL
+signal of a genuine production advantage: `S += aggl_R·(n^β − n)` puts real food on crowded cells, so
+per-capita yield really does rise with n. **The ideal-free distribution is working correctly — it sends agents
+where the returns actually are.** The perception was never the driver; the economics are. My fix targeted the
+messenger.
+
+**SO THE LEVER IS THE PRODUCTION FUNCTION, AND THE ANCHOR BEHIND IT IS ALREADY FLAGGED AS BORROWED.** With
+`aggl_beta = 1.15` (point mode) per-capita output rises with n **without bound**, which makes unlimited
+crowding economically optimal; concentration is then the correct answer to the economics, not a defect in the
+movement rule. MODEL_SPEC §4.8.21 already records the provenance caveat verbatim: β≈1.15 is **Bettencourt
+2013, measured on MODERN CITIES (socioeconomic output)** — "an explicit cross-domain borrowing... subsistence
+returns-to-co-location (weirs/terraces/defense/storage) may be sharper — **a *testable prediction*, not a
+fit**." This is that test, and it reads against the borrowing: unbounded urban superlinearity applied to
+forager subsistence produces a landscape 97% empty with everyone stacked on 2.7% of it.
+
+**Consistent with R-63**, which found villages land exactly at Bar-Yosef 50–150 with agglomeration OFF and
+become mega-villages with it ON. Same cause, seen from the settlement side.
+
+**THE REMAINING TENSION, stated honestly.** Agglomeration OFF gives good village size and correct dispersal
+(mean occupancy 2.3) but a population of 331 — far too small. Agglomeration ON gives a viable population and
+untenable concentration. Neither is right, and no setting of the new weight bridges them, because the weight
+does not touch the term that matters. **The next test is the SHAPE of the production function**: an unbounded
+`n^β` versus a SATURATING one (returns to co-location that rise then level off, which is what a real catchment
+does — you cannot keep gaining from crowding forever). The `catchment` mode (`L(n) = n^α/(n^α + half^α)`)
+already implements a saturating form and is retired as DEAD_ENDS DE-11, but it was retired for a different
+question and is worth re-testing against this one.
+
+**KEPT ANYWAY, at default 1.0.** The split is retained because it is correct, tested and bit-exact, and it
+now carries a measured answer — "perception is not the concentrator" — that the codebase previously only
+assumed. It is not adopted as a non-default value.
+
+**Origin:** `sic_games/src/sic_games/{demography,substrate,phase1_model}.py`,
+`sic_games/tests/test_aggl_attraction_split.py` (7 tests), commit 7506828; sweep
+`diag_aggl_split.py` (scratchpad). Seventh of my own hypotheses falsified in this arc.
+
+**ADDENDUM 14 — A POSITIVE RESULT: a CONGESTIBLE production form breaks the population/concentration
+tradeoff (pop ×0.95, land use +57%, mean occupancy −40%). It does NOT fix the density gap, and the mechanism
+that does it is one this project already retired — for exactly the property we now want (2026-07-31).**
+
+**Setup.** Addendum 13 established the concentration is produced by REAL superlinear output
+(`S += aggl_R·(n^β − n)`, β=1.15, per-capita rising without bound), not by perception. This sweeps the
+production SHAPE at the bit-exact default attraction weight: point mode β ∈ {1.15, 1.10, 1.05, 1.00} and the
+`catchment` form `L(n) = n^α/(n^α + half^α)` over `aggl_half` ∈ {25, 50, 100, 200}, plus an agglomeration-OFF
+reference. Coastal/temperate, ALL-ON, N=1500, 600 steps, `patch=None`.
+
+**INSTRUMENT CHECK PASSED:** `point β=1.00` reproduced the agglomeration-OFF arm **exactly** (331 / 141 cells /
+occ 2.3 / max 21 / 0.0004), as the algebra requires since both `n^(β−1) − 1` and `n^β − n` vanish at β=1.
+
+| arm | pop | cells | %land | mean occ | max occ | dens/km² | village med |
+|---|---|---|---|---|---|---|---|
+| point β=1.15 (shipped) | 1657 | 254 | 2.69 | 6.5 | 159 | 0.0018 | 63 |
+| point β=1.10 | 1044 | 167 | 1.77 | 6.3 | 179 | 0.0011 | 110 |
+| point β=1.05 | 795 | 226 | 2.39 | 3.5 | 167 | 0.0008 | 134 |
+| point β=1.00 | 331 | 141 | 1.49 | 2.3 | 21 | 0.0004 | — |
+| **catchment half=25** | **1569** | **398** | **4.21** | **3.9** | **89** | 0.0017 | **49** |
+| catchment half=50 | 938 | 298 | 3.15 | 3.1 | 49 | 0.0010 | 50 |
+| catchment half=100 | 626 | 200 | 2.12 | 3.1 | 51 | 0.0007 | 51 |
+| catchment half=200 | 540 | 200 | 2.12 | 2.7 | 44 | 0.0006 | 51 |
+| agglomeration OFF | 331 | 141 | 1.49 | 2.3 | 21 | 0.0004 | — |
+
+**THE POSITIVE.** `catchment half=25` keeps **95% of the shipped population** (1569 vs 1657) while cutting
+mean cell occupancy **6.5 → 3.9 (−40%)**, max occupancy **159 → 89 (−44%)**, and expanding land use
+**2.69% → 4.21% (+57%)**. Lowering β in point mode cannot do this — β=1.10/1.05 shed 37%/52% of the population
+for little dispersal, and β=1.00 is just agglomeration off. **This is the first arm in the arc that improves
+the spatial pathology without paying for it in population.**
+
+**WHAT IT DOES NOT DO — stated plainly. It does not fix the density gap.** Realized density is
+**0.0017 vs the shipped 0.0018** — unchanged, still ~55× below the Tallavaara low anchor. Density is
+population ÷ total land, and population is essentially the same; dispersal redistributes the same people over
+more cells. Worse for the projection: since `proj = mean_occ/100`, the full-occupancy projection FALLS
+(0.0652 → 0.0394), because dispersal trades per-cell density for coverage. **The population ceiling and the
+concentration are separable problems, and this addresses only the second.** Village median 49 also sits just
+under Bar-Yosef's 50 floor (from 63), and under-maintenance intake rises 7.0% → 10.8%.
+
+**THE MECHANISM IS RETIRED, AND DE-11 CALLED THIS EXACTLY RIGHT.** `aggl_mode="catchment"` is DEAD_ENDS
+**DE-11** (2026-07-06). Its stated reason is not that the mechanism misbehaves — it is that `L(n)` saturates
+so per-capita `R·L(n)/n` **peaks then falls ∝1/n**, making the term "**areal-dispersive**", with the measured
+signature that cranking it "**monotonically reduces packing (26→21→15%)**". **This sweep reproduces that
+direction precisely** (mean occupancy 3.9 → 3.1 → 3.1 → 2.7 as `half` rises 25 → 200). DE-11 retired it for
+failing to produce nucleation, because nucleation was the goal in July. **We now measure over-nucleation as
+the defect. The mechanism has not changed; the objective inverted.**
+
+**BUT DO NOT CALL IT "SATURATING AGGLOMERATION" — DE-11 is right that it is a different economic object.**
+Bettencourt's form has per-capita rising without bound (an agglomeration economy); the catchment form has
+per-capita peaking then declining (a **congestible common-pool**). So the real modelling question this
+exposes is: *which is correct for FORAGER subsistence?* MODEL_SPEC §4.8.21 already flags β≈1.15 as measured on
+**modern cities** and labels the transfer "a *testable prediction*, not a fit". A weir, a drive hunt, a shellfish
+bed or a catchment is congestible — past some crew size more bodies add nothing and then subtract. Unbounded
+increasing returns may well be right for later urbanism and wrong here. **That is a substantive claim about
+the model's economics, and it is now supported by a measurement rather than asserted.**
+
+**NOT ADOPTED.** One seed, one world. MARKER_MATRIX binding rule 3 ("seeds must beat the variance", with R-65's
+30× seed variance on record) forbids adopting on this. Required before any adoption: the full 5×5 envelope on
+`battery6_long`, a check that village size stays inside Bar-Yosef, and an explicit decision on whether to
+revive a DEAD_ENDS entry — which needs the supervisor, since it reverses a documented retirement.
+
+**Origin:** diagnostic-only; `diag_aggl_shape.py` (scratchpad). No source changed (the catchment path already
+exists and is kept "for comparison only" per DE-11). Reads against DEAD_ENDS DE-11's retirement and against
+MODEL_SPEC §4.8.21's own flagged caveat.
+
+**ADDENDUM 15 — THE MOBILITY THREAD CLOSES: nothing is miscalibrated. The world set matches the forager
+anchor (+18%), and the missing gradient is a DISCRETIZATION limit — the model cannot represent a move shorter
+than 10 km or more often than monthly. Plus: the group bisection was UNDERPOWERED and its null is not
+evidence (2026-07-31).**
+
+**PART 1 — the mobility question, answered under the anchor-wins directive.** The supervisor rule is that when
+a lit anchor blocks a benchmark the anchor stands and something else must be broken. Addendum 9 found
+`mobility_npp_ref = 900` sits BELOW the landscape mean (1004), so 99.1% of agents get `r=1` and the
+Kelly/Binford productivity gradient never reaches behaviour. Two candidate culprits: the anchor, or the worlds.
+**Measured: it is neither.**
+
+| world | mean NPP | median NPP | p10 | p90 | r at median |
+|---|---|---|---|---|---|
+| coastal/temperate | 1004 | 1054 | 694 | 1280 | 1 |
+| flat/boreal | 795 | 859 | 497 | 987 | 1 |
+| flat/tropical | 2291 | 2410 | 1806 | 2508 | 1 |
+| flat/temperate | 1083 | 1109 | 720 | 1406 | 1 |
+| hilly/temperate | 1002 | 1067 | 688 | 1232 | 1 |
+| mountainous/boreal | 458 | 440 | 316 | 624 | **2** |
+
+Median NPP across the six worlds is **1061 against the 900 anchor — +18%**. That is not a systematic bias;
+foragers occupy habitats spanning roughly 150–2500 g/m²/yr and this world set sits comfortably inside it.
+**World generation is not the defect, and `npp_ref=900` (the Tallavaara forager median) does not need moving.**
+
+**THE ACTUAL CONSTRAINT IS THE GRID.** `mobility_radius` returns an INTEGER stride with a floor of 1, and one
+cell is **10 km**. So the shortest move the model can represent is 10 km — while Binford/Kelly's *mean*
+residential move is **~4–16 km** (158 km/yr spread over 10–40 moves). In rich habitat Kelly's ∝1/productivity
+law calls for moves SHORTER than one cell, which is unrepresentable; the stride can only floor at 1. The
+gradient therefore survives only at the poor end (mountainous/boreal, r=2) and is mathematically erased
+everywhere above ~600 g/m²/yr. **`r=1` in a rich biome is not a calibration failure — it is the model
+correctly saturating at its own spatial resolution, at a value (10 km) that is already a realistic
+residential move.**
+
+**COMBINED WITH THE TEMPORAL LIMIT (Addendum 7), THE ENVELOPE IS BOUNDED.** Movement resolves once per monthly
+step ⇒ ≤12 moves/yr; each move is ≥10 km ⇒ the representable maximum is **12 × 10 = 120 km/yr**, against
+Binford **158** and Kelly **174**. **The discretization caps achievable annual travel just BELOW the
+ethnographic anchor, and only if every agent moves every step.** Measured mobile-agent travel is 86–115 km/yr
+(Addenda 7/8), i.e. **72–96% of the model's own representable ceiling.** The model is close to the most it can
+express. Closing the remaining gap is an architectural question (sub-cell movement, a finer grid, or a
+sub-monthly step), not a parameter one. This retires the "calibrate `mobility_npp_ref`" task: there is nothing
+to calibrate.
+
+**PART 2 — THE GROUP BISECTION IS INCONCLUSIVE, AND ITS NULL MUST NOT BE READ AS A RESULT.** Addendum 12's
+degradation (connubium 13/25→3/25, lineage Gini 12/25→3/25) was bisected by adding flag groups one at a time
+on top of the canonical baseline (3 worlds × 2 seeds × 1200 steps):
+
+| arm | band_med | connubium_med | lineage_size_gini | settle_med |
+|---|---|---|---|---|
+| baseline | 6/6 | **1/6** | **0/6** | 6/6 |
+| G1 band/fission | 6/6 | 0/6 | 0/6 | 6/6 |
+| G2 social/residence | 6/6 | 2/6 | 0/6 | 6/6 |
+| G3 demography | 6/6 | 0/6 | 0/6 | 6/6 |
+| G4 environment | 6/6 | 1/6 | 0/6 | 6/6 |
+
+No group reproduces the degradation — **but the test had no power to detect one.** The two markers that
+degraded are ALREADY FLOORED AT BASELINE at this horizon (connubium 1/6, lineage Gini 0/6), because both are
+structure-ACCUMULATION markers and 1200 steps is too short for them to reach their bands at all; at 2000 steps
+the same baseline reaches 13/25 and 12/25, which is where the headroom to detect a drop exists. `band_med` is
+6/6 in every arm, so it carries no signal either. **I chose 1200 steps for speed and destroyed the very
+contrast the test was built to measure.** Reporting "no group is responsible" would be a false negative
+manufactured by the instrument — the same class of error as the un-suffixed scoring tags and the missing
+`C_EXTRA_ON` knob. **The bisection must be re-run at ≥2000 steps; until then the attribution is OPEN.**
+
+**Origin:** diagnostic-only; a direct world-NPP/stride computation and `diag_bisect_allon.py` (scratchpad).
+No source changed. Retires the mobility-calibration task; leaves the Addendum 12 attribution open.
+
+**ADDENDUM 16 — ADDENDUM 14'S POSITIVE DOES NOT SURVIVE THE FULL ENVELOPE. The congestible form buys
+dispersal by destroying villages: `settle_med` 21/25 → 12/25. The tradeoff was not broken, it was RELOCATED —
+and that identifies superlinear co-location as what MAKES villages (2026-07-31).**
+
+**The confirmation required by binding rule 3.** Addendum 14 reported a single-seed positive: the congestible
+`catchment` production form kept 95% of the population while cutting mean cell occupancy 40% and expanding
+land use 57%. It flagged the risk that village median had fallen 63 → 49, just under the Bar-Yosef floor.
+The full 5 worlds × 5 seeds × 2000 steps envelope was run to settle it (`C_AGGLMODE=catchment`,
+`C_AGGLHALF=25`, tags `_b6_catch_*`). **The flagged risk is what happened.** All three columns at a matched
+2000-step horizon:
+
+| marker | band | baseline | ALL-ON (point β=1.15) | ALL-ON (catchment half=25) |
+|---|---|---|---|---|
+| `band_med` | [18–35] | 23/25 | 20/25 | **22/25** |
+| `settle_med` | [50–150] Bar-Yosef | 21/25 | 21/25 | **12/25** |
+| `settle_med` | [50–250] Alvard | 21/25 | 21/25 | **12/25** |
+| `connubium_med` | [79–332] | 13/25 | 3/25 | **1/25** |
+| `lineage_size_gini` | [0.51–0.68] | 12/25 | 3/25 | 3/25 |
+| `lin_top_share` | [0.08–0.30] | 1/25 | 2/25 | 2/25 |
+| T-7 ordering | 3 proxies | 2 of 3 | 0 of 3 | 1 of 3 |
+
+**Village formation collapses.** `settle_med` falls **21/25 → 12/25** on both the Bar-Yosef and Alvard bands,
+with observed values **0..83** — villages never exceed 83 anywhere, and in several arms fail to form at all
+(the 0s). Band size improves marginally (20→22/25) but its observed range widens to 3..38. Connubium degrades
+further (3/25 → 1/25). Only T-7 recovers slightly (0 → 1 of 3 proxies).
+
+**SO THE TRADEOFF WAS NOT BROKEN — IT MOVED.** Addendum 14 measured the congestible form paying no price in
+POPULATION and concluded the population/concentration tension was resolved. It was not: the price is paid in
+VILLAGE SIZE instead. Dispersal works so well that nucleation stops happening. **Addendum 14's headline is
+hereby superseded: it was a real effect measured on too narrow a slice, and the marker it broke was not among
+the four that sweep scored.** The single-seed sweep tracked village median but not the pass fraction across
+worlds, which is precisely what binding rule 3 exists to catch.
+
+**WHAT THIS BUYS US ANYWAY — a mechanistic identification.** Point-mode superlinearity (per-capita output
+rising without bound with n) is what MAKES villages in this model. Replace it with a congestible common-pool
+(per-capita peaking then falling ∝1/n) and villages stop reaching Bar-Yosef size. So the same term is doing a
+THIRD job on top of the two Addendum 10 identified: it attracts movers, it feeds the economy, **and it is the
+engine of village nucleation.** That is why every attempt to soften it costs something elsewhere — population
+(Addendum 13), or villages (here). **The concentration is not a bug bolted onto village formation; it is the
+same mechanism seen from the other side.**
+
+**IMPLICATION FOR THE DENSITY PROGRAMME.** There is now no known setting of the agglomeration production
+function that gives dispersed settlement AND viable population AND Bar-Yosef villages simultaneously. Either
+the three are genuinely in tension under any single co-location term — in which case villages and dispersal
+need SEPARATE mechanisms (nucleation from something other than unbounded returns, e.g. defensibility, storage
+tethering or site appraisal, with co-location returns left congestible) — or the resolution lies outside this
+term entirely. Addendum 10's arithmetic still stands and is untouched by this: density = per-cell occupancy ×
+fraction of land occupied, and the shortfall is dominated by the 2.7% land-use term.
+
+**NOTHING ADOPTED. `aggl_mode` stays `"point"`**, and DEAD_ENDS **DE-11** stands — its retirement of the
+catchment form is now supported by a second, independent line of evidence (village collapse), on top of the
+"areal-dispersive" reason it originally gave. The revival question raised in Addendum 14 is **answered
+negatively and does not need supervisor time.**
+
+**Origin:** `battery6_long` 5×5 envelope, tags `_b6_catch_*`, via the `C_AGGLMODE`/`C_AGGLHALF` knobs
+(d359054). Compared at a matched 2000-step horizon against the ALL-ON point-mode arms (Addendum 12) and the
+run-length-truncated canonical baseline. Supersedes Addendum 14's adoption case; Addendum 14's measurements
+themselves stand.
+
+**ADDENDUM 17 — BISECTION, PROPERLY POWERED: `band_med`'s degradation IS attributable (band/fission group,
++14% band size in 6/6 pairs). The connubium and lineage-Gini degradations are NOT — their per-pair variance
+dwarfs any group effect. Plus a fifth instance of the silent-resume bug, this one mine (2026-07-31).**
+
+**INSTRUMENT FAULT FIRST (the fifth in this arc, third of them mine).** The first re-run of the bisection at
+2000 steps produced output **byte-identical** to the 1200-step pass. It had not run: `diag_bisect_allon.py`
+tagged arms `_bx_{group}_{world}_s{seed}` with **no horizon in the tag**, so its resume check
+(`traj(tag) is None`) matched the existing 1200-step trajectories and skipped all 30 arms, re-scoring stale
+files. Identical to `battery6_long`'s un-suffixed scoring tags (Addendum 12) and the missing `C_EXTRA_ON`
+knob. Fixed by putting the step count in the tag. **Every one of these five faults produced a clean,
+plausible, wrong answer; the only reason any was caught is that the results were suspiciously consistent.**
+(Arms then wall-clocked at **1800** steps against the 2000 requested — the analysis below is at 1800.)
+
+**SECOND METHOD FIX — pass fractions were the wrong statistic.** Scoring 6 arms as a pass fraction discards
+nearly all the information: baseline sits at 1/6 on both degraded markers, so a real drop has nowhere to
+appear (floor effect), and 6 Bernoulli trials cannot resolve a 40-point change. Re-analysed the SAME
+trajectories as **paired continuous deltas** — each group arm against the baseline arm of the same world and
+seed, so world/seed variation (R-65: up to 30×) cancels exactly. Sign test over the 6 pairs.
+
+| group | marker | median Δ | pairs down | rel. | reading |
+|---|---|---|---|---|---|
+| **G1 band/fission** | `band_med` | **+3.75** | **0/6** | **+14%** | **consistent, all pairs up** |
+| G1 band/fission | `pop` | +425 | 0/6 | +6% | consistent |
+| G1 band/fission | `lineage_size_gini` | −0.023 | 5/6 | −5% | small, consistent |
+| G2 social/resid | `pop` | +1008 | 1/6 | +14% | consistent |
+| G3 demography | `pop` | −1200 | 4/6 | −16% | real, some spread |
+| G3 demography | `lineage_size_gini` | −0.013 | 5/6 | −3% | small, consistent |
+| G4 environment | `settle_med` | −4.25 | 5/6 | −4% | small, consistent |
+| G4 environment | `band_med` | +1.50 | 0/6 | +6% | consistent |
+| *all four groups* | `connubium_med` | −15 … +10.5 | 1–3/6 | — | **NOISE** (per-pair −49 … +62) |
+
+**ATTRIBUTED: the `band_med` degradation.** `G1_band_fission` (`emergent_band_size`,
+`malnutrition_fission`, `resource_directed_fusion`, `band_risk`) raises band size **+14% in 6 of 6 pairs** —
+the most consistent effect in the whole table. Baseline bands run 23.5–31.5 against a [18–35] band, so a
+uniform +14% pushes the upper arms out the top. That is precisely Addendum 12's `band_med` 23/25 → 20/25, and
+it matches the observed range widening to 8..37 there. **`G4_environment` adds a smaller +6% in the same
+direction.** Which of G1's four flags carries it is not resolved (the group was not split further).
+
+**NOT ATTRIBUTED — and the reason is measurement, not absence.** `connubium_med` per-pair deltas swing from
+**−49 to +62** with no group showing a consistent direction; at that variance a 6-pair design cannot resolve
+anything, and no group comes close to explaining Addendum 12's 13/25 → 3/25. `lineage_size_gini` shows small
+consistent negatives for G1 (−5%) and G3 (−3%) which together are nowhere near its 12/25 → 3/25 collapse.
+**So the two large degradations are either INTERACTIVE across groups, or driven by the knob-controlled flags
+`C_ALLON` deliberately does not touch** (`enable_exogamy`, `enable_adaptive_connubium`,
+`enable_economic_defensibility`, `enable_village_budding`, `enable_soil_depletion`, `enable_genome`, the
+lineage branch/split rates — several of which bear directly on connubium reach and lineage structure).
+Resolving it needs either a full 5×5 envelope per group (5 × 25 = 125 arms) or a design that varies the
+knob-controlled set, and **is left OPEN rather than forced.**
+
+**INCIDENTAL, worth recording:** the population effects are the clearest signals here — G2 social/residence
+**+14%**, G1 band/fission **+6%**, G3 demography **−16%**. The demography group (which includes
+`enable_intake_fertility`, this arc's own addition) costs population, consistent with R-106's finding that the
+intake brake moves regulation from deaths to births and lowers the equilibrium.
+
+**Origin:** diagnostic-only; `diag_bisect_allon.py` (horizon-tagged) + `score_bisect_paired.py` (scratchpad,
+re-analysis of the same trajectories, no new simulation). 3 worlds × 2 seeds, 1800 steps. No source changed.
+
+**ADDENDUM 18 — MALTHUS RETEST ON A TRACTABLE WORLD: NO CYCLES. Population does not oscillate, it DECLINES
+in every completed seed — the slow variable (soil) DRAGS carrying capacity down rather than driving
+oscillation. And the equilibrium-seeding trick failed for an instructive reason (2026-07-31).**
+
+**Design, and why it is the first tractable attempt.** Every prior cycle test in this arc was uninterpretable
+because the population never reached stationarity (Addendum 6). Two changes fixed the tractability: a SMALL
+world (`patch=32` ⇒ 708–1008 habitable cells, so equilibrium is reached in hundreds of steps rather than
+thousands) and **seeding AT the measured equilibrium** rather than growing into it (R-106: starts of 3k/12k/20k
+converge on the same attractor). ALL-ON, 6000 steps, sampled every 4 (1500 samples ⇒ `period_of` accepts
+periods to window/3 = 2000 steps = 167 yr, covering the 60–100 yr anchor), 3 seeds. Founders tuned to
+6200/6000/4400 after a first attempt at 10,000 proved ~60% too high and cost 2.2 s/step.
+
+| series | seed 1 | seed 2 | verdict |
+|---|---|---|---|
+| population | trend **−11.4%**/1000 steps, ratio 0.805 → **DRIFTING** | **−13.0%**/1000, ratio 0.690 → **DRIFTING** | **uninterpretable** |
+| occupied cells | stationary; period 1368, ac_peak **−0.003** | stationary; period 784 (65 yr), ac_peak **+0.042** | **NO CYCLE** (both ≤ null p95 0.13) |
+| mean wealth | stationary; period **144 (12.0 yr)**, ac_peak **+0.312**, CV 0.101 | stationary; period **240 (20.0 yr)**, ac_peak **+0.176**, CV 0.134 | see below |
+
+(Seed 0 incomplete at 3000/6000 steps; its trajectory 6200 → 10522 → **12054** → 11926 → 9982 → 8301 → 8001
+shows clear OVERSHOOT then decline.)
+
+**1. NO MALTHUSIAN CYCLES — and this time the negative is INTERPRETABLE.** `occupied_cells` is stationary in
+both completed seeds and its autocorrelation peak is **−0.003 and +0.042**, at or below R-87d's calibrated
+null floor (p95 = 0.13). That is a genuine negative on a stationary series — **the first one this arc has been
+entitled to state**, since every previous attempt failed the stationarity gate.
+
+**2. THE ONE REPRODUCIBLE POSITIVE IS NOT A SECULAR CYCLE.** `mean_wealth` clears the null floor in BOTH seeds
+(+0.312, +0.176). But it fails on three counts: the **periods disagree by 1.7×** (12.0 vs 20.0 yr — two seeds
+agreeing that *a* peak exists while disagreeing on *where* is not a period); both are far below the **60–100 yr**
+ethnographic anchor; and the detrended CV is **10–13%** against the **30–50%** swings real secular cycles show.
+It is also a per-capita STOCK, not the Malthusian population variable. **Plausible mechanical origin, offered
+as a hypothesis and not a finding:** `soil_regrow_per_yr ≈ 0.06` gives a ~17 yr time constant, squarely in the
+12–20 yr band — i.e. this may simply be the soil depletion/regrowth relaxation showing up in wealth, not a
+population dynamic at all.
+
+**3. THE REAL FINDING — THE SLOW VARIABLE DRAGS, IT DOES NOT CYCLE.** R-106 and R-97 concluded that cycles
+need a SLOW variable and that the model had none. `enable_soil_depletion` supplies one (~17 yr). With it live,
+population does not oscillate around a level — **it falls monotonically in both completed seeds** (−11.4%,
+−13.0% per 1000 steps) and, in seed 0, overshoots to 12,054 and then falls a third to 8,001. Progressive
+capacity degradation moves the attractor DOWNWARD instead of creating a delayed restoring force. **A slow
+variable is necessary for cycles but is evidently not sufficient; a degrading one produces decline, not
+oscillation.**
+
+**4. THE EQUILIBRIUM-SEEDING TRICK FAILED, INSTRUCTIVELY.** It was meant to deliver stationarity by starting
+at the attractor. It could not, because **under soil depletion there is no stationary state to start at** —
+carrying capacity itself is falling, so any seeded level is transient by construction. Future cycle tests face
+a fork: ablate soil depletion (removing the only slow variable, and with it any hope of a delayed feedback), or
+accept a declining baseline and detrend hard enough to test for oscillation *about the trend* — which
+`period_of` already does via its linear detrend, and which is what makes the `occupied_cells` negative usable.
+
+**5. A CAUTION ON SINGLE-SEED DENSITY CLAIMS.** The three seeds settle at very different densities — seed 0
+~0.120/km² (after overshoot), seed 1 ~0.062, seed 2 ~0.035 and falling — a **3× spread** on worlds differing
+only in the terrain lottery. Any density statement from one seed, including several made earlier today, carries
+that uncertainty.
+
+**Origin:** diagnostic-only; `diag_malthus_stationarity.py` (scratchpad), `patch=(30,30,32)`, ALL-ON,
+`probe_hcycles.period_of` (the R-87c/d validated detector: linear detrend, reject periods beyond window/3,
+require a genuine local ACF maximum). Seed 0 incomplete. No source changed.
+
+**ADDENDUM 19 — RETRACTION AND QUALIFICATION: the baseline trajectories used as a control were TWO DAYS
+OLDER than the arms compared against them, so Addendum 12's headline and today's MARKER_MATRIX #14 claim both
+measured CODE DRIFT, not the flags. Sixth instrument fault of the arc, fourth of them mine (2026-08-03).**
+
+**How it was caught.** A solo ablation of `enable_wealth_obligation` was run to attribute the apparent
+MARKER_MATRIX #14 movement. It came back NEGATIVE (`noble_material_lift` 1.248 → 1.183, −5%, 2/6 pairs up;
+`leader_material_lift` 0/6 pairs up). But its BASELINE read **1.248**, where the battery6 baseline used an hour
+earlier read **1.059** for the nominally identical configuration. That discrepancy — not the ablation result —
+is the finding.
+
+**PROVENANCE (checked by file mtime):**
+
+| trajectory set | written |
+|---|---|
+| battery6 BASELINE `_b6_*` (used as the control all day) | **2026-07-29 00:21** |
+| battery6 ALL-ON `_b6_allon_*` | 2026-07-31 10:30 |
+| bisect baseline `_bx2000_base_*` (same-session control) | 2026-08-03 13:55 |
+
+**Commits that landed between the control and the arms compared to it** include, verbatim from the log:
+`4980344` **"THE WEALTH FIX: a feast is an EVENT, not a per-step bleed — and the elite now accrues wealth"**;
+`4c1c90a` "Marker matrix: wire 14 markers that were computed every step and never recorded";
+`ed8cb11` "Adopt the Marlowe polygyny calibration"; the entire 2026-07-30 R-106 demography arc
+(`f2e839e` intake fertility, `3db3532` dependent load, `13bcb5b` Kaplan convex ramp, `676f37d`, `b15017e`);
+and this session's own `a3e0b64`…`5204d75`.
+
+**1. RETRACTED — the MARKER_MATRIX #14 claim.** Earlier today I reported `noble_material_lift` 1.059 → 1.228
+(+16%, 24/25 pairs up) and called the project's "live open question" moved for the first time. **It is not.**
+The same-code control run in this session gives baseline **1.248** against all-on **1.228** — no material
+difference. The +16% is almost certainly commit `4980344`, whose own message states the elite now accrues
+wealth. The marker moved because of a fix made on 2026-07-29, not because of the dark flags.
+
+**2. QUALIFIED — Addendum 12's headline is NOT established.** "ALL-ON scores materially worse on 3 of 6
+markers (connubium 13→3/25, lineage Gini 12→3/25, band 23→20/25)" compared the 07-29 baseline against the
+07-31 all-on arms. Two days of substantive model change sit between them, including a demography overhaul that
+directly touches fertility, mortality and lineage formation — precisely the quantities those markers measure.
+**The comparison cannot separate flags from code drift, so the conclusion "the preset's curation is
+load-bearing" is unsupported as stated.** Addendum 12's *method* corrections (the run-length truncation, the
+tag fix) stand; its headline does not. Note the same-session bisect baseline (`band_med` 6/6, `connubium_med`
+1/6, `lineage_size_gini` 1/6, `settle_med` 6/6) with groups added on top showed NO large degradation, which is
+consistent with the flags being far less harmful than Addendum 12 claimed.
+
+**3. CONFIRMED, and it agrees with the project's own prior finding.** The solo `enable_wealth_obligation`
+ablation shows it does not concentrate durable wealth (−4 to −5% across three markers, 0–2 of 6 pairs up).
+Commit `605000b` (2026-07-29) already recorded exactly this: *"Wealth → obligation → production (Sahlins), and
+the finding that it is NOT sufficient."* An independent reproduction of a known negative — which is the one
+clean thing to come out of this.
+
+**THE LESSON, and it is the general one.** **Pre-existing trajectory files are not a control.** They carry no
+record of the code that produced them, so any A/B that reuses them silently compares two different models. This
+is the same failure as Addendum 12's un-suffixed scoring tags (which also silently read old files) and as the
+bisect tags without a horizon — three variants of one mistake: *trusting a file's name instead of its
+provenance*. **Any future A/B must run BOTH arms with the same commit, in the same session**, or verify the
+commit that produced each trajectory. The campaign banner already prints `sha=` — that should be read back and
+compared before any cross-run claim.
+
+**Origin:** solo ablation via `B_SOLO` (`diag_bisect_allon.py`), material scoring via `score_material.py`
+(scratchpad), provenance by file mtime and `git log --since`. No source changed. Retracts one claim made
+earlier this session and qualifies Addendum 12.
+
+**ADDENDUM 20 — BATTERY 7 (controlled): the full stack's ONLY large effect is band size +22%, and at long
+horizon that pushes `band_med` OUT of its ethnographic band. connubium, lineage-Gini and top-share fail in
+the CONTROL TOO, so they were never flag-caused. 7 mechanisms are genuinely inert (2026-08-04).**
+
+**The instrument.** `battery7_controlled.py`, built after Addendum 19's retraction, enforces: same build (arms
+carry `meta.sha`, a stage refuses to score if they disagree), same session (the control is produced here, never
+read from a previous run), paired by (world, seed), matched horizon, and fail-loud on unknown flags. Run with
+`C_SOIL=1 C_ABANDON=1` so the soil stack — the only slow variable, and absent from every previous battery
+because `C_SOIL` defaults to 0 — is exercised for the first time.
+
+**S1 — CONTROL vs FULL STACK (3 worlds × 2 seeds, 1200 steps, paired):**
+
+| marker | control | full stack | delta | pairs up |
+|---|---|---|---|---|
+| **`band_med`** | 31.5 | **38.5** | **+22%** | **6/6** |
+| `settle_med` | 58.5 | 53 | −9% | 3/6 |
+| `connubium_med` | 66.25 | 52.75 | **−20%** | 1/6 (i.e. 5/6 DOWN) |
+| `lineage_size_gini` | 0.4165 | 0.4035 | −3% | 3/6 |
+| `lin_top_share` | 0.0105 | 0.010 | −5% | 1/6 |
+
+**S3 — LONG (2500 steps requested; arms wall-clocked, common horizon 1625):**
+
+| marker | band | CONTROL | FULL STACK |
+|---|---|---|---|
+| `band_med` | [18–35] | **2/2** (31..33) | **0/2 (37..38)** |
+| `settle_med` | [50–150] | 2/2 (64..86) | 2/2 (80..95) |
+| `connubium_med` | [79–332] | **0/2** (43..68) | 0/2 (70..77) |
+| `lineage_size_gini` | [0.51–0.68] | **0/2** (0.385..0.42) | 0/2 (0.384..0.407) |
+| `lin_top_share` | [0.08–0.30] | **0/2** (0.013..0.018) | 0/2 (0.011..0.016) |
+
+**1. THE FLAGS BREAK EXACTLY ONE MARKER, AND IT IS `band_med`.** +22% in every pair at 1200 steps, and at the
+long horizon that carries band size to **37–38 against Johnson's [18–35]** — inside the band under the control,
+outside it under the full stack. This is the third independent measurement of the same effect (Addendum 17's
+band/fission group at +14%, 6/6 pairs; battery7's first S1 at +23%, 6/6), now with a clean control and a
+consequence: it is not a curiosity, it is a benchmark failure the mechanisms cause.
+
+**2. connubium, lineage-Gini and top-share FAIL IN THE CONTROL.** All three score 0/2 with the canonical preset
+alone. **They are baseline failures of the model, not costs of enabling mechanisms.** This finally closes the
+question Addendum 12 opened and Addendum 19 qualified: Addendum 12 attributed a collapse in those markers to
+the dark flags; the flags are not responsible, and never were. (The full stack even *improves* connubium's
+range at long horizon, 43–68 → 70–77, moving toward the 79 floor without reaching it.)
+
+**3. SEVEN MECHANISMS ARE GENUINELY INERT** — on, in the stack, and removing them changes nothing:
+`enable_band_risk`, `enable_bonded_mating`, `enable_energetic_fertility`, `enable_malnutrition_fission`,
+`enable_relative_resentment`, `enable_resentment_accumulator`, `enable_terrain_pathogen`. `energetic_fertility`
+is expected and confirmatory — R-106 established it is inert by construction, superseded by
+`enable_intake_fertility`. The other six are open defects. Four more (`adaptive_connubium`,
+`ascribed_mate_choice`, `exogamy`, `improved_land`) were correctly reported NOT IN STACK rather than inert,
+after the first S2 run scored 7 such verdicts invalid by ablating already-off flags.
+
+**4. THE SOIL STACK IS LIVE.** With `C_SOIL=1`, both `enable_soil_depletion` and `enable_alluvial_renewal` read
+LIVE. Previous batteries never tested them: `C_SOIL` defaults to 0, so the model's only slow variable had never
+been in a battery stack at all. Addendum 18's Malthus runs did enable it (via a different harness), so its
+measurements stand, but no benchmark result before this one exercised soil.
+
+**INCOMPLETE:** S3 finished only 4 of 12 arms within the 25-minute-per-arm budget, so the long-horizon scores
+above are coastal/temperate × 2 seeds only, at horizon 1625 rather than the requested 2500. The
+control-vs-full contrast on `band_med` is consistent with S1's six pairs, but the pass fractions are
+under-powered and the other two worlds are unmeasured. **Needs a re-run with a larger wall-clock budget before
+the S3 numbers are quoted as an envelope.**
+
+**Origin:** `sic_games/outputs/mechanism_battery/battery7_controlled.py` (commits e83c0c7, fde3e52),
+`C_EXTRA_OFF` in `run_campaign.py`, build fde3e52. Supersedes Addendum 12's attribution entirely.
+
+**ADDENDUM 21 — SEVEN CONFIGURATION DEFECTS, found by pointing the knobs at themselves. One killed a 24-arm
+sweep silently; one means `C_ALLON=1` alone was never "all on"; one is a hole underneath the sha gate
+Addendum 19 built; and one shows two liveness verdicts were coin flips (2026-08-04).**
+
+None of these is an analysis error. Every one is a *"what was actually on?"* error — the class this arc keeps
+paying for, and the reason `config/*.toml` exists. They are grouped here because they were all found the same
+way: by asserting, in a test, what a knob claims to do.
+
+**1. `C_PARAM` SHADOWED THE TERRAIN KNOBS.** The knob added yesterday parsed its arguments with
+
+```python
+for item in _pv:
+    k, v = item.split("=", 1)
+```
+
+inside `main()`, where `k` had been bound 90 lines earlier to the terrain-knob dict. Every `C_PARAM` run
+therefore died in the `TerrainWorld` constructor with a bare `'str' object has no attribute 'get'`. It was
+found 24 arms into a `cv_safe` sweep whose every arm was dead — and the harness, which discarded stdout to
+`/dev/null` and treated a missing trajectory as "no arms", **printed a tidy empty table instead of an error**.
+Two fixes: the loop variables are renamed and commented, and the harness now raises with the failing arm's log
+tail rather than reporting a sweep with missing arms as a result. `tests/test_campaign_knobs.py` (9 tests) now
+drives the actual script as a subprocess and asserts the process EXITS 0 as well as that the value lands — the
+original smoke test checked only that the value parsed, which is exactly what a run that dies 90 lines later
+still does.
+
+**2. `C_ALLON=1` ALONE WAS NEVER "ALL ON": ten mechanisms stayed dark behind their knobs' OFF defaults.**
+`C_ALLON` skipped every flag that has a `C_*` knob, unconditionally, so a knob's *default* silently overrode
+the supervisor rule. A bare `C_ALLON=1` left `adaptive_connubium`, `exogamy`, `ascribed_mate_choice`,
+`material_inheritance`, `noble_leveling_exemption`, `lineage_tribute`, `lineage_branching`, `lineage_split`,
+`improved_land` and `emergent_abandonment` off. The rule is now the intended one: **an explicitly set knob
+wins (an ablation is respected), an unset knob does not (a default is not an ablation)**. A bare `C_ALLON=1`
+goes from 28 to 38 enabled mechanisms and leaves exactly five off, and the campaign now ECHOES both lists at
+launch. Flags whose magnitude knob defaults to zero (`lineage_branch_rate`, `lineage_split_rate`,
+`ascribed_mate_strength`, `mate_search_min_eligible`) carry their validated value with them, so `C_ALLON`
+cannot enable a mechanism into a no-op.
+
+**3. `C_ALLON` ALSO SWITCHED THE ELITE LAYER ON AT ZERO STRENGTH.** The elite *flags* are not the elite layer:
+its magnitudes live in `ELITE_KW`, which is empty unless `C_ELITE=1`. A bare `C_ALLON=1` therefore switched on
+all twelve elite flags while a config dump from the same environment reads `leveling_strength=0.0`,
+`leveling_share=0.0`, `material_hide_frac=0.0`, `material_decay=0.0`, `aggrandizer_frac=0.0`,
+`leader_share_frac=0.0`, `legit_cred_gain=0.0`, `legit_feast_frac=0.0` — material capture, leader share,
+leveling and legitimacy were on and completely dead. `C_ALLON` now implies `C_ELITE` unless `C_ELITE` is set,
+and the elite block is governed as a unit so that `C_ELITE=0` is a REAL ablation (flags off) rather than a half
+one (flags on, magnitudes 0) — the worst of both states, since the dump says the mechanism ran and the world
+says it did nothing.
+
+**Battery 7 was NOT affected by (2) or (3), and this was checked rather than assumed.** Its `STACK` sets
+`C_ELITE=1` and fourteen other knobs explicitly. Read back from
+`campaign_trajectory_b7_full_coastal_temperate_s0.json` (`meta.sha` `fde3e52`): **72 flags ON, 7 OFF**, with
+`leveling_strength=0.79`, `material_hide_frac=0.07`, `legit_cred_gain=10.0`. Addendum 20's stack is what it
+said it was. **What does change for it:** `C_ALLON` now enables `adaptive_connubium`, `exogamy` and
+`ascribed_mate_choice`, three of the four mechanisms Addendum 20 correctly reported as NOT IN STACK — and
+`connubium_med` failed there 3/25 **with the adaptive connubium switched off**. That marker must be
+re-measured on the fixed stack before Addendum 20's connubium reading stands.
+
+**4. `enable_band_risk` IS A MEASURED DEAD END AND WAS BEING SWITCHED ON AT GAIN ZERO.** `demography.py`'s own
+comment records the F.2 prototype result — loner-mortality does not produce an optimal band size, it culls:
+*"pop 281→64, mean band 56→5 ... a DEATH SPIRAL, not a stabilizing optimum ... KEEP OFF"*. Its only magnitude
+`band_risk_penalty` is 0.0 and the code is guarded on `> 0.0`, so `C_ALLON` was enabling a no-op: "on" in the
+dump, INERT in every ablation, and a death spiral at any value that would make it live. It is now excluded by
+name, with the reason. **One of Addendum 20's seven "genuinely inert" verdicts is resolved as
+correctly-excluded rather than defective.**
+
+**5. THE SHA GATE HAD A HOLE UNDERNEATH IT: a DIRTY tree records the PARENT commit.** Addendum 19's fix was to
+record `meta.sha` and refuse to score arms whose builds disagree. But `git rev-parse HEAD` does not identify a
+build when the working tree has uncommitted edits — a run started from a dirty tree records the parent commit,
+so the gate happily pairs it with a run of the committed code and calls them the same build. That is the same
+failure, one level down. The campaign now records `meta.tree_dirty`, prints a loud banner when it is set, and
+`battery6_long`, `battery7_controlled` and the sweep harness all treat a dirty arm as ABSENT, forcing a re-run.
+
+**6. `divorce_rate` WAS UN-CALIBRATED IN THE BATTERY OVERLAY.** R-78 (`b8501ea`, 2026-07-17) calibrated it to
+**0.005** against Hill & Hurtado Tab. 13.1, explicitly on both pairing paths (*"base 0.140 / village 0.149"*).
+The `VILLAGE` overlay written ten days later (`46eb0c9`) listed `divorce_rate=0.004` with no rationale,
+silently overriding the calibration for `battery1_liveness` and `battery6_stress` — and, because
+`config/parameters.toml` is generated from that overlay, putting the wrong number in the authoritative file
+while every campaign ran 0.005. Removed; the calibrated value stands and the files are regenerated.
+
+**7. AND THE `divorce_rate` FIX EXPOSED A SEVENTH: two liveness tests were coin flips.** Changing
+`divorce_rate` by 0.001, in an unrelated overlay, flipped
+`test_intake_fertility.py::test_on_changes_the_world` from pass to fail — the intake-fertility branch became
+*bit-identical*, i.e. it never fired at all. The mechanism is fine; the test's horizon was not. The brake only
+bites below `intake_fert_hi = 1.20`, and the share of fertile women under that gate in the liveness world
+measures **0.0% at step 60, 2.2% (three women) at 120, 7.3% at 180, 13.1% at 300** — so at the 120-step
+horizon the verdict turned on whether one of three women happened to be drawn for a birth. The population
+GROWS through that window (757 → 867), which is the root of it: a fertility brake needs scarcity, and the
+small liveness world is rich. Both tests now run at 300 steps, the horizon at which the gate demonstrably
+binds and the one the sibling EMA-spread test already used. **A liveness test whose verdict a 0.001 change
+elsewhere can reverse is not evidence that a mechanism is live** — and this arc has been reading exactly such
+verdicts.
+
+**A ZERO-PARAMETER AUDIT, since (2)–(4) are all the same shape.** Under a bare `C_ALLON=1`, fifteen numeric
+parameters are exactly 0. Six are INTENTIONAL and documented as such in their own provenance comments —
+`maternal_mortality_per_birth` (folded into the all-cause female Siler by construction), `assortative_strength`
+(R-80, prototyped and REVERTED as structurally inert), `pathogen_npp_ref` (0 ⇒ use the terrain mean),
+`genome_mutation` (0 ⇒ pure drift / infinite-allele), `comove_footprint` (0 ⇒ exact snap),
+`aggregation_rank_homogamy` (0 ⇒ directional only). The rest are open, and three of them are why a mechanism
+reads INERT:
+
+| parameter | flag it silences | status in its own provenance |
+|---|---|---|
+| `malnutrition_fission_gain` | `enable_malnutrition_fission` | "UNANCHORED" |
+| `pathogen_gamma` | `enable_terrain_pathogen` | "0 = OFF/flat. **Sweep low/mid/high**" |
+| `material_capture_frac` | the aggrandizer-capture half of `enable_material_capture` | no note — see below |
+| `shock_rho` | the REGIME half of `enable_tier2_shock` | "[PROVISIONAL — sweep]" |
+| `paternal_provision_frac` | the paternal channel of `enable_paternity` | "0 = pure B (no paternal feeding)" |
+| `wife_quality_strength` | R-77's status→RS channel | built, never switched on |
+
+`material_capture_frac` is the sharpest of these. Material production from hides is live
+(`material_hide_frac=0.07`), but the branch that lets aggrandizers claim a share of the GROUP's durable output
+— Hayden's actual move — is gated on `mat_frac > 0.0` and never fires, while `aggrandizer_frac=0.15` IS set.
+So the elite runs have an aggrandizer population that captures nothing, and every noble/commoner material
+gap in this arc was produced by inheritance, tribute and the leveling exemption alone. **This bears directly on
+MARKER_MATRIX #14 (`noble_material_lift`)** and is recorded here as an open question, not fixed: no value for
+it is anchored, and inventing one is not a calibration.
+
+**Origin:** `run_campaign.py` (C_PARAM shadowing, C_ALLON knob table, C_ELITE implication, `band_risk`
+exclusion, `meta.tree_dirty`), `battery1_liveness.py` (`divorce_rate`), `battery6_long.py` and
+`battery7_controlled.py` (dirty gate), `test_intake_fertility.py` and `test_pressure_mobility.py` (horizon),
+`config/parameters.toml` regenerated, and `sic_games/tests/test_campaign_knobs.py` — 9 new subprocess-level
+tests that pin every claim above. Suite 1065 pass / 2 xfail. Qualifies Addendum 20 on `connubium_med` and on
+one of its seven inert verdicts; supersedes nothing.
+
+**ADDENDUM 22 — THE COHESION BUDGET HAS NO HEADROOM. `cohesion_frac` clamps at 1.0 for every band that has a
+leader, so the band-fission threshold is EXACTLY `band_split_size`, and four mechanisms that feed it —
+emergent band size, dynamic bands/assabiyah, size repulsion, malnutrition fission — cannot act on band size at
+all. R-72's emergent band size is structurally inert, not mis-calibrated (2026-08-04).**
+
+**WHAT WAS BEING FIXED.** Addendum 20 measured the full stack pushing `band_med` to 37–38 against Johnson's
+[18–35], attributed additively to `enable_emergent_band_size` (+11.9%) and `enable_resource_directed_fusion`
+(+9.7%). `cv_safe` is documented as *"the ONE fitted scale ... calibrated — but ONLY to place the MEAN band at
+Hill 2011's ~25–30 (mean RETURN_CV 1.017 / 27.5 = 0.037)"*, and it was fitted for emergent band size ALONE.
+Re-fitting it to its own anchor with the current stack looked like ordinary calibration maintenance.
+
+**IT IS NOT, AND THE SWEEP SAID SO.** Four values, full stack, 3 worlds × 2 seeds, 1200 steps (common horizon
+1020), paired by (world, seed), same build `77151e4`, same session:
+
+| `cv_safe` | vs default | `band_med` median | range | paired Δ | in Johnson [18–35] |
+|---|---|---|---|---|---|
+| 0.037 (default) | — | 35.00 | 34.0–38.0 | control | 4/6 |
+| 0.045 | +22% | 33.50 | 31.0–43.0 | −1.9%, 4/6 down | 4/6 |
+| 0.052 | +41% | 34.50 | 32.0–36.5 | −3.5%, **6/6 down** | 5/6 |
+| 0.060 | +62% | 33.00 | 31.0–34.0 | −8.4%, **6/6 down** | 6/6 |
+
+The mechanism's own law is `g* = CV/cv_safe`, so band size should scale as `1/cv_safe`: **elasticity −1.0**.
+Measured elasticity is **−0.14** — a seventh of the law, consistently signed but nearly inert. Reaching Hill's
+27.5 at that elasticity would need `cv_safe ≈ 0.22`, a SIX-FOLD move in a constant the model calls calibrated.
+That is not maintaining a calibration; that is fitting the model to the benchmark. **The re-fit is dropped.**
+
+**WHY — measured, not inferred.** Instrumenting the model's own stored per-band state (`_band_assabiyah`,
+`_band_leader_term`, `_band_repulsion`, `_band_malnutrition`) over 94 bands after 400 steps on the village +
+elite stack:
+
+```
+  band size        min 10.0  p25 27.0  med 34.0  p75 47.0  max 98.0
+  g* = CV/cv_safe  min 29.2  p25 37.5  med 38.2  p75 38.2  max 38.2
+  split_thr        min 45.0  p25 45.0  med 45.0  p75 45.0  max 45.0     <- sd 0.00
+  cohesion_frac    min 1.000 p25 1.000 med 1.000 p75 1.000 max 1.000    <- 94/94 pinned
+    assabiyah      min 0.955 p25 1.000 med 1.000 p75 1.000 max 1.000
+    leader term    min 0.409 p25 0.670 med 0.783 p75 1.255 max 1.641
+    repulsion      min 0.001 p25 0.017 med 0.044 p75 0.075 max 0.150
+    malnutrition   min 0.000 p25 0.000 med 0.000 p75 0.000 max 0.000
+  raw (unclamped)  min 1.329 p25 1.576 med 1.718 p75 2.214 max 2.621
+```
+
+The threshold is `split_thr = g* + max(0, cap − g*) · cohesion_frac`, `cohesion_frac = clamp01(assabiyah +
+leader − repulsion − malnutrition)`, `cap = band_split_size = 45`. Two independent causes each suffice to pin
+it:
+
+**(a) Assabiyah saturates BY CONSTRUCTION.** Its update is `a += gain·surplus − decay`, clamped to [0,1], so
+its fixed point is `surplus_frac = decay/gain = 0.02/0.05 = 0.40`. Measured band `surplus_frac` runs
+0.35–0.99, **median 0.69**, and **90 of 94 bands (95.7%) sit above the fixed point** — so assabiyah is not a
+state variable at all, it is the constant 1.0. F.3c-3's premise (*"a rich, high-solidarity band STAYS TOGETHER
+larger; a poor one fissions at the base"*) requires the band to be able to be poor; in this economy it cannot.
+
+**(b) The leader term alone would do it.** It runs 0.409–1.641 with median 0.783, and it is ADDED on top of a
+saturated assabiyah. The unclamped sum is 1.33–2.62 for every band — **33% to 162% above the clamp**.
+
+**THE RULE, checked across horizons and two world scales.** The share of bands pinned tracks the share that
+has acquired a leader, and at every checkpoint the unpinned bands are EXACTLY the leaderless ones: 0% pinned
+at step 50 (no leaders yet), 68%/86% at 100, 88%/99% at 200, 96%/100% at 400 (n=1200 patch=30 / n=2500
+patch=40). Assabiyah's median reaches exactly 1.000 by step 100 in both and never comes down. So the general
+statement is *a leader term on top of a saturated assabiyah always exceeds the clamp* — the 100% figure above
+is that rule evaluated in a mature world where every band has a leader, not a coincidence of one run.
+
+**THE CONSEQUENCE.** With `cohesion_frac ≡ 1`, the threshold reduces to `max(g*, band_split_size)`. Measured
+`g*` spans 29.2–38.2 and **0 of 94 bands have g* > 45**, so `split_thr` is exactly 45 for every band, sd 0.00.
+`corr(g*, realized band size) = −0.077`. R-72 built v3 specifically because v1/v2 measured −0.22 and *"a
+ceiling cannot pull a band together"*; v3 replaced the ceiling with a per-band centre and the correlation is
+still −0.08. **Realized `band_med` ≈ 34 ≈ 0.75 × cap** — the sawtooth of grow-then-halve against a threshold
+that is the same constant everywhere. That, and not the CV, is what sets band size.
+
+**FOUR MECHANISMS FEED ONE SATURATED EXPRESSION.** `_band_repulsion` and `_band_leader_term` are stored but
+read nowhere else (both are commented "diagnostic"), and `_band_assabiyah` is read only to update itself. So
+`cohesion_frac` is the ONLY consumer of the repulsion, leader, malnutrition and assabiyah terms — and it is
+clamped for every band. `enable_size_repulsion` (Johnson scalar stress), `enable_dynamic_bands`,
+`enable_malnutrition_fission` and the Stage-1 leader-coherence term are therefore all structurally inert with
+respect to band size, whatever their magnitudes.
+
+This gives a QUANTITATIVE floor for the ones still awaiting anchors: **a malnutrition term must exceed 0.718 —
+the median headroom — before it changes a single median band's threshold**, and 1.62 before it reaches the
+largest. `malnutrition_fission_gain` is documented as a "max dispersion" scale and is currently 0.0; any
+plausible small value calibrated in isolation would still read INERT here, and Addendum 20's inert verdict for
+it would be reproduced by a correctly-calibrated mechanism. The same arithmetic applies to `band_risk_penalty`
+(already excluded as a dead end, Addendum 21) and to `repulsion_gain`.
+
+**WHAT THIS DOES NOT SAY.** It does not say `band_split_size = 45` is wrong — that constant is the Johnson
+"upper community rung" and lowering it to land `band_med` on an anchor would be exactly the benchmark-fitting
+refused above. It says the model currently has ONE lever where it was designed to have five, and that the
+four dead ones are dead for a stated, measurable reason. The design question — whether assabiyah's clamp, its
+`decay/gain` fixed point, or the leader term's scale is the thing to change so the budget regains headroom —
+is a supervisor call, not a calibration.
+
+**Incidentally, `band_med` improved on its own.** On the fixed stack of Addendum 21 the control reads 35.0
+(4/6 arms in Johnson's band), against 38.5 on Addendum 20's stack. Turning the previously-dark mechanisms on
+moved it about a third of the way back inside the band without touching a calibrated constant.
+
+**Origin:** `sic_games/outputs/mechanism_battery/diag_param_sweep.py` and `diag_band_size_terms.py`, build
+`77151e4`, 24 campaign arms plus in-process instrumented worlds (n=1200 patch=30 and n=2500 patch=40,
+village+elite stack). Pinned as `sic_games/tests/test_cohesion_headroom.py` (5 blocker tests that FAIL when
+the headroom is restored). No model source changed — this is a diagnosis, and the fix it implies is a design
+decision. Supersedes the `cv_safe` re-fit proposed after Addendum 20; explains, mechanically, several of
+Addendum 20's inert verdicts.
+
+**ADDENDUM 23 — CORRECTION to Addendum 22, and the fix measured. The clamp does NOT make four mechanisms
+inert; it kills the CONDITION-DEPENDENCE for the 91–100% of bands that have a leader, while the mechanisms
+stay live on the unled remainder. An ablation therefore reads LIVE while the mechanism is swallowed for the
+bands that matter — which is why the ablation audit could never have found this (2026-08-04).**
+
+**THE CORRECTION.** Addendum 22 ended: *"`enable_size_repulsion`, `enable_dynamic_bands`,
+`enable_malnutrition_fission` and the Stage-1 leader term are therefore all structurally inert with respect to
+band size, whatever their magnitudes."* **That is wrong, and it is wrong in the direction of overstatement.**
+Ablated one at a time out of the live stack, 2 seeds, 300 steps, 1500 agents:
+
+| ablated | under the baseline | under the candidate fix |
+|---|---|---|
+| `size_repulsion` | **LIVE 2/2** | LIVE 2/2 |
+| `dynamic_bands` | **LIVE 2/2** | LIVE 2/2 |
+| `emergent_band_size` | **LIVE 2/2** | LIVE 2/2 |
+| `malnutrition_fission` | inert 0/2 | inert 0/2 |
+
+`malnutrition_fission` is the negative control — its gain is 0.0, so it must read inert under both, and it
+does. The instrument is sound; the earlier claim was not.
+
+**WHY THEY ARE STILL LIVE, AND WHAT IS ACTUALLY DEAD.** The clamp binds only where the leader term is
+present. Measured share of multi-member bands that have a leader: **91.4% at step 150, 100% at step 300,
+93.3% at step 500**. For those, `cohesion_frac ≡ 1`, `split_thr ≡ band_split_size` (sd 0.00), and the
+repulsion, malnutrition and leader terms cannot move the threshold at all. On the unled 0–9% remainder,
+cohesion is genuinely below 1 and every term acts — and `dynamic_bands` additionally gates the whole block
+while `emergent_band_size` sets the threshold's base, so ablating either changes the world through those
+paths regardless.
+
+So Addendum 22's measurements all stand — the pinning, the sd 0.00, the assabiyah saturation, `corr(g*, band
+size) = −0.077`, the `cv_safe` elasticity of −0.14. What was wrong was the inference from them.
+
+**AND THE CORRECTED VERSION IS THE SHARPER METHODOLOGICAL POINT.** A mechanism can be LIVE by ablation and
+still be swallowed where it was supposed to act. "Turn it off and see if the world changes" cannot
+distinguish *"acts on 9% of bands"* from *"acts on all of them"*, so it certifies a mechanism that has lost
+the population it was written for. This is the same shape as C.5 intercept hunting, which computes a correct
++28% boost on cells no agent stands on.
+
+**A STRUCTURAL FINDING ABOUT ASSABIYAH, which Addendum 22 missed.** Its update is
+
+    a += gain·surplus − decay          (clamped to [0,1])
+
+— a pure integrator with a CONSTANT leak. That has **no interior fixed point at all**: if `gain·s > decay` it
+climbs to the clamp and stays; otherwise it falls to 0. It is bang-bang *by construction*, and no choice of
+gain or decay makes it graded — only the share of bands at each end changes. F.3c-3's premise ("a rich,
+high-solidarity band STAYS TOGETHER larger; a poor one fissions at the base") needs a band to be able to be
+poor, and this form cannot deliver that at any calibration.
+
+Making the leak proportional to the level, `a += gain·s·(1−a) − decay·a`, gives the interior fixed point
+`a* = gain·s/(gain·s + decay)`, which tracks surplus: 0.47 at s=0.35, 0.63 at the measured median 0.69, 0.71
+at s=0.99.
+
+**THE CANDIDATES, MEASURED.** Two flags, both default-off and bit-exact: `enable_leaky_assabiyah` and
+`cohesion_leader_weight` (scales the leader's share of the budget; 1.0 = today). Coastal-temperate, 1500
+agents, 300 steps, 2 seeds:
+
+| candidate | headroom | median assabiyah | thr spread | corr(g*, n) | `band_med` |
+|---|---|---|---|---|---|
+| baseline | 0.0% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leaky | 3.4% | 0.607 | 3.4% | +0.124 | 25.8 ✓Hill |
+| leader weight 0.5 | 0.0% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leader weight 0.25 | 0.9% | 1.000 | 1.0% | −0.073 | 30.2 |
+| leaky + weight 0.5 | 64.8% | 0.603 | 1.8% | −0.058 | 29.0 ✓Hill |
+| leaky + weight 0.25 | **100.0%** | 0.602 | 2.5% | −0.089 | 28.2 ✓Hill |
+| leaky + weight 0.1 | 100.0% | 0.604 | 1.8% | −0.070 | 26.8 ✓Hill |
+
+*headroom* = share of LED bands with `cohesion_frac` below the clamp. Three readings:
+
+**1. The leader weight alone does nothing** (0.0% / 0.9%). Assabiyah is already at the clamp on its own, so
+scaling the leader changes nothing until assabiyah is graded. Saturation is assabiyah's, not the leader's.
+
+**2. Leaky alone is not enough either** (3.4%) — it makes assabiyah a state variable again (median 1.000 →
+0.607) but the leader term then saturates the sum by itself. **Both are needed**, and that is a fact about
+the expression rather than a tuning preference.
+
+**3. It does NOT restore R-72's gradient.** `corr(g*, band size)` stays at −0.089 with the headroom fully
+restored, against −0.22 for v1/v2 and −0.077 for v3. The clamp was not the only thing decoupling the CV from
+realized band size: with cohesion at ~0.6, `split_thr = g* + (cap − g*)·0.6` gives g* only 40% weight, and the
+grow-then-halve sawtooth around the threshold swamps what is left. **Restoring the headroom is not the same
+as making band size emergent from the CV**, and the second still has no mechanism.
+
+`band_med` incidentally improves — 30.2 → 26.8–29.0, i.e. from "inside Johnson" to "inside Hill 25–30" — but
+that is a by-product, and adopting a fix *because* a marker moved is the benchmark-fitting refused throughout
+this arc.
+
+**NOTHING IS ADOPTED.** Both flags stay default-off and bit-exact. `enable_leaky_assabiyah` is a structural
+correction with a stated rationale and is defensible on its own terms; `cohesion_leader_weight` is an
+UNANCHORED fitted constant, and inventing one is what this arc has spent itself refusing to do. There is an
+in-code precedent for the principled alternative — `rank_w` is already normalised to [0,1] by
+`resent_effect_threshold` before it is combined — so normalising the leader term to its own reference, rather
+than scaling it by a free parameter, is the obvious candidate to try next. That is a supervisor call.
+
+**Origin:** `diag_cohesion_candidates.py` and `diag_cohesion_unlocks.py`
+(`sic_games/outputs/mechanism_battery/`), build 5b91d2b, in-process instrumented worlds. Two new flags in
+`DemographyConfig`, both default-off. Corrects Addendum 22's closing inference; every measurement in
+Addendum 22 stands.
+
+**ADDENDUM 24 — THE LONG-HORIZON ENVELOPE, complete for the first time: 16/16 arms at 2500 steps on the fixed
+build. The full stack is NOT uniformly worse than the control — it FIXES two markers and BREAKS two — and the
+connubium is now BRACKETED between the two arms, which makes it a calibration with an anchor on both sides
+rather than an open failure (2026-08-04).**
+
+**THE INSTRUMENT.** Battery 7 stages S1 and S3 on build `f77be6a` — the build carrying Addendum 21's
+configuration fixes (`C_ALLON` reaching 38 mechanisms rather than 28, `C_ELITE` implied, the `tree_dirty`
+gate), Addendum 23's corrections, the wired climate layer, and the savanna world. Four worlds
+(coastal/flat/hilly temperate + **flat savanna**) × 2 seeds, paired, same build, same session. **All 16 arms
+reached the full 2500 steps** — Addendum 20's attempt lost 8 of 12 to the wall-clock cap and its S3 numbers
+were withdrawn as under-powered, so this is the first time the envelope has actually been measured.
+
+| marker | band | CONTROL | FULL STACK |
+|---|---|---|---|
+| `band_med` | Johnson 18–35 | **7/8** (17.5–33) | 5/8 (19–39) |
+| `settle_med` | Bar-Yosef 50–150 | 6/8 (21–122) | 6/8 (52–154) |
+| `settle_med` | Alvard 50–250 | 6/8 | **8/8** |
+| `connubium_med` | White MVP 79–332 | 1/8 (**8–89**) | 0/8 (**440–2387**) |
+| `lineage_size_gini` | BHM 0.51–0.68 | 1/8 (0.411–0.532) | **8/8** (0.522–0.600) |
+| `lin_top_share` | Karmin 0.08–0.30 | 1/8 (0.024–0.085) | 1/8 (0.011–0.124) |
+
+**1. THE FULL STACK IS NOT A NET LOSS, which is a change from Addendum 20's reading.** It takes
+`lineage_size_gini` from 1/8 to **8/8** — every arm inside BHM 2009's band, range 0.522–0.600 against a band
+of 0.51–0.68 — and `settle_med` from 6/8 to 8/8 on Alvard's wider village band. Those are the two markers the
+lineage and settlement layers exist to produce, and with the previously-dark mechanisms switched on they land.
+
+**2. THE CONNUBIUM IS NOW BRACKETED, and that is the most useful single number here.** With the adaptive
+connubium OFF (the control, `m* = 3`) the reach is **8–89**, below White's MVP band. With it ON at `m* = 50`
+the reach is **440–2387**, overshooting by up to 7×. The band [79, 332] lies strictly between the two arms, so
+`mate_search_min_eligible` has an anchor on BOTH sides — a genuine interpolation rather than an open failure.
+This also surfaces an anchor conflict worth settling: `m* = 50` was calibrated to **Wobst's ~475 reach**,
+which is a different quantity from White's minimum viable population, and both cannot be met at once.
+
+**3. `lin_top_share` FAILS IN BOTH ARMS** — 1/8 either way, 0.011–0.124 against Karmin's 0.08–0.30, i.e. short
+by roughly an order of magnitude at the low end. It is a BASELINE failure and was never flag-caused. Whatever
+concentrates Y-lineages in Karmin 2015 is not in this model, and no configuration change in this arc has
+touched it. That is the one marker with no route currently visible.
+
+**4. `band_med` gets worse, and it is the cohesion clamp.** 7/8 → 5/8, the full stack reaching 39 against
+Johnson's ceiling of 35, with the misses in coastal- and flat-temperate. This is the same +40% Addendum 22
+attributed and Addendum 23 diagnosed: with `cohesion_frac` pinned, `split_thr` is the constant
+`band_split_size = 45` and the realised median sits at ~0.75 of it. The measured candidate fix
+(`enable_leaky_assabiyah` + a leader weight) puts `band_med` back to 26.8–29.0 in-process but is NOT adopted,
+because the leader weight is an unanchored constant (Addendum 23).
+
+**5. THE SAVANNA WORLD BEHAVES DIFFERENTLY, and it is the control's only `settle_med` miss** (21, far below
+Bar-Yosef's floor of 50) and its only `band_med` miss. This is the first time the Hadza-anchored biome has
+been in a battery at all — it was an explicit-only preset no harness had ever requested — so a divergence
+there is expected and unexamined rather than a defect. It deserves its own look: most of the ethnographic
+anchors in this project (Hadza band size, Hadza intercept hunting, the savanna return rates) come from
+exactly this biome, so a world that fails `settle_med` there is worth understanding before the temperate
+worlds are trusted as representative.
+
+**Origin:** `battery7_controlled.py` stages S1+S3, build `f77be6a`, `B7_WORLDS` including `flat_savanna`,
+133 min wall clock, 16/16 arms at horizon 2500. Supersedes Addendum 20's withdrawn S3 numbers. Confirms
+Addendum 21's qualification that `connubium_med` had to be re-measured with the adaptive connubium switched
+on — it was, and it overshoots.
+
+**ADDENDUM 25 — CORRECTION to Addendum 24, twice over. There is no anchor conflict in the connubium (R-67
+retracted the 475 three weeks ago and the CODE NEVER FOLLOWED), and `connubium_med` is TWO DIFFERENT
+STATISTICS reported under one name — so Addendum 24's control-vs-full comparison put a pool-of-adults count
+beside a population-within-reach count (2026-08-04).**
+
+**PART 1 — THE PROPAGATION FAILURE.** Addendum 24 read the connubium overshoot as a conflict between two
+anchors: *"m* = 50 was calibrated to Wobst's ~475 reach … and both cannot be met at once."* **Wrong on both
+halves.** `LITERATURE.md` (2026-07-13) and RESULTS **R-67** had already settled it:
+
+> Wobst's **Minimum Equilibrium Size** … his 40 simulation runs returned **MES = 79–332** — the commonly cited
+> **175–475 is an *extrapolation*** … The earlier `mate_search_min_eligible` calibration to reach ~475
+> (m* = 50) anchored to the contested max-dispersal extrapolation … **re-anchored to MVP (m* ≈ 15)**.
+
+Wobst's real MES **is** the MARKER_MATRIX band, and White's MVP ~150 sits inside it. The anchors agree.
+
+The defect is that the re-anchoring never reached the code. `run_campaign.py` kept
+`MSTAR = int(os.environ.get("C_MSTAR", "50"))  # probe: m*=50 → median reach 496 ≈ Wobst` — the retired value,
+with the RETRACTED anchor quoted in its own comment as justification, for three weeks. Fixed: default → 15,
+with the retraction recorded at the point of use. Fourth instance of one shape; now **MECHANISM_CHARTER §11,
+the propagation discipline**.
+
+**PART 2 — AND THE MARKER IS TWO STATISTICS.** Prompted by the supervisor's question — *is the lit anchor
+biome-specific, so could the model legitimately differ?* Wobst's MES is indeed density-dependent, but the
+dominant effect is that `self._connubium_sizes` is appended from two places with two different quantities:
+
+    phase1_model:3642   (Cut-1, gathering)   append(pool_n)      # distinct adults in the mating pool
+    phase1_model:3719   (Cut-2, adaptive)    append(reach_pop)   # TOTAL POPULATION within the realized reach
+
+`reach_pop` increments once for **every agent** in every cell of the expanding search ring — all ages, both
+sexes. That is exactly Wobst's quantity, *"persons living in the intervening distance between two marriage
+partners"*. `pool_n` is not. The class attribute declares only the first meaning
+(*"distinct-adult size of each mating pool"*), so the name and the comment describe the Cut-1 statistic while
+Cut-2 silently reports another.
+
+**Consequences for Addendum 24, precisely:**
+- the FULL-stack numbers (440–2387) ARE in the anchor's units and DO overshoot [79, 332] by 1.3–7×. **That
+  finding stands.**
+- the CONTROL numbers (8–89) are a pool-of-adults count and are **not comparable to the band at all**. Scoring
+  them "1/8 in [79–332]" was a category error, and so was the conclusion that the band *"lies strictly between
+  the two arms"* — the two arms are not measuring the same thing, so nothing was bracketed.
+
+**WHY THE POOL REACHES 75% OF THE WORLD.** The ring expands until `len(eligible) >= m_star`, where eligible
+means adult male, non-kin, exogamy-passing and not already at `max_wives`. Those are a small minority, so
+finding 50 of them requires sweeping a large area, and `reach_pop` counts everyone swept. In `flat_savanna_s0`
+(pop 1563, dispersed) that is 1168 people — 75% of everyone alive. Full-stack `connubium_med / pop` across the
+eight long arms: 0.75, 0.73, 0.33, 0.17, 0.17, 0.13, 0.11, 0.11. **A mate-search catchment holding 11–75% of a
+population is not a catchment**, and at m* = 50 it was guaranteed by arithmetic rather than by any biology.
+With the default now 15 the reach should fall by roughly the same factor; that is measured, not assumed, and
+is not yet done.
+
+**AN OPEN TENSION, stated rather than resolved.** Wobst is explicit that the MES **SHRINKS as residential
+units aggregate** — "a large village already contains the pool". Measured on the full-stack arms, where
+`connubium_med` genuinely is the MES: `corr(connubium_med, density_per_km2) = +0.544`,
+`corr(…, n_villages) = +0.572`. The model's reach RISES with aggregation. This is confounded — `n_villages`
+also tracks total population, and `reach_pop` scales with the area that had to be swept — so it is not yet a
+finding. Disentangling it needs a same-population, different-aggregation pair.
+
+**WHAT IS NOW OPEN.** (a) Split the two statistics — a Cut-1 pool size and a Cut-2 reach are both worth having,
+under different names, and only the second is scoreable against Wobst. (b) `MARKER_MATRIX` row 4 must say
+which quantity it scores, since White's demographic pool and Wobst's spatial reach are different numbers with
+different dependencies. (c) Re-measure the reach at m* = 15 before treating the re-anchor as verified.
+
+**A PLANNED SWEEP WAS STOPPED BECAUSE OF THIS.** m* over 50/25/15/8 was running when the two-statistics
+problem was found. It was killed rather than completed: half its arms would have reported `pool_n` and half
+`reach_pop`, scored against one band. Reporting that would have been a D3/D4 failure dressed as a calibration.
+
+**Origin:** `LITERATURE.md` 2026-07-13, RESULTS R-67, `MARKER_MATRIX.md` row 4,
+`phase1_model.connubium()` and lines 3642/3719, and Addendum 24's 16 long arms re-read for composition and
+density. Corrects Addendum 24's anchor-conflict reading AND its control-vs-full bracketing. `C_MSTAR` default
+50 → 15 committed as the documented re-anchor; whether 15 is right is now OPEN, not closed.
+
+**ADDENDUM 26 — MARKER #5's ANCHOR IS WITHDRAWN. The paper was read: BHM 2009 contains no lineage-size Gini.
+[0.51–0.68] is its MATERIAL-WEALTH band, applied to a lineage-size distribution — the wrong QUANTITY, not
+merely the wrong unit. And the quantity it does belong to, #14, reads about half the anchor (2026-08-04).**
+
+**THE CHECK.** On the supervisor's instruction — *check the actual paper in the lit folder* —
+`literature/borgerhoff-mulder.som.pdf` was read. It is the Supporting Online Material for Borgerhoff Mulder
+et al., *Intergenerational Wealth Transmission and the Dynamics of Inequality in Small-Scale Societies*,
+Science 326:682 (2009). Every Gini in it is a **wealth** Gini:
+
+> Population- and wealth-type-specific Gini coefficients were calculated using the maximal sample of
+> individuals … for whom **wealth** and age data were available … The Ginis were age-adjusted by regressing
+> the raw data against a quadratic in age.
+
+Forty-three **wealth types** across four economic systems. **Table S5**, the α-weighted averages:
+
+| economic system | embodied | relational | **material** | α-weighted |
+|---|---|---|---|---|
+| hunter-gatherer | 0.21 | 0.24 | **0.36** | 0.25 |
+| horticultural | 0.20 | 0.23 | **0.52** | 0.27 |
+| pastoral | 0.20 | na | **0.51** | 0.42 |
+| agricultural | 0.28 | 0.46 | **0.57** | 0.48 |
+
+**There is no lineage-size Gini anywhere in the paper.** The band [0.51–0.68] is the MATERIAL column for the
+stratified systems — 0.51 pastoral, 0.52 horticultural, 0.57 agricultural. It was borrowed onto a
+lineage-size distribution, which is a different quantity, not a different unit of the same one.
+`ELITE_STRATIFICATION_ROADMAP` also quotes two incompatible BHM ranges for this same marker — "0.51–0.68
+(BHM stratified range)" at line 173 and "0.4–0.6" at line 190 — which is the tell that neither was traced to
+the table.
+
+**WHERE THE BAND ACTUALLY BELONGS — and it was already there.** MARKER_MATRIX **#14** reads *"wealth
+concentration | `material_gini`, `material_top10_share` | BHM by society type | BHM 2009 (T-5)"*. So BHM was
+cited for two markers and only #14 is the right one. Scored properly, against the **hunter-gatherer** row a
+forager model has to answer to (material Gini **0.36**), the model reads:
+
+    material_gini   median 0.162   range 0.131-0.185   (16 long arms, control and full)
+
+**About half the anchor.** #14 was already flagged as "the live open question" — this puts a number on it and
+identifies the correct band, which is 0.36 and not the stratified 0.51–0.68 that a mis-assigned row had been
+suggesting. Note the model's `wealth_gini` (0.17 control → 0.30–0.46 full) is a *different* stock and is not
+BHM's material class.
+
+**AND #5 HAS A SEPARATE UNIT PROBLEM.** `lineage_size_gini` is a Gini over `_rank_keys()`, which under
+`enable_local_ascription` — ON in the canonical stack — returns **(community, lineage) pairs**, so one
+patriline fragments into one unit per community. `lin_size_gini`, in the same trajectory row, is the Gini over
+`_lineage` itself. They differ in **16/16** long arms and the sign of the difference flips between arms:
+
+| unit | control in the old band | full in the old band |
+|---|---|---|
+| rank-key (what was scored) | 1/8 | 8/8 |
+| patriline | 6/8 | 4/8 |
+
+So Addendum 24's "the full stack takes `lineage_size_gini` from 1/8 to 8/8" held only on the fragmented unit
+and against a band that does not belong to the marker. **Both halves of that headline are withdrawn.**
+
+**WHAT #5 NEEDS BEFORE IT IS SCORED AGAIN:** a decision on the quantity (is a lineage-size Gini a marker this
+project wants at all, and against what source), and on the unit (patriline, or lineage-within-community).
+Neither is inferable from the code, and neither should be settled by whichever choice scores better.
+
+**THE GENERAL LESSON, which is charter §11 P5 with teeth.** The band survived because it was written as a
+number with a citation and never as a traceable claim — no table, no column, no quantity. Reading the paper
+took ten minutes and settled a marker that had been scored 17/25 for months. **A doc claim about a measurable
+quantity names its measurement**, and "BHM 2009" is not a measurement.
+
+**Origin:** `literature/borgerhoff-mulder.som.pdf` Table S5 and the Gini methods section, against
+`MARKER_MATRIX.md` rows 5 and 14, `ELITE_STRATIFICATION_ROADMAP.md` lines 173/190, and the 16 long arms of
+Addendum 24 re-read for `material_gini`, `wealth_gini`, `lineage_size_gini` and `lin_size_gini`.
+MARKER_MATRIX row 5 marked NOT SCOREABLE; row 14 given its real band and the measured value.
+
+**ADDENDUM 27 — THE ANCHOR-PROVENANCE SWEEP. Every marker's cited source checked against the actual paper in
+`literature/`. Two sources are NOT IN THE FOLDER AT ALL (one of them scores 21/25), two bands are traceable
+to a DIFFERENT paper than the one cited, one was withdrawn yesterday, and two verify verbatim (2026-08-04).**
+
+**WHY.** Addendum 26 withdrew marker #5 after ten minutes with the actual PDF: BHM 2009's Ginis are wealth
+Ginis and the band had been borrowed from its material-wealth column. The obvious question was how many of
+the other fifteen rows cite a source without naming a table, a column or a quantity. This is that sweep — the
+source PDF located in `literature/`, opened, and searched for the number.
+
+| # | marker | band | cited source | verdict |
+|---|---|---|---|---|
+| 1 | `band_med` | 25 [18–35] | Johnson scalar stress | **MIS-ATTRIBUTED** |
+| 2 | `settle_med` | 100 [50–150] | Bar-Yosef | **SOURCE NOT IN `literature/`** |
+| 3 | `settle_med` | [50–250] | Alvard 2009 | **VERIFIED VERBATIM** |
+| 4 | `connubium_med` | 150 [79–332] | White 2017 / Wobst MES | verified (R-67 already corrected it from the paper) |
+| 5 | `lineage_size_gini` | [0.51–0.68] | BHM 2009 | **WITHDRAWN** (Addendum 26) |
+| 6 | `lin_top_share` | 0.16 [0.08–0.30] | Karmin 2015 | **MIS-CITED — numbers are from two OTHER papers** |
+| 8 | `bud_events` | 2–5×10⁻³ | Bandy 2004 | citation NAMES its derivation — the best-documented row |
+| 9 | T-7 ordering | structure > productivity | Smith & Codding 2021 | **SOURCE NOT IN `literature/`** |
+| 14 | `material_gini` | HG 0.36 … | BHM 2009 Table S5 | **VERIFIED** (Addendum 26) |
+
+**#3 IS EXACTLY RIGHT, and shows what a good citation looks like.** `AlvardPaper2.pdf`: *"Yanomamö villages are
+small compared to Lamalera, ranging from **50** or so up to **250** individuals."* The band is the sentence.
+
+**#6 — THE NUMBERS ARE REAL AND THE CITATION IS WRONG.** Karmin 2015 is *"A recent bottleneck of Y chromosome
+diversity coincides with a global change in culture"*; its quantities are Y-chromosome **effective population
+sizes** and **coalescence dates** — "0.16", "0.08" and "0.30" appear nowhere in it. The band's numbers are in
+the folder, in two other papers:
+
+- **Yan 2014** (`yan2014_three_neolithic_super_grandfathers_PLoSONE.pdf`): the three star-like Neolithic
+  clades *"encompass more than 40% of the present Han Chinese in total (estimated **16%** for Oα, 11% for Oβ,
+  and 14% for Oγ)"*. **0.16 is Oα, exactly the marker's point value.**
+- **Zerjal 2003** (`Zerjal et al. - 2003 - The Genetic Legacy of the Mongols.pdf`): the star cluster *"was
+  present at high frequency: ∼**8%** of the men in this region carry it"*. **That is the 0.08 floor.**
+
+So the band was assembled from Yan and Zerjal and filed under Karmin. **And it matters beyond the citation:**
+both sources are POST-NEOLITHIC EXPANSIONS — an agricultural expansion in Neolithic China and the Mongol
+empire. R-97 already concluded that Turchin's cycles are a state-scale phenomenon and *"we built the Kachin"*.
+Marker #6 has been asking a forager/Kachin-scale model to reproduce the Y-lineage concentration of an empire,
+and its 7/25 — the matrix's own "weakest" — is what that should look like. The 0.30 ceiling is traceable to
+neither paper and remains unaccounted for.
+
+**#1 — THE BEST-SCORING MARKER IS MIS-ATTRIBUTED.** `SiC_Games_D2_Johnson1982_OrgStructureScalarStress.pdf`
+reports *"average camp size was 30.9 people, the range over the 28 days was **22-40** (SD = 5.4)"* for the
+!Kung, and an organisational threshold *"in groups of approximately six individuals"*. It does not contain
+[18–35] or a band-size band of any kind — Johnson's contribution is the scalar-stress curve, which is what
+`repulsion_width` and the logistic FORM were taken from. `LITERATURE.md` says so itself: the ~25 *"rest[s] on
+Wobst/Kelly/Hill"*, and the famous band ≈ 25 is Birdsell's 1968 *Man the Hunter* chapter. So #1's band comes
+from real sources — just not the one on the row. Johnson's own **22–40** would be a defensible and better-
+traced alternative, and the model scores differently against it (2500-step arms: control 17.5–33, full 19–39).
+
+**#2 AND #9 CANNOT BE CHECKED AT ALL.** Neither Bar-Yosef nor Smith & Codding 2021 is in `literature/`. #2 is
+not a minor row: `settle_med` against [50–150] scores **21/25** and is one of the two markers Addendum 24
+reported the full stack fixing. Its band is currently unverifiable from anything in this repository.
+
+**WHAT THE SWEEP SAYS ABOUT THE MATRIX AS A WHOLE.** Of nine rows with a numeric band and a named paper:
+2 verify, 2 are mis-attributed with the real numbers elsewhere in the folder, 1 is withdrawn, 2 have no source
+present, and 2 (#8 Bandy, #15 Hill & Hurtado) name their derivation well enough to be trusted without
+re-reading. **The rows that survived are the ones whose citation named a table, a page or a sentence.** Every
+row that failed cited only an author and a year.
+
+That is charter §11 P5 turned into an acceptance criterion: **an anchor names its table, or it is not an
+anchor.** A number with an author-year beside it has, on this evidence, about a one-in-three chance of coming
+from that author.
+
+**NOT RE-CHECKED HERE:** #10 (Marlowe polygyny — the PDF's page extracts as a garbled table; the marker was
+already corrected once, 15× → 1.0×), #11 (von Rueden, verified during R-77/R-80), #15 (Hill & Hurtado, cites
+Table 13.1 explicitly), #7 (`ascribed_frac`, band never documented, not scored), #12/#13 (Johnson rank-size —
+conceptual, ≈−1.0 and ≈1 are definitions rather than measurements).
+
+**Origin:** `literature/` read directly — AlvardPaper2, Genome Res.-2015-Karmin, yan2014_three_neolithic_
+super_grandfathers, Zerjal et al. 2003, SiC_Games_D2_Johnson1982, borgerhoff-mulder.som — against
+`MARKER_MATRIX.md`. No model code touched.
+
+**ADDENDUM 28 — THE THREE FETCHED PAPERS, READ. Smith & Codding verifies verbatim. Hill 2011 contains NO
+LINEAGE DATA, which retracts the replacement anchor proposed for #6 one turn earlier. And Hill's real number
+— band size in ADULTS — shows the model's bands hold 11.8 adults against 28.2, failing 16/16, while
+`band_med` "passes" 23/25 because it counts children the model has too many of (2026-08-04).**
+
+**#9 SMITH & CODDING 2021 — VERIFIED VERBATIM.** *"among the 17 CAL groups with maximum fish harvest scores …
+the correlation between HI and RI was nearly as high (**r = 0.766, n = 17**) as for the full sample
+(**r = 0.881, n = 89**)"*. Exactly as `LITERATURE.md` recorded it. The `[VERIFIED]` tag was honest; only the
+PDF was missing. #9's source is now filed and confirmed.
+
+**#6's PROPOSED REPLACEMENT ANCHOR IS RETRACTED — Hill 2011 has no lineages in it.** One turn ago this log
+recommended retargeting #6 from whole-population `lin_top_share` to band-level `dom_lineage_share`, anchored
+to *"Hill 2011: dominant-lineage share 0.38, ~7 lineages/band"* as carried by `MODEL_SPEC` §4.8.8, `TARGETS`
+and `PARAMETERS` (where `rank_hierarchy_frac = 0.15` is DERIVED as ~1/7 from it). The paper is now in the
+folder and **the string "lineage" occurs ZERO times in it**. Its unit is the co-residence of *primary kin* —
+brothers, sisters, parents, offspring — not descent groups. The three occurrences of "0.38" are cells in
+Table 1: the Nunamuit and Hadza co-residence values, and a column average. **There is no dominant-lineage
+share and no ~7-lineages-per-band in Hill et al. 2011.**
+
+That is the fourth mis-attribution this sweep has found, it was recommended in this log as the *fix* for the
+third, and it propagates further than the others — `rank_hierarchy_frac = 0.15` rests on the 1/7.
+
+**WHAT HILL 2011 ACTUALLY GIVES, verified:** 32 societies, and
+
+> mean experienced band size = **28.2 adults** … the mean total number of co-resident adult primary kin per
+> band is only **1.8** … most individuals in residential groups are **genetically unrelated**
+
+**AND THAT NUMBER BREAKS MARKER #1, in the units it is stated in.** Hill's 28.2 is **ADULTS**. The model's
+`band_med` counts everyone. Converting across the 16 long arms of Addendum 24 with each arm's own
+`frac_child`:
+
+| | model band_med (all ages) | frac_child | **adults per band** | vs Hill 28.2 |
+|---|---|---|---|---|
+| control, median | 26.0 | 0.60 | **10.7** | 0.38× |
+| full stack, median | 32.5 | 0.59 | **13.3** | 0.47× |
+| **all 16 arms, median** | | | **11.8** | **0.42×** |
+
+Range across arms 0.29×–0.58×. **Not one arm reaches even 60% of Hill's figure.** Meanwhile `band_med` scores
+**23/25** against [18–35] — the matrix's best row — because it is an all-ages count measured against a band
+whose provenance Addendum 27 already showed is not Johnson's.
+
+**The two findings are one finding.** MARKER #4/#5 records the demographic engine as running far too young:
+`frac_child` **0.59** against the ~0.40 anchor, median age 12.8 against ~20, e₀ 21.4 against ~28. A band of 27
+people that is 60% children holds 11 adults. **The band-size pass is being carried by the excess children.**
+Fix the demography and `band_med` falls out of [18–35] from below unless adult band size roughly doubles.
+
+So #1 should be scored on **adults**, against Hill 2011's 28.2 — a traceable, in-folder, 32-society figure —
+and on that basis the model fails it 16/16 rather than passing it 23/25.
+
+**#2 BAR-YOSEF 1998 — STILL NOT VERIFIED, now for a better reason.** The PDF is filed and read. Its treatment
+of size is archaeological and comparative: sections titled *"Site Size and Settlement Pattern"* and *"Site
+Size, Intrasite Variability, and Settlement Pattern"*, and the one quantitative statement in the extracted
+text is relative — *"The largest Neolithic sites … are at least **three to eight times larger** than the
+largest Natufian sites."* **No population figure appears anywhere in the extracted text**: no "100–150", no
+"dozens", and a regex for "N to M people/persons/inhabitants" matches nothing. `LITERATURE.md` had already
+conceded the position — *"Status: SEARCH-VERIFIED (PDF not filed)"* — and its own note derives the band's
+floor from the project rather than the paper: *"should let villages LAND in ~50–150 — checked in run A, not
+pre-tuned"*.
+
+**CAVEAT, stated because it is the honest limit of this check:** PDF text extraction does not recover figures
+or embedded tables, and this is a 19-page review article. A site-size figure may exist that this method cannot
+see. #2's band should be treated as UNVERIFIED — not disproven — until someone reads the figures.
+
+**THE SWEEP'S TALLY, after three fetches.** Of the markers with a numeric band and a named paper: **3 verify**
+(#3 Alvard, #9 Smith & Codding, #14 BHM), **4 are mis-attributed** (#1, #5, #6, and #6's proposed replacement),
+**1 remains unverified with the PDF in hand** (#2). Every verified one cites a sentence or a table. Every
+failed one cites an author and a year.
+
+**Origin:** `literature/hill2011.pdf`, `literature/baryosef.pdf`,
+`literature/smith-codding-2021-....pdf` (all added by the supervisor 2026-08-06), read directly; the 16 long
+arms of Addendum 24 re-read for `band_med` × `frac_child`. Retracts this log's own prior recommendation for
+#6. No model code touched.
+
+---
+
+**ADDENDUM 29 — THE ANCHOR SWEEP EXTENDED TO THE CLIMATE LAYER AND TO THE CONFIG ITSELF. Four climate anchors
+opened for the first time: three verify, one does not exist in the paper it is credited to. Village sizes turn
+out to be well anchored after all — the row that looked unanchored was the redundant one — and the LARGEST
+village is the marker that actually misses. And the parameter-provenance gap reported one turn ago was mostly
+an artefact of the generator that reports it (2026-08-06).**
+
+Prompted by the supervisor's read of Bar-Yosef ("mostly maps and burial sites") and the two questions it
+raised: is there a village anchor at all, and what else has never been checked. Worked in three tiers.
+
+---
+
+### TIER 1a — the climate anchors, checked against the PDFs for the first time
+
+The C.2–C.5 channels were wired on 2026-08-04 and every number in them was transcribed from a code comment or
+a web survey. `tools/verify_anchor.py` now extracts each source PDF and searches it for the number the code
+claims. Four sources were in the folder; a fifth is not.
+
+| anchor | verdict |
+|---|---|
+| **Sarmiento 2004** — llanos flood-year ANPP | **VERIFIED VERBATIM.** The table reads `Total ANPP (*) 236±36 265±38 428±71 601±58` / `(**) 352±45 418±43 601±82 659±68` for grazed/ungrazed 1996 vs 1997. The ungrazed ratios 265/601 and 418/659 give **−56%** and **−37%** — exactly the range the code quotes. Arithmetic reproduced, not just the digits |
+| **Wanner 2008** — regime amplitude | **VERIFIED VERBATIM:** EMICs *"simulate relatively modest changes during the period AD 1000-1850, with peak to peak variations in the order of 0.5 C"*. Note that is **peak-to-peak over the millennium**, not an LIA-vs-baseline anomaly. The °C→CC% step was already tagged interpretive in `LITERATURE.md` and now is in the code too |
+| **Hawkes 1991** — intercept hunting | **VERIFIED VIA A DOCUMENTED CONVERSION.** 745 and 518 are *not in the paper* — it reports **mass**. Table 2's kg/hr column gives encounter/scavenge all-seasons **0.71** and night intercept **1.02**, with footnote a fixing the denominator: *"mean number of hours spent by adult men in day-time foraging was about 4.5 hours … We use this number to calculate an hourly rate."* The return-rate table's LOCKED constants (0.50 × 1460 = 730) convert them to **518.3** and **744.6**. Exact to the unit |
+| **Timmermann 2018** — ENSO **period** | **VERIFIED, as a SYNTHESIS of two printed bands.** EOF1 is *"quasi-quadrennial timescales (3-7 years)"*; EOF2 is quasi-biennial, and the eigenmode section pins the pair at *"timescales of approximately four and two years, respectively"*. So our [2, 7] is the union of the two observed modes — defensible, but a union and not a quotation, and now labelled one |
+| **Timmermann 2018** — ENSO **amplitude** | **RETRACTED. THE NUMBER IS NOT IN THE PAPER** |
+| **St. John 2022** — caribou swing | **UNSOURCED. NO PDF EXISTS IN `literature/`** |
+
+**THE ENSO AMPLITUDE WAS NEVER TIMMERMANN'S.** `LITERATURE.md` recorded *"±20–40% CC swing in marginal biomes
+→ `interannual_amp`"* and `climate.py` carried `ENSO_AMP_MIN, ENSO_AMP_MAX = 0.20, 0.40  # Timmermann 2018`.
+Timmermann 2018 is an **SST-dynamics review**. It discusses ENSO amplitude only qualitatively — skewness,
+*"a wide range of amplitudes"* in palaeo-reconstructions — and states **no production or carrying-capacity
+amplitude anywhere in the text**. This is the Bar-Yosef pattern reproduced exactly, in code two days old,
+written after the sweep that found Bar-Yosef.
+
+The value is retained and **retagged `[INTERPRETIVE]`**, which is the treatment its sibling `REGIME_AMP`
+(Wanner's ±10–15%) has carried since it was written. It is **bounded, not anchored**: Sarmiento measures
+−37…−56% in an *exceptional* flood year, and an ordinary interannual excursion must be milder than an
+exceptional one, so [0.20, 0.40] sitting below [0.37, 0.56] is coherent. That is an argument for the bracket,
+not a source for the number, and the code now says so.
+
+**ST. JOHN 2022 IS THE BAR-YOSEF CASE AGAIN, WITHOUT THE PAPER.** The caribou amplitude 0.871 and the 40–90 yr
+period rest on an M.Sc. thesis that is **not in the folder**. The only caribou paper we hold is Usher 2022,
+which `LITERATURE.md`'s own entry explicitly *rejects* for this purpose as a category error. The channel is
+default-OFF in both `ClimateConfig` and `mechanisms.toml`, so nothing in the canonical stack rides on it, and
+`test_anchor_provenance.py` now **fails if it is ever defaulted ON while the row reports UNSOURCED**.
+
+**Also corrected, a P5 drift in my own week-old work:** `LITERATURE.md`'s St. John entry said *"C.4b, NOT yet
+wired"*. C.4b was wired on 2026-08-04, by me, and tested live. The doc had not moved with the code.
+
+---
+
+### TIER 1b — village sizes ARE anchored. The unanchored-looking row was the redundant one
+
+The supervisor's finding on Bar-Yosef closes marker **#2**, and closing it costs nothing:
+
+- **#2 RETIRED.** 100 [50–150] on `settle_med`, sourced to a paper with no village-population figure in it.
+  It was a **second band on the same field as #3**, whose band is verified. Retiring it removes an
+  unverifiable number and loses no measurement.
+- **#3 STANDS and re-scores well.** Alvard 2009 [50–250], verified verbatim. Re-scored over every trajectory
+  on disk (52 arms): **46/52 pass**, median of arm medians **97.5**.
+
+Two further sources were verified verbatim and both land on the same scale:
+
+- **Alberti 2014:** *"a critical scalar stress threshold at community size 127 (95% CI: 122–132), while the
+  maximum probability of critical scale stress is predicted at size 158 (95% CI: 147–170)"*
+- **Hamilton 2007:** aggregated group **53.66 [49.86–58.29]** (n=297), periodic aggregation
+  **165.32 [152.25–181.00]** (n=213)
+
+**AND SCORING ALBERTI AS A BAND WOULD HAVE BEEN THE FOURTH INSTANCE OF THIS PROJECT'S UNIT-MISMATCH BUG.**
+The tempting move — add `settle_med ∈ [122, 132]`, the CI is beautifully tight — is wrong, and would have
+scored **0/52**. **127 is the size at which a community starts to come apart.** A population whose *median*
+village sat there would be permanently mid-fission. What Alberti bounds is the **ceiling**, so the field is
+`settle_max` and the test is one-sided. Same family as `hayden_stage` on occupied-vs-regional density,
+`lineage_size_gini` on rank-keys-vs-patrilines, and `connubium_med` on `pool_n`-vs-`reach_pop`. **All four
+were real numbers read against the wrong denominator, unit or statistic — never wrong numbers.**
+
+**NEW MARKER #17 — THE FISSION CEILING, AND IT MISSES.** Scored correctly against `settle_max` over the same
+52 trajectories:
+
+| | median `settle_max` | arms over Alberti's 158 | arms over Alvard's 250 |
+|---|---|---|---|
+| 52 trajectories | **220** | **39/52** | **18/52** |
+
+**The typical village is right and the largest one is not.** `settle_med` ≈ 98 sits comfortably inside the
+ethnographic band while `settle_max` ≈ 220 routinely exceeds the size at which both Alberti (scalar stress)
+and Alvard (ethnographic maximum) say communities break up. That is not a contradiction between #3 and #17 —
+it is the diagnosis: **fission fires, but not hard enough at the top of the distribution.** A single "village
+size" verdict would have averaged the two into a meaningless pass.
+
+**#17 is a SCREEN, not a score.** The 52 arms were run for other purposes, across different worlds, lengths
+and flag stacks, several predating the R-105 and R-106 fixes. They establish direction and that the marker is
+worth wiring; they do not size the miss. That needs a proper campaign.
+
+**#6 remains unanchored.** Smith & Codding was fetched and verifies, but for #9's ordering claim, not for a
+lineage share. No forager-scale lineage-concentration source exists in the folder. Retire or leave visibly
+broken — the supervisor's call.
+
+---
+
+### TIER 2 — the provenance gap was mostly the generator, not the parameters
+
+One turn ago this log reported *"245 parameters, 26 PROVISIONAL, 18 ANCHORED, ~200 with no provenance tag at
+all"*. **That number was wrong, and wrong in the direction that flatters nobody: it overstated the gap.** Two
+measurement defects, both in the instrument rather than the model:
+
+**(1) `gen_runconfig.py` harvested only the comment TOUCHING each field.** The config classes are written in
+channel blocks — one comment carrying the anchor, then the flag and the two or three parameters it governs:
+
+```
+# [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; duration 100-500 yr ...
+enable_regime_shift: bool = False
+regime_amp: float = Field(0.0, ...)          <- documented to a human, "UNDOCUMENTED" to the generator
+regime_duration: int = Field(0, ...)         <- same
+```
+
+Only the flag sat directly under the comment, so only the flag inherited it. **18 of the 25 "undocumented"
+parameters were documented in the line above their own.** The generator now inherits the channel note
+(tagged, so a field-specific note is still distinguishable) and falls back to the class docstring **only when
+the docstring names the field** — a blanket fallback would dress an undocumented field in its neighbours'
+prose and hide a real gap.
+
+**(2) The audit's own classifier tested `ANCHORED` before `UNANCHORED`.** One string contains the other, so
+16 parameters that **honestly declare they have no literature source** were counted as anchored. The first
+corrected run read 31 ANCHORED; the true figure is 15. A clean sweep produced by a substring.
+
+Both bugs are now constructed-truth tests in `test_provenance_coverage.py`. CLAUDE.md's first rule applies to
+an audit exactly as it applies to a diagnostic.
+
+**The corrected picture, 244 parameters:**
+
+| class | n | % |
+|---|---|---|
+| ANCHORED | 15 | 6% |
+| PROVISIONAL | 25 | 10% |
+| UNANCHORED (explicitly declared) | 16 | 7% |
+| CITES-A-YEAR, untagged | 88 | 36% |
+| COMMENTED, no source | 100 | 41% |
+| **UNDOCUMENTED** | **0** | **0%** |
+
+**59% now declare a source or declare that they have none**, and nothing is silent. The actionable backlog is
+the **88 that name a paper-and-year but carry no tag** — they are the cheap expansion of the
+`verify_anchor.py` registry, because the citation is already there and only the tag is missing.
+
+**The one real gap was `CarbonConfig` — and reachability answered it better than provenance would have.**
+9 of its 10 fields had no comment anywhere, and none of the names appear in `PARAMETERS.md` either. Before
+writing provenance, the reachability was checked: **`phase1_model.py` imports neither `oracle.py` nor
+`joint_task.py`**, so **five of the nine cannot be reached from any campaign run** — `cred_decay` and
+`velocity_tau` (Oracle only), `matthew_alpha`, `epsilon` and `cred_bonus_per_participant` (joint-task only).
+Chasing literature anchors for those would have been effort spent on the wrong five. Each field is now
+labelled LIVE or DEAD at its point of use, and the generated config carries the label.
+
+---
+
+### TIER 3 — all six named open parameters are INERT, and that is the finding
+
+`pathogen_gamma`, `shock_rho`, `material_capture_frac`, `paternal_provision_frac`, `wife_quality_strength`
+and `cohesion_leader_weight` were checked against their neutral values:
+
+```
+pathogen_gamma           0.0   neutral 0.0    INERT
+shock_rho                0.0   neutral 0.0    INERT
+material_capture_frac    0.0   neutral 0.0    INERT
+paternal_provision_frac  0.0   neutral 0.0    INERT
+wife_quality_strength    0.0   neutral 0.0    INERT
+cohesion_leader_weight   1.0   neutral 1.0    INERT   (bit-exact today)
+```
+
+**Every one sits at its no-op value, so none has ever affected a campaign.** That reframes the backlog: it is
+not a correctness risk to the current stack, it is a set of unexercised mechanisms. It also separates two
+things that had been filed together — `wife_quality_strength` **already has a lit anchor** (von Rueden &
+Jaeggi, r = 0.19, cited in full at its point of use). Its gap is **adoption**, not anchoring. Only
+`pathogen_gamma` (Cashdan 2014, comment reads "Sweep low/mid/high") and `shock_rho` ([PROVISIONAL — sweep])
+are genuinely waiting on a run.
+
+---
+
+### WHAT IS NOW CODE RATHER THAN PROSE
+
+- **`tools/verify_anchor.py`** — extracts each source PDF and searches it for the number the code claims.
+  Three honest states: VERIFIED, INTERPRETIVE (our judgement, informed by the paper but not printed in it),
+  UNSOURCED (no PDF). 12 rows registered, 0 unaccounted for.
+- **`tools/audit_provenance.py`** — provenance coverage over the generated config, with the class order that
+  the substring bug made load-bearing.
+- **`sic_games/tests/test_anchor_provenance.py`** (17 tests) — fails the suite if any wired number stops being
+  findable in its own source; pins the ENSO retraction; reproduces the Hawkes conversion from the paper's own
+  kg/hr; constructs the per-session-vs-per-hour unit error the Hawkes table invites; and keeps the caribou
+  channel OFF while its source is unfilebound.
+- **`sic_games/tests/test_provenance_coverage.py`** — a ratchet. Coverage may rise and may not fall, and both
+  audit bugs are constructed cases.
+
+**The rule this arc keeps re-learning, now in three places:** a citation that names an author and a year is a
+promise, not a provenance. Every row that survived a check named a table, a page or a sentence. Every row that
+failed named only an author and a year — Bar-Yosef, BHM, Hill 2011, Timmermann's amplitude, St. John.
+
+---
+
+**ADDENDUM 30 — ADDENDUM 28's RETRACTION NEVER REACHED THE CODE. Three live parameters were still citing Hill
+2011's nonexistent lineage target two days after it was retracted, and one of them derives its value from it.
+Found by the provenance audit of Addendum 29, which was not looking for it (2026-08-06).**
+
+Charter **P3** — *a retracted anchor is edited at its point of use* — was written on 2026-08-04 in response to
+the Addendum-28 retractions. It was being violated by those same retractions at the moment it was written.
+
+**HOW IT SURFACED.** The Tier-2 audit grouped the 88 untagged-but-citing parameters by cited source, purely to
+size the registry backlog. **`Hill 2011` came back with five hits.** Addendum 28 had established two days
+earlier that the word *"lineage"* occurs **zero times** in Hill et al. 2011. Opening the five showed the
+retraction had been written into `RESULTS.md` and `MARKER_MATRIX.md` and nowhere else.
+
+**WHAT WAS STILL STANDING IN `demography.py`:**
+
+| parameter | what the comment still said |
+|---|---|
+| `lineage_branch_rate` | *"breaks the FILED Hill-2011 target of ~7 lineages/band + dominant-lineage share 0.38 that R-25 already passed"* |
+| `rank_hierarchy_frac` = **0.15** | *"0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band … tied to a target the model already carries rather than picked freely"* |
+| `legit_threshold` = 0.15 (R-93 note) | *"that boundary is 6.67, against a Hill 2011 target of ~7 — a FIVE PERCENT margin"* |
+
+**`rank_hierarchy_frac` is the one that bites.** Its comment presents 0.15 as **derived** — the reader is told
+it was *"tied to a target the model already carries rather than picked freely."* There is no ~7. It is a free
+parameter that has been reading as a derived one for as long as the comment has existed, and R-93's "five
+percent margin" argument is a margin against nothing.
+
+**A SECOND, DIFFERENT FAMILY in the same five.** `band_cohesion` / `band_split_size` / `band_merge_size` and
+`cv_safe` cite Hill 2011 for band size **~25 all-ages**. That number *does* have a paper behind it, but the
+paper's quantity is **28.2 ADULTS** — the all-ages reading is the mis-attribution Addendum 28 identified.
+`cv_safe` is explicitly *"calibrated … ONLY to place the MEAN band at Hill 2011's ~25–30"*, i.e. **fitted to a
+quantity in the wrong unit.** The R-106 re-fit against the corrected adults target was attempted earlier in
+this arc and **falsified** — the mechanism cannot reach 28.2 adults from this direction — so the fit is left
+standing and the target is now labelled. An honest, documented mismatch beats a second fit to a wrong unit.
+
+**NOTHING WAS RE-VALUED.** Every one of these is left at its current number and labelled `[UNANCHORED]` with
+the reason. Re-deriving `rank_hierarchy_frac` or `legit_threshold` is a calibration decision requiring runs and
+a supervisor call, not a documentation fix, and `enable_rank_hierarchy` is default-OFF in any case. The
+R-90/R-92/R-93 *reasoning* is untouched by the retraction and stays: an absorbing lineage process really does
+fixate at probability 1, and a threshold on a share really does have a hidden denominator. Only the **number
+those arguments were aimed at** turns out not to be a literature target.
+
+**NOW ENFORCED — `sic_games/tests/test_retraction_propagation.py`.** For each retracted claim, any source file
+still mentioning it must also carry the retraction marker. The claim may stay (the surrounding reasoning is
+usually sound and deleting it would lose the history); it may not stand unqualified. Registered: Hill 2011 as
+a lineage source, Timmermann 2018 as the ENSO amplitude source, St. John 2022 as a filed source. The guard
+includes a constructed violation, because a check that can only pass is not a check — and on its first run it
+caught a defect in **itself**, splitting on the bare parameter name and landing in the new warning block
+instead of the field declaration.
+
+**THE PATTERN, STATED PLAINLY.** Every retraction this arc has produced was recorded in the log that produced
+it and left live at the point of use. Bar-Yosef, BHM, Hill 2011, Timmermann's amplitude. **A retraction that
+lives only in RESULTS.md is a note, not a correction** — the next person to read the parameter reads the
+comment, not the log. The docs are downstream of the code, and the code is what runs.
+
+---
+
+**ADDENDUM 31 — TWO DEAD KNOBS DELETED, THE CLIMATE LAYER SWITCHED ON BY DEFAULT, AND A PER-CHANNEL HEALTH
+DIAGNOSTIC THAT FOUND THREE DARK CHANNELS ON ITS FIRST REAL RUN. Also: the regime telegraph is correctly
+anchored and STRUCTURALLY UNABLE TO ACT at our run lengths — it fires in ~13% of a standard campaign
+(2026-08-06).**
+
+Supervisor directive: *"kill all dead knobs, turn on the climate channels — wire them with diagnostics of
+healthy functioning and benchmark on a well characterized case."* The procedure now has a name — **CTB
+(Constructed-Truth Benchmark)** — defined at the end of this entry.
+
+---
+
+### 1. THE DEAD KNOBS ARE DELETED, AND THE DELETION EXPOSED A WORSE BUG
+
+**`enable_infanticide`** — a declared flag that **no line of code ever read**. Three separate audits had to
+re-discover that and write "UNIMPLEMENTED STUB" beside it; `C_ALLON` carried a special case to skip it; two
+mechanism batteries carried an entry explaining it. A switch that does nothing is not documentation, it is a
+standing invitation to believe the mechanism exists. The science it encoded is unchanged and lives in R-74's
+`enable_orphan_mortality`, which is built, anchored and ON.
+
+**`enable_band_risk` + `band_risk_penalty` + `band_risk_size`** — not a stub; a **measured dead end** with real
+implemented code. Loner-mortality does not produce an optimal band size, it culls: fewer people → lower density
+→ smaller bands → more loners → more penalty (run_3i: penalty 0→6 took pop 281→64 and mean band 56→5). Its gain
+defaulted to 0.0 behind a `> 0.0` guard, so **the flag could read ON in a config dump while the mechanism was
+inert — it passed a whole ablation battery as a fake positive.** Its only two reachable states were "does
+nothing" and "kills the population". Recoverable at commit `daa7194`; the `run_3i` prototype went with it,
+because a script that can no longer run is the same kind of lie as a flag that does nothing.
+
+**THE BUG THE DELETION FOUND, WHICH IS BIGGER THAN EITHER KNOB.** `DemographyConfig` **silently ignored unknown
+keyword arguments** — pydantic's default. So deleting `band_risk_penalty` would have made every harness that
+still passed it run happily *without* it: the run succeeds, the manifest looks right, the setting is absent.
+That is precisely the failure this entire audit arc has been chasing, sitting one line away from being
+impossible, and **the cleanup itself would have been the trap.**
+
+`model_config = ConfigDict(extra="forbid")` on `DemographyConfig` and `ClimateConfig`. A stale or mistyped field
+now raises. Three harnesses were passing the deleted fields and were repaired rather than left to no-op.
+
+---
+
+### 2. CLIMATE IS ON BY DEFAULT. THE CONTROL IS NOW A CHOICE, NOT AN INHERITANCE
+
+`C_CLIMATE` flipped from opt-in to opt-out. Five channels run by default — seasonality, eccentricity mean,
+ENSO interannual, the regime telegraph, the llanos flood — plus the lottery that draws their per-world values.
+`C_CLIMATE=0` still reproduces the pre-2026-08-06 flat world exactly, and that arm is now what a climate
+ablation compares against. **A control has to be chosen, not inherited by default**, and the old default meant
+the entire variability layer sat out every experiment this project ran while reading as built.
+
+**One channel stays off, by name and with a reason: `enable_caribou_swing`.** Its amplitude (0.871) and period
+(40–90 yr) are credited to an M.Sc. thesis that is not in `literature/` (Addendum 29). Not a control and not
+"not needed" — **unverifiable**. Turning it on would put an unsourced number into every result. File the thesis
+and delete one line.
+
+---
+
+### 3. THE HEALTH DIAGNOSTIC, AND WHAT IT FOUND IMMEDIATELY
+
+A climate channel fails in three ways that are **indistinguishable in a config dump**:
+
+| | what it looks like | what it is |
+|---|---|---|
+| `OFF` | flag false | not asked to act |
+| `UNREACHABLE` | flag true, **mask empty** | cannot touch a cell at any amplitude |
+| `NEVER-FIRED` | flag true, mask populated, **run shorter than the channel's clock** | asked to act, never got the chance |
+
+The third is the one nothing in this project could previously see. `ClimateField.health()` now reports, per
+channel, its reach in cells, how often it actually moved the field, and its measured extremes — **seven scalar
+evaluations per STEP, not per cell**, carried in every checkpoint and printed to the run log only when the set
+of complaints changes.
+
+**First real run (coastal-temperate, the campaign default), step 25:**
+
+```
+~~ climate: intercept=UNREACHABLE, llanos=UNREACHABLE, regime=NEVER-FIRED
+```
+
+**Three of six channels dark on the default world.** llanos and intercept are UNREACHABLE because a temperate
+coastal world contains neither llanos nor savanna — biome-dependence, exactly as the standing rule says: *a
+mechanism validated in one world is a claim about that world.* On a **savanna** world both come alive
+(llanos reach 200 cells, intercept 4499), which is the correct behaviour and confirms the masks are wired.
+
+**THE MEASURED EXTREMES EQUAL THE CONFIGURED AMPLITUDES — the diagnostic and the seeding align:**
+
+| channel | verdict | reach | measured extreme | expected from the config |
+|---|---|---|---|---|
+| season | LIVE | global | min **0.221** | 1 − a_seas(0.779) = 0.221 ✓ |
+| eccentricity | LIVE | global | **1.1228** flat | the drawn mean_factor ✓ |
+| interannual | LIVE | global | min **0.7484** | 1 − ENSO amp(0.25) = 0.75 ✓ |
+| llanos | LIVE | 200 cells | min **0.6989**, active **100%** | 1 − 0.30 = 0.70, two-sided ✓ |
+| intercept | LIVE | 4499 cells | max **1.4382**, active **33.5%** | **745/518 = 1.4382** exactly, late-dry only ✓ |
+| caribou | OFF | 0 | — | excluded, unsourced ✓ |
+| regime | **NEVER-FIRED** | global | — | see below |
+
+The intercept row is worth pausing on: **the Hawkes anchor verified from the PDF this morning is now measured
+coming out of a live run, to four decimal places.**
+
+---
+
+### 4. THE REGIME TELEGRAPH IS ANCHORED CORRECTLY AND CANNOT ACT AT OUR RUN LENGTHS
+
+Not a bug — a **structural mismatch between the literature's timescale and ours**. The recurrence is anchored to
+Bond ~1500 yr (Mayewski RCC), drawn over 1000–2000 yr. A standard campaign is 2500 steps = **208 years**.
+
+| run | years | P(≥1 regime onset) at 1000 / 1500 / 2000 yr recurrence |
+|---|---|---|
+| 400 | 33 | 3.3% / 2.2% / 1.7% |
+| **2500** | **208** | **18.8% / 13.0% / 9.9%** |
+| 5000 | 417 | 34.1% / 24.3% / 18.8% |
+| 12000 | 1000 | 63.2% / 48.7% / 39.3% |
+| 30000 | 2500 | 91.8% / 81.1% / 71.3% |
+
+**A standard campaign sees the slow driver about one run in eight.** Reaching a coin-flip needs ~12,500 steps
+(1,040 yr); reaching 90% needs ~41,000 (3,450 yr).
+
+This matters directly for the cycles question. Turning the regime channel on does **not** by itself put a slow
+environmental variable into a secular-cycle test — at 2500 steps it mostly puts a *flag* into one. The three
+honest options are (a) run 5–16× longer, (b) drive it deterministically with the `regime_driver` /
+`ClimateDriver` hook that §4.1.9 already built for exactly this, or (c) accept it as a rare-event driver and
+say so. **(b) is the right instrument for a controlled test** and costs nothing to adopt.
+
+Shortening the recurrence to make it fire is the one thing that must not happen: it is the anchored number.
+
+---
+
+### 5. **CTB — CONSTRUCTED-TRUTH BENCHMARK.** The procedure, now named
+
+> **Build a world whose answer you already know. Measure it with the real diagnostic. Verify the measurement
+> returns what you built.**
+
+Named at supervisor request. It is CLAUDE.md's first rule with a handle, and it applies to a mechanism, a
+diagnostic, a map, a population, or an audit — anything where a measurement could be believed without being
+checked. `sic_games/tests/test_climate_health_ctb.py` is the reference implementation: each of the four
+verdicts is constructed explicitly, so the instrument is shown to distinguish them rather than assumed to.
+
+**THE CTB EARNED ITSELF THREE TIMES IN ONE SITTING, ALL THREE DEFECTS IN THE INSTRUMENT:**
+
+1. **`OFF` was decided from the observation, not the config** — so "you never switched it on" and "you switched
+   it on and it never fired" collapsed into one verdict, the exact distinction the diagnostic exists to draw.
+   Caught within a minute of the instrument being written.
+2. **A brightening channel reported a value it never took.** min/max were seeded at the neutral 1.0, so
+   `eccentricity` — always ~1.12 — reported `min 1.0`. Depressions hid the bug because for them 1.0 genuinely
+   is the ceiling. Found by *reading a real run's output*, then constructed as a test.
+3. **An unreachable channel reported a fictional magnitude.** On the temperate world the block read
+   `llanos: verdict UNREACHABLE, reach 0, active_frac 1.0, min 0.699` — the verdict right, and the numbers
+   underneath describing a depression applied to **zero cells**. Detail that looks like corroboration is worse
+   than a bare wrong answer, because it invites someone to quote the 0.699.
+
+**Every one was a defect in the measuring instrument, not the model** — which is the entire argument for the
+procedure. A diagnostic is not a neutral window onto a run; it is code, and it is wrong until it is checked
+against something whose answer is already known.
+
+---
+
+**ADDENDUM 32 — THE CARIBOU THESIS ARRIVED AND FALSIFIED HALF OF WHAT WE HAD CREDITED TO IT. Plus: the
+ON-but-dead gate, which caught two more flags advertising mechanisms that could not act; and the config files
+can now SET a run instead of only describing one (2026-08-06).**
+
+---
+
+### 1. THE CARIBOU ANCHOR — one confirmation, three corrections
+
+`[UNSOURCED]` for one morning (Addendum 29); the supervisor filed it the same afternoon. **Reading it was not
+a formality.**
+
+**St. John, Jack R. (2022), "Understanding Caribou Population Cycles", University of Montana ScholarWorks.**
+
+| | what we carried | what the thesis says |
+|---|---|---|
+| **amplitude** | 0.871 about the mean | ✅ **CONFIRMED** verbatim — *"the amplitude, standardized about the mean population size, was .871"* |
+| **period band** | **40–90 yr**, credited to Bergerud | ❌ **FALSIFIED.** Figure 9: `Min=23, Q1=33, Median=40.5, Q3=50, Max=67`. **Bergerud is not cited in the thesis at all** (zero occurrences) |
+| **sample** | "43-herd database" of cycles | ❌ **OVERSTATED.** *"of the 43 herds, I only 19 were deemed cyclic via periodogram analysis"* — **56% of the database is not cyclic** |
+| **status** | M.Sc. thesis | ❌ **UNDERGRADUATE thesis** (ScholarWorks: *Undergraduate Theses, Professional Papers, and Capstone Artifacts*). Not peer-reviewed |
+
+**The period band was wrong on BOTH ends.** It excluded everything below the median (Min 23, Q1 33) and ran 23
+years past the longest cycle ever measured, so nearly every drawn world got a period longer than the median
+herd. **Corrected to the observed 23–67**, and the correction is pinned by a test so a future edit back toward
+40–90 fails.
+
+**Both figures are MEDIANS of wide distributions**, not constants:
+```
+period     Min=23   Q1=33    Median=40.5  Q3=50     Max=67      (years)
+amplitude  Min=.406 Q1=.700  Median=.871  Q3=1.126  Max=1.570
+```
+
+**⚠ A HAZARD THE DISTRIBUTION EXPOSES, found before anyone could hit it.** `_caribou_factor` is peak-pinned
+`(1 + a·cos)/(1 + a)`, whose trough is `(1−a)/(1+a)` — **negative for a > 1**. The thesis's Q3 (1.126) and Max
+(1.570) are both above 1, so **half the observed herds sit above the value at which our form breaks**. Pinning
+the median is safe; a per-world draw from this distribution would silently produce negative meat. Constructed
+as a CTB case so the clamp is a known requirement rather than a future bug report.
+
+**Channel switched ON** (boreal world: reach 4794 steppe cells, drawn period 584 steps = 48.7 yr, inside the
+corrected band). The campaign's `_CLIMATE_UNSOURCED` exclusion set is now **empty**, which was the point of
+naming it.
+
+**The general lesson, third instance today: fetching the paper is not a rubber stamp.** Bar-Yosef had nothing.
+Timmermann had the period and not the amplitude. St. John had the amplitude and not the period band. **In every
+case the number that survived was the one someone had actually read, and the number that failed was the one
+that came with an author-and-year and no page.**
+
+---
+
+### 2. THE ON-BUT-DEAD GATE — two more flags advertising mechanisms that cannot act
+
+**Closing R-85's residual (task #23).** R-85b explained all six inert flags on 2026-07-18 and left a decision
+list of seven zero-magnitude knobs. **Five have since been given values** (`leader_coherence_gain` 2.0,
+`repulsion_gain` 0.3, `village_gain` 5.0, `move_cost_kcal` 750, `site_gain` 0.3). Two had not:
+
+| flag | magnitude | status |
+|---|---|---|
+| `enable_terrain_pathogen` | `pathogen_gamma = 0.0` | **ON-but-dead in the canonical config** |
+| `enable_malnutrition_fission` | `malnutrition_fission_gain = 0.0` | **ON-but-dead in the canonical config** |
+
+Both read as live mechanisms in every config dump throughout this entire audit arc.
+
+**`enable_condition` is NO LONGER dead-downstream** — R-85b found its only consumer was the zeroed pathogen
+term, but `enable_nutrition_synergy` is now ON and reads `a._condition` directly. That chained finding is
+resolved.
+
+**Neither got an invented value.** `pathogen_gamma` has a real anchor (Cashdan 2014) and its own comment says
+*"sweep low/mid/high"* — the sweep has never been run, and picking a number without it is the exact sin this
+arc documents. `malnutrition_fission_gain` was **deliberately** zeroed as the R-106 negative control and
+behaved correctly as one; the mistake was leaving the FLAG on rather than the gain at zero. Both are now
+excluded by name in `C_ALLON` under §12 **UNDER EVALUATION**.
+
+**Now structural, not an audit finding.** `runconfig.dead_flags()` generalises `climate.py`'s `need()` refusal
+to demography, and `run_campaign.py` checks the FINAL config before a single step runs:
+
+```
+campaign: ON-but-dead mechanism(s) in the final config:
+  enable_terrain_pathogen is ON but pathogen_gamma=0.0 — the mechanism cannot act
+  Turn the flag off to ablate, or give the magnitude a value.
+```
+
+**You ablate by turning the FLAG off, never by zeroing the magnitude** — zeroing leaves the flag advertising a
+mechanism that is not running. This bug class produced 3 of battery 7's 6 "inert" verdicts, cost R-85 an entire
+follow-up study, and let `enable_band_risk` pass a whole ablation battery as a fake positive before it was
+deleted this morning. It is now a run-halting error.
+
+---
+
+### 3. THE CONFIG FILES CAN NOW SET A RUN (task #24, step B)
+
+**The asymmetry that existed until today.** `tools/gen_runconfig.py` produces `config/*.toml` by *executing*
+`run_campaign.py` with `C_ALLON=1` and recording the resolved config. So the files were a faithful **record**
+of a run with no power to **cause** one — "edit the file and you get that run" was not true, and nothing told
+a reader otherwise.
+
+`C_CFGSRC=files` makes the file the base configuration, with `C_PARAM` / `C_EXTRA_ON` / `C_EXTRA_OFF` still
+applying on top so ablations stay expressible.
+
+**MEASURED EQUIVALENCE, which is what makes it safe: the file and a `C_ALLON=1` run agree on all 279 fields,
+zero differences.** Loading the file reproduces the canonical arm exactly rather than approximately, and a
+test pins it.
+
+**WHAT WAS DELIBERATELY NOT DONE, and why it is the supervisor's call.** `preset` remains the default. A
+**plain** run and the file differ in **52 fields** — the entire elite layer (leveling, legitimacy, leader
+share, material capture, rank hierarchy, resentment), village budding, soil depletion, improved land, intake
+fertility, adaptive connubium, lineage branching and split, and ~30 others are OFF in a plain run and ON in the
+file. Flipping the default would silently convert every ad-hoc run, probe and quick check into the full
+canonical stack.
+
+That is arguably what "nothing stays off" implies, and it may well be right — but it changes what every
+existing invocation of the script does, which is a scientific decision rather than a refactor. The gap is
+pinned as a measurement (`test_the_default_is_still_the_preset_path_and_differs_from_the_file`) so it cannot
+drift unnoticed, and that test is the one to invert when the call is made.
+
+---
+
+**ADDENDUM 33 — THE BENCHMARK LADDER, AND FOUR TIERS CLIMBED IN ONE NIGHT. The mortality curve is right and the
+turnover is not; marker #1 is two faults on two tiers; the canonical world contains no savanna, so the best-
+verified anchor in the project never enters a run. Three instrument defects found, two of them mine, one of
+them in the ladder itself (2026-08-07).**
+
+Supervisor principle: **benchmark behavioural groups in the order they appear in evolution**, not by size or
+novelty. Adopted as `docs/BENCHMARK_LADDER.md`. It changed a decision immediately — the `noble_*_lift` block
+had been proposed as the next CTB target because it was the largest uncovered one, and it is **tier 12, the
+top of the ladder**, while both known failures sit at tiers 3 and 5.
+
+---
+
+### TIER 2 — ENERGETICS. The anchors are right; the world does not contain one of them
+
+**What verifies.** Game return rates hit their anchored means exactly across seeds — forest 5,541 (Hill 1987),
+grass 3,001 (Hurtado & Hill 1987), desert 995. Forage needed a qualifier: it **overshoots** on any coastal
+world (desert reads 1332 against 1200) because the Bird 1997 shore bonus (1491.5, **additive**) is applied
+*after* the per-biome rescale. Measured off-shore the targets hold exactly.
+
+**THE FINDING: `coastal-temperate`, the campaign's default world, contains ZERO savanna cells.** So
+
+- **Hawkes 1991's savanna game rate, 518 kcal/hr** — verified against the PDF to the unit on 2026-08-06, one
+  of the best-provenanced numbers in the project — **never enters the canonical run**;
+- nor does the intercept-hunting boost (745/518), which is savanna+llanos gated.
+
+That is exactly why `ClimateField.health()` has been reporting `intercept=UNREACHABLE` and `llanos=UNREACHABLE`
+on every temperate run since it was built. **The channels are not broken. The world has no savanna in it.** On
+a savanna world the same anchor lands at 518 within 2%.
+
+**VERIFIED, IMPLEMENTED and REACHABLE are three separate claims**, and this is the first time the third has
+been measured. Which worlds can exercise the savanna layer is now pinned: savanna and tropical yes, temperate
+and boreal no.
+
+---
+
+### TIER 3 — DEMOGRAPHY. The standing diagnosis was wrong
+
+`test_age_structure.py` has said for weeks that the pyramid is young because *"people die in early
+adulthood"*, which implicates the Siler schedule. **It does not.** Integrated, that schedule gives
+**e₀ = 36.5 yr** against the Aché forest-period ~37, and its survivorship shows no early-adult collapse at all
+(S(30) = 0.54, S(45) = 0.43). The anchored life table is fine, and a fix aimed at it would have been aimed at
+the wrong thing.
+
+The stable age structure the model's **own** curve implies is a one-parameter family in the growth rate:
+
+| r (%/yr) | frac < 15 | median age |
+|---|---|---|
+| 0.0 | 0.307 | 26.5 |
+| 1.0 | 0.377 | 21.5 |
+| 2.0 | 0.446 | 17.5 |
+
+The Aché anchor (0.40 / ~20) sits at r ≈ 1.3 %/yr — so the target is internally consistent with the life
+table, which makes it a fair one.
+
+**Measured: r = +0.67 %/yr with frac_child = 0.571 and median age 12.3.** At that growth the curve implies
+~0.35 and ~23. **The model is outside the family its own mortality can produce**, and no forager growth rate
+closes it.
+
+**Where the difference lives.** Births run **5.66 %/yr** (crude birth rate ~57/1000 against a forager norm of
+40–45) and **starvation deaths alone run 3.80 %/yr — larger than the entire anchored life table**, whose crude
+death rate at this structure is ~2.7 %/yr. Starvation is outside the life table, so the realised mortality
+regime is the anchored one *plus a bigger unanchored one*. High births and high deaths together are a
+**high-turnover regime**, and turnover is what makes a pyramid young.
+
+This is the ladder's *"an anchor verified is not a mechanism validated"* corollary arriving as an empirical
+result.
+
+---
+
+### TIER 4 — MOVEMENT. A real hazard, and two failed attempts to guard it
+
+`mobility_radius` implements Kelly/Binford correctly: monotone in productivity, base stride at the reference,
+the closed form matching hand-computed points, the floor bounding an empty cell, and OFF returning base for
+every value (the bit-exactness guarantee every pre-R-39 result rests on).
+
+**The hazard.** It takes two pressure sources — NPP in g/m²/yr and an intake requirement RATIO — and its
+docstring put the burden of matching them on the caller. Both mismatches are silent and fail in **opposite**
+directions:
+
+- `source="intake"` fed an NPP value → stride pins to `base` → **inert while reading ON**
+- `source="npp"` fed an intake ratio → stride pins to `max` → **Kelly/Binford exactly inverted**
+
+**I tried to guard it twice and both guards were wrong.** Rejecting small values under `"npp"` broke four
+existing tests within a minute — an arid or near-water cell genuinely has NPP below 20 g/m²/yr, which is what
+`mobility_npp_floor` exists for. Rejecting large values under `"intake"` broke two more — a well-fed agent
+genuinely reads an intake ratio of 27. **The scales overlap across their whole useful ranges.** No threshold
+separates them.
+
+So the hazard is **documented, not fixed**. A guard that fires on legitimate input gets switched off and takes
+the sound half with it. The existing tests catching both bad guards is the CTB discipline working on my own
+change.
+
+---
+
+### TIER 5 — BANDS. Marker #1 is two faults on two tiers
+
+Applying the ladder's rule — *a failure at tier N is diagnosed at tier N or below* — to #1 (`band_med` fails
+16/16 on adults, 11.8 against Hill's 28.2):
+
+| | adults/band |
+|---|---|
+| measured (band 23.0 all-ages, frac_child 0.589) | **9.4** |
+| same band, Aché child fraction 0.40 → **tier 3 fixed** | **13.8** |
+| Hill 2011 anchor | **28.2** |
+
+**Fixing tier 3 closes about a quarter of the gap and no more.** The residual — 13.8 against 28.2 — is a
+genuine **tier 5** fault: the bands are too small. To hold 28.2 adults at the measured child fraction a band
+would need **69 people** against the 23 produced; even with a perfect Aché pyramid it would need **47**. Both
+tiers have to move, and neither is diagnosable at tier 9 or above, which is where most recent attention went.
+
+It also explains why #1 "passed" 23/25 on the all-ages unit for so long: **23 people sits inside Birdsell's
+~25 and Marlowe's 25–50**, so the body count looks right. It *is* right, as a count of bodies. Hill counts
+ADULTS, and the model reaches that total only by including children it should not have.
+
+---
+
+### THE THIRD INSTRUMENT DEFECT WAS IN THE LADDER
+
+Its **CTB column undercounts**. It is a filename heuristic (`*_ctb.py`, `*_ground_truth.py`), and genuine
+constructed-truth tests live in ordinarily-named files —
+`test_bands.py::test_bands_method_connected_components` hand-places five agents and asserts `bands()` returns
+the partition `[1, 2, 2]`, which is textbook CTB in a file the heuristic scores as zero.
+
+The error can only undercount and is roughly uniform across tiers, so the prescribed **ordering stands**. But
+no tier should be called "uncovered" on that column alone. It now reads *"has no dedicated CTB file"*.
+
+The ladder's tier membership had also drifted **before it was committed** — the first draft invented five
+flags that do not exist and missed eight that do, including `game` and `forage_cap`, which are tier 2, the
+very next thing to benchmark. A hand-maintained list of 86 names is a second copy, so Charter P4 applies and
+`test_benchmark_ladder.py` now checks it against the config classes.
+
+---
+
+### THE NIGHT'S SCORE ON INSTRUMENTS VS MODEL
+
+Three defects found in **instruments** (two unsound mobility guards, one ladder heuristic) and two genuine
+**model** faults located and decomposed (the turnover regime, the band-size shortfall). Both surviving marker
+failures from 2026-08-06 (#14 wealth, #17 fission ceiling) had already been CTB'd and held.
+
+Configuration is now a file per run (`--config`), so every arm above was launched from a named, fully-resolved
+config with a stated reason for differing.
+
+---
+
+**ADDENDUM 34 — THE REGIME TELEGRAPH FIRED. The overnight long-climate arm passed 844 model years and the slow
+environmental driver acted for the first time in this project's history; the health diagnostic tracked it
+through all three of its states, and both live channels reproduce their configured amplitudes to the fourth
+decimal (2026-08-07, overnight).**
+
+The arm: `config/runs/long_climate.toml`, 30,000 steps capped at 7 h, launched from a clean tree at `04d0724`
+under the new `--config` path — the first campaign in this project configured by a named file rather than by
+environment variables.
+
+### The telegraph fired, and the instrument caught the transition
+
+`ClimateField.health()` reported the regime channel in three successive states as the run advanced:
+
+| model years | verdict | what it means |
+|---|---|---|
+| ~30 | `NEVER-FIRED` | configured, reachable, clock never came round |
+| ~500 | `RARE` | fired, active on <1% of steps |
+| **844** | **`LIVE`** | active 2.0% of steps, trough **0.8608** |
+
+That is the diagnostic doing exactly what it was built for on 2026-08-06 — distinguishing "not switched on"
+from "switched on and never got a chance to act" — and it is the first time the distinction has been observed
+resolving in a live run rather than constructed in a test.
+
+**The prediction held.** Addendum 31 computed that at ~1500 yr recurrence the telegraph fires in ~13% of a
+standard 2500-step campaign and needs ~12,500 steps for a coin flip. It fired between step 2,500 and 10,000,
+which is the middle of that range.
+
+### Both live channels reproduce their configured amplitudes exactly
+
+| channel | configured | measured trough |
+|---|---|---|
+| regime | amp 0.14 → 0.860 | **0.8608** |
+| caribou | a = 0.871 → (1−a)/(1+a) = 0.0689 | **0.069** |
+
+The caribou figure is the anchor corrected yesterday when the supervisor filed the thesis — its peak-pinned
+form, reproduced in a live 844-year run on 5,474 steppe cells.
+
+### And the tier-2 finding is visible in the same block
+
+`intercept` and `llanos` remain **UNREACHABLE** at 844 years, on every checkpoint, for the reason tier 2
+established: `coastal-temperate` contains **no savanna**, so the sub-biome those channels need does not exist
+in this world. Not a defect, not a clock problem — an absent biome. A run of any length will report the same.
+
+### Status
+
+The arm is still running at ~10,200 of 30,000 steps and will stop at its 7 h cap. Full suite green at
+**1300 passed, 2 xfailed** across the whole night's work.
+
+---
+
+**ADDENDUM 35 — THE CARIBOU HERD CYCLE PACES FORAGER POPULATION AT ITS OWN PERIOD. Attributed by ablation, not
+inferred from a coincidence: the oscillation signature vanishes when the channel is switched off, and the
+channel depresses mean population by 32%. The first environmental driver this project has attributed to a
+population response (2026-08-08).**
+
+### The observation
+
+`long_climate` (30,000 steps = 2,500 model years, completed in 86 min) showed population autocorrelation that
+**does not decay monotonically**. It dips to a trough and rises again to a local peak at **lag 23 = 47.9 yr**.
+The caribou period drawn for that world was **584 steps = 48.7 yr** — a 1.6% match.
+
+**That is a coincidence until tested.** A driver's period matching a response's periodicity is not evidence it
+caused it, and this project's recent history is mostly of such inferences failing.
+
+### The ablation
+
+`long_climate_no_caribou.toml` — identical in all 315 settings except `enable_caribou_swing = false`,
+authored by `tools/make_runconfig.py` with the reason recorded in its `[meta]`. This is the first experiment
+in the project where "identical except one thing" is a checkable property of two files rather than a claim.
+
+| lag (yr) | caribou **ON** | caribou **OFF** |
+|---|---|---|
+| 8.3 | +0.658 | +0.826 |
+| 20.8 | +0.344 | +0.739 |
+| **25.0** | **+0.314** ← trough | +0.721 |
+| 37.5 | +0.486 | +0.672 |
+| **47.9** | **+0.560** ← peak | +0.632 |
+| 62.5 | +0.383 | +0.585 |
+| 83.3 | +0.344 | +0.516 |
+
+**ON: a trough at 25 yr and a peak at 48 yr.** A trough at half the period and a peak at the period is the
+textbook autocorrelation signature of an oscillation, and 25.0 is half of 48.7 to within the checkpoint
+spacing.
+
+**OFF: smooth monotonic decay** from +0.83 to +0.52 across the same range. No trough, no local peak — ordinary
+persistence in a slowly drifting population.
+
+**The oscillation is the caribou channel.** Switch it off and the periodic structure disappears entirely.
+
+### THE LEVEL COMPARISON IS A TRAP, and it caught me first
+
+The autocorrelation at 48 yr is **higher in the no-caribou arm** (+0.632 vs +0.560), and read on its own that
+says the opposite — that removing caribou strengthened the 48-year signal. It does not. The whole
+autocorrelation function sits higher in the OFF arm because that population is more persistent; what matters
+is the **shape**, and only the ON arm has a local maximum. Comparing the level at one lag, rather than the
+curvature across lags, would have inverted the conclusion.
+
+### Magnitude
+
+Mean population **2,470 with caribou / 3,642 without — a 32% depression**, from a channel that applies a 93%
+peak-to-trough meat drawdown on 5,474 steppe cells. The herd swing is not a decoration; it is one of the
+largest single effects measured in this model.
+
+### Why one seed is defensible here and was NOT for the regime telegraph
+
+The caribou channel is **deterministic** — a cosine with a drawn period and phase — so its period is fixed
+once drawn and the response is reproducible. The regime telegraph is a **stochastic two-state chain**, and
+60-seed replication (same drawn parameters) gives an active fraction ranging **0.000 to 0.494 with 18% of
+seeds never firing at all in 2,500 years**. A single regime arm carries no information; a single caribou arm
+carries its period.
+
+**That distinction should govern how the climate layer is benchmarked**: deterministic channels can be read
+from one long arm, stochastic ones need seed replication. MARKER_MATRIX binding rule 3 ("seeds must beat the
+variance") applies to the climate layer, and nothing had said so.
+
+### Caveats, stated
+
+- One seed per arm. Defensible for the deterministic channel as above; the 32% level effect would still
+  benefit from replication.
+- `coastal-temperate` has no savanna, so `intercept` and `llanos` were UNREACHABLE in both arms (tier-2
+  finding). This is a claim about a steppe-bearing temperate world.
+- The caribou amplitude 0.871 is from an UNDERGRADUATE thesis (Addendum 32) — the weakest anchor in the
+  climate layer, and this result rests on it.
+
+
+---
+
+**ADDENDUM 36 — A DIAGNOSTIC I BUILT, COMMITTED AND WIRED INTO EVERY CAMPAIGN COMPARED INCOMPATIBLE UNITS.
+Retracted in full. Measuring the question properly instead produced a real finding: the per-biome GAME
+return-rate table has never affected a single run, and `forage_kcal` is load-bearing through exactly three
+surfaces, none of them "food supply" (2026-08-08).**
+
+### The retraction
+
+`food_consistency.py` (commit `4f02e1d`, reverted `25df603`) divided a **cell capacity** (persons/cell, from the
+NPP-derived Tallavaara field) by a **per-person harvest multiple** (`forage_kcal × hours / burn`). Those are not
+the same kind of quantity. Everything downstream was void: the "savanna 16.9×, wetland 14.0×, cluster 2.2–2.7"
+result, the reading that savanna's rates were mis-scoped, and the wetland `game_kcal` 0 → 3,001 change made to
+fix it. None of it reached this file before the retraction; it was reported in chat and is recorded here so the
+reasoning is on the record rather than only the reversal.
+
+`capacity.py`'s own header states the design outright — *"a cell's extractable kcal/step is set by its
+NPP-derived forager density, NOT the bare `forage_kcal` rate ... the bare forage field (~1–8 persons/cell) is too
+poor to hold a band, while this field gives ~30–50 persons/cell."* The ~1–8 vs ~30–50 gap I reported as a defect
+**is the documented rationale for the capacity field existing**. There are not two competing food models; there
+is one supply and a return-rate table doing other jobs.
+
+The suite caught the second half unaided: `test_phase1_kcal.py::test_game_kcal_zeroed_at_wetland` asserts
+*"game_kcal must be 0 at wetland (UNANCHORED)"* — a deliberate provenance guard (Return-Rate Table §1.4) that an
+unanchored biome reads zero rather than carrying an invented number. I overrode a tested design rule on the
+strength of a diagnostic that was wrong.
+
+**The specific failure of discipline, since CTB is supposed to prevent exactly this.** I wrote ten CTB tests for
+that diagnostic and every one of them verified that the ratio was *computed as specified*. Not one asked whether
+the ratio *meant* anything. **A constructed truth for the arithmetic is not a constructed truth for the
+quantity** — the CTB has to be built on a world whose ANSWER is known, not on a formula whose STEPS are known.
+Sixth instrument defect of this arc, and the first that was committed and wired into every campaign before being
+caught.
+
+### The question that was actually open
+
+If the capacity field is the supply, what are `forage_kcal` and `game_kcal` doing? Answered by **perturbation,
+not inspection**: scale a field ×1000 or ×0, re-run, compare the trajectory. Reading call sites tells you where
+a name *appears*; only perturbation tells you whether the value *matters*. Config: `full_campaign.toml`
+(the config campaigns actually run), coastal-temperate, 200 founders, 10 steps.
+
+**The instrument's own first version was wrong, and the positive control is what caught it.**
+`TerrainWorld.__init__` line 267 does `self._fields = generate_world(knobs)` — the model **regenerates its own
+world** from the knobs and never reads the `WorldFields` the caller built for the capacity field. Perturbing the
+caller's copy changed nothing; every arm read "not load-bearing"; the answer was clean, plausible and
+meaningless. The tell was that `enable_forage_cap=True` with `forage_kcal ×0.001` should starve everyone and did
+not. The published version perturbs `w._fields` and **requires** a known-live field (`npp_gm2 ×0.5`) to change
+the run before any negative result is reported. Two instrument failures in one day on the same question, the
+first shipped and the second caught in ten minutes — by a control that costs one test.
+
+### The findings
+
+| Perturbation | Result |
+|---|---|
+| `npp_gm2 × 0.5` — POSITIVE CONTROL | pool_sum ×0.66, pop 106 → 104 (**changes, as required**) |
+| `game_kcal × 0` | **bit-identical** |
+| `game_kcal × 1000` | **bit-identical** |
+| `forage_kcal × 1000`, in-model | pool_sum ×3.24, pop 106 → 110 |
+| `forage_kcal × 0.001` at seeding | placement 67 → **175** distinct cells |
+| `forage_kcal × 1000` at seeding | placement 67 → **8** distinct cells |
+| `forage_kcal × 1000`, agglomeration + forage cap both OFF | **bit-identical** |
+
+**`game_kcal` is dead, and always has been.** It is read only by `TerrainField.game_level`, called from exactly
+one site (`_step_agent`), which executes only when the multi-occupancy substrate is **disabled** *and*
+`game_stream=True`. Every campaign is rivalrous and passes `game_stream=False`, and **no harness anywhere in the
+repository sets it True** — only `tests/test_phase1_kcal.py`. An anchored, curated, twice-corrected per-biome
+table (R-79 corrected desert game 730 → 995 as recently as 2026-07-17) has never entered a result.
+
+**Campaign meat is `game_meat_frac × S`** — and `game_meat_frac` is a **scalar** (0.55, the forest value), so the
+same fraction of the capacity pool in **every biome**. Whatever biome-to-biome variation in hunting the table
+encodes, the model does not have it. Two live things must not be swept in with this: the climate `meat_factor`
+(caribou swing, Addendum 35) modulates meat in *time* on GRASS_STEPPE, so **Addendum 35's finding is
+unaffected** — it runs through `meat_factor`, not `game_kcal`; and Cordain 2000's per-biome `terrain.MEAT_FRAC`
+does reach the model, by a different route (`terrain.RETURN_CV` → `enable_emergent_band_size`, on in
+`full_campaign.toml`). What is missing is a biome-varying **harvest split**, not every biome-varying diet term.
+
+**`forage_kcal` is live on three surfaces and no others:** founder **band placement** (outside the model, the
+largest effect), the per-person **forage cap**, and the **agglomeration base**
+`A_cell = aggl_tier2 · S_pot · (forage_kcal · forage_cap_hours)`. The exhaustiveness is itself a test: with
+`enable_agglomeration` and `enable_forage_cap` both off, `×1000` is bit-identical in-model, so those two flags
+carry **all** of its in-model influence and a third consumer added later will fail loudly.
+
+### What this dissolves, and what it does not
+
+The wetland/mountain `game_kcal` zeros — which I spent the preceding stretch trying to justify filling — **cost
+nothing at present**. They are honest gaps under the §1.4 UNANCHORED policy, and no run outcome depends on them.
+Anchoring them is a prerequisite for a two-stream economy, not a fix for a live defect. Rademaker 2014
+(Cuncaicha foragers at 4,480 m taking vicuña, guanaco and taruka) still shows the mountain zero is
+*ecologically* false; that stays a real gap in the table and a false one in the model's biology.
+
+**Still unexplained, and back to unknown:** `world_savanna` settles at **9%** of trough-limited capacity against
+51% and 69% for the other two canonical worlds. That measurement stands — it came from run trajectories, not
+from the retracted diagnostic — but the explanation offered for it was the retracted one. No replacement is
+offered here rather than a third guess.
+
+Pinned by `sic_games/tests/test_field_load_bearing_ctb.py` (12 tests, positive control first). Documented in
+Return-Rate Table §0. **The modelling decision — wire the two-stream economy so §3 becomes load-bearing, or
+retire §3 to a reference table and say so — is the supervisor's and is not taken here.**
+
+---
+
+**ADDENDUM 37 — THE TWO-STREAM ECONOMY BECOMES PER-BIOME. Both new flags read dicts that were already anchored,
+so no new number enters the model. The CTB caught a bug in my own wiring on its first run (2026-08-08).**
+
+### What was already live, and what was not
+
+The supervisor's reaction to Addendum 36 was surprise that the two-stream economy was not live. The record needs
+a correction here, because **the split itself has run in every campaign since the Carbon build**: the cell pool
+`S` divides into a forage stream at a literal κ=0 and a meat stream at the substrate κ, band-pooled and
+Cred-weighted, with the G.3 stochastic meat draw on top. That mechanism was never dead.
+
+What was **scalar** is the split. One `game_meat_frac` = 0.55 — the FOREST value — for every biome on the map,
+and one `game_meat_cv` for every biome. Combined with Addendum 36 (`game_kcal` reaches nothing), a campaign
+carried **no biome signal in its diet at all**. MODEL_SPEC §4.5.5 had said so in one line since 2026-06-21:
+*"`mf` is a scalar config ... the per-biome `terrain.MEAT_FRAC` dict is the home for a future per-cell wiring."*
+
+### The wiring
+
+Two flags, each reading a dict that already exists and is already anchored. **Neither introduces a new number.**
+
+| Flag | Source | Values |
+|---|---|---|
+| `enable_biome_meat_frac` | `terrain.MEAT_FRAC` — Cordain 2000 Table 2, terrestrial-renormalized | forest 0.55, desert 0.45, savanna 0.38, grass 0.66, mountain 0.34 |
+| `enable_biome_meat_cv` | `terrain.MEAT_CV` — cchunts day-to-day CV; Hawkes 1991 for the Hadza | forest/Aché 1.97, desert/Martu 2.92, savanna/Hadza 5.29 |
+
+**The two fallbacks differ, and that is deliberate.** The dicts record different reasons for an absent biome.
+`MEAT_FRAC` omits WETLAND on purpose — terrain.py calls it *"a gap, not a measured zero"*, because 0.0 would
+assert that wetland foragers eat no meat — so an absent biome takes the configured **scalar**. `MEAT_CV` omits
+grass, mountain and wetland for want of a calibration people, and terrain.py's own rule for that case is
+**`HUNT_CV` = 2.11**, a measured biome-invariant value across ~15,600 trips. Both fallbacks are pinned by tests,
+so a later tidy-up to 0.0 fails loudly rather than quietly asserting two things no source supports.
+
+Class defaults are False (Charter §12, bit-exact). The **campaign** default is `true` in
+`config/mechanisms.toml`, per the supervisor's standing rule that nothing stays off without being a control.
+
+### What the wiring puts on each canonical world — FIELDS, not yet run results
+
+Measured on the three tier-2 worlds at their configured terrain × climate. This says what CHANGED, not what it
+DOES; the run comparison is a separate step and is not reported here.
+
+| world | land cells | biomes | mean `mf` (was 0.55 everywhere) | mean meat CV (was 0.73 everywhere) |
+|---|---|---|---|---|
+| `world_temperate` | 9,449 | forest 3399, grass 5474, desert 576 | **0.608** | **2.11** |
+| `world_savanna` | 9,453 | savanna 4499, desert 2896, forest 1717, grass 237, wetland 104 | **0.441** | **3.85** |
+| `world_montane` | 9,822 | grass 4325, forest 2285, desert 2113, savanna 654, mountain 367, wetland 78 | **0.558** | **2.46** |
+
+Two things stand out and neither is a claim yet:
+
+- **The change is not a uniform shift.** Temperate goes UP (grass-dominated, `mf` 0.66) and savanna goes DOWN
+  (`mf` 0.38). A flat 0.55 was not a neutral average of the three — it sat above savanna and below temperate.
+- **`world_savanna` moves most, on both axes at once**: the meat fraction falls 0.55 → 0.44 while the meat CV
+  rises 0.73 → 3.85, a **5.3×** more variable meat stream, because Hadza big-game hunting is the documented
+  extreme (Hawkes 1991, CV 5.29). Savanna is also the world with the unexplained 9%-of-capacity settling
+  (Addendum 36). **That is a coincidence of location, not evidence**, and it must be tested as a hypothesis with
+  the flags as the ablation — not adopted as the explanation this arc has already had two of.
+
+### A side effect worth naming: the retired 0.73 leaves live runs
+
+`game_meat_cv = 0.73` is still the scalar in `full_campaign.toml`. R-72/R-73 established that 0.73 is
+`GAME_KCAL_STD/mean` for forest — a **SPATIAL** cross-cell spread used as a **TEMPORAL** per-step draw, 2.7×
+low. R-73 then measured that error's blast radius as **zero** (the Cred effect is CV-insensitive), so the value
+was left in place and quietly outlived its own retraction by three weeks. The per-biome path does not reproduce
+it anywhere, and a test asserts that. **This is a provenance correction, not a results correction** — R-73 says
+not to expect a marker to move.
+
+That a retired anchor sat in the live config for three weeks is the same class as Addendum 30 ("Addendum 28's
+retraction never reached the code"). A sweep of every config value against the addenda that touched its anchor
+is now an open task.
+
+### The CTB caught a bug in my own wiring, first run
+
+`test_each_flag_is_live_on_its_own[enable_biome_meat_cv]` failed: the flag was on and the trajectory did not
+move. Cause — I replaced the guard `if meat_cv > 0.0` with `if cv_c > 0.0`, and left the line below it computing
+`sig = sqrt(log(1 + meat_cv²))` from the **scalar**. The per-cell CV gated the draw and then took no part in it.
+
+Worth recording plainly, because it is the *cheap* version of the failure that has cost this arc six
+instruments: the per-flag liveness test is three lines, and it is the only reason a half-wired mechanism did not
+ship reading "on". A flag that is on and changes nothing is exactly what the ON-but-dead gate exists for
+(Charter §12) — that gate checks the CONFIG, and this one needed a check on the RUN.
+
+### Not done, and why
+
+**The meat pool still does not come from `game_kcal`.** `game_kcal` is a RATE (kcal per forager-hour); `S` is a
+cell POOL (kcal per step). Feeding one into the other is the unit error of commit `4f02e1d`, one addendum ago.
+Total food already comes from the Tallavaara NPP capacity field, which integrates the whole subsistence base,
+and diet composition now comes from Cordain. **In the current architecture the game return-rate table has no
+remaining job.** The recommendation is to retire Return-Rate Table §3 to a reference table unless the separate
+depletable game stock (the GD-1/CC-1 seam) is built. That decision is the supervisor's; nothing is deleted.
+
+Pinned by `sic_games/tests/test_biome_meat_ctb.py` (12 tests, including per-cell energy conservation).
+
+---
+
+**ADDENDUM 38 — CORRECTION TO ADDENDUM 37. I described a documented, reasoned decision as a lapse. R-73 did not
+forget to remove `game_meat_cv = 0.73`; it decided to leave it and wrote down why. Third time in two days that
+I have read a deliberate design decision as a defect (2026-08-08).**
+
+### What Addendum 37 got wrong
+
+Addendum 37 says the value *"outlived its own retraction by three weeks"*, that *"nobody removed it"*, and that
+it is *"the same class as Addendum 30"*. **All three are wrong.** R-73's closing paragraph states the decision
+in plain words:
+
+> *"Harness CVs left at 0.73 with the mis-anchoring documented, since (1) shows re-running them would be compute
+> spent to reproduce the same numbers."*
+
+That is a decision with a reason and a measurement behind it — R-73's own sweep showed the Cred effect is flat
+from CV 0.73 to 5.29, so at forest's true 1.97 the result is statistically indistinguishable from the arm that
+was actually run. Leaving the value was the *cheap* correct call. **It is the opposite of Addendum 30's case**,
+where a retraction reached RESULTS.md and never reached the code at all.
+
+What survives from Addendum 37 on this point: nothing, except the plain fact that the scalar is 0.73 and that
+`enable_biome_meat_cv` now bypasses it for every biome with a calibration people. That is a genuine improvement.
+It is not a rescue.
+
+### The instrument I built on the misreading, and did not ship
+
+I wrote `tools/retired_values.py` — a registry of values that a RESULTS addendum has withdrawn, plus a sweep of
+every config for one still live. It ran, and reported **24 live retired values across 8 config files**.
+
+**Every one was a false positive.** The two registry rows were `game_meat_cv = 0.73` (above) and
+`rank_hierarchy_frac = 0.15`, and Addendum 30 states the second in capitals: **"NOTHING WAS RE-VALUED."** Both
+values are deliberately kept and labelled `[UNANCHORED]` at their point of use. The tool's whole premise — that
+a retired value in a live config is an oversight — is false for exactly the cases that motivated it.
+
+**The tool is deleted, not fixed.** Two reasons. First, the check that actually matters is Charter P3 (*a
+retracted anchor is edited at its point of use*), and `tests/test_retraction_propagation.py` already enforces
+it — a second instrument over the same rule is a second copy, which Charter P4 forbids. Second, a diagnostic
+whose first run produces 24 confident false findings has not earned a place in the suite; the arc has shipped
+enough of those.
+
+### The pattern, since this is now the third instance
+
+| what I called it | what it was | where it was written down |
+|---|---|---|
+| two food models disagree (Addendum 36) | the capacity field's design rationale | `capacity.py` header, first paragraph |
+| wetland game 0 is a defect (Addendum 36) | a provenance guard, deliberately zero | `test_phase1_kcal.py`, the assertion message |
+| 0.73 outlived its retraction (Addendum 37) | a measured decision to leave it | R-73, closing paragraph |
+
+The common shape: **I found a value or a structure that looked wrong, and reported it before reading the place
+where the project had already reasoned about it.** In all three the explanation was one grep away, in the file
+or the log I was already working in. The CTB rules cover instruments. This is a reading failure upstream of any
+instrument — the fix is to search the record for the thing before calling it a defect, not to build a diagnostic
+that finds it again.
+
+Addendum 37's substance is otherwise unaffected: the per-biome wiring, the anchored dicts, the two fallbacks,
+the CTB that caught the σ bug, and the field measurements on the three canonical worlds all stand.
+
+---
+
+**ADDENDUM 39 — THE CANONICAL WORLDS, AND THE SEED. The savanna capacity anomaly carried through three addenda
+is a SEED, not a world. Replicating it closed it; every world in this project is far more seed-dispersed than
+any single-run result has admitted; the montane world cannot be partitioned and no world can be; and the
+capacity denominator has a floor nobody had noticed (2026-08-08 / 08-11).**
+
+### Why this entry is late, and what that cost
+
+The three worlds were built and run on 2026-08-08 and reported in chat only. `world_montane.toml` carried a
+`why` citing *"the partition measurement in Addendum 36"* — an addendum that did not exist, and whose number was
+then taken by the retraction entry. The false forward reference is removed. Every figure below was re-measured
+from the current code and the committed run outputs, not transcribed from the earlier report.
+
+### The world set
+
+| world | terrain × climate | land cells | biomes present (land cells) |
+|---|---|---|---|
+| `world_temperate` | coastal × temperate | 9,449 | forest 3,399 · grass 5,474 · desert 576 |
+| `world_savanna` | coastal × savanna | 9,453 | savanna 4,499 · desert 2,896 · forest 1,717 · grass 237 · wetland 104 |
+| `world_montane` | mountainous × savanna | 9,822 | grass 4,325 · forest 2,285 · desert 2,113 · savanna 654 · mountain 367 · wetland 78 |
+
+Between them the set covers all six land biomes. **No single world does**, which closed the supervisor's option
+(a) — one canonical world containing everything — and forced the three-world set.
+
+### THE DENOMINATOR, because this measure has two
+
+`settled_fraction` = settled population ÷ supportable population, and "supportable" has two defensible readings
+that differ by 3.9×. Both are recorded so no later reader has to guess which one a number meant.
+
+| world | MEAN capacity | TROUGH capacity | trough ÷ mean |
+|---|---|---|---|
+| `world_temperate` | 27,614 | 7,161 | **0.259** |
+| `world_savanna` | 26,549 | 6,907 | **0.260** |
+| `world_montane` | 31,023 | 8,052 | **0.260** |
+
+Measured over 2,500 steps of the live climate field, all channels on, sampled every 5 steps. **The trough/mean
+ratio is 0.26 in all three worlds to three decimals** — the climate layer compresses capacity by the same factor
+everywhere, so a cross-world comparison is insensitive to the choice. That is what makes the next section safe,
+and it was not obvious in advance.
+
+### THE FINDING: the savanna anomaly is a seed
+
+`world_savanna`, flat-meat control, settled population by seed:
+
+| seed | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| settled | 594 | 3,034 | 2,518 | **8,677** | 634 | 3,572 | **186** | 3,961 |
+
+**Range 186 → 8,677: a 46.7× spread, CV 0.949.** Seed 3 settles at 126% of its own trough capacity; seed 0 — the
+seed every earlier savanna number came from — is near the floor.
+
+So *"world_savanna settles at 9% of trough capacity while the others reach 51% and 69%"* is a statement about
+**seed 0**. It was carried as an open anomaly through Addenda 36, 37 and 38, survived two retracted explanations
+and one reverted diagnostic, and **every one of those rounds was spent interpreting a single run.** One extra
+seed would have closed it at the start, for twenty minutes of compute. MARKER_MATRIX binding rule 3 — *a seeded
+effect must beat 30× seed variance* — exists for exactly this and was applied to markers but not to this.
+
+### AND THE DISPERSION IS NOT SAVANNA'S ALONE
+
+| world | flat-control range | spread | CV | n seeds |
+|---|---|---|---|---|
+| `world_savanna` | 186 → 8,677 | **46.7×** | 0.949 | 8 |
+| `world_temperate` | 2,445 → 13,467 | 5.5× | 0.666 | 5 |
+| `world_montane` | 3,729 → 9,975 | **2.7×** | 0.392 | 5 |
+
+Savanna is genuinely the outlier — the ordering is clean and monotone. **But even montane, the tightest world,
+spans 2.7× on identical configuration.** No single-seed settled population in this project's history means what
+it appears to mean, and that includes results this log has recorded as findings.
+
+### The flag effects, replicated
+
+Each arm against the SAME seed's own flat control (the per-biome meat wiring of Addendum 37):
+
+| world | fraction only | CV only | both |
+|---|---|---|---|
+| `world_savanna` | −30.3% (n=8, all neg) | **−65.3%** (n=8, all neg) | **−67.5%** (n=8, all neg) |
+| `world_temperate` | −11.6% (n=5, all neg) | −8.0% (n=5, **not** all neg) | −19.4% (n=5, all neg) |
+| `world_montane` | −10.7% (n=5, **not** all neg) | −17.1% (n=5, all neg) | −28.7% (n=5, **not** all neg) |
+
+Standard deviations run 7–28 points, comparable to the effects themselves. **The sign replicates; the magnitude
+is not estimable from five seeds.** Savanna is the only world where every arm in every seed is negative — in the
+other two the flags sometimes *help* (temperate CV-only +11% at seed 0, montane both +5% at seed 3). So *"the
+per-biome wiring reduces population"* is a savanna statement, not a model statement.
+
+**One clean structural signal, and it is the first thing in this arc that behaved as predicted without needing a
+retraction first: effect size tracks the size of the CV change.** Savanna's mean meat CV moves 0.73 → 3.85,
+montane's → 2.46, temperate's → 2.11, and the CV-only effects order the same way (−65%, −17%, −8%).
+
+### A SELECTION BIAS IN THE ANALYSIS, caught before publication
+
+The first version of this analysis filtered on `steps_completed == 2500` and silently dropped two savanna arms
+— seed 6, CV-only and both — which had **gone EXTINCT** (population 1 at steps 1411 and 1503;
+`run_campaign.py:915` is `log("EXTINCT"); break`, and with `max_minutes = 0` the budget branch cannot fire).
+
+**Those are the strongest possible instances of the effect being measured, and the filter threw them away**,
+biasing every arm mean toward the survivors. Correcting it — an extinction is settled = 0, not a missing datum —
+moved savanna CV-only from −60.4% to **−65.3%** and both from −62.8% to **−67.5%**, and made seed 6 read −100%
+on both arms. The filter now distinguishes extinction from budget truncation and asserts which it is seeing.
+
+### The montane world is NOT partitioned, and no world can be
+
+Measured on the traversal-cost field the model actually uses, not on elevation:
+
+- land traversal cost **0.151 → 1.000**, mean 0.420 · cells at maximum cost: **3** · **impassable cells: 0**
+- mountain biome: 367 cells, **3.7% of land**
+
+**The model has no impassable terrain.** Relief raises the *cost* of movement and cannot isolate a population.
+The supervisor's original design — *"all biomes seeded with people and preferably separated by hard-to-pass
+mountains that would keep the pops separated and evolving differently"* — is **not buildable on this terrain
+generator as it stands**. That is a statement about the generator, not about these worlds. A partitioned world
+needs water or a gap of uninhabitable cells.
+
+### The capacity diagnostic has a floor, and the CTB negative found it
+
+CTB before use: a flat 800 g/m²/yr NPP world over the 40×40 patch. Expected 8.62 persons/cell × 1,600 cells =
+13,799; the diagnostic returned **13,799**.
+
+**Then the negative, which is the half that earned its keep.** A zero-NPP world — bare rock, all water — should
+support nobody. It reads **1,398 persons**, ~0.87 per 100 km². `density_tallavaara` is `exp(INT + B1·npp + …)`
+and `exp(−0.1353) = 0.873` at npp = 0. An exponential never reaches zero, and Tallavaara 2018's data do not
+extend to a barren world, so this is extrapolation outside the fitted range.
+
+Size: ~1,398 in a denominator of 26,000–31,000, so **~5% of every capacity figure in this entry is floor rather
+than ecology.** It changes no conclusion here, but it is a real property of the measure and has presumably been
+present in every capacity number this project has produced.
+
+### What tier 2 covers, and what it does not
+
+**Covered:** all six land biomes across the set; the Hawkes 1991 savanna game rate and the llanos flood are
+reachable for the first time (they read `UNREACHABLE` on `world_temperate` and looked broken for that reason);
+the capacity diagnostic is CTB'd positive and negative.
+
+**Not covered:** a partitioned world. Independent evolution of separated populations is not testable at tier 2
+as built.
+
+**CLOSED:** the savanna capacity gap. There is nothing left to explain at world level.
+
+**NEWLY OPEN, and larger than what it replaced:** every world is seed-dispersed by 2.7–47×, and this project has
+been reading single runs as results throughout. The question is no longer "why is savanna low" but **"which
+existing findings survive replication?"** That is a re-audit, not a study.
+
+---
+
+**ADDENDUM 40 — THE VARIANCE IS THE WORLD LOTTERY, NOT THE DYNAMICS. Splitting the seed into its three roles
+attributes 73% of the population variance to the PLANET DRAW and under 1% each to the climate realisation and
+the stochastic path. But the marker that this project scores stratification on is the exception, and the rule
+that follows differs by marker (2026-08-11).**
+
+### The design
+
+Commit `fe00524` split `seed` into `world_seed` / `climate_seed` / `agent_seed`. Fifteen arms on
+coastal-savanna, 2,500 steps, current config; each arm varies ONE role over 0–4 and pins the other two at 0.
+
+**CONSISTENCY CHECK FIRST, and it is not decoration.** `var_P_a0`, `var_W_w0` and `var_C_c0` are the same run
+(0,0,0) authored three ways. All three settle at **105.2**, identically. If they had differed, the pinning would
+not work and every number below would be void. It cost nothing and it ran first.
+
+### The answer
+
+| source varied | n | CV | share of variance | share of CV |
+|---|---|---|---|---|
+| **all three** (an ordinary `seed` sweep) | 8 | **1.735** | 100% | 100% |
+| **world** — the planet draw | 5 | **1.487** | **73.5%** | 85.7% |
+| climate — the realisation on one planet | 5 | 0.200 | **1.3%** | 11.5% |
+| path — repeated trials of one planet | 5 | 0.149 | **0.7%** | 8.6% |
+
+Settled populations: path **105 · 96 · 99 · 72 · 108**; climate **105 · 148 · 99 · 92 · 125**; world
+**105 · 1,403 · 695 · 5,562 · EXTINCT**.
+
+**One planet in five goes extinct; no path and no climate realisation ever does.** The three named sources
+account for 76% of the variance; the remainder is interaction plus the different n.
+
+### Two expectations of mine were wrong
+
+**I predicted climate would be the smallest source.** It is not — it is larger than path, on every marker except
+`band_med` and `deaths_starv`. **And the 400-step probe put path CV at 0.27, but by step 2,500 it is 0.149**:
+early divergence partly re-converges rather than compounding. A short probe over-states path sensitivity, which
+is worth knowing before anyone uses one as a shortcut.
+
+### THE EXCEPTION, and it is the marker that matters most
+
+| marker | path | climate | **world** |
+|---|---|---|---|
+| `pop` | 0.151 | 0.199 | **1.487** |
+| `band_med` | 0.193 | 0.162 | **0.565** |
+| `gini_cred` | 0.188 | 0.145 | **0.529** |
+| **`pct_stratified`** | **0.404** | **0.546** | **0.947** |
+| **`deaths_starv`** | **1.465** | 0.573 | 1.245 |
+
+**`pct_stratified` carries a 3–5× spread on ONE IDENTICAL PLANET.** And `deaths_starv` is the one marker where
+PATH variance EXCEEDS world variance — which makes sense, since a starvation count is an event tally driven by
+bad draws, not by how much land there is.
+
+So "fix the world and one run is enough" is true for population and false for the two markers this project most
+often argues from.
+
+### The rule this produces, and it is per-marker
+
+- **A population or capacity claim** — pin the world. Path noise is ~15% CV, so one run per world is adequate
+  and the comparison should be ACROSS worlds, replicated.
+- **A stratification, inequality or mortality claim** — replicate the PATH on a fixed world. Multiple worlds do
+  not substitute: `pct_stratified` moves 3× and `deaths_starv` moves more from the path alone than from the
+  planet.
+- **MARKER_MATRIX binding rule 3** says *"seeds must beat the variance"* and cites R-65's 30× seed variance in
+  `%stratified`. That rule is right and its stated basis was imprecise: until `fe00524`, "seed variance" could
+  only mean WORLD variance, because one integer drew the planet. It should now distinguish the two, because the
+  answer differs by marker and for `%stratified` BOTH bars are large.
+
+### What this settles about Addendum 39
+
+The 46.7× savanna spread is **the planet lottery**, not model chaos. `world_lottery_climate(seed)` draws relief,
+roughness, water fraction, latitude and aridity from the preset ranges, and one draw in five gives a world that
+cannot hold a population at all. The model is not unstable; the world set is wide. That is a defensible design —
+but it means a "seed sweep" has always been a sweep over planets, and a result quoted from one is a result about
+one planet.
+
+### One more hidden denominator, in my own reporting
+
+The first version of the decomposition table printed a spread of **6×10⁸** for `deaths_starv`, because one arm
+reached ~0 and the ratio divided by it. Fixed: the ratio is suppressed when the floor is near zero and CV carries
+the comparison. Same bug class as the settled-fraction denominator in Addendum 39, two entries apart, in code I
+wrote to investigate the first one.
+
+---
+
+**ADDENDUM 41 — THE TIER-3 AGE-STRUCTURE FAULT IS REAL: two alternative explanations tested and both
+FALSIFIED. But the mechanism is NOT yet attributable, because the vital-rate comparators I reached for are not
+in the filed source and I withdraw them (2026-08-11).**
+
+### The fault, on verified ground
+
+Model under-15 fraction at stationarity, measured across nine arms (Addendum 40's decomposition set):
+
+| | value |
+|---|---|
+| model, 9 arms | **0.478 – 0.569**, mean **0.518** |
+| !Kung 1968 | 0.287 |
+| Aché 1970 | 0.419 |
+| Yanomamö 1960s | 0.454 |
+
+Table 4.4 is VERIFIED verbatim and uses the model's own age classes, so no conversion is involved. **Every arm
+sits above the highest of three real forager populations.** Model mean age is 19.0 years.
+
+### Alternative 1: "the population is still growing" — FALSIFIED
+
+A growing population is legitimately young, and MARKER_MATRIX rule 4 exists to catch exactly this. Measured the
+tail growth rate (log-linear, last 20%) on all fifteen arms: **most are stationary**, |growth| < 0.5%/yr, and
+they carry juvenile fractions of 0.478–0.569 regardless. Two arms that ARE growing (0.93 and 1.20 %/yr) sit at
+0.546 and 0.514 — inside the same range. The fault is not a transient.
+
+### Alternative 2: "the definition differs from the anchor's" — FALSIFIED
+
+`juv_frac` could have been the `is_juvenile()` productivity gate rather than the under-15 count, which would
+make the whole comparison a category error — the `connubium_med` failure again. Checked at the point of
+computation: `sum(1 for x in ages if x < 180) / pop`, and 180 months is 15 years. **It is the under-15
+fraction.** The comparison is valid.
+
+### AND HERE I HAVE TO STOP, because the next step needs an anchor I do not have
+
+The obvious mechanism question is whether this is too much fertility or too little adult survival. Model crude
+birth rate across the same arms is **3.99 – 7.75 %/yr, mean 5.26**. I compared that to "Aché ~4.6 %/yr" and
+"!Kung ~3.5 %/yr" — **and those two numbers are not verified.** Searching the filed Hill & Hurtado PDF for
+*crude birth rate*, *births per 1000* and *birth rate of* returns **nothing**. I quoted them from memory, which
+is the precise failure this project has recorded four times in six days.
+
+**Both comparators are withdrawn.** With them goes the interpretation they supported — that the model is a
+high-turnover population with excess fertility. It may be; the evidence for it is not on file.
+
+What that leaves, which is still worth having: **several arms produce a juvenile fraction of 0.478–0.514 at a
+crude birth rate of 3.99–4.37 %/yr.** Whatever the ethnographic rate turns out to be, a *within-model* fact
+holds — the youngest age structures do not sit on the highest birth rates, so fertility alone does not order
+this. That points at adult survivorship, and it is a hypothesis, not a finding.
+
+### Next, and it is a literature task before it is a modelling one
+
+1. Find a VERIFIED forager crude birth rate, or a life table. The Aché book has one (it is a demography
+   monograph) but not under the phrases searched; it will need the tables read, not grepped.
+2. Then compare the model's survivorship curve, not its aggregate rates. The age-band diagnostic already exists
+   (`demography()` returns `frac_child` / `frac_adult` / `frac_elder` / `dependency_ratio`) but is NOT in the
+   trajectory rows, so it cannot be read off any completed run — that wiring is the cheap enabling step.
+
+---
+
+**ADDENDUM 42 — THE FERTILITY ANCHOR EXISTS AND IS NOW FILED, BUT IT IS NOT A CRUDE BIRTH RATE. My attempt to
+derive one was dominated by an assumption I invented, and I abandoned it rather than ship it. The comparison
+tier 3 needs is TFR, and the model does not measure TFR (2026-08-11).**
+
+### Found, by listing the book's tables instead of guessing phrases
+
+Addendum 41 searched the Hill & Hurtado PDF for *"crude birth rate"*, *"births per 1000"* and *"birth rate of"*
+and got nothing, so two comparators were withdrawn. The failure was the **search method**: guessing what a
+sentence might say. Extracting all **73 table captions** and reading them found the data immediately.
+
+Three anchors now registered and VERIFIED (registry 22/22):
+
+| anchor | content |
+|---|---|
+| **Table 8.1** | Aché forest ASFR by SINGLE year of age, 10–49, with women-years at risk. **3,309 women-years, TFR 8.031** |
+| **Table 8.2** | Comparative TFR — **Aché 8.03 · !Kung 4.69 · Yanomamö 6.86** |
+| **Table 8.2** | Interbirth interval (months) — **Aché 37.6 · !Kung 49.4 · Yanomamö 34.4** |
+
+Table 8.2 covers **the same three societies as Table 4.4**, so fertility and age structure can be read off one
+consistent set. `!Kung` from Howell 1979 Table 6.1; Yanomamö from Melancon 1982 Table 4.2.
+
+### The derivation I abandoned, and why that is the result
+
+The monograph states **no crude birth rate anywhere.** I tried to derive one by combining Table 4.4's age
+structure with Table 8.2's age-specific rates. Table 4.4 gives 15–60 as ONE band, so the within-band female age
+split has to be assumed. Sensitivity to that assumption:
+
+| assumed attrition per decade | Aché | !Kung | model ÷ Aché |
+|---|---|---|---|
+| 1.00 (flat) | 4.13 | 3.24 | **1.27×** |
+| 0.95 | 5.07 | 4.61 | 1.04× |
+| 0.90 | 5.27 | 5.41 | **1.00×** |
+| 0.80 | 5.00 | 5.90 | 1.05× |
+
+**The conclusion flips on the assumption.** At flat weighting the model has 27% excess fertility and that alone
+explains the excess child fraction; at 0.90 the model's fertility matches the Aché exactly and the excess needs
+a different cause. My invented parameter was doing all the work, so the derivation says nothing — and my
+memory-quoted 4.6%/yr happens to sit inside the range, which is luck, not corroboration.
+
+**Abandoned rather than published.** Six days ago this project shipped a diagnostic that divided incompatible
+units; the lesson was to name the quantity before computing it. Here the quantity was fine and the *input* was
+invented. Same discipline, different point in the chain.
+
+### What the comparison should be, and what it needs
+
+**TFR, not CBR.** TFR needs no total-population denominator, it is stated verbatim for all three societies, and
+it is the quantity a fertility model should be judged on. Interbirth interval is a second direct comparator and
+the model already has an IBI mechanism (`_do_births_ibi`).
+
+**But the model measures neither.** The trajectory logs `births` (a count per step) and `juv_frac`. It does not
+log TFR, age-specific fertility, or realised IBI. So the tier-3 fertility question — the one Addendum 41 stopped
+on — **cannot be answered from any run on disk**, and no amount of re-analysis will change that.
+
+### Status of Addendum 41's hypothesis
+
+Addendum 41 closed with *"that points at adult survivorship"*, reasoning that the lowest-CBR arms still carried
+high juvenile fractions. **That reasoning used the withdrawn comparators and is now unsupported in either
+direction.** It is neither confirmed nor refuted; it is untested, and it stays that way until the model reports
+TFR.
+
+### The enabling work, in order
+
+1. **Log TFR, ASFR and realised IBI** per run. Pairs with the age-band diagnostic (`frac_child` / `frac_adult` /
+   `frac_elder` / `dependency_ratio`) which `demography()` already computes and nothing writes down.
+2. Then compare against Table 8.1/8.2 directly, with no derivation and no assumed splits.
+
+**A note on method, because it generalises.** Grepping a PDF for a phrase you expect tests your guess about the
+wording, not the document. Listing its TABLE CAPTIONS tests the document. That is how Table 4.4 was recovered
+after being wrongly called OCR-garbled, and it is how these three were found in one pass.
+
+---
+
+## Addendum 42 — The fertility brake multiplies the wrong term (2026-08-13, R-106)
+
+**THE FAULT.** The demography markers fail together. `frac_child` reads 0.481 to 0.633 against a VERIFIED
+[0.287, 0.454]. `dependency_ratio` reads 1.18 to 1.81 against a VERIFIED [0.598, 0.899]. The realised life
+expectancy is 15 to 19 years against a CONFIGURED 36.6 (Siler ACHE_FOREST, Gurven & Kaplan 2007 Table 2).
+
+**NEW INSTRUMENTS.** Nothing measured a REALISED schedule before this date. `phase1_model.py` now counts
+person-months and deaths per year of age per cause, woman-months and births per mother age, the realised
+IBI, and the fertility multiplier that is actually applied. `life_table()`, `fertility_schedule()` and
+`raw_demographic_counters()` read them. All are pure observers, consume no RNG and carry no flag, so every
+earlier run stays bit-exact. 22 CTB tests, including a positive control that feeds ACHE_FOREST to the
+estimator and demands 36.6 back, and a purity guard that fails on an injected read.
+
+**THE IDENTITY THAT EXPLAINS EVERY ARM.** `TFR = span / (refractory + 1/(fecundability x brake factor))`.
+With span 324 months and fecundability 0.12 this reproduces both measured arms to within 1%:
+
+| arm | refractory | brake factor | predicted TFR | MEASURED TFR |
+|---|---|---|---|---|
+| canonical (`enable_sedentism_fertility` ON) | 22 | 0.950 | 10.53 | 10.46 |
+| `hg_villages_off` (that flag OFF) | 30 | 0.9998 | 8.45 | 8.41 |
+
+**REPAIR 1 FAILS, AND THE IDENTITY SAYS WHY.** The brake multiplies `1/(fecundability x factor)`, which is
+only 22% of the birth interval. A bracket over the EMA half-life (1, 3, 6, 12 months against the shipped
+~17) moved the applied factor from 0.967 to 0.861 — the brake DID bite harder — and moved nothing else:
+
+| half-life (mo) | 1 | 3 | 6 | 12 | ~17 |
+|---|---|---|---|---|---|
+| mean factor | 0.861 | 0.927 | 0.925 | 0.935 | 0.967 |
+| realised TFR | 10.33 | 10.57 | 10.27 | 10.43 | 10.46 |
+| `frac_child` | 0.592 | 0.593 | 0.573 | 0.604 | 0.572 |
+| realised e0 | 15.2 | 15.0 | 15.2 | 15.1 | 15.0 |
+
+Even at the ABSOLUTE ceiling — zero memory, measured factor 0.767 over 240 steps and 331 women — the brake
+reaches TFR 7.93. The age structure needs about 4.5. **The brake cannot regulate this model's fertility.**
+
+**THE VARIANCE HYPOTHESIS IS FALSIFIED, WITH A PASSING POSITIVE CONTROL.** A bracket over `game_meat_cv`
+(0.0 deterministic / 2.11 = terrain.HUNT_CV / 4.0) left the starvation share flat at 0.493, 0.499, 0.518.
+The positive control confirms the knob is live and strong: the same sweep moves the intake coefficient of
+variation from 0.604 to 1.933 and p90/p10 from 4.3 to 9.8. Note the FLAG ALONE would have given a vacuous
+test — `enable_biome_meat_cv=false` falls back to the scalar `game_meat_cv`, which the canonical stack sets
+to 0.73, so the parameter had to go to 0.0.
+
+**THE VILLAGES ARE NOT THE CAUSE.** `hg_villages_off` removes only the settlement lifecycle and keeps every
+production mechanism. It gives the best world this project has produced — regional density 0.061/km2 =
+0.67x the Binford 0.091 anchor, `band_med` 23 against Birdsell ~25, realised IBI 35 months against Hill
+& Hurtado's 37.6, the lowest starvation share at 0.352, and `frac_resident` 0.0. The population is 9661,
+FOUR TIMES the sedentary arms, so the villages SUPPRESS population rather than support it. `frac_child`
+0.543 and `dependency_ratio` 1.292 still fail.
+
+**A CORRECTION.** An earlier note this arc said fertility was exonerated because the observed age structure
+needed TFR 14.3 against "a ceiling of 9". That ceiling assumed `ibi_refractory_months = 30`, but
+`enable_sedentism_fertility` replaces it with a society-dependent value as low as 22. Measured TFR is 8.4
+to 10.5. Fertility is NOT exonerated; it is the dominant term.
+
+**A SECOND CORRECTION.** An earlier note said starvation was a minor death channel, from one final step of
+each of 12 arms. The cumulative counters give 0.35 to 0.58 depending on the arm.
+
+**A DISCARDED PROBE.** A seasonality test returned `season()` = 1.000 for all 12 months and a starvation
+share of 0.026 against the campaign's 0.35. It built a `TerrainWorld` without the campaign's
+`NPPCapacityField` and `ClimateField`, so that world had no climate. Seasonality REMAINS UNTESTED.
+
+**WHAT THE IDENTITY PROPOSES.** Lactational amenorrhea physically IS the refractory period, and energy
+availability modulates its LENGTH — so the energetic condition belongs on the refractory, not on
+fecundability. Inside the FILED ethnographic range the refractory alone spans the needed TFR:
+
+| refractory | 34.4 | 37.6 | 44 | 49.4 |
+|---|---|---|---|---|
+| source | Hill 8.2 reservation | Hill 8.2 forest | Howell !Kung | Hill 8.2 contact |
+| TFR | 7.58 | 7.05 | 6.19 | 5.61 |
+
+The decomposition puts BOTH anchors in band at TFR 5 to 8 on this arm's own mortality. **NOT ADOPTED** —
+this is a proposal awaiting the supervisor.
+
+**AN ANCHOR GAP FOUND.** `demography.py` names Ellison's energetics as the mechanism behind the intake
+brake, but no Ellison source appears in `docs/LITERATURE.md` or in `literature/`, and the specs carry only
+the LENGTH of lactational amenorrhea, not its RESPONSE TIME. `intake_ema_alpha` therefore has no anchor and
+no value was adopted from the bracket.
+
+---
+
+## Addendum 43 — The demography monitor, and two corrections to Addendum 42's follow-ups (2026-08-14, R-106)
+
+**THE STANDING PANEL.** Supervisor directive: *"We cannot expect social dynamics to work when the demography
+is skewed."* The case that proves it: `band_med` read 23 against Birdsell's ~25 and looked like a PASS on a
+population that was 54% children — about 11 ADULTS against Hill et al. 2011's **28.2 ADULTS**. A marker read
+as passing while failing 2.5-fold. `MARKER_MATRIX.md` #1 had already recorded this and it was still missed.
+
+Every run now logs, and SCORES against filed bands: `e15` / `e45` / `surv_to_15` / `surv_to_45` /
+`modal_adult_death`; mortality in seven age bands; `cbr` / `cdr` / `r_pct_yr` / `srb_male_frac` /
+`age_first_birth_yr`; completed parity of post-menopausal women; joint orphanhood, never-partnered-by-30,
+widowhood; sex-specific `e0`/`e15`; child and old-age dependency separately; and **`band_med_adults`**, the
+quantity Hill's anchor names and which the model had never logged. `demography_health()` prints one verdict
+line and GATES the ladder: age structure out of band ⇒ every marker above demography is provisional.
+
+**THE CEILING FIX WORKED.** `ceiling_on` required `settle_on`, so switching villages off switched the R-63
+carrying capacity off with them — including R-105's branch for capping agglomeration at non-settlement
+cells, unreachable in exactly the configuration it exists for. Before: population 2,916 → 24,727 by step
+3,000 and climbing, per-capita intake RISING with density. After: both arms **stable at 15,000 steps**,
+0.27x and 0.35x Binford, r ≈ 0. R-105's tripwire test fired with its own message, *"scope note is stale"*,
+exactly as it was written to.
+
+**CORRECTION 1 — the density-reference fix does NOT buy 3 years of life expectancy.** Addendum 42's
+follow-up reported e0 17.7 → 20.9. That was measured on the RUNAWAY world, where density had exploded and
+`density_mult` was saturated near its 4.0 ceiling, so re-referencing it mattered. With the ceiling working,
+density stays low, the term sits near its reference, and the fix is **near-neutral: e0 17.87 → 17.96, +0.09
+yr**. The normalisation remains correct on its own terms — `risk_mult` and `pathogen_mult` hold that
+invariant and `density_mult` did not — but it is NOT load-bearing at forager densities. It stays default-OFF
+and out of `C_ALLON`.
+
+**CORRECTION 2 — "age at first birth 22-25, above every forager" was a short-run transient.** Measured on
+400-step smoke runs. Over 15,000 steps AFB declines monotonically 18.95 → **16.25**, which is INSIDE Walker
+et al. 2006's forager bracket [16.2, 20.5] — at its extreme low edge. The defect I reported does not exist
+at equilibrium; if anything the equilibrium value is now too early.
+
+**THE ISO-GROWTH CONSTRAINT IS VIOLATED, IDENTICALLY IN BOTH ARMS.** Gurven & Kaplan 2007 endnote 5 gives
+`R0 = (TFR/2.06)·l25`, `l25 = 0.9973·l15 − 0.0422`, `R0 = exp(r·28)`. The implementation reproduces their
+own published claims (R0 = 1.0001 at their stated TFR 4.069, l15 0.55). Applied to the pair:
+
+| arm | TFR | l(15) | r measured | r REQUIRED | gap |
+|---|---|---|---|---|---|
+| hg_villages_off | 8.37 | 0.424 | +0.02 %/yr | **+1.58 %/yr** | +1.56 |
+| hg_densref | 8.40 | 0.427 | +0.03 %/yr | **+1.62 %/yr** | +1.59 |
+
+**WHERE THE VIOLATION LIVES.** GK07's regression (R² = 0.98) says adult survival is tightly predicted by
+child survival in a real forager. Measured against it: predicted l(25) 0.390, **ACTUAL 0.268 — a ratio of
+0.69**, consistent at 0.67–0.71 across every arm. The model's adults die ~30% faster than the forager
+relationship allows, on top of already-poor child survival.
+
+**THE REMAINING DEFECT, DECOMPOSED.** `m_5_15` = **0.0506 against GK07's 0.010** — five times over, in the
+band that is the LOWEST-mortality band of a human life table. Split by cause (control arm):
+
+| band | m total | m starvation | m other |
+|---|---|---|---|
+| 1–5 | 0.0574 | 0.0143 | 0.0430 |
+| **5–15** | **0.0506** | **0.0208** | **0.0298** |
+| 15–30 | 0.0474 | 0.0225 | 0.0249 |
+| 30–45 | 0.0474 | 0.0211 | 0.0263 |
+| 45–60 | 0.0528 | 0.0206 | 0.0321 |
+
+Two roughly equal contributors, both already named. (i) `m_other` in the 5–15 band is 0.0298 against a
+configured Siler ~0.0137 = **2.2x**, which is the `a2_mult` inflation — and since the density term is now
+shown to be near-neutral at these densities, the remaining inflation must be `risk_mult` and/or
+`synergy_mult`, NOT density. (ii) `m_starv` is **flat at ~0.021 from age 1 to 60**, confirming Addendum 42's
+"second Makeham term" at scale and now per age band.
+
+**THREE DEFECTS IN MY OWN INSTRUMENTS, all caught before they reached a conclusion.**
+- `family_structure()` counted a missing `_father` link as a DEAD father, inflating double-orphanhood
+  **8.8x** (0.086 → 0.0098). `_orphan_status` had always been right. The CTB missed it because every
+  constructed family had explicit links.
+- `q = m/(1+m/2)` exceeds 1.0 at m > 2 deaths/person-year, driving survivorship NEGATIVE: short test runs
+  returned l(15) = −0.091, l(25) = −0.500. No scored result was affected (a real arm never approaches m=2),
+  but a survivorship that can go negative is not a survivorship. Clamped, negative control confirms
+  l(x) = −0.111 without it.
+- A duplicate keyword argument from a rename broke the campaign entrypoint and cost a 27-failure suite run,
+  because I launched the suite without an import check.
+
+**A PROCESS NOTE.** Editing source while the suite runs produces spurious failures: several tests read
+`phase1_model.py` FROM DISK for token scans, so a half-written file fails them. Three such failures were
+recorded and discarded on 2026-08-14.
+
+**LITERATURE SURVEY (2026-08-14).** Registered `age_first_birth_yr` [16.2, 20.5] (Walker et al. 2006 Table
+2, 15 forager societies; Gainj and Turkana excluded as horticulturalist/pastoralist) and `m_5_15` = 0.010
+(GK07 p.330 verbatim). The survey also established that **e0 is NOT diagnostic**: Sweden 1751–59 had e0 = 34,
+inside the forager range of 21–37. Neither is e45 (20.7 vs 19.8 across HG and forager-horticulturalist) nor
+MRDT (6–10 yr, a human constant). **Score on l(15), r and the juvenility index.** And GK07 Fig. 9: *"forager
+mortality is narrowly confined, fertility ranges widely from below 4 to as high as 8"* — regulation runs
+through fertility. **NO forager anchor exists** for joint orphanhood, never-married-by-30, widowhood, sex-
+specific life tables, or CBR/CDR; those report NO-ANCHOR rather than being dropped. **Ellison remains
+unobtained** and is the single gap blocking a fertility-response timescale.
+
+---
+
+## Addendum 44 — The model is Malthusian, so no hazard fix can raise e0 (2026-08-14, R-106)
+
+**THE a2 MODULATOR, DECOMPOSED.** `_a2_mult` multiplies three live factors into Siler's Makeham term and only
+the PRODUCT was ever visible. Per-factor observers, measured on a 600-step campaign:
+
+| factor | measured | what it was meant to be |
+|---|---|---|
+| `risk_mult` | **0.630** | ~1.1 — accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007) |
+| `density_mult` | **2.435** (1.329 with `enable_density_reference`) | — |
+| `synergy_mult` | **1.000**, mean body condition 1.0000 | up to 2.5 at zero condition |
+
+**`risk_mult` RUNS BELOW 1.0 — terrain risk is a net PROTECTIVE factor.** It divides by a GLOBAL mean risk
+(`risk_cell / risk_ref`) while agents self-select into low-risk cells, so the realised mean sits on the wrong
+side of 1. The normalisation is not wrong in itself; the reference is a world mean and the sample is a biased
+subset of it. Filed, not fixed.
+
+**CORRECTION TO ADDENDUM 43 — the density fix is not "near-neutral", it is COMPENSATED.** Addendum 43 recorded
+e0 17.87 → 17.96 and called the fix near-neutral. A controlled pair shows the fix working exactly as designed
+and the system absorbing it:
+
+| | 600 steps | 15,000 steps |
+|---|---|---|
+| e0 gain | **+5.8 yr** (21.6 → 27.4) | **+0.09 yr** |
+| `density_mult` | 2.435 → 1.329 (−45%) | same |
+| `a2` product | 1.414 → 0.719 (−49%) | same |
+
+In the 15,000-step pair, `m_other` in the 5–15 band fell **0.0298 → 0.0165** while `m_starv` rose **0.0208 →
+0.0339**, holding total mortality flat at 0.0506 → 0.0504.
+
+**THE STRUCTURAL RESULT.** Once the carrying-capacity ceiling is repaired (Addendum 43), the model is
+MALTHUSIAN: equilibrium e0 is set by the food-to-population balance, NOT by the hazard parameters. Reduce any
+hazard and the population grows until starvation restores the same total mortality. **No hazard fix can raise
+equilibrium e0.** The `hg_villages_off` trajectory shows it directly — e0 falls 30.15 → 18.5 → 17.87 as the
+population fills the world, and thereafter is flat while intake p50 fluctuates 2.3–3.9.
+
+The only levers on equilibrium e0 are FERTILITY (a lower equilibrium density) or PRODUCTIVITY. That is what
+Gurven & Kaplan 2007 Fig. 9 says independently: *"forager mortality is narrowly confined, fertility ranges
+widely from below 4 to as high as 8"*. Regulation runs through fertility, and this model now agrees.
+
+**A CLAIM OF MINE CORRECTED BY ITS OWN TEST.** I first recorded that `enable_nutrition_synergy` is DEAD, having
+measured `synergy_mult` = 1.000 and condition = 1.0000 on a campaign run. The CTB failed at once: in the
+smaller, poorer test world condition is **0.49** and the synergy is live at ~1.76. **The mechanism is not
+inert — it is SILENCED BY THE WORLD**, because campaign agents eat 2.6x their requirement and `_condition`
+saturates. That is the same root cause as the dead energetic fertility brake, which reads an intake signal
+that saturates for the same reason. TWO MECHANISMS, ONE FAILURE. "World-dependent" is a fixable finding;
+"inert" would have aimed the next fix at the wrong target.
+
+**TASK #70 IS PARTLY REHABILITATED.** Its premise — that the energy signal never enters the FAO/IOM window
+[1.0, 1.2] — was falsified on the RUNAWAY world. Re-measured at equilibrium on the repaired world:
+
+| | runaway world | repaired world |
+|---|---|---|
+| intake EMA median | 6.62 | **2.58** |
+| EMA p10 | 1.72 | **1.41** |
+| below 1.2, raw | 4.7% | **8.5%** |
+| below 1.2, after the EMA | **0.0%** | **2.0%** |
+| `fert_factor_sat` | 0.999 | **0.971** |
+
+Still small, but no longer zero, and 2.5x closer to the window. The refractory route deserves a re-test rather
+than the flat falsification recorded earlier.
+
+**BASELINE PAIR, 15,000 steps, ceiling repaired, sha dff049f, both stable.** `hg_villages_off` pop 3,916
+(0.27x Binford), `hg_densref` pop 5,062 (0.35x). Both `structure_ok = False`: `frac_child` 0.535/0.559 against
+[0.287, 0.454] and `dependency` 1.262/1.398 against [0.598, 0.899]. `band_med_adults` **10 against Hill's
+28.2**. Cohort parity 8.46 and synthetic TFR 8.37 now AGREE, confirming the arms are in steady state — the
+divergence seen on the 400-step run was the diagnostic working, not an artefact.
+
+---
+
+## Addendum 45 — The refractory lever works, and delivers a tenth of what is needed (2026-08-15, R-106)
+
+**THE TRIO.** Three arms at one sha (96caab9), 15,000 steps, differing by ONE setting at a time. Control =
+`hg_villages_off`; `hg_refrac` adds `enable_energetic_refractory`; `hg_refrac_ema` adds the Ellison-anchored
+one-month EMA half-life (`intake_ema_alpha` 0.04 → 0.5) on top.
+
+| marker | control | +refractory | +refractory & EMA | anchor |
+|---|---|---|---|---|
+| realised TFR | 8.372 | 8.355 | **8.005** | [4.69, 8.03] |
+| cohort parity | 8.46 | 8.57 | 8.12 | — |
+| realised IBI mean | 38.0 | 38.1 | **39.5** | — |
+| e0 | 17.87 | 17.90 | **18.35** | [21, 37] |
+| l(15) | 0.424 | 0.426 | **0.434** | 0.66 |
+| starvation share | 0.364 | 0.362 | **0.352** | — |
+| markers in band | 3/16 | 3/16 | **4/16** | — |
+
+**PREDICTION 1 CONFIRMED — the mechanism alone does nothing.** `hg_refrac` moved TFR by 0.017 and e0 by 0.03,
+i.e. nothing. The shipped 17-month EMA smooths away the very signal the mechanism reads. This was stated
+before the run.
+
+**PREDICTION 2 CONFIRMED — the Ellison timescale is what makes it live.** With the one-month half-life, the
+fraction of women below the FAO/IOM window rises **0.0195 → 0.0476**, realised IBI mean rises 38.0 → 39.5
+months, and **`realised_tfr` crosses from OUT-OF-BAND into PASS** (8.005 against a [4.69, 8.03] band). That
+is the first marker this mechanism has brought into band, and it is attributable to the TIMESCALE rather than
+to the mechanism, because the two arms separate them.
+
+**PREDICTION 3 CONFIRMED, WEAKLY — e0 rose.** 17.87 → 18.35, **+0.48 yr**, with l(15) 0.424 → 0.434 and the
+starvation share falling 0.364 → 0.352. The direction is exactly what Addendum 44's Malthusian reading
+requires: lower fertility → lower equilibrium density → less starvation → longer life. **Addendum 44 STANDS.**
+The refrac-only arm moved e0 by 0.03, so the EMA arm's 0.48 is roughly sixteen times that noise floor — but
+this is ONE SEED and the claim deserves replication before it is leaned on.
+
+**THE MAGNITUDE IS ABOUT A TENTH OF WHAT IS NEEDED.** The iso-growth identity requires TFR ≈ 5.45 at this
+l(15); the mechanism delivers 8.005. The iso-growth gap barely moves (+1.56 → +1.49 percentage points). e0
+needs +19 years and gains 0.48.
+
+**WHY, AND IT IS THE SAME REASON AS EVERY PREVIOUS FAILURE.** Even with the anchored fast EMA, only **4.8% of
+women fall below the physiological window**. The other 95% get no stretch at all, because the median woman
+takes in **2.85x her requirement**. The lever is correctly built, correctly anchored and correctly wired, and
+it has almost nothing to act on.
+
+**FOUR MECHANISMS ARE NOW DEAD FOR ONE REASON.** `enable_energetic_fertility` (the reserve saturates at its
+cap), `enable_intake_fertility` (the intake ratio sits at 2.6-3.4x the window), `enable_nutrition_synergy`
+(body condition pins at 1.0 — see Addendum 44, where this was first misreported as inertness and corrected to
+world-dependence), and now `enable_energetic_refractory`. Every energetically-gated mechanism in the model is
+silenced by the same fact: **the world feeds almost everyone above the level at which any energetic signal
+carries information.**
+
+**SO THE ARC RETURNS TO WHERE THE SUPERVISOR PUT IT ON DAY ONE** — *"either our bands are idiots and settle
+too easy or this world is too abundant"* (2026-08-12). Task #65 measured the first half then: 40% of habitable
+land passes the village-site test, because `settle_persist_threshold` sits at the MEDIAN of S_pot. This
+addendum measures the second half from the demographic side: the median agent eats ~2.85x maintenance, and
+that single fact has now defeated four separate mechanisms and every mortality fix attempted since Addendum
+42. **The productivity question is no longer deferrable; it is the binding constraint on the whole
+demographic layer.**
+
+**WHAT IS NOT CLAIMED.** That `refractory_stretch_max = 1.436` is right — it is a bracket endpoint and was
+never swept, because the mechanism turned out to be signal-limited rather than magnitude-limited. Sweeping it
+before fixing the supply would be tuning a lever that is not attached to anything.
+
+---
+
+## Addendum 46 — The cell split was age-blind, and that is why the hazard was age-blind (2026-08-15, R-106)
+
+**THE SUPERVISOR'S QUESTION.** *"What then will move the demography? If not food — something is broken in
+demographic mechanisms."* This addendum answers it. Something was broken, it was not a demographic mechanism,
+and it was not food. It was the rule that decides who eats.
+
+**THE DEFECT.** `substrate.compute_harvest_shares` divided a cell pool FLAT per head at κ=0: `base = S / n`.
+Every occupant claimed the same absolute kcal regardless of age. **59% of a canonical population is under 15**
+(measured age_0_5 26.0%, age_5_15 33.2%), so a newborn claimed exactly what a 30-year-old hunter claimed.
+
+**THE MEASUREMENT THAT NAMES IT.** The realised hazard was FLAT across the whole of life:
+
+| age band | 1-5 | 5-15 | 15-30 | 30-45 | 45-60 |
+|---|---|---|---|---|---|
+| realised hazard /yr | 0.069 | 0.057 | 0.060 | 0.059 | 0.064 |
+
+Siler ACHE_FOREST gives **0.0141/yr at age 30**. The excess is ~0.045/yr and it does not vary with age.
+Starvation cannot produce that — starvation kills the small and the old first. An age-blind split can, and it
+was the only term in the model that could.
+
+**THIS RESOLVES THE PARADOX OPEN SINCE ADDENDUM 44.** The median agent eats 2.8x requirement AND
+`starv_share` is 0.51-0.67. Both are true. Only ~3% sit below the floor at any instant
+(`intake_ema_frac_below_hi` 0.031); the FLUX through that state carries the deaths, at every age at once.
+
+**A HYPOTHESIS OF MINE IS FALSIFIED, and is recorded rather than dropped.** Task #71 predicted the starving
+would be ISOLATED agents. They are not. `starv_occ_at_death` 44.1 against `starv_occ_of_living` 27.7 — the
+dead sit in cells MORE crowded than the living. The earlier 6.5-against-71.4 reading came from a single arm
+and did not replicate. The isolation-flux hypothesis is dead.
+
+**THE FIX.** `compute_harvest_shares` gains an optional per-occupant CLAIM WEIGHT applied before the κ
+contest. `claim=None` reproduces the historical split bit-exact. Two flags, because they are two separate
+assertions, and neither introduces a new number — each reads a ramp that already exists:
+
+- `enable_need_weighted_shares` — claim ∝ `consumption_factor` (cons_min 0.3→1.0). [ANCHORED — Kaplan 2000,
+  already the citation on `BaseAgent.consumption_factor`.]
+- `enable_eta_weighted_shares` — claim ∝ `eta` (eta_min 0.2→1.0). Recovers the ~26% of every cell pool
+  claimed by someone who cannot convert it.
+
+**THE PREDICTION WAS STATED BEFORE THE MEASUREMENT, and it held at BOTH ends.** Coastal-temperate, seed 0:
+
+| marker | control | need | eta | both | anchor |
+|---|---|---|---|---|---|
+| m 0-1 | 0.1366 | 0.1666 | 0.1702 | 0.1819 | ~0.20 (Aché) |
+| m 15-30 | 0.0611 | 0.0539 | 0.0538 | 0.0494 | 0.005-0.010 (G&K) |
+| m 30-45 | 0.0594 | 0.0534 | 0.0522 | 0.0493 | 0.005-0.010 |
+| **e15** | **15.92** | **17.60** | **17.73** | **18.85** | **~35** |
+| e45 | 12.95 | 13.57 | 13.69 | 14.03 | |
+| frac_double_orphan | 0.0394 | 0.0291 | 0.0263 | 0.0202 | |
+| frac_both_parents_alive | 0.746 | 0.776 | 0.779 | 0.801 | |
+| band_med_adults | 9.74 | 10.25 | 10.18 | 11.06 | 9-25 |
+
+Monotone in how much claim weighting is applied. Family structure improved without being targeted.
+
+**THE CTB IS LOAD-BEARING, CHECKED RATHER THAN ASSERTED.** 26 tests pass, and 4 FAIL under a perturbation
+that disables the mechanism. The control that decides interpretability is
+`test_all_adult_cell_is_untouched_by_*`: every adult has `consumption_factor` 1.0, so an all-adult cell must
+not move. If it did, the effect would be a code-path artefact rather than age composition.
+
+**A SIDE EFFECT PREDICTED BEFORE IT WAS MEASURED.** Task #77 recorded that this change would move the spatial
+distribution. The savanna reachability gate that failed at 0.058 now measures 0.210, population 861→1017. The
+threshold was NOT touched.
+
+**WHAT DID NOT MOVE, AND IT MATTERS MORE THAN WHAT DID.** `starv_share` is 0.67 in EVERY arm. TFR is ~10 in
+every arm. The claim weight changed WHO starves, not HOW MANY. That CONFIRMS Addendum 44 rather than
+overturning it: total deaths are still set by the food-to-population balance. This fix redistributes them
+across ages.
+
+**THE SHARPER DEFECT THIS EXPOSES.** `m_0_1` now nearly reaches its anchor (0.182 vs ~0.20), but `l15` moved
+the WRONG way, 0.399 → 0.357 against an anchor of 0.55-0.60. Those two are compatible only if mortality
+between 1 and 15 is far lower than the model's — it is not (`m_1_5` 0.080, `m_5_15` 0.054, against `m_30_45`
+0.049). **The hazard is still nearly flat from 1 to 60.** Real foragers have a deep survival trough across
+ages 5-40 that this model lacks. The claim weight fixed the SIGN of the age gradient at the infant end; the
+trough is a separate, still-open defect.
+
+**HONEST SIZE OF THE GAIN.** e15 closes ~15% of its gap to 35. Prime-adult hazard falls 17% where a 5-10x
+reduction is needed. This is a real, correctly-signed, mechanism-driven improvement. It is NOT a solved
+demography.
+
+**A METHOD NOTE, because it saved four CPU-hours.** Two of the four arms were cut short at ~13800 steps. I
+began a re-run, then tested the assumption instead: reading the two COMPLETE arms at BOTH 13875 and 15000
+changed every marker the finding rests on by **≤0.3%**, against effect sizes of 17-33%. The truncation is two
+orders of magnitude below the signal, so the re-run was cancelled. The endpoint check is three minutes of
+arithmetic; the re-run was four hours.
+
+**WHAT IS NOT CLAIMED.** That the claim weight fixes the demography — it does not; it fixes the shape, and the
+level remains wrong. That `both` is the right adoption — it is canonically ON via C_ALLON per the standing
+rule, and every mortality-shape marker improves monotonically, but the arms are ONE world and TWO of them are
+single-seed. That the residual flat hazard is understood — it is not.
+
+---
+
+## Addendum 47 — The population is not food-limited; it fails to disperse (2026-08-22, R-106)
+
+**THE HEADLINE, and it retires a claim this document made three addenda ago.** Addendum 44 concluded "the
+model is Malthusian, so no hazard fix can raise e0". The arithmetic there was right and the label was wrong.
+A population sitting at **4.8× BELOW** Binford's packing threshold regionally, on **13% of its habitable
+land**, with the median agent eating **2.7× requirement**, is not limited by carrying capacity. It is limited
+by a local crowding pathology. Every carrying-capacity reading taken between Addenda 44 and 46 should be
+re-read in that light.
+
+### The packing paradox
+
+A forager population cannot be simultaneously PACKED (locally dense enough that Binford says it would
+intensify) and SPARSE (regionally nowhere near filling its range). Measured on coastal-temperate, seed 0:
+
+| | value | anchor |
+|---|---|---|
+| regional density | 0.0174 /km² | **4.8× below** Binford packing 0.091 |
+| local density | 0.131 /km² | **1.4× above** it |
+| land used | 13.3% | — |
+| km² per band | 214 | below its own 314 km² catchment (Vita-Finzi & Higgs) |
+| corr(forage, people) | **+0.12** | on a landscape with a 5× productivity range |
+| top-decile land occupied | 34.6% | — |
+
+The check needs NO new number: it uses Binford's filed 0.091 twice, once per side. It is now WIRED
+(`demography.spatial_health`, a `!! SPATIAL:` banner in every campaign snapshot) rather than written down,
+because a table nobody reads is what allowed this. Verified firing from the first snapshot of a live run.
+
+### SubstrateConfig was outside the config system
+
+`run_campaign` built `SubstrateConfig` inline from `**GRP`, imported from a 2026 one-off script, while
+`config/parameters.toml` — the authoritative file — stated the grouping drives were **OFF**:
+
+| field | the file said | every campaign ran |
+|---|---|---|
+| `group_safety_max` | 0.0 | **8.0** |
+| `group_mate_min` | 0.0 | **15.0** |
+
+Those two multipliers make leaving a band of 30 cost **20.6×** in perceived yield, against a terrain signal
+whose entire range is 4.8× — clustering outweighed the whole landscape by 4.3×. The same
+`DemographyConfig + ClimateConfig` pair was hardcoded in FOUR places (`gen_runconfig.resolved_canonical`,
+`runspec.load` validation, `make_runconfig --set`, and the campaign's construction), and SubstrateConfig fell
+through every one. `runspec.build` was ALREADY generic over all three modules — the design was right and only
+the guards were narrow. Fixed in five bit-exact steps, and the fidelity test is now parametrised over owner
+classes rather than checking DemographyConfig alone.
+
+### THE HYPOTHESIS THAT FOLLOWED WAS FALSIFIED
+
+Having found a 20.6× clustering force, the obvious inference was that it caused the crowding. **It does not.**
+Ablating both grouping drives entirely moved land use 13.3% → **14.1%**, and `corr(forage,people)` got WORSE
+(+0.120 → +0.082). Five arms — mobility radius, agglomeration attraction, cohesion, E.1 safety, E.2 mate
+access — every attraction term nameable, and **none disperses the population**. The constraint is not any
+single attraction parameter, and that is recorded here because the 20.6× number is seductive and wrong.
+
+Note also `disp_radius` came back BIT-IDENTICAL to control: `mobility_max_radius` only binds where NPP < 150
+g/m²/yr, which never occurs on occupied land. A knob raised 6 → 20 changed nothing.
+
+### TWO CLAIMS OF MINE, WITHDRAWN
+
+**(1) "Villages form on non-optimal areas" — WITHDRAWN.** Every spatial claim in this arc was scored against
+`forage_kcal`. Village siting reads `S_pot = max(aquatic_food, cultivability)`, and the two are
+**UNCORRELATED (+0.027)**. Scored against the field that actually governs it, sites sit at S_pot **0.934**
+against a habitable mean of 0.353 — 2.6× better than average and near the maximum. **Villages are well
+sited.** What survives, restated properly: only 9.5% of top-decile S_pot land carries a site.
+
+**(2) The isolation-flux hypothesis (task #71) — FALSIFIED.** The dead sit in cells MORE crowded than the
+living (`occ_at_death` 44.1 vs `occ_of_living` 27.7). The earlier 6.5-against-71.4 reading came from a single
+arm and did not replicate.
+
+### Two terrain-generator defects, found by single-biome testing
+
+The generator had never had a coherence benchmark. It is structurally SOUND — determinism, no NaN, rivers and
+shore never on water, `aquatic_food` bounded and only where there is water, every biome label re-derivable
+from its own climate, and **every filed per-biome forage anchor reproduced at 0.96–1.00** once shore cells are
+excluded (the `SHORE_BONUS_KCAL` addition, verified by a positive control so the exclusion cannot hide a real
+defect). Two real defects:
+
+**(a) Rivers are drainage AREA with no water balance.** `flow = np.ones()` gives every cell one unit
+regardless of rainfall, so across 20 worlds **deserts are 1.63× WETTER than forests** (0.075 vs 0.046). That
+propagates: `aquatic_food` scores desert rivers as cold anadromous fisheries, `S_pot` ranks desert 0.413 >
+grass 0.404 > forest 0.259, and villages settle the desert at 2.5× enrichment. Weighting the accumulation by
+Budyko runoff (VERIFIED and filed; parameter-free) reverses the ordering to forest 0.283 > grass 0.228 >
+desert 0.171 and the river ratio to 0.49.
+
+**(b) The river threshold is RELATIVE.** `riverThresh = fmax * (0.10 − waterK*0.06)` is a fraction of the
+world's own maximum flow, so "is this a river" means "is this in the top decile of this world's drainage" —
+equally true in a rainforest and a desert. The 100%-desert world went 474 → **519** river cells under Budyko.
+An earlier version of the test asserted that world dropped to ~0 rivers; it did under the crude
+`Q = max(0, P − PET)`, but FOR THE WRONG REASON — that form returns exactly zero everywhere P < PET, so `fmax`
+was 0, the guard substituted 1.0, and every cell failed the comparison. **An accident of a broken runoff model
+passing a test by luck.** The fix this points to is an ABSOLUTE discharge threshold, which introduces a number
+this project has not filed.
+
+### Three scored markers are provisional
+
+`_maintain_settlements` counts everyone inside a site's 25-cell, 2,500 km² window, and the windows OVERLAP:
+**184 sites × 25 cells = 4,602 window-cells over 229 OCCUPIED cells**, so every occupied cell lies inside ~20
+different sites' persistence windows. `n_settle = 184` with `settle_med = 11` is ONE clustered population
+counted twenty times. `primate_ratio` and `zipf_slope` read the same list, so #12's clean-looking Zipf −0.98
+is a rank-size slope over phantom settlements. Markers #3, #12, #13 are flagged PROVISIONAL; #3's prior
+"46/52 arms PASS" is withdrawn.
+`enable_exclusive_village_membership` is NOT the fix: re-tested against this question rather than the spacing
+question it was rejected for, it failed the discriminator — population fell 9.5%/63.7% across two seeds and
+founding churn rose 8×. It buys a correct-looking number by destroying the population that produced it.
+
+### What single-biome testing found that the mixed world hid
+
+Forest and savanna run. **Arid and mountain go extinct inside 80 steps, 95% starvation, ZERO births**, and the
+mixed world never pressed on it because base_s0 has 1,229 viable anchor sites. Four predictions were made and
+all four FAILED: cluster seeding, capacity-scaled grouping, both together, and seeding at the anchored
+density. The measured cause is a startup transient — the bottom intake decile sits at 0.62× requirement from
+step 1 with reserves under one month, 90% die in six steps, and the ~30 survivors on good land thrive
+(intake 2–5×) but are below the breeding threshold. The arid world is NOT uninhabitable: 1,471 of its 3×3
+neighbourhoods can feed ≥15 people, and the filed density (0.005/km², Long 1971 / Cane 1990) clears its
+stability ceiling `K/(1+DEPLETE_FRAC)` = 1.33 by 2.7×.
+
+**One real defect was found there:** `comove_footprint = 0` ("exact snap") collapses every co-moving family
+onto ONE cell, so the annual pairing gate halves the occupied-cell count in a single step (110 → 75, occupancy
+1.07 → 1.56). Two competing explanations were falsified first — ablating the annual drought shock and ablating
+band cohesion each left it untouched. The fix was ALREADY BUILT AND DARK: `comove_footprint_scaled`, k ∝ 1/NPP
+on the Kelly/Binford shape, giving **k = 0 on every rich world** (bit-exact) and k = 2–3 on poor ones.
+
+### What is NOT claimed
+
+That the demography is fixed — `e15` is 18.9 against ~35, TFR ~10 against 5–8. That any of tonight's
+mechanisms rescues arid — none does; it still dies in the first seasonal trough, and the reason is now
+anchored: the model implements only CENTRAL-PLACE overwintering storage, and the mode that applies to arid
+Australia (dispersed caching, keyed to multi-year unpredictability) was never built. That `runoff_rivers`,
+`enable_capacity_scaled_grouping` or `comove_footprint_scaled` should be adopted — all three remain OFF
+pending a supervisor call. And that the residual flat hazard is understood — it is not.
+
+---
+
+## Addendum 48 — Earth climate becomes the baseline, and Addendum 47's numbers are superseded (2026-08-23, R-106)
+
+**READ THIS BEFORE QUOTING ADDENDUM 47.** Every quantity in Addendum 47 was measured on a planet with more
+than twice Earth's obliquity. The FINDINGS there stand; the NUMBERS are superseded by the ones below.
+
+### The canonical world was an outlier, by lottery accident
+
+`a_seas` — the seasonal amplitude of the food field — is drawn per world from an obliquity lottery,
+ε ~ U[0°, 60°], as `a_seas = 0.40 · sin ε / sin 23.4°`. **Seed 0, which every canonical run in this project
+uses, draws ε = 50.7° → a_seas 0.779**: the second highest of twelve seeds, against a median of 0.464 and
+Earth's 0.4.
+
+| seed | ε (deg) | a_seas | trough yield |
+|---|---|---|---|
+| **0 (canonical)** | **50.7** | **0.779** | **22.1% of mean** |
+| median of 12 | ~27 | 0.464 | 53.6% |
+| Earth | 23.4 | 0.400 | 60.0% |
+
+**That amplitude is not anchored.** `obliquity_to_amplitude`'s own docstring calls it *"a PROVISIONAL bounding
+heuristic onto the Earth band, NOT a sunlight→food transfer function (forage amplitude is rain/phenology-
+driven)"*. An insolation heuristic was doing load-bearing work on food seasonality in every result.
+
+### It is why arid could not be fixed
+
+At a_seas 0.779 an arid cell yields **0.44 BURN** at the seasonal trough against a lone adult's requirement of
+1.0. **The world cannot feed anyone for part of every year — at any density, however seeded or dispersed.**
+Four mechanism-level fixes (cluster seeding, capacity-scaled grouping, both together, seeding at the
+anchored density) were each predicted to work and each failed, because all four were tuned against a periodic
+hard floor that none of them could lift. The floor should have been checked before the second attempt, let
+alone the fourth.
+
+### Adopted (supervisor call, 2026-08-22)
+
+**Earth climate is now the default.** `C_CLIMATE` defaulted to `"1"` — every channel on; it now defaults to
+`"0"`, so `ClimateConfig`'s class defaults apply, and those already ARE the Earth baseline (a_seas 0.4,
+seasonality live, lottery / interannual / regime-shift / caribou / llanos / eccentricity off). Variability is
+opted INTO with `C_CLIMATE=1`, and belongs to a later stage.
+
+Three mechanisms adopted alongside it: `runoff_rivers` (Budyko-weighted flow; reverses deserts being 1.63×
+wetter than forests), `enable_capacity_scaled_grouping` (a group larger than the land feeds earns no further
+benefit), `comove_footprint_scaled` (k ∝ 1/NPP; fixes the annual pairing collapse).
+
+### The re-measurement
+
+| | Addendum 47 (a_seas 0.779) | Addendum 48 (Earth) | target |
+|---|---|---|---|
+| pop | 2,760 | **3,841** | — |
+| land used | 13.3% | **14.3%** | > 50% |
+| regional /km² | 0.0174 | **0.0242** | ~0.091 |
+| corr(forage, people) | +0.120 | **+0.157** | > +0.50 |
+| top-decile occupied | 34.6% | **38.4%** | > 80% |
+| km² per site | 85 | **125** | > 314 |
+| settle_med | 11.5 | **15.4** | 50–250 |
+| e15 | 18.9 | **19.4** | ~35 |
+| TFR | 9.96 | **9.93** | 5.0–8.0 |
+| starv share | 0.666 | **0.661** | — |
+| PACKING PARADOX | yes | **yes** | no |
+
+**Everything moved the right way and nothing was fixed.** Population +39%, but the paradox holds, land use is
+still 14% against a 50% target, and **TFR and starvation share are unchanged**. Arid survives 294 steps
+against 29–52 originally and 150 for Earth-climate-alone — roughly 6× — and still goes extinct.
+
+### A confound in my own test design, stated rather than buried
+
+`earth_forest` was presented as the control for the claim that the adoptions are bit-exact where land is
+productive. **It is not a control**: it changes the climate AND the three mechanisms at once, so its +31%
+population against `biome_forest` is unattributable. That claim was measured only on unit arithmetic (0 of 72
+rich configurations changed; footprint k = 0 at forest NPP) and **remains untested at run scale**. An arm with
+the two behavioural mechanisms ablated is running to separate them.
+
+### What is NOT claimed
+
+That the demography is fixed — `e15` 19.4 against ~35 and TFR 9.9 against 5–8 are barely moved. That arid is
+solved — it is not, and the anchored reason stands: the model implements only CENTRAL-PLACE overwintering
+storage, and the mode that applies to arid Australia (dispersed caching, keyed to multi-year unpredictability)
+was never built. That the adoptions are individually validated at run scale — one arm is still running to
+test that. And that `runoff_rivers` is properly configurable — it is a TERRAIN knob outside the config system,
+the same defect class as the `SubstrateConfig` breach and `ClimateConfig.a_seas` being overridden by the
+lottery, both found this week.
+
+---
+
+## Addendum 49 — Fertility solved: it was two config errors, not a mechanism (2026-08-24, R-106)
+
+**THE RESULT.** On a warm world with both fixes active, the demography reaches its forager anchors for the
+first time in this project, and life expectancy rose 9 years as a free consequence:
+
+| | earth_base (broken) | fert_warm (fixed) | anchor |
+|---|---|---|---|
+| %egalitarian | 8% | **100%** | >80 |
+| surplus_med (false storage) | 0.76 | **0.00** | ~0 |
+| IBI median | 24 | **35** | 37 (Aché) |
+| TFR | 9.9 | **7.5** | 5–8 |
+| CBR /1000 | 65 | **53** | 45–55 |
+| **e15** | **19.4** | **28.5** | ~35 |
+| starv share | 0.66 | 0.59 | — |
+
+TFR and CBR are IN BAND for the first time. IBI is at 35 against a 37 anchor. And **e15 rose from 19.4 to 28.5
+with no mortality parameter touched** — the "dying is the bill for the breeding" chain, confirmed: the
+population is stationary, births fell, deaths followed.
+
+### It was TWO config errors, both the same defect class
+
+Neither the fertility mechanism nor the society classifier was wrong. Each was fed a corrupted input, by an
+override silently defeating an anchored default — the class of defect this arc found four times (SubstrateConfig
+`**GRP`, the `a_seas` lottery, and these two).
+
+**Cause 1 — the classifier read LOCAL density (Addendum 48 groundwork; fixed `ea725c6`).** The morph
+classifier asks "is this band packed past Binford's 0.091/km²?" — a REGIONAL threshold. It was fed
+members/occupied-cells, a LOCAL density. Because the model crowds everyone onto ~14% of the land, every band
+read as packed → chiefdom → 14-month refractory. 46–57% of a pure forager world came out stratified. Fix: feed
+the classifier members/(range share), the scale Binford's number means. Stratified share → 0.
+
+**Cause 2 — storage was ungated (fixed `f92eb83`).** `realistic_forager_demog()` overrode
+`storage_temp_threshold_c = 100.0`, so every cell on every world counted as "overwintering" and stored. A warm
+tropical world with no winter stored anyway (surplus 0.62), which read as `complex_forager` → 22-month
+refractory. The correct value is Binford's ET 15.25 °C — the class default, named in the field's own doc, on
+the scale of the model's temperature field (tropical 21, temperate 10, boreal 2 °C). The 100 was an
+un-annotated test convenience that leaked into the production preset. Fix: delete the override. Warm worlds now
+store nothing and stay egalitarian; only genuinely cold worlds store — Testart's distinction.
+
+### A correction to my own reasoning, on record
+
+After the FIRST fix alone (temperate world, storage still ungated), e15 moved only +0.8 years, and I wrote that
+this WEAKENED the fertility→mortality chain. That was wrong: only half the fix was active. With BOTH causes
+removed, e15 moved +9.1 years. The chain is not weak; the earlier measurement was on a half-fixed run.
+
+### Two legitimate regimes, not one target
+
+This is the WARM world (immediate-return, egalitarian, IBI ~35). The TEMPERATE world correctly DOES store, so
+its bands read complex and space births shorter (~24), and that is the Neolithic Demographic Transition
+(Bocquet-Appel 2011), not a bug. A cold storing world SHOULD out-breed a warm mobile one. Both must be reported
+as the two regimes the model now distinguishes correctly, rather than forcing both to the Aché mobile anchor.
+
+### What is NOT solved
+
+e15 is 28.5 against ~35, and l15 is 0.38 against 0.55–0.60 — closer, not closed. The residual mortality is now
+CONCENTRATED IN CHILDHOOD (m_1_5 at 3.3× Siler, m_5_15 2.7×), where before the whole curve was flat; prime-
+adult hazard has fallen to ~1.8× Siler. The paradox persists in age-graded form: the bottom intake decile eats
+2.7× requirement, yet 59% of deaths are "starvation", and they are children. Provisioning and both claim-
+weights are ON, so it is not a missing mechanism — something is defeating the provisioning that exists. That is
+the next thread (child mortality), diagnosed rather than guessed.
+
+---
+
+## Addendum 50 — Child mortality is not a provisioning bug; it is the density ceiling (2026-08-24, R-106)
+
+**A prediction of mine, falsified and recorded.** After the fertility fix, residual mortality concentrated in
+childhood (m_1_5 at 3.3× Siler). I traced it to `provision_self_keep = 1.0`, which disables tier-2 maternal
+provisioning (the field doc: "1.0 = overflow-only; lower = child priority, gated so child starvation → ≈0").
+I predicted that adding the FATHER as a second provider (`paternal_provision_frac 0 → 0.5`, Marlowe ~58%
+under-3 share) would save children WITHOUT the adult cost the maternal lever carried, so e15 would RISE.
+
+**It did not.** Both levers, measured at equilibrium against `fert_warm`:
+
+| | no provision | maternal 0.7 | paternal 0.5 |
+|---|---|---|---|
+| m_0_1 | 0.221 | 0.153 | 0.176 |
+| l15 | 0.381 | 0.427 | 0.425 |
+| m_30_45 | 0.027 | 0.032 | 0.033 |
+| **e15** | **28.5** | **26.9** | **24.6** |
+| pop | 2597 | 2439 | 2798 |
+
+Every lever saves children (m_0_1 and l15 improve) and every lever LOWERS e15, because adult hazard rises to
+compensate. The paternal path raised population 2597 → 2798 — it genuinely kept more children alive — and e15
+fell hardest of the three.
+
+**Why: the population is at a density ceiling, so mortality is conserved.** The run is stationary. Saving a
+child adds a survivor to an already-crowded world; per-capita falls; the death reappears elsewhere, on adults.
+The maternal lever moved death child→mother; the paternal lever moved it child→adult-via-crowding. Neither
+lowered TOTAL mortality because the ceiling fixes it. This is the mortality-side mirror of the fertility
+result: once births are correct, **you cannot lower total death by transferring food between groups — only by
+lifting the ceiling.** The fertility fixes raised e15 precisely because they changed the BIRTH rate (fewer
+entrants to a stationary system), which provisioning does not.
+
+**So neither provisioning lever is adopted** — both cost adult life for child life at no net gain, and the
+model represents that trade honestly. `provision_self_keep` stays 1.0 and `paternal_provision_frac` stays 0.0
+in the forager preset until the ceiling is lifted.
+
+**And a correction to Addendum 46/49's framing.** "The dying is the bill for the breeding" is right for
+fertility but must not be read as "mortality is downstream of provisioning." The residual e15 gap
+(28.5 vs ~35) is not a child-feeding problem. It is the packing paradox: the population pinned onto ~13% of
+its land. That is the next and root target.
+
+---
+
+## Addendum 51 — The deaths are crowding, not famine; dispersal reads the one signal that can't see it (2026-08-24, R-106)
+
+**VERIFIED: it is not famine.** The supervisor asked to confirm the cause before fixing it. At equilibrium on
+`fert_warm`, 59% of deaths are labelled starvation, yet:
+
+- `frac_below_needs = 0.000` — **not one agent is below the requirement floor**
+- p10 intake = 2.72× requirement — even the bottom decile eats well
+- dying agents ate **0.258×** requirement while the cell median ate 6.4× (p90 17×)
+- `occ_at_death = 56` vs `occ_of_living = 37` — the dead sat on MORE crowded cells
+
+The food is present. A dying agent is losing the CONTEST FOR THE SHARE on a rich, mobbed cell — not sitting on
+empty land. This is a split failure under crowding, not scarcity.
+
+**Answering the three questions.**
+- *What holds people on the cell?* The move utility reads per-capita `S/n_after`, so a mobbed cell does offer
+  a smaller share — that part is sound. But the cell pool `S` stays large (rich land, many occupants), so a
+  crowded rich cell can still out-score an empty poorer neighbour.
+- *Why die rather than move?* From the agent's view the cell is not short of food; the deficit is a losing
+  share, and nothing in its perception says "leave."
+- *Why doesn't dispersal fire?* Because it is keyed to the wrong signal. `mobility_pressure_source = "npp"`
+  sets the move STRIDE from the cell's static geographic NPP. A crowded rich cell has high NPP, so the rule
+  says "good land, short stride, stay" — the one signal that structurally cannot see crowding. A starving
+  agent is pinned at stride 1 and cannot reach past the mob even though the per-capita utility would prefer
+  the emptier cell.
+
+**The fix already exists and was in the wrong mode.** `mobility_pressure_source = "intake"` (R-106 Addendum 6,
+"density-aware, since a crowded cell dilutes it regardless of nominal fertility") sets the stride from the
+agent's own intake EMA: a 0.26× agent gets stride 4 and reaches out; a 2.7× agent stays. The per-capita move
+utility already prefers emptier ground, so stride was the only missing piece. Under test as `disp_intake`;
+prediction on record: land use 13% → >50%, occ/cell down, corr(forage,people) up, starv_share down, e15 up.
+
+**This is the packing-paradox root**, the same defect that made arid uninhabitable and that has held e15 down
+since Addendum 47 — not another age-group transfer.
+
+---
+
+## Addendum 52 — The settlement mesh: spacing is emergent from an unclaimed-land founding gate, not an imposed distance (2026-08-26, R-106)
+
+**The defect.** The map showed one dense blob of 109 settlement sites, 92% of them within one cell of another
+(median nearest-neighbour spacing 1.0 cell), with a connected-component village size of ~12. A village did
+not occupy one cell with gaps; the whole population packed a corner as a mesh of adjacent, individually
+unviable sites.
+
+**The cause is one bypass.** The occupancy-founding path (`enable_emergent_village_founding`, on) already
+spaces villages: its condition 3 refuses a site inside another village's catchment — disjoint catchments, the
+~20 km Vita-Finzi & Higgs site-exploitation territory (filed). But `enable_village_budding` (on) bypasses that
+gate: a bud MANUFACTURES a site outright from a faction of two people (~1,700 settlements out of pairs in 400
+steps, 2026-08-12), so condition 3 never judges it. The mesh is that bypass, nothing else.
+
+**Five prior fixes had failed** (recorded in `_maintain_village_budding`): min-faction share silenced budding;
+village identity was inert for spacing; parent-only separation did nothing; global separation worked but
+imposed 50 km against the ~20 km anchor; `enable_exclusive_village_membership` raised founding churn 8× and
+cut population 9.5%/63.7% across two seeds — it buys the spacing by dissolving established villages.
+
+**Road A vs Road B — imposed rule vs emergent mechanism.** Two arms on the warm world, both composed with the
+new default-off `enable_village_pooling`:
+
+| metric | baseline (mesh) | Road A `bud_site_separation` | Road B `bud_requires_occupancy` |
+|---|---|---|---|
+| n sites | 109 | 30 | 30 |
+| NN spacing median | 1.0 | 3.0 | 3.0 |
+| % adjacent (<=1) | 92% | 0% | 0% |
+| % disjoint (>2) | 6% | 100% | 100% |
+| km2 per site | 185 | 723 | 717 |
+| village size (settle_med) | 12 | 72 | 72 |
+| population | 2,159 | 3,059 | 3,056 |
+| e15 | 28.5 | 33.9 | 34.1 |
+
+Road B (`enable_bud_requires_occupancy`: a bud RELOCATES its faction only; the daughter becomes a site solely
+where people gather past `settle_min_pool`, through the gate that already spaces villages) reproduces the
+imposed rule bit-for-bit on geometry AND demography, with NO distance constant anywhere. The falsifier — the
+population collapse that killed exclusive membership — did not fire (3,056, above baseline). Spacing is
+emergent: a bud that lands on another village's catchment cannot assemble its own pool, so no site forms
+there. `bud_requires_occupancy` is the recommended mesh fix.
+
+**Village pooling is load-bearing but net-negative — NOT adopted.** An ablation isolated it: on the separated
+base the gaps are identical with or without pooling (both 30-31 sites, NN 3.0, 0% adjacent), so the gaps come
+entirely from `bud_requires_occupancy`. Pooling only raises on-site concentration 0.65 → 0.75, and it pays
+for that by crowding more infants onto one cell — population −8% (3,325 → 3,056), m_0_1 0.27 → 0.31,
+l15 0.34 → 0.31. It trades child survival for a cosmetic concentration gain. Kept as a tested, default-off
+mechanism.
+
+**Village identity as the social concentration source — under diagnosis.** `enable_village_identity`
+(co-resident bands merge into one band community past 180 months; Birdsell's local group) was tested on the
+Road B base as the meaningful alternative to the pooling food-penalty. It does NOT concentrate (0.63, the
+lowest arm) — so it does not answer the "1 cell" geometry. But it ends the "45 bands in one village" artifact
+(n_bands 188 → 28), grows realistic bands (16 adults) and connubium (575), and gives the best demographic
+RATES of any arm: m_0_1 0.20, l15 0.45, e15 37, TFR 5.3, IBI 36 — nearly every anchor. The catch: population
+HALVED (3,325 → 1,393) and was still drifting down at 8,000 steps (−260/quarter), so those healthy rates may
+be a shrinking-population artifact, not a proven low-density equilibrium. A 16,000-step run is diagnosing
+whether it plateaus or leaks. NOT adopted; the decline must be explained first.
+
+**Canonical benchmark unchanged.** `bud_requires_occupancy`, `bud_site_separation`, `village_pooling` and
+`village_identity` all remain OFF in the C_ALLON canonical resolution, pending one benchmark update once the
+identity decline is diagnosed — so the geometry+demography picture is adopted in a single move, not two.
+New tool: `mesh_report.py` (torus nearest-neighbour spacing, % adjacent/disjoint, on-site vs catchment-ring
+concentration).
+
+**Registration caution.** `gen_runconfig.py` associates a field's preceding comment block by proximity; when
+the `enable_village_pooling` block is inserted between `enable_village_identity` and `village_identity_months`,
+the regenerated `parameters.toml` clobbers the `village_identity_months` Birdsell provenance with the pooling
+text, and `mechanisms.toml` records `enable_village_pooling` at the C_ALLON value. Before registering pooling,
+place its block AFTER `village_identity_months` and add the flag to the C_ALLON exclusion set.
+
+---
+
+## Addendum 53 — `bud_requires_occupancy` is adopted into the canonical benchmark; `village_identity` is held (2026-08-26, R-106)
+
+**Decision (supervisor, Path B).** `enable_bud_requires_occupancy` is adopted — removed from the C_ALLON
+exclusion set, so it is now canonically ON. `enable_village_identity` is held in the exclusion set pending a
+multi-biome / long-run validation. `enable_village_pooling` is not adopted and its code is not committed (it
+is net-negative, Addendum 52; recoverable from the session record if ever revisited).
+
+**Why adopt the mesh fix.** `bud_requires_occupancy` closes the budding bypass so village spacing emerges from
+disjoint catchments, with no distance constant. It reproduces the imposed `bud_site_separation` rule
+bit-for-bit (30 separated sites, 0% adjacent, 100% disjoint) and raises population (Addendum 52). It rests on
+the filed ~20 km Vita-Finzi & Higgs catchment, not on one world, so it is safe to make canonical.
+
+**A CORRECTED attribution, and the reason `village_identity` is held.** On the standard characterization
+fixture (n=1500, 300 steps, coastal/temperate, seed 0) the age structure improves markedly WITH identity —
+`frac_child` 0.55 → 0.41 (the ~0.40 Aché anchor), median age 12.8 → 17.1 yr. But `bud_requires_occupancy`
+ALONE leaves it at the old pathology: `frac_child` 0.545, median 13.6. So the age-structure gain is
+**identity's, not the mesh fix's** — the opposite of a mid-investigation guess. Two consequences:
+
+1. `test_the_model_is_currently_pathologically_young` stays valid and GREEN under this adoption, because
+   identity (the thing that flipped it) is held. No re-baseline of that characterization is taken.
+2. Identity does real demographic work — it is the lever that moves the pyramid to the anchor — which is
+   exactly why it must be validated across biomes before it re-baselines the canonical population. Adopting it
+   halves the canonical population (~3,100 → ~1,560, a stable equilibrium; Addendum 52) — a benchmark-wide
+   change that must not rest on the single warm-coastal world it was measured on.
+
+**Validation state.** The full suite is green but for the pre-existing savanna reachability failure
+(`test_agents_actually_stand_where_the_intercept_can_act`, task #77 — verified to fail identically on the
+prior HEAD, unrelated to this change). Registry, run-file reference (`config/runs/full_campaign.toml`) and the
+C_ALLON coverage tests all agree with the new canonical stack.
+
+---
+
+## Addendum 54 — Village identity validates in three biomes and is adopted; MARKER #16 re-scored (2026-08-28, R-106)
+
+**The hold is lifted.** Addendum 53 held `enable_village_identity` because its whole case rested on ONE biome
+(warm coastal/tropical), per the standing rule that a mechanism validated in one world is a claim about that
+world. The A/B was then run on the new canonical base (`bud_requires_occupancy` ON) in three contrasting
+biomes, with the predictions registered before the runs. It passed, and it is adopted.
+
+### Every marker moves the same direction in every biome
+
+Equilibrium = last 20% of an 8,000-step run, seed 0, 3,000 founders.
+
+| | tropical off → ON | temperate off → ON | boreal off → ON |
+|---|---|---|---|
+| median age (yr) | 21.7 → **26.4** | 17.5 → **18.8** | 16.0 → **20.7** |
+| TFR (band 5–8) | 7.68 → **5.28** | 6.31 → **5.90** | 8.54 → **6.15** |
+| survival to 15 | .341 → **.451** | .480 → **.503** | .317 → **.398** |
+| starvation share | .559 → **.447** | .478 → **.451** | .558 → **.448** |
+| merged village size | 24 → **101** | 60 → **88** | 31 → **107** |
+| n_bands | 188 → **28** | 182 → **119** | 14 → **7** |
+| population trend (tail) | −157 (stable at 16k) | **−104 → +259** | **−105 → +6** |
+
+**Identity does not drain population — it RESCUES it.** The prediction under test was that identity might buy
+its demography by shrinking the population. The opposite holds in two of three biomes: temperate and boreal
+were both LEAKING without identity (−104, −105 on the tail) and are healthy with it (+259, +6). The tropical
+halving (3,325 → ~1,560, confirmed stable over 16,000 steps: 758 births vs 765 deaths, net −7) is
+world-specific, not a general cost.
+
+### Two of my own criteria were wrong, and are corrected here
+
+* **P3 was mis-specified.** It tested `|births − deaths| ≈ 0` and therefore flagged temperate's GROWTH
+  (+259) as a failure. P3 existed to catch a LEAK; growth is not the failure mode. The meaningful comparison
+  is the direction against the off arm.
+* **"Identity only reaches villagers" was falsified.** Proposed to explain why the band collapse is graded
+  (188→28 tropical vs 182→119 temperate), it predicts a low villager share in temperate. Measured: 84% of the
+  temperate population lives inside a village catchment, against 93% tropical and 100% boreal. The reach is
+  not the limit. What identity does everywhere is form REAL merged villages — big-band count 0.4→8.9
+  tropical, 11→20 temperate, 1.1→2.6 boreal, at median sizes ~90–107.
+
+### Savanna is excluded for cause, and it is NOT a regression
+
+The savanna world is degenerate — population ~125 at equilibrium — so it cannot test any mechanism. A control
+on the OLD canonical (`bud_requires_occupancy` OFF) returns **bit-identical** numbers (pop tail 125, final
+137, 7 bands), so the collapse predates this arc's adoptions entirely. It is a separate open defect, adjacent
+to the standing savanna reachability failure (task #77).
+
+### MARKER #16 re-scored, all four together
+
+The adoption flips `test_the_model_is_currently_pathologically_young`, which is the sanctioned trigger its own
+docstring names. Re-scored on that test's fixture (n=1500, 300 steps, coastal-temperate, seed 0):
+
+| marker | before | after | anchor |
+|---|---|---|---|
+| `frac_child` | 0.585 | **0.414** | 0.287–0.454 — **INSIDE**, at the Aché 0.419 |
+| `dependency_ratio` | 1.495 | **0.907** | 0.598–0.899 — misses the ceiling by 0.9% |
+| `sex_ratio_m_f` | 1.061 | **0.987** | 0.896–1.368 — **INSIDE** |
+| `median_age_yr` | 12.8 | **17.1** | ~20 — **still the open gap** |
+| `frac_motherless` | ~11.8% | **3.6%** | ~2% |
+
+2 of 4 pass, 1 marginal, 1 open. The test is re-baselined and RENAMED to
+`test_the_pyramid_is_young_but_the_child_share_is_now_anchored`; it now pins the improved regime in BOTH
+directions — the child share must stay inside the forager range, and median age must stay short of the anchor
+until the engine improves again.
+
+**What is NOT claimed.** That the demography is solved: `median_age_yr` 17.1 against ~20, `l15` improves in
+every biome but still misses .55–.60 everywhere, and the early-adult cliff (15-30 : 30-45) is 2.71× and
+untouched. That savanna or arid work. That the packing paradox is addressed — it is not; villages are
+separated but the population still occupies ~14% of the land.
+
+---
+
+## Addendum 55 — The young pyramid is a Malthusian-ceiling phenomenon; the subsistence floor is FALSIFIED (2026-08-31, R-106)
+
+**The diagnosis (before any tuning).** The persistent young median (temperate 18.8 at a stable ~4,500) is not
+a transient — it is a HOT equilibrium. Realised e₀ is **23.5 against the Siler schedule 36.5**; 43% of deaths
+are crowding/starvation, and they are STATUS-SELECTIVE: with `contest_exponent = 1.5` on the per-cell food
+split, a low-status adult gets **0.04 of the even share even when the cell holds exactly enough for all**
+(measured on the real `compute_harvest_shares`), so low-status young adults (modal death age ~22) are culled
+while the village mean is 2.4× requirement and the granary is full. Need-weighting is alive but orthogonal (it
+corrects age, not status).
+
+**The fix that FAILED (`enable_subsistence_floor`, built + CTB'd, then reverted).** Forager demand-sharing:
+guarantee each occupant its ration before status contests the surplus. It worked mechanically (cut the cull,
+starvation share 43%→40%) but was **net-negative**: realised e₀ 23.5→22.3, l15 0.502→0.478, infant mortality
+0.131→0.149. A controlled proof of the ceiling: relieving the low-status adult cull raised BIRTHS
+(CBR 42.9→45.1) and the extra infants then died (infant deaths/step 0.17→0.21); CDR did not fall (42.4→44.6).
+**Redistribution relocates death (adult→infant); it does not reduce it**, and e₀ falls because an infant death
+costs more life-years. Reverted. The lesson: the young pyramid is set by the CEILING (total effective food),
+not the distribution — raising e₀ needs a higher ceiling or lower fertility, not a fairer split.
+
+## Addendum 56 — Metabolic down-regulation: a survivable hunger state raises the ceiling (2026-08-31→09-01, R-106)
+
+**Why the deaths are abrupt, and why dispersal never fires.** The reserve is spent at a FLAT burn, so any
+sustained intake below 100% is inexorably fatal (even 70% kills in ~5 months) and there is NO thin-but-alive
+state. 96% of starvation deaths are ACUTE one-step crashes on agents whose intake-EMA is 2.4× requirement —
+they look well-fed to every dispersal trigger (static NPP stride, smoothed intake, remembered hardship), which
+are all slow, while the death is fast. The reserve is also CAPPED, so a volatile crowded cell ratchets it down
+even at a high mean intake.
+
+**The mechanism (Keys 1950, Minnesota Starvation; LITERATURE.md, MODEL_SPEC §4.6.7).** `enable_metabolic_downreg`:
+under a draining reserve the burn falls, `burn_eff = burn·(1 − d)`, `d = 0.40·clamp((1 − frac)/0.5)` on the
+reserve fill fraction (Keys: ~40% total BMR reduction at ~25% weight loss). Triggered on the RESERVE LEVEL, not
+the intake-EMA (the crash agents have a HIGH EMA, so an EMA trigger would never fire); it buffers the transient
+crash as it happens, at every age. It preserves the Malthusian ceiling for real scarcity — a true chronic
+deficit below the reduced burn still kills — so it buffers volatility, it does not feed a genuine shortage.
+
+**Validated NET-POSITIVE (the A/B, on vs off).** Temperate (decisive, where the cull was measured): pop
+4,402→**4,848**, e₀ 23.5→**23.7**, median 18.8→**19.2**, l15 0.502→**0.509**, infant mortality
+0.131→**0.120** (toward the anchor), starvation 43%→**34%** — a clean improvement, NOT the subsistence floor's
+relocation (contrast Addendum 55). Boreal (marginal): pop 346→**524 (+51%)**, e₀ 18.5→19.4, median 21.3→23.2,
+starvation 30%→23%, with a small infant-mortality uptick (0.161→0.206 — the ceiling pushback in a marginal
+world). It genuinely raises the ceiling. **Honest caveat: the e₀ gain is small (+0.2 temperate)** — a real,
+modest improvement, not the transformation that closes the 23.7→36.5 gap; the rest is the packing paradox
+(dispersal onto the unused ~86% of the land) or fertility, still open.
+
+**Adopted (built ON per the new rule).** Canonical `C_ALLON` resolution audited: `bud_requires_occupancy`,
+`village_identity`, `metabolic_downreg`, `society_regional_density` all ON; `village_pooling` and
+`subsistence_floor` reverted. Full suite green but for the pre-existing degenerate-savanna family (task #77);
+down-reg surfaced one fragile liveness test (`test_biome_meat_ctb` ran on the collapsing savanna world for 8
+steps — a dead population is insensitive to everything, the CTB rule's own warning) which was HARDENED to run
+on a living population with an alive-guard. **New standing rule (CLAUDE.md, 2026-08-28):** build every
+mechanism ON, audit that it is on, and raise a flagged discussion with a stated reason for any flag left OFF.
+
+## Addendum 57 — Catchment-foraging depletion: the resource map follows the take, not the feet (2026-09-02, R-106)
+
+**The defect (supervisor, 2026-09-02).** The depletable stock `deplete_and_regrow` keys on `occ_count` — where
+an agent STANDS. But a settled village FORAGES its whole catchment (tier-2, pooled) while it stands on the site
+cell, so a hunted-out catchment cell that nobody stands on is NEVER depleted. A village therefore lives on an
+inexhaustible catchment (measured: 43 people on a cell eat 3.11× requirement with no dispersal pressure). The
+supervisor spec: "all the cells where the agents hunt and forage should be depleted accordingly — an exact map
+of how much each is foraged and how much that reduces the yield at a given cell."
+
+**The mechanism (`enable_catchment_depletion`).** When on, the depletion pressure becomes a FORAGING map, not a
+standing-occupancy map. `_catchment_foraging_pressure` spreads each settled villager's one forager-unit over its
+catchment cells ∝ each cell's yield (a richer cell is hunted harder); a mobile band forages the cell it stands
+on. The total is conserved (Σ pressure = the population). So a village hunts down its catchment, the depletable
+stock there falls, and the carrying-capacity ceiling (Σ depletable cell yield over the catchment) drops with it.
+Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact.
+
+**CTB (`tests/test_catchment_depletion_ctb.py`, 4 tests).** The load-bearing test seats a village on its site
+cell and drives an EMPTY neighbouring catchment cell down under the foraging map (B < 0.9) while the same cell
+stays FULL (B > 0.98) under the standing-occupancy map — the foraged-but-unoccupied cell now depletes, which was
+the whole gap. The map test verifies conservation and the ∝-yield spread; a monotonicity test verifies a bigger
+village leaves a lower catchment stock.
+
+**A METHOD CATCH worth recording.** The first A/B ran on the `battery1_liveness` preset and read as a strong
+NEGATIVE: catchment depletion consolidated the population into FEWER, MUCH LARGER villages (median 20→52, and
+225–280 in two seeds — above the Bar-Yosef ~150 egalitarian bound), with land-use and peak crowding moving the
+WRONG way. That preset is STALE: it carries `enable_village_identity=False`, `bud_requires_occupancy=False`,
+i.e. it PRE-DATES the adopted anti-clustering fixes (Addenda 53–54). The giant villages were the un-fixed
+mutual-subsidy runaway, funnelled by depletion into the few catchment-viable spots — not the mechanism. The
+honest baseline is the resolved canonical config (`runconfig.load()`), which already carries the adopted fixes.
+
+**On the true adopted stack the effect is EQUIVOCAL and baseline-dependent (A/B, 4 seeds, temperate/coastal,
+450 steps).** The marginal effect depends on what else runs. Against the PRE-HOLD baseline (with
+`hunger_dispersal` + `founding_delay` still on, before they were held — see below) it read neutral-to-mild-
+positive: population mean +39 (3/4 up), land-use up in 3/4, peak crowding low (18–64). Against the FINAL adopted
+baseline (those two held OFF, so villages are larger and more crowded — median 92–212, peak 161–322), catchment
+depletion drops median village size in 3/4 seeds (helps the over-clustering) but costs population: OFF→ON
++133/−20/−43/**−349** (mean −70, driven by one −39% seed). The −349 seed is the Malthusian ceiling biting as
+designed — an over-crowded village that hunts out its own catchment loses the people the depleted land can no
+longer feed (contrast Addendum 55) — not a death spiral: the catchment regrows when the take eases. So the
+mechanism is CORRECT (the resource economy it fixes was wrong) and it pulls median village size down, but its net
+demographic effect on the current stack is a wash with tail risk, because the point-mode agglomeration reward
+(below) keeps rebuilding the crowd that depletion then culls.
+
+**Adopted ON, on the correctness case (built ON per the standing rule; the population wash is not a stated
+reason for OFF — it is the ceiling working).** `gen_runconfig` + `make_runconfig full_campaign` regenerated; the
+resolved canonical config audits `enable_catchment_depletion = true`, `differs_from_canonical = 0`; the
+parameters file is byte-identical bar the new switch; `test_runconfig_sync`, both depletion CTBs, and the schema
+tests are green. Registered: audit TYPE **D** (a resource sink over cells-through-time, like
+`enable_soil_depletion`) and BENCHMARK_LADDER tier 1. **Held OFF in the SAME regeneration, with stated reasons
+(the standing rule's other half): `enable_hunger_dispersal` and `enable_founding_delay`.** Both are built and
+CTB'd but equivocal — hunger_dispersal roughly halves the population (the loss is fertility, band fragmentation,
+not death) and empties the degenerate savanna; founding_delay is marginal and trips the age-structure CTB
+through a startup transient with no anchor for the delay length yet. `C_ALLON` was silently turning both ON in
+`full_campaign.toml`; they are now in the campaign `_skip` set with the reasons above and resolve to false. They
+are the strongest anti-clustering levers in the model (holding them OFF is why the adopted baseline is more
+clustered than the pre-hold one), so their adoption is the open supervisor decision this addendum surfaces.
+
+**What this rules out, and where the density gap actually lives.** Catchment inexhaustibility is NOT the engine
+of the over-clustering: fixing it moves regional density essentially not at all, and only ~1.3–3.5% of viable
+land is occupied in BOTH arms. The remaining levers are the ones diagnosed earlier — point-mode agglomeration
+(β=1.15, a super-linear reward for single-cell packing) and high per-cell Tallavaara capacity (~104 persons on
+the richest cells). Depletion's dispersal pressure cannot express against a mechanism that pays MORE to crowd;
+the agglomeration return is the next thing to attack.
+
+## Addendum 58 — Over-clustering is the residence pin, not the economy; and it is the SAME thing as the population ceiling (2026-09-02, R-106)
+
+**The directive.** Attack over-clustering by attacking agglomeration (the point-mode super-linear reward,
+β=1.15, long suspected as the packing engine — Addendum 4).
+
+**Diagnosis 1: the agglomeration production reward is already bounded, so it is a red herring.** Instrumented the
+REALIZED per-cell output vs occupancy on the canonical stack. Per-capita realized food FALLS with n (620k at
+n=1–4 → 93k at n=40–79), it does not rise, because every big cell (n≥40) is 100% `aggl_ceiling`-bound (R-105):
+the raw `n^β` premium wants 5–14× the catchment capacity and is discarded. The `aggl_attraction_weight` split
+(Addendum 13) confirmed the food is separable — lowering the perceived premium does NOT crater population — but
+it does not robustly reduce packing either (4-seed: 2/4 worse). Packing is not driven by realized production.
+
+**Diagnosis 2: the packing is the residence pin.** Every big cell is a settlement site, and 100% of the people
+on it are settled/pinned (81–89% of the whole population is pinned). A "village of 150–300" is that many bodies
+standing on ONE 100 km² site cell — the pin's target — each eating LESS per head than a loner. A real village's
+dwellings spread over its territory; only the model stacks them on a point.
+
+**The fix built (`enable_village_catchment_spread`, CTB `test_village_catchment_spread_ctb.py`).** Each settled
+member pins to a deterministic HOME cell within settle_radius (∝ yield) instead of the site point. The physical
+footprint and the density-disease hazard (`occ_count[pos]`, Binford 0.091 reference) follow the spread; FOOD is
+bit-exact because the harvest regroups a village's members at its site (it forages its catchment as one economic
+unit). The CTB proves the invariant: bodies spread over many cells, membership preserved, the food group returns
+the whole village to its site — and OFF stacks 95% on the site cell.
+
+**It fixes the over-clustering, decisively.** A/B (4 seeds, 450 steps): peak single-cell occupancy collapses
+172/305/209/240 → **48/46/38/60** (−72 to −85%); land-use TRIPLES (0.5–1.5% → 2.5–3.3%). The spread holds even
+at scale — peak stays ~70 at population 5,000.
+
+**But it is NOT adopted, because it uncaps the population.** The density-disease hazard at packed cells was the
+DE-FACTO Malthusian brake — packing → high `density_mult` → death capped BOTH clustering and population.
+Spreading the bodies removes that cull, and population RUNS AWAY: a 1,200-step run climbs 571 → **5,134 and
+accelerating**, land-use still only 11%, density still below the Tallavaara anchor, no plateau. This is the R-104
+lesson again: removing a ceiling reveals whether another one binds, and here none does within the window.
+
+**The finding that matters: over-clustering and the population ceiling are the SAME mechanism**, coupled through
+the density-disease channel. You cannot disperse the villages without also releasing the brake that dispersal
+removes. The mechanism is HELD (default-off, in the C_ALLON `_skip` set and the sync-test allowed-dark set,
+audit TYPE T, ladder tier 1-settlement) until a REPLACEMENT brake is built — a food ceiling that binds at the
+regional scale, or a density penalty that survives the spread — so we get dispersed settlement at a stationary
+population. That replacement brake is the next arc.
+
+## Addendum 59 — The density gap is a colonization trap, and the population brake IS the over-clustering (2026-09-03, R-106)
+
+**The question (supervisor).** The canonical model plateaus at ~0.006 persons/km² — ~8× below the Tallavaara
+regional anchor (0.05). Why so sparse, and is it founding, spacing, or capacity?
+
+**Budget check — the world is RICH, not poor.** Σ Tallavaara local capacity over the land = 329,331 people
+(0.35/km²); the model plateau (~5,585) is **2% of the terrain's own carrying capacity**. Three single-lever
+probes (storability bar, village cap ×2, search radius) each FAILED to raise density — lowering the bar settles
+poorer cells and REDUCES it; a bigger cap just packs one cell to 864. So the population is **trapped, not
+starved** — 94% of the rich land is empty.
+
+**The trap is `enable_bud_requires_occupancy`.** It was adopted (Addendum 53) to fix village spacing, but by
+forbidding establishment: a shed faction relocates and must re-aggregate 40 people, which never happens on empty
+land, so the parent grows to 300–500 and the excess dies of crowding-disease in place. Probe (seed 1, 1,800
+steps): turning it off lifts population 4× (4,400→18,131), villages 22× (32→720), density 4× toward the anchor —
+but village spacing collapses to 1.0 cell (adjacent, mutual-subsidy). The real tension is **colonization vs
+spacing**, one fork, not two bugs.
+
+**Literature (2026-09-03).** Village size 250–1,500 (NW Coast; the model's 300–500 is already in range —
+village COUNT, not size, was wrong). No clean published km-spacing table; DERIVED from density + size, villages
+sit ~10–35 km apart (~10–20 km rich aquatic, ~30–35 km sparse/cold), clustering at resource NODES. The model's
+own biomes give a MODEST ~1.6–3.5-cell gradient; biome sparseness lives in the ELIGIBLE-LAND FRACTION (coastal
+18% → boreal 2%), not the spacing constant. Aquatic cap `AQUATIC_DENSITY_MAX=80` reaches ~124 persons/cell vs
+the observed forager MAX 494.9 (Tallavaara Dataset_4) — undercalibrated ~4× at the top end (secondary lever).
+
+**Built: `enable_colonizing_budding`** (docs/DESIGN_colonization_spacing.md; CTB test_colonizing_budding_ctb.py,
+4 tests). An over-threshold village sheds a VIABLE emigrant bloc (topped up to settle_min_pool, led by the
+rival — not the median-2 kinship sliver that made 2-person villages) which FOUNDS a daughter directly on the
+nearest open storable cell, spaced by a DENSITY-SCALED separation `d = clamp(round(sqrt(V_target/K_local)),1,3)`
+cells (~1.6 rich → 3 poor). Supersedes bud_requires_occupancy. Default OFF ⇒ bit-exact.
+
+**Validation — the design WORKS spatially but RUNS AWAY demographically.** Coastal/temperate, colonizing on:
+village spacing holds at 2.2–3.3 cells (density-scaled, NOT the 1.0 packing), median village ~86 (in range),
+villages multiply to 300+, and density reaches the anchor 0.05 at step 3,000. **But it does not plateau** — it
+crosses 0.05 and keeps climbing to 0.078 and accelerating at step 4,000, heading for the food ceiling (0.35).
+Boreal reached a stationary ~0.0024 but bootstrapped ZERO villages (its 2% eligible land never seeds a first
+village for budding); savanna is the known-degenerate world.
+
+**THE FINDING (confirmed three ways now — catchment-spread A.58, budocc-off, colonizing budding).** The model's
+ONLY effective Malthusian brake is **crowding-disease in packed single cells**. Any mechanism that disperses the
+population — bodies OR villages — drops per-cell occupancy, releases the disease brake, and the population runs
+away to the food ceiling (which sits ~7× above the anchor, so food never binds near 0.05). Over-clustering and
+the population ceiling are the SAME phenomenon; you cannot fix the first without replacing the second.
+
+**The keystone (next arc).** The density-disease hazard reads `occ_count[cell]` (single-cell). It must scale
+with **village population / local regional density** instead — epidemiologically truer (a community of 470
+carries a village-scale disease load however its dwellings are spread) and it makes the brake bind at a
+realistic density REGARDLESS of dwelling spread. That single change unlocks BOTH colonizing budding and
+catchment-spread to give dispersed settlement at a stationary ~0.05. Colonizing budding stays HELD until then.
+
+## Addendum 60 — Juvenile productivity recalibrated to Kaplan; the dependent-load channel unblocked (2026-09-04, R-106)
+
+**The defect (long filed).** Foragers' children are net energy CONSUMERS until ~15–20 yr (Kaplan/Hill/Lancaster/
+Hurtado 2000), the anchor human life-history rests on. But the model's juvenile production ramp was LINEAR
+(`lh_eta_juvenile_exponent = 1.0`) with a high birth floor (`eta_min = 0.2`), so a child gathering at η·1.7×burn
+out-produced its consumption (`cons_min = 0.3`): only ~1% of juveniles ran any deficit, `enable_dependent_load`
+was inert (a strict-xfail), and children added ~18% PHANTOM food that inflated carrying capacity.
+
+**Diagnosis + the instrument bug it exposed.** A first sweep read the age wrong — `agent.age` is in MONTHS and
+`forage_age_min` is 180 months (15 yr), but the script compared `age < 15`, so it measured infants < 15 MONTHS
+and mapped the ramp on the wrong scale ([[feedback_validate_the_instrument]]). Corrected: the population is a
+YOUNG pyramid (frac_child 0.56, median 13 yr — too young vs anchors 0.40 / 20), so the phantom child production
+is real and large.
+
+**The 2-D calibration sweep (overnight, 24 runs).** `lh_eta_juvenile_exponent {1,2,3,4} × lh_eta_min
+{0.20,0.10,0.05}`, 2 seeds, canonical, 1,800 steps, scored on distance to the age anchors subject to viable +
+children-net-consuming. Winner **(exponent 3.0, eta_min 0.10)**: frac_child **0.42** (≈0.40), median **19.2 yr**
+(≈20), **81%** of juveniles net-consuming (analytic; ~35% realized deficit), population viable and near-
+stationary. Reading the grid: the EXPONENT drives the net-consumer share (convex ramp), and dropping `eta_min`
+0.20→0.10 (newborns forage ~nothing) is what actually pulls the age structure onto the anchor — the youngest
+are net producers under any exponent while `eta_min·1.7 > cons_min`. Pushing further (exp 4 / eta_min 0.05)
+over-corrects and gets noisier.
+
+**Adopted CANONICAL: `lh_eta_juvenile_exponent = 3.0`, `lh_eta_min = 0.10`** (provenance Kaplan 2000). Effects:
+children are net consumers, the ~18% phantom carrying-capacity inflation drops to ~4%, and the dependent-load
+fertility channel is now MATERIAL (~35% of juveniles run a real deficit, was ~1%). Cost: ~11% lower plateau
+population (carrying capacity corrected). Tests: the intake-fertility blocker test is FLIPPED (children now net
+consumers), the dependent-load materiality test is UN-XFAILED (a real pass), and the fragile intake-fertility
+liveness test's horizon moved 300→700 steps (the recalibration binds the fertility gate later); 214 demography/
+life-history/coverage/sync tests green. Added `lh_eta_min` passthrough (demography → LifeHistoryConfig).
+
+**Why it mattered here.** This was found while auditing that inequality/demography/genealogy are wired + CTB'd
+(all green, 544 tests). It was fixed BEFORE the colonizing-budding + village-disease confirmation run, because
+phantom child production would have inflated that run's equilibrium density — so the density plateau is now
+measured on a demographically honest base (age structure on the anchors, children net-consuming).
+
+## Addendum 61 — The settlement pair is adopted; the colonization arc closes (2026-09-05, R-106)
+
+**The result.** The model reached the goal of the arc. Two mechanisms together give dispersed settlement at a
+stationary population. The pair is `enable_colonizing_budding` and `enable_village_density_disease`. Both are now
+canonical. `enable_bud_requires_occupancy` is superseded and retired.
+
+**Why the pair, not one mechanism.** `enable_colonizing_budding` founds daughter villages on empty rich land.
+Alone it runs away, because it disperses the population and releases the single-cell disease brake (Addendum 59).
+`enable_village_density_disease` keys the disease hazard on the VILLAGE population over the village territory, not
+on single-cell occupancy. Alone it stays trapped and sparse, because it needs colonization to fill the land.
+Together they close the loop. The disease term caps the village SIZE. The eligibility bar and the density-scaled
+spacing cap the village COUNT. The product is a bounded regional density.
+
+**The plateau is confirmed.** A small fast world (patch 40) reached a stationary state near step 3,000. The
+population held near 8,900. The growth rate oscillated around zero (+3.1, -1.1, +0.1, -3.6 per step). The village
+count held near 80. The spacing held at 2.3 cells. So the pair does NOT run to the food ceiling. The big world
+(patch 80) climbs far longer only because its carrying capacity is much larger.
+
+**The validated markers.** Spacing 2.3 cells (density-scaled, not the 1-cell packing). Median village 74 (small
+world) to 153 (rich world), inside the Bar-Yosef / Ames 250-1,500 house range. Genealogy is sound: ~60 effective
+lineages, stable, no dynastic collapse. Inequality is moderate: material Gini ~0.17, wealth Gini ~0.3-0.5.
+
+**Two caveats, both filed for separate work.** First, the panel run did NOT plateau in its window, so its age
+structure is a growth transient (frac_child 0.52, median 13 yr), not the stationary value. Second, the society
+mix reads 0% egalitarian and ~37% stratified chiefdoms. This over-counts stratification. It is the R-103
+classifier defect (the classifier keys on the surplus level, not on the inequality). Do not read it as real
+stratification.
+
+**Adoption record.** `gen_runconfig` + `make_runconfig full_campaign` regenerated. The resolved canonical config
+audits `enable_colonizing_budding = true`, `enable_village_density_disease = true`, `enable_bud_requires_occupancy
+= false`. The `_skip` set and the sync-test allowed-dark set are updated. The pair CTBs, the sync tests, and the
+demography suites are green. The corrected juvenile calibration of Addendum 60 stays canonical.
+
+**Next.** Two follow-ups: the R-103 stratification-classifier fix, and a per-biome density-target calibration if
+a specific density number is wanted.
+
+## Addendum 62 — R-103 stratification: the relational, between-band criterion (2026-09-05, R-106)
+
+**The defect.** The society classifier called a band a `stratified_chiefdom` on `packed (density ≥ Binford) AND
+surplus ≥ 0.7` — pure affluence, with no measure of inequality. In the rich adopted world it read 36% of bands
+stratified while the between-band cred Gini was only 0.14. So the stratified label ran opposite to the measured
+inequality. The R-103 v1 gate added a WITHIN-band Gini test, but the within-band Gini is ~uniform (0.29) and
+cannot separate a chiefdom from a rich, internally-equal band; the gate was off in canonical.
+
+**The fix.** `enable_relational_stratification`. Stratification is a relation BETWEEN bands, not a property of
+one band — a chiefdom is a hierarchy of settlements where a few centres dominate. The stratified verdict now
+needs (a) the regional BETWEEN-band cred Gini ≥ `between_band_gini_min`, and (b) this band in the top quartile of
+per-band mean cred (`strat_top_quantile` = 0.75). A rich but between-band-equal world is affluent-egalitarian ⇒
+complex.
+
+**The calibration.** A 3,000-step run measured the between-band Gini as it matures: it climbs 0.13 → 0.33 as the
+elite inequality accumulates, then plateaus near 0.33. So the proposed 0.35 threshold was unreachable (it would
+read 0% forever). The threshold is set to **0.30** — above the affluent-egalitarian baseline (0.21) and crossed
+only at full maturity. So stratification emerges LATE, in a dense unequal world, which is archaeologically
+correct. (BHM 2009 puts the forager whole-population Gini at 0.25; the between-band Gini is a lower, different
+quantity, so it is calibrated to the model's own range, not to the BHM number directly.)
+
+**Validated + adopted.** The A/B: the level-only classifier reads 36% stratified; the relational gate reads 0%
+in the affluent-egalitarian world (between-band Gini 0.21 < 0.30), and the top quartile of bands only once the
+region crosses 0.30 at maturity. CTB `test_relational_stratification_ctb.py`: the classifier needs an unequal
+region AND a top band; off is bit-exact. The gate is adopted canonical (removed from the C_ALLON `_skip` set).
+The within-band gate (v1) stays default-off as the superseded control.
+
+**Caveat, filed.** The downstream effect of the corrected labels on demography (the contest exponent κ and the
+sedentism IBI both read the society label) is not separately measured yet. The benchmark on the canonical worlds
+is the next check.
+
+## Addendum 63 — Per-biome density is sound; the over-clustering / density-gap arc closes (2026-09-05, R-106)
+
+**The question.** After the settlement pair, does each biome equilibrate at its Tallavaara-anchored density, or
+does a knob need tuning?
+
+**The measurement (analytic ceiling per biome; validated against the temperate run, which reached 0.078 and
+climbed toward the analytic 0.095).** The regional equilibrium density spans the biomes:
+
+  boreal 0.011 · subtropical-coast 0.046 · tropical 0.048 · savanna 0.056 · montane-savanna 0.085 ·
+  temperate-coast 0.095   (persons/km²)
+
+**The verdict: no tuning is needed.** Three properties make this correct, not a coincidence. (1) The densities
+SPAN the global anchor (0.05), not a single flat number. (2) They scale with productivity — the Tallavaara law.
+(3) They ALSO scale with storability — the Testart/Woodburn pattern: tropical (0.048, immediate-return) and
+temperate coast (0.095, storable/aquatic) have similar local capacity, but the storable coast sustains ~2× the
+sedentary density. The model reproduces this on its own. Every biome is far above the pre-fix TRAPPED density
+(0.006) that opened the arc. Forcing a single target number would erase the ethnographic signal — the diagnosis
+says do NOT tune.
+
+**Arc closed.** The over-clustering / density-gap arc that ran from Addendum 57 is complete:
+  - catchment_depletion (57): depletion follows foraging.
+  - the diagnosis (58-59): over-clustering, the disease ceiling, and the sparse equilibrium are ONE phenomenon,
+    coupled through the density channel; the terrain is rich, the population was trapped, not starved.
+  - the settlement pair (61): colonizing budding + village-scaled disease → dispersed settlement at a
+    stationary population.
+  - the Kaplan juvenile calibration (60): honest age structure, a live dependent-load channel.
+  - R-103 relational stratification (62): biome-appropriate chiefdoms.
+  - per-biome density (this addendum): biome-appropriate, anchor-centred, no defect.
+
+## Addendum 64 — The e0 gap is HUNGER; age-graded synergy fixes the adult over-amplification (2026-09-05, R-106)
+
+**The measurement.** On the fully-corrected stack (temperate coastal, period life table over steps 900-2200)
+the model realises e0 = 24.6 against the configured Siler schedule (42.8) and the ~36.5 anchor.
+
+**The driver breakdown — where the excess sits.** By age band (realised m_x vs schedule m_x):
+  - infants 0-1: realised 0.147 vs schedule 0.169 — BELOW schedule, not a problem;
+  - weaned children 5-15: 0.034 vs 0.009 — a 3.6x excess, 63% starvation;
+  - adults 15-45: 0.025 vs 0.009 — a 2.6x excess, 55% starvation.
+  47% of ALL deaths are starvation. The a2 modulators: terrain-risk 0.56 (protective), disease-density 1.12
+  (mild, after the village-disease fix), nutrition-synergy 2.0 (DOUBLES the baseline hazard). So the gap is
+  HUNGER in weaned children and adults, amplified by the malnutrition-mortality synergy — not infants, not
+  crowding, not terrain.
+
+**The one mis-calibration, fixed.** `mu_max = 2.5` is Pelletier 1994 CHILD data (RR mild 2.5 / severe 8.4)
+applied at full strength to every age; adults are far more robust (community-dwelling >50 HR ~1.14-1.29).
+`enable_synergy_age_grade` (ADOPTED): an agent past menarche uses `synergy_mu_max_adult = 1.3`; children keep
+the full Pelletier value. A/B: adult mortality 15-45 fell 21% (0.0247 -> 0.0195), e0 +0.8 (24.6 -> 25.4).
+
+**The rest is Malthusian, and this is the key finding.** The e0 gain is only +0.8 because the saved adult lives
+GROW the population (+18%, 20,745 -> 24,421), which pushes it into the food ceiling: child starvation +7%,
+starvation share 0.47 -> 0.51. The saved adults are partly re-spent as child hunger deaths. Provisioning is not
+the gap (it already covers all juveniles 0-15); its SUPPLY is, because hungry mothers have little overflow. So
+the residual e0 gap is not a mortality-calibration problem — it is that the population REGULATES THROUGH
+STARVATION (deaths), which is exactly what holds e0 low.
+
+**The direction this sets (next arc).** To raise e0 in a Malthusian system, regulation must move from DEATHS to
+BIRTHS — the demographic transition, and the original R-106 goal. If hunger suppressed FERTILITY enough to check
+the population before it hit the starvation ceiling, there would be less crowding, less hunger, higher survival.
+The channels exist and are live (`intake_fertility`, `dependent_load`), but starvation share ~0.5 shows the
+fertility brake is too weak to regulate ahead of starvation. Strengthening it is the e0 lever.
+
+## Addendum 65 — Density-dependent fertility closes e0; the lever map and the e0-density frontier (2026-09-06, R-106)
+
+**The move deaths→births.** The e0 gap (Addendum 64) is Malthusian: the population regulates through STARVATION,
+which holds e0 low. `enable_density_fertility`: birth probability is scaled by `1 - fill^exponent`, fill =
+population × burn / catchment food capacity, so births fall as a village nears its food ceiling. Regulation
+shifts from starvation deaths to fewer births.
+
+**A/B (temperate, period life table): e0 25.4 -> 37.3**, starvation share 0.51 -> 0.29, population 24.4k -> 9.2k.
+It closes the e0 gap. The denominator matters: an early version keyed fill on the Tallavaara K_persons and read
+0.14 (villages sit far below their local K); the food ceiling (catchment capacity) is the denominator the
+population actually hits.
+
+**Which signal is honest — a correlation map (n=56,603 adult-woman snapshots).** The intake-fertility brake read
+the intake EMA, which does NOT predict death (corr -0.015; those who die eat 4.1x requirement, survivors 4.5x);
+neither does reserve fill (corr +0.003, backwards). Density-fill is the only positive predictor (corr +0.029,
+died 3.59 vs survived 3.15) but WEAK. The deeper truth: death is ACUTE (crashes from well-fed states), so no
+smoothed signal strongly predicts an individual death (max |corr| 0.11). Density-fertility works at the
+POPULATION level (holding the population off the crash-prone ceiling), not by predicting who dies.
+
+**Lever-sensitivity sweep (26 runs, OAT + 2x2 factorial, 2 seeds).** Elasticity on e0: density_fert +14.2 >>
+food ceiling +2.2 ~ mu_max (+0.3..2.8, noisy) > paternal provisioning +0.0. Density-fertility dominates ~6x.
+The e0-density FRONTIER shows a hard tradeoff: high e0 (36-38) comes only with low density (0.008-0.013); no
+config reaches the joint anchor (e0 36.5 AND density 0.05). The 2x2 factorial confirms the levers are
+Malthusian-COUPLED: adding food at fixed density_fert LOWERS e0 by -4 to -5 (the extra food grows the
+population back into the crash regime), a cross-term larger than food's own OAT effect — so OAT elasticities are
+a first cut only. NOTE: seed = world (the two seeds differ 6x in population), so e0 (a period rate) is the robust
+axis and density is world-dependent.
+
+**Adopted: `enable_density_fertility` at `density_fert_exponent = 6`** — the frontier's best e0-density balance
+(e0 36.0 at the anchor, highest density of the high-e0 set). CTB `test_density_fertility_ctb`; sync + coverage green.
+
+**Next arc — the FRONTIER, not a point on it.** e0 36 and density 0.05 cannot be reached together by tuning
+fertility, food mean, synergy, or provisioning; the frontier is fixed by ACUTE food-supply VOLATILITY (the
+crash generator the correlation map exposed). Reducing volatility — not the food mean — lets a denser population
+avoid crashes, moving e0 and density up together. That is the next build.
+
+## Addendum 66 — Food volatility is a density-ceiling lever, not an e0 lever; the volatility build is FALSIFIED (2026-09-06, R-106)
+
+**The prediction under test.** Addendum 65 named the next build: reduce food-supply VOLATILITY (the crash
+generator), and a denser population avoids crashes, so e0 and density rise together. This addendum tests that
+prediction before any build. It fails.
+
+**The method — a volatility decomposition.** The model draws food variance from three sources: the
+mean-preserving meat lognormal draw (`game_meat_cv`), catchment depletion/regrow, and seasonality
+(`ClimateField a_seas`). The canonical world (density-fertility at exponent 6, all adopted mechanisms on) ran
+five ways: ALL (every source on), noMeatCV, noDeplete, noSeason, and noneVar (all three off). Two biomes ran:
+coastal-temperate and coastal-boreal. The regime was N=600, patch=24, 1400 steps, burn-in 600. Each arm reported
+the period-life-table e0 over the post-burn window, the starvation share, and the acute-crash fraction.
+
+**The result — removing variance raises population and does NOT raise e0.** In temperate the seed-0 gradient is
+monotone: as variance falls, the population rises (ALL 1169 -> noneVar 2150) and e0 FALLS (36.9 -> 25.3), while
+starvation rises (0.28 -> 0.54). The ten arm-points (2 biomes x 5 arms) lie on ONE downward Malthusian curve:
+e0 is set by population relative to the food ceiling, and volatility only moves you ALONG that curve.
+
+**Seed-robustness (endpoint contrast ALL vs noneVar, seeds 0-3).** Temperate: mean e0 31.2 -> 25.1 (-6.1 yr),
+population 1377 -> 1790; e0 falls in 3 of 4 world-pairs (one mild reversal +2.2). Boreal: mean e0 25.1 -> 23.5,
+population swings ~8x across seeds (seed = world). In NO world-pair does removing volatility raise BOTH e0 and
+density. The promised joint gain never appears.
+
+**The interpretation — a density lever, not a welfare lever.** Food variance sets HOW MANY the world holds, not
+HOW WELL they live. The density-fertility brake reads the MEAN fill, so it lets the population grow to the mean
+ceiling; the population Malthusian-relocates into any headroom that a calmer food supply opens, then re-starves.
+This is the same Malthusian coupling Addendum 65 measured for food, now shown for volatility itself.
+
+**The death mode changed under the brake.** The acute one-step-crash fraction is small in this regime
+(`frac_acute` 0.001-0.02; agents die at ~42% reserve, a sub-acute grind). Density-fertility converted the
+pre-brake one-step crash (Addendum 65's "death is ACUTE") into a slow decline. So the crash generator that
+Addendum 65 pointed at no longer dominates once the birth brake is on — which is why smoothing the supply cannot
+help.
+
+**Decision — DO NOT build a volatility-reduction mechanism.** It would lower e0, not raise it. The canonical
+temperate world already sits at the e0 anchor (ALL, seed 0: e0 36.9 vs Ache-forest 36.5), and the volatility is
+part of the regulation that holds it there. This negative result is the diagnose-before-tuning rule paying for
+itself: the build was wrong before it started.
+
+**The one lever left open.** e0 rises only if the population stays BELOW the ceiling. The candidate is a birth
+brake that binds against the seasonal TROUGH, not the mean fill. That is a future arc, not a build; it needs its
+own diagnosis first.
+
+**Provenance.** Instrument only (`volatility_decomp.py`, seed-robustness `conf_*.log`); no model code changed; no
+CTB, because a negative result adopts no mechanism.
+
+## Addendum 67 — Sedentism is the seasonal-biome e0 lever; the birth brake and the fishery-bootstrap fixes are FALSIFIED (2026-09-06, R-106)
+
+**The birth brake is falsified.** Addendum 66 left one candidate for raising e0: a birth brake that binds against
+the seasonal TROUGH, not the mean fill. A death-timing diagnostic kills it. In temperate the starvation deaths are
+ASEASONAL — they do not track the season curve, at a sub-ceiling world (fill 0.60) or a near-ceiling one (0.92) —
+so they are local, stochastic crashes, not a population overshoot a brake could hold back. The canonical config has
+NO interannual variability, so the one slow scale a slow brake (inter-birth interval ~ years) could chase does not
+exist. A birth brake acts on the aggregate population; these deaths are local.
+
+**Sedentism IS the seasonal-biome e0 lever (+10 yr).** The boreal deaths DO cluster at the seasonal trough (a 6x
+month-of-year swing), but boreal forms no villages, so the density-fertility brake never engages. Across four
+boreal worlds (coastal, seed = world): the worlds that FORM villages reach e0 ~30 (seeds 1,2: 6 and 30
+settlements); the worlds that form NONE stall at e0 ~20 (seeds 0,3). Same biome, +10 yr from sedentism. Sedentism
+site-anchors the granary, so the village survives the trough; a mobile band cannot.
+
+**Why some boreal worlds do not sediment — the fishery bootstrap trap.** A settlement founds where >= 40 people
+cluster on a cell whose founding potential (`aquatic_food`) >= 0.30. All four boreal worlds HAVE the fishery
+(shore cells, sea-connected cold rivers, aqf up to 1.0), but the tier-2 yield that turns `aquatic_food` into food
+is GATED to settlement sites — so a mobile band on a fish-rich but terrestrially barren reach gets ~0 food, never
+clusters there, and no village bootstraps. That inverts the real sequence: the salmon run DRAWS the aggregation
+that founds the village (Testart/Ames).
+
+**Both proposed fixes are falsified and reverted.** (1) A pre-settlement tier-1 fishery (mobile bands can eat the
+reach) — even at 4x strength, the blocked worlds form ZERO villages, and the extra food LOWERS e0 in the worlds
+that already sediment (seed 1: 29.6 -> 24.1; Malthusian relocation, the Addendum-66 lesson). (2) Stronger site
+appraisal (attraction to the fishery) — even at 10x gain, ZERO villages, and it harms temperate. (3) Both together
+— ZERO villages. Neither food, nor attraction, nor their combination gathers 40 people onto a fishery cell. The
+block is STRUCTURAL: the point-founding gate (40 packed in a 5x5 block on one aqf cell) cannot represent a
+DISPERSED coastal/riverine fishery, and no knob changes that spatial packing. Every food/attraction lever also
+Malthusian-harms the already-anchored main world (temperate e0 36.9 = the Ache-forest anchor 36.5).
+
+**Decision — no mechanism adopted; the refinement is deferred.** The main world sits at the e0 anchor, so this is a
+boreal-specific refinement, not a headline gap. Raising boreal e0 needs a FOUNDING-MODEL redesign (a dispersed,
+logistical settlement that a point-founding gate cannot express), a large separate arc with uncertain payoff — not
+a knob and not this branch.
+
+**Provenance.** Instruments only (`death_timing.py`, `sedentism_diag.py`, `founding_pot_probe.py`, `aqf_seeds.py`,
+`bootstrap_test.py`, `site_gain_sweep.py`, `combo_test.py`); the two fix attempts were built, measured, and
+REVERTED (tree bit-exact); no CTB, because no mechanism is adopted.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -1,0 +1,295 @@
+{
+ "build": "f77be6a",
+ "S1": {
+  "build": "f77be6a",
+  "horizon": 1200,
+  "rows": [
+   {
+    "world": "coastal_temperate",
+    "seed": "0",
+    "ctl": {
+     "band_med": 26.0,
+     "settle_med": 102,
+     "connubium_med": 44.0,
+     "lineage_size_gini": 0.402,
+     "lin_top_share": 0.024
+    },
+    "full": {
+     "band_med": 43,
+     "settle_med": 81,
+     "connubium_med": 1843.5,
+     "lineage_size_gini": 0.549,
+     "lin_top_share": 0.014
+    },
+    "ctl_pop": 7471,
+    "full_pop": 6423
+   },
+   {
+    "world": "coastal_temperate",
+    "seed": "1",
+    "ctl": {
+     "band_med": 31,
+     "settle_med": 100,
+     "connubium_med": 79.0,
+     "lineage_size_gini": 0.406,
+     "lin_top_share": 0.013
+    },
+    "full": {
+     "band_med": 38.5,
+     "settle_med": 100,
+     "connubium_med": 1449.0,
+     "lineage_size_gini": 0.532,
+     "lin_top_share": 0.011
+    },
+    "ctl_pop": 9382,
+    "full_pop": 7873
+   },
+   {
+    "world": "flat_temperate",
+    "seed": "0",
+    "ctl": {
+     "band_med": 27.0,
+     "settle_med": 99,
+     "connubium_med": 54.0,
+     "lineage_size_gini": 0.422,
+     "lin_top_share": 0.016
+    },
+    "full": {
+     "band_med": 44,
+     "settle_med": 86,
+     "connubium_med": 1727.0,
+     "lineage_size_gini": 0.544,
+     "lin_top_share": 0.008
+    },
+    "ctl_pop": 7648,
+    "full_pop": 10255
+   },
+   {
+    "world": "flat_temperate",
+    "seed": "1",
+    "ctl": {
+     "band_med": 31.0,
+     "settle_med": 118,
+     "connubium_med": 62.5,
+     "lineage_size_gini": 0.476,
+     "lin_top_share": 0.014
+    },
+    "full": {
+     "band_med": 40.0,
+     "settle_med": 143,
+     "connubium_med": 1576.5,
+     "lineage_size_gini": 0.539,
+     "lin_top_share": 0.008
+    },
+    "ctl_pop": 5642,
+    "full_pop": 15262
+   },
+   {
+    "world": "hilly_temperate",
+    "seed": "0",
+    "ctl": {
+     "band_med": 23.0,
+     "settle_med": 84,
+     "connubium_med": 33.0,
+     "lineage_size_gini": 0.491,
+     "lin_top_share": 0.021
+    },
+    "full": {
+     "band_med": 32.0,
+     "settle_med": 109,
+     "connubium_med": 2510.0,
+     "lineage_size_gini": 0.477,
+     "lin_top_share": 0.012
+    },
+    "ctl_pop": 3434,
+    "full_pop": 6152
+   },
+   {
+    "world": "hilly_temperate",
+    "seed": "1",
+    "ctl": {
+     "band_med": 28,
+     "settle_med": 115,
+     "connubium_med": 52.0,
+     "lineage_size_gini": 0.417,
+     "lin_top_share": 0.017
+    },
+    "full": {
+     "band_med": 37,
+     "settle_med": 164,
+     "connubium_med": 1905.0,
+     "lineage_size_gini": 0.541,
+     "lin_top_share": 0.01
+    },
+    "ctl_pop": 6866,
+    "full_pop": 9872
+   },
+   {
+    "world": "flat_savanna",
+    "seed": "0",
+    "ctl": {
+     "band_med": 24,
+     "settle_med": 35,
+     "connubium_med": 15.0,
+     "lineage_size_gini": 0.428,
+     "lin_top_share": 0.026
+    },
+    "full": {
+     "band_med": 25,
+     "settle_med": 57,
+     "connubium_med": 799.0,
+     "lineage_size_gini": 0.469,
+     "lin_top_share": 0.041
+    },
+    "ctl_pop": 1872,
+    "full_pop": 1137
+   },
+   {
+    "world": "flat_savanna",
+    "seed": "1",
+    "ctl": {
+     "band_med": 17,
+     "settle_med": 19,
+     "connubium_med": 11.0,
+     "lineage_size_gini": 0.425,
+     "lin_top_share": 0.044
+    },
+    "full": {
+     "band_med": 20,
+     "settle_med": 63,
+     "connubium_med": 400.0,
+     "lineage_size_gini": 0.451,
+     "lin_top_share": 0.056
+    },
+    "ctl_pop": 809,
+    "full_pop": 704
+   }
+  ]
+ },
+ "S3": {
+  "build": "f77be6a",
+  "horizon": 2500,
+  "score": [
+   {
+    "arm": "CONTROL",
+    "key": "band_med",
+    "band": [
+     18,
+     35
+    ],
+    "hits": 7,
+    "n": 8
+   },
+   {
+    "arm": "CONTROL",
+    "key": "settle_med",
+    "band": [
+     50,
+     150
+    ],
+    "hits": 6,
+    "n": 8
+   },
+   {
+    "arm": "CONTROL",
+    "key": "settle_med",
+    "band": [
+     50,
+     250
+    ],
+    "hits": 6,
+    "n": 8
+   },
+   {
+    "arm": "CONTROL",
+    "key": "connubium_med",
+    "band": [
+     79,
+     332
+    ],
+    "hits": 1,
+    "n": 8
+   },
+   {
+    "arm": "CONTROL",
+    "key": "lineage_size_gini",
+    "band": [
+     0.51,
+     0.68
+    ],
+    "hits": 1,
+    "n": 8
+   },
+   {
+    "arm": "CONTROL",
+    "key": "lin_top_share",
+    "band": [
+     0.08,
+     0.3
+    ],
+    "hits": 1,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "band_med",
+    "band": [
+     18,
+     35
+    ],
+    "hits": 5,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "settle_med",
+    "band": [
+     50,
+     150
+    ],
+    "hits": 6,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "settle_med",
+    "band": [
+     50,
+     250
+    ],
+    "hits": 8,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "connubium_med",
+    "band": [
+     79,
+     332
+    ],
+    "hits": 0,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "lineage_size_gini",
+    "band": [
+     0.51,
+     0.68
+    ],
+    "hits": 8,
+    "n": 8
+   },
+   {
+    "arm": "FULL STACK",
+    "key": "lin_top_share",
+    "band": [
+     0.08,
+     0.3
+    ],
+    "hits": 1,
+    "n": 8
+   }
+  ]
+ }
+}

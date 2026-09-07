@@ -186,6 +186,61 @@ python -m cProfile -s cumtime sic_games/run.py # profile
     bit-exact and are adopted by flipping the flag in `run_se0_controlled_climate.py`'s preset with a
     `# CANONICAL <date>` note, not in the `DemographyConfig` default.)*
 
+17. **Declare a mechanism's TYPE, UNIT and INVARIANT before building it (added 2026-07-18).**
+    Binding contract: `docs/MECHANISM_CHARTER.md`. Every new mechanism's docstring must state (a) its **type**
+    from `S F T P D X C A N H O`; (b) the **unit** it operates on (agent/pair/household/band/settlement/cell) —
+    this line exists because R-82's redistribution operator was applied to a group of size 1-2 and read as
+    "inert"; (c) the category **invariant** and how a test asserts it (X conserves its total; A changes the graph
+    and NO quantity; T conserves count and every carried quantity; H acts only at births; O mutates nothing and
+    must not consume the model RNG). If a mechanism needs two types it is two mechanisms — split it.
+    **If a flag's ON/OFF output is indistinguishable, that is a specification bug, not a small effect size**
+    (DE-19), unless it is declared *gauge fixing*, where invariance is the point (`enable_cred_renorm`).
+    Prefer vectorized execution: T/P/D/X/C/H are elementwise, gather-by-index or segment-reduction and should not
+    be written as per-agent Python loops; A and N are where loops remain legitimate.
+
+18. **Validate the INSTRUMENT, not just the mechanism (added 2026-07-18).**
+    Binding contract: `docs/MECHANISM_CHARTER.md` §10. Four findings in one day turned out to be artifacts of
+    the measuring apparatus, not facts about the model. Before reporting any result ask: **if the effect I am
+    claiming (or denying) were absent (or present), would this instrument have told me?**
+    The two cheapest and highest-yield, both usually a few lines against synthetic data with no model run:
+    **(D1) a POSITIVE CONTROL before any negative** — inject the effect, show the instrument finds it, report the
+    detection floor; and **(D2) a NULL FLOOR before any positive** — report what the statistic gives on shuffled
+    or noise data and compare to THAT, never to an invented threshold.
+    Also: record the **baseline state** beside every verdict ("does nothing when toggled" ≠ "does nothing");
+    confirm a swept parameter is actually **rate-limiting** before concluding from the sweep; **detrend** before
+    any periodicity claim; **save the raw series** so re-analysis never needs a re-run; check the **magnitude**
+    and the magnitudes downstream, not just the flag; and **measure** invariance rather than asserting it from
+    reading the code.
+
+19. **PLOT IT — show the supervisor the picture, not just the table (added 2026-07-18).**
+    Any analysis that is inherently graphical — time series, sweeps, distributions, power/response curves,
+    trends, before/after comparisons — must be rendered as a chart in the chat for visual verification, not
+    reported only as numbers. Tables hide what eyes catch instantly: a trend the statistic was blind to, an
+    outlier driving a mean, a threshold sitting in the wrong place. **Worked example:** R-87's cycle verdict was
+    a table of three autocorrelation values and read as "no cycles"; plotted against its own measured noise
+    floor, one value was visibly ABOVE the noise and below only an invented cut-off — obvious in the picture,
+    invisible in the table.
+    Pair it with §10: a plot of a result should show the **null floor** and, where relevant, the **detection
+    floor** on the same axes, so the reader can see whether the signal clears them rather than taking a verdict
+    on trust. Persist the raw series (D8) so a plot can be redrawn without re-running the model.
+
+20. **CHECK THE BIOME-DEPENDENCE of every mechanism before generalising it (added 2026-07-21).**
+    A mechanism validated in ONE world is a claim about that world. Ask of each: *is this universal, or is it
+    the signature of a particular ecology?* — and where the ethnographic source names a setting, **run that
+    setting**, not a convenient one. Record the world beside the result: `coastal-temperate`, `C_SOIL=0` are
+    part of the finding, not run trivia. **Worked example:** the entire R-86…R-96 elite/legitimacy arc was
+    built and validated only in `coastal-temperate` with soil depletion OFF, while its anchor — Leach's Kachin
+    gumsa/gumlao cycle — describes RAIN-FED SWIDDEN HILL FARMERS. Worse, R-71 had ALREADY measured that this
+    model yields two regimes from terrain alone (rain-fed swidden → egalitarian, strat 0.4%; alluvial floodplain
+    → stratified, 11–16%), so terrain-dependence was a known property of the substrate that the elite layer was
+    never once tested against.
+    **It cuts both ways:** a mechanism that works in only one biome may be broken, or may be a genuine
+    PREDICTION about where the phenomenon occurs — but only if the sweep is run deliberately. And when a
+    mechanism does look biome-dependent, hold the confound fixed with a same-biome arm toggling only the
+    suspected driver: swidden also drives constant relocation, so a cycle appearing there could be the ecology
+    or could be villages dissolving before a village-held memory matures (the R-88/R-95 container-churn failure
+    in a new costume). See MECHANISM_CHARTER §10 D16.
+
 ---
 
 ## Locked parameters — do not change without explicit instruction
@@ -246,6 +301,20 @@ All B0–B5 are LHS-feasible. Target working grid for Stage 5.x: 100×100.
 ---
 
 ## Session management
+
+**Model recommendation, per new task.** At the start of each distinct new task within a
+conversation, state which Claude model fits it best, one line, before starting work:
+- Sonnet (default) — standard implementation, debugging, most day-to-day dev/analysis work.
+- Opus — architecture-level decisions, highly ambiguous or open-ended reasoning, work where
+  getting the approach wrong is expensive to unwind (e.g. a mechanism redesign, not a bugfix).
+- Haiku — cheap, narrow, mechanical lookups where quality is not the constraint.
+Skip the note if the task obviously continues the same kind of work as the one before it.
+
+**Conversation length.** Once a conversation has accumulated a long history — several
+multi-step diagnostic investigations, many background-run round-trips, or context
+compression has already happened once — say so explicitly and recommend starting a fresh
+session for the next stage: long-running context degrades recall of exact measurements and
+raises the odds of re-deriving or contradicting something already established this session.
 
 After completing each full stage or major task, state:
 

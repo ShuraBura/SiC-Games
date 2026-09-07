@@ -261,8 +261,12 @@ targeted identical cells. **C.4a (BUILT, `terrain.py`):** the dormant `temperatu
 nothing read it) becomes a **latitudinal gradient** (equator `TEMP_EQUATOR_C=27 °C` → high-lat
 `TEMP_HIGHLAT_C=1 °C`, 14 °C area-mean preserved); a new per-cell `grass_subtype` splits GRASS by the
 `GRASS_TROPICAL_THRESHOLD_C=18 °C` Köppen isotherm → `GRASS_LLANOS` (warm) / `GRASS_STEPPE` (cool). Gate:
-non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (BUILT):** a 40–90 yr caribou
-quasi-cycle (St. John 2022 amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration)
+non-degenerate split on 4 seeds; tag exhaustive on grass; T-mean 14.00. **C.4b (BUILT, ON since 2026-08-06):** a
+**23–67 yr** caribou quasi-cycle (St. John 2022 — median period 40.5, observed range 23–67 over the **19 cyclic
+herds of 43 collected**; amplitude 0.871-about-mean ⇒ ~93% peak-to-trough; Vors & Boyce 57% corroboration only,
+and still not filed). **This read "40–90 yr" until the thesis was filed and read — see Addendum 32; the old band
+excluded everything below the median and ran past the longest cycle measured.** St. John is an UNDERGRADUATE
+thesis, not peer-reviewed: the weakest anchor in the climate layer.)
 on `GRASS_STEPPE` **meat only** (supervisor choice B). ClimateField exposes `meat_factor(x,y)` =
 `(1+a·cos(2πt/P+φ))/(1+a)` (peak-pinned, trough ≈0.069), masked to steppe cells; the economy applies it as
 `meat_pool *= tf.meat_factor(cx,cy)` (phase1_model.py:354) — the forage slice `(1−meat_frac)·S` is untouched,
@@ -650,6 +654,18 @@ Carneiro 1970 circumscription/saturation is the missing keystone. This is why th
 (originally scoped as GAME depletion of `game_kcal`) is realized here as GENERAL resource depletion of the NPP
 capacity stock.
 
+**Catchment-foraging pressure (`enable_catchment_depletion`; added 2026-09-02, R-106; RESULTS Addendum 57).**
+The hook above keys on `occ_count` — where an agent STANDS. A settled village forages its whole catchment
+(tier-2, pooled) yet stands on the site cell, so a foraged-but-unoccupied catchment cell never depletes. When
+on, `_catchment_foraging_pressure` replaces `occ_count` with a FORAGING map: each settled villager's unit is
+spread over its catchment ∝ each cell's yield (Σ conserved = population); a mobile band forages the cell it
+stands on. So the catchment depletes ∝ how hard it is foraged, and its carrying-capacity ceiling falls with it.
+A/B (4 seeds) is baseline-dependent: it drops median village size but its net demographic effect is a wash
+with tail risk (one −39% seed = the ceiling biting an over-hunted catchment) — it corrects the resource economy without a large behavioural swing, because the
+adopted `village_identity` / `bud_requires_occupancy` fixes already tamed the peak crowding. It confirms
+catchment inexhaustibility is NOT the over-clustering engine; the point-mode agglomeration return (β=1.15)
+is. Default OFF ⇒ pressure = standing occupancy ⇒ bit-exact; adopted ON in canonical.
+
 ---
 
 ## Resource-Ecology economy methods (added 2026-06-20; RESULTS R-6…R-8)
@@ -658,6 +674,76 @@ The economy layer added to give the demographic modulators nutritional *variance
 `outputs/phase1_resource_ecology/run_2d…2f`. **Headline (R-6/7/8):** all three are NEGATIVE — none makes
 the graded modulators bite at equilibrium, because the density-regulated population self-organises to
 "broadly fed at the biome carrying capacity." Each only moves the *carrying capacity*.
+
+### §4.3.12 THE RESOURCE DISTRIBUTIONS — how concentrated each stream is, and what is anchored
+
+**WHY THIS SECTION EXISTS.** Every resource field's RETURN RATE is anchored (§4.1.5, §4.3.6, the Game
+Return-Rate Table). Until 2026-08-15 the **DISTRIBUTION** — how unevenly that return is spread across a
+landscape, and what fraction of cells qualify as a good site — was documented nowhere, even though it decides
+how rare a village is, how much reason a band has to move, and how much of the intake variance is
+environmental rather than social. It is the difference between "a forager gets 5,541 kcal/hr in forest"
+(anchored) and "1 cell in 20 is worth settling" (was not).
+
+**MEASURED, coastal-temperate, 1584 habitable cells, `world_seed=0`** (2026-08-15):
+
+| field | Gini | CV | p90/p50 | lag-1 spatial r |
+|---|---|---|---|---|
+| `aquatic_food` | **0.817** | 2.21 | ∞ (median 0) | +0.80 |
+| `cultivability` | **0.502** | 0.94 | 4.5 | +0.90 |
+| `game_kcal` | 0.305 | 0.74 | 3.0 | +0.94 |
+| `forage_kcal` | 0.220 | 0.46 | 2.3 | +0.93 |
+| `forage` (normalised) | 0.111 | 0.20 | 1.3 | +0.98 |
+| `npp` | 0.100 | 0.17 | 1.2 | +0.99 |
+
+**THE VARIATION IS PATCHY, NOT NOISY.** Lag-1 spatial autocorrelation runs +0.80 to +0.99 on every field, so
+good cells form regions rather than scattered pixels. A white-noise landscape would give nonsense IFD
+movement — a band would have no gradient to climb and no reason to persist anywhere.
+
+**THE ORDERING IS RIGHT AND WAS NOT IMPOSED.** aquatic ≫ cultivable > game > forage. Fisheries most
+concentrated (median ZERO, Gini 0.82 — the salmon-run choke-point structure, §4.3.9), plant gathering flattest.
+That is the ethnographic pattern: gathering is the reliable, spatially uniform fallback, which is why foragers
+rely on it. It emerges from the field constructions rather than from a distributional parameter.
+
+**WHAT IS ANCHORED, AND WHAT IS A TERRAIN-GENERATOR ARTEFACT — read this before tuning anything.**
+
+- **ANCHORED — the return rates.** Hill 1987 (forest 5,541 kcal/hr), Hurtado & Hill 1987 (grassland 3,001),
+  Hawkes et al. 1991 (encounter 518 / intercept 745 kcal/hr), Bird 1997 (intertidal); Lieth 1973 Miami NPP;
+  Tallavaara 2018 NPP→density. All `[VERIFIED]`, see LITERATURE.md.
+- **ANCHORED — the storabilities.** `STORABILITY_BY_RESOURCE` grain 0.85 / fish 0.80 / forage 0.15 / game
+  0.35, Testart 1982 (§4.5.10). This is what makes grain-and-fish cells the sedentism-capable ones.
+- **PARTIALLY ANCHORED — the aquatic pass fraction.** Measured 5.9% temperate / 3.5% boreal / 4.2% tropical
+  of habitable land. Derived target **4–8% temperate and boreal**: Testart 1982:529 records **10 of 40** HG
+  societies as storing (25% **by society count**), and Cunningham 2020 gives **7 of 36** SCCS foragers at
+  medium/high density, **6 of them** fished. **DENOMINATOR CORRECTION (load-bearing):** storing societies sit
+  at Testart's density codes C–D (>1.1 persons/sq mi) against A–B (<1) for the rest, so they hold 5–25× LESS
+  LAND per society. Converting a society count to a land fraction divides by roughly three: **25% of
+  societies ≈ 5–14% of land.** Temperate and boreal are therefore DEFENSIBLE AS THEY STAND. **Tropical at
+  4.2% is TOO HIGH — target 0.5–2%**, and the reason is Binford's ET = 15.25 storage threshold suppressing
+  storage in the tropics, not fishery productivity. Testart's 40-society sample contains NO tropical storer.
+- **NOT ANCHORED, AND WRONG — the cultivable pass fraction.** Measured **39.6% temperate / 28.1% tropical**.
+  FAO global arable is **10.9% of FAO land area**, and FAO land area (13.0 Bha, excluding inland water and
+  Antarctica) is NOT the model's denominator; against HABITABLE land (~10.4 Bha) arable is **~13.5%**. That
+  is a **CEILING, not a target** — it is the product of the plough, irrigation, drainage and fertiliser, so
+  early rain-fed pre-plough agriculture must fall strictly below it. **The model exceeds the modern
+  industrial ceiling by a factor of ~3.** Bar-Yosef gives the qualitative bound: the earliest Levantine
+  farming communities sat on a LINE, "along today's boundary between the Mediterranean and the
+  Irano-Turanian steppic vegetational belts" — a one-dimensional feature in a two-dimensional landscape.
+  Provisional target **5–12% temperate / 3–10% tropical / 0–2% boreal**, all LOW CONFIDENCE, to be swept.
+- **UNANCHORED — everything else in the table.** The Ginis and autocorrelations above are MEASUREMENTS of
+  what the generator produces, not calibrations against a source. No literature was found reporting a
+  landscape-wide concentration statistic for forager resources. Treat them as a baseline to detect drift
+  against, NOT as validated values.
+
+**`cultivability` IS NEARLY BIMODAL** — median 0.219 but p90 0.995, with 20.8% of land ≥ 0.6. It is
+mostly-bad-or-excellent rather than a gradient, so `settle_persist_threshold` JUMPS rather than glides. If a
+target fraction of ~10% is wanted against a measured 39.6%, the honest instrument is the field's GENERATION,
+not the threshold.
+
+**THE VARIANCE AGENTS ACTUALLY EXPERIENCE IS SOCIAL, NOT ENVIRONMENTAL.** Realised per-agent intake spans p10
+1.36 / p50 2.64 / p90 9.30 — about 7×, far wider than any single resource field. The excess comes from
+rivalrous harvest (`S/n`, §4.5) and the agglomeration exponent (`aggl_beta` = 1.15, §4.8.21), not from the
+land. Any diagnosis of starvation, of the energetic fertility brake, or of the age structure must start
+there; the landscape statistics above are not the cause. See RESULTS Addenda 42–45.
 
 ### §4.4.1 Seasonality (A.1) — `s(t)` harvest multiplier
 Uniform annual cosine `s(t) = s_min + (1−s_min)·½(1+cos(2π·t/12))`, period 12 steps = 1 yr. **`s_min`
@@ -769,8 +855,21 @@ class-interval midpoints, **fished column dropped** (`terrain.MEAT_FRAC`):
 
 Cordain finding used: hunted-animal dependence is ~latitude-invariant (~26–35%, r=0.08 n.s.); the latitude
 gradient is fishing↔plant, not hunting — so the terrestrial `mf` is set by environment, not a latitude law.
-**`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs; the per-biome
-`terrain.MEAT_FRAC` dict is the home for a future per-cell wiring.
+**`mf` is a scalar config** (the dwelling biome's value) for the single-biome demographic runs. **The per-cell
+wiring exists as of 2026-08-08 (Addendum 37):** `enable_biome_meat_frac` reads `mf` per cell from
+`terrain.MEAT_FRAC`, and `enable_biome_meat_cv` reads the G.3 draw's CV per cell from `terrain.MEAT_CV`
+(fallback `terrain.HUNT_CV` = 2.11). Both default OFF in the class and ON in `config/mechanisms.toml`. A biome
+absent from `MEAT_FRAC` (wetland) keeps the scalar, never 0.0 — the omission is a gap, not a measured zero.
+
+**WHERE THE MEAT COMES FROM, stated because it is easy to assume otherwise (measured 2026-08-08, Addendum 36).**
+The meat pool is `mf · S` where `S` is the **NPP capacity field** pool for the cell — it is **not** drawn from
+`terrain.game_kcal`, and the per-biome GAME return-rate table (Return-Rate Table §3) does not enter this or any
+other campaign path. `game_kcal` is reachable only through `TerrainField.game_level` ← `_step_agent`, i.e. only
+with the substrate disabled *and* `game_stream=True`, which no harness in the repository sets. Perturbation
+evidence and the exhaustive surface list: `tests/test_field_load_bearing_ctb.py`; status table: Return-Rate
+Table §0. Since `mf` is also a scalar, a campaign's meat is the **same fraction of capacity in every biome** —
+so "wire per-cell `MEAT_FRAC`" and "make `game_kcal` load-bearing" are the same piece of unbuilt work, not two.
+(`MEAT_FRAC` itself is not idle: it reaches the model via `terrain.RETURN_CV` → `enable_emergent_band_size`.)
 
 **DEFERRED (documented, not built):** (a) **meat not η-discounted** — currently η(age) multiplies the *summed*
 intake, so a child's received meat share is production-discounted; the lit-faithful refinement (band sharing
@@ -1166,6 +1265,29 @@ module, OFF); accidents (terrain-risk modulator, can promote to a tracked cause)
 maternal-removed female Siler (approach (a), deferred); full pathogen calibration (data non-extractable →
 bracketed); the multi-biome harness (S3.5 — to build; every run so far is one 40×40 window); cause-decomposed
 mortality outputs (out of scope — total q(x) only).
+
+### §4.6.7 Adaptive metabolic down-regulation under deficit (`enable_metabolic_downreg`; added 2026-08-28, R-106)
+**The gap (RESULTS Addendum 52–54 diagnosis).** The starvation reserve (`wealth`, Cahill §PARAMETERS) is
+spent at a FLAT burn: `wealth += intake − burn`, death at `wealth ≤ floor`, and `burn` never falls no matter
+how little the agent eats. So ANY sustained intake below 100% of the fixed burn is inexorably fatal — even 70%
+of requirement kills in ~5 months — and there is no thin-but-alive state. Measured consequence at equilibrium:
+**96% of starvation deaths are ACUTE one-step crashes** (reserve still >50% the step before), the dying agent's
+intake-EMA is **2.4× requirement** (well-fed on average) and its realised e₀ is **23.5 vs the Siler schedule
+36.5**. The deaths are volatility on a crowded cell, not scarcity — food is ample on average — but the flat
+burn plus the ~1.7-month capped reserve cannot ride a transient dip.
+
+**The mechanism (Keys 1950, LITERATURE.md — Minnesota Starvation Experiment).** Under a sustained deficit a real
+body turns its metabolism down; the adaptive (mass-independent) component reaches ~10% at wk 4, ~20% at wk 12,
+~25% at wk 24 of prestarvation BMR, and men held at ~50% intake for 6 months lost ~25% of body weight and
+SURVIVED. Modelled: `burn_eff = burn · (1 − d)` where `d = downreg_max · clamp((1 − intake_ema)/downreg_span, 0, 1)`,
+`downreg_max = 0.25` (Keys wk-24 adaptive), `downreg_span = 0.5` (full down-regulation at ≤50% intake). The
+agent's own `_intake_ema` supplies the weeks-scale ramp (a single bad step barely moves it; a sustained deficit
+drives `d` to its cap). Well-fed agents (`intake_ema ≥ 1`) get `d = 0` ⇒ **bit-exact when off, and inert for the
+well-fed even when on**. It buffers TRANSIENT crashes without saving a CHRONICALLY starving agent: at a true
+mean deficit below ~0.75× the reduced burn still exceeds intake and the agent dies, so the Malthusian ceiling
+for real scarcity is preserved (contrast the subsistence-floor experiment, Addendum 55, which only relocated
+death and was reverted). Diminishment couplings (strength/harvest, fertility) are documented in the Keys anchor
+and deferred to a follow-up; the first build is the survival term only.
 
 ---
 
@@ -1779,6 +1901,85 @@ Lit added this arc (docs/LITERATURE.md): AGG1 Bettencourt; SK1–3 Walker/Gurven
 *End of MODEL_SPEC.md — resource layer (§4.1), demographic layer (§4.2), terrain/climate methodology (§4.3),
 resource-ecology/life-history/mortality (§4.4–§4.6), model architecture (§4.7), emergent bands & corrected band
 substrate (§4.8).*
+
+### §4.9 Elite layer - extraction methodology (2026-07-17...18; RESULTS R-82/R-83/R-84/R-84b)
+
+#### §4.9.1 Boehm 1993 Table I - recovering the sanction COUNTS (the succession anchor)
+
+Boehm's "World Survey of Egalitarian Sanctioning" is an x-marked matrix: 48 societies (rows) x 8 sanction types
+(columns). The narrative gives only the aggregate ("38 of the 48 societies"), which is what `leveling_strength`
+already used; the PER-SANCTION counts needed for succession are only in the matrix.
+
+**A linear `get_text()` dump DESTROYS this table** - it emits the header words and then a flat run of bare `x`
+tokens with no column association, so the counts cannot be read off. **Method: positional extraction.** Take
+`page.get_text("words")` (each word carries x0,y0,x1,y1), locate the x-centre of each column HEADER word, bucket
+every remaining word into a row by rounding y0, then assign each `x` mark to the column whose header centre is
+nearest its own x-centre. Script: `sic_games/outputs/phase1_biome_mortality/` (probe series); the same technique
+is required for Bird 2009 (§ image-table note) and for BHM Table 2 below.
+
+**Recovered counts (2026-07-18):** Public opinion 10 - Criticism 6 - Ridicule 5 - Disobedience 7 - **Deposition 9**
+- **Desertion 17** - Exile 2 - Execution 10. (Total 66 marks over 48 societies; Boehm notes "in many cases a
+single society exhibited both types of behavior", so marks exceed societies as expected - a consistency check
+that the bucketing did not double-count.)
+
+**Transformation to parameters.** Removal-type sanctions are deposition and desertion; the rest are pressure.
+`office_deposition_share = 9/(9+17) = 0.346`. This is the ratio of sanctions **ATTEMPTED** - what a society
+practises - not of leaders actually unseated, because a deposition can FAIL against the challenge margin while a
+desertion cannot fail. The model therefore counts `challenges_this_step` (attempts) separately from
+`depositions_this_step` (successes), and only the attempt ratio is compared to Boehm.
+
+**The trigger weights** come from Boehm's separate tally of 47 coded motivations: too aggressive 13, dominating
+others as leader 14, ineffectiveness/partiality/unresponsiveness in a leadership role 10, lack of generosity or
+monopolizing resources 5, moral transgressions 3, meanness 2. Restricting to LEADERSHIP conduct (14 + 10 + 5 = 29
+of 47, i.e. 62%) and splitting it into overreach (14 + 5 = 19) vs failure-to-deliver (10) gives
+`office_overreach_weight = 19/29 = 0.655`.
+
+#### §4.9.2 Sahlins 1972:209 - the two succession regimes (qualitative -> a boolean)
+
+The Siuai-vs-Nootka contrast is the operative distinction and is coded as a single flag rather than a rate,
+because Sahlins states it as a structural dichotomy, not a frequency: the Nootka leader's "central economic
+position is ascribed by right of chiefly due ... So centricity is built into the structure", whereas in Siuai "the
+whole structure will as such dissolve with the demise of the pivotal big-man" => `succession_dissolve`.
+
+**Implementation note that follows from the same page.** Sahlins is explicit that the big-man does NOT levy - he
+mobilises through debt ("uses wealth to place others in his debt"), while the Nootka chief "is necessarily
+accorded a certain right to group resources". **Therefore a non-zero `leader_share_frac` IS the chiefly regime by
+construction**, and pairing it with `succession_dissolve=True` models a mixed case that Sahlins does not describe.
+Flagged so a future run does not silently combine them and call the result ethnographic.
+
+**Dissolution bar.** In dissolve mode a successor must clear his NEAREST RIVAL by `office_challenge_margin`, not
+the band MEAN. Measured reason: against the mean, the max of ~25 lognormal-ish merit draws clears +25% essentially
+always, so the flag had literally zero effect (identical output, 0 vacancies). Against the nearest rival it leaves
+2/18 bands leaderless, which is the intended interregnum.
+
+#### §4.9.3 Borgerhoff Mulder et al. 2009 Table 2 - the composite-Gini anchor
+
+**Extraction.** The NIH-PA author manuscript renders Table 2 in landscape, so a linear dump transposes it: rows of
+the printed table appear as interleaved column fragments. Recovered by the same positional method as §4.9.1
+(bucket `get_text("words")` by rounded y, read each recovered line as one printed COLUMN). Cross-check that the
+extraction is correct: the recovered alpha rows sum to 1.000 within each economic system (0.46+0.39+0.15 = 1.00;
+0.27+0.14+0.59 = 1.00), and the recovered forager/horticultural Ginis (0.25/0.27) reproduce the paper's own
+narrative statement that they sit "almost exactly [at] the average of the Gini measure of disposable income for
+Denmark, Norway and Finland (0.24)".
+
+**The class->facet mapping is read off their Table 1, not assumed** - i.e. from what each class was operationalised
+as in the forager populations: embodied = Ache hunting returns / Ache and Hadza body weight / Hadza grip strength /
+Hadza foraging returns (=> `prowess`); relational = Ju/'hoansi exchange partners, Lamalera food-share partners
+(=> `cred`); material = Lamalera quality of housing, Lamalera boat shares (=> `material`).
+
+**Composite computation (the comparison the model must be judged on).** Per-facet Gini is computed over ADULTS
+(`age >= menarche_months`) with the standard sorted-rank estimator, then combined as
+`G_composite = a_e * G(prowess) + a_r * G(cred) + a_m * G(material)` using the alpha row for the society type
+being modelled. **The model's `material_gini` must NOT be compared to BHM's headline number directly** - the
+headline is the alpha-weighted composite across all three classes, and the paper states separately that material
+wealth types display HIGHER Ginis than the composite. Per-class Ginis are in their Table S5 (supplementary, absent
+from the author manuscript), so the composite is the only like-for-like comparison currently available.
+
+**Verified negative recorded here so it is not re-searched.** No chiefly-due PERCENTAGE - the fraction of group
+product a leader receives - exists in Sahlins 1972 (Stone Age Economics, full text searched) or Ames 1994 (NW
+Coast, full text searched). Both were read directly for one. This is why `leader_share_frac` is anchored on
+outcome rather than rate. If a future source supplies a direct rate (Earle on staple finance is the obvious
+candidate), it supersedes the outcome calibration.
 
 > **Cross-reference:** Parameter values (energy density, forage kcal targets, terrain constants, Siler
 coefficients, fertility params) are authoritative in `docs/PARAMETERS.md`. This document records

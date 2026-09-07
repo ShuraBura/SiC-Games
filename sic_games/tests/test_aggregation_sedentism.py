@@ -17,6 +17,7 @@ def _fake(sites, agent_positions, min_pool=40, rad=2, release=12):
     cfg = DemographyConfig(enable_aggregation_sedentism=True, settle_min_pool=min_pool,
                            settle_radius=rad, settle_release_steps=release)
     f = SimpleNamespace(_settlement_sites=dict(sites), _demog=cfg, _nearest_map=None,
+                        settle_released_this_step=0,   # diag counter _maintain_settlements increments on dissolution
                         agent_list=[SimpleNamespace(pos=p) for p in agent_positions])
     f._torus_cheby = lambda ax, ay, bx, by: TerrainWorld._torus_cheby(f, ax, ay, bx, by)
     f._build_nearest_map = lambda: TerrainWorld._build_nearest_map(f)   # PERF: nearest-settlement now via a cached map
@@ -101,6 +102,12 @@ def test_catchment_yield_sums_spot_times_multiplier():
     cfg = DemographyConfig(settle_catchment_radius=1, settle_tier2_yield=10.0)
     f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=aq, cultivability=None), _demog=cfg, _spot_cache=None)
     f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
+    # The founding path judges sites through `_founding_pot_field` (R-106, 2026-08-15); it falls
+    # back to `_s_pot_field` while `enable_storable_founding` is off, so these tests keep
+    # exercising the SITE RULE rather than the storability weighting.
+    f._founding_pot_cache = None
+    f._storable_frac_cache = None
+    f._founding_pot_field = lambda: TerrainWorld._founding_pot_field(f)
     assert abs(TerrainWorld._settlement_catchment_yield(f, (50, 50)) - 15.0) < 1e-9   # 1.5 × 10
 
 
@@ -108,6 +115,12 @@ def test_catchment_yield_zero_without_spot_field():
     cfg = DemographyConfig()
     f = SimpleNamespace(_fields=SimpleNamespace(aquatic_food=None, cultivability=None), _demog=cfg, _spot_cache=None)
     f._s_pot_field = lambda: TerrainWorld._s_pot_field(f)
+    # The founding path judges sites through `_founding_pot_field` (R-106, 2026-08-15); it falls
+    # back to `_s_pot_field` while `enable_storable_founding` is off, so these tests keep
+    # exercising the SITE RULE rather than the storability weighting.
+    f._founding_pot_cache = None
+    f._storable_frac_cache = None
+    f._founding_pot_field = lambda: TerrainWorld._founding_pot_field(f)
     assert TerrainWorld._settlement_catchment_yield(f, (50, 50)) == 0.0
 
 

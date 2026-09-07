@@ -339,7 +339,9 @@ All values tagged [PLACEHOLDER] are pending MR-1 (physiological anchoring, DEFER
 | humidity (climate seam) | **0.70** | PLACEHOLDER | " |
 | game_mobility | **FOREST 0, DESERT 0, SAVANNA 0.2, GRASS 1.0** | SEAM (mechanic deferred) | Binford 2001 / forager-collector; ≈0 in calibration biomes by construction. §4.1.8 |
 | enable_game | **False** (default) | OPT-IN | Two-stream forage+meat economy (G.1+G.2). Default off = forage-only back-compat. §4.5.5 |
-| game_meat_frac (mf) | **FOREST 0.55, DESERT 0.45, SAVANNA 0.38, GRASS 0.66** | LIT-ANCHORED (Cordain 2000 Table 2) | diet animal fraction = hunted/(plant+hunted), terrestrial-renormalized (fished dropped). `terrain.MEAT_FRAC`. §4.5.5 |
+| game_meat_frac (mf) | **FOREST 0.55, DESERT 0.45, SAVANNA 0.38, GRASS 0.66, MOUNTAIN 0.34** | LIT-ANCHORED (Cordain 2000 Table 2) | diet animal fraction = hunted/(plant+hunted), terrestrial-renormalized (fished dropped). `terrain.MEAT_FRAC`. §4.5.5 |
+| enable_biome_meat_frac | **False** (class) / **true** (campaign) | OPT-IN, LIT-ANCHORED | reads `mf` PER CELL from `terrain.MEAT_FRAC` instead of the scalar. Before 2026-08-08 every biome used 0.55, the forest value. Wetland is absent from the dict by intent → keeps the scalar, never 0.0. §4.5.5, Addendum 37 |
+| enable_biome_meat_cv | **False** (class) / **true** (campaign) | OPT-IN, LIT-ANCHORED | reads the G.3 draw's CV PER CELL from `terrain.MEAT_CV` (forest 1.97, desert 2.92, savanna 5.29); biomes with no calibration people fall back to `terrain.HUNT_CV` = 2.11. Retires the scalar 0.73, whose anchor R-72/R-73 falsified. §4.5.5, Addendum 37 |
 | meat sharing κ | = substrate `contest_exponent` | STRATEGY LEVER | meat split Cred-weighted (φ+ε)^κ for Carbon; forage forced κ=0. κ=0 ⇒ energy-conserving/inert (Silicon). §4.5.5 |
 
 > **§14–16 currency note (2026-06-20):** added to close the audit gap — PARAMETERS.md had not been updated
@@ -514,7 +516,7 @@ Settlements as MULTI-BAND coalescence — "the gathering that stops dispersing".
 | Name | Value | Status | Meaning / grounding |
 |------|-------|--------|---------------------|
 | settle_catchment_radius | **2** cells | PROVISIONAL | catchment the settlement forages tier-2 from (Binford collectors; residence pins to the single site cell). |
-| settle_tier2_yield | **40.0** /unit S_pot/cell | PROVISIONAL — sweep | intensive tier-2 yield per unit S_pot per catchment cell, UNLOCKED by settlement (gated; mobile bands get only tier-1). Resource-agnostic (S_pot = aquatic_food now, cultivability later). Note: ~7× a village's need ⇒ fisheries never food-stressed → stable (R-53). |
+| settle_tier2_yield | **40.0** /unit S_pot/cell | PROVISIONAL — **CEILING-DOMINATED, effectively dead** | intensive tier-2 yield per unit S_pot per catchment cell, UNLOCKED by settlement (gated; mobile bands get only tier-1). Resource-agnostic (S_pot = aquatic_food now, cultivability later). **CORRECTED 2026-07-31 (R-106 Addendum 11): the former note "~7× a village's need ⇒ fisheries never food-stressed" is FALSE at this value.** Measured at settlement cells on coastal/temperate: tier-2 = 40 × Σ_catchment S_pot ≈ 2.7e2 kcal against tier-1 ≈ 5.3e6 kcal = **0.012% of the cell's food**. Delivering ~1× a village's own need would require ~1.1e6 and the claimed 7× ~7.8e6 — 4–6 orders of magnitude above the shipped value. **However, correcting it changes almost nothing**: a sweep over 40 → 7.8e6 (200,000×, tier2/tier1 0.012% → 4673%) moved village median only 63 → 118 and population 1657 → 1407, because `_settlement_carrying_capacity` (the R-63 ceiling, which reads the DEPLETABLE field) clamps total cell food via `S = min(S, cap)` regardless. The settlement economy is governed by the ceiling, not by this parameter. Raising it mildly IMPROVES the Bar-Yosef in-band score (52.9% → ~78%), but on a single seed with only 14–17 villages — **not adopted; needs a multi-seed test per MARKER_MATRIX binding rule 3.** |
 | enable_tier2_shock | **False** (default) | OPT-IN | Layer 2b regional bad-year shock; off ⇒ shock=1.0 ⇒ bit-exact. |
 | shock_cv | **0.6** | PROVISIONAL — salmon-anchored | inter-annual tier-2 yield CV (salmon-run variability). |
 | shock_rho | **0.0** (default) | PROVISIONAL | AR(1) persistence: 0 = IID single bad years (bit-identical to pre-AR(1)); →1 = multi-year regimes (ENSO/PDO). Only regimes test storage (R-53). |
@@ -643,7 +645,8 @@ m≈0.9 ⇒ g\*≈49) would give the predicted 2× room to show.
 ### §21.7 — Village economy: catchment ceiling + settlement scalar stress (R-63/R-64 — the emergent village-size mechanism)
 | Name | Value | Status | Grounding |
 |---|---|---|---|
-| enable_catchment_ceiling | False | opt-in | settled-cell food capped at Σ(sustainable yield over catchment) — a village can't out-produce its land (Bettencourt subsistence ceiling; R-54). Stops the unbounded `n^1.15` runaway |
+| enable_catchment_ceiling | False | opt-in | settled-cell food capped at Σ(sustainable yield over catchment) — a village can't out-produce its land (Bettencourt subsistence ceiling; R-54). Stops the unbounded `n^1.15` runaway **at settlement sites only — see the next row** |
+| enable_aggl_ceiling | False | opt-in (ON in the campaign harness, `C_AGGLCEIL`) | R-105 BUGFIX. The row above was gated on `(cx,cy) in _settlement_sites`, so the superlinear agglomeration bonus at NON-settlement cells escaped it entirely — unbounded increasing returns, no Malthusian limit (R-104: pop 3259→97551, zero starvation). ON ⇒ the ceiling applies wherever the bonus applies. Default OFF ⇒ every pre-R-105 result is bit-exact. Still requires `enable_aggregation_sedentism` (residual scope, R-105) |
 | catchment_ceiling_mult | **1.0** | DESIGN | 1.0 = the land's own capacity |
 | enable_settlement_scalar_stress | False | opt-in | over-crowded settlement repels residence-pin agents, prob=`size_repulsion(village_pop, midpoint, society)` (Johnson 1982, dissipated by REPULSION_SOCIETY_FACTOR). **The village-size cap** |
 | settlement_ss_gain | **1.0** | DESIGN | max repel prob for an egalitarian over-crowded village |
@@ -651,9 +654,180 @@ m≈0.9 ⇒ g\*≈49) would give the predicted 2× room to show.
 | settlement_ss_width | **50.0** | DESIGN | Alberti 2014 logistic width |
 
 **R-64 result (2000 steps, all-on):** village median ~100, p90 ~154, **77% in Bar-Yosef 50–150**, bounded stratified
-tail ~240, stratification sustained 9–16%, population plateaus ~7200 — STABLE, no runaway. See RESULTS R-64.
+tail ~240, ~~stratification sustained 9–16%, population plateaus ~7200~~ — STABLE, no runaway. See RESULTS R-64.
+**[R-105, 2026-07-26]** Re-validated with `enable_aggl_ceiling` ON (5 seeds × 2000 steps): the **village-size rung
+holds** (settlement median 100 → 104, tail 295 → 283). The struck figures do not: sustained %stratified is
+**2.7–12.5% across seeds** (within-run range 1.2–25.7) with the gap open OR closed, and population sits at
+~9.8k not 7.2k on today's stack. See ELITE_STRATIFICATION_ROADMAP R-105.
+
+### §21.8 — Village budding: cleavage axis + the retired bloc rule (2026-07-27)
+
+| Name | Value | Status | Grounding |
+|---|---|---|---|
+| `village_fission_threshold` | **170** | ANCHORED | Bandy 2004 p.330, **re-verified from the filed PDF**: Chiaramaya 186 + Cerro Choncaya 157 ⇒ "on the order of 170" |
+| `village_circumscription_gain` | **0.6** | ANCHORED | Bandy 2004 p.330: Sonaji reached 277 pre-fission ⇒ threshold rose "more than 50 percent" when the peninsula filled |
+| `village_bud_min_faction` | ~~0.25~~ → **0.0** | DESIGN (retired) | The 25% rival-bloc rule was the ONE budding parameter with **no anchor tag**, and is **absent from Bandy**, which never mentions faction size ("lineage" appears once, in a bibliography entry). It silently disabled the mechanism: a measured 475-person village held **126 lineages, largest 8.2%**, so no bloc could ever qualify. A ≥2-member floor replaces it (one man is not a daughter village) |
+| cleavage axis | ~~2nd-largest lineage~~ → **kinship** | ANCHORED | **Alvard 2009** (see LITERATURE): factions assort by genetic kinship (~15% of variance); lineage alone ~3% and **non-significant once kinship is controlled (p=0.281)** |
+
+**Result at the unmodified threshold of 170:** budding fires. Settlements 14 → 35 (Bandy's settlement-system
+expansion), and — an independent check not tuned for — village median 452 → **135**, moving 1/14 → **21/35** of
+villages into the ethnographic 50–250 band. Villages with no open site in reach still grow and stratify
+(max 483), which is Bandy's other fork.
+
+### §21.9 — Body condition sampling point (2026-07-27)
+
+`enable_condition`'s EMA read `_fed_reserve` — wealth POST-harvest but PRE-burn, the **peak** of the metabolic
+cycle — and its fraction clamps at 1.0, so a topped-up agent read "completely fed". Measured `_condition` mean
+**0.9998** in a crowded boreal world ⇒ the mortality multiplier it feeds was ~1.0002 and
+`enable_nutrition_synergy` was **silently dead whenever `enable_condition` was on**. Now sampled after
+maintenance + movement costs. `_fed_reserve` is unchanged (energetic fertility and the legacy synergy branch
+both want the post-harvest value). **Bit-exact for all prior results — `enable_condition` defaults OFF and the
+campaigns run it off.**
+
+**KNOWN LIMITATION, do not read the fix as success:** post-fix `_condition` is ~0.32 for essentially every agent
+(p05 0.314, p95 0.347) and reads the same in a crowded boreal world (0.328) as a comfortable temperate one
+(0.331). Reserves are homeostatic and shortfall is lethal quickly, so survivors cluster at the setpoint and
+there is no chronic-malnutrition state to detect. The branch applies a near-uniform ~2× multiplier (pop 991 →
+761) rather than discriminating. **Recommendation: leave `enable_condition` OFF** until S0 is reworked to
+measure shortfall FREQUENCY rather than reserve LEVEL.
+
+### §21.10 — Intake-based energetic fertility (`enable_intake_fertility`; R-106, 2026-07-30)
+
+§21.9 recommended reworking S0 to read shortfall **flux** rather than reserve **level**. This is that move,
+applied to fertility rather than to mortality — and it is the same defect one layer over.
+
+**Why the reserve cannot work.** Burn is ~68% of the floor-to-full span per step, so an agent either
+re-saturates at the cap or dies within a step; the margin at the trough is **0.46 burn-steps**. Both candidate
+inputs are therefore constants — post-harvest reserve **0.996** of full, post-burn trough **0.318** — each with
+spread ~0.002 and **zero response across a 5× density range**. `energetic_fertility_factor` returned ~0.995
+always, so births could not respond to crowding (CBR −3% while CDR +59%) and mortality did **all** the
+regulating, forcing e₀ = 1/CDR ≈ 20.7. See R-106.
+
+| Parameter | Value | Status | Anchor |
+|---|---|---|---|
+| `enable_intake_fertility` | False | **OPT-IN**, bit-exact when off | supersedes the `enable_energetic_fertility` branch when ON |
+| `intake_ema_alpha` | **0.04** | DERIVED | half-life = ln2/−ln(1−α) ≈ **17 steps ≈ 1.4 yr** — slow enough that one bad month cannot stop births, fast enough to track a multi-year squeeze |
+| `intake_fert_lo` | **1.00** | ANCHORED | intake = maintenance ⇒ **no surplus** to gestate or lactate ⇒ factor 0 |
+| `intake_fert_hi` | **1.20** | ANCHORED | maintenance + the **lactation increment** (~+500 kcal/d on ~2500 ⇒ +20%; pregnancy ~+285 ⇒ +11%) — FAO/IOM |
+
+Mechanism: Ellison's energetics — fecundity tracks energy **flux**, not stored reserve. The EMA accumulates only
+from `menarche_months`, because a juvenile's **gathered** intake understates what it **eats** (juveniles are
+provisioned), so girls would otherwise reach fertility pre-penalised.
+
+**Measured effect** (R-106): e₀ 19.1 → 21.4, median age 13.4 → 15.2, child 54.5 → 49.6%, motherless 11.8 → 7.9%
+(n=15000); **26–40% of the gap to the anchors closed**, and population CV over 400 yr **7.9% → 1.9%** — i.e.
+regulation moved from deaths to births.
+
+**KNOWN LIMITATION.** It does **not** produce Malthusian cycles, and cannot: a 1.4-yr feedback is effectively
+instantaneous on demographic timescales, so it **damps** deviations (hence the CV collapse) rather than
+overshooting them. Cycles require **delayed** density-dependence. Do not attempt to buy cycles by enlarging
+`intake_fert_hi` — the threshold is anchored, and the missing ingredient is a **lag**, not a gain.
 
 ---
 
 *PARAMETERS.md extracted 2026-06-08. Supersedes interim locked-param tables in `sic_games/CLAUDE.md`
 and `docs/ROADMAP.md`. Maintained by Code; updated any time a parameter is locked, swept, or retired.*
+
+
+## §22 - Elite layer (2026-07-17...18; RESULTS R-82/R-83/R-84/R-84b; branch `agriculture`; ALL default-OFF/bit-exact)
+
+### §22.1 - Durable material wealth (`enable_material_capture`; R-82)
+| Param | Value | Basis |
+|---|---|---|
+| `material_hide_frac` | 0.07 | [DESIGN] fraction of game yield carried as durable hides. Material comes from GAME, not the granary (the granary is food) - supervisor correction, R-82. |
+| `material_decay` | 0.002/step | [DESIGN] stores rot, prestige goods are given away, herds die. 0 => imperishable (bit-exact). |
+| `aggrandizer_frac` | 0.15 | [Hayden 1995] the captor is an ambition TYPE, not a rank. Keying capture on `cred^k` gave corr -0.018; keying on the type gave +0.780. |
+| `material_unit_value` | 1.0 | [DESIGN] VALUE HOOK, deliberately constant. Stage E replaces it with an exchange-set value (Kula/cattle/bride-price), NOT a price-setting market (Polanyi puts that far later). |
+
+### §22.2 - Boehm leveling (`enable_leveling`; R-82)
+| Param | Value | Basis |
+|---|---|---|
+| `leveling_strength` | 0.79 | **[Boehm 1993 VERIFIED]** "behaviors that terminated relations with an overly assertive individual or removed him from a leadership role involved **38 of the 48 societies**" => 38/48 = 0.79. Leveling is the NORM, not the exception. |
+| `leveling_share` | 0.8 | [DESIGN] fraction of the excess disgorged when sanctioned. |
+
+### §22.3 - Leader managerial rights (`enable_leader_share`; R-83, anchored R-84b)
+| Param | Value | Basis |
+|---|---|---|
+| `leader_share_frac` | **0.20** | **[Borgerhoff Mulder et al. 2009 Table 2, VERIFIED]** ANCHORED ON OUTCOME - no chiefly-due percentage exists in Sahlins 1972 or Ames 1994 (verified negative, both read directly). 0.20 gives an alpha-weighted composite Gini of 0.258 against BHM's forager target 0.25 +/- 0.04. NB the composite is nearly FLAT in this knob (0.248 -> 0.261 over 0 -> 0.5) because material carries only 15% of the forager weight - see R-84b. |
+
+**BHM alpha weights (the coupling-weight row of the capital/operator matrix), by society type:**
+| System | alpha embodied (`prowess`) | alpha relational (`cred`) | alpha material (`material`) | target Gini |
+|---|---|---|---|---|
+| Hunter-gatherer | 0.46 | 0.39 | 0.15 | 0.25 |
+| Horticultural | 0.53 | 0.26 | 0.21 | 0.27 |
+| Pastoral | 0.26 | 0.14 | 0.61 | 0.42 |
+| Agricultural | 0.27 | 0.14 | 0.59 | 0.48 |
+
+### §22.4 - Challenge-succession (`enable_leader_office`; R-84)
+| Param | Value | Basis |
+|---|---|---|
+| `office_deposition_share` | **9/26 = 0.346** | **[Boehm 1993 Table I, VERIFIED - columns counted]** DEPOSITION 9 vs DESERTION 17 across the 48-society survey. Deposition is the MINORITY channel; followers walking away is the commoner end of a bad leader. |
+| `office_overreach_weight` | **19/29 = 0.655** | **[Boehm 1993, the 47 coded motivations]** OVERREACH = "dominating others as leader" (14) + "lack of generosity or monopolizing resources" (5) = 19; FAILURE TO DELIVER = "ineffectiveness, partiality, or unresponsiveness in a leadership role" (10). |
+| `office_challenge_margin` | 0.25 | [DESIGN] a challenger must clear the incumbent's merit by this factor - so a challenge can FAIL ("until he dies or is challenged AND DEFEATED"). |
+| `office_grievance_gain` | 0.05 | [DESIGN, calibrated] per-step sanction hazard at unit grievance. Set so band tenure lands at 4-6 yr; at the band level tenure is bounded by band FUSION, not by the leader's life (R-84 honest limit). |
+| `succession_dissolve` | False | **[Sahlins 1972:209 VERIFIED]** False = Nootka chiefly office ("ascribed by right of chiefly due", "centricity is built into the structure") => outlives the holder. True = Siuai big-man ("the whole structure will as such dissolve with the demise of the pivotal big-man") => vacancy until someone re-earns it. |
+| office eligibility | `age >= menarche_months` | Not a knob - the model's existing producer-age threshold. Without it a high-cred CHILD could hold office (measured mean leader age 23.5 yr vs adult mean 34.1). |
+
+**Validation target (never an input):** `leader_tenure()["father_was_leader"]` vs **Hayden 1995's "about 75% of New
+Guinea Entrepreneur Big Men had fathers that were also Big Men"** - measured 53-69%. The office is never inherited
+in the model, so any continuity must EMERGE from heritable cred, which is Hayden's own mechanism (he transmits moka
+partners and wives, not the position).
+
+### §22.5 - Lineage descent: branching + segmentation (`enable_lineage_branching` / `enable_lineage_split`; R-90 -> R-92)
+
+`_lineage` was founder-seeded and only ever LOST by extinction, never created - an ABSORBING process, so
+fixation has probability 1 (measured: 3000 patrilines -> 5 by step 1950, then frozen 5,650 steps). These two
+flags are a PAIR; neither does anything useful alone.
+
+| param | value | provenance |
+|---|---|---|
+| `lineage_branch_rate` | **0.05** (campaign) | [DESIGN] per-BIRTH probability the child starts a new heritable `_subclan` tag. Singletons are HARMLESS at sub-branch level - the tag either grows into a real body of kin or vanishes unnoticed. Sets the pool segmentation later draws on; mean sub-branch size ~ 1/rate, so it must sit comfortably above `lineage_split_min_segment`. |
+| `lineage_split_rate` | **3e-5** (campaign) | [DESIGN, calibrated to Hill 2011 via R-92] per-MEMBER per-step hazard; a lineage of n segments at rate n*rate (a Yule process - what generates realistic skewed haplogroup distributions). **LOW BEATS HIGH:** 5x this rate gives 3x the lineages but LOWER eff_lineages (5.9 -> 4.1) and HIGHER top_share (0.235 -> 0.347), regressing toward R-90's singleton pathology. |
+| `lineage_split_min_segment` | **8** | [DESIGN] both sides must reach this or the cleavage is SKIPPED. This is what makes a new lineage born VIABLE rather than as a singleton - the whole R-90 -> R-92 correction. |
+
+**No CEILING is imposed on lineage size.** Hazard scales with size but nothing caps it, so `top_share` stays a
+free measurement rather than an artifact of a trigger - the distinction from size-TRIGGERED segmentation, which
+would have destroyed the very statistic T-9 compares against Zerjal 2003 / Yan 2014.
+
+**Implementation constraint, measured not assumed:** the cleavage follows the heritable `_subclan` tag rather
+than an ancestor chain, because live `_father` chains reach a MAXIMUM DEPTH OF 2 (median 1) even at step 400 -
+a chain terminates at the first ancestor born without an assigned father, and early births largely lack one.
+Deep ancestry exists only in the offline genealogy CSV, never in memory.
+
+### §22.6 - Relative legitimacy (`enable_relative_legitimacy`; R-93)
+
+| param | value | provenance |
+|---|---|---|
+| `legit_rel_multiplier` | **2.0** (campaign) | [DESIGN] a lineage crosses at this MULTIPLE of an average lineage's feasting share (1.0 == exactly average). Replaces the absolute `legit_threshold`, which compared a SHARE to a CONSTANT and so carried a hidden denominator. |
+
+**Why the absolute form had to go - the arithmetic, because it is the general lesson.** Mean share is
+1/`lineages_per_band`, so `legit_threshold=0.15` discriminates only while lineages_per_band > 1/0.15 = **6.67**,
+against a ~~FILED Hill 2011 target of ~7~~. **A five percent margin.** **[RETRACTED 2026-08-06 — Hill et al. 2011 contains NO lineage data; the word does not occur in it. There is no ~7-lineages-per-band target and no 0.38 dominant share. Addenda 28/30/32.]** Nobody changed the parameter; the substrate
+drifted under it (measured lpb 2.14-3.69), and below the boundary the AVERAGE lineage clears the bar, so
+"nobility" becomes universal by arithmetic rather than by competition. **ANY threshold applied to a share or a
+ratio has a validity domain and fails SILENTLY when its denominator moves** - see MECHANISM_CHARTER D15.
+
+**Measured effect** (campaign scale, segmentation on in both arms): lineages_per_band 3.69 -> **6.66** (target
+~7), eff_lineages 5.9 -> 18.1, top_share 0.235 -> 0.154, ascribed_frac 0.581 -> 0.063. NB segmentation ALONE
+could not reach the target, because `lineages_per_band` is CAPPED BY `eff_lineages`; this lifted the ceiling.
+
+**KNOWN CONSEQUENCE, not yet resolved:** it kills the gumsa/gumlao reversion entirely (0 reversions vs 5,741),
+because `resent_privilege_ref=10.0` was implicitly calibrated when ascription was UNIVERSAL and cred saturated.
+The same bug class, one layer down, tuned against the BROKEN upstream mechanism. See RESULTS R-93.
+
+### §22.7 - Resentment, rank scope, and the hierarchy unlock (R-94 -> R-98; all default-OFF/bit-exact)
+
+| param | value | provenance |
+|---|---|---|
+| `enable_relative_resentment` / `resent_effect_threshold` | False / **0.8** | [Cohen conventions] privilege as an EFFECT SIZE - the noble/commoner cred gap in units of the band's OWN pooled spread. Replaces `(m_a-m_o)/m_o / resent_privilege_ref`, whose ref=10.0 was calibrated while ascription was UNIVERSAL and cred saturated; once nobility became a 6% minority the signal collapsed and reversions never fired. 0.8 = Cohen "large". Charter D15. |
+| `enable_resentment_accumulator` | False | resentment ACCUMULATES rather than tracks. The old EMA converged to its input, so a threshold at/above typical privilege could NEVER be crossed at any horizon (measured: grudge 0.796 vs threshold 0.800, 1 revolt in 3000 yr). With this on the crossing threshold is FIXED AT 1.0 by construction and stops being a knob. |
+| `resent_years_to_revolt` | **80** | **[Leach via Flannery ch.10, VERIFIED]** yr to revolt at UNIT privilege (effect size 1.0). Hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the wait. **This is now the calibrated quantity in place of a threshold.** |
+| `enable_village_resentment` | False | the SETTLEMENT holds the grudge, not the band. R-88 measured band lifetime 10.2 yr median vs 700-1600 yr for the grudge to mature, and fission resets it - the memory outlived its container 40-100x. Leach's gumlao premises describe VILLAGES with headmen and councils. Follows R-71's per-site precedent. |
+| `enable_local_ascription` | False | rank held per (community, lineage) instead of one GLOBAL set. Globally, one village's revolt de-ranked that lineage EVERYWHERE (~7% of all lineages per revolt), annihilating nobility instead of cycling it - and contradicting Leach, whose whole observation is communities in DIFFERENT states at once. **Requires a persistent community: band-keyed local rank produces NO ascription at all** (stock resets on fission ~10 yr, needs ~50 to mature), so pair it with `enable_village_resentment`. |
+| `enable_rank_hierarchy` / `rank_hierarchy_frac` | False / **0.15** | a band holding ranked lineages climbs ONE rung on the society ladder, converting `LEADER_SOCIETY_WEIGHT` 0.0 -> 0.5. Without it a fully-ranked but sparse/poor village stays `egalitarian_forager` and its nobility has no structural consequence at all. Applied AFTER the aquatic gate: Leach's gumsa were swidden hill farmers with no glut and no surplus yet ranked, so Testart's route is one road to hierarchy and not the only one. ~~**0.15 is DERIVED**: ~1/7, from the FILED Hill 2011 ~7 lineages/band~~ — **[UNANCHORED, RETRACTED 2026-08-06]** Hill et al. 2011 contains no lineage data at all (Addendum 28), so there is no ~7 and 0.15 was never derived from anything. It is a FREE parameter that has been reading as a derived one. Value left unchanged (re-deriving it is a calibration decision) and the flag is default-OFF. |
+
+**PAIRING, because these are not independent.** The intended full stack is
+`relative_legitimacy + relative_resentment + resentment_accumulator + village_resentment + local_ascription +
+rank_hierarchy`, on top of `lineage_branching + lineage_split`. Two hard dependencies are enforced or tested:
+segmentation needs branching (no sub-branches to cleave along without it), and local ascription needs the
+village unit (a band-keyed stock never matures).

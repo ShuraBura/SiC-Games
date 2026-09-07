@@ -65,4 +65,112 @@ table locations to log), `village_gain=5.0` (UNANCHORED design knob), morph gate
 8. **Climate/season** fields — `ClimateField.season/regime`, seasonal amplitude per biome (PROVISIONAL).
 
 ---
+
+## Elite layer - source verification (2026-07-18; R-82/R-83/R-84/R-84b)
+
+| Source | Status | What was verified, and how |
+|---|---|---|
+| Boehm 1993, *Curr. Anthro.* 34(3) | **[VERIFIED]** | Full text + **Table I recovered by POSITIONAL extraction** (linear dump destroys the x-mark matrix). Counts: Public opinion 10, Criticism 6, Ridicule 5, Disobedience 7, **Deposition 9**, **Desertion 17**, Exile 2, Execution 10. Consistency check: 66 marks over 48 societies, consistent with Boehm's "in many cases a single society exhibited both types". Also the 47-motivation tally (13/14/10/5/3/2) and the 38/48 removal aggregate that `leveling_strength` already used. |
+| Hayden 1995 (`literature/hayden1995.pdf`) | **[VERIFIED]** | "MANAGERIAL RIGHTS over the resource locations and facilities of the group" (NW Coast, spatially restricted resources) vs New Guinea "more ubiquitous access ... limited the development of social stratification". **"About 75% of New Guinea Entrepreneur Big Men had fathers that were also Big Men"** - transmitted via moka partners and wives, NOT the position. Strict positional inheritance appears only at the Ahousaht chiefdom (Rosman & Rubel 1971:80). |
+| Sahlins 1972 *Stone Age Economics* | **[VERIFIED]** | Full text layer, 363 pp. p.209 Siuai-vs-Nootka office/achievement contrast (the succession dichotomy); p.136-137 the big-man MOBILISES via debt rather than levying, while the NW Coast chief is "accorded a certain right to group resources". |
+| Borgerhoff Mulder et al. 2009 *Science* 326:682 | **[VERIFIED]** | Tables 1 and 2 of the NIH-PA author manuscript; **Table 2 recovered by POSITIONAL extraction** (landscape layout transposes under linear dump). Cross-checks passed: alpha rows sum to 1.000 per system; recovered forager/horticultural Ginis 0.25/0.27 reproduce the paper's own Nordic-comparison statement (0.24). |
+| Ames 1994 (AGG6) | **[VERIFIED - NEGATIVE]** | Full text searched for a chiefly extraction RATE. **None exists.** Qualitative elite control of production only. |
+| Sahlins 1972 (rate search) | **[VERIFIED - NEGATIVE]** | Full text searched for a chiefly-due PERCENTAGE. **None exists.** This is why `leader_share_frac` is anchored on outcome (BHM composite Gini), not on a rate. |
+| Smith & Codding 2021 *PNAS* | **[VERIFIED]** | Full text read 2026-07-18 (open access, PMC8020663). **r = 0.881, n = 89 CONFIRMED** (HI ~ RI, full sample). Plus: NPP effect size **0.04** (productivity nearly irrelevant) vs Resource Index 0.37; fishing-site OWNERSHIP a significant direct pSEM predictor (b_std 0.96, P=0.043); offensive raiding -0.01. **Process note:** a first summarised fetch reported the 0.881 as ABSENT and was wrong - a single fetch summary is not verification. |
+
+**Code checks performed (R-84, all found by MEASUREMENT not inspection - added to the standing skip-list):**
+1. **Tenure keyed to the wrong object** - office was keyed to `band_id`; band_ids churn on every fusion/fission, capping tenure at ~4 yr even with sanctions OFF. Re-keyed to the MAN. *Lesson: when a diagnostic is flat against a knob that should move it, check what the clock is attached to before tuning the knob.*
+2. **Collision resolution by dict order** - ended 106 of 135 tenures (death only 29). Now by merit.
+3. **Eligibility unbounded** - `max(ms, ...)` over ALL band members let a high-cred CHILD hold office; mean leader age 23.5 yr vs adult mean 34.1. Gated on `menarche_months`.
+4. **Vacuous flag** - `succession_dissolve` measured against the band MEAN had literally zero effect (identical output, 0 vacancies), because the max of ~25 draws clears +25% over the mean essentially always. Re-specified against the nearest RIVAL. *Same failure class as the R-74 vacuous test: a mechanism that "passes" while doing nothing.*
+
+**OPEN for the elite layer:**
+- `office_grievance_gain` and `office_challenge_margin` are [DESIGN], calibrated on tenure, not lit-anchored.
+- Band-level tenure is bounded by band FUSION (4-6 yr), not by the leader's life. A chiefly 20-yr tenure needs the office attached to the SETTLEMENT - the next rung, and Hayden's precondition.
+- `material_invulnerability_min` gate still unexercised in a stressed/high-density regime.
+- Father-was-leader lands 53-69% vs Hayden's 75% - same order, somewhat low; worth revisiting once relational capital (exchange partners) is transmissible, since that is Hayden's actual channel.
+
+---
 *Verification Log opened 2026-07-09. Append/update rows as checks are performed — this is the skip-list.*
+
+### Elite-layer sources, second pass (2026-07-18)
+
+| Source | Status | Outcome |
+|---|---|---|
+| D'Altroy & Earle 1985 | **[VERIFIED - NEGATIVE]** | Fetched specifically to find a direct levy RATE that would supersede the outcome-anchoring of `leader_share_frac`. **None exists** - obligation is corvee LABOUR (mit'a) per household, not a share of product. The anchor stands as R-84b left it. **Do not re-fetch for this purpose.** Yields instead a stored-GRAIN decay anchor: **30%/yr maize loss** (our stored-food decay is [DESIGN]); must not be applied to durable prestige goods. |
+| BHM 2009 SOM (Table S4) | **[VERIFIED]** | Per-wealth-type Ginis obtained. Model matches facet-by-facet: prowess 0.24-0.26 vs 0.237/0.339; cred 0.27 vs 0.216/0.263; **material 0.237 vs Lamalera housing 0.241**. The remaining gap is entirely **boat shares 0.474 = a PRODUCTIVE ASSET the model lacks**. |
+| Hawkes et al. 1991 | **[TEXT LAYER OBTAINED]** | Two searchable copies filed, replacing the image-only scan. Pooled savanna return rates unchanged. |
+| Flannery & Marcus 2012 | **TOC ONLY** | Chapters identified for retrieval: **5** (Inequality without Agriculture, p.66 - our current stage), **10** (Rise and *Fall* of Hereditary Inequality in Farming Societies, p.187 - the next rung AND the cycles question), **16** (How to Turn Rank into Stratification, p.313 - T-5's failing agricultural arm), then **11** (Three Sources of Power in Chiefly Societies, p.208) and **9** (Prestige and Equality in Four Native American Societies, p.153). |
+
+### Charter retrofit - code checks (R-85, 2026-07-18)
+
+| Check | Result |
+|---|---|
+| `enable_leader_office` without `enable_band_affiliation` | **CRASH FIXED** - `_next_band_id` was created only inside the affiliation guard; the office runs outside it. Now initialised unconditionally (bit-exact); regression test `test_office_survives_without_band_affiliation`. |
+| `enable_cred_renorm` gauge-invariance | **REFUTED** - moves every observable. The fixed 1.0 inheritance anchor makes cred rescaling non-scale-invariant. Re-typed R (Regulator). |
+| `enable_genealogy_log` observer invariance | **PASS** - mutates nothing. First positive confirmation of a charter type. |
+| `enable_infanticide` reader search | **CONFIRMED STUB** - no reader outside the config object. |
+| Flag-vs-magnitude audit | **RETRACTED (R-85c)** - those flags are NOT enabled in `realistic_forager_demog()`; the harness flipped them ON while their gain stayed at the zero DEFAULT. All seven run at live values in `emergent_village_demog()` (leader_coherence_gain=2.0, repulsion_gain=0.3, village_gain=5.0, site_gain=0.3, move_cost_kcal=750.0, malnutrition_fission_gain=2.0, pathogen_gamma swept). Re-run with a MAGNITUDE map: 5 of 7 active immediately. The claim invalidating the 2026-07-15 config audit is **also withdrawn**. |
+| Black-box conservation testing | **NOT SOUND** - trajectory coupling makes A-typed flags move conserved quantities legitimately. Conservation must be instrumented around the call. |
+
+**R-85 residual - CLOSED 2026-07-18 (R-85b).** All six explained, none a spec bug:
+`enable_terrain_move_cost` (`move_cost_kcal=0`) and `enable_site_appraisal` (`site_gain=0`) are DEAD KNOBS whose
+magnitude sits inside the field builder, not at the reader; `enable_condition` is alive but its only consumer is
+the zero-gain pathogen term (CHAINED DEAD); `enable_bonded_mating` is SUPERSEDED BY DESIGN (dead whenever
+pair-bonds are on - F.3a replaced F.1); `enable_energetic_fertility` and `enable_landscape_packing` are
+REGIME-GATED (factor 1.0 in 99.75% of birth-eligible draws; both density definitions give the same society
+target in 8/8 bands).
+
+**Detection lesson:** a zero magnitude can sit one level deeper than the flag. The tell is general - **a derived
+field whose std is exactly 0 while its input's std is not** (terrain `cost` std 0.188 -> move-cost field std
+0.000). Scan the whole dependency chain, not the reader line.
+
+**Substantive consequence:** fertility is effectively NOT nutrition-modulated at current densities. Re-read any
+result that assumes the energetic-fertility coupling is doing work.
+
+**STILL OPEN:** the in-step conservation instrumentation (the half of the charter audit that a black-box
+differential cannot do). ~~the per-knob decision on the 7 dead knobs~~ - **withdrawn, see R-85c: there are no
+dead knobs; those flags are simply off in the forager preset and live in `emergent_village_demog()`.**
+
+**R-85c correction (2026-07-18).** Two method errors, both mine, recorded so the pattern is recognisable:
+1. **Conflating "does nothing when turned ON" with "does nothing".** The distinguishing fact is the BASELINE
+   state of the flag; the harness computed it but did not surface it beside the verdict. Fixed - `baseline_on`
+   is now printed, and only `True` rows are genuine tests of a running mechanism.
+2. **Scoping a config grep to a FILE containing two presets.** `run_se0_controlled_climate.py` defines both
+   `realistic_forager_demog()` and `emergent_village_demog()`; grepping `enable_*=True` over the file
+   attributed the union to the forager preset. **Scope to the function.**
+
+### R-86v father-was-leader validation (2026-07-20)
+| Check | Result |
+|---|---|
+| D1 positive control | **PASS** - lift recovered 1.02 / 1.52 / 2.01 / 2.51 against built-in 1.0 / 1.5 / 2.0 / 2.5 |
+| D2 null floor | **PASS** - base rate 0.44 (not ~0.70); measured is z = 3.1-4.9 in a 2000-shuffle permutation null |
+| D14 two estimators | lift and odds ratio agree in direction (1.72 / 4.93 ON vs 1.54 / 2.94 OFF, ungated) |
+| **Age bias FOUND** | comparison pool mean age 17.7 yr vs leaders 36.0 yr; ungated lift 1.72 falls to **1.43** age-matched |
+| **Mechanism effect** | age-matched lift is IDENTICAL ON vs OFF (1.43 vs 1.43) - legitimacy supplies CONCENTRATION, not transmission |
+
+**Standing method note:** any statistic conditioned on a life-course event needs an AGE GATE - an ungated pool
+mixes agents who have had their chance with those who have not. And always report the LIFT beside the raw
+fraction: here the fraction moved 0.655 -> 0.757 (reads as a large mechanism effect) while the lift did not move.
+
+### Lineage / legitimacy arc - code checks (R-89 ... R-93, 2026-07-20/21)
+
+| # | claim | how checked | result |
+|---|---|---|---|
+| 1 | `_do_delegitimation` cannot fire once a band is fully ascribed | read the guard: `if not asc or not oth: ... continue` | CONFIRMED - resentment could only decay; a one-way door. Fixed with a population-wide commoner fallback. |
+| 2 | the ascription cred target is a fixed constant, not lineage-relative | read `a.cred += LEGIT_RELAX * ((1.0 + cg) - a.cred)` | CONFIRMED - explains gini_cred collapsing to ~0.008 once ascription saturates. |
+| 3 | `dynasties()`'s eff_lineages/top_share are NOT contaminated by that cred collapse | read the function: computed from `sizes = [len(v) for v in groups.values()]`, no cred term anywhere | CONFIRMED - the T-9 statistics were safe. |
+| 4 | the society classifier reads ascription | read `society_from_character(density, surplus_frac)` and grepped for any ascription reference in the morph path | **FALSIFIED** - it reads density and surplus ONLY. `ascribed_frac=1.0` can coexist with 88% "egalitarian_forager" bands. Still open. |
+| 5 | live `_father` chains are deep enough to reconstruct a sub-clade | measured chain depth over ALL live agents at steps 80/200/400 | **FALSIFIED** - max depth 2, median 1. First measurement was biased (sampled `agent_list[:200]`, which is founder-heavy); re-measured unbiased. Design changed to a carried tag (DE-21). |
+| 6 | lineage branching affects population size | 3 seeds x 2 rates x elite on/off | NOT REAL - 631 vs 634 and 329 vs 328. The apparent 3490 -> 635 was single-seed RNG-stream divergence. |
+| 7 | `lineages_per_band` can reach the Hill target by raising the split rate | computed the null two independent ways (binomial and Poisson), agreeing to 2dp | **FALSIFIED** - expected distinct lineages in a band of ~29 equals `eff_lineages`, so lpb is CAPPED by it. Rate increases LOWER eff_lineages. Ceiling lifted later by R-93 instead. |
+| 8 | the R-91 checker's DOMAIN rule is correct under relative legitimacy | ran the checker on the R-93 arm, live vs offline | **DEFECT FOUND** - the offline CLI produced a false positive because trajectory `meta` did not record the mode; the live harness was correct. `meta` now carries it. |
+| 9 | a quiet reversion counter means the mechanism is dead | inspected the R-93 trajectory | **DEFECT FOUND** - at step 475 the EMA had simply not matured (resent_alpha=0.001 ~ 1000-step constant). Right outcome, wrong stated cause. Rule now separates STOPPED from NEVER-FIRED. |
+
+### Biome-dependence audit of the elite layer (2026-07-21)
+
+| # | claim | how checked | result |
+|---|---|---|---|
+| 1 | Leach's gumsa/gumlao cycle is a general social dynamic | read the filed LITERATURE entry | **QUALIFIED** — Flannery prefers Friedman's endogenous scenario *"to Leach's, which needs Shan princes to intervene"*. Leach's own model requires adjacent valley STATES. The code implements Friedman's version, so the cycle was kept while its stated cause was dropped — a deliberate choice, but one that had not been written down as a limitation. |
+| 2 | the elite layer was validated across worlds | re-read the run configs of R-89…R-96 | **FALSIFIED** — every arm was `coastal-temperate` with `C_SOIL=0`. The mechanism's own ethnographic source describes rain-fed swidden hill farmers. |
+| 3 | terrain-dependence of hierarchy was unknown | grepped RESULTS | **ALREADY KNOWN** — R-71 measured two regimes from terrain alone (rain-fed swidden → EGALITARIAN, strat 0.4%; alluvial floodplain → STRATIFIED, 11–16%). The elite layer was built on top of that finding without ever being tested against it. |

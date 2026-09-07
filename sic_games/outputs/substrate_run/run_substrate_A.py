@@ -82,8 +82,8 @@ def snapshot(w, step):
         step=step, pop=pop, births=w.births_this_step, deaths_starv=w.deaths_starv_this_step,
         n_bands=len(sizes), band_med=statistics.median(szv) if szv else 0,
         band_mean=round(statistics.mean(szv), 1) if szv else 0, band_max=max(szv) if szv else 0,
-        n_villages=len(villages), village_med=round(statistics.median(villages), 1) if villages else 0,
-        village_max=max(villages) if villages else 0,
+        n_bigbands=len(villages), bigband_med=round(statistics.median(villages), 1) if villages else 0,
+        bigband_max=max(villages) if villages else 0,
         pct_complex=round(100 * socs.get("complex_forager", 0) / pop, 1) if pop else 0,
         pct_stratified=round(100 * socs.get("stratified_chiefdom", 0) / pop, 1) if pop else 0,
         gini_cred=round(gini(cred), 3), gini_wealth=round(gini(wealth), 3),
@@ -139,7 +139,7 @@ def main():
             el = time.time() - t0
             eta = el / step * (STEPS - step)
             log(f"[{step:5d}/{STEPS}] pop={row['pop']:6d} bands={row['n_bands']:4d} "
-                f"band(med/max)={row['band_med']}/{row['band_max']} vill={row['n_villages']}(med {row['village_med']},max {row['village_max']}) "
+                f"band(med/max)={row['band_med']}/{row['band_max']} bigbd={row['n_bigbands']}(med {row['bigband_med']},max {row['bigband_max']}) "
                 f"cplx={row['pct_complex']}% strat={row['pct_stratified']}% surp(med/mx)={row['surplus_med']}/{row['surplus_max']} giniC={row['gini_cred']} "
                 f"res={row['mean_reserve']} starvD={row['deaths_starv']} occ={row['occ_cells']}c/max{row['occ_max']} "
                 f"| el={el/60:.1f}m eta={eta/60:.1f}m")

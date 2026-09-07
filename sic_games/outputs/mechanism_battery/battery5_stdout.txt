@@ -1,0 +1,98 @@
+
+=== BATTERY 5 @ 07:53 | 7 arms x 2 seeds | 3000 steps | budget 75m | 5 concurrent ===
+  launched P_flat_boreal seed 0
+  launched P_flat_boreal seed 1
+  launched P_flat_temperate seed 0
+  launched P_flat_temperate seed 1
+  launched P_flat_tropical seed 0
+  finished P_flat_boreal seed 1 rc=0
+  launched P_flat_tropical seed 1
+  finished P_flat_boreal seed 0 rc=0
+  launched S_flat_temperate seed 0
+  finished P_flat_tropical seed 0 rc=0
+  launched S_flat_temperate seed 1
+  finished P_flat_tropical seed 1 rc=0
+  launched S_hilly_temperate seed 0
+  finished S_hilly_temperate seed 0 rc=0
+  launched S_hilly_temperate seed 1
+  finished P_flat_temperate seed 0 rc=0
+  launched S_coastal_temp seed 0
+  finished S_flat_temperate seed 0 rc=0
+  launched S_coastal_temp seed 1
+  finished P_flat_temperate seed 1 rc=0
+  launched S_coastal_nodefend seed 0
+  finished S_hilly_temperate seed 1 rc=0
+  launched S_coastal_nodefend seed 1
+  finished S_coastal_temp seed 0 rc=0
+  finished S_flat_temperate seed 1 rc=0
+  finished S_coastal_nodefend seed 0 rc=0
+  finished S_coastal_temp seed 1 rc=0
+  finished S_coastal_nodefend seed 1 rc=0
+
+=== ARMS (sustained medians over the run's second half, pooled across seeds) ===
+arm                    ax            pop pct_stratifie     gini_cred      band_med    settle_med    settle_max      n_settle connubium_med lineage_size_ lin_top_share ascribed_frac noble_lineage noble_materia   surplus_med
+P_flat_boreal          P          1217.0           0.0         0.206         19.75           0.0           0.0           0.0          32.5         0.506        0.0665          0.38        2.5975         1.015        0.3915
+P_flat_temperate       P         11320.0           3.2        0.4105         29.75          94.5         265.0          58.5         139.5        0.5435         0.089        0.3245         3.417        1.0655        0.4945
+P_flat_tropical        P          3798.0          1.15        0.2415          23.5          87.5         160.0          18.0         78.75         0.504        0.0565        0.3195        3.0955        1.0675        0.4215
+S_flat_temperate       S         11320.0           3.2        0.4105         29.75          94.5         265.0          58.5         139.5        0.5435         0.089        0.3245         3.417        1.0655        0.4945
+S_hilly_temperate      S          5840.0           3.6         0.372          25.5          98.5         245.5          43.0         71.75         0.548         0.078         0.363         3.496         1.063         0.462
+S_coastal_temp         S          9254.5           6.5         0.302          30.0         104.0         256.5          80.5          79.0         0.463         0.073        0.1975         2.901        1.0855        0.5185
+S_coastal_nodefend     S         10183.5          7.35          0.37          29.0         109.0         259.5          80.5         133.5        0.4675        0.0935        0.1875        3.4125         1.081         0.504
+
+=== T-7 HEALTH TEST — structure must move hierarchy more than productivity does ===
+    (Smith & Codding 2021: Resource structure 0.37 vs NPP productivity 0.04)
+  pct_stratified       productivity-range 3.2  structure-range 4.1499999999999995  -> ORDERING HOLDS
+  gini_cred            productivity-range 0.2045  structure-range 0.10849999999999999  -> *** ORDERING VIOLATED / inconclusive ***
+  lineage_size_gini    productivity-range 0.03949999999999998  structure-range 0.08500000000000002  -> ORDERING HOLDS
+
+=== BENCHMARK SCORECARD (per arm, vs documented targets) ===
+  band_med             target 25.0 [18.0-35.0]  MET in 7/7 arms   (Johnson scalar stress / R-72)
+        HIT  P_flat_boreal          19.75
+        HIT  P_flat_temperate       29.75
+        HIT  P_flat_tropical        23.5
+        HIT  S_flat_temperate       29.75
+        HIT  S_hilly_temperate      25.5
+        HIT  S_coastal_temp         30.0
+        HIT  S_coastal_nodefend     29.0
+  settle_med           target 100.0 [50.0-150.0]  MET in 6/7 arms   (Bar-Yosef 50-150; R-63/R-64)
+        miss P_flat_boreal          0.0
+        HIT  P_flat_temperate       94.5
+        HIT  P_flat_tropical        87.5
+        HIT  S_flat_temperate       94.5
+        HIT  S_hilly_temperate      98.5
+        HIT  S_coastal_temp         104.0
+        HIT  S_coastal_nodefend     109.0
+  connubium_med        target 475.0 [300.0-700.0]  MET in 0/7 arms   (Wobst ~475)
+        miss P_flat_boreal          32.5
+        miss P_flat_temperate       139.5
+        miss P_flat_tropical        78.75
+        miss S_flat_temperate       139.5
+        miss S_hilly_temperate      71.75
+        miss S_coastal_temp         79.0
+        miss S_coastal_nodefend     133.5
+  lineage_size_gini    target 0.6 [0.51-0.68]  MET in 3/7 arms   (BHM 2009 stratified range; R-103g)
+        miss P_flat_boreal          0.506
+        HIT  P_flat_temperate       0.5435
+        miss P_flat_tropical        0.504
+        HIT  S_flat_temperate       0.5435
+        HIT  S_hilly_temperate      0.548
+        miss S_coastal_temp         0.463
+        miss S_coastal_nodefend     0.4675
+  lin_top_share        target 0.16 [0.08-0.3]  MET in 3/7 arms   (T-9 Karmin et al. 2015)
+        miss P_flat_boreal          0.0665
+        HIT  P_flat_temperate       0.089
+        miss P_flat_tropical        0.0565
+        HIT  S_flat_temperate       0.089
+        miss S_hilly_temperate      0.078
+        miss S_coastal_temp         0.073
+        HIT  S_coastal_nodefend     0.0935
+  ascribed_frac        target 0.057 [0.036-0.078]  MET in 0/7 arms   (EA true-elite 3.6-7.8%)
+        miss P_flat_boreal          0.38
+        miss P_flat_temperate       0.3245
+        miss P_flat_tropical        0.3195
+        miss S_flat_temperate       0.3245
+        miss S_hilly_temperate      0.363
+        miss S_coastal_temp         0.1975
+        miss S_coastal_nodefend     0.1875
+
+-> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery5_results.json

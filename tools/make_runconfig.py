@@ -1,0 +1,194 @@
+"""Author a RUN FILE: base config + a stated difference, emitted fully resolved.
+
+WHY BOTH. Hand-writing 330 fields per run would drift the moment a shared default changed (Charter P4: a
+second copy is tested or deleted). Resolving inheritance at LOAD time would give a file that reads one way and
+runs another, which is the layering that produced every "what was actually on?" failure in this project. So:
+inheritance at AUTHORING time, a complete statement on disk.
+
+    py -3 tools/make_runconfig.py full_campaign
+    py -3 tools/make_runconfig.py ablation_soil_off --off enable_soil_depletion,enable_alluvial_renewal \
+        --why "isolate the swidden oscillator from the settlement signal"
+    py -3 tools/make_runconfig.py sweep_pathogen --set pathogen_gamma=0.15 --on enable_terrain_pathogen \
+        --why "Cashdan low arm"
+
+The base is `config/mechanisms.toml` + `config/parameters.toml`, which `tools/gen_runconfig.py` derives from
+the config classes. Output goes to `config/runs/<name>.toml`.
+
+EVERY FILE RECORDS WHAT IT DIFFERS FROM AND WHY, in a `[meta]` section. A run file with an unexplained
+difference from the canonical stack is an experiment nobody can interpret later.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as _dt
+import os
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "sic_games" / "src"))
+
+RUNS_DIR = ROOT / "config" / "runs"
+
+# Execution settings for the reference arm. A run file states all of them explicitly.
+# DERIVED FROM runspec.RUN_DEFAULTS, NOT A SECOND COPY (2026-08-22). It WAS a hand-maintained duplicate, and
+# it drifted the moment `seed_layout` was added: new run keys silently failed to appear in authored files, so
+# a run file could not express the setting at all. Charter P4 -- a second copy is tested or deleted.
+# `tag` is excluded (it is per-invocation, not a run property) and `steps` keeps its smaller AUTHORING default
+# so a hand-made arm is cheap to smoke-test before anyone commits to 15000 steps.
+def _base_run() -> dict:
+    from sic_games.runspec import RUN_DEFAULTS
+    # `tag` is per-invocation, not a run property. None-valued defaults (world_seed / climate_seed /
+    # agent_seed) mean "inherit from `seed`" and have no TOML representation -- emitting them wrote
+    # `world_seed = None`, which is not valid TOML and broke every file authored for one commit.
+    skip = {"tag"} | {k for k, v in RUN_DEFAULTS.items() if v is None}
+    return {**{k: v for k, v in RUN_DEFAULTS.items() if k not in skip}, "steps": 2500}
+
+
+BASE_RUN = _base_run()
+
+
+def _fmt(v) -> str:
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, str):
+        return '"' + v.replace('"', '\\"') + '"'
+    return repr(v)
+
+
+def build(name: str, on=(), off=(), sets=(), run_over=None, why: str = "") -> str:
+    from sic_games import runconfig
+    from sic_games.climate import ClimateConfig
+    from sic_games.config import SubstrateConfig
+    from sic_games.demography import DemographyConfig
+
+    loaded = runconfig.load(refresh=True)
+    flat: dict = {}
+    for owner in ("DemographyConfig", "ClimateConfig", "SubstrateConfig"):
+        flat.update(loaded.get(owner, {}))
+
+    # SubstrateConfig added 2026-08-17. Its fields were unnameable here, so `--set group_safety_max=0` was
+    # rejected as an unknown field and the grouping drives could not be varied by any run file -- while every
+    # campaign ran them at 8.0/15.0 through a hardcoded `**GRP`.
+    known = (set(DemographyConfig.model_fields) | set(ClimateConfig.model_fields)
+             | set(SubstrateConfig.model_fields))
+    diffs: list[str] = []
+
+    for f in on:
+        if f not in known:
+            raise SystemExit(f"--on: unknown field {f!r}")
+        if flat.get(f) is not True:
+            diffs.append(f"{f}: {flat.get(f)} -> true")
+        flat[f] = True
+    for f in off:
+        if f not in known:
+            raise SystemExit(f"--off: unknown field {f!r}")
+        if flat.get(f) is not False:
+            diffs.append(f"{f}: {flat.get(f)} -> false")
+        flat[f] = False
+    for item in sets:
+        k, _, v = item.partition("=")
+        k = k.strip()
+        if k not in known:
+            raise SystemExit(f"--set: unknown field {k!r}")
+        ann = (DemographyConfig.model_fields.get(k) or ClimateConfig.model_fields.get(k)
+               or SubstrateConfig.model_fields[k]).annotation
+        cast = {int: int, float: float, bool: lambda s: s.lower() in ("1", "true")}.get(ann, str)
+        new = cast(v.strip())
+        if flat.get(k) != new:
+            diffs.append(f"{k}: {flat.get(k)} -> {new}")
+        flat[k] = new
+
+    run = {**BASE_RUN, **(run_over or {})}
+    for k, v in (run_over or {}).items():
+        if BASE_RUN.get(k) != v:
+            diffs.append(f"run.{k}: {BASE_RUN.get(k)} -> {v}")
+
+    if diffs and not why:
+        raise SystemExit(
+            "this file differs from the canonical stack but gives no reason.\n  "
+            + "\n  ".join(diffs)
+            + "\nPass --why. An experiment whose difference is unexplained cannot be interpreted later.")
+
+    mech = {k: v for k, v in sorted(flat.items()) if k.startswith("enable_")}
+    par = {k: v for k, v in sorted(flat.items()) if not k.startswith("enable_")}
+
+    L = [f"# RUN CONFIG — {name}",
+         "#",
+         "# A RUN IS THIS FILE. It states everything: how long, which world, every mechanism, every",
+         "# parameter. Nothing else decides what happened. Generated by tools/make_runconfig.py from",
+         "# config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the",
+         "# base and the difference stay separable.",
+         "#",
+         f"# generated {_dt.date.today().isoformat()}",
+         ""]
+    L += ["[meta]",
+          f'name = "{name}"',
+          f'differs_from_canonical = {len(diffs)}']
+    if why:
+        L.append(f'why = {_fmt(why)}')
+    if diffs:
+        L.append("# THE DIFFERENCE, stated field by field:")
+        L += [f"#   {d}" for d in diffs]
+    else:
+        L.append("# No difference from the canonical stack — this IS the reference arm.")
+    L += ["", "[run]"]
+    L += [f"{k} = {_fmt(v)}" for k, v in run.items()]
+    L += ["", "[mechanisms]"]
+    L += [f"{k} = {_fmt(v)}" for k, v in mech.items()]
+    L += ["", "[parameters]"]
+    L += [f"{k} = {_fmt(v)}" for k, v in par.items()]
+    return "\n".join(L) + "\n"
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="Author a fully-resolved run config file.")
+    ap.add_argument("name")
+    ap.add_argument("--on", default="", help="comma-separated enable_* to force ON")
+    ap.add_argument("--off", default="", help="comma-separated enable_* to force OFF")
+    ap.add_argument("--set", dest="sets", default="", help="comma-separated field=value")
+    ap.add_argument("--steps", type=int)
+    ap.add_argument("--seed", type=int)
+    ap.add_argument("--founders", type=int)
+    ap.add_argument("--max-minutes", dest="max_minutes", type=int,
+                    help="wall-clock budget; the run stops cleanly at it. 0 = uncapped.")
+    ap.add_argument("--seed-layout", dest="seed_layout", choices=["cycle", "cluster"],
+                    help="founder layout: cycle (legacy, 1/cell) or cluster (capacity-sized groups)")
+    ap.add_argument("--seed-cluster-size", dest="seed_cluster_size", type=int)
+    ap.add_argument("--terrain")
+    ap.add_argument("--climate")
+    # THE SEED'S THREE ROLES (runspec RUN_DEFAULTS, 2026-08-11). Omit them and all three follow `--seed`,
+    # which is what every existing run file does. State one to PIN it: `--world-seed 0 --agent-seed 3` holds
+    # the planet still and varies only the stochastic path, which is the only way to separate WORLD variance
+    # from PATH variance. With one integer, two "seeds" are two different planets.
+    ap.add_argument("--world-seed", dest="world_seed", type=int,
+                    help="pin the world draw (terrain+climate knobs and the noise grid)")
+    ap.add_argument("--climate-seed", dest="climate_seed", type=int,
+                    help="pin the climate realisation on that world")
+    ap.add_argument("--agent-seed", dest="agent_seed", type=int,
+                    help="pin the agents' stochastic path")
+    ap.add_argument("--why", default="", help="why this run differs from the canonical stack")
+    a = ap.parse_args(argv)
+
+    run_over = {k: v for k, v in
+                (("steps", a.steps), ("seed", a.seed), ("founders", a.founders),
+                 ("terrain", a.terrain), ("climate", a.climate),
+                 ("max_minutes", a.max_minutes), ("world_seed", a.world_seed),
+                 ("climate_seed", a.climate_seed), ("agent_seed", a.agent_seed),
+                 ("seed_layout", a.seed_layout), ("seed_cluster_size", a.seed_cluster_size))
+                if v is not None}
+    text = build(a.name,
+                 on=[s.strip() for s in a.on.split(",") if s.strip()],
+                 off=[s.strip() for s in a.off.split(",") if s.strip()],
+                 sets=[s.strip() for s in a.sets.split(",") if s.strip()],
+                 run_over=run_over, why=a.why)
+    RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    out = RUNS_DIR / f"{a.name}.toml"
+    out.write_text(text, encoding="utf-8")
+    n = sum(1 for l in text.splitlines() if " = " in l)
+    print(f"wrote {n} settings -> {out.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -10,6 +10,12 @@ from collections import Counter, defaultdict
 HERE = os.path.dirname(__file__)
 
 
+def _g(row, new, old):
+    """Read a renamed trajectory key, falling back to the pre-R-106 name so historical
+    trajectories stay readable (n_villages -> n_bigbands, village_med -> bigband_med)."""
+    return row.get(new, row.get(old))
+
+
 def gini(xs):
     xs = sorted(v for v in xs if v is not None)
     n = len(xs)
@@ -61,7 +67,8 @@ def analyze_traj(tag):
     print(f"  DYNASTY eff_lineages {eff[0]:.0f}→{eff[-1]:.1f}  top_share {top[0]:.3f}→{top[-1]:.3f}  "
           f"(fixation: {'YES — winner-take-all' if top[-1] > 0.6 else 'pluralistic' if top[-1] < 0.35 else 'partial'})")
     print(f"  SETTLE  n {tr[-1]['n_settle']} max {tr[-1]['settle_max']} primate {tr[-1].get('primate_ratio')} "
-          f"zipf {tr[-1].get('zipf_slope')} | villages {tr[-1]['n_villages']} med {tr[-1]['village_med']}")
+          f"zipf {tr[-1].get('zipf_slope')} | big bands {_g(tr[-1],'n_bigbands','n_villages')} "
+          f"med {_g(tr[-1],'bigband_med','village_med')}")
     print(f"  MATING  connubium median max {max(r.get('connubium_med') or 0 for r in tr):.0f} (→Wobst ~475)  "
           f"| INSTAB mean {statistics.mean(r['claim_events'] for r in tr):.1f} events/step  cells-owned final {tr[-1]['cells_owned']}")
     print(f"  INEQ    gini_cred {tr[-1]['gini_cred']} gini_wealth {tr[-1]['gini_wealth']}  male_RS_gini {tr[-1]['male_rs_gini']}  "

@@ -47,19 +47,51 @@ def compute_harvest_shares(
     S: float,
     kappa: float,
     phi_epsilon: float,
+    claim: list[float] | None = None,
 ) -> list[float]:
-    """Return per-occupant shares of S (Σ shares == S). See module docstring."""
+    """Return per-occupant shares of S (Σ shares == S). See module docstring.
+
+    `claim` is an optional per-occupant CLAIM WEIGHT applied before the κ contest. `claim=None` is the
+    historical split and is reproduced bit-exact, so every prior result stands and the vectorised
+    `soa_tier1.harvest_split_segment` equivalence holds unchanged.
+
+    WHY A CLAIM WEIGHT EXISTS (R-106, 2026-08-15). The flat branch gives every occupant S/n regardless of
+    age. 59% of a canonical population is under 15, so a newborn claims exactly what a 30-year-old hunter
+    claims. The realised hazard is then FLAT at ~0.06/yr from age 1 to 60 — crowding starves a prime adult
+    at the same rate as a child — against a Siler intrinsic hazard of 0.0141/yr at age 30. An age-blind
+    split is the only term in the model that can produce an age-blind excess hazard.
+
+    The caller supplies the weight; this function does not decide what a claim should be. Two candidates
+    live in `DemographyConfig`: `enable_need_weighted_shares` (claim ∝ consumption_factor, Kaplan 2000
+    net-consumer childhood) and `enable_eta_weighted_shares` (claim ∝ η, a person claims what they can
+    actually harvest). They are separate flags because they are separate assertions about the world.
+    """
     n = len(occupants)
     if n == 0:
         return []
-    if kappa == 0.0 or n == 1:
+    if claim is None:
+        if kappa == 0.0 or n == 1:
+            base = S / n
+            return [base] * n
+        weights = [
+            base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
+            for a in occupants
+        ]
+    elif kappa == 0.0:
+        weights = list(claim)
+    else:
+        # MULTIPLICATIVE composition: the claim scales the contest rather than replacing it, so the Carbon
+        # κ-contest keeps its ordering within an age class and κ=0 stays the pure claim split.
+        weights = [
+            c * (base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0)
+            for c, a in zip(claim, occupants)
+        ]
+    wsum = sum(weights)
+    if wsum <= 0.0:
+        # Degenerate claim (every weight zero): fall back to the even split rather than divide by zero.
+        # Σ shares == S must hold in EVERY branch — a cell that silently returned zeros would destroy kcal.
         base = S / n
         return [base] * n
-    weights = [
-        base_status(a, phi_epsilon) ** kappa if a.strategy == "carbon" else 1.0
-        for a in occupants
-    ]
-    wsum = sum(weights)
     return [S * w / wsum for w in weights]
 
 
@@ -85,6 +117,7 @@ def diffusion_select_target(
     aggl_alpha: float = 1.15,
     aggl_half: float = 100.0,
     aggl_mode: str = "point",
+    aggl_attract: float = 1.0,
     forage_cap=None,
     move_cost_field=None,
     site_field=None,
@@ -94,6 +127,8 @@ def diffusion_select_target(
     store_field=None,
     store_gain: float = 0.0,
     store_horizon: float = 24.0,
+    cap_group: bool = False,
+    burn: float = 0.0,
 ) -> tuple[int, int]:
     """Stage 6.0a §4.1/4.2 diffusion movement: local-gradient step over the von-Neumann
     neighbourhood (4 cardinal + current), NO unoccupied filter.
@@ -179,6 +214,19 @@ def diffusion_select_target(
         # E.2 mating access (a penalty below the minimum viable band ⇒ being alone is actively bad).
         if s_max > 0.0 or g_mate > 0.0:
             g = n_cell if is_cur else n_cell + 1                 # post-move group size
+            # CAPACITY-SCALED GROUPING (R-106, 2026-08-22). A group larger than the land can feed confers NO
+            # further grouping benefit: fifteen people on a cell that feeds two are not a safer band, they are
+            # a famine. Without this the E.1/E.2 multipliers reward aggregation identically at every
+            # productivity, which is calibrated for rich ground and lethal on poor.
+            # MEASURED: a stable cell needs occ <= K/(1+DEPLETE_FRAC). Arid K=2.0 gives occ_max 1.33; the
+            # agents sat at 1.40 and every arid run went extinct inside 60 steps, 95% of deaths from
+            # starvation, zero births ever. Forest K=36.3 gives occ_max 24.2, so the same behaviour is
+            # harmless there -- which is why this only ever showed up on a single-biome test.
+            # NO NEW PARAMETER: the cap is the cell's own food divided by BURN, both already in hand.
+            # Real foragers size groups to what the country supports -- the Western Desert pattern behind the
+            # 0.005/km2 anchor (Long 1971, Cane 1990; LITERATURE.md).
+            if cap_group and burn > 0.0:
+                g = min(g, max(1.0, S / burn))
             if s_max > 0.0:
                 gs_local = float(band_opt_field[cy, cx]) if band_opt_field is not None else g_s   # v3: CV-derived
                 ypc *= 1.0 + s_max * (1.0 - math.exp(-g / gs_local))                              # risk-pooling saturates at g*(CV)
@@ -203,15 +251,22 @@ def diffusion_select_target(
         #    super-linearly (O=A·n^β), so per-capita RISES with n (β>1) and REINFORCES packing. aggl_alpha carries β here.
         #  CATCHMENT (falsified): R·L(n)/n, L=n^α/(n^α+half^α) — a shared saturating pot ⇒ per-capita PEAKS then congests
         #    (areal-dispersive; DEAD_ENDS). Kept for comparison.
+        # `aggl_attract` scales the PERCEIVED premium ONLY (R-106 Addendum 13). The same agglomeration term
+        # does two jobs: here it ATTRACTS movers, and in the harvest (`phase1_model`) it CREATES food. R-106
+        # Addendum 10 measured that entanglement — ablating agglomeration cut population to x0.20-0.45 because
+        # it supplies over half the economy's output, while max cell occupancy fell 159 -> 10. So concentration
+        # could not be tuned without wrecking subsistence. This weight decouples them: at 0 an agent perceives
+        # no co-location premium (it distributes by food alone, IFD) yet still RECEIVES the realized production
+        # bonus. 1.0 ⇒ bit-exact with every prior run.
         if R_field is not None:
             n_grp = (n_cell if is_cur else n_cell + 1) + extra_occupants
             Rv = float(R_field[cy, cx])
             if Rv > 0.0 and n_grp > 0:
                 if aggl_mode == "point":
-                    ypc += Rv * (n_grp ** (aggl_alpha - 1.0) - 1.0)         # co-location PREMIUM: 0 at n=1, rises with n
+                    ypc += aggl_attract * Rv * (n_grp ** (aggl_alpha - 1.0) - 1.0)   # co-location PREMIUM: 0 at n=1
                 else:
                     na = n_grp ** aggl_alpha
-                    ypc += Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
+                    ypc += aggl_attract * Rv * (na / (na + aggl_half ** aggl_alpha)) / n_grp
         # Stage 1c CATCHMENT SITE-APPRAISAL: a static central-place suitability bonus (occupancy-INDEPENDENT) — the
         # anticipated value of the SITE (rich, cheap-to-work catchment). A global gradient agents climb toward prime
         # real-estate (assembly) + tightens onto catchment cores. site_field=None ⇒ off, bit-exact.

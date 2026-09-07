@@ -1,0 +1,104 @@
+BATTERY 1 — liveness of 75 mechanisms | regime: 600 agents, patch 24, 400 steps, seed 0 | 6 workers
+
+CONTROLS
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  C1 NULL      baseline run twice -> IDENTICAL (PASS)   [10.5s per run]
+  C2 POSITIVE  flip enable_game -> DIFFERS (PASS)
+  PRECONDITIONS in the baseline regime: {'max_settlements': 7, 'bonds': 190, 'tot_material': np.float64(3084164589.613425), 'n_ascribed': 27, 'deaths': 830, 'births': 1046, 'n_villages': 5, 'n_lineages': 206}
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  1/75 enable_adaptive_connubium                live [13 fields]
+  2/75 enable_aggl_ceiling                      live [13 fields]
+  3/75 enable_agglomeration                     live [13 fields]
+  4/75 enable_aggregation_sedentism             live [13 fields]
+  5/75 enable_agriculture                       live [12 fields]
+  6/75 enable_alluvial_renewal                  *** INERT *** 
+  7/75 enable_ascribed_mate_choice              live [11 fields]
+  8/75 enable_band_affiliation                  live [13 fields]
+  9/75 enable_band_family_knobs                 live [12 fields]
+ 10/75 enable_band_risk                         *** INERT *** 
+ 11/75 enable_bonded_mating                     *** INERT *** 
+ 12/75 enable_catchment_ceiling                 live [12 fields]
+ 13/75 enable_condition                         *** INERT *** 
+ 14/75 enable_cred_renorm                       live [12 fields]
+ 15/75 enable_cred_status                       live [13 fields]
+ 16/75 enable_delegitimation                    live [12 fields]
+ 17/75 enable_density_disease                   live [12 fields]
+ 18/75 enable_dynamic_bands                     live [12 fields]
+ 19/75 enable_economic_defensibility            live [12 fields]
+ 20/75 enable_emergent_abandonment              *** INERT *** 
+ 21/75 enable_emergent_band_size                live [12 fields]
+ 22/75 enable_energetic_fertility               live [13 fields]
+ 23/75 enable_exogamy                           live [12 fields]
+ 24/75 enable_forage_cap                        live [11 fields]
+ 25/75 enable_game                              live [12 fields]
+ 26/75 enable_genealogy_log                     *** INERT *** 
+ 27/75 enable_genome                            live [12 fields]
+ 28/75 enable_improved_land                     *** INERT *** 
+ 29/75 enable_infanticide                       *** INERT *** 
+ 30/75 enable_landscape_packing                 live [12 fields]
+ 31/75 enable_leader_coherence                  live [12 fields]
+ 32/75 enable_leader_office                     live [11 fields]
+ 33/75 enable_leader_share                      live [13 fields]
+ 34/75 enable_legitimacy                        live [12 fields]
+ 35/75 enable_leveling                          live [11 fields]
+ 36/75 enable_life_history                      live [12 fields]
+ 37/75 enable_lineage_branching                 live [12 fields]
+ 38/75 enable_lineage_split                     live [12 fields]
+ 39/75 enable_lineage_tribute                   live [11 fields]
+ 40/75 enable_local_ascription                  live [13 fields]
+ 41/75 enable_malnutrition_fission              live [11 fields]
+ 42/75 enable_marriage_aggregation              live [13 fields]
+ 43/75 enable_material_capture                  live [10 fields]
+ 44/75 enable_material_inheritance              live [12 fields]
+ 45/75 enable_morph                             live [12 fields]
+ 46/75 enable_noble_leveling_exemption          live [12 fields]
+ 47/75 enable_nutrition_synergy                 *** INERT *** 
+ 48/75 enable_orphan_mortality                  live [12 fields]
+ 49/75 enable_pair_bonds                        live [13 fields]
+ 50/75 enable_paternity                         live [11 fields]
+ 51/75 enable_productivity_mobility             live [12 fields]
+ 52/75 enable_provisioning                      *** INERT *** 
+ 53/75 enable_prowess_facet                     live [12 fields]
+ 54/75 enable_rank_hierarchy                    *** INERT *** 
+ 55/75 enable_relative_legitimacy               live [12 fields]
+ 56/75 enable_relative_resentment               live [11 fields]
+ 57/75 enable_resentment_accumulator            live [11 fields]
+ 58/75 enable_resource_directed_fusion          live [11 fields]
+ 59/75 enable_resource_storability              live [12 fields]
+ 60/75 enable_sedentism_fertility               live [12 fields]
+ 61/75 enable_settlement_scalar_stress          live [13 fields]
+ 62/75 enable_site_appraisal                    live [12 fields]
+ 63/75 enable_size_repulsion                    live [12 fields]
+ 64/75 enable_soil_depletion                    *** INERT *** 
+ 65/75 enable_standing                          live [12 fields]
+ 66/75 enable_storage                           live [12 fields]
+ 67/75 enable_store_anchor                      live [12 fields]
+ 68/75 enable_stratification_inequality_gate    live [11 fields]
+ 69/75 enable_terrain_move_cost                 live [11 fields]
+ 70/75 enable_terrain_pathogen                  live [12 fields]
+ 71/75 enable_terrain_risk                      live [12 fields]
+ 72/75 enable_tier2_shock                       live [12 fields]
+ 73/75 enable_village_budding                   *** INERT *** 
+ 74/75 enable_village_resentment                live [12 fields]
+ 75/75 enable_village_scaling                   live [12 fields]
+
+==============================================================================
+INERT        13  enable_alluvial_renewal, enable_band_risk, enable_bonded_mating, enable_condition, enable_emergent_abandonment, enable_genealogy_log, enable_improved_land, enable_infanticide, enable_nutrition_synergy, enable_provisioning, enable_rank_hierarchy, enable_soil_depletion, enable_village_budding
+UNTESTABLE    0
+HARNESS       0
+CRASH         0
+LIVE         62
+
+204s -> C:\Users\syatom\Projects\SiC Games\sic_games\outputs\mechanism_battery\battery1_results.json

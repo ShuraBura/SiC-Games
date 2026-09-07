@@ -1,0 +1,1 @@
+alpha=0.02 step 3200/3600 pop=7053 n_bands=326 fissions=1737 fusions=1412

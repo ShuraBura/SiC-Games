@@ -1,0 +1,336 @@
+# Marker matrix — the scorecard for a well-working model
+
+**Purpose.** One table, scored on every significant run, that says whether the model reproduces the
+ethnographic and archaeological record. A run that does not carry these numbers cannot be said to have been
+validated, however long it ran.
+
+**Binding rules, each earned the hard way:**
+
+1. **Every band is re-verified against `LITERATURE.md` at run time.** A benchmark whose anchor has been retired
+   is **skipped with a note, never scored** — Battery 5 reported "connubium 0/7" against a target this project
+   had retired two weeks earlier, manufacturing a defect that did not exist.
+2. **A marker with no documented band is not scored.** `ascribed_frac` has been reported as a headline failure
+   for weeks against a 3.6–7.8% band that appears nowhere in `docs/`. Unverifiable is not the same as failing.
+3. **Seeds must beat the variance — and WHICH variance depends on the marker.** R-65 documented 30× seed
+   variance in `%stratified`. Addendum 40 split the seed into its three roles (`world_seed` / `climate_seed` /
+   `agent_seed`) and found the answer is not one number:
+   - **`pop`, capacity, density** — the variance is the PLANET DRAW (world CV 1.49 against path 0.15). Pin the
+     world; replicate ACROSS worlds. One run per world is adequate.
+   - **`pct_stratified`, `gini_cred`** — world CV 0.95 but path CV 0.40 and climate 0.55. **Both bars are
+     large.** Multiple worlds do NOT substitute for multiple paths here.
+   - **`deaths_starv`** — path variance EXCEEDS world variance (1.47 vs 1.25). An event tally is driven by bad
+     draws, not by how much land there is. Replicate the path.
+   Single-point verdicts on high-variance markers are not evidence. Before `fe00524` "seed variance" could only
+   mean world variance, because one integer drew the planet, the climate and the path together.
+4. **Markers travel together.** A wealth marker read on a steeply growing population means something different
+   from one read at stationarity, which is why the demographic-engine block is scored alongside, not separately.
+
+---
+
+## The matrix
+
+| # | marker | field | band | source | status |
+|---|---|---|---|---|---|
+| 1 | band size | `band_med` | **28.2 ADULTS** (Hill 2011, 32 societies) — the all-ages [18–35] is mis-attributed | Hill et al. 2011 `[VERIFIED, PDF read]`; ~~Johnson~~ | **FAILS 16/16 on adults** — model 11.8 adults/band = 0.42×. The 23/25 all-ages pass is carried by excess children |
+| 2 | ~~settlement size~~ | ~~`settle_med`~~ | **RETIRED 2026-08-06** | Bar-Yosef 1998: PDF filed, read, and confirmed by the supervisor to be maps and burial sites — no village-population figure exists in the text to find | **Retired at zero cost to coverage:** it was a second, unverifiable band on the *same field* as #3, whose band is verified. Nothing was being measured here that #3 does not measure |
+| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **PROVISIONAL — THE FIELD IS CONTAMINATED (2026-08-16).** The prior "46/52 arms PASS, median of arm medians 97.5" was read off a settlement list that double-counts people ~20×. See the settlement-overlap note below. |
+| 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
+| 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
+| 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
+| 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
+| 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
+| 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
+| 10 | **polygyny** | `frac_polygynous_m` | **~0.04 OF ALL MEN** — our field divides by MARRIED men | Marlowe, *The Hadza* — **VERIFIED VERBATIM 2026-08-07**: *"about 4% of men have 2 wives at any given time, but never more than two wives"* | **UNIT MISMATCH on a PASS.** 0.0362 on our denominator reads ~1.0×; on Marlowe's it is **0.0307 = 0.77×**. The gap IS the male marriage rate (0.847), so the bias MOVES between arms |
+| 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
+| 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** The clean-looking first read of −0.98 is a rank-size slope over ~20× phantom settlements. See the note below. |
+| 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** Computed from the same settlement list. See the note below. |
+| 14 | **wealth concentration** | `material_gini`, `material_top10_share` | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column) | BHM 2009 (T-5) | **0.162** measured (0.131–0.185, 16 arms) — ~2× below the HG anchor |
+| 15 | orphanhood | `frac_motherless` | ~0.02 | Aché, Hill & Hurtado | tracks |
+| 16 | demographic engine | `median_age_yr`, `dependency_ratio`, `sex_ratio_m_f`, `frac_child` | **NOW ANCHORED (2026-08-08)** — Hill & Hurtado Table 4.4 p.141, on the model's OWN age classes (0–15/15–60/60+): dependency **0.598 !Kung / 0.866 Yanomamö / 0.899 Aché**; %<15 **28.7 / 45.4 / 41.9**; sex ratio **0.896 / 1.202 / 1.368** | Hill & Hurtado 1996 Table 4.4 `[VERIFIED VERBATIM, 3 rows registered]`; !Kung via Lee 1979:45, Yanomamö via Neel & Weiss 1975:28 | **RE-SCORED 2026-08-28 (R-106 Addendum 54)** after `enable_village_identity` was adopted, all four together on the n=1500/300 coastal-temperate fixture: **`frac_child` 0.585 → 0.414 PASSES** (inside 0.287–0.454, at the Aché 0.419); **dependency 1.495 → 0.907**, was 1.66× the highest of three forager peoples and now misses the 0.899 ceiling by 0.9%; **sex ratio 1.061 → 0.987 PASSES** (inside 0.896–1.368); **`median_age_yr` 12.8 → 17.1, STILL SHORT of ~20 — the open gap.** 2 of 4 pass, 1 marginal, 1 open. No longer context — a scored row |
+| 17 | **fission ceiling** | `settle_max` | communities should not persist far past **158 [147–170]** (max scalar stress) and effectively never past **250** (ethnographic maximum) | Alberti 2014 `[VERIFIED VERBATIM]` + Alvard 2009 `[VERIFIED VERBATIM]`; Hamilton 2007 periodic aggregation **165.32 [152.25–181.00]** independently lands on the same scale `[VERIFIED VERBATIM]` | **MISSES — screen only.** Over 52 trajectories the median `settle_max` is **220**; **39/52 exceed 158** and **18/52 exceed 250**. The typical village is right (#3) while the largest one over-runs the size at which both sources say communities break up |
+
+**HILL 2011 IS NOT A LINEAGE SOURCE (2026-08-06, PDF read).** `MODEL_SPEC` §4.8.8, `TARGETS` and `PARAMETERS`
+all carry *"dominant-lineage share 0.38, ~7 lineages/band (Hill et al. 2011)"*. **The word "lineage" occurs
+zero times in that paper.** Its unit is co-residence of PRIMARY KIN (brothers, sisters, parents, offspring);
+the three "0.38"s are Table 1 cells (Nunamuit, Hadza, and a column average). This propagates:
+`rank_hierarchy_frac = 0.15` is documented as DERIVED from the ~1/7. What Hill 2011 does give, verified:
+**mean experienced band size 28.2 ADULTS**, **1.8 co-resident adult primary kin per band**, and that most band
+members are genetically unrelated.
+
+**ANCHOR-PROVENANCE SWEEP (2026-08-04, RESULTS Addendum 27).** Every cited source was located in
+`literature/` and searched for its number. Of nine rows with a numeric band and a named paper: **2 verify**
+(#3 Alvard verbatim, #14 BHM Table S5), **2 are mis-attributed** with the real numbers elsewhere in the folder
+(#1, #6), **1 is withdrawn** (#5), **2 have no source in the repo at all** (#2, #9), and 2 name their
+derivation well enough to trust (#8 Bandy, #15 Hill & Hurtado Table 13.1).
+
+**The rows that survived are the ones whose citation named a table, a page or a sentence. Every row that
+failed cited only an author and a year.** Charter §11 P5 as an acceptance criterion: **an anchor names its
+table, or it is not an anchor.**
+
+**SWEEP CLOSED 2026-08-06 (RESULTS Addendum 29).** The three papers the supervisor fetched settled the two
+open rows and the sweep was then extended to the climate layer wired on 2026-08-04, which had never been
+checked at all.
+- **#2 retired.** Bar-Yosef holds no village-population figure — confirmed by the supervisor's own read. It
+  was a duplicate band on #3's field, so retiring it costs no coverage.
+- **#17 added.** Alberti 2014 and Hamilton 2007 both verified verbatim and both land on ~160 for the
+  aggregation ceiling, giving `settle_max` a two-source anchor where it had none.
+- **#6 RETIRED 2026-08-07 (supervisor decision).** Smith & Codding 2021 was fetched and verified, but for
+  #9's ordering claim, not for a lineage share, and no forager-scale lineage-concentration source exists
+  in the folder. Its band came from **Yan 2014** (Neolithic Chinese super-grandfather haplogroups) and
+  **Zerjal 2003** (the Genghis Khan haplogroup) — both measure Y-chromosome dominance in large,
+  post-Neolithic, state-scale populations where one man's descendants could out-reproduce everyone for
+  forty generations. **A forager band of 20–60 with a mate-gate and high mortality cannot structurally
+  reach that concentration**, so the 7/25 was never evidence about the model. Retired rather than left
+  visibly broken, because a marker that fails permanently for a reason everyone has to re-learn is a
+  warning that trains people to ignore warnings. **The diagnostic is unchanged and still reported.**
+- **Climate, first check ever:** Sarmiento, Wanner, Hawkes and Timmermann's *period* all verify (Hawkes via a
+  documented conversion that reproduces 518/745 to the unit); **Timmermann's amplitude does not exist in the
+  paper** and is now tagged INTERPRETIVE; **St. John 2022 has no PDF** and its channel is default-OFF.
+- **The checker is now code:** `tools/verify_anchor.py --list` re-reads every PDF and
+  `sic_games/tests/test_anchor_provenance.py` fails the suite if any wired number stops being findable in its
+  own source. Prose could drift; this cannot.
+
+**#5's ANCHOR IS WITHDRAWN — BHM 2009 contains no lineage-size Gini (2026-08-04, the paper read).**
+`literature/borgerhoff-mulder.som.pdf` is the SOM for *Intergenerational Wealth Transmission and the Dynamics
+of Inequality in Small-Scale Societies* (Science 326:682). Every Gini in it is a **wealth** Gini: *"Population-
+and wealth-type-specific Gini coefficients were calculated using the maximal sample of individuals … for whom
+**wealth** and age data were available"*, age-adjusted against a quadratic in age, over 43 **wealth types**.
+Table S5's material-wealth column reads pastoral **0.51**, horticultural **0.52**, agricultural **0.57** —
+which is where [0.51–0.68] came from. It was a MATERIAL-WEALTH band applied to a LINEAGE-SIZE distribution,
+i.e. the wrong quantity, not merely the wrong unit. (`ELITE_STRATIFICATION_ROADMAP` also quotes two
+incompatible BHM ranges for this same marker, "0.51–0.68" at line 173 and "0.4–0.6" at line 190.)
+
+BHM's band belongs on **#14**, where the project had already put it — and scored there against the
+hunter-gatherer row (material Gini **0.36**) the model reads **0.162**, about half. #5's apparent 17/25 was a
+pass against a borrowed band.
+
+**#5 also has a UNIT problem, independent of the anchor.** `lineage_size_gini` is a Gini over `_rank_keys()`,
+which under `enable_local_ascription` (ON in the canonical stack) returns **(community, lineage) pairs** — so
+one patriline fragments into one unit per community. `lin_size_gini`, in the same row, is the Gini over
+`_lineage` itself. They differ in 16/16 long arms and the sign of the difference flips between arms, which
+reverses the reading: on the rank-key unit the full stack goes 1/8 → 8/8 in the old band; on the patriline it
+goes 6/8 → 4/8. Both the quantity and the unit need deciding before #5 is scored again.
+
+Markers **10–14 and 16 were wired on 2026-07-27**; before that they were computed by `demography()` every step
+and never carried into a campaign trajectory, so **no long run in this project's history has ever scored them.**
+That is how polygyny sat 15× off Marlowe unnoticed: nothing was looking.
+
+---
+
+## Notes that must travel with specific markers
+
+**#17 — ALBERTI'S 127 IS A THRESHOLD, NOT A CENTRAL BAND. Scoring it as one was nearly the fourth instance of
+this project's unit-mismatch bug class (2026-08-06).** Alberti 2014 verified verbatim: *"a critical scalar
+stress threshold at community size 127 (95% CI: 122–132), while the maximum probability of critical scale
+stress is predicted at size 158 (95% CI: 147–170)."* Those CIs are tight and tempting, and the obvious move —
+add `settle_med ∈ [122, 132]` as a row — is **wrong**, and would have scored **0/52**. 127 is the size at
+which a community *starts to come apart*; a population whose median village sat there would be a population
+permanently mid-fission. The quantity Alberti bounds is the **ceiling**, so the field is `settle_max` and the
+test is one-sided. Same family as the three that came before it: `hayden_stage` on occupied vs regional
+density, `lineage_size_gini` on rank-keys vs patrilines, `connubium_med` on `pool_n` vs `reach_pop`. **Every
+one of them was a real number read against the wrong denominator, unit, or statistic — never a wrong number.**
+
+**#10's PASS IS ON THE WRONG DENOMINATOR (2026-08-07, `test_tier6_family_ctb.py`).** Every unit mismatch
+found so far turned a reported FAILURE into an artefact. This one runs the other way: #10 is reported as a
+PASS ("was 15× off; now 1.0×") and its denominator is not the anchor's.
+
+Marlowe's sentence — now verified verbatim and registered in `verify_anchor.py` — says **"about 4% of MEN have
+2 wives"**. `frac_polygynous_m` divides by **married** men, so the two differ by the male marriage rate.
+Measured: 84.7% of adult men married, giving 0.0362 on our unit (~1.0× the anchor) but **0.0307 on Marlowe's
+(0.77×)** — a 23% shortfall, not parity. **And because the discrepancy IS the marriage rate, its size moves
+between arms**, so the marker is not currently comparable across runs.
+
+A wrong unit is not more forgivable because the answer came out nice. The same sentence also carries a second,
+never-scored property — **"never more than two wives"** — which the diagnostic cannot check because it reports
+no maximum.
+
+**#14 AND #17 SURVIVED THEIR OWN CONFOUND TESTS (2026-08-07, `test_marker_diagnostics_ctb.py`).** Both
+were reported as failures while the diagnostics computing them had **no test anywhere**, which by CLAUDE.md's
+first rule made them claims about the instrument rather than about the model. Both were then CTB'd, and both
+held:
+
+- **#14 `material_gini`.** The measured vector runs over the WHOLE population, children included, and children
+  hold nothing. Adding zero-holders can only push a Gini **UP** — so the child confound cannot explain a
+  reading that is 2× BELOW the anchor; correcting for it widens the gap. Separately, BHM's 0.36 is
+  **age-adjusted** (a quadratic in age, removing the life-cycle component), which *lowers* their figure, while
+  ours is raw. So we compare a raw-inflated 0.162 against an adjusted-reduced 0.36 and are still 2× under.
+  **The miss is real and, if anything, understated.** The methodological mismatch should travel with the
+  number.
+- **#17 `settle_max`.** A MAXIMUM grows with sample size at a fixed distribution — verified on constructed
+  normal draws, where E[max] rises by >15 units from n=5 to n=50 — so an arm with more settlements could
+  report a larger `settle_max` without its settlements being any bigger. **Measured across the 52 arms:
+  corr(n_settle, settle_max) = +0.024** — essentially nil, against corr(n_settle, settle_med) = −0.328. The
+  confound is real in principle and **not operating in this data**, so #17's over-run is not an artefact of
+  settlement count.
+
+**#17's status is a SCREEN, not a score.** The 52 trajectories were run for other purposes across different
+worlds, run lengths and flag stacks, several predating R-105/R-106 fixes. They establish the *direction* and
+that the marker is worth wiring; they do not give a calibrated figure. It needs a proper campaign before the
+miss is sized.
+
+**#3 and #17 come from the same field and must be read together.** `settle_med` passing while `settle_max`
+over-runs is not a contradiction — it is the diagnosis: fission fires, but not hard enough at the top of the
+distribution. A single "village size" verdict would have averaged these into a meaningless pass.
+
+**#4 connubium is density-dependent — do not score it pooled.** Measured corr(density, connubium) = **+0.55**
+across 25 arms: sparse boreal worlds give 7.5–48, dense worlds give 85–173, straddling the ~150 anchor. A
+pooled "15/25" reads as a failure and is mostly an artefact of including near-dead worlds. Score it against
+density, or restrict to arms above a density floor.
+
+**#7 nobility share is not scoreable.** `docs/` record only "EA true-elite few %". The precise 3.6–7.8% band
+came from somewhere and was never filed. File the Ethnographic Atlas source with its numbers and this marker
+starts scoring automatically.
+
+**#9 the T-7 ordering is unstable.** It holds on 2 of 3 hierarchy proxies, but *which* proxy violates has moved
+between runs (`gini_cred` once, `lineage_size_gini` the next). Pre-register one proxy as *the* hierarchy index
+before scoring, or the verdict is chosen after the fact.
+
+**#11 status→RS must be re-measured, not carried over.** R-77 established the old +0.170 was an artefact of 6×
+excess polygyny. With polygyny corrected the expectation was ~+0.019; a first short run reads 0.117. Needs a
+full-length run before it means anything.
+
+**#4/#5 the AGE-STRUCTURE markers had a single upstream cause (R-106, 2026-07-30).** `median_age_yr` ~13 and
+`frac_motherless` 8–11% were not two failures but one: the fertility brake read a reserve level that cannot
+vary, so births could not respond to crowding and **mortality did 100% of the regulating**. In a stationary
+population e₀ = 1/CDR, so a CDR of ~50–77/1000 forces e₀ ≈ 20.7, a median age of 13 and a high orphan rate.
+`enable_intake_fertility` closes **26–40%** of the gap on all four demographic markers at once:
+
+| marker | before | after | anchor |
+|---|---|---|---|
+| e₀ (yr) | 19.1 | **21.4** | ~28 stationary (R-16) |
+| `median_age_yr` | 13.4 | **15.2** | ~20 (Aché) |
+| `frac_child` | 54.5% | **49.6%** | ~40% |
+| `frac_motherless` | 11.8% | **7.9%** | ~2% (Hill & Hurtado) |
+
+**RE-SCORE 2026-08-28 (R-106 Addendum 54) — village identity moved the family again, and further.** Same rule,
+same fixture (n=1500 / 300 steps, coastal-temperate, seed 0), after `enable_village_identity` was adopted:
+
+| marker | 2026-08-08 | **now** | anchor |
+|---|---|---|---|
+| `frac_child` | 54.5% | **41.4%** | 28.7–45.4% (Hill & Hurtado Table 4.4) — **INSIDE, at the Aché 41.9%** |
+| `dependency_ratio` | 1.495 | **0.907** | 0.598–0.899 — misses the ceiling by 0.9% |
+| `sex_ratio_m_f` | 1.061 | **0.987** | 0.896–1.368 — **INSIDE** |
+| `median_age_yr` | 13.4 | **17.1** | ~20 (Aché) — **still the open gap** |
+| `frac_motherless` | 11.8% | **3.6%** | ~2% (Hill & Hurtado) |
+
+The mechanism is social, not a mortality knob: co-resident bands merge into one community, which ends the
+"45 bands in one village" artifact and lowers turnover. Validated in THREE biomes (tropical, temperate,
+boreal) before adoption — every marker moved the same direction in each. What is NOT fixed: median age, and
+the early-adult cliff (15-30 : 30-45 = 2.71×).
+
+**Score these four TOGETHER, never singly** — they share a denominator in the vital-rate identity, so moving one
+without the others is a sign of forcing rather than a fix. Still short of every anchor; next lever is counting
+dependents in the fertility requirement (PARAMETERS §21.10).
+
+**#14 is the live open question.** Material does not concentrate in the elite (`noble_material_lift` 0.87–1.04)
+even with inheritance, tribute, noble exemption, zero decay and a narrow elite. Diagnosed as **no return on
+capital**: `material` is a terminal stock that cannot buy anything, whereas Sahlins' big-man "uses wealth to
+place others in his debt … he constructs a following whose production may be harnessed to his ambition."
+
+---
+
+## THE SETTLEMENT LIST DOUBLE-COUNTS PEOPLE ~20× — markers #3, #12, #13 are provisional (2026-08-16)
+
+**The defect.** `_maintain_settlements` counts every person inside a site's `(2·settle_radius+1)` window —
+`settle_radius = 2`, so **25 cells = 2,500 km²** — and its own docstring warns the windows **overlap** whenever
+sites sit closer than that, so neighbouring villages each count the **same** people toward their own
+`settle_min_pool` floor of 40.
+
+**Measured, canonical arm, coastal-temperate seed 0:**
+
+```
+184 sites × 25 cells = 4,602 window-cells  over  229 OCCUPIED cells
+→ every occupied cell lies inside ~20 different sites' persistence windows
+```
+
+So `n_settle = 184` and `settle_med = 11` do not describe 184 hamlets of 11 people. They describe **one
+clustered population counted about twenty times over**, each site reporting ~11 residents of its own while
+borrowing its neighbours to survive. None could stand alone.
+
+**Savanna is the natural control and it agrees:** 2 sites, only 4.2× overlap, `settle_med` **85.1** — inside
+Alvard's verified 50–250. Where sites cannot overlap, the reported village is village-sized.
+
+**An anchor-free consistency check that should have caught this years earlier.** Alvard's 50–250 plus the
+measured population *bounds* the settlement count — no new number required:
+
+| arm | pop | allowed `n_settle` | reported | verdict |
+|---|---|---|---|---|
+| canonical s0 | 2,782 | 11 – 56 | 160 | **TOO MANY** |
+| canonical s1 | 9,084 | 36 – 182 | 213 | **TOO MANY** |
+| savanna | 240 | 1 – 5 | 2 | OK |
+
+**Three markers are affected, not one.** `primate_ratio` and `zipf_slope` are computed from the *same*
+settlement list (`run_campaign.py:424`), so #12's clean-looking first read of **−0.98** is a rank-size slope
+over phantom settlements.
+
+**The fix is NOT `enable_exclusive_village_membership`.** It was re-tested on 2026-08-16 against this question
+rather than the spacing question it was rejected for in August, and it **failed the discriminator**: a pure
+measurement fix must move `settle_med` while leaving the physical distribution alone. Instead population fell
+**9.5% / 63.7%** across two seeds, occupied land **halved**, and founding churn rose **8×** — confirming the
+original "raises churn" rejection from a second direction. It buys a correct-looking number by destroying the
+population that produced it.
+
+**What is needed** is a pure diagnostic with no behavioural coupling: cluster the occupied cells into
+connected components and report distinct settlements and their true sizes, leaving `_maintain_settlements`
+untouched. Scoreable on size (#3, Alvard **VERIFIED**), max (#17), slope (#12) and primacy (#13). **Spacing
+has no filed anchor** and must be reported as a bracket with only a floor — two non-overlapping 10 km HG
+catchments imply ≥20 km — never as a scored target.
+
+---
+
+## The spatial sanity check — compare the population to the MAP, every run
+
+**Why this section exists.** The R-106 arc spent a week diagnosing mortality, then fertility, on a population
+that was using **14% of its land**, sitting **4.8× BELOW** Binford packing regionally while **1.4× ABOVE** it
+locally, with the median agent eating **2.7× requirement**. Every input was already logged in every row.
+Nothing multiplied `pop` by anything and compared it to the map. The supervisor's verdict: *"Copious amount of
+time and tokens was wasted not doing just that."*
+
+**It is wired, not just written.** `demography.spatial_health()` runs in every snapshot of every campaign and
+prints a `!! SPATIAL:` banner when a check fails. A table nobody reads is what let this happen.
+
+### What the map should carry
+
+Habitable area = `habitable_cells × 100 km²`. That is the **capacity patch's** land (R-103i circumscription),
+NOT the 100×100 grid — the population cannot disperse outside it. For the standard coastal-temperate world,
+1584 habitable cells = **158,400 km²**.
+
+| density /km² | source | people | bands of 25 | connubia of 150 | tribes of 500 |
+|---|---|---|---|---|---|
+| 0.010 | arid / sparse — *round, illustrative* | 1,584 | 63 | 11 | 3 |
+| 0.030 | boreal–temperate — *round, illustrative* | 4,752 | 190 | 32 | 10 |
+| 0.050 | temperate generalist — *round, illustrative* | 7,920 | 317 | 53 | 16 |
+| **0.091** | **Binford 2001 packing — FILED ANCHOR** | **14,414** | **577** | **96** | **29** |
+| 0.150 | rich coastal — *round, illustrative* | 23,760 | 950 | 158 | 48 |
+
+**Only 0.091 is a filed anchor**, and it is a **CEILING**, not a target — the threshold above which Binford
+says foragers intensify. Per binding rule 2 of this document, the other rows are a reference bracket and must
+never be cited as though this project had filed them. `expected_population()` labels them in code for the same
+reason.
+
+### The two checks — neither introduces a new number
+
+| check | rule | anchor |
+|---|---|---|
+| **PACKING PARADOX** | not (local > 0.091 **and** regional < 0.091) | Binford 2001, used twice — once per side |
+| **BAND CATCHMENT** | km² per band ≥ 314 | Vita-Finzi & Higgs 1970, 10 km site catchment |
+
+**The paradox is the one that matters.** A forager population cannot be simultaneously PACKED (locally dense
+enough to intensify) and SPARSE (regionally nowhere near filling its range). If both hold, the population is
+**not food-limited — it is failing to disperse**, and every carrying-capacity conclusion drawn from that run
+is void. A ±10% deadband keeps the verdict off the knife edge; without it a population sitting exactly at
+packing reads as "sparse" by one part in 10,000 (caught by this checker's own CTB before it was wired in).
+
+**The band-catchment check** is the blunter one. A band commanding less land than its own foraging radius
+would have territories overlapping completely. That is not a forager landscape.
+
+### What the model actually did (2026-08-16, coastal-temperate seed 0)
+
+| arm | pop | bands | land used | regional /km² | local /km² | km²/band | verdict |
+|---|---|---|---|---|---|---|---|
+| `claim_both` | 2,782 | 102 | 12.3% | 0.0176 | 0.143 | 214 | **PARADOX + below catchment** |
+| `fert_sedoff_s0` | 3,010 | 107 | 14.4% | 0.0190 | 0.132 | 214 | **PARADOX + below catchment** |
+| `morph_off_s0` | 3,070 | 157 | 16.7% | 0.0194 | 0.116 | 169 | **PARADOX + below catchment** |
+| `fert_ctl_savanna` | 240 | 12 | **0.8%** | 0.0016 | 0.198 | 100 | **PARADOX + below catchment** |
+
+Band size itself is fine (28 per band against Hill's ~25–28 adults). **The arrangement is the defect.**

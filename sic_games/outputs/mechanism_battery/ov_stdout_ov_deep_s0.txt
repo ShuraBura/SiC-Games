@@ -1,0 +1,8 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+campaign: sha=234437f world=coastal-temperate founders=3000 steps=30000 habitable=1584 connubium=cut1 defend=True improved=False budding=True(thr150) elite=True genome=True genealogy=OFF flush/500
+[    1/30000] pop=  2917 bd=   2 vil=2(med1458.5) strat=0.0% giniC=0.277 dyn:eff=2917.0 top=0.0 nlin=2917 lpb=1458.5/dom=0.001 mRSg=0.0 set=0(mx0,primNone) con=None inst=0 ldT=0.0 | asc=0.001 gumsa=1.0 tenure=0.0y levy=20833120.0 resent(mean/max)=0.0/0.0 revs=0 | 0.0m eta71m
+  [33] SUSPENSION: 241.7m elapsed vs 0.01m pace — charging pace, not wall (budget protected)
+[  100/30000] pop=  2934 bd= 139 vil=0(med0) strat=55.9% giniC=0.3 dyn:eff=1236.5 top=0.004 nlin=2023 lpb=14.79/dom=0.211 mRSg=0.694 set=60(mx130,prim1.14) con=34.0 inst=28 ldT=1.0 | asc=0.015 gumsa=0.065 tenure=2.2y levy=8681641.0 resent(mean/max)=0.0/0.0 revs=0 | 242.2m eta72414m
+[  200/30000] pop=  3510 bd= 127 vil=15(med52) strat=66.9% giniC=0.346 dyn:eff=701.8 top=0.005 nlin=1607 lpb=13.01/dom=0.299 mRSg=0.685 set=88(mx164,prim1.13) con=36.0 inst=15 ldT=0.484 | asc=0.131 gumsa=0.52 tenure=3.6y levy=9250672.5 resent(mean/max)=0.0/0.0 revs=12 | 242.8m eta36174m
+[  300/30000] pop=  4430 bd= 124 vil=32(med58.5) strat=81.0% giniC=0.37 dyn:eff=516.2 top=0.008 nlin=1329 lpb=14.03/dom=0.322 mRSg=0.708 set=167(mx120,prim1.02) con=55.5 inst=15 ldT=0.603 | asc=0.116 gumsa=0.605 tenure=4.7y levy=12640026.6 resent(mean/max)=0.0/0.0 revs=27 | 243.2m eta24078m
