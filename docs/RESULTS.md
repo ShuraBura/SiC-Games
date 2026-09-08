@@ -7858,6 +7858,27 @@ clean exogenous biome-harshness proxy for the target — NOT seasonal amplitude 
 similar amplitude but very different e0; savanna's food is lower/more variable RELATIVE TO REQUIREMENT). No
 mechanism adopted; the static-target finding and the framing are the deliverable.
 
+**FINAL — all four preventive-check implementations exhausted (2026-09-08).** Beyond the endogenous form
+(self-cancels) and the exogenous cell-proxy (no property predicts the emergent harshness — lean-return/burn,
+NPP, forage_cap, amplitude all fail to rank the biomes by e0; temperate has the HIGHEST amplitude yet the BEST
+e0 because it BUFFERS its trough): (3) a GLOBAL sub-K target `density_fert_target_fill` — at 0.75 (6 seeds)
+savanna e0 +3.6 / temperate +0.9, but marginal, seed-noisy (per-seed e0 ranges 16-44), doesn't reach anchor, and
+changes a core fertility knob for EVERY run (band size / stratification / elite all calibrated at 1.0) — a huge
+blast radius for a ~3-yr nudge, rejected. (4) a CARRYING-COST target (Blurton Jones): brake on
+pop·burn/(trough capacity + granary buffer, capped at the mean) — forward-looking + buffer-aware, so it does
+NOT self-cancel and does NOT over-brake buffered biomes. Built, capacity-cap bug fixed (storage smooths UP TO
+the mean, not beyond), lean-steps swept: at lean=24 savanna +2.9 / temperate −1.5 — a real but WEAK selectivity
+that does NOT beat the simpler global target, still costs temperate, and doesn't reach anchor. Reverted.
+
+THE DEFINITIVE REASON: once STORAGE is adopted (Addendum 68 union gate), the seasonal TROUGH is buffered, so
+trough-based mechanisms are weak — the harsh-biome e0 gap lives at the MEAN-K equilibrium (children chronically
+marginal at fill≈1), not at the trough. Closing it requires holding N below the MEAN ceiling, and NO signal
+cleanly separates savanna from temperate at the mean level (both sit at mean-fill≈1; the harshness is emergent).
+So the preventive check is REAL and NAMED (Malthus's other half) but has no clean, robust, biome-selective
+implementation in this model. This is a precisely-characterized MODEL LIMITATION, not a loose end. The adopted
+deliverable of the whole biome-e0 arc is per-biome seasonality (Addendum 69, the one real defect); the
+harsh-biome residual is the honest Malthusian floor.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
