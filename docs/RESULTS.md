@@ -7822,6 +7822,42 @@ the `mu_max` child-synergy territory: 2.5 (Pelletier's MILD RR) is applied at th
 chronically under-provisioned children. Whether to recalibrate it is Malthusian-fraught (child-first was
 falsified, Addendum 68) and is left open.
 
+## Addendum 70 — The missing mechanism is Malthus's PREVENTIVE CHECK; the endogenous form self-cancels (2026-09-07, R-106)
+
+**The framing.** After the per-biome seasonality fix (Addendum 69), the residual harsh-biome e0 gap (savanna ~24
+vs 31; tropical residual) is the model's children running chronically lean (condition ~0.32, ~17 days from
+starvation) and the SOUND Pelletier synergy correctly taxing them. The proxy was validated (`condition` = distance
+from the starvation floor; a child at 0.32 is genuinely chronically stressed, not a bookkeeping artifact). So the
+residual is not a synergy miscalibration — it is that the model regulates population ONLY by Malthus's POSITIVE
+check (starvation at the ceiling). Real forager and pre-industrial populations regulate mainly by the PREVENTIVE
+check — fertility falls with scarcity, holding the population BELOW the famine ceiling (Wrigley & Schofield's
+low-pressure homeostasis of pre-industrial England; forager environment-sensitive birth spacing, !Kung IBI 44 mo
+> Ache 37). Adding it is not un-Malthusian — it is the OTHER half of Malthus, the half he thought mattered.
+
+**The static sub-K target WORKS (confirms the thesis).** A `density_fert_target_fill` that makes the
+density-fertility brake reach full suppression at a fraction of K (holding N below the ceiling) was built and swept:
+at target 0.5, SAVANNA reaches its anchor (e0 23.7 -> 30.3) with less starvation (0.54 -> 0.45), at lower density
+(pop 467 -> 395) — the real low-density harsh-biome forager pattern. IMPORTANT CHANNEL CORRECTION: child condition
+is INVARIANT (~0.34) to the target, so the e0 gain is NOT better-provisioned children — it is FEWER starvation
+deaths (the Malthusian cull shrinks as N drops). A global constant target is wrong (it pushes temperate to e0 40 >
+anchor 37); the target must be biome-sensitive.
+
+**The ENDOGENOUS form is FALSIFIED (self-cancels + oscillates).** Making the target fall with the band's realized
+starvation EMA (`_band_starv_ema`) — a homeostat keyed on the variable it controls — FAILS: fertility down ->
+starvation down -> signal down -> target rises -> starvation returns, settling at a fixed point with starvation
+still present, never at the low-starvation state the static target reaches. The lag makes it a DELAYED negative
+feedback that induces population oscillations, so the period e0 catches the crashes and drops. A/B (endogenous,
+calibrated to reach ~0.5 for savanna): savanna e0 23.7 -> 22.1 (WORSE, vs the static 0.5's 30.3). Built, measured,
+REVERTED (tree bit-exact).
+
+**The lesson (and the open problem).** The preventive check must respond to an EXOGENOUS scarcity signal (the
+ENVIRONMENT — a lean place/season, encoded by cultural birth-spacing norms), NOT the ENDOGENOUS outcome (realized
+deaths) — the endogenous form has the causal direction wrong and self-cancels. It is INDIVIDUAL-aggregate (each
+mother spacing to her provisioning capacity), NOT group selection (Wynne-Edwards, discredited). What remains is a
+clean exogenous biome-harshness proxy for the target — NOT seasonal amplitude alone (savanna and temperate have
+similar amplitude but very different e0; savanna's food is lower/more variable RELATIVE TO REQUIREMENT). No
+mechanism adopted; the static-target finding and the framing are the deliverable.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
