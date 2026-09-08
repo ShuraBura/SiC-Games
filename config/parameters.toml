@@ -1201,6 +1201,106 @@ type  = "float"
 # per-capita rises, and the acute crash is averted; villages re-form when the lean passes (the
 # abandonment/budding cycle). Default OFF ⇒ pin never released on hunger ⇒ bit-exact.
 
+[restraint_init]
+value = 0.0
+owner = "DemographyConfig"
+type  = "float"
+# [PROVISIONAL] founder restraint; 0 ⇒ restraint must EVOLVE from nothing (R-106 candidate, no lit anchor)
+# — (channel note, inherited) ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested
+# on top of `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries `_fert_restraint` ∈
+# [0,1] (founders start at `restraint_init`, inherited from the mother with Gaussian mutation
+# `restraint_mutation_sigma`). It multiplies her per-step birth probability by (1 − restraint) → more
+# restraint = longer inter-birth interval. Within a band, a LESS-restrained woman out-reproduces a
+# more-restrained one (Williams' problem), so this channel alone is expected to lose. (2) GROUP cultural
+# transmission: every `restraint_transmission_period` steps, a fraction `restraint_transmission_rate` of
+# agents copy the mean restraint of the CURRENTLY FITTEST band (payoff-biased social learning, Boyd &
+# Richerson) — the between-band channel that band autonomy is meant to make effective, because under
+# autonomy the fittest band is the one that held its size below its own catchment ceiling. Both default
+# OFF ⇒ birth probability unchanged ⇒ bit-exact.
+
+[restraint_mutation_sigma]
+value = 0.02
+owner = "DemographyConfig"
+type  = "float"
+# [PROVISIONAL] per-birth Gaussian mutation of the heritable restraint gene (R-106 candidate) — (channel
+# note, inherited) ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of
+# `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries `_fert_restraint` ∈ [0,1]
+# (founders start at `restraint_init`, inherited from the mother with Gaussian mutation
+# `restraint_mutation_sigma`). It multiplies her per-step birth probability by (1 − restraint) → more
+# restraint = longer inter-birth interval. Within a band, a LESS-restrained woman out-reproduces a
+# more-restrained one (Williams' problem), so this channel alone is expected to lose. (2) GROUP cultural
+# transmission: every `restraint_transmission_period` steps, a fraction `restraint_transmission_rate` of
+# agents copy the mean restraint of the CURRENTLY FITTEST band (payoff-biased social learning, Boyd &
+# Richerson) — the between-band channel that band autonomy is meant to make effective, because under
+# autonomy the fittest band is the one that held its size below its own catchment ceiling. Both default
+# OFF ⇒ birth probability unchanged ⇒ bit-exact.
+
+[restraint_transmission_period]
+value = 60
+owner = "DemographyConfig"
+type  = "int"
+# [PROVISIONAL] steps between payoff-biased social-learning events (R-106 candidate) — (channel note,
+# inherited) ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of
+# `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries `_fert_restraint` ∈ [0,1]
+# (founders start at `restraint_init`, inherited from the mother with Gaussian mutation
+# `restraint_mutation_sigma`). It multiplies her per-step birth probability by (1 − restraint) → more
+# restraint = longer inter-birth interval. Within a band, a LESS-restrained woman out-reproduces a
+# more-restrained one (Williams' problem), so this channel alone is expected to lose. (2) GROUP cultural
+# transmission: every `restraint_transmission_period` steps, a fraction `restraint_transmission_rate` of
+# agents copy the mean restraint of the CURRENTLY FITTEST band (payoff-biased social learning, Boyd &
+# Richerson) — the between-band channel that band autonomy is meant to make effective, because under
+# autonomy the fittest band is the one that held its size below its own catchment ceiling. Both default
+# OFF ⇒ birth probability unchanged ⇒ bit-exact.
+
+[restraint_transmission_rate]
+value = 0.1
+owner = "DemographyConfig"
+type  = "float"
+# [PROVISIONAL] fraction of agents who copy the fittest band's restraint each event (R-106 candidate) —
+# (channel note, inherited) ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on
+# top of `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries `_fert_restraint` ∈
+# [0,1] (founders start at `restraint_init`, inherited from the mother with Gaussian mutation
+# `restraint_mutation_sigma`). It multiplies her per-step birth probability by (1 − restraint) → more
+# restraint = longer inter-birth interval. Within a band, a LESS-restrained woman out-reproduces a
+# more-restrained one (Williams' problem), so this channel alone is expected to lose. (2) GROUP cultural
+# transmission: every `restraint_transmission_period` steps, a fraction `restraint_transmission_rate` of
+# agents copy the mean restraint of the CURRENTLY FITTEST band (payoff-biased social learning, Boyd &
+# Richerson) — the between-band channel that band autonomy is meant to make effective, because under
+# autonomy the fittest band is the one that held its size below its own catchment ceiling. Both default
+# OFF ⇒ birth probability unchanged ⇒ bit-exact.
+
+[dens_response_init]
+value = 6.0
+owner = "DemographyConfig"
+type  = "float"
+# [PROVISIONAL] founder exponent (= the calibrated density_fert_exponent; R-106 candidate) — (channel
+# note, inherited) ── HERITABLE DENSITY-RESPONSE (the reaction-norm selectability test; R-106). The
+# density-fertility brake (`enable_density_fertility`) is currently a FIXED exponent shared by all women.
+# Here the exponent becomes a per-mother HERITABLE trait `_dens_exponent` (founder value
+# `dens_response_init`, inherited with mean-preserving lognormal mutation `dens_response_mut_sigma`). A
+# LOWER exponent brakes fertility EARLIER (more restraint at moderate fill); a HIGHER exponent brakes only
+# at the very edge of K (less restraint). The test reads the DIRECTION selection pushes the exponent:
+# under the commons a restrained mother pays the fertility cost while the lower-density benefit is shared
+# (altruism) ⇒ the exponent should drift UP (restraint lost); under band autonomy the band bears its own
+# density ⇒ the between-band channel can hold or lower it. Requires `enable_density_fertility`. Default
+# OFF ⇒ the fixed `density_fert_exponent` is used ⇒ bit-exact.
+
+[dens_response_mut_sigma]
+value = 0.1
+owner = "DemographyConfig"
+type  = "float"
+# [PROVISIONAL] per-birth mean-preserving lognormal mutation of the exponent (R-106 candidate) — (channel
+# note, inherited) ── HERITABLE DENSITY-RESPONSE (the reaction-norm selectability test; R-106). The
+# density-fertility brake (`enable_density_fertility`) is currently a FIXED exponent shared by all women.
+# Here the exponent becomes a per-mother HERITABLE trait `_dens_exponent` (founder value
+# `dens_response_init`, inherited with mean-preserving lognormal mutation `dens_response_mut_sigma`). A
+# LOWER exponent brakes fertility EARLIER (more restraint at moderate fill); a HIGHER exponent brakes only
+# at the very edge of K (less restraint). The test reads the DIRECTION selection pushes the exponent:
+# under the commons a restrained mother pays the fertility cost while the lower-density benefit is shared
+# (altruism) ⇒ the exponent should drift UP (restraint lost); under band autonomy the band bears its own
+# density ⇒ the between-band channel can hold or lower it. Requires `enable_density_fertility`. Default
+# OFF ⇒ the fixed `density_fert_exponent` is used ⇒ bit-exact.
+
 [aggl_mode]
 value = "point"
 owner = "DemographyConfig"

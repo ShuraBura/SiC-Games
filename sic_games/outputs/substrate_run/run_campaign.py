@@ -954,6 +954,17 @@ def main():
             # Over-clustering and the population ceiling are coupled through the density channel; the spread
             # needs a replacement brake before it can be adopted. HELD until that is built + validated.
             "enable_village_catchment_spread",
+            # BAND-AUTONOMY / PREVENTIVE-CHECK CANDIDATES (R-106, 2026-09-08, docs/RESULTS Addendum 72). Built to
+            # test whether band-autonomous resources make fertility restraint selectable. `enable_band_territory`
+            # DOES create the per-band fitness signal (savanna corr −0.075 → +0.118) but does NOT raise e0. The
+            # three fertility flags — a heritable restraint gene, its group-transmission engine, and a heritable
+            # density-response reaction norm — leave the restraint neither selectable nor consequential to e0
+            # (the population homeostats below K via compensating mortality). NONE is adopted; they are kept as
+            # ablatable instruments, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
+            "enable_band_territory",
+            "enable_fertility_restraint_gene",
+            "enable_restraint_group_transmission",
+            "enable_heritable_density_response",
             # SETTLEMENT PAIR ADOPTED (R-106, 2026-09-05, docs/RESULTS Addendum 61). `enable_colonizing_budding`
             # and `enable_village_density_disease` are removed from this set -> canonically ON. Together they give
             # dispersed settlement (spacing ~2.3 cells) at a STATIONARY population (small-world plateau confirmed)

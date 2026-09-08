@@ -79,6 +79,10 @@ TYPES = {
     # Founding judged on STORABLE surplus rather than raw S_pot, and tier-2 yield summed over OWNED cells.
     # Both are T: they decide WHERE a site may exist and WHICH land it draws on, not how much a cell yields.
     "enable_storable_founding": "T", "enable_worked_land_yield": "T",
+    # BAND TERRITORY (R-106, 2026-09-08): pins a settled member to its OWN band's home site instead of the
+    # nearest settlement, so a band cannot escape its own over-breeding by drifting to a neighbour. Decides
+    # WHERE members reside -> type T. No magnitude of its own (a pure residence rule).
+    "enable_band_territory": "T",
     "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
     "enable_leader_share": "X",
     # STORAGE UNION GATE (R-106, 2026-09-07): the overwintering zone becomes cold ENOUGH OR seasonal ENOUGH, so a
@@ -122,6 +126,11 @@ TYPES = {
     # DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05): birth prob falls as the village nears its food
     # ceiling. A vital-rate modifier -> N.
     "enable_density_fertility": "N",
+    # FERTILITY RESTRAINT (R-106, 2026-09-08). The heritable birth-spacing gene multiplies the birth prob by
+    # (1-restraint); the group-transmission engine copies the fittest band's norm; the heritable density-response
+    # makes the density-brake exponent a per-mother trait. All three modulate the birth RATE -> type N.
+    "enable_fertility_restraint_gene": "N", "enable_restraint_group_transmission": "N",
+    "enable_heritable_density_response": "N",
     # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03, keystone): a settled agent's disease density is its
     # village population over the village territory, not single-cell occupancy. Modulates the a2 hazard -> N.
     "enable_village_density_disease": "N",
@@ -244,6 +253,10 @@ MAGNITUDE = {
     "enable_cred_status": {"cred_seed_sigma": 0.5, "cred_inherit_sigma": 0.1},   # default 0.0 ⇒ all cred equal
     "enable_game": {"game_meat_frac": 0.55, "game_meat_cv": 0.73},    # default 0.0 ⇒ no meat stream at all
     "enable_prowess_facet": {"prowess_decay": 0.05},                  # default 0.0, adopted value 0.05
+    # R-106 fertility restraint: restraint_init defaults 0.0 ⇒ the birth-prob multiplier is 1 ⇒ a dead knob
+    # without a live seed. Group transmission also needs a norm present to copy.
+    "enable_fertility_restraint_gene": {"restraint_init": 0.3},
+    "enable_restraint_group_transmission": {"restraint_init": 0.3},
 }
 # Flags whose only prefix-matching parameter is legitimately 0 in the project — no magnitude is missing.
 # `enable_paternity` carries the `_father` link (R-74); `paternal_provision_frac` is 0.0 in EVERY preset, so a
@@ -297,6 +310,12 @@ PREREQ = {
     "enable_noble_leveling_exemption": ("enable_leveling", "enable_legitimacy"),
     "enable_lineage_split": ("enable_lineage_branching",),
     "enable_bud_hazard": ("enable_village_budding",),
+    # R-106 band-autonomy arc (2026-09-08). Band territory needs villages with a stable band identity to pin to
+    # (the `_village_band` map); group transmission copies the restraint gene's trait; the heritable
+    # density-response replaces the density-fertility brake's exponent.
+    "enable_band_territory": ("enable_aggregation_sedentism", "enable_band_affiliation", "enable_village_identity"),
+    "enable_restraint_group_transmission": ("enable_fertility_restraint_gene",),
+    "enable_heritable_density_response": ("enable_density_fertility",),
     "enable_wealth_obligation": ("enable_material_capture",),
     "enable_stratification_inequality_gate": ("enable_morph",),
     "enable_relational_stratification": ("enable_morph",),

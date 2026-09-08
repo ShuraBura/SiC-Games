@@ -7912,6 +7912,58 @@ seasonality (Addendum 69); the harsh-biome residual is now characterised to its 
 fertility restraint is irreducibly cultural AND requires band-autonomous resources to be selectable, neither of
 which the current well-mixed economy supports. This is the honest frontier.
 
+## Addendum 72 — Band-autonomy tested: the preventive check is neither selectable nor consequential; the population homeostats BELOW K (2026-09-08, R-106)
+
+**The hypothesis.** Addendum 71 predicted that fertility restraint could become selectable IF resources were
+BAND-AUTONOMOUS — if a band's over-breeding hurt its OWN patch rather than a shared commons. This addendum builds
+that economy and tests the prediction.
+
+**The diagnosis that scoped the build.** The commons is NOT food pooling. The economy already caps each
+settlement pool at its catchment carrying capacity (`_settlement_carrying_capacity`), so the food is
+territory-limited. The commons is a MEMBERSHIP + MIGRATION artefact: `_maintain_village_identity` assigns band
+membership by RESIDENCE (live at a site `village_identity_months` → you ARE that site's band), and a settled member
+steps toward the NEAREST settlement, not its OWN band's. So a member of an over-crowded band drifts to a neighbour
+site, accretes, and is re-labelled into that band. Measured (`band_commons_diag`): corr(band size, own starvation)
+= −0.075 (savanna), −0.055 (temperate); settled_frac 0.99 — the harsh-biome bands are VILLAGED, not mobile.
+
+**The build (four flags, all default-off, bit-exact).** `enable_band_territory` pins a settled member to its OWN
+band's home site (the site where it is the `_village_band`), so it cannot escape its band's crowding. Then, to
+test whether restraint now becomes selectable: `enable_fertility_restraint_gene` (a heritable per-mother birth-prob
+multiplier), `enable_restraint_group_transmission` (payoff-biased copying of the fittest band's norm), and
+`enable_heritable_density_response` (the density-brake exponent becomes a per-mother heritable reaction norm).
+
+**Result 1 — band autonomy DOES create the per-band fitness signal.** With the pin on, savanna corr(band size,
+own starvation) flips −0.075 → +0.118; temperate stays neutral (−0.041), correctly, because a rich biome has no
+scarcity to signal. Addendum 71's precondition is achieved. But band autonomy ALONE LOWERS savanna e0 (26.5 →
+20.7): the pin removes the migration relief valve, so over-breeders grind harder at their own ceiling.
+
+**Result 2 — restraint is NOT selectable, by either channel, in either economy.** A CONSTANT restraint gene is
+the wrong instrument (a fixed birth cut only slows the APPROACH to K; equilibrium N still = K), and a 2×2
+{commons,autonomy}×{no-restraint,restraint=0.2} gives e0 23.5–27.4 in ALL cells (±4–9, 5 seeds) — no lift, no
+interaction. The heritable density-RESPONSE exponent (the correct reaction-norm instrument) stays pinned at its
+seed of 6.0 under INDIVIDUAL selection (5.85–6.24, commons AND autonomy) AND under GROUP transmission (~5.9) — no
+directional selection either way.
+
+**Result 3 — the preventive check is INCONSEQUENTIAL to e0 even when IMPOSED.** An imposed fixed-exponent sweep
+(2→8, autonomy on) leaves BOTH the equilibrium village fill (~0.43) AND e0 (~22) FLAT. The population equilibrates
+at 43% of catchment capacity — WELL BELOW K — so the sub-K brake shape barely fires, and the ~18% birth reduction a
+low exponent does impose is absorbed by COMPENSATING MORTALITY: the system homeostats its per-capita condition back
+to the same point. This is the Malthusian relocation law again — feeding, adding food, and redistribution never
+raised e0 (Addenda 63–67), and neither does fertility restraint.
+
+**Conclusion — Addendum 71's band-autonomy route is FALSIFIED.** Band-autonomous resources do NOT make the
+preventive check work: restraint is neither selectable (Result 2) nor consequential to e0 (Result 3). And the
+harsh-biome e0 deficit is not a density problem at all — the population already sits below K, yet e0 is still ~22.
+Low e0 is set by the MORTALITY regime at the natural equilibrium, which endogenous regulation of any kind is
+compensated away. Only an EXOGENOUS hold below the natural equilibrium raises e0 (static sub-K → 30.3, Addendum
+71), and exogenous imposition cannot evolve. The preventive-check arc closes here.
+
+**Deliverable.** No mechanism adopted (canonical unchanged). The four flags are kept default-off and bit-exact as
+ablatable instruments for a future selection / social-evolution arc, registered in the benchmark ladder (band
+territory → Tier 9; the three fertility flags → Tier 3) and the flag audit (`audit_flag_invariants.py`). The
+per-band fitness signal (corr +0.118) is a genuine structural result, but it does not translate into e0. The
+harsh-biome e0 residual remains the honest frontier: a property of the mortality regime, not of fertility.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

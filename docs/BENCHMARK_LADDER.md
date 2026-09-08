@@ -98,7 +98,8 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `nutrition_synergy`, `condition`, `store_anchor`, `storage`, `storage_seasonal_union`, `tier2_shock`,
   `energetic_fertility`, `intake_fertility`, `need_weighted_shares`, `eta_weighted_shares`
 - **3 Demography** — `orphan_mortality`, `density_disease`, `density_reference`, `society_regional_density`, `terrain_pathogen`, `dependent_load`, `synergy_age_grade`, `density_fertility`,
-  `sedentism_fertility`, `energetic_refractory`, `life_history`, `malnutrition_fission`, `metabolic_downreg`
+  `sedentism_fertility`, `energetic_refractory`, `life_history`, `malnutrition_fission`, `metabolic_downreg`,
+  `fertility_restraint_gene`, `restraint_group_transmission`, `heritable_density_response`
 - **4 Movement** — `landscape_packing`, `site_appraisal`, `productivity_mobility`, `hunger_dispersal`, `founding_delay`
 - **5 Bands** — `band_affiliation`, `dynamic_bands`, `band_family_knobs`, `emergent_band_size`,
   `leader_coherence`, `size_repulsion`, `resource_directed_fusion`, `leaky_assabiyah`,
@@ -111,7 +112,8 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `catchment_ceiling`, `agglomeration`, `aggl_ceiling`, `emergent_abandonment`,
   `economic_defensibility`, `improved_land`, `agriculture`, `emergent_village_founding`,
   `bud_requires_occupancy`, `bud_site_separation`, `exclusive_village_membership`,
-  `village_identity`, `storable_founding`, `worked_land_yield`, `village_catchment_spread`, `colonizing_budding`
+  `village_identity`, `storable_founding`, `worked_land_yield`, `village_catchment_spread`, `colonizing_budding`,
+  `band_territory`
 - **10 Surplus & material** — `material_capture`, `material_inheritance`, `wealth_obligation`, `standing`,
   `cred_status`, `cred_renorm`, `prowess_facet`
 - **11 Stratification** — `morph`, `rank_hierarchy`, `stratification_inequality_gate`, `relational_stratification`

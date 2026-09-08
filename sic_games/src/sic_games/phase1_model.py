@@ -601,6 +601,12 @@ class TerrainWorld(mesa.Model):
         agent._use_standing = self._demog is not None and getattr(self._demog, "enable_standing", False)
         agent._standing = (self._demog.standing_floor if agent._use_standing else 0.0)
         agent._standing_band = None               # band the standing was built in (change ⇒ outsider penalty)
+        # R-106 preventive check: heritable fertility-restraint gene ∈ [0,1] (founder value = restraint_init;
+        # inherited + mutated at birth). Multiplies the mother's birth probability by (1 − restraint). See demography.py.
+        agent._fert_restraint = (getattr(self._demog, "restraint_init", 0.0) if self._demog is not None else 0.0)
+        # R-106 reaction-norm test: heritable density-response exponent (founder = dens_response_init; lower = more
+        # restraint). Read by the density-fertility brake when enable_heritable_density_response is on. See demography.py.
+        agent._dens_exponent = (getattr(self._demog, "dens_response_init", 6.0) if self._demog is not None else 6.0)
         agent._condition = 1.0                    # S0 body-condition / immune competence (EMA of nutrition)
         agent._last_intake = 0.0                  # this step's gathered kcal (set during harvest)
         # Intake-based energetic fertility: slow EMA of intake/requirement. Starts NEUTRAL (at `intake_fert_hi`
@@ -714,6 +720,8 @@ class TerrainWorld(mesa.Model):
             self._maintain_leader_office()        # R-84: tenure the office; Boehm deposition (9) / desertion (17)
             self._do_obligations()                # C: wealth -> obligation -> a claim on production (Sahlins)
             self._do_births_ibi()
+            if getattr(self._demog, "enable_restraint_group_transmission", False):
+                self._transmit_restraint()   # R-106: payoff-biased social learning of the restraint norm (between-band channel)
             self._do_lineage_split()   # R-92: named lines SEGMENT into sub-clades (after births, so newborns
                                        # are already placed in their father's line and can be carried by a split)
         elif self._reproduction:
@@ -1642,6 +1650,10 @@ class TerrainWorld(mesa.Model):
         # CATCHMENT SPREAD: settled members pin to a HOME cell across the catchment (physical footprint spreads),
         # while the harvest regroups them at the site (food bit-exact). See `enable_village_catchment_spread`.
         spread_on = settle_on and getattr(self._demog, "enable_village_catchment_spread", False)
+        # BAND TERRITORY (band-autonomy): pin a settled member to its OWN band's home site, not the nearest one, so
+        # its band's over-breeding raises its OWN starvation (the fitness signal for restraint). See demography.py.
+        band_terr_on = settle_on and getattr(self._demog, "enable_band_territory", False)
+        band_home_site = {b: s for s, b in self._village_band.items()} if band_terr_on else None
         settle_pop: dict = {}
         if settle_ss_on:
             srad = self._demog.settle_radius
@@ -1727,7 +1739,14 @@ class TerrainWorld(mesa.Model):
                 temp = tfn(agent)
             # Layer 2 RESIDENCE PIN: a settled member steps onto the SINGLE settlement site cell (residence ≠ foraging);
             # its food comes from the catchment tier-2 (harvest step), not the cell it stands on. Mobile agents diffuse.
-            site = self._nearest_settlement(agent.pos) if settle_on else None
+            # BAND TERRITORY: pin to the agent's OWN band's home site, not the nearest one, so it cannot escape its
+            # band's crowding by drifting to a neighbour. A band with no home site yet falls back to the nearest.
+            if band_terr_on:
+                site = band_home_site.get(agent._group.band_id)
+                if site is None:
+                    site = self._nearest_settlement(agent.pos) if settle_on else None
+            else:
+                site = self._nearest_settlement(agent.pos) if settle_on else None
             if site is not None and abandon_on:
                 # EMERGENT ABANDONMENT: chronic REMEMBERED hardship erodes the village's hold. Released ⇒ this agent's
                 # ordinary IFD drive decides — it stays anyway if nowhere nearby is better, or drifts out if it is; the
@@ -2682,6 +2701,50 @@ class TerrainWorld(mesa.Model):
             for c in newborns:
                 self._log_genea("birth", c)
 
+    def _transmit_restraint(self) -> None:
+        """R-106 GROUP channel: payoff-biased social learning of the fertility-restraint norm (Boyd & Richerson).
+        Every `restraint_transmission_period` steps a fraction `restraint_transmission_rate` of agents copy the mean
+        restraint of the FITTEST band. Fitness = per-capita food MARGIN = catchment yield / (N · burn), so the model
+        band is the one that held its size FARTHEST below its own catchment ceiling — which, under band autonomy, is
+        the restrained band. This is the between-band channel that a well-mixed economy cannot reward (a band's
+        margin there is a system property, not a property of its own norm). Mobile bands (no home site) fall back to
+        mean nutritional status. Called only when the flag is on; the period gate lives here."""
+        cfg = self._demog
+        period = max(1, getattr(cfg, "restraint_transmission_period", 60))
+        if self.step_count % period != 0:
+            return
+        rate = getattr(cfg, "restraint_transmission_rate", 0.0)
+        if rate <= 0.0:
+            return
+        members: dict = {}
+        for a in self.agent_list:
+            members.setdefault(a._group.band_id, []).append(a)
+        site_of_band = {b: s for s, b in self._village_band.items()}
+        dens_resp = getattr(cfg, "enable_heritable_density_response", False)   # copy the reaction-norm exponent too
+        best_fit = None
+        best_R = None
+        best_E = None
+        for b, ms in members.items():
+            if len(ms) < 5:
+                continue
+            s = site_of_band.get(b)
+            if s is not None and self._burn > 0.0:
+                fit = self._settlement_carrying_capacity(s) / (len(ms) * self._burn)   # per-capita food margin
+            else:
+                fit = (sum(getattr(x, "_fed_reserve", 0.0) for x in ms) / len(ms)
+                       / max(self._reserve_full, 1e-9))                                # mobile: nutritional status
+            if best_fit is None or fit > best_fit:
+                best_fit = fit
+                best_R = sum(x._fert_restraint for x in ms) / len(ms)
+                best_E = sum(x._dens_exponent for x in ms) / len(ms)
+        if best_R is None:
+            return
+        for a in self.agent_list:
+            if self.random.random() < rate:
+                a._fert_restraint = best_R
+                if dens_resp:
+                    a._dens_exponent = best_E
+
     def _do_births_ibi(self) -> None:
         """Demographic-stage reproduction: female-only, IBI-gated (Siler+IBI core). Maternal folded
         into the all-cause female schedule (approach (ii)); the energetic fertility modifier is OFF
@@ -2734,6 +2797,12 @@ class TerrainWorld(mesa.Model):
         # one. Fill does not re-saturate (unlike the intake EMA), so it tracks the Malthusian stress. Computed
         # once here; the per-mother brake below reads it. Off ⇒ never computed ⇒ bit-exact.
         dens_fert_on = getattr(cfg, "enable_density_fertility", False)
+        # R-106 heritable fertility-restraint gene: a mother's birth probability is multiplied by (1 − restraint).
+        restraint_on = getattr(cfg, "enable_fertility_restraint_gene", False)
+        restraint_sig = getattr(cfg, "restraint_mutation_sigma", 0.0) if restraint_on else 0.0
+        # R-106 reaction-norm: the density-brake exponent is a per-mother heritable trait when this flag is on.
+        dens_resp_on = getattr(cfg, "enable_heritable_density_response", False)
+        dens_resp_sig = getattr(cfg, "dens_response_mut_sigma", 0.0) if dens_resp_on else 0.0
         _fill_cell: dict = {}
         _fill_village: dict = {}
         if dens_fert_on:
@@ -2804,8 +2873,12 @@ class TerrainWorld(mesa.Model):
                 # does not re-saturate, so this checks the population BEFORE starvation (regulation deaths→births).
                 _site = self._nearest_settlement(a.pos)
                 _fill = _fill_village.get(_site, 1.0) if _site is not None else _fill_cell.get(a.pos, 1.0)
-                _fd = 1.0 - (_fill ** cfg.density_fert_exponent if _fill > 0.0 else 0.0)
+                _exp = a._dens_exponent if dens_resp_on else cfg.density_fert_exponent
+                _fd = 1.0 - (_fill ** _exp if _fill > 0.0 else 0.0)
                 p_birth *= 0.0 if _fd < 0.0 else _fd
+            if restraint_on:
+                # PREVENTIVE CHECK: the mother's heritable restraint lengthens her inter-birth interval.
+                p_birth *= (1.0 - a._fert_restraint)
             # Realised fertility schedule (pure observer). Sampled HERE — past the age gate, the IBI gate and
             # the mate gate — so the denominator is "women actually at risk of conception this step", which is
             # what makes the multiplier interpretable. Sampling over all women would dilute it with the
@@ -2838,6 +2911,14 @@ class TerrainWorld(mesa.Model):
                 child.age = 0
                 child._mother = a                                          # C.2b mother-link for provisioning
                 child._group = a._group.inherit()                          # F.3c-1: newborn inherits the mother's band affiliation
+                if restraint_on:                                           # R-106: heritable restraint gene + Gaussian mutation, clamped [0,1]
+                    _r = a._fert_restraint + (self.random.normalvariate(0.0, restraint_sig) if restraint_sig > 0.0 else 0.0)
+                    child._fert_restraint = 0.0 if _r < 0.0 else (1.0 if _r > 1.0 else _r)
+                if dens_resp_on:                                           # R-106: heritable density-response exponent, mean-preserving lognormal mutation
+                    _mult = (math.exp(self.random.normalvariate(-0.5 * dens_resp_sig * dens_resp_sig, dens_resp_sig))
+                             if dens_resp_sig > 0.0 else 1.0)
+                    _e = a._dens_exponent * _mult
+                    child._dens_exponent = 0.05 if _e < 0.05 else (50.0 if _e > 50.0 else _e)
                 child._lineage = a._lineage                                # default matriline (overridden to patriline if a father is assigned)
                 if getattr(child, "use_cred_status", False):               # heritable lineage (cred)
                     si = cfg.cred_inherit_sigma

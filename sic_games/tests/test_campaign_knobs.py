@@ -122,7 +122,13 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # run, so it stays dark until the supervisor adopts it (2026-08-13).
                "enable_density_reference",
                # A CANDIDATE under evaluation: it changes the fertility of every run (2026-08-14).
-               "enable_energetic_refractory"}
+               "enable_energetic_refractory",
+               # BAND-AUTONOMY / PREVENTIVE-CHECK CANDIDATES (R-106, Addendum 72). Built to test whether
+               # band-autonomous resources make fertility restraint selectable; the answer is no (the signal
+               # appears but restraint stays neither selectable nor consequential to e0). NONE adopted; kept as
+               # ablatable instruments, so C_ALLON must not enable them by side effect.
+               "enable_band_territory", "enable_fertility_restraint_gene",
+               "enable_restraint_group_transmission", "enable_heritable_density_response"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

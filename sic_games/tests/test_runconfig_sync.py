@@ -184,7 +184,12 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # population at 2% of carrying capacity, so it is now dark. Reason in run_campaign.py _skip.
                # (colonizing_budding and village_density_disease were ADOPTED here -> canonically ON, so they are
                # deliberately absent from this allowed-dark set.)
-               "enable_bud_requires_occupancy"}
+               "enable_bud_requires_occupancy",
+               # BAND-AUTONOMY / PREVENTIVE-CHECK candidates (R-106, 2026-09-08, Addendum 72), built and CTB'd but
+               # NOT adopted: band autonomy makes the per-band fitness signal but restraint stays neither
+               # selectable nor consequential to e0. Kept as ablatable instruments; reasons in run_campaign.py _skip.
+               "enable_band_territory", "enable_fertility_restraint_gene",
+               "enable_restraint_group_transmission", "enable_heritable_density_response"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

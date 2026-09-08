@@ -1146,6 +1146,48 @@ class DemographyConfig(BaseModel):
     # the lean passes (the abandonment/budding cycle). Default OFF ⇒ pin never released on hunger ⇒ bit-exact.
     enable_hunger_dispersal: bool = False
     hunger_flee_reserve_frac: float = Field(0.35, ge=0.0, le=1.0)  # reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5]
+    # ── BAND TERRITORY (band-autonomy economy; R-106 preventive-check arc). THE FINDING (Addendum 71): forager
+    # fertility restraint cannot become selectable in the current economy, because a band's over-breeding does not
+    # raise its OWN starvation. The economy already caps each settlement pool at its catchment carrying capacity
+    # (`_settlement_carrying_capacity`), so the food is territory-limited. BUT a settled member steps toward the
+    # NEAREST settlement (`_nearest_settlement`), not its OWN band's site — so a member of an over-crowded band
+    # drifts to a neighbour site, accretes, and `_assign_village_identity` re-labels it into that band. Free
+    # migration plus residence-based re-labelling equalises per-capita across all bands (the Malthusian relocation
+    # law), so no lineage bears the cost of its own fertility. corr(band size, band starvation) measures ~0.
+    # THE FIX: pin a settled member to its OWN band's home site (the site where it is the `_village_band`), not the
+    # nearest one. A member of an over-breeding band then stays on its band's fixed-capacity territory and shares
+    # a smaller per-capita ration → its own starvation rises with its own band's size → the fitness signal that
+    # fertility restraint needs. A band with no home site yet (a founder or a fresh bud) falls back to the nearest
+    # site until it qualifies as a village. Default OFF ⇒ nearest-site pin ⇒ bit-exact.
+    enable_band_territory: bool = False
+    # ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of `enable_band_territory`.
+    # (1) INDIVIDUAL heritable gene: each woman carries `_fert_restraint` ∈ [0,1] (founders start at
+    # `restraint_init`, inherited from the mother with Gaussian mutation `restraint_mutation_sigma`). It multiplies
+    # her per-step birth probability by (1 − restraint) → more restraint = longer inter-birth interval. Within a
+    # band, a LESS-restrained woman out-reproduces a more-restrained one (Williams' problem), so this channel alone
+    # is expected to lose. (2) GROUP cultural transmission: every `restraint_transmission_period` steps, a fraction
+    # `restraint_transmission_rate` of agents copy the mean restraint of the CURRENTLY FITTEST band (payoff-biased
+    # social learning, Boyd & Richerson) — the between-band channel that band autonomy is meant to make effective,
+    # because under autonomy the fittest band is the one that held its size below its own catchment ceiling. Both
+    # default OFF ⇒ birth probability unchanged ⇒ bit-exact.
+    enable_fertility_restraint_gene: bool = False
+    restraint_init: float = Field(0.0, ge=0.0, le=1.0)             # [PROVISIONAL] founder restraint; 0 ⇒ restraint must EVOLVE from nothing (R-106 candidate, no lit anchor)
+    restraint_mutation_sigma: float = Field(0.02, ge=0.0)         # [PROVISIONAL] per-birth Gaussian mutation of the heritable restraint gene (R-106 candidate)
+    enable_restraint_group_transmission: bool = False
+    restraint_transmission_period: int = Field(60, ge=1)          # [PROVISIONAL] steps between payoff-biased social-learning events (R-106 candidate)
+    restraint_transmission_rate: float = Field(0.10, ge=0.0, le=1.0)  # [PROVISIONAL] fraction of agents who copy the fittest band's restraint each event (R-106 candidate)
+    # ── HERITABLE DENSITY-RESPONSE (the reaction-norm selectability test; R-106). The density-fertility brake
+    # (`enable_density_fertility`) is currently a FIXED exponent shared by all women. Here the exponent becomes a
+    # per-mother HERITABLE trait `_dens_exponent` (founder value `dens_response_init`, inherited with mean-preserving
+    # lognormal mutation `dens_response_mut_sigma`). A LOWER exponent brakes fertility EARLIER (more restraint at
+    # moderate fill); a HIGHER exponent brakes only at the very edge of K (less restraint). The test reads the
+    # DIRECTION selection pushes the exponent: under the commons a restrained mother pays the fertility cost while
+    # the lower-density benefit is shared (altruism) ⇒ the exponent should drift UP (restraint lost); under band
+    # autonomy the band bears its own density ⇒ the between-band channel can hold or lower it. Requires
+    # `enable_density_fertility`. Default OFF ⇒ the fixed `density_fert_exponent` is used ⇒ bit-exact.
+    enable_heritable_density_response: bool = False
+    dens_response_init: float = Field(6.0, gt=0.0)               # [PROVISIONAL] founder exponent (= the calibrated density_fert_exponent; R-106 candidate)
+    dens_response_mut_sigma: float = Field(0.10, ge=0.0)         # [PROVISIONAL] per-birth mean-preserving lognormal mutation of the exponent (R-106 candidate)
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so
