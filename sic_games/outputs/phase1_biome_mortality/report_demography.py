@@ -50,6 +50,10 @@ BENCH = [
 def build(seed=0, n=500):
     k = world_lottery_climate(seed, terrain="coastal", climate="temperate")
     f = generate_world(k, mode="climate")
+    # CAVEAT (RESULTS Addendum 73): this FLAT `a_seas=0.5` build ignores the ADOPTED per-biome seasonality
+    # (Addendum 69) and is measured on a windowed, less-packed population — so its absolute e0 is NOT the canonical
+    # value. It both understates the packing paradox and manufactures a spurious harsh-biome pattern. For an
+    # absolute e0 read, use the PACKED-EQUILIBRIUM campaign (`run_campaign.py`, which builds via build_climate_field).
     hf = ClimateField(NPPCapacityField(f, BURN, patch=(20, 20, 60), mode="tallavaara",
                                        aquatic=True, enable_depletion=True), a_seas=0.5)
     hf0 = NPPCapacityField(f, BURN, patch=(20, 20, 60), mode="tallavaara", aquatic=True, enable_depletion=True)

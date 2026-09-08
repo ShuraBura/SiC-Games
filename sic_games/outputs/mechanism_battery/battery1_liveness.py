@@ -150,7 +150,11 @@ def baseline_cfg():
     return emergent_village_demog().model_copy(update=VILLAGE).model_copy(update=ELITE)
 
 
-def _build(update, seed=SEED, n=NAGENT, patch=PATCH, terr="coastal", clim="temperate"):
+def _build(update, seed=SEED, n=NAGENT, patch=PATCH, terr="coastal", clim="temperate", biome_seasonality=False):
+    # `biome_seasonality`: OFF (default) keeps the FLAT `a_seas=0.5` climate build that every CTB baseline depends
+    # on — bit-exact. ON routes the climate through `build_climate_field`, applying the ADOPTED per-biome seasonal
+    # amplitude (Addendum 69). Use ON for canonical absolute-e0 measurement; the flat build BOTH understates the
+    # packing paradox AND manufactures a spurious harsh-biome pattern (RESULTS Addendum 73).
     from run_se0_controlled_climate import emergent_village_demog
     from sic_games.capacity import NPPCapacityField
     from sic_games.climate import ClimateField
@@ -159,8 +163,13 @@ def _build(update, seed=SEED, n=NAGENT, patch=PATCH, terr="coastal", clim="tempe
     from sic_games.terrain import generate_world, world_lottery_climate
     k = world_lottery_climate(seed, terrain=terr, climate=clim)
     f = generate_world(k, mode="climate")
-    hf = ClimateField(NPPCapacityField(f, 75000.0, patch=(20, 20, patch), mode="tallavaara", aquatic=True,
-                                       enable_depletion=True), a_seas=0.5)
+    _base = NPPCapacityField(f, 75000.0, patch=(20, 20, patch), mode="tallavaara", aquatic=True, enable_depletion=True)
+    if biome_seasonality:
+        from sic_games.climate import ClimateConfig, build_climate_field
+        _cc = ClimateConfig().model_copy(update={"enable_seasonality": True, "enable_biome_seasonality": True})
+        hf = build_climate_field(_base, _cc, fields=f, seed=seed)
+    else:
+        hf = ClimateField(_base, a_seas=0.5)
     hf0 = NPPCapacityField(f, 75000.0, patch=(20, 20, patch), mode="tallavaara", aquatic=True,
                            enable_depletion=True)
     land = [(x, y) for y in range(100) for x in range(100) if f.isWater[y, x] == 0 and hf0.level(x, y) > 0]

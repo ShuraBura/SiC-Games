@@ -163,6 +163,9 @@ def run_controlled(driver, seed=0, steps=1500, founders=300, demog=None, a_seas=
     fields = generate_world(knobs_for(seed)); base = SubWindowCapacity(fields)
     pos = band_positions_patch(fields, base, founders)
     # Seasonality kept on (it is part of the realistic world); the CONTROLLED variation is the regime driver.
+    # CAVEAT (RESULTS Addendum 73): this FLAT `a_seas` build is correct for the regime-shock experiment here, but it
+    # does NOT carry the adopted per-biome seasonality, so its absolute e0 is not the canonical value. For absolute
+    # e0, read the packed-equilibrium campaign (`run_campaign.py`), not this harness.
     cap = ClimateField(base, a_seas=a_seas, regime_driver=driver)
     w = TerrainWorld(n_agents=founders, kcal_cfg=KcalEconomyConfig(), terrain_knobs=knobs_for(seed),
                      game_stream=False, seed=seed, carbon_cfg=CarbonConfig(kappa=1.5),

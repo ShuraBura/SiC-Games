@@ -7966,4 +7966,51 @@ harsh-biome e0 residual remains the honest frontier: a property of the mortality
 
 ---
 
+## Addendum 73 — The harsh-biome e0 "gap" is the GLOBAL packing paradox, confirmed in the canonical campaign; the diagnostic harness misled (2026-09-08, R-106)
+
+**The instrument check that reframes the arc.** Addendum 72 left the harsh-biome e0 residual as "the honest
+frontier". Before building further, this addendum VALIDATES THE INSTRUMENT. Every biome-e0 DIAGNOSTIC harness in the
+project — `battery1_liveness._build`, `run_se0_controlled_climate`, `report_demography` — builds climate as
+`ClimateField(base, a_seas=0.5)`: a FLAT seasonal amplitude that IGNORES the per-biome seasonality adopted in
+Addendum 69. Only the CAMPAIGN pipeline (`run_campaign.py`) assembles climate through `build_climate_field`. So
+every e0 number the arc reported was measured against a climate the canonical config no longer uses.
+
+**Correcting the harness shrinks, then relocates, the gap.** Rebuilding the battery with `build_climate_field`
+(per-biome amplitude: savanna 0.40, not 0.50) raised savanna e0 ~4–7 yr per seed. But at 15 seeds a residual
+undershoot persisted in ALL THREE biomes — savanna median 25.3 (anchor 31), boreal 22.5 (27), temperate 29.5 (37) —
+with temperate the WORST. The earlier 6-seed read that showed "no gap" was a small-sample artefact (it caught high
+draws). So the deficit is NOT harsh-biome-specific; it is GLOBAL, and the easy biome shows it too.
+
+**The canonical campaign confirms it, larger.** Running the real pipeline (`run_campaign.py`, C_CLIM=temperate,
+`build_climate_field`, 1500 steps) settles it. As the population packs toward its stationary equilibrium (pop
+1112 → 3289), realised e0 COLLAPSES: 24 (still growing) → **17.0** (packed), e15 → 21.6, survival-to-15 → 0.38 —
+against anchors 37 / 38.5 / 0.66. A ~20-yr undershoot, WORSE than any diagnostic harness showed. The savanna
+campaign arm did not even establish (extinction under the no-budding/no-elite campaign config). The campaign source
+already documented this (its own note: "configured e0 36.6 … realises ~19").
+
+**The unifying finding — realised e0 is a function of how PACKED the population is.** During growth the age pyramid
+is bottom-light and realised e0 runs high; at the stationary Malthusian equilibrium births ≈ deaths, the pyramid is
+very young, child mortality dominates (surv-to-15 0.38), and realised e0 falls to ~17–24 in EVERY biome regardless
+of the natural-mortality schedule (configured 36.6). The windowed battery measured a LESS-packed transient, so it
+both UNDERSTATED the paradox and MANUFACTURED a spurious harsh-biome pattern (harsh worlds pack or collapse
+differently). This is the packing paradox on record since the mortality/metabolism arc ("young pyramid = Malthusian
+ceiling").
+
+**Why it closes the arc.** The escape from the packed equilibrium is to hold N BELOW the ceiling — the preventive
+check — which Addendum 72 showed is neither selectable nor consequential (compensating mortality absorbs it). Real
+foragers reach e0 27–37 because they are NOT at a packed Malthusian equilibrium; this model has only the POSITIVE
+check, packs to stationarity, and realises e0 ~17–24. The harsh-biome e0 deficit that drove R-106 is therefore a
+GLOBAL, STRUCTURAL property — the age structure at the Malthusian ceiling — not a missing biome mechanism. It can be
+raised only by an EXOGENOUS hold below the equilibrium (static sub-K → 30.3, Addendum 71), which cannot evolve.
+
+**Deliverable.** Canonical unchanged. `battery1_liveness._build` gains an opt-in `biome_seasonality=False` argument
+(default bit-exact; True routes through `build_climate_field`) so future e0 measurements can use the adopted
+seasonality without breaking the CTB baselines that depend on the flat build. `report_demography.py` and
+`run_se0_controlled_climate.py` carry a caveat comment pointing to the packed-equilibrium campaign as the reference
+for absolute e0. The R-106 biome-mortality / preventive-check arc closes here: the e0 deficit is a characterized
+structural limitation (the packing paradox), reproducible in the canonical campaign, and future e0 benchmarks must
+read the packed campaign equilibrium, not the flat-seasonal windowed battery.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
