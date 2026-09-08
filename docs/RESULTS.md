@@ -7879,6 +7879,39 @@ implementation in this model. This is a precisely-characterized MODEL LIMITATION
 deliverable of the whole biome-e0 arc is per-biome seasonality (Addendum 69, the one real defect); the
 harsh-biome residual is the honest Malthusian floor.
 
+## Addendum 71 — Fertility restraint is NOT selectable in a well-mixed forager economy; the preventive check can only be imposed (2026-09-08, R-106)
+
+**The build.** To represent forager cultural fertility norms explicitly (Boyd & Richerson), a heritable per-agent
+birth-spacing NORM (≤1 fertility multiplier, matrilineal inheritance + lognormal mutation + founder variation)
+was built, plus a between-band success-biased transmission engine (bands imitate the norm of a LOWER-STARVATION
+— crash-avoiding, not larger — band). The goal: let SELECTION discover the biome-appropriate spacing, since the
+four target-based approaches (Addendum 70) all failed and no exogenous proxy predicts the emergent harshness.
+
+**Two results, both decisive.** (1) VERTICAL transmission alone: the mean norm DRIFTS UP toward max fertility in
+every biome (savanna 0.71→0.81 over ~8 generations) — restraint is selected AGAINST, because a restrained mother
+has fewer norm-carrying descendants. Confirmed the Wynne-Edwards trap the precondition predicted. (2) GROUP
+transmission (the maintenance engine): it DOES halt the drift (norms held ~0.73), but holds EVERY biome at the
+same undifferentiated value and yields NO e0 gain (savanna 22.1, temperate hurt to 33.6) — the success-biased
+imitation merely homogenises toward the founder mean; it does not selectively restrain the harsh biome.
+
+**The structural cause (the precondition, generalised).** A restrained BAND does not out-survive an unrestrained
+one, because starvation here is a SYSTEM / COMMONS property, not tied to a band's OWN norm — exactly as child
+condition was flat (~0.34) across maternal loads. So there is NO fitness signal rewarding restraint at ANY level:
+individual, lineage, or band. Cultural group selection has nothing to select on.
+
+**The complete characterisation (five implementations, one cause).** Fertility restraint RAISES harsh-biome e0 —
+proven repeatedly (static sub-K target → savanna 30.3; transient founder-suppression → savanna 36). But it CANNOT
+EMERGE in this model at any level, because the WELL-MIXED FOOD ECONOMY makes its benefit a commons with no fitness
+signal. So the preventive check can only be IMPOSED (a parameter — the marginal, large-blast-radius global target
+of Addendum 70), never SELECTED. THE ROOT IS THE ECONOMY, NOT THE FERTILITY MECHANISM: for restraint to be
+selectable, resources would first have to be BAND-AUTONOMOUS (a band's over-breeding must hurt its OWN patch, not
+a shared commons) — a change to the food-sharing / territory structure, a distinct and larger arc.
+
+**Deliverable.** No mechanism adopted (tree bit-exact to main). The biome-e0 arc's one adopted fix is per-biome
+seasonality (Addendum 69); the harsh-biome residual is now characterised to its structural root — forager
+fertility restraint is irreducibly cultural AND requires band-autonomous resources to be selectable, neither of
+which the current well-mixed economy supports. This is the honest frontier.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
