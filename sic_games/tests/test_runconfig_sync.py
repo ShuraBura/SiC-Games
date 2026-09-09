@@ -189,7 +189,8 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # NOT adopted: band autonomy makes the per-band fitness signal but restraint stays neither
                # selectable nor consequential to e0. Kept as ablatable instruments; reasons in run_campaign.py _skip.
                "enable_band_territory", "enable_fertility_restraint_gene",
-               "enable_restraint_group_transmission", "enable_heritable_density_response"}
+               "enable_restraint_group_transmission", "enable_heritable_density_response",
+               "enable_sub_k_regulation"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

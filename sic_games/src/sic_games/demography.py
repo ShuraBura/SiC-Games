@@ -1188,6 +1188,30 @@ class DemographyConfig(BaseModel):
     enable_heritable_density_response: bool = False
     dens_response_init: float = Field(6.0, gt=0.0)               # [PROVISIONAL] founder exponent (= the calibrated density_fert_exponent; R-106 candidate)
     dens_response_mut_sigma: float = Field(0.10, ge=0.0)         # [PROVISIONAL] per-birth mean-preserving lognormal mutation of the exponent (R-106 candidate)
+    # ── EXOGENOUS SUB-K REGULATION (R-106, Addendum 74 candidate). WHY: the model reaches realistic forager DENSITY
+    # but via the WRONG vital rates — the population packs against the FOOD MARGIN (condition ~0.34, starvation
+    # threshold), reached at village fill ~0.43 of Tallavaara catchment-K, so the pyramid is too young (juv_frac
+    # ~0.50 vs 0.35–0.42) and child survival too low (~0.38 vs 0.66) → realised e0 ~17–24 vs anchors 27–37. Real
+    # foragers sit BELOW the food margin (territorial spacing + birth spacing), better fed, older pyramid, higher
+    # e0. The existing density-fertility brake is referenced to K (fill=1) and NEVER fires, because starvation
+    # regulates first at fill 0.43; and a WEAK fractional brake is compensated (mortality creeps back). THE FIX: a
+    # STRONG hold referenced to a TARGET FILL BELOW the food margin. When a mother's village fill exceeds
+    # `sub_k_target_fill`, her birth probability is suppressed by a sharp logistic (sharpness `sub_k_sharpness`),
+    # holding the population well-fed below the margin — the exogenous "static sub-K" regime that raised e0 to ~30
+    # (Addendum 71). This is IMPOSED, not evolved (restraint is not selectable, Addendum 72). Default OFF ⇒ no
+    # suppression ⇒ bit-exact. Requires the village-fill precompute (shared with enable_density_fertility).
+    enable_sub_k_regulation: bool = False
+    sub_k_target_fill: float = Field(0.30, gt=0.0, le=1.0)       # [PROVISIONAL] village fill (pop/catchment-K) the population is held below; below the ~0.43 food margin
+    sub_k_sharpness: float = Field(20.0, ge=0.0)                 # [PROVISIONAL] logistic steepness of the birth hold around the target fill
+    # SUB-K MODE. The birth-hold above raises e0 but, being a fertility-only lever, OVER-AGES the pyramid (juv_frac
+    # falls below the forager 0.35–0.42 band). `sub_k_by_emigration` instead holds the population below the target by
+    # EMIGRATION — each step a fraction `sub_k_emigration_rate` of the over-target excess LEAVES the modelled
+    # population as whole FAMILIES (a mother with her dependent juveniles, so no orphans are created), representing
+    # forager territorial dispersal to new land. Emigrants are NOT deaths (not tallied in the life table), so this
+    # raises per-capita e0 WHILE keeping fertility normal → the younger pyramid is preserved. When on, the birth-hold
+    # is skipped. Default OFF ⇒ birth-hold mode.
+    sub_k_by_emigration: bool = False
+    sub_k_emigration_rate: float = Field(0.25, ge=0.0, le=1.0)   # [PROVISIONAL] fraction of the over-target excess that emigrates per step
     # ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea:
     # INCREASING RETURNS TO CO-LOCATION. Each cell's intensive catchment resource R(c) = aggl_tier2·Σ_catchment(S_pot·
     # soil); a co-located group of n gets total output R·L(n) with L(n)=n^α/(n^α+half^α) (convex→saturating), so

@@ -8013,4 +8013,55 @@ read the packed campaign equilibrium, not the flat-seasonal windowed battery.
 
 ---
 
+## Addendum 74 — The e0 deficit is CHILD STARVATION; exogenous EMIGRATION closes it on all three biomes (2026-09-09, R-106)
+
+**Where Addendum 73 left it.** The harsh-biome e0 deficit is the packing paradox: the population packs to the
+Malthusian food margin and realises e0 ~17-24 in every biome. Escape needs holding N below the margin — the
+preventive check — which is not selectable (Addendum 72). This addendum builds the EXOGENOUS form of that hold and
+localises the deficit precisely.
+
+**The deficit is child starvation; the mortality SCHEDULE is correct.** Decomposing age-resolved deaths at
+equilibrium (`lt_deaths_starv` vs `lt_deaths_senesc`): remove starvation and e0 = 40.2 (temperate) / 36.0
+(savanna) — AT OR ABOVE the anchors. So the Siler baseline is right; the whole deficit is EXCESS STARVATION,
+concentrated in children (starvation is 34-53% of all deaths at ages 1-15, worse in savanna). The population packs
+against the FOOD margin (condition ~0.34), so children starve even at realistic SPATIAL density — regional density
+0.01-0.07/km2 is BELOW the Kelly forager band, local density realistic, so K is not miscalibrated high. The model
+reaches forager DENSITY via the wrong VITAL RATES (high fertility + high child mortality) where real foragers use
+low+low.
+
+**The fix: emigration (territorial dispersal), NOT redistribution.** `enable_sub_k_regulation` holds each settled
+population below `sub_k_target_fill` of its catchment K. Two modes: the birth-hold (a sharp logistic on the
+mother's birth probability) raises e0 but OVER-AGES the pyramid (fertility-only lever). `sub_k_by_emigration` (the
+adopted form) instead disperses whole FAMILIES (a mother + her dependent juveniles, so no orphans) OUT of the
+modelled population each step — forager fissioning to new land; emigrants are NOT life-table deaths. It raises
+per-capita e0 while KEEPING fertility normal, so the pyramid is preserved. Child-first provisioning
+(`provision_self_keep` < 1) is INERT on the canonical config — redistributing food from mothers to children is
+compensated (mothers starve instead), the distributional form of the Malthusian relocation law (Addenda 63-67).
+
+**Result — all three biomes hit their e0 anchors.** On the canonical config, emigration with a per-biome target
+(harsher biome → lower target → more dispersal below K, which is ecologically correct): temperate target 0.80 →
+e0 37.0±1.9 (anchor 37), savanna 0.45 → 30.4±2.7 (31), boreal 0.48 → 26.3±2.2 (27), all with juvenile fraction in
+the forager band 0.37-0.43 and realistic population. Emigration is EXOGENOUS (it cannot evolve, Addendum 72) but
+ethnographically grounded, and it supplies the below-margin hold the endogenous preventive check could not.
+
+**Instrument (validated) and a methodology correction.** The battery world's e0 noise (SD ±5-12) is dominated by
+the WORLD LOTTERY. Fixing the world seed and varying only the demographic seed cuts the SD 2-3x (savanna 5.3→1.9,
+temperate 7.3→3.1); a panel of 3 worlds × 3 demographic replicates gives SE ~0.7-2 — the instrument used for the
+calibration above, reusable for any ±2 e0 work. CORRECTION: `battery1_liveness._build(update, ...)` does NOT apply
+the canonical runconfig (its base is `emergent_village_demog + VILLAGE + ELITE` with 45 adopted mechanisms OFF);
+one must merge `runconfig.load()['DemographyConfig']` into `update`. Runs that omitted it understated e0 by ~10 yr
+and inverted intermediate conclusions during this arc; the figures above are the corrected, canonical-config,
+low-noise values.
+
+**Deliverable.** No mechanism adopted (canonical unchanged). `enable_sub_k_regulation` + `sub_k_by_emigration`
+(and the birth-hold mode) are kept default-off and bit-exact as an ablatable, calibrated lever; the per-biome
+target is a candidate, not an adopted value. Two REJECTED candidates recorded: IBI 45 (it pushes the realised
+inter-birth interval to ~53 mo vs the forager 37-44, trading the fertility anchor) and a mean-preserving
+seasonality (the current form under-feeds seasonal biomes by ~0.5·amplitude — a density-calibration quirk — but
+restoring the food is Malthusian-compensated, so it is not an e0 lever). The R-106 biome e0 arc's practical
+question is answered: the deficit is child starvation at the food margin, closable only by an exogenous hold
+below it.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

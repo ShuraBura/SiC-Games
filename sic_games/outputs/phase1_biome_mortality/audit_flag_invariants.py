@@ -131,6 +131,10 @@ TYPES = {
     # makes the density-brake exponent a per-mother trait. All three modulate the birth RATE -> type N.
     "enable_fertility_restraint_gene": "N", "enable_restraint_group_transmission": "N",
     "enable_heritable_density_response": "N",
+    # EXOGENOUS SUB-K REGULATION (R-106, 2026-09-09): holds the settled population below a target fraction of its
+    # catchment K, by suppressing births (birth-hold) or dispersing families (emigration). A population/vital-rate
+    # regulator -> N.
+    "enable_sub_k_regulation": "N",
     # VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03, keystone): a settled agent's disease density is its
     # village population over the village territory, not single-cell occupancy. Modulates the a2 hazard -> N.
     "enable_village_density_disease": "N",
@@ -316,6 +320,7 @@ PREREQ = {
     "enable_band_territory": ("enable_aggregation_sedentism", "enable_band_affiliation", "enable_village_identity"),
     "enable_restraint_group_transmission": ("enable_fertility_restraint_gene",),
     "enable_heritable_density_response": ("enable_density_fertility",),
+    "enable_sub_k_regulation": ("enable_aggregation_sedentism",),
     "enable_wealth_obligation": ("enable_material_capture",),
     "enable_stratification_inequality_gate": ("enable_morph",),
     "enable_relational_stratification": ("enable_morph",),

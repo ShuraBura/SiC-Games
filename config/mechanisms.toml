@@ -897,6 +897,24 @@ type  = "bool"
 # channel can hold or lower it. Requires `enable_density_fertility`. Default OFF ⇒ the fixed
 # `density_fert_exponent` is used ⇒ bit-exact.
 
+[enable_sub_k_regulation]
+value = false
+owner = "DemographyConfig"
+type  = "bool"
+# ── EXOGENOUS SUB-K REGULATION (R-106, Addendum 74 candidate). WHY: the model reaches realistic forager
+# DENSITY but via the WRONG vital rates — the population packs against the FOOD MARGIN (condition ~0.34,
+# starvation threshold), reached at village fill ~0.43 of Tallavaara catchment-K, so the pyramid is too
+# young (juv_frac ~0.50 vs 0.35–0.42) and child survival too low (~0.38 vs 0.66) → realised e0 ~17–24 vs
+# anchors 27–37. Real foragers sit BELOW the food margin (territorial spacing + birth spacing), better
+# fed, older pyramid, higher e0. The existing density-fertility brake is referenced to K (fill=1) and
+# NEVER fires, because starvation regulates first at fill 0.43; and a WEAK fractional brake is compensated
+# (mortality creeps back). THE FIX: a STRONG hold referenced to a TARGET FILL BELOW the food margin. When
+# a mother's village fill exceeds `sub_k_target_fill`, her birth probability is suppressed by a sharp
+# logistic (sharpness `sub_k_sharpness`), holding the population well-fed below the margin — the exogenous
+# "static sub-K" regime that raised e0 to ~30 (Addendum 71). This is IMPOSED, not evolved (restraint is
+# not selectable, Addendum 72). Default OFF ⇒ no suppression ⇒ bit-exact. Requires the village-fill
+# precompute (shared with enable_density_fertility).
+
 [enable_agglomeration]
 value = true
 owner = "DemographyConfig"

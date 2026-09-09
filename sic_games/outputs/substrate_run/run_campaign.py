@@ -965,6 +965,11 @@ def main():
             "enable_fertility_restraint_gene",
             "enable_restraint_group_transmission",
             "enable_heritable_density_response",
+            # EXOGENOUS SUB-K REGULATION (R-106, 2026-09-09, docs/RESULTS Addendum 74). Emigration (family
+            # territorial dispersal below the food margin) closes the harsh-biome e0 deficit on all three biomes,
+            # but it is EXOGENOUS (cannot evolve, Addendum 72) with a per-biome target — a candidate, not adopted.
+            # Kept as an ablatable lever, so C_ALLON must NOT enable it by side effect (the leaky_assabiyah rule).
+            "enable_sub_k_regulation",
             # SETTLEMENT PAIR ADOPTED (R-106, 2026-09-05, docs/RESULTS Addendum 61). `enable_colonizing_budding`
             # and `enable_village_density_disease` are removed from this set -> canonically ON. Together they give
             # dispersed settlement (spacing ~2.3 cells) at a STATIONARY population (small-world plateau confirmed)

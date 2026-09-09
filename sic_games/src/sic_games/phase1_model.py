@@ -720,6 +720,8 @@ class TerrainWorld(mesa.Model):
             self._maintain_leader_office()        # R-84: tenure the office; Boehm deposition (9) / desertion (17)
             self._do_obligations()                # C: wealth -> obligation -> a claim on production (Sahlins)
             self._do_births_ibi()
+            if getattr(self._demog, "enable_sub_k_regulation", False) and getattr(self._demog, "sub_k_by_emigration", False):
+                self._sub_k_emigrate()       # R-106: hold pop below the food margin by family emigration (preserves the pyramid)
             if getattr(self._demog, "enable_restraint_group_transmission", False):
                 self._transmit_restraint()   # R-106: payoff-biased social learning of the restraint norm (between-band channel)
             self._do_lineage_split()   # R-92: named lines SEGMENT into sub-clades (after births, so newborns
@@ -2701,6 +2703,65 @@ class TerrainWorld(mesa.Model):
             for c in newborns:
                 self._log_genea("birth", c)
 
+    def _sub_k_emigrate(self) -> None:
+        """R-106 sub-K by EMIGRATION: hold each settled population below `sub_k_target_fill` of its catchment K by
+        dispersing whole FAMILIES (a mother + her dependent juveniles) OUT of the modelled population — forager
+        territorial dispersal to new land. Emigrants are NOT deaths (no life-table tally, no orphan channel), so per
+        capita rises WHILE fertility stays normal → the age pyramid is preserved (unlike the birth-hold, which
+        over-ages it). Called only in emigration mode; default off ⇒ never called ⇒ bit-exact. No RNG unless it acts."""
+        cfg = self._demog
+        target = cfg.sub_k_target_fill
+        rate = getattr(cfg, "sub_k_emigration_rate", 0.0)
+        if rate <= 0.0 or self._burn <= 0.0:
+            return
+        menarche = cfg.menarche_months
+        by_site: dict = {}
+        for a in self.agent_list:
+            s = self._nearest_settlement(a.pos)
+            if s is not None:
+                by_site.setdefault(s, []).append(a)
+        leaving: set = set()
+        for site, members in by_site.items():
+            cap = self._settlement_carrying_capacity(site)
+            if cap <= 0.0:
+                continue
+            target_pop = target * cap / self._burn          # persons the catchment holds at the target fill
+            excess = len(members) - target_pop
+            if excess <= 0.0:
+                continue
+            k = int(rate * excess)
+            if k <= 0:
+                continue
+            deps: dict = {}                                  # mother -> her co-resident dependent juveniles
+            for a in members:
+                if a.age < menarche:
+                    m = getattr(a, "_mother", None)
+                    if m is not None:
+                        deps.setdefault(m, []).append(a)
+            pool = list(members)
+            self.random.shuffle(pool)
+            picked: set = set()
+            for a in pool:
+                if len(picked) >= k:
+                    break
+                picked.add(a)
+                for c in deps.get(a, ()):                    # the mother takes her dependent juveniles with her
+                    picked.add(c)
+            leaving |= picked
+        if not leaving:
+            return
+        for a in leaving:                                    # remove as EMIGRATION, not death (mirror the prune cleanup)
+            self.occupied.discard(a.pos)
+            if a._partner is not None:
+                a._partner._wives.discard(a)
+                a._partner = None
+            for w in a._wives:
+                w._partner = None
+            a._wives.clear()
+            a.alive = False
+            a.remove()
+        self.agent_list = [a for a in self.agent_list if a.alive]
+
     def _transmit_restraint(self) -> None:
         """R-106 GROUP channel: payoff-biased social learning of the fertility-restraint norm (Boyd & Richerson).
         Every `restraint_transmission_period` steps a fraction `restraint_transmission_rate` of agents copy the mean
@@ -2803,9 +2864,14 @@ class TerrainWorld(mesa.Model):
         # R-106 reaction-norm: the density-brake exponent is a per-mother heritable trait when this flag is on.
         dens_resp_on = getattr(cfg, "enable_heritable_density_response", False)
         dens_resp_sig = getattr(cfg, "dens_response_mut_sigma", 0.0) if dens_resp_on else 0.0
+        # R-106 exogenous sub-K regulation: hold the population below the food margin (a target village fill).
+        sub_k_on = getattr(cfg, "enable_sub_k_regulation", False)
+        sub_k_target = getattr(cfg, "sub_k_target_fill", 0.30) if sub_k_on else 0.30
+        sub_k_sharp = getattr(cfg, "sub_k_sharpness", 20.0) if sub_k_on else 0.0
+        sub_k_birthhold = sub_k_on and not getattr(cfg, "sub_k_by_emigration", False)   # emigration mode skips the birth hold
         _fill_cell: dict = {}
         _fill_village: dict = {}
-        if dens_fert_on:
+        if dens_fert_on or sub_k_on:
             # FILL = food NEED / food CAPACITY, so fill→1 as the group reaches the point where its food just
             # feeds it — i.e. the STARVATION threshold. A village's capacity is its catchment ceiling (the food
             # it can sustainably yield); a mobile cell's is the cell's own yield. This is the denominator the
@@ -2879,6 +2945,14 @@ class TerrainWorld(mesa.Model):
             if restraint_on:
                 # PREVENTIVE CHECK: the mother's heritable restraint lengthens her inter-birth interval.
                 p_birth *= (1.0 - a._fert_restraint)
+            if sub_k_birthhold:
+                # EXOGENOUS SUB-K HOLD: suppress births once the mother's village fill exceeds the target, so the
+                # population stays below the food margin (well-fed → lower child mortality → higher e0). A sharp
+                # logistic makes it a near-hold at `sub_k_target_fill` rather than a weak fractional brake (which
+                # starvation compensates away). See demography.py.
+                _sk_site = self._nearest_settlement(a.pos)
+                _sk_fill = _fill_village.get(_sk_site, 1.0) if _sk_site is not None else _fill_cell.get(a.pos, 1.0)
+                p_birth *= 1.0 / (1.0 + math.exp(sub_k_sharp * (_sk_fill - sub_k_target)))
             # Realised fertility schedule (pure observer). Sampled HERE — past the age gate, the IBI gate and
             # the mate gate — so the denominator is "women actually at risk of conception this step", which is
             # what makes the multiplier interpretable. Sampling over all women would dilute it with the
