@@ -2354,6 +2354,44 @@ class TerrainWorld(mesa.Model):
                             child.wealth += g3; provision_pool[f] = provision_pool.get(f, 0.0) - g3; need -= g3
                             if young: self.prov_young_paternal += g3
 
+        if demog is not None and getattr(demog, "enable_band_provisioning", False):
+            # BAND (alloparental) PROVISIONING: co-resident adults feed the deficit of ANY juvenile in their
+            # food-sharing group (nearest settlement, or the cell if mobile) — not just their own child — down to
+            # `band_provision_self_keep`·(their cap). Reaches juveniles whose mother/father is dead or absent, the
+            # cohort the mother-linked tiers miss (see demography.py). Conserved: Σ given == Σ taken.
+            keep = demog.band_provision_self_keep
+            bp_groups: dict = {}
+            for a in self.agent_list:
+                bk = (self._nearest_settlement(a.pos) if settle_on else None) or a.pos
+                bp_groups.setdefault(bk, []).append(a)
+            for members in bp_groups.values():
+                needy = []
+                for c in members:
+                    if c.is_juvenile():
+                        d = self._reserve_full * c.reserve_scale() - c.wealth
+                        if d > 0.0:
+                            needy.append((c, d))
+                if not needy:
+                    continue
+                donors = []
+                pool = 0.0
+                for a in members:
+                    if not a.is_juvenile():
+                        s = a.wealth - keep * self._reserve_full * a.reserve_scale()
+                        if s > 0.0:
+                            donors.append((a, s)); pool += s
+                if pool <= 0.0:
+                    continue
+                total_need = sum(d for _, d in needy)
+                take = pool if pool < total_need else total_need
+                for a, s in donors:
+                    a.wealth -= (s / pool) * take          # draw proportionally from donors' surplus
+                for c, d in needy:
+                    g = (d / total_need) * take            # give proportionally to the deficit
+                    c.wealth += g
+                    if c.age < 36:
+                        self.prov_young_maternal += g
+
         # Prowess facet dynamics (B+ step 2): achieved status = a slow decaying EMA of RELATIVE meat intake
         # (reputation, not instantaneous — Smith 2004). Relative (mean-pinned) ⇒ runaway-safe by construction
         # (mean prowess → ~1); the independent skill/luck component comes from the G.3 meat draws.

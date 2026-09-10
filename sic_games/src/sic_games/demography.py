@@ -676,6 +676,16 @@ class DemographyConfig(BaseModel):
     # mother absorbs the deeper end). 1.0 = C.2b overflow-only (no reserve-sharing); lower = more priority.
     # The child-priority knob, gated so child starvation→≈0 but children still dwell (→ condition degrades).
     provision_self_keep: float = 1.0
+    # BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09, docs/RESULTS). THE DEFECT it fixes: the e0 deficit is a
+    # chronic STARVING TAIL of low-efficiency juveniles (~13-16 yr, eta ~0.4) on RICH cells — realised intake =
+    # eta x forage-capped share ~0.7x burn, below maintenance — whom the MOTHER-linked provisioning above does NOT
+    # reach (they lack a living/linked provisioning parent; the self_keep and eta-weighting knobs are both inert on
+    # the tail). Ethnographically foragers are net CONSUMERS until ~18-20 (Kaplan/Hill), fed by the whole band.
+    # THE FIX: co-resident adults (the food-sharing group = nearest settlement, or the cell if mobile) feed the
+    # deficit of ANY juvenile in the group, down to `band_provision_self_keep`·(their cap), pooled and shared
+    # proportionally. Reaches motherless/absent-parent juveniles. Default OFF ⇒ no band pool ⇒ bit-exact.
+    enable_band_provisioning: bool = False
+    band_provision_self_keep: float = Field(0.5, ge=0.0, le=1.0)   # [PROVISIONAL] co-resident adults share surplus above this fraction of their cap to band juveniles
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)

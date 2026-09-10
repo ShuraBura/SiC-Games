@@ -970,6 +970,11 @@ def main():
             # but it is EXOGENOUS (cannot evolve, Addendum 72) with a per-biome target — a candidate, not adopted.
             # Kept as an ablatable lever, so C_ALLON must NOT enable it by side effect (the leaky_assabiyah rule).
             "enable_sub_k_regulation",
+            # BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09, docs/RESULTS Addendum 75). The grounded candidate
+            # fix for the juvenile starving tail (feed the young from co-resident adults' surplus). Temperate hits
+            # its survival anchor with density preserved; savanna's adult-scarcity residual is open. NOT adopted;
+            # kept default-off as an ablatable instrument, so C_ALLON must NOT enable it by side effect.
+            "enable_band_provisioning",
             # SETTLEMENT PAIR ADOPTED (R-106, 2026-09-05, docs/RESULTS Addendum 61). `enable_colonizing_budding`
             # and `enable_village_density_disease` are removed from this set -> canonically ON. Together they give
             # dispersed settlement (spacing ~2.3 cells) at a STATIONARY population (small-world plateau confirmed)

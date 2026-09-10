@@ -94,7 +94,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
 - **1 Physical world** — `climate_lottery`, `seasonality`, `biome_seasonality`, `eccentricity_mean`, `interannual`, `regime_shift`,
   `caribou_swing`, `llanos_flood`, `intercept_hunting`, `terrain_risk`, `terrain_move_cost`, `soil_depletion`,
   `alluvial_renewal`, `resource_storability`, `catchment_depletion`, `village_density_disease`
-- **2 Energetics** — `game`, `biome_meat_frac`, `biome_meat_cv`, `forage_cap`, `provisioning`,
+- **2 Energetics** — `game`, `biome_meat_frac`, `biome_meat_cv`, `forage_cap`, `provisioning`, `band_provisioning`,
   `nutrition_synergy`, `condition`, `store_anchor`, `storage`, `storage_seasonal_union`, `tier2_shock`,
   `energetic_fertility`, `intake_fertility`, `need_weighted_shares`, `eta_weighted_shares`
 - **3 Demography** — `orphan_mortality`, `density_disease`, `density_reference`, `society_regional_density`, `terrain_pathogen`, `dependent_load`, `synergy_age_grade`, `density_fertility`,

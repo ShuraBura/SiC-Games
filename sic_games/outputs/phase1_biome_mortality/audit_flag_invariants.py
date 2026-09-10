@@ -85,6 +85,10 @@ TYPES = {
     "enable_band_territory": "T",
     "enable_storage": "X", "enable_store_anchor": "X", "enable_provisioning": "X", "enable_leveling": "X",
     "enable_leader_share": "X",
+    # BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09): co-resident adults feed the deficit of any juvenile in
+    # their food-sharing group from their surplus. A food-sharing/redistribution subsystem rule, like
+    # enable_provisioning -> type X. Its magnitude knob is `band_provision_self_keep` (a keep fraction, not a gain).
+    "enable_band_provisioning": "X",
     # STORAGE UNION GATE (R-106, 2026-09-07): the overwintering zone becomes cold ENOUGH OR seasonal ENOUGH, so a
     # hot-but-seasonal savanna can store its wet-season glut (Testart) as well as a cold biome its meat (Binford).
     # A rule on the STORAGE subsystem — which cells may hold the granary — so type X, like enable_storage. No
@@ -321,6 +325,7 @@ PREREQ = {
     "enable_restraint_group_transmission": ("enable_fertility_restraint_gene",),
     "enable_heritable_density_response": ("enable_density_fertility",),
     "enable_sub_k_regulation": ("enable_aggregation_sedentism",),
+    "enable_band_provisioning": ("enable_provisioning",),
     "enable_wealth_obligation": ("enable_material_capture",),
     "enable_stratification_inequality_gate": ("enable_morph",),
     "enable_relational_stratification": ("enable_morph",),

@@ -8064,4 +8064,47 @@ below it.
 
 ---
 
+## Addendum 75 — The e0 deficit is a juvenile starving tail; band (alloparental) provisioning is the grounded fix; emigration was a density trade (2026-09-09, R-106)
+
+**Grounding falsified the Addendum 74 emigration fix.** Tallavaara-K IS the ethnographic forager density
+(LITERATURE.md CC-1: ln(density)~NPP on Binford 2001 + Kelly 2013). Against that anchor, emigration hits e0 only by
+pushing density FURTHER BELOW it (temperate regional 0.037 -> 0.024/km2 vs anchor ~0.05; savanna 0.023 -> 0.018).
+It is a density-for-e0 TRADE, not a fix; `enable_sub_k_regulation` stays a default-off ablatable instrument, NOT
+adopted.
+
+**METHODOLOGY CORRECTION.** `battery1_liveness._build(update, ...)` does NOT apply the canonical runconfig — its
+base (`emergent_village_demog + VILLAGE + ELITE`) has ~45 adopted mechanisms OFF. Several exploration runs earlier
+in this arc omitted it and understated e0 by ~10 yr; every figure below merges `runconfig.load()` into the update
+dict. A low-noise e0 instrument was also validated: fixing the world seed and varying only the demographic seed
+cuts the e0 SD 2-3x (the world lottery is the dominant noise), used with a 3-world x 3-replicate panel.
+
+**The deficit localised (all on CANON).** It is entirely starvation (baseline-only e0 = 47.8 temperate / 43.0
+savanna, above the anchors — the Siler schedule is generous), but NOT aggregate scarcity (mean intake 3.2x /
+5.25x burn) and NOT volatility (constant food does not raise e0). It is a chronic DISTRIBUTIONAL starving tail:
+~41% of agent-obs below maintenance, 99-100% of them on RICH cells (S/n > 3x burn), LOW-eta and YOUNG (eta ~0.4,
+age ~13-16). Realised intake = eta x forage-capped share ~0.7x burn for a juvenile. The MOTHER-linked provisioning
+does not reach them (self_keep and eta-weighted-shares ablations are both inert) — they lack a living/linked
+provisioning parent.
+
+**The fix: band (alloparental) provisioning.** `enable_band_provisioning` (default-off): co-resident adults (the
+food-sharing group = nearest settlement, or the cell if mobile) feed the deficit of ANY juvenile in the group down
+to `band_provision_self_keep`*(their cap), pooled and shared proportionally (conserved). Ethnographically foragers
+are net CONSUMERS until ~18-20 (Kaplan/Hill), fed by the whole band. RESULT (CANON, keep=0.5): temperate
+survival-to-15 0.61 -> **0.67 (hits the Ache anchor exactly)**, e0 32.8 -> 34.4, adult mortality flat (0.019), and
+DENSITY PRESERVED (pop ~1763 vs 1841) — strictly better than the emigration trade, which cut density to buy e0.
+
+**Savanna residual (open).** Band provisioning raises savanna child survival (0.44 -> 0.54) but adult mortality
+compensates (0.027 -> 0.043) — the adults share themselves toward death and e0 stays ~22. So savanna carries a
+deeper, biome-specific ADULT-scarcity residual beyond juvenile distribution. A deficit-vs-surplus probe returned a
+paradoxical (post-provisioning-confounded) result and did NOT cleanly resolve it. Left as a stated open item for a
+future focused arc.
+
+**Deliverable.** No mechanism adopted (canonical unchanged). `enable_band_provisioning` kept default-off and
+bit-exact, registered (flag audit, benchmark ladder tier 2, C_ALLON _skip, campaign-knobs / runconfig-sync allowed
+sets). It is the grounded candidate fix for the e0 deficit; `band_provision_self_keep` is [PROVISIONAL]. The e0
+arc's answer: the deficit is a juvenile provisioning gap, fixed (temperate) by feeding the young from the band;
+savanna's adult-scarcity residual remains open.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

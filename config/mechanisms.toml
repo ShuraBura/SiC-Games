@@ -279,6 +279,20 @@ type  = "bool"
 # reserve — so sustained undernutrition potentiates DISEASE mortality (Pelletier), routing the seasonal
 # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
 
+[enable_band_provisioning]
+value = false
+owner = "DemographyConfig"
+type  = "bool"
+# BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09, docs/RESULTS). THE DEFECT it fixes: the e0 deficit
+# is a chronic STARVING TAIL of low-efficiency juveniles (~13-16 yr, eta ~0.4) on RICH cells — realised
+# intake = eta x forage-capped share ~0.7x burn, below maintenance — whom the MOTHER-linked provisioning
+# above does NOT reach (they lack a living/linked provisioning parent; the self_keep and eta-weighting
+# knobs are both inert on the tail). Ethnographically foragers are net CONSUMERS until ~18-20
+# (Kaplan/Hill), fed by the whole band. THE FIX: co-resident adults (the food-sharing group = nearest
+# settlement, or the cell if mobile) feed the deficit of ANY juvenile in the group, down to
+# `band_provision_self_keep`·(their cap), pooled and shared proportionally. Reaches
+# motherless/absent-parent juveniles. Default OFF ⇒ no band pool ⇒ bit-exact.
+
 [enable_density_reference]
 value = true
 owner = "DemographyConfig"
