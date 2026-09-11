@@ -57,8 +57,13 @@ mechanisms are default-OFF and NOT adopted — the canonical config is unchanged
   biome-specific channels for adult food-short agents (full-eta, not the juvenile tail): TEMPERATE = PULL (empty
   feeding cell adjacent + 97% reachable, but 59% stay put — sedentism/agglomeration override the food gradient);
   SAVANNA = REACH (feeding cells ~5 cells away, only 32% within the 1-cell/step move). The lever is SPATIAL
-  movement (tier-1/2), not the food base. NEXT: tune ONE channel (cut the temperate pull / add a hunger-scaled
-  residential stride for savanna) and re-measure density AND e0 together on the low-noise panel. NOT yet committed.
+  movement (tier-1/2), not the food base. BOTH spatial levers then TESTED and exhausted (Addenda 78-79): forced
+  hunger dispersal (`enable_hunger_dispersal`) unpacks the population but CRASHES temperate e0 (36.2→27.7 — it
+  strips agents of the settlement buffer); intake-mode mobility (`mobility_pressure_source="intake"`) is INERT.
+  The packing is an ADAPTIVE equilibrium. ARC CLOSED: temperate e0 36.2 at the Ache anchor 36.6, savanna e0 24.6
+  inside the ethnographic forager range 21-37 — the model is calibrated, the savanna "residual" is the honest
+  harsh-biome e0. Nothing adopted, canonical unchanged. Addenda 76-79 committed on branch
+  `arc/savanna-residual-diagnosis` (HELD, not pushed/merged).
 - **Adoption decisions deferred.** Emigration — keep off. Band provisioning — validated for temperate; decide
   adoption once the savanna residual is understood; `band_provision_self_keep` is [PROVISIONAL].
 - **Other ladder misses** (independent of e0): band size (tier 5, model ~12 adults vs Hill 28.2 — the oldest

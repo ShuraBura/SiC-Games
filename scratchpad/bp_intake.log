@@ -1,0 +1,23 @@
+INTAKE-MOBILITY TEST | canon npp vs mobility_pressure_source=intake | 800 steps | period LT 400 | worlds [0, 1, 2] x agents [0]
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: e0 38.3->34.4 surv15 0.60->0.59 dens 0.050->0.076 spatial 0.08->0.10 pop 708->1085
+  temperate w1a0: e0 37.7->38.6 surv15 0.65->0.65 dens 0.128->0.125 spatial 0.28->0.24 pop 2123->2068
+  temperate w2a0: e0 32.7->32.9 surv15 0.59->0.59 dens 0.106->0.104 spatial 0.10->0.10 pop 1231->1208
+  === temperate PAIRED intake-OFF over 3 worlds ===
+    e0             OFF 36.249 -> ON 35.282 | delta -0.967 +/- 1.467 (z=-0.7)
+    surv_to_15     OFF 0.610 -> ON 0.611 | delta +0.001 +/- 0.004 (z=0.3)
+    density_ratio  OFF 0.095 -> ON 0.102 | delta +0.007 +/- 0.010 (z=0.7)
+    spatial_use    OFF 0.154 -> ON 0.145 | delta -0.009 +/- 0.019 (z=-0.5)
+    fill_median    OFF 0.185 -> ON 0.218 | delta +0.033 +/- 0.014 (z=2.4)
+    pop            OFF 1354.000 -> ON 1453.667 | delta +99.667 +/- 138.974 (z=0.7)
+  savanna w0a0: e0 23.7->25.0 surv15 0.42->0.45 dens 0.031->0.033 spatial 0.10->0.10 pop 761->807
+  savanna w1a0: e0 28.8->26.4 surv15 0.51->0.46 dens 0.066->0.061 spatial 0.20->0.17 pop 1626->1489
+  savanna w2a0: e0 21.3->22.9 surv15 0.38->0.38 dens 0.023->0.024 spatial 0.11->0.10 pop 544->569
+  === savanna PAIRED intake-OFF over 3 worlds ===
+    e0             OFF 24.621 -> ON 24.758 | delta +0.137 +/- 1.295 (z=0.1)
+    surv_to_15     OFF 0.437 -> ON 0.430 | delta -0.007 +/- 0.025 (z=-0.3)
+    density_ratio  OFF 0.040 -> ON 0.039 | delta -0.001 +/- 0.002 (z=-0.4)
+    spatial_use    OFF 0.136 -> ON 0.122 | delta -0.014 +/- 0.011 (z=-1.3)
+    fill_median    OFF 0.116 -> ON 0.126 | delta +0.010 +/- 0.012 (z=0.9)
+    pop            OFF 977.000 -> ON 955.000 | delta -22.000 +/- 57.819 (z=-0.4)

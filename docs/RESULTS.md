@@ -8230,4 +8230,38 @@ toward distant feeding cells rather than expelling it from its buffer. `scratchp
 
 ---
 
+## Addendum 79 — Intervention #2 inert; both spatial levers exhausted; the packing is an ADAPTIVE equilibrium — ARC CLOSED (2026-09-11, R-106)
+
+**The test.** The savanna REACH lever: `mobility_pressure_source="intake"` (built; canon uses "npp"). It scales a
+starving agent's move stride up to `mobility_max_radius` (6) via `base·(intake_ref/max(intake_ema,floor))^exp`, so
+a hungry agent reaches toward distant feeding cells WITHOUT breaking its settlement pin — the piece hunger
+dispersal got wrong (Addendum 78). Paired canon vs ON, 3-world panel, period life table 400–800.
+`scratchpad/bp_intake.py`.
+
+**It is INERT.** No material change in either biome: temperate e0 36.2 → 35.3 (Δ −1.0 ± 1.5, n.s.), savanna e0
+24.6 → 24.8 (Δ +0.1 ± 1.3, n.s.); survival-to-15, density, and spatial use all flat. Crucially it does NOT crash
+temperate (it keeps agents in their buffer), but it also does not unpack the population (spatial use flat) — the
+longer hungry stride lands agents in the same clustered equilibrium, because the agglomeration/cohesion pull still
+dominates the move utility and the distant "empty feeding" cells are marginal or immediately re-contested.
+
+**Both spatial levers are now exhausted.** hunger dispersal (Addendum 78) unpacks the population but crashes
+temperate e0 (buffer loss); intake mobility is inert. Neither lifts savanna. The packing is an ADAPTIVE
+equilibrium — the clusters buffer hunger (storage/provisioning/agglomeration), and the model resists both
+available means of dispersing them.
+
+**Arc conclusion — the model is calibrated where it should be.** Temperate e0 (36.2) sits at the Aché forest anchor
+(36.6). Savanna e0 (24.6) sits squarely inside the ethnographic forager e0 range (21–37; Aché forest is the TOP of
+that range, a forest people), at the harsh-biome end where real savanna/arid foragers are. The "savanna e0
+residual" the R-106 biome arc chased is not a defect: it is the honest e0 of a harsh-biome forager economy. The
+whole causal chain now closes consistently: (75–76) demographic redistribution is zero-sum on death; (77) the
+carrying-capacity shortfall is spatial packing; (78–79) the packing is adaptive and resists both spatial levers,
+and the resulting biome e0 spread matches the ethnographic range.
+
+**Deliverable.** No mechanism adopted; canonical unchanged. `enable_band_provisioning`, `enable_sub_k_regulation`,
+`enable_hunger_dispersal` stay default-off; `mobility_pressure_source` stays "npp". The R-106 biome-e0 arc is
+CLOSED: temperate at anchor, savanna in-range, the packing paradox an adaptive equilibrium. `scratchpad/
+bp_intake.py`, `bp_arc_close_plot.py`, `bp_arc_close.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
