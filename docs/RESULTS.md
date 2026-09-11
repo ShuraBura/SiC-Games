@@ -8197,4 +8197,37 @@ DIAGNOSIS ONLY — no mechanism changed, canonical unchanged. `scratchpad/bp_foo
 
 ---
 
+## Addendum 78 — Intervention #1 FALSIFIED: forced hunger dispersal unpacks the population but crashes temperate e0 — the clusters are adaptive buffers (2026-09-10, R-106)
+
+**The test.** Addendum 77 named two packing channels. The temperate PULL lever already exists as a built,
+default-OFF flag: `enable_hunger_dispersal` breaks a settled agent's residence pin when its reserve falls below
+`hunger_flee_reserve_frac` (0.35), so its IFD drive takes the better cell one stride away — its own code comment
+cites "99% of the hungry have one," matching the Addendum-77 finding (97% within reach). This tests turning it ON,
+paired OFF/ON per world on the low-noise panel (canon, biome_seasonality ON, 600 agents, period life table 400–800,
+3 worlds), watching e0 AND density AND packing together. `scratchpad/bp_disperse.py`.
+
+**It works mechanically — and that is the problem.** The flag DOES unpack the population: spatial use (fraction of
+food-bearing land occupied) rises in both biomes (temperate 0.15 → 0.35, z=7.7; savanna 0.14 → 0.24, z=3.2). So
+the diagnosis was mechanically right — the agents CAN be dispersed. But the demographic outcome is a net loss:
+- TEMPERATE: e0 CRASHES 36.2 → 27.7 (Δ −8.6 ± 2.5, z=−3.4); survival-to-15 0.61 → 0.52 (z=−2.4); density flat.
+- SAVANNA: e0 essentially unchanged 24.6 → 25.2 (Δ +0.6 ± 1.5, n.s.); survival-to-15 0.44 → 0.47 (z=1.7,
+  marginal); density flat.
+
+**The clusters are ADAPTIVE.** Forcing hungry agents out of settlements strips them of the settlement's survival
+infrastructure — storage (`enable_storage_seasonal_union`), provisioning, and agglomeration returns — which is
+worth MORE than the raw per-capita food on the empty cell they flee to. The temperate "PULL" is therefore NOT a
+defect: agents correctly stay where the buffering is; the empty adjacent cell offers per-capita food but not the
+buffer. Addendum 77's "adults starve next to empty food they won't move to" is corrected — the food is there, the
+buffer is not. Temperate baseline e0 (36.2) already sits at the Aché anchor (36.6); the intervention only breaks it.
+
+**Deliverable.** `enable_hunger_dispersal` is FALSIFIED as a packing fix and stays default-OFF (canonical
+unchanged). The packing paradox is not a simple dispersal bug — the clustering earns its keep by buffering hunger.
+Only SAVANNA remains below anchor, and dispersal barely helps it, consistent with its REACH channel (the escapes
+are far, not adjacent). The remaining untested lever is savanna-specific: the intake-mode mobility stride
+(`mobility_pressure_source="intake"`, already built, canon uses "npp"), which lengthens a starving agent's move
+toward distant feeding cells rather than expelling it from its buffer. `scratchpad/bp_disperse.py`,
+`bp_disperse_plot.py`, `bp_disperse_diagnosis.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

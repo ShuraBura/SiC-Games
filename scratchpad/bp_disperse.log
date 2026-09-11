@@ -1,0 +1,23 @@
+HUNGER-DISPERSAL TEST | canon OFF vs enable_hunger_dispersal ON | 800 steps | period LT from 400 | worlds [0, 1, 2] x agents [0]
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: e0 38.3->25.5 surv15 0.60->0.43 dens 0.050->0.070 spatial 0.08->0.32 pop 708->990
+  temperate w1a0: e0 37.7->28.8 surv15 0.65->0.56 dens 0.128->0.110 spatial 0.28->0.45 pop 2123->1826
+  temperate w2a0: e0 32.7->28.7 surv15 0.59->0.56 dens 0.106->0.091 spatial 0.10->0.27 pop 1231->1056
+  === temperate PAIRED ON-OFF over 3 worlds ===
+    e0             OFF 36.249 -> ON 27.661 | delta -8.588 +/- 2.547 (z=-3.4)
+    surv_to_15     OFF 0.610 -> ON 0.516 | delta -0.094 +/- 0.039 (z=-2.4)
+    density_ratio  OFF 0.095 -> ON 0.090 | delta -0.004 +/- 0.012 (z=-0.4)
+    spatial_use    OFF 0.154 -> ON 0.348 | delta +0.194 +/- 0.025 (z=7.7)
+    fill_median    OFF 0.185 -> ON 0.181 | delta -0.004 +/- 0.023 (z=-0.2)
+    pop            OFF 1354.000 -> ON 1290.667 | delta -63.333 +/- 176.222 (z=-0.4)
+  savanna w0a0: e0 23.7->21.3 surv15 0.42->0.42 dens 0.031->0.027 spatial 0.10->0.14 pop 761->657
+  savanna w1a0: e0 28.8->31.1 surv15 0.51->0.56 dens 0.066->0.062 spatial 0.20->0.33 pop 1626->1515
+  savanna w2a0: e0 21.3->23.2 surv15 0.38->0.44 dens 0.023->0.039 spatial 0.11->0.26 pop 544->930
+  === savanna PAIRED ON-OFF over 3 worlds ===
+    e0             OFF 24.621 -> ON 25.185 | delta +0.563 +/- 1.501 (z=0.4)
+    surv_to_15     OFF 0.437 -> ON 0.474 | delta +0.037 +/- 0.021 (z=1.7)
+    density_ratio  OFF 0.040 -> ON 0.043 | delta +0.003 +/- 0.007 (z=0.4)
+    spatial_use    OFF 0.136 -> ON 0.241 | delta +0.105 +/- 0.033 (z=3.2)
+    fill_median    OFF 0.116 -> ON 0.112 | delta -0.004 +/- 0.014 (z=-0.3)
+    pop            OFF 977.000 -> ON 1034.000 | delta +57.000 +/- 164.512 (z=0.3)
