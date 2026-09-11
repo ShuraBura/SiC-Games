@@ -50,6 +50,15 @@ mechanisms are default-OFF and NOT adopted — the canonical config is unchanged
   reduction" was world-lottery noise (RETRACTED). Temperate's Addendum-75 e0 gain is the age-shift, not fewer
   deaths; savanna's 2.6× higher death flux cancels it. No provisioning variant can close savanna e0; the fix is a
   food-economy / carrying-capacity change (tier-1/2). Addendum 76 + the probe hook are NOT yet committed.
+- **Food-economy diagnosis — DONE (Addendum 77, 2026-09-10). NEXT ARC = the spatial lever.** The
+  carrying-capacity shortfall is the PACKING PARADOX (`scratchpad/bp_foodchain.py`, `bp_reach.py`): the population
+  uses only ~14% of the food-bearing land, clusters, and starves next to empty food — NOT seasonality (13–30%
+  loss) or food quantity (aggregate density temperate ~74% / savanna ~46% of the ethnographic anchor). Two
+  biome-specific channels for adult food-short agents (full-eta, not the juvenile tail): TEMPERATE = PULL (empty
+  feeding cell adjacent + 97% reachable, but 59% stay put — sedentism/agglomeration override the food gradient);
+  SAVANNA = REACH (feeding cells ~5 cells away, only 32% within the 1-cell/step move). The lever is SPATIAL
+  movement (tier-1/2), not the food base. NEXT: tune ONE channel (cut the temperate pull / add a hunger-scaled
+  residential stride for savanna) and re-measure density AND e0 together on the low-noise panel. NOT yet committed.
 - **Adoption decisions deferred.** Emigration — keep off. Band provisioning — validated for temperate; decide
   adoption once the savanna residual is understood; `band_provision_self_keep` is [PROVISIONAL].
 - **Other ladder misses** (independent of e0): band size (tier 5, model ~12 adults vs Hill 28.2 — the oldest

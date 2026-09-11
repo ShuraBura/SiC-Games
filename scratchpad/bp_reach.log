@@ -1,0 +1,25 @@
+REACH/PERCEPTION/PULL PROBE | canon (bp OFF) | 800 steps | sample>=740 every 8 | worlds [0, 1, 2] x agents [0]
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: pop 708 short 0.41 | disp med 0.0 p90 1.0 | dist-to-empty-feed med 1.0 reachable 100.00%
+  temperate w1a0: pop 2123 short 0.42 | disp med 1.0 p90 1.0 | dist-to-empty-feed med 1.0 reachable 94.19%
+  temperate w2a0: pop 1231 short 0.40 | disp med 0.0 p90 1.0 | dist-to-empty-feed med 1.0 reachable 98.31%
+  === temperate POOLED ===
+    food-short fraction of pop         0.41
+    per-step displacement  median 0.0  p90 1.0  max 16  (fraction that stay put: 59.07%)
+    short agents' distance to nearest EMPTY feeding cell: median 1.0  p25 1.0  p90 1.0
+    ADULT-short agents (n=2470): median eta 1.00  (adult fed eta ~0.95; low eta => cannot be fed by moving)
+    ADULT-short distance to nearest EMPTY feeding cell: median 1.0  p25 1.0  p90 1.0
+    ADULT-short with a feeding cell WITHIN reach: 96.76%  -> PERCEPTION/PULL dominates
+    [dumped scratchpad/reach_arr_temperate.npz]
+  savanna w0a0: pop 761 short 0.45 | disp med 1.0 p90 1.0 | dist-to-empty-feed med 5.0 reachable 6.45%
+  savanna w1a0: pop 1626 short 0.37 | disp med 1.0 p90 1.0 | dist-to-empty-feed med 1.0 reachable 97.58%
+  savanna w2a0: pop 544 short 0.39 | disp med 1.0 p90 1.0 | dist-to-empty-feed med 2.0 reachable 47.48%
+  === savanna POOLED ===
+    food-short fraction of pop         0.40
+    per-step displacement  median 1.0  p90 1.0  max 15  (fraction that stay put: 45.89%)
+    short agents' distance to nearest EMPTY feeding cell: median 5.0  p25 1.0  p90 5.0
+    ADULT-short agents (n=1127): median eta 1.00  (adult fed eta ~0.95; low eta => cannot be fed by moving)
+    ADULT-short distance to nearest EMPTY feeding cell: median 5.0  p25 1.0  p90 5.0
+    ADULT-short with a feeding cell WITHIN reach: 31.85%  -> REACH dominates
+    [dumped scratchpad/reach_arr_savanna.npz]

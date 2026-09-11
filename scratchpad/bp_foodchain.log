@@ -1,0 +1,31 @@
+FOOD-CHAIN DIAGNOSIS | canon (bp OFF) | 800 steps | final-year window 12 | worlds [0, 1, 2] x agents [0]
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: pop 708/14191 dens 0.05 | seas 0.69 extr/anch 0.158 extr/deliv 0.23 | spatial 0.08 fill(med 0.16 p90 1.46) | starv% 0.13 cond 0.80
+  temperate w1a0: pop 2123/16589 dens 0.13 | seas 0.74 extr/anch 0.462 extr/deliv 0.62 | spatial 0.28 fill(med 0.16 p90 0.83) | starv% 0.32 cond 0.42
+  temperate w2a0: pop 1231/11580 dens 0.11 | seas 0.67 extr/anch 0.386 extr/deliv 0.57 | spatial 0.10 fill(med 0.23 p90 1.32) | starv% 0.38 cond 0.42
+  === temperate MEAN over 3 cells ===
+    density_ratio          0.095 +/- 0.023
+    seasonality            0.702 +/- 0.022
+    extract_of_anchor      0.335 +/- 0.091
+    extract_of_delivered   0.475 +/- 0.124
+    spatial_use            0.154 +/- 0.065
+    fill_mean              0.458 +/- 0.076
+    fill_median            0.185 +/- 0.021
+    fill_p90               1.203 +/- 0.190
+    starv_frac             0.275 +/- 0.075
+    cond_mean              0.548 +/- 0.127
+  savanna w0a0: pop 761/24494 dens 0.03 | seas 0.83 extr/anch 0.155 extr/deliv 0.19 | spatial 0.10 fill(med 0.12 p90 0.56) | starv% 0.52 cond 1.41
+  savanna w1a0: pop 1626/24550 dens 0.07 | seas 0.88 extr/anch 0.335 extr/deliv 0.38 | spatial 0.20 fill(med 0.13 p90 0.67) | starv% 0.43 cond 0.59
+  savanna w2a0: pop 544/23719 dens 0.02 | seas 0.90 extr/anch 0.091 extr/deliv 0.10 | spatial 0.11 fill(med 0.10 p90 0.29) | starv% 0.61 cond 0.42
+  === savanna MEAN over 3 cells ===
+    density_ratio          0.040 +/- 0.013
+    seasonality            0.873 +/- 0.021
+    extract_of_anchor      0.194 +/- 0.073
+    extract_of_delivered   0.222 +/- 0.082
+    spatial_use            0.136 +/- 0.032
+    fill_mean              0.248 +/- 0.028
+    fill_median            0.116 +/- 0.010
+    fill_p90               0.506 +/- 0.112
+    starv_frac             0.521 +/- 0.052
+    cond_mean              0.808 +/- 0.305

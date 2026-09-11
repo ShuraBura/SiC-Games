@@ -8159,4 +8159,42 @@ CLOSED as a demographic-lever question. Canonical unchanged; `enable_band_provis
 
 ---
 
+## Addendum 77 — The carrying-capacity shortfall is the PACKING PARADOX, and it has TWO biome-specific channels: temperate PULL, savanna REACH (2026-09-10, R-106)
+
+**Why this arc.** Addenda 75–76 closed the demographic layer: within-band redistribution is zero-sum on death,
+so the savanna e0 residual is downstream of the FOOD ECONOMY, not the provisioning rule. This addendum
+instruments the food economy directly, per biome, on the low-noise panel (canon, band provisioning OFF,
+biome_seasonality ON, 600 agents, steps 400–800, 3 worlds). `scratchpad/bp_foodchain.py`, `bp_reach.py`.
+
+**The shortfall is spatial, not food-quantity or seasonality.** The food chain, anchor → delivered → extracted:
+- SEASONALITY is minor: delivered food is 70% (temperate) / 87% (savanna) of the undepleted Tallavaara anchor
+  (a 13–30% loss to seasonality + depletion), not the driver.
+- AGGREGATE density is reasonable: against the ethnographic /km² grounding, temperate ≈ 74%, savanna ≈ 46% of
+  the anchor. (The pop/patch-ceiling ratio of 4–10% is against an aquatic-inflated ceiling and overstates the gap.)
+- The failure is DISTRIBUTION. The population occupies only ~14% of the food-bearing land. Occupancy is bimodal:
+  the median occupied cell sits at 12–19% of its Tallavaara capacity while the top decile is packed to/over
+  capacity. Survivors are pinned at the ~0.42 body-condition food margin, and starvation is 28% (temperate) /
+  52% (savanna) of all deaths — agents STARVE in the packed clusters while 86% of the food-bearing patch is empty.
+  This is the packing paradox (Addendum 73), now measured through the food chain.
+
+**The mechanism is biome-specific — check biome-dependence.** Movement (`substrate.diffusion_select_target`) is
+LOCAL: an agent evaluates only its cell + 4 cardinal cells at stride `move_radius`, with no long-range
+residential move. For ADULT food-short agents (median eta 1.00 — full-efficiency, NOT the low-eta juvenile tail),
+the reach/perception/pull probe splits the two biomes:
+- TEMPERATE = PULL. The nearest empty feeding cell is ADJACENT (median distance 1) and reachable (97% within a
+  step), yet 59% of short adults STAY PUT. Sedentism / agglomeration / cohesion override the local food gradient;
+  full-eta adults starve on a cell next to empty food.
+- SAVANNA = REACH. Feeding cells are sparse (fewer cells clear the maintenance bar) and the good ones are
+  occupied, so the nearest EMPTY feeding cell sits ~5 cells away — beyond the 1-cell/step move (only 32% within
+  reach). Agents cannot relocate to the distant food.
+
+**Conclusion / the lever.** The shortfall and the savanna e0 residual are both the packing paradox, and the lever
+is SPATIAL, not the food base: (temperate) reduce the sedentism/agglomeration PULL or strengthen hunger-driven
+dispersal so short adults leave for adjacent empty food; (savanna) give hungry agents a longer residential move
+(a hunger-scaled stride) so they can reach the sparse distant feeding cells. This is a tier-1/2 movement change.
+DIAGNOSIS ONLY — no mechanism changed, canonical unchanged. `scratchpad/bp_foodchain.py`, `bp_foodchain_plot.py`,
+`bp_reach.py`, `bp_reach_plot.py`, `bp_foodchain_diagnosis.png`, `bp_reach_diagnosis.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
