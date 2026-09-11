@@ -62,8 +62,8 @@ mechanisms are default-OFF and NOT adopted — the canonical config is unchanged
   strips agents of the settlement buffer); intake-mode mobility (`mobility_pressure_source="intake"`) is INERT.
   The packing is an ADAPTIVE equilibrium. ARC CLOSED: temperate e0 36.2 at the Ache anchor 36.6, savanna e0 24.6
   inside the ethnographic forager range 21-37 — the model is calibrated, the savanna "residual" is the honest
-  harsh-biome e0. Nothing adopted, canonical unchanged. Addenda 76-79 committed on branch
-  `arc/savanna-residual-diagnosis` (HELD, not pushed/merged).
+  harsh-biome e0. Nothing adopted, canonical unchanged. Addenda 76-79 MERGED + PUSHED to origin/main @ 5a1bb4d
+  (2026-09-11); arc branch deleted.
 - **Adoption decisions deferred.** Emigration — keep off. Band provisioning — validated for temperate; decide
   adoption once the savanna residual is understood; `band_provision_self_keep` is [PROVISIONAL].
 - **Other ladder misses** (independent of e0): band size (tier 5, model ~12 adults vs Hill 28.2 — the oldest
