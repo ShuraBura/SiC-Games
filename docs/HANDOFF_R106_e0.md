@@ -42,10 +42,14 @@ mechanisms are default-OFF and NOT adopted — the canonical config is unchanged
 
 ## Open items (next-session pickup)
 
-- **Savanna adult-scarcity residual.** Band provisioning is COMPENSATED in savanna (adults share to death,
-  mortality 0.027 → 0.043; e0 stays ~22). Not cleanly diagnosed — the deficit-vs-surplus probe was measured
-  POST-provisioning and returned a paradox. Redo it PRE-provisioning (measure each group's juvenile deficit and
-  adult surplus BEFORE the transfer), plus the dependency ratio and the reserve-cap/burn ratio.
+- **Savanna adult-scarcity residual — DIAGNOSED + CLOSED (Addendum 76, 2026-09-10).** The PRE-transfer probe
+  (`phase1_model.py` `_bp_probe` hook, bit-exact; `scratchpad/bp_savanna_probe.py`), on a 3-world × 3-replicate
+  low-noise panel, shows the residual is Malthusian RELOCATION, not a donor-flow defect. Band provisioning is
+  ZERO-SUM on starvation hazard in BOTH biomes (temperate Δ +0.01 ± 0.07, savanna Δ −0.00 ± 0.14 /1000
+  person-months); it only ages the deaths (temperate +5.9y, savanna +8.2y, z=13). The 2-world "temperate −27%
+  reduction" was world-lottery noise (RETRACTED). Temperate's Addendum-75 e0 gain is the age-shift, not fewer
+  deaths; savanna's 2.6× higher death flux cancels it. No provisioning variant can close savanna e0; the fix is a
+  food-economy / carrying-capacity change (tier-1/2). Addendum 76 + the probe hook are NOT yet committed.
 - **Adoption decisions deferred.** Emigration — keep off. Band provisioning — validated for temperate; decide
   adoption once the savanna residual is understood; `band_provision_self_keep` is [PROVISIONAL].
 - **Other ladder misses** (independent of e0): band size (tier 5, model ~12 adults vs Hill 28.2 — the oldest

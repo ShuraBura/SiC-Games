@@ -1,0 +1,49 @@
+PRE-TRANSFER PROBE | 600 agents, patch 24, 800 steps | sample steps>=400 every 10 | worlds [0, 1, 2] x agents [0, 1, 2]
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: OFF pop 708 haz 0.27/kpm age 10.0y | ON pop 1152 haz 0.37/kpm age 34.1y groups 900
+  temperate w0a1: OFF pop 803 haz 1.04/kpm age 18.8y | ON pop 1071 haz 0.71/kpm age 22.8y groups 1025
+  temperate w0a2: OFF pop 1066 haz 0.58/kpm age 20.2y | ON pop 1046 haz 0.75/kpm age 24.0y groups 962
+  temperate w1a0: OFF pop 2123 haz 0.64/kpm age 17.9y | ON pop 1954 haz 0.37/kpm age 24.0y groups 1060
+  temperate w1a1: OFF pop 1955 haz 0.27/kpm age 19.0y | ON pop 1990 haz 0.32/kpm age 25.0y groups 1062
+  temperate w1a2: OFF pop 2163 haz 0.44/kpm age 20.5y | ON pop 2218 haz 0.32/kpm age 27.3y groups 1026
+  temperate w2a0: OFF pop 1231 haz 0.90/kpm age 19.4y | ON pop 1187 haz 1.05/kpm age 21.1y groups 944
+  temperate w2a1: OFF pop 1126 haz 0.86/kpm age 20.1y | ON pop 1230 haz 0.87/kpm age 21.3y groups 940
+  temperate w2a2: OFF pop 1093 haz 0.97/kpm age 22.9y | ON pop 1071 haz 1.25/kpm age 22.1y groups 791
+  === temperate PAIRED ON-OFF across 9 cells ===
+    starvation HAZARD /1000 person-months: OFF 0.66 -> ON 0.67 | delta +0.01 +/- 0.07  (NOT reduced (z=0.1))
+    mean starvation AGE (yr):              OFF 18.7 -> ON 24.6 | delta +5.9 +/- 2.4  (z=2.4)
+
+  === TEMPERATE === active groups (juv deficit present) = 433
+  dependency ratio  n_juv/n_adult   mean 0.70
+  cap/burn buffer   per adult       mean 1.73
+  juv STOCK deficit / step-group    mean 41677.7
+  adult STOCK surplus (donatable)   mean 4060677.8   (ratio surplus/deficit = 97.43)
+  adult FLOW deficit (own shortfall) mean 723965.4   (ratio flowdef/surplus = 0.18)
+  groups donating from surplus              97%
+  ... of those, donors in FLOW deficit too  87.41%  <-- 'phantom surplus' = buffer the adult needs
+  frac of donor adults in flow deficit      44.05%
+  [dumped scratchpad/bp_arr_temperate.npz]
+  savanna w0a0: OFF pop 761 haz 1.88/kpm age 14.6y | ON pop 835 haz 1.57/kpm age 23.2y groups 887
+  savanna w0a1: OFF pop 566 haz 2.03/kpm age 14.8y | ON pop 540 haz 1.70/kpm age 22.6y groups 555
+  savanna w0a2: OFF pop 783 haz 1.46/kpm age 14.3y | ON pop 631 haz 2.06/kpm age 22.5y groups 776
+  savanna w1a0: OFF pop 1626 haz 1.31/kpm age 12.4y | ON pop 1569 haz 1.29/kpm age 22.6y groups 1000
+  savanna w1a1: OFF pop 1600 haz 1.03/kpm age 12.1y | ON pop 1934 haz 1.29/kpm age 22.9y groups 1363
+  savanna w1a2: OFF pop 1487 haz 0.82/kpm age 13.7y | ON pop 1956 haz 1.25/kpm age 20.9y groups 1304
+  savanna w2a0: OFF pop 544 haz 2.44/kpm age 17.6y | ON pop 685 haz 2.41/kpm age 22.1y groups 993
+  savanna w2a1: OFF pop 311 haz 2.76/kpm age 15.9y | ON pop 717 haz 2.02/kpm age 23.0y groups 1009
+  savanna w2a2: OFF pop 787 haz 1.78/kpm age 13.1y | ON pop 1174 haz 1.89/kpm age 23.0y groups 1814
+  === savanna PAIRED ON-OFF across 9 cells ===
+    starvation HAZARD /1000 person-months: OFF 1.72 -> ON 1.72 | delta -0.00 +/- 0.14  (NOT reduced (z=-0.0))
+    mean starvation AGE (yr):              OFF 14.3 -> ON 22.5 | delta +8.2 +/- 0.6  (z=12.8)
+
+  === SAVANNA === active groups (juv deficit present) = 1711
+  dependency ratio  n_juv/n_adult   mean 1.20
+  cap/burn buffer   per adult       mean 1.73
+  juv STOCK deficit / step-group    mean 86561.7
+  adult STOCK surplus (donatable)   mean 3484860.7   (ratio surplus/deficit = 40.26)
+  adult FLOW deficit (own shortfall) mean 185391.4   (ratio flowdef/surplus = 0.05)
+  groups donating from surplus              98%
+  ... of those, donors in FLOW deficit too  52.38%  <-- 'phantom surplus' = buffer the adult needs
+  frac of donor adults in flow deficit      12.54%
+  [dumped scratchpad/bp_arr_savanna.npz]

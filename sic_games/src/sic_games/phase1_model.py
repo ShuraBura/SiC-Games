@@ -2364,6 +2364,48 @@ class TerrainWorld(mesa.Model):
             for a in self.agent_list:
                 bk = (self._nearest_settlement(a.pos) if settle_on else None) or a.pos
                 bp_groups.setdefault(bk, []).append(a)
+            # PRE-TRANSFER PROBE (diagnostic only; bit-exact when `_bp_probe` is None — the default). Records,
+            # for every food-sharing group, the juvenile STOCK deficit and the adult STOCK surplus that drive the
+            # transfer, PLUS the donors' own FLOW state (burn·cf − intake this step). The earlier deficit-vs-surplus
+            # probe read POST-transfer (adults already drained, juveniles already fed) and returned a paradox; this
+            # measures the same quantities before any wealth moves. R-106 savanna adult-scarcity residual.
+            if getattr(self, "_bp_probe", None) is not None:
+                for members in bp_groups.values():
+                    n_j = n_a = 0
+                    juv_def = 0.0
+                    adult_surplus = 0.0        # stock above keep·cap (what the mechanism treats as donatable)
+                    adult_flow_def = 0.0       # Σ max(0, burn·cf − intake): the adults' own shortfall this step
+                    n_a_flow_def = 0
+                    adult_wealth = adult_cap = 0.0
+                    caps_over_burn = 0.0
+                    for m in members:
+                        cf = m.consumption_factor()
+                        req = self._burn * cf
+                        cap = self._reserve_full * m.reserve_scale()
+                        if m.is_juvenile():
+                            n_j += 1
+                            d = cap - m.wealth
+                            if d > 0.0:
+                                juv_def += d
+                        else:
+                            n_a += 1
+                            adult_wealth += m.wealth
+                            adult_cap += cap
+                            s = m.wealth - keep * cap
+                            if s > 0.0:
+                                adult_surplus += s
+                            fd = req - getattr(m, "_last_intake", 0.0)
+                            if fd > 0.0:
+                                adult_flow_def += fd
+                                n_a_flow_def += 1
+                            if req > 0.0:
+                                caps_over_burn += cap / req
+                    self._bp_probe.append(dict(
+                        step=self.step_count, n_juv=n_j, n_adult=n_a,
+                        juv_deficit=juv_def, adult_surplus=adult_surplus,
+                        adult_flow_deficit=adult_flow_def, n_adult_flow_deficit=n_a_flow_def,
+                        adult_wealth=adult_wealth, adult_cap=adult_cap,
+                        cap_over_burn_sum=caps_over_burn))
             for members in bp_groups.values():
                 needy = []
                 for c in members:

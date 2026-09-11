@@ -8107,4 +8107,56 @@ savanna's adult-scarcity residual remains open.
 
 ---
 
+## Addendum 76 — The savanna band-provisioning residual is Malthusian RELOCATION, not a donor-flow defect (2026-09-10, R-106)
+
+**The open item.** Addendum 75 left the savanna residual open: `enable_band_provisioning` raises savanna child
+survival but adult mortality rises to match and e0 stays ~22. A first deficit-vs-surplus probe read POST-transfer
+and returned a paradox. This addendum measures the same quantities PRE-transfer.
+
+**The instrument.** A bit-exact PRE-transfer probe hook (`phase1_model.py`, guarded by `_bp_probe`; the default
+path is bit-identical, 15 canonical CTBs pass) records, per food-sharing group and BEFORE any wealth moves: the
+juvenile STOCK deficit, the adult donatable STOCK surplus, and the donors' own FLOW state (burn·cf − intake). Run
+on CANON with biome_seasonality ON, 600 agents, equilibrium steps 400–800. Outcomes use a low-noise 3-world ×
+3-replicate panel (9 cells per biome), paired OFF vs ON per cell, reported as mean ± SE (the world lottery is the
+dominant e0/hazard noise, so a paired design across worlds is required).
+
+**The donor-flow hypothesis is FALSIFIED.** The natural guess — adults donate into their own instantaneous
+deficit — is wrong. Savanna donors are LESS short at the instant of donation than temperate donors (12% vs 44% of
+donor adults below maintenance; flow-deficit / surplus 0.05 vs 0.18). The compensation is not a defect in the
+donor-selection rule.
+
+**The mechanism is Malthusian relocation, in BOTH biomes.** Band provisioning does not reduce total starvation; it
+relocates it from children to adults:
+- Starvation HAZARD (deaths / 1000 person-months) is UNCHANGED in both biomes: temperate 0.66 → 0.67 (Δ +0.01 ±
+  0.07, z=0.1, n.s.); savanna 1.72 → 1.72 (Δ −0.00 ± 0.14, z=0.0, n.s.). It is zero-sum on total death.
+- The mean AGE of starvation deaths RISES sharply: temperate 18.7 → 24.6 yr (Δ +5.9 ± 2.4, z=2.4); savanna
+  14.3 → 22.5 yr (Δ +8.2 ± 0.6, z=12.8). Provisioning feeds a child; an adult dies later in the trough.
+
+**RETRACTION of the 2-world reading.** An earlier 2-world panel recorded temperate starvation dropping 487 → 354
+(−27%) — a genuine REDUCTION. The 9-cell panel shows that was world-lottery noise: temperate hazard is flat
+(Δ +0.01 ± 0.07). Provisioning is zero-sum on total starvation in temperate too. The e0 GAIN that temperate shows
+in Addendum 75 (survival-15 0.61 → 0.67, e0 32.8 → 34.4) is therefore NOT a reduction in deaths; it is the
+age-shift raising life expectancy — a death moved from age ~14 to age ~24 destroys fewer remaining life-years.
+This age-shift raises e0 where the death flux is small (temperate); savanna's ~2.6× larger flux cancels the gain,
+so savanna e0 stays ~22.
+
+**Why the biomes differ.** Savanna carries a higher death flux and a tighter budget: baseline hazard 2.6× higher
+(1.72 vs 0.66 / 1000 person-months), 4× more needy group-observations (1711 vs 433), a lower donatable-surplus /
+juvenile-deficit ratio (40× vs 97×), and a higher dependency ratio (1.20 vs 0.70 juveniles per adult). The band
+carries more dependents than its donors cover across the season. The post-harvest surplus (40×) is a MIRAGE: the
+probe samples after harvest, when adults look fed; the deaths fall in savanna's deeper seasonal trough (amplitude
+0.40, the ~16% annual food loss on record). This is why the earlier POST-transfer probe saw a paradox — it sampled
+after the give, before the trough.
+
+**Conclusion for the fix.** Within-band redistribution is zero-sum on total starvation at BOTH food bases, so no
+provisioning variant can raise e0 by reducing death; it can only raise e0 by the age-shift, and only where the
+death flux is small enough for that shift to net positive. Savanna e0 ≈ 22 is the honest equilibrium for that food
+economy. Closing it requires a FOOD-ECONOMY / carrying-capacity change (the non-mean-preserving seasonality, or
+savanna harvest delivery), a tier-1/2 change — the same conclusion the emigration grounding reached (Addendum 75).
+The savanna adult-scarcity residual is now DIAGNOSED (a food-quantity ceiling, not a distribution defect) and
+CLOSED as a demographic-lever question. Canonical unchanged; `enable_band_provisioning` stays default-off.
+`scratchpad/bp_savanna_probe.py`, `bp_plot.py`, `bp_probe_panel.log`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
