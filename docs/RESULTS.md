@@ -8262,6 +8262,38 @@ and the resulting biome e0 spread matches the ethnographic range.
 CLOSED: temperate at anchor, savanna in-range, the packing paradox an adaptive equilibrium. `scratchpad/
 bp_intake.py`, `bp_arc_close_plot.py`, `bp_arc_close.png`.
 
+## Addendum 80 — Tier-5 band size is a SPATIAL limit, not a cohesion-cap limit; the de-saturation fix is falsified by a natural control (2026-09-12, R-106)
+
+**The miss.** `band_med_adults` = 28.2 (Hill 2011) is the tier-5 benchmark; the model reads ~11.8 and fails 16/16.
+Addendum 22 found the cohesion budget `cohesion_frac = clamp01(assabiyah + leader − repulsion − malnutrition)`
+saturates at 1.0, so the four band-size mechanisms are inert, and proposed de-saturation fixes (`enable_leaky_
+assabiyah`, `cohesion_leader_weight`) — built, never validated. A per-band probe (`_band_probe`, bit-exact off;
+12 age-structure CTBs pass) tests the current canon on the low-noise panel. `scratchpad/bp_bandsize.py`.
+
+**Reproduced.** band_med_adults 11.7 ± 0.9 (temperate) / 9.5 ± 0.9 (savanna) vs 28.2. Band TOTAL size is 23 / 18
+people — the bands are not small in headcount; they are child-heavy (~10–12 adults inside ~20–23 people) AND below
+the ~73 people a 28.2-adult band needs at the model's child fraction.
+
+**It is NOT a cohesion-cap limit.** In both biomes the realised band size sits FAR below its own fission
+threshold: median size / split_thr = 0.27 (temperate, split_thr ~90 via village scaling) and 0.55 (savanna,
+split_thr ~36). Bands have far more permission to grow than they use.
+
+**The natural control falsifies de-saturation.** Temperate's cohesion budget is 76% saturated (rich → high
+assabiyah); savanna's is 1.8% saturated — effectively UNSATURATED (poor → low assabiyah). Yet savanna's bands are
+SMALLER (9.5 vs 11.7 adults). The one biome that already runs de-saturated is the smaller one, so de-saturating
+the budget cannot be the band-size lever; if anything cohesion correlates POSITIVELY with size, and savanna's low
+cohesion is downstream of its low surplus (the food economy), not a budget-shape defect.
+
+**The root is tier-1/2/3, the same as the packing arc.** Co-resident band size is set by the adaptive spatial/food
+equilibrium (Addenda 77–79 — bands sit at the packing equilibrium, well below their fission cap), and adults-per-
+band is further depressed by the high child fraction (tier-3 age structure). Both are below tier 5. The four tier-5
+band mechanisms (emergent band size, dynamic bands, size repulsion, malnutrition fission) and the de-saturation
+candidates are downstream and cannot move the benchmark — matching the falsified R-106 cv_safe re-fit.
+
+**Deliverable.** DIAGNOSIS ONLY; canonical unchanged; the de-saturation candidates stay default-off. Tier-5 band
+size is not fixable at tier 5: the miss is the packing paradox plus the age structure. `scratchpad/bp_bandsize.py`,
+`bp_bandsize_plot.py`, `bp_bandsize_diagnosis.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

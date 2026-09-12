@@ -5357,6 +5357,14 @@ class TerrainWorld(mesa.Model):
                     net_raw = a_new + leader_term - repulsion - malnutrition
                     if net_raw > 1.0:
                         split_thr[bid] += cfg.village_gain * (cap - base) * (net_raw - 1.0)
+                # PER-BAND PROBE (diagnostic only; bit-exact when `_band_probe` is None — the default). Records
+                # the cohesion budget and the realised band size, to separate a cohesion-CAP limit (size ~
+                # split_thr) from a spatial/demographic limit (size << split_thr). R-106 tier-5 band-size arc.
+                if getattr(self, "_band_probe", None) is not None:
+                    self._band_probe.append(dict(
+                        step=self.step_count, size=len(ms), split_thr=split_thr[bid],
+                        cohesion_frac=cohesion_frac, assabiyah=a_new, leader_term=leader_term,
+                        repulsion=repulsion, malnutrition=malnutrition, surplus=surplus))
             self._band_assabiyah = new_assab
             self._band_leader_term = new_leader
             self._band_repulsion = new_repulsion

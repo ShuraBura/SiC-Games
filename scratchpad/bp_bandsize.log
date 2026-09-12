@@ -1,0 +1,25 @@
+BAND-SIZE DIAGNOSIS | canon | 800 steps | sample>=740 every 4 | worlds [0, 1, 2] x agents [0] | Hill anchor band_med_adults=28.2
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: band_med_adults 12.0 band_med 31.0 n_bands 15 pop 708 rows 222
+  temperate w1a0: band_med_adults 13.0 band_med 21.0 n_bands 77 pop 2123 rows 1076
+  temperate w2a0: band_med_adults 10.0 band_med 18.0 n_bands 25 pop 1231 rows 329
+  === temperate (band-records n=1627) ===
+    band_med_adults 11.7 +/- 0.9  (Hill 28.2) | band_med 23.3
+    cohesion_frac   mean 0.837  frac at 1.0: 76.15%  (saturated?)
+    budget terms    assabiyah 0.83  leader 0.50  repulsion 0.05  malnutrition 0.00
+    split_thr       mean 89.7  (band_split_size cap)
+    band size       mean 36.4  median 22.0
+    size / split_thr  mean 0.43  median 0.27  -> SPATIAL limit (bands never fill their cap)
+    [dumped scratchpad/band_arr_temperate.npz]
+  savanna w0a0: band_med_adults 8.0 band_med 17.5 n_bands 10 pop 761 rows 152
+  savanna w1a0: band_med_adults 11.0 band_med 20.0 n_bands 49 pop 1626 rows 663
+  savanna w2a0: band_med_adults 9.5 band_med 18.0 n_bands 20 pop 544 rows 304
+  === savanna (band-records n=1119) ===
+    band_med_adults 9.5 +/- 0.9  (Hill 28.2) | band_med 18.5
+    cohesion_frac   mean 0.368  frac at 1.0: 1.79%  (saturated?)
+    budget terms    assabiyah 0.01  leader 0.39  repulsion 0.05  malnutrition 0.00
+    split_thr       mean 35.8  (band_split_size cap)
+    band size       mean 38.6  median 20.0
+    size / split_thr  mean 0.99  median 0.55  -> SPATIAL limit (bands never fill their cap)
+    [dumped scratchpad/band_arr_savanna.npz]
