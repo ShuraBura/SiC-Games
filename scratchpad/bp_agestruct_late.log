@@ -1,0 +1,16 @@
+AGE-STRUCTURE DIAGNOSIS | canon | 1200 steps | period 800-1200 | worlds [0, 1, 2] x agents [0]
+  anchors: frac_child [0.287-0.454]  dependency [0.598-0.899]  TFR [4.69-8.03]  e0 [21-37]  surv15 ~0.66
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: frac_child 0.38 dep 0.81 TFR 5.6 e0 31.7 surv15 0.55 | CBR 7.7 CDR 3.2 r +4.5%/yr (starv 1.2 senesc 2.1) | iso r_pred +1.2 consistent False
+  temperate w1a0: frac_child 0.35 dep 0.70 TFR 4.7 e0 32.6 surv15 0.60 | CBR 7.3 CDR 2.9 r +4.4%/yr (starv 1.2 senesc 1.7) | iso r_pred +0.9 consistent False
+  temperate w2a0: frac_child 0.37 dep 0.84 TFR 5.3 e0 28.0 surv15 0.55 | CBR 7.2 CDR 3.5 r +3.7%/yr (starv 1.5 senesc 2.0) | iso r_pred +0.9 consistent False
+  === temperate MEAN ===
+    frac_child       0.37 +/- 0.01   IN-anchor
+    dependency       0.78 +/- 0.04   IN-anchor
+    TFR              5.19 +/- 0.26   IN-anchor
+    e0              30.79 +/- 1.40   IN-anchor
+    surv15           0.57 +/- 0.02   IN-anchor
+    r %/yr           4.20 +/- 0.26   
+    starv %/yr       1.29 +/- 0.13   
+    senesc %/yr      1.91 +/- 0.12   

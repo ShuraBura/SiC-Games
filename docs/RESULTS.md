@@ -8294,6 +8294,35 @@ candidates are downstream and cannot move the benchmark — matching the falsifi
 size is not fixable at tier 5: the miss is the packing paradox plus the age structure. `scratchpad/bp_bandsize.py`,
 `bp_bandsize_plot.py`, `bp_bandsize_diagnosis.png`.
 
+## Addendum 81 — Tier-3 age structure PASSES on current canon; the ladder's "too many children" is stale; the band-size gap is therefore entirely the packing limit (2026-09-12, R-106)
+
+**Why.** Addendum 80 left the band-size gap split between tier-5 (packing) and a tier-3 age-structure residual the
+ladder credited with ~¼ of the gap ("carries too many children"). This measures the tier-3 markers on the CURRENT
+canon (low-noise panel, period 400–800) to see whether that residual still exists. Read-only accessors + the GK07
+iso-growth consistency check. `scratchpad/bp_agestruct.py`.
+
+**Tier-3 passes.** Temperate: frac_child 0.37 ± 0.02, dependency 0.81 ± 0.03, TFR 5.5 ± 0.2, e0 36.3 ± 1.8,
+survival-to-15 0.61 ± 0.02 — EVERY marker inside its forager anchor band (frac_child [0.287–0.454], dependency
+[0.598–0.899], TFR [4.69–8.03], e0 [21–37]). Savanna: frac_child 0.42, TFR 7.5, e0 24.6 in-band; dependency 0.95
+and survival-to-15 0.44 marginally out — both on the harsh-biome side (Aché dependency is itself 0.899). The
+ladder's tier-3 failure is STALE: the metabolic-downreg and the other mechanisms adopted since it was written have
+already closed it. The age structure is no longer carrying too many children.
+
+**Instrument correction (retraction).** A first pass reported r = +4–6%/yr and iso-growth "inconsistent," implying
+a non-stationary run. That was a probe BUG: `fert_births[mother_age]` increments once per birth (total births), and
+the probe divided it by the female fraction, double-counting births and inflating CBR ~2×. The bounded population
+(~1000–2000, not exploding) flagged the impossibility. Corrected: CBR ~3.5–5.5%/yr, **r ~ +1%/yr**, iso-growth
+CONSISTENT in 5/6 worlds — the demography is near-stationary and internally consistent. The buggy +5% is withdrawn.
+
+**Consequence for band size.** Since frac_child is already in-anchor, the ¼-of-the-gap the ladder attributed to
+tier-3 is already realised, yet band_med_adults is still ~11.8 (Addendum 80). So the ENTIRE band-size gap is the
+tier-5 packing structural limit — the adaptive spatial equilibrium (Addenda 77–79), which resists both spatial
+levers. There is no tier-3 lever to pull.
+
+**Deliverable.** DIAGNOSIS ONLY; canonical unchanged. Tier-3 age structure is re-scored as a PASS; the benchmark
+ladder should be updated (the standing tier-3 "fault" is closed). `scratchpad/bp_agestruct.py`,
+`bp_agestruct_plot.py`, `bp_agestruct_diagnosis.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

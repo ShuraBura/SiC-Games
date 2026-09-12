@@ -1,0 +1,28 @@
+AGE-STRUCTURE DIAGNOSIS | canon | 800 steps | period 400-800 | worlds [0, 1, 2] x agents [0]
+  anchors: frac_child [0.287-0.454]  dependency [0.598-0.899]  TFR [4.69-8.03]  e0 [21-37]  surv15 ~0.66
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: frac_child 0.36 dep 0.79 TFR 5.5 e0 38.3 surv15 0.60 | CBR 3.4 CDR 2.6 r +0.9%/yr (starv 0.3 senesc 2.3) | iso r_pred +1.4 consistent False
+  temperate w1a0: frac_child 0.41 dep 0.86 TFR 6.0 e0 37.7 surv15 0.65 | CBR 4.3 CDR 2.4 r +1.9%/yr (starv 0.8 senesc 1.6) | iso r_pred +2.0 consistent True
+  temperate w2a0: frac_child 0.36 dep 0.79 TFR 5.1 e0 32.7 surv15 0.59 | CBR 3.6 CDR 2.9 r +0.7%/yr (starv 1.1 senesc 1.8) | iso r_pred +1.1 consistent True
+  === temperate MEAN ===
+    frac_child       0.37 +/- 0.02   IN-anchor
+    dependency       0.81 +/- 0.03   IN-anchor
+    TFR              5.54 +/- 0.24   IN-anchor
+    e0              36.25 +/- 1.77   IN-anchor
+    surv15           0.61 +/- 0.02   IN-anchor
+    r %/yr           1.16 +/- 0.36   
+    starv %/yr       0.72 +/- 0.22   
+    senesc %/yr      1.89 +/- 0.19   
+  savanna w0a0: frac_child 0.39 dep 0.87 TFR 7.3 e0 23.7 surv15 0.42 | CBR 5.0 CDR 4.3 r +0.7%/yr (starv 2.3 senesc 2.0) | iso r_pred +1.0 consistent True
+  savanna w1a0: frac_child 0.45 dep 0.95 TFR 8.2 e0 28.8 surv15 0.51 | CBR 5.5 CDR 3.7 r +1.8%/yr (starv 1.6 senesc 2.1) | iso r_pred +2.2 consistent True
+  savanna w2a0: frac_child 0.42 dep 1.04 TFR 7.0 e0 21.3 surv15 0.38 | CBR 5.0 CDR 4.8 r +0.2%/yr (starv 2.9 senesc 1.9) | iso r_pred +0.5 consistent True
+  === savanna MEAN ===
+    frac_child       0.42 +/- 0.02   IN-anchor
+    dependency       0.95 +/- 0.05   OUT (anchor 0.598-0.899)
+    TFR              7.50 +/- 0.35   IN-anchor
+    e0              24.62 +/- 2.21   IN-anchor
+    surv15           0.44 +/- 0.04   OUT (anchor 0.46-0.86)
+    r %/yr           0.90 +/- 0.49   
+    starv %/yr       2.26 +/- 0.39   
+    senesc %/yr      2.01 +/- 0.07   
