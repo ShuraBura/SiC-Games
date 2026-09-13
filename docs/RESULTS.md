@@ -8323,6 +8323,33 @@ levers. There is no tier-3 lever to pull.
 ladder should be updated (the standing tier-3 "fault" is closed). `scratchpad/bp_agestruct.py`,
 `bp_agestruct_plot.py`, `bp_agestruct_diagnosis.png`.
 
+## Addendum 82 — Tier-10 material Gini: status concentrates to the anchor but material does not follow it — a broken status→material coupling (a FIXABLE miss, unlike band size) (2026-09-12, R-106)
+
+**Why.** Tier-10 marker #14: `material_gini` (whole population) = 0.16 vs BHM 2009 material Gini 0.36. Unlike the
+band-size and e0 misses (structural adaptive limits), the question is whether this one has a real mechanism lever.
+A within-band / between-band decomposition of material AND cred on the low-noise panel (canon, 600 agents, step
+800, 3 worlds). Read-only; the probe's Gini reproduces the model's `material_gini` exactly. `scratchpad/bp_gini.py`.
+
+**Reproduced.** material Gini 0.174 (temperate) / 0.175 (savanna) — near the 0.16 on record, far below 0.36.
+Decomposition: temperate within 0.12 ≈ between 0.10; savanna mostly within (0.16 vs 0.06). Top-10% hold only ~15%
+of material, and EVERY agent holds some (frac>0 = 1.00). Material is nearly evenly spread.
+
+**The decisive finding — the coupling, not the structure.** Cred (status) IS unequal and sits AT the anchor:
+cred Gini 0.359 (temperate) / 0.318 (savanna) ≈ BHM 0.36. But material does NOT track it: corr(cred, material) =
+0.21 / 0.17 — weak, far from the R-82 "strongly positive" target the material-teeth mechanism was built to
+produce. So status concentrates correctly while durable wealth stays evenly held. The miss is a broken
+status→material COUPLING (weak `material_capture` dependence on status/aggrandizer, plus per-capita material
+distribution paths that flatten it), NOT the packing/band structural limit that caps band size (Addenda 77–80).
+
+**Consequence.** This is the FIRST ladder miss this arc that is a genuinely FIXABLE mechanism gap rather than an
+adaptive equilibrium. The lever is the coupling: make durable-material capture depend on status/aggrandizer more
+strongly (or cut the per-capita flattening), so the material Gini rises toward 0.36 with cred already at anchor.
+It connects to the R-103 relational-stratification open item and the R-82 material-teeth expectation.
+
+**Deliverable.** DIAGNOSIS ONLY; canonical unchanged; no mechanism tuned yet. Tier-10 material Gini is diagnosed
+as a status→material coupling gap (fixable), pending a decision on the specific lever. `scratchpad/bp_gini.py`,
+`bp_gini_plot.py`, `bp_gini_diagnosis.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -1,0 +1,27 @@
+MATERIAL-GINI DIAGNOSIS | canon | 800 steps | worlds [0, 1, 2] x agents [0] | anchor BHM material Gini 0.36 (whole-pop 0.25)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate w0a0: mat_gini 0.161 (model 0.161) within 0.106 between 0.108 | mat_mean 3247155.1 top10 0.15 frac>0 1.00 | cred_gini 0.365 cred_between 0.207 corr(cred,mat) 0.26 | n_bands 15
+  temperate w1a0: mat_gini 0.130 (model 0.130) within 0.113 between 0.052 | mat_mean 2980256.4 top10 0.13 frac>0 1.00 | cred_gini 0.320 cred_between 0.138 corr(cred,mat) 0.09 | n_bands 77
+  temperate w2a0: mat_gini 0.231 (model 0.231) within 0.151 between 0.146 | mat_mean 3212336.7 top10 0.17 frac>0 1.00 | cred_gini 0.393 cred_between 0.206 corr(cred,mat) 0.27 | n_bands 25
+  === temperate MEAN ===
+    material Gini (#14, vs 0.36)      0.174 +/- 0.030
+      within-band                     0.123 +/- 0.014
+      between-band                    0.102 +/- 0.028
+    material top-10% share            0.153 +/- 0.011
+    frac holding material             1.000 +/- 0.000
+    corr(cred,material)               0.211 +/- 0.059
+    cred Gini (whole-pop)             0.359 +/- 0.021
+    cred Gini BETWEEN-band (R-103)    0.184 +/- 0.023
+  savanna w0a0: mat_gini 0.243 (model 0.243) within 0.218 between 0.095 | mat_mean 3172815.5 top10 0.17 frac>0 1.00 | cred_gini 0.360 cred_between 0.086 corr(cred,mat) 0.39 | n_bands 10
+  savanna w1a0: mat_gini 0.149 (model 0.149) within 0.138 between 0.046 | mat_mean 3617566.6 top10 0.14 frac>0 1.00 | cred_gini 0.307 cred_between 0.133 corr(cred,mat) 0.13 | n_bands 49
+  savanna w2a0: mat_gini 0.134 (model 0.134) within 0.120 between 0.036 | mat_mean 3295860.5 top10 0.14 frac>0 1.00 | cred_gini 0.288 cred_between 0.089 corr(cred,mat) -0.01 | n_bands 20
+  === savanna MEAN ===
+    material Gini (#14, vs 0.36)      0.175 +/- 0.034
+      within-band                     0.159 +/- 0.030
+      between-band                    0.059 +/- 0.018
+    material top-10% share            0.150 +/- 0.008
+    frac holding material             0.998 +/- 0.001
+    corr(cred,material)               0.170 +/- 0.115
+    cred Gini (whole-pop)             0.318 +/- 0.021
+    cred Gini BETWEEN-band (R-103)    0.103 +/- 0.015
