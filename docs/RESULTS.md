@@ -8350,6 +8350,42 @@ It connects to the R-103 relational-stratification open item and the R-82 materi
 as a status→material coupling gap (fixable), pending a decision on the specific lever. `scratchpad/bp_gini.py`,
 `bp_gini_plot.py`, `bp_gini_diagnosis.png`.
 
+## Addendum 83 — Tier-10 material Gini IS movable: the root is a dead capture knob + status-blind inheritance + over-strong leveling; 0.36 is bracketed (2026-09-13, R-106)
+
+**Why / method.** Addendum 82 diagnosed the tier-10 miss (material Gini 0.16 vs BHM 0.36) as a weak status→material
+coupling. This isolates the responsible flows by ablation on the low-noise panel (3 worlds, temperate).
+`scratchpad/bp_gini_isolate.py`.
+
+**Instrument correction mid-arc.** A first "high_capture" arm moved `material_hide_frac` and `aggrandizer_frac` and
+read INERT. That was the wrong knob: the aggrandizers' concentrating claim is `material_capture_frac` (line ~2082),
+and canon has **`material_capture_frac = 0.0`** — a hidden DEAD KNOB (`enable_material_capture=True` advertising a
+mechanism whose gain is zero), so all durable hides stay with their producer (per-capita → Gini 0.17). This is the
+project's recurring dead-knob bug class; the "validate the instrument" check caught it.
+
+**The knobs span 0.17 → 0.78 — 0.36 is reachable.** Ladder of interventions (material Gini): canon 0.17; leveling
+OFF 0.23; `material_capture_frac=0.75` with leveling ON 0.17 (capture is leveled away — corr(aggr,material) 0.12);
+capture 0.75 + leveling OFF 0.25 (capture now bites — corr(aggr,material) 0.49); + `material_heir_by_status=True`
++ no feast (max_stack) 0.78 (corr 0.63), pop intact throughout. The dominant concentrator is inheritance-by-status
+(dynastic compounding): with capture on and leveling relaxed, flipping it jumps 0.25 → 0.78.
+
+**Three coupled, currently mis-set knobs — all grounded, all fixable:**
+1. `material_capture_frac = 0.0` — the aggrandizer capture is dead (should be > 0; Hayden).
+2. `material_heir_by_status = False` — primogeniture inheritance does not compound onto status, so a big
+   concentrator does not track it (BHM/Shennan intergenerational transmission says it should).
+3. `leveling_strength = 0.79` — the Boehm reverse-dominance flattener is strong enough to erase what capture
+   concentrates (halving it is inert; only removing it moves the Gini — a near-bang-bang response).
+
+**This is the first MOVABLE ladder miss this arc** (contrast band size / e0, which are adaptive structural limits).
+CAVEAT: `max_stack` (0.78) reaches its value by ZEROING the grounded levelers (leveling, feast) and overshoots a
+forager Gini into a stratified-society one. The grounded fix is a JOINT CALIBRATION — turn on the dead
+concentrators (`material_capture_frac`, `material_heir_by_status`) and RELAX (not zero) `leveling_strength` — landing
+material Gini at 0.36 while keeping the grounded egalitarian mechanisms, and watching the tier-11 stratification
+gate and lower tiers. Not yet done.
+
+**Deliverable.** DIAGNOSIS ONLY; canonical unchanged; no knob adopted. Tier-10 material Gini is diagnosed as three
+coupled mis-set knobs (one dead), with 0.36 bracketed and a joint calibration as the fix. `scratchpad/
+bp_gini_isolate.py`, `bp_gini_ladder_plot.py`, `bp_gini_ladder.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

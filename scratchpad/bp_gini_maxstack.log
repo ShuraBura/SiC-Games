@@ -1,0 +1,7 @@
+MATERIAL-GINI ISOLATION | canon vs ablations | 800 steps | worlds [0, 1, 2] | anchor 0.36
+  --- temperate ---
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+    canon        mat_gini 0.174+/-0.030 (delta +0.000)  corr(cred) +0.21  corr(aggr) +0.02  top10 0.15  cred_gini 0.36  pop 1354
+    cap75_nolvl  mat_gini 0.246+/-0.008 (delta +0.072)  corr(cred) +0.13  corr(aggr) +0.49  top10 0.22  cred_gini 0.35  pop 1393
+    max_stack    mat_gini 0.778+/-0.008 (delta +0.604)  corr(cred) +0.13  corr(aggr) +0.63  top10 0.57  cred_gini 0.39  pop 1339
