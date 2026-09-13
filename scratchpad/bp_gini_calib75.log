@@ -1,0 +1,10 @@
+TIER-10 JOINT CALIBRATION | temperate | capfrac 0.75 + heir_by_status, dial leveling | 800 steps | worlds [0, 1, 2] | TARGET material Gini 0.36
+  guardrails: e0 [21-37], frac_child [0.287-0.454], pct_strat (tier-11), pop
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  canon     mat_gini 0.174+/-0.030  | e0 36.2  frac_child 0.37  cred_gini 0.36  pct_strat 66%  pop 1354
+  lvl_0.79  mat_gini 0.171+/-0.020  | e0 35.4  frac_child 0.35  cred_gini 0.34  pct_strat 69%  pop 1531
+  lvl_0.20  mat_gini 0.214+/-0.016  | e0 35.4  frac_child 0.34  cred_gini 0.40  pct_strat 86%  pop 1341
+  lvl_0.00  mat_gini 0.264+/-0.010  | e0 34.2  frac_child 0.38  cred_gini 0.34  pct_strat 65%  pop 1371
+  lvl_off   mat_gini 0.264+/-0.010  | e0 34.2  frac_child 0.38  cred_gini 0.34  pct_strat 65%  pop 1371
+  lvl_off_nofeast mat_gini 0.778+/-0.008  | e0 36.6  frac_child 0.34  cred_gini 0.39  pct_strat 61%  pop 1339

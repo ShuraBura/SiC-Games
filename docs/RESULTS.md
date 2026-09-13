@@ -8386,6 +8386,36 @@ gate and lower tiers. Not yet done.
 coupled mis-set knobs (one dead), with 0.36 bracketed and a joint calibration as the fix. `scratchpad/
 bp_gini_isolate.py`, `bp_gini_ladder_plot.py`, `bp_gini_ladder.png`.
 
+## Addendum 84 — Tier-10 material Gini is BIMODAL: the two dead knobs close ~40% of the gap, but 0.36 has no grounded landing (the levelers are near-bang-bang) (2026-09-13, R-106)
+
+**Why / method.** Addendum 83 bracketed BHM 0.36 and named three mis-set knobs. This is the joint calibration —
+enable the two concentrators (`material_capture_frac`, `material_heir_by_status`) and dial the two levelers
+(`leveling_strength`, `legit_feast_frac`) to land material Gini at 0.36 with the guardrails (e0, frac_child, pop,
+pct-stratified) intact. Low-noise panel, 3 worlds, temperate. `scratchpad/bp_gini_calib.py`.
+
+**The system is BIMODAL, not smoothly tunable.** With the concentrators on (capture 0.75 + heir-by-status),
+material Gini plateaus at ~0.17–0.26 for ANY nonzero leveling OR feast — reducing them barely moves it (leveling
+0.79→0.20→0 gives 0.17→0.21→0.26; feast 0.25→0.05 at leveling 0.20 is flat ~0.22). Only when BOTH leveling and
+feast are fully removed does it cliff to 0.78. So **0.36 falls in the unreachable gap** between the egalitarian
+plateau (~0.26) and the runaway (0.78). Confirmed `leveling_strength=0` ≡ `enable_leveling=False`; the feast is the
+dominant binding leveler in the concentrated regime (0.264→0.778 when zeroed). This is the same near-bang-bang class
+as the cohesion-budget saturation (Addendum 22): the levelers are threshold-like, giving a regime switch, not a
+graded response.
+
+**What IS a real, grounded fix.** Two genuine defects sit under this: `material_capture_frac = 0.0` (a hidden dead
+knob — `enable_material_capture=True` with zero gain) and `material_heir_by_status = False` (status-blind
+inheritance). Enabling both (levelers KEPT at grounded values) moves material Gini 0.17 → 0.22–0.26 and
+corr(aggr,material) 0.02 → ~0.3, with e0 (34–36), frac_child (0.36–0.38), pop (1200–1400) and stratification all
+intact — ~40% of the gap closed, and a dead mechanism revived. But it does NOT pass marker #14 (0.22 vs 0.36±0.25
+rel), because the remaining gap is the bang-bang levelers, which cannot be dialed to an intermediate 0.36.
+
+**Conclusion.** Tier-10 is MOVABLE but not to a grounded 0.36 by knobs alone. Reaching the anchor would require
+making the levelers (leveling / feast) GRADED rather than threshold-like — a mechanism redesign, analogous to the
+leaky-assabiyah fix proposed for the cohesion budget (Addendum 22) — not a calibration. The dead-knob fixes
+(`material_capture_frac` > 0, `material_heir_by_status` = True) are a defensible partial improvement + a genuine
+dead-knob repair, pending a decision. No canonical change made here; DIAGNOSIS + calibration only. `scratchpad/
+bp_gini_calib.py`, `bp_gini_regime_plot.py`, `bp_gini_regime.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
