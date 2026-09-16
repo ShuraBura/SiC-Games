@@ -1,5 +1,11 @@
 # Handoff — R-106 ladder-miss arc (2026-09-15 20:29 EDT)
 
+> **UPDATE 2026-09-15 (Add.86, origin/main @ 7d715e6):** the graded-leveler mechanism below is now BUILT + calibrated.
+> `leveling_tolerance` + `feast_tolerance` (both default 0.0, bit-exact OFF) reach material Gini 0.367 in BOTH biomes
+> at `lt1.0 / ft1.5` with tier-11 intact and the feast kept on. NOT adopted — canon unchanged. The remaining work is
+> the ADOPTION path, gated on GROUNDING `material_capture_frac` (Hayden aggrandizer-skim anchor) then re-calibrating,
+> then the full CTB suite. Do NOT rebuild the mechanism; see RESULTS Add.86 + memory `project_sic_games_material_gini`.
+
 This note points the next session at the graded-leveler arc, the live frontier. It is a map, not the record:
 the formal record is `docs/RESULTS.md` (Addenda 76–85) and the git history; the working state is in the assistant
 memory files listed below.
