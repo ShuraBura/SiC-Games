@@ -1,0 +1,5 @@
+BAND-SIZE INSTRUMENT CHECK | canon | 800 steps | worlds [0, 1, 2] | Hill 'mean experienced' = 28.2 ADULTS
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate | median-over-bands adults 10.5+/-0.3 (CURRENT MARKER) | mean-over-bands adults 21.3 | MEAN EXPERIENCED adults 48.2+/-9.5 (Hill 28.2) | experienced total 67.1
+  savanna   | median-over-bands adults 10.5+/-0.8 (CURRENT MARKER) | mean-over-bands adults 22.7 | MEAN EXPERIENCED adults 58.8+/-30.8 (Hill 28.2) | experienced total 101.5

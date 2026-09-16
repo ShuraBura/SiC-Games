@@ -8580,6 +8580,50 @@ pattern. `scratchpad/bp_bandsize_add87.png`.
 is the right fix for a CLAMPED benchmark (tier-10) and the wrong tool for a PACKING-LIMITED one (tier-5); the
 difference is whether the mechanism's cap actually binds.
 
+## Addendum 89 — Tier-5 band size is NOT a deficit: the marker was the wrong STATISTIC and the wrong UNIT; on the model's own co-residence unit it matches Hill 28.2 (2026-09-16, R-106)
+
+**This retracts the framing of Addendum 80.** The tier-5 miss (`band_med_adults` ≈ 10.5 vs Hill 2011's 28.2, "fails
+16/16, a structural packing limit not fixable at tier 5") rested on a marker that is mis-specified on TWO axes at
+once. Corrected, the model reproduces Hill's anchor. No mechanism is at fault; nothing is built or changed.
+
+**Axis 1 — the STATISTIC.** Hill 2011's 28.2 is not a median. Verbatim from the paper (Table 1 note):
+> "The mean experienced band size is the mean of all band sizes weighted by the number of individuals who [co-reside]"
+— i.e. a PERSON-WEIGHTED mean. The marker scores the MEDIAN over band units. On the model's strongly right-skewed
+band distribution (many small units, a few large ones) the two diverge by ~4×: median 10.5, mean-over-units 21,
+person-weighted mean 48. Comparing a median to a person-weighted-mean anchor is the same unit-mismatch class this log
+already caught for polygyny (Addendum 24 denominator) and the retracted "~7 lineages/band" (Addenda 28–32).
+
+**Axis 2 — the UNIT.** Hill's "band" is a RESIDENTIAL GROUP — people who physically co-reside (a camp). The marker
+uses `band_id`, which is an AFFILIATION unit spread across a median of ~8 cells (biggest: 119 adults over 32 cells) —
+a multi-camp social unit, not a camp. The model's OWN co-residence unit is the CELL: the Boehm leveling coalition is
+built `by_cell` ("cell-mates"), and consumption is shared among a cell's occupants. So the residential-group analogue
+is the cell, not `band_id`.
+
+**Corrected measurement (`scratchpad/bp_bandsize_unit.py`, low-noise 3-world panel).** Mean-experienced ADULTS
+(Hill's statistic) per residential unit:
+
+| unit | temperate | savanna | note |
+|---|---|---|---|
+| median over `band_id` (the OLD marker) | 10.5 | 10.5 | wrong statistic AND wrong unit |
+| mean-experienced, `band_id` | 48.2 | 58.8 | right statistic, wrong unit (≈8-cell affiliation) |
+| mean-experienced, cluster (occupied region) | 357 | 210 | the whole agglomerated blob — a region |
+| **mean-experienced, CELL (the co-residence unit)** | **33.3** | **22.9** | right statistic AND right unit → **≈ Hill 28.2** |
+
+The cell-based mean-experienced adult band size is 33.3 / 22.9 (mean ≈ 28), inside Hill's per-society range (~12–40;
+Paiute 11.7 … Paliyan 25.0 … average 28.2). **The model reproduces Hill's mean-experienced residential band size.**
+
+**What Addendum 80 got right, and what is retracted.** Its sub-findings stand: the `band_id`-median does not reach
+28.2, and cohesion de-saturation (Add.80/88), the food catchment, and the agglomeration↔repulsion balance do not move
+it. But those were chasing the wrong target — the shortfall was the median-of-the-wrong-unit, not a real band-size
+deficit. RETRACTED: the conclusion that tier-5 band size is a genuine miss / a structural packing limit / not
+fixable. There is nothing to fix; the model already produces Hill-scale camps.
+
+**Deliverable.** Tier-5 marker #1 is re-scored: measured as Hill's own statistic (person-weighted mean-experienced
+ADULTS) on the model's own co-residence unit (the cell), band size is 33/23 ≈ 28.2 — NO deficit. Diagnosis only;
+canonical unchanged. Harnesses `scratchpad/bp_bandsize_experienced.py`, `bp_bandsize_unit.py` (+ `_plot`s,
+`bp_bandsize_experienced.png`, `bp_bandsize_unit.png`); the catchment and agglomeration sweeps that led here are
+`bp_bandsize_catchment.py`, `bp_bandsize_aggl.py`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

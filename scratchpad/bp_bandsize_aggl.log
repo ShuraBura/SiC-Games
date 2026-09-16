@@ -1,0 +1,15 @@
+AGGL<->REPULSION SWEEP | 800 steps | worlds [0, 1, 2] | Hill band_med_adults=28.2 | guardrail e0 [21-37]
+== TEMPERATE ==
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  canon(rg0.3)    bma 10.5+/-0.3  mean 21.3  max 119  %pop>20ad 54%  %pop<5ad 12%  n_bands 43  e0 34.5  pop 1289
+  rg0.2           bma 11.3+/-0.7  mean 22.5  max 136  %pop>20ad 56%  %pop<5ad 10%  n_bands 42  e0 33.6  pop 1317
+  rg0.1           bma 11.0+/-1.0  mean 22.9  max 109  %pop>20ad 60%  %pop<5ad 8%  n_bands 37  e0 33.4  pop 1276
+  rg0.0           bma 11.8+/-0.9  mean 23.3  max 169  %pop>20ad 59%  %pop<5ad 11%  n_bands 36  e0 31.2  pop 1281
+  rg0.0_beta1.5   bma 11.7+/-0.6  mean 29.3  max 128  %pop>20ad 68%  %pop<5ad 5%  n_bands 29  e0 38.5  pop 1229
+== SAVANNA ==
+  canon(rg0.3)    bma 10.5+/-0.8  mean 22.7  max 124  %pop>20ad 41%  %pop<5ad 8%  n_bands 40  e0 28.0  pop 1089
+  rg0.2           bma 10.3+/-0.9  mean 22.6  max 140  %pop>20ad 45%  %pop<5ad 13%  n_bands 40  e0 27.4  pop 1089
+  rg0.1           bma 10.7+/-0.3  mean 21.7  max 140  %pop>20ad 48%  %pop<5ad 6%  n_bands 30  e0 27.7  pop 921
+  rg0.0           bma 8.8+/-0.7  mean 22.6  max 143  %pop>20ad 45%  %pop<5ad 14%  n_bands 39  e0 28.0  pop 1051
+  rg0.0_beta1.5   bma 11.0+/-1.5  mean 25.7  max 197  %pop>20ad 61%  %pop<5ad 7%  n_bands 27  e0 27.9  pop 1076

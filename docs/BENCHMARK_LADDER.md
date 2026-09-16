@@ -22,13 +22,15 @@ Size was the wrong criterion; depth is the right one.
   marginally out on the harsh-biome side. The "age structure carrying too many children" fault is stale — closed
   by the mechanisms adopted since (metabolic down-regulation and others). The run is near-stationary (r ≈ +1 %/yr)
   and GK07 iso-growth consistent (Addendum 81).
-- **Tier 5 band size is a STRUCTURAL ADAPTIVE LIMIT, not a tunable fault.** `band_med_adults` ≈ 11.8 vs Hill 28.2
-  holds, but the diagnosis (Addenda 77–80) shows bands sit at 0.27–0.55 of their own fission cap (the cohesion cap
-  does not bind; savanna's unsaturated budget yet smaller bands is the natural control that falsifies the
-  de-saturation fix). Band size is set by the adaptive packing equilibrium, which resists both spatial levers
-  (forced dispersal crashes temperate e0; intake mobility is inert). Since tier 3 now passes, the whole gap is this
-  tier-5 packing limit. It is not fixable from tier 5; closing it would require changing the packing equilibrium
-  itself, which the e0 arc showed to be adaptive and near the ethnographic anchors.
+- **Tier 5 band size is RE-SCORED — NO DEFICIT (R-106 Add.89, 2026-09-16).** The apparent miss (`band_med_adults`
+  ≈ 10.5 vs 28.2) was the wrong STATISTIC and the wrong UNIT. Hill's 28.2 is the PERSON-WEIGHTED "mean experienced"
+  adult band size (verbatim), not a median; and Hill's "band" is a RESIDENTIAL group (a camp), which is the model's
+  CELL (the co-residence unit: leveling coalition is `by_cell`, consumption is per-cell), not `band_id` (a ~8-cell
+  affiliation). Measured with Hill's statistic on the model's co-residence unit, the mean-experienced adult band size
+  is **33 temperate / 23 savanna ≈ Hill 28.2** (inside the per-society range ~12–40). The model reproduces Hill-scale
+  camps. RETRACTED: Add.80's "structural packing limit, not fixable" — its sub-findings hold (the `band_id`-median
+  does not reach 28.2, and cohesion/food/repulsion do not move it) but they chased a mis-specified target, so tier-5
+  is not a genuine miss. `scratchpad/bp_bandsize_unit.py`.
 
 ---
 
@@ -70,7 +72,7 @@ read it as "has no dedicated CTB file", not as "has never been checked against a
 | 2 | **Energetics** — forage/game return, storage, shock | 8 | 7 | **0** | Hawkes 1991 (518/745 kcal·hr⁻¹), Hill 1987 (forest 5,541), Hurtado & Hill 1987 (grassland 3,001), Bird 1997 (intertidal), Testart 1982 (storage) | — |
 | 3 | **Demography** — mortality, fertility, orphanhood | 8 | 8 | 1 | Gurven & Kaplan 2007 (Siler), Hill & Hurtado 1996 (sex split; Table 13.1 orphan), Pelletier 2009 | #15 orphanhood ✓, #16 engine; **age structure PASS (R-106 Add.81)** |
 | 4 | **Movement** — mobility, packing, site choice | 3 | 2 | **0** | Kelly / Binford mobility bands | — |
-| 5 | **Bands** — grouping, cohesion, assabiyah, fission | 9 | 9 | **0** | **Hill et al. 2011 (28.2 ADULTS)**, Birdsell 1953 (~25), Marlowe (25–50) | **#1 band size — structural packing limit, not tunable (R-106 Add.77–80)** |
+| 5 | **Bands** — grouping, cohesion, assabiyah, fission | 9 | 9 | **0** | **Hill et al. 2011 (28.2 ADULTS)**, Birdsell 1953 (~25), Marlowe (25–50) | **#1 band size — NO DEFICIT: re-scored 33/23 ≈ 28.2 on the mean-experienced statistic + the cell (co-residence) unit (R-106 Add.89); the old "miss" was median-over-band_id, wrong statistic + wrong unit** |
 | 6 | **Family** — pair bonds, paternity, polygyny | 3 | 3 | **0** | Marlowe *The Hadza* (polygyny ~0.04), von Rueden & Jaeggi | #10 polygyny ✓ |
 | 7 | **Kin & lineage** — descent, exogamy, genome | 7 | 7 | 1 | **none at forager scale** (#6 retired 2026-08-07; #5 anchor withdrawn) | #5 not scoreable, ~~#6 retired~~ |
 | 8 | **Connubium** — between-band mating networks | 2 | 2 | **0** | White 2017 (MVP), Wobst 1974 (MES 79–332) | #4 connubium 15/25 |
@@ -158,16 +160,17 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 | **2 energetics** | anchors land correctly (game exact; forage exact off-shore, the Bird shore bonus being additive on top). **But the canonical world contains NO SAVANNA**, so Hawkes' 518 kcal/hr — the best-verified anchor in the project — never enters a canonical run, and the intercept/llanos channels are `UNREACHABLE` for that reason and not because they are broken |
 | **3 demography** | the Siler schedule is CORRECT (e₀ = 36.5 vs Aché ~37, no early-adult collapse). The standing diagnosis "people die in early adulthood" was **wrong**. The pyramid is young because of a HIGH-TURNOVER regime: births 5.66 %/yr and starvation deaths 3.80 %/yr, the latter larger than the entire anchored life table. **RE-SCORED PASS (R-106 Add.81, 2026-09-12):** on current canon every temperate marker is in-band (frac_child 0.37, dependency 0.81, TFR 5.5, e0 36.3, surv-15 0.61), the run is near-stationary (r ≈ +1 %/yr, iso-growth consistent). The old fault is closed |
 | **4 movement** | Kelly/Binford implemented correctly. A real unit hazard between the two pressure sources is **silent in both directions** and **cannot be guarded from the value** — two attempts both fired on legitimate data. Documented, not fixed |
-| **5 bands** | marker #1 decomposes into **two faults on two tiers**: fixing tier 3's age structure closes ~¼ of the gap (9.4 → 13.8 adults), and the residual to Hill's 28.2 is a genuine tier-5 band-size shortfall. A band would need 69 people to hold 28.2 adults at the measured child fraction; it produces 23. **UPDATE (R-106 Add.77–81):** tier 3 now passes, so its ¼ is already realised and the whole residual is tier 5 — and that residual is a STRUCTURAL packing limit, not a tunable cohesion fault. Bands sit at 0.27–0.55 of their fission cap; the unsaturated biome (savanna) has the smaller bands, falsifying de-saturation. Band size is set by the adaptive packing equilibrium, not fixable at tier 5 |
+| **5 bands** | marker #1 decomposes into **two faults on two tiers**: fixing tier 3's age structure closes ~¼ of the gap (9.4 → 13.8 adults), and the residual to Hill's 28.2 is a genuine tier-5 band-size shortfall. A band would need 69 people to hold 28.2 adults at the measured child fraction; it produces 23. **UPDATE (R-106 Add.77–81):** tier 3 now passes, so its ¼ is already realised and the whole residual is tier 5 — and that residual is a STRUCTURAL packing limit, not a tunable cohesion fault. Bands sit at 0.27–0.55 of their fission cap; the unsaturated biome (savanna) has the smaller bands, falsifying de-saturation. **RE-SCORED — NO DEFICIT (R-106 Add.89, 2026-09-16):** the whole "shortfall" was a mis-specified marker. Hill's 28.2 is the PERSON-WEIGHTED mean-experienced adult size on a RESIDENTIAL group (= the model's CELL, the co-residence unit), not a median over `band_id` (a ~8-cell affiliation). Measured correctly the model gives 33/23 ≈ 28.2 — Hill-scale camps. The earlier "genuine shortfall / packing limit / not fixable" is retracted; the sub-findings (median doesn't reach 28.2; cohesion/food/repulsion inert) stand but chased the wrong target |
 
 | **6 family** | Marlowe's polygyny sentence **verified verbatim**, and marker #10's reported PASS is on the **wrong denominator** — he counts *all men*, we divide by *married* men. 0.0362 reads ~1.0×; on his unit it is 0.0307 = **0.77×**, and because the bias IS the marriage rate it **moves between arms**. First unit mismatch here to turn a PASS rather than a failure into an artefact |
 | **7 kin & lineage** | **NO NEW CTB NEEDED — and no anchor to benchmark against.** Already covered by constructed-truth tests in ordinarily-named files: `test_lineage_ground_truth.py` (7 tests, including the rank-key vs patriline unit divergence) and `test_connubium.py::test_lineage_exogamy_rejects_sibling_and_clan_pairs_outsider`, which hand-builds kin relations and asserts the pairing. Its two markers are **#5 (anchor withdrawn)** and **#6 (retired 2026-08-07)**, so the tier has nothing scoreable. The gap here is a SOURCE, not a test |
 
 **Tier 8 (connubium) is next**, then 9.
 
-**Tiers 9–12 still wait.** Their markers include the two surviving failures (#14 wealth, #17 fission ceiling)
-and both are quotable — CTB'd on 2026-08-07 and held — but *diagnosing* them means looking down the ladder,
-and tier 5 has just shown what that produces.
+**Tiers 9–12 still wait.** Of the markers once called surviving failures, **#14 wealth is now CLOSED** (adopted,
+R-106 Add.87) and **tier-5 band size was never a real deficit** (Add.89, a marker mis-specification). The remaining
+quoted miss is **#17 fission ceiling** — CTB'd on 2026-08-07 and held — but *diagnosing* it means looking down the
+ladder, and tier 5 has just shown what that produces: check the marker's statistic and unit before the mechanism.
 
 **UPDATE — #14 wealth has a built, calibrated fix (R-106 Add.82–86, 2026-09-15).** The miss decomposes to a
 near-bang-bang shape in the two levelers (Boehm sanction + feast): each pulls material to the cell/band mean with no

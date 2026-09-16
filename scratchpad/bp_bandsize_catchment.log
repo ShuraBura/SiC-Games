@@ -1,0 +1,11 @@
+CATCHMENT-RADIUS SWEEP | 800 steps | worlds [0, 1, 2] | Hill band_med_adults=28.2 | guardrail e0 [21-37]
+== TEMPERATE ==
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  rad1 (cells  9)  band_med_adults 10.5+/-0.3  band_med 20.7  n_bands 43  e0 34.5  pop 1289
+  rad2 (cells 25)  band_med_adults 10.2+/-0.6  band_med 24.5  n_bands 43  e0 36.3  pop 1855
+  rad3 (cells 49)  band_med_adults 9.0+/-0.6  band_med 22.2  n_bands 52  e0 38.8  pop 2199
+== SAVANNA ==
+  rad1 (cells  9)  band_med_adults 10.5+/-0.8  band_med 20.7  n_bands 40  e0 28.0  pop 1089
+  rad2 (cells 25)  band_med_adults 7.3+/-0.3  band_med 15.7  n_bands 38  e0 32.0  pop 1181
+  rad3 (cells 49)  band_med_adults 8.8+/-0.9  band_med 16.5  n_bands 35  e0 30.0  pop 1085

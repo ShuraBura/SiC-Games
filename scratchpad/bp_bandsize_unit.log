@@ -1,0 +1,9 @@
+BAND-SIZE UNIT CHECK | canon | 800 steps | worlds [0, 1, 2] | Hill mean-experienced = 28.2 ADULTS
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE ==
+  mean-experienced adults  |  band_id 48.2   cell 33.3   cluster 357.1   (Hill 28.2)
+  band_id spatial spread   |  median 7.8 cells/band  mean 9.7   | biggest band: 119 adults across 32 cells
+== SAVANNA ==
+  mean-experienced adults  |  band_id 58.8   cell 22.9   cluster 210.0   (Hill 28.2)
+  band_id spatial spread   |  median 8.8 cells/band  mean 11.1   | biggest band: 124 adults across 36 cells
