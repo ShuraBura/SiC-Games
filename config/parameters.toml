@@ -3086,6 +3086,21 @@ type  = "float"
 # with probability ≈0.79, not rarely: leveling is the NORM, not the exception. `leveling_strength` is the
 # per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
 
+[leveling_tolerance]
+value = 0.0
+owner = "DemographyConfig"
+type  = "float"
+# R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum
+# 84 found the coalition levels every agent's material back to the CELL MEAN each step (excess = material
+# - mean), with no tolerated band, so any nonzero strength pins the material Gini near 0.2 and 0.36 (BHM
+# 2009 #14) sits in an unreachable gap. The defect is the redistribution SHAPE, not the gain.
+# `leveling_tolerance` is the fraction of the local mean a co-resident may hold ABOVE the norm before the
+# sanction fires: the sanctionable excess is max(0, material - (1+tolerance)*mean). So the equilibrium
+# settles at the TOLERATED band, not at the mean. 0.0 = the mean is the norm (no tolerated inequality) ⇒
+# BIT-EXACT with the pre-band sanction. Higher = a more tolerant coalition, closer to the BHM stratified
+# target. Applied to COMMONER leveling; the noble exemption (enable_noble_leveling_exemption) still waives
+# the residual for ascribed lineages. local-mean fraction tolerated above the norm [PROVISIONAL]
+
 [office_challenge_margin]
 value = 0.25
 owner = "DemographyConfig"
@@ -3232,95 +3247,73 @@ type  = "float"
 # lives on the model as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for
 # actual religion ids.
 
+[feast_tolerance]
+value = 0.0
+owner = "DemographyConfig"
+type  = "float"
+# R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding
+# leveler. The feast debits `legit_feast_frac * material` from EVERY agent and redistributes it per-capita
+# to the band's guests, so its net effect is a pull toward the band mean — a leveler as strong as the
+# Boehm sanction (Addendum 84: it, not the coalition, pins the material Gini at ~0.24). `feast_tolerance`
+# exempts material BELOW `feast_tolerance * band_mean` from the feast: the debit becomes `legit_feast_frac
+# * max(0, material - feast_tolerance*mean)`, so only conspicuous holders feast. 0.0 = every holder feasts
+# from the first unit ⇒ BIT-EXACT with the pre-band feast (threshold 0). Higher = the feast is
+# wealth-gated, which is grounded (Hayden's aggrandizers sponsor feasts) and STRENGTHENS the
+# status→material coupling (Addendum 82's miss): the legitimacy EMA is a SHARE of the band's feasting
+# (line ~4026), so a wealth-gated feast lifts the wealthy lineages' share of ascription. The legitimacy
+# channel is PRESERVED — the feast still fires and still buys standing. band-mean multiple exempt from the
+# feast [PROVISIONAL]
+
 [legit_decay]
 value = 0.02
 owner = "DemographyConfig"
 type  = "float"
-# legitimacy fades without renewal (~1/0.02 = 50-step memory) — (channel note, inherited) ── DM-F1 / R-86:
-# THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ──────────────── WHY THIS EXISTS.
-# Flannery & Marcus 2012 ch.10 is blunt that our elite layer's premise is insufficient: "if feasting were
-# all it took to produce hereditary inequality, there would have been no achievement-based societies left
-# for anthropologists to study" — competitive feasting "produced individual Big Men who had no way of
-# bequeathing renown to their offspring." That is EXACTLY what the model measures (R-83/R-84: leaders
-# 3.68× ahead, father-was-leader only 53–69%, no transmission), i.e. the model is a correct
-# ACHIEVEMENT-BASED society and hereditary rank needs a different mechanism. THE MECHANISM [Friedman's
-# endogenous scenario, via Flannery ch.10 VERIFIED]: rank is created by a REINTERPRETATION of success, not
-# by accumulation. Successful lineages were not credited with hard work — "they believed that one only
-# obtained good harvests through proper sacrifices to the nats. The key shift in social logic was
-# therefore from 'They must have pleased the nats' to 'They must be descended from higher nats than we
-# are.'" Once a lineage is held to descend from the ruling spirits it controls the region's land and "was
-# also entitled to receive tribute from other lineages". CHARTER DECLARATION (MECHANISM_CHARTER §3.1):
-# TYPE C (Conversion) — material → heritable cred, gated on a legitimating belief. An OFF-DIAGONAL of the
-# capital matrix: the achieved→ascribed cell. UNIT LINEAGE (patriline `_lineage`), competing WITHIN a
-# band. Friedman's unit is explicit: "one lineage convinces all the others". NOT the band, and not the
-# agent (cf. R-82's unit error). INVARIANT DEBITED, not catalytic — sponsoring the sacrifice SPENDS
-# material ("could sponsor the most prestigious sacrifices and feed the most visitors"); belief is bought,
-# not merely asserted. ANCHOR [VERIFIED Flannery & Marcus 2012 ch.10] for the mechanism; the four rates
-# are [DESIGN], calibrated against TARGETS T-6 (Hayden's 75% father-was-leader) and T-5 (BHM composite
-# Gini). NOTE on the seam: MECHANISM_CHARTER §9.2 named `GroupVector.religion` as the carrier. On
-# inspection that cell is an int RELIGION ID, while legitimacy is a continuous per-LINEAGE stock — so it
-# lives on the model as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for
-# actual religion ids.
+# legitimacy fades without renewal (~1/0.02 = 50-step memory) — (channel note, inherited) R-106 Addendum
+# 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding leveler. The
+# feast debits `legit_feast_frac * material` from EVERY agent and redistributes it per-capita to the
+# band's guests, so its net effect is a pull toward the band mean — a leveler as strong as the Boehm
+# sanction (Addendum 84: it, not the coalition, pins the material Gini at ~0.24). `feast_tolerance`
+# exempts material BELOW `feast_tolerance * band_mean` from the feast: the debit becomes `legit_feast_frac
+# * max(0, material - feast_tolerance*mean)`, so only conspicuous holders feast. 0.0 = every holder feasts
+# from the first unit ⇒ BIT-EXACT with the pre-band feast (threshold 0). Higher = the feast is
+# wealth-gated, which is grounded (Hayden's aggrandizers sponsor feasts) and STRENGTHENS the
+# status→material coupling (Addendum 82's miss): the legitimacy EMA is a SHARE of the band's feasting
+# (line ~4026), so a wealth-gated feast lifts the wealthy lineages' share of ascription. The legitimacy
+# channel is PRESERVED — the feast still fires and still buys standing.
 
 [legit_threshold]
 value = 0.15
 owner = "DemographyConfig"
 type  = "float"
 # above this share of the band's feasting, the lineage is "descended from higher nats" — (channel note,
-# inherited) ── DM-F1 / R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank
-# ──────────────── WHY THIS EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our elite layer's premise
-# is insufficient: "if feasting were all it took to produce hereditary inequality, there would have been
-# no achievement-based societies left for anthropologists to study" — competitive feasting "produced
-# individual Big Men who had no way of bequeathing renown to their offspring." That is EXACTLY what the
-# model measures (R-83/R-84: leaders 3.68× ahead, father-was-leader only 53–69%, no transmission), i.e.
-# the model is a correct ACHIEVEMENT-BASED society and hereditary rank needs a different mechanism. THE
-# MECHANISM [Friedman's endogenous scenario, via Flannery ch.10 VERIFIED]: rank is created by a
-# REINTERPRETATION of success, not by accumulation. Successful lineages were not credited with hard work —
-# "they believed that one only obtained good harvests through proper sacrifices to the nats. The key shift
-# in social logic was therefore from 'They must have pleased the nats' to 'They must be descended from
-# higher nats than we are.'" Once a lineage is held to descend from the ruling spirits it controls the
-# region's land and "was also entitled to receive tribute from other lineages". CHARTER DECLARATION
-# (MECHANISM_CHARTER §3.1): TYPE C (Conversion) — material → heritable cred, gated on a legitimating
-# belief. An OFF-DIAGONAL of the capital matrix: the achieved→ascribed cell. UNIT LINEAGE (patriline
-# `_lineage`), competing WITHIN a band. Friedman's unit is explicit: "one lineage convinces all the
-# others". NOT the band, and not the agent (cf. R-82's unit error). INVARIANT DEBITED, not catalytic —
-# sponsoring the sacrifice SPENDS material ("could sponsor the most prestigious sacrifices and feed the
-# most visitors"); belief is bought, not merely asserted. ANCHOR [VERIFIED Flannery & Marcus 2012 ch.10]
-# for the mechanism; the four rates are [DESIGN], calibrated against TARGETS T-6 (Hayden's 75%
-# father-was-leader) and T-5 (BHM composite Gini). NOTE on the seam: MECHANISM_CHARTER §9.2 named
-# `GroupVector.religion` as the carrier. On inspection that cell is an int RELIGION ID, while legitimacy
-# is a continuous per-LINEAGE stock — so it lives on the model as `_lineage_legit` (mirroring
-# `_band_surplus`), and `religion` stays reserved for actual religion ids.
+# inherited) R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the
+# SECOND binding leveler. The feast debits `legit_feast_frac * material` from EVERY agent and
+# redistributes it per-capita to the band's guests, so its net effect is a pull toward the band mean — a
+# leveler as strong as the Boehm sanction (Addendum 84: it, not the coalition, pins the material Gini at
+# ~0.24). `feast_tolerance` exempts material BELOW `feast_tolerance * band_mean` from the feast: the debit
+# becomes `legit_feast_frac * max(0, material - feast_tolerance*mean)`, so only conspicuous holders feast.
+# 0.0 = every holder feasts from the first unit ⇒ BIT-EXACT with the pre-band feast (threshold 0). Higher
+# = the feast is wealth-gated, which is grounded (Hayden's aggrandizers sponsor feasts) and STRENGTHENS
+# the status→material coupling (Addendum 82's miss): the legitimacy EMA is a SHARE of the band's feasting
+# (line ~4026), so a wealth-gated feast lifts the wealthy lineages' share of ascription. The legitimacy
+# channel is PRESERVED — the feast still fires and still buys standing.
 
 [legit_cred_gain]
 value = 10.0
 owner = "DemographyConfig"
 type  = "float"
-# per-step heritable-cred boost to a legitimated lineage's members — (channel note, inherited) ── DM-F1 /
-# R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ──────────────── WHY THIS
-# EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our elite layer's premise is insufficient: "if
-# feasting were all it took to produce hereditary inequality, there would have been no achievement-based
-# societies left for anthropologists to study" — competitive feasting "produced individual Big Men who had
-# no way of bequeathing renown to their offspring." That is EXACTLY what the model measures (R-83/R-84:
-# leaders 3.68× ahead, father-was-leader only 53–69%, no transmission), i.e. the model is a correct
-# ACHIEVEMENT-BASED society and hereditary rank needs a different mechanism. THE MECHANISM [Friedman's
-# endogenous scenario, via Flannery ch.10 VERIFIED]: rank is created by a REINTERPRETATION of success, not
-# by accumulation. Successful lineages were not credited with hard work — "they believed that one only
-# obtained good harvests through proper sacrifices to the nats. The key shift in social logic was
-# therefore from 'They must have pleased the nats' to 'They must be descended from higher nats than we
-# are.'" Once a lineage is held to descend from the ruling spirits it controls the region's land and "was
-# also entitled to receive tribute from other lineages". CHARTER DECLARATION (MECHANISM_CHARTER §3.1):
-# TYPE C (Conversion) — material → heritable cred, gated on a legitimating belief. An OFF-DIAGONAL of the
-# capital matrix: the achieved→ascribed cell. UNIT LINEAGE (patriline `_lineage`), competing WITHIN a
-# band. Friedman's unit is explicit: "one lineage convinces all the others". NOT the band, and not the
-# agent (cf. R-82's unit error). INVARIANT DEBITED, not catalytic — sponsoring the sacrifice SPENDS
-# material ("could sponsor the most prestigious sacrifices and feed the most visitors"); belief is bought,
-# not merely asserted. ANCHOR [VERIFIED Flannery & Marcus 2012 ch.10] for the mechanism; the four rates
-# are [DESIGN], calibrated against TARGETS T-6 (Hayden's 75% father-was-leader) and T-5 (BHM composite
-# Gini). NOTE on the seam: MECHANISM_CHARTER §9.2 named `GroupVector.religion` as the carrier. On
-# inspection that cell is an int RELIGION ID, while legitimacy is a continuous per-LINEAGE stock — so it
-# lives on the model as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for
-# actual religion ids.
+# per-step heritable-cred boost to a legitimated lineage's members — (channel note, inherited) R-106
+# Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding
+# leveler. The feast debits `legit_feast_frac * material` from EVERY agent and redistributes it per-capita
+# to the band's guests, so its net effect is a pull toward the band mean — a leveler as strong as the
+# Boehm sanction (Addendum 84: it, not the coalition, pins the material Gini at ~0.24). `feast_tolerance`
+# exempts material BELOW `feast_tolerance * band_mean` from the feast: the debit becomes `legit_feast_frac
+# * max(0, material - feast_tolerance*mean)`, so only conspicuous holders feast. 0.0 = every holder feasts
+# from the first unit ⇒ BIT-EXACT with the pre-band feast (threshold 0). Higher = the feast is
+# wealth-gated, which is grounded (Hayden's aggrandizers sponsor feasts) and STRENGTHENS the
+# status→material coupling (Addendum 82's miss): the legitimacy EMA is a SHARE of the band's feasting
+# (line ~4026), so a wealth-gated feast lifts the wealthy lineages' share of ascription. The legitimacy
+# channel is PRESERVED — the feast still fires and still buys standing.
 
 [resent_alpha]
 value = 0.001

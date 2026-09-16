@@ -2032,6 +2032,16 @@ class DemographyConfig(BaseModel):
     # is the per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
     leveling_strength: float = Field(0.0, ge=0.0)              # sanction rate per unit of relative excess [0.79 = Boehm 38/48]
     leveling_share: float = Field(0.0, ge=0.0, le=1.0)         # fraction of the excess disgorged when sanctioned [DESIGN]
+    # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum 84
+    # found the coalition levels every agent's material back to the CELL MEAN each step (excess = material - mean),
+    # with no tolerated band, so any nonzero strength pins the material Gini near 0.2 and 0.36 (BHM 2009 #14) sits in
+    # an unreachable gap. The defect is the redistribution SHAPE, not the gain. `leveling_tolerance` is the fraction
+    # of the local mean a co-resident may hold ABOVE the norm before the sanction fires: the sanctionable excess is
+    # max(0, material - (1+tolerance)*mean). So the equilibrium settles at the TOLERATED band, not at the mean.
+    # 0.0 = the mean is the norm (no tolerated inequality) ⇒ BIT-EXACT with the pre-band sanction. Higher = a more
+    # tolerant coalition, closer to the BHM stratified target. Applied to COMMONER leveling; the noble exemption
+    # (enable_noble_leveling_exemption) still waives the residual for ascribed lineages.
+    leveling_tolerance: float = Field(0.0, ge=0.0)             # local-mean fraction tolerated above the norm [PROVISIONAL]
     # ── R-84 CHALLENGE-SUCCESSION: leadership as a TENURED OFFICE, and the two ways it is LOST ───────────
     # DEFECT this fixes: `band_leaders()` recomputes argmax(cred·prowess) EVERY step ⇒ zero incumbency. There is
     # no office, no tenure, and a leader is never *removed* — he merely stops being the maximum. The ethnography
@@ -2091,6 +2101,17 @@ class DemographyConfig(BaseModel):
     # as `_lineage_legit` (mirroring `_band_surplus`), and `religion` stays reserved for actual religion ids.
     enable_legitimacy: bool = False
     legit_feast_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of a lineage's material spent on sacrifices/feasts each step
+    # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding
+    # leveler. The feast debits `legit_feast_frac * material` from EVERY agent and redistributes it per-capita to the
+    # band's guests, so its net effect is a pull toward the band mean — a leveler as strong as the Boehm sanction
+    # (Addendum 84: it, not the coalition, pins the material Gini at ~0.24). `feast_tolerance` exempts material BELOW
+    # `feast_tolerance * band_mean` from the feast: the debit becomes `legit_feast_frac * max(0, material -
+    # feast_tolerance*mean)`, so only conspicuous holders feast. 0.0 = every holder feasts from the first unit ⇒
+    # BIT-EXACT with the pre-band feast (threshold 0). Higher = the feast is wealth-gated, which is grounded (Hayden's
+    # aggrandizers sponsor feasts) and STRENGTHENS the status→material coupling (Addendum 82's miss): the legitimacy
+    # EMA is a SHARE of the band's feasting (line ~4026), so a wealth-gated feast lifts the wealthy lineages' share of
+    # ascription. The legitimacy channel is PRESERVED — the feast still fires and still buys standing.
+    feast_tolerance: float = Field(0.0, ge=0.0)            # band-mean multiple exempt from the feast [PROVISIONAL]
     legit_decay: float = Field(0.02, ge=0.0, le=1.0)       # legitimacy fades without renewal (~1/0.02 = 50-step memory)
     legit_threshold: float = Field(0.5, ge=0.0, le=1.0)    # above this share of the band's feasting, the lineage is "descended from higher nats"
     legit_cred_gain: float = Field(0.0, ge=0.0)            # per-step heritable-cred boost to a legitimated lineage's members

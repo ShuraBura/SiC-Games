@@ -1,0 +1,13 @@
+TIER-10 JOINT BAND (feast ON 0.25) | temperate | capfrac 0.5 + heir_by_status | 800 steps | worlds [0, 1, 2] | TARGET material Gini 0.36
+  guardrails: e0 [21-37], frac_child [0.287-0.454], pct_strat (tier-11), pop
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  canon     mat_gini 0.174+/-0.030  | e0 36.2  frac_child 0.37  cred_gini 0.36  corr(cred,mat) +0.21  pct_strat 66%  pop 1354
+  lt0_ft0.5 mat_gini 0.181+/-0.018  | e0 36.5  frac_child 0.39  cred_gini 0.35  corr(cred,mat) +0.28  pct_strat 73%  pop 1618
+  lt0_ft1.0 mat_gini 0.193+/-0.025  | e0 34.1  frac_child 0.39  cred_gini 0.37  corr(cred,mat) +0.19  pct_strat 72%  pop 1491
+  lt0_ft2.0 mat_gini 0.192+/-0.022  | e0 37.8  frac_child 0.37  cred_gini 0.36  corr(cred,mat) +0.23  pct_strat 68%  pop 1571
+  lt0_ft4.0 mat_gini 0.175+/-0.020  | e0 36.4  frac_child 0.38  cred_gini 0.33  corr(cred,mat) +0.10  pct_strat 65%  pop 1640
+  lt1_ft1.0 mat_gini 0.303+/-0.004  | e0 35.1  frac_child 0.36  cred_gini 0.37  corr(cred,mat) +0.10  pct_strat 74%  pop 1288
+  lt1_ft2.0 mat_gini 0.384+/-0.006  <== ~0.36  | e0 35.6  frac_child 0.40  cred_gini 0.35  corr(cred,mat) +0.16  pct_strat 66%  pop 1387
+  lt2_ft2.0 mat_gini 0.442+/-0.004  | e0 31.2  frac_child 0.36  cred_gini 0.33  corr(cred,mat) +0.14  pct_strat 64%  pop 1157
+  lt1_ft3.0 mat_gini 0.382+/-0.013  <== ~0.36  | e0 37.8  frac_child 0.36  cred_gini 0.38  corr(cred,mat) +0.13  pct_strat 76%  pop 1335

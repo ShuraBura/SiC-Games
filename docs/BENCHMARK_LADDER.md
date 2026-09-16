@@ -169,6 +169,15 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 and both are quotable — CTB'd on 2026-08-07 and held — but *diagnosing* them means looking down the ladder,
 and tier 5 has just shown what that produces.
 
+**UPDATE — #14 wealth has a built, calibrated fix (R-106 Add.82–86, 2026-09-15).** The miss decomposes to a
+near-bang-bang shape in the two levelers (Boehm sanction + feast): each pulls material to the cell/band mean with no
+tolerated band, so any nonzero strength pins the material Gini at ~0.2 (Add.84). Add.86 builds two tolerance-band
+knobs (`leveling_tolerance`, `feast_tolerance`, both default 0.0 ⇒ bit-exact OFF). With the concentrators on, both
+bands open (`lt 1.0 / ft 1.5`) reach material Gini **0.367 in both biomes**, guardrails and tier-11 stratification
+intact, feast kept on. **NOT adopted** — canon unchanged; adoption is gated on grounding the aggrandizer-skim
+magnitude (`material_capture_frac`) and re-calibrating. So #14 is now a MOVABLE, calibrated miss, not a structural
+limit like tier-5 band size.
+
 ---
 
 *Ladder adopted 2026-08-07. Amend by dated note. Coverage figures are measured, not estimated — regenerate

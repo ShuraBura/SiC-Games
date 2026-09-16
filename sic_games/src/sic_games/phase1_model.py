@@ -3230,6 +3230,8 @@ class TerrainWorld(mesa.Model):
             _lx_on = getattr(self._demog, "enable_noble_leveling_exemption", False)
             _lx_frac = getattr(self._demog, "noble_exemption_frac", 1.0) if _lx_on else 0.0
             _lx_rk = self._rank_keys() if _lx_on else None
+            # R-106 Addendum 86: the tolerance band. 0.0 ⇒ threshold == mean ⇒ bit-exact with the pre-band sanction.
+            _lev_tol = getattr(self._demog, "leveling_tolerance", 0.0)
             if lev_s > 0.0 and lev_sh > 0.0:
                 by_cell: dict = {}
                 for a in self.agent_list:
@@ -3241,8 +3243,9 @@ class TerrainWorld(mesa.Model):
                     mean_m = sum(mats) / len(mats)
                     if mean_m <= 0.0:
                         continue
+                    thresh = (1.0 + _lev_tol) * mean_m            # the tolerated band above the local norm
                     for a in occ_l:
-                        excess = a.material - mean_m
+                        excess = a.material - thresh
                         if excess <= 0.0:
                             continue
                         if _lx_rk is not None and _lx_rk.get(a) in self._lineage_ascribed:
@@ -4042,13 +4045,19 @@ class TerrainWorld(mesa.Model):
 
         alpha = cfg.legit_decay                       # EMA weight: legitimacy tracks long-run ritual standing
         rel_legit = getattr(cfg, "enable_relative_legitimacy", False)   # R-93: scale-free crossing test
+        # R-106 Addendum 86: the feast tolerance band. 0.0 ⇒ threshold 0 ⇒ every holder feasts ⇒ bit-exact.
+        _feast_tol = getattr(cfg, "feast_tolerance", 0.0)
         for unit, lins in by_band.items():
             spend, total = {}, 0.0
             guests = [a for ms in lins.values() for a in ms]
+            # the band norm the feast is reckoned against — only material ABOVE feast_tolerance*mean is conspicuous
+            _thr = 0.0
+            if _feast_tol > 0.0 and guests:
+                _thr = _feast_tol * (sum(a.material for a in guests) / len(guests))
             for lid, ms in lins.items():
                 s = 0.0
                 for a in ms:
-                    take = ff * a.material
+                    take = ff * (a.material - _thr if _thr > 0.0 else a.material)
                     if take > 0.0:
                         a.material -= take            # DEBITED — belief is bought, not asserted
                         s += take

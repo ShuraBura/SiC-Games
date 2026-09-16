@@ -1,0 +1,14 @@
+== TEMPERATE | capfrac 0.5 + heir, feast ON 0.25 | 800 steps | worlds [0, 1, 2] | TARGET 0.36 ==
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  lt0.6_ft2.0  mat_gini 0.325+/-0.007  | e0 32.3  frac_child 0.38  cred_gini 0.32  corr(cred,mat) +0.12  pct_strat 74%  pop 1323
+  lt0.8_ft1.5  mat_gini 0.332+/-0.008  <== ~0.36  | e0 37.4  frac_child 0.35  cred_gini 0.36  corr(cred,mat) +0.08  pct_strat 68%  pop 1387
+  lt0.8_ft2.0  mat_gini 0.353+/-0.006  <== ~0.36  | e0 35.7  frac_child 0.35  cred_gini 0.37  corr(cred,mat) +0.13  pct_strat 73%  pop 1355
+  lt1.0_ft1.5  mat_gini 0.367+/-0.011  <== ~0.36  | e0 35.6  frac_child 0.37  cred_gini 0.42  corr(cred,mat) +0.16  pct_strat 66%  pop 1213
+  lt1.0_ft1.75 mat_gini 0.365+/-0.006  <== ~0.36  | e0 33.9  frac_child 0.37  cred_gini 0.37  corr(cred,mat) +0.10  pct_strat 71%  pop 1238
+== SAVANNA | capfrac 0.5 + heir, feast ON 0.25 | 800 steps | worlds [0, 1, 2] | TARGET 0.36 ==
+  lt0.6_ft2.0  mat_gini 0.321+/-0.003  | e0 28.7  frac_child 0.41  cred_gini 0.26  corr(cred,mat) +0.07  pct_strat 61%  pop 1090
+  lt0.8_ft1.5  mat_gini 0.354+/-0.014  <== ~0.36  | e0 29.6  frac_child 0.40  cred_gini 0.30  corr(cred,mat) +0.07  pct_strat 68%  pop 1005
+  lt0.8_ft2.0  mat_gini 0.363+/-0.015  <== ~0.36  | e0 27.6  frac_child 0.40  cred_gini 0.33  corr(cred,mat) +0.11  pct_strat 52%  pop 1083
+  lt1.0_ft1.5  mat_gini 0.367+/-0.008  <== ~0.36  | e0 27.3  frac_child 0.44  cred_gini 0.27  corr(cred,mat) +0.06  pct_strat 60%  pop 1085
+  lt1.0_ft1.75 mat_gini 0.383+/-0.010  <== ~0.36  | e0 25.1  frac_child 0.43  cred_gini 0.31  corr(cred,mat) +0.09  pct_strat 63%  pop 1100

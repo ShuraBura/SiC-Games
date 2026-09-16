@@ -8448,6 +8448,58 @@ tier-11 stratification markers together. This is the same near-bang-bang class a
 **Deliverable.** Config debt cleared (provenance only, bit-exact); the graded-leveler arc is scoped with the fix
 localised to the redistribution shape and the tier-11 coupling identified. No mechanism built or changed.
 
+## Addendum 86 — The graded-leveler mechanism is built and calibrated: two tolerance bands reach BHM 0.36 in BOTH biomes; NOT adopted, canon unchanged (2026-09-15, R-106)
+
+**What this addendum builds.** Addendum 85 scoped the fix as a TOLERANCE BAND on each leveler, not a graded gain.
+This addendum builds it. Two new `DemographyConfig` knobs (both `[PROVISIONAL]`, both default 0.0 ⇒ bit-exact OFF):
+- `leveling_tolerance` — the Boehm sanction fires only on `max(0, material − (1+tolerance)·cell_mean)`, so a
+  co-resident may hold a tolerated fraction above the local norm before the coalition acts. 0.0 reproduces the
+  pre-band sanction (threshold = mean) exactly (`phase1_model.py` ~3245).
+- `feast_tolerance` — the feast debits `legit_feast_frac · max(0, material − tolerance·band_mean)`, so only
+  conspicuous holders feast. 0.0 reproduces the pre-band feast (threshold = 0, everyone feasts) exactly
+  (`phase1_model.py` ~4054). The legitimacy channel is preserved: the feast still fires, still buys standing, and a
+  wealth-gated feast lifts the wealthy lineages' SHARE of ascription — which strengthens the Addendum-82 coupling.
+
+The noble exemption (`enable_noble_leveling_exemption`, Flannery ch.16) stays in force; the band applies to the
+commoner sanction, as Bridge #2 of Addendum 85 requires.
+
+**The bang-bang is gone — each leveler is a ceiling on its own.** Low-noise 3-world panel, concentrators ON
+(`material_capture_frac = 0.5`, `material_heir_by_status = True`), 800 steps, life table 400–800. The leveling band
+with the feast ON gives a graded climb that SATURATES at ~0.24 (tol 0→4: 0.17, 0.21, 0.23, 0.235, 0.242); the feast
+band with leveling ON stays flat at ~0.18. Each leveler alone pins the Gini because the other still pulls to the
+mean. This reproduces Addendum 84's bimodal reading and identifies its cause: two independent pull-to-mean forces.
+
+**Both bands together reach the target, feast kept ON at canon 0.25.** The joint dial is graded and monotone:
+`(leveling_tolerance, feast_tolerance)` = (1.0, 1.0) → 0.303; (1.0, 2.0) → 0.384; (1.0, 3.0) → 0.382. A refinement
+lands the value at BHM 0.36.
+
+**The landing is biome-invariant (not a temperate artifact).** `leveling_tolerance = 1.0, feast_tolerance = 1.5`
+gives material Gini **0.367 temperate / 0.367 savanna**. Guardrails hold in both: e₀ 35.6 / 27.3 (each inside the
+biome range; savanna's is the honest harsh-biome value), `frac_child` 0.37 / 0.44 (inside [0.287, 0.454]), and the
+tier-11 stratification share stays high (`pct_strat` 66% / 60%) — the stratification machinery is intact. The pop is
+stable. `corr(cred, material)` stays weak (+0.10 to +0.16, ≈ canon +0.21); the band lifts the Gini through a
+tolerated commoner spread, so marker #14 passes without a large change in the status→material rank correlation.
+
+**NOT adopted; canon unchanged.** The user's call this session: land the mechanism default-neutral (bit-exact),
+record the result, and DEFER the canonical adoption. The adoption is gated on GROUNDING the concentrator magnitude:
+`material_capture_frac = 0.5` is an unanchored `[DESIGN]` value carried from the Addendum-84 calibration, and it
+trades against the band widths to set the level. Before any adoption, the aggrandizer-skim fraction needs a
+defensible anchor (Hayden), and the bands need re-calibration around that value. The adoption also needs the full
+suite: a canonical value change breaks the bit-exact CTBs that assert canon outputs, which is expected churn.
+
+**Verification (bit-exact path).** `config/parameters.toml` regenerated from the field comments
+(`tools/gen_runconfig.py`); only two `value = 0.0` sections added, no existing value changed. `test_runconfig_sync.py`
+(16), `test_canonical_worlds_ctb.py`, `test_legitimacy.py`, `test_material_inheritance.py` all pass — the canonical
+path is unperturbed.
+
+**Deliverable.** The graded-leveler mechanism exists, defaults OFF/bit-exact, and reaches BHM 0.36 in both biomes at
+a single grounded-shape landing with the tier-11 markers intact. Nothing adopted. Harnesses: `scratchpad/
+bp_gini_band.py`, `bp_gini_band2.py`, `bp_gini_band3.py` (+ `bp_gini_band_plot.py`, `bp_gini_band_biome_plot.py`;
+figures `bp_gini_band.png`, `bp_gini_band_biome.png`).
+
+**Bonus hypothesis, not yet tested.** The band-cohesion budget (Addendum 22) is the same near-bang-bang class; a
+tolerance-band fix there may move tier-5 band size. Worth a check now that the pattern is proven.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
