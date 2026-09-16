@@ -8416,6 +8416,38 @@ leaky-assabiyah fix proposed for the cohesion budget (Addendum 22) — not a cal
 dead-knob repair, pending a decision. No canonical change made here; DIAGNOSIS + calibration only. `scratchpad/
 bp_gini_calib.py`, `bp_gini_regime_plot.py`, `bp_gini_regime.png`.
 
+## Addendum 85 — Tier-10 config debt resolved + graded-leveler arc scoped: the bang-bang is the SHAPE (pull-to-mean, no tolerance band), and the levelers are load-bearing for tier-11 (2026-09-15, R-106)
+
+**Config debt (done).** The two parked concentration levers now carry provenance in `demography.py` (and the
+regenerated `config/parameters.toml`), value UNCHANGED (bit-exact): `material_capture_frac = 0.0` and
+`material_heir_by_status = False` are DELIBERATE egalitarian neutrals, with the note that activating them is a
+grounded partial gain (Gini 0.17 → 0.22–0.26) that cannot reach BHM 0.36 without graded levelers (Addendum 84).
+`enable_material_capture = True` is NOT a lie — it runs the hide economy; only the aggrandizer skim is zero.
+
+**Bridge #1 — the near-bang-bang is the SHAPE, not the gain.** The leveling code pulls each agent's material
+EXCESS ABOVE THE CELL MEAN back down every step (sanction p = strength·excess/mean, capped at 1) and redistributes
+per-capita; feasting is the same (debit ∝ wealth, hand back per-capita). Both are PULL-TO-THE-MEAN with NO tolerance
+band, so any nonzero strength cumulatively levels to the mean — which is exactly why the strength dial read inert
+(Addendum 84) and only strength = 0 moved the Gini. The equilibrium Gini is pinned at ~the mean (~0.2) regardless
+of gain. Therefore the redesign target is a TOLERANCE BAND (a setpoint of tolerated inequality below which no
+sanction fires), NOT a graded gain — so the Gini can settle at 0.36 instead of at the mean.
+
+**Bridge #2 — the levelers are load-bearing for tier-11 stratification.** Leveling uses the NOBLE EXEMPTION
+(`enable_noble_leveling_exemption`; Flannery ch.16 — the device that turns rank into stratification: legitimate
+ascribed nobles are exempt, commoners are leveled), and the feast feeds LEGITIMACY (→ ascription). So the redesign
+MUST preserve the noble exemption and the legitimacy-feast channel, and apply the tolerance band to COMMONER
+leveling. Expected direction: material Gini rises (a tolerated commoner spread + preserved noble accumulation)
+toward 0.36, with the stratification machinery intact.
+
+**Scoped redesign (the graded-leveler arc, not started).** Add `leveling_tolerance` (and a feast equivalent) so
+sanctions fire only on excess BEYOND a tolerated band; the band width is the new calibration knob, sitting
+alongside the existing noble exemption. Default = neutral (bit-exact). Validate against material Gini 0.36 AND the
+tier-11 stratification markers together. This is the same near-bang-bang class as the cohesion-budget saturation
+(Addendum 22 leaky-assabiyah), so the arc may move tier-5 band size as well as tier-10.
+
+**Deliverable.** Config debt cleared (provenance only, bit-exact); the graded-leveler arc is scoped with the fix
+localised to the redistribution shape and the tier-11 coupling identified. No mechanism built or changed.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

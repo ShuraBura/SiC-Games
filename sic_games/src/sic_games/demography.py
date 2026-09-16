@@ -1932,6 +1932,12 @@ class DemographyConfig(BaseModel):
     # (Testart's storable-food route drives inequality by BUFFERING SUBSISTENCE, which is a different channel.)
     # Bonus: hides ∝ meat couples material to the hunting economy, hence to `prowess` — the achieved facet.
     material_hide_frac: float = Field(0.0, ge=0.0)              # durable yield per unit meat taken (sets UNITS only)
+    # PARKED at 0.0 (egalitarian neutral) DELIBERATELY, R-106 Addendum 84: enable_material_capture runs the hide
+    # economy (every hunter accrues durable goods), but the aggrandizer SKIM is zero, so material stays with its
+    # producer and the whole-pop material Gini sits at ~0.17 vs BHM 2009's 0.36. Activating it (>0) with
+    # material_heir_by_status raises the Gini only to ~0.22-0.26 — the leveling+feast rules are near-bang-bang and
+    # clamp it there; 0.36 has NO grounded landing. Reaching the anchor needs GRADED levelers (a redesign, cf.
+    # leaky-assabiyah, Addendum 22), not this knob. Left at neutral pending that arc.
     material_capture_frac: float = Field(0.0, ge=0.0, le=1.0)   # share of the cell's hide pool claimed by aggrandizers
     material_decay: float = Field(0.0, ge=0.0, le=1.0)          # per-step depreciation of the durable stock (0 = imperishable)
     # R-103d MATERIAL INHERITANCE — bequeath durable capital at death, the missing 'bequeathing' step (Flannery
@@ -1945,6 +1951,10 @@ class DemographyConfig(BaseModel):
     #   patrilineal_sons→ split equally among surviving SONS (the EA-modal 43-61% rule)
     # R-103e — HEIR COUPLED TO STATUS. Estate+rank should pass TOGETHER (Flannery ch.16 chiefly primogeniture),
     # not to a random child. ON ⇒ primogeniture picks the highest-CRED (status) child, so wealth follows rank.
+    # PARKED False (egalitarian neutral) DELIBERATELY, R-106 Addendum 84: with capture on this is the DOMINANT
+    # material concentrator (flipping it jumps the Gini toward runaway once leveling is off), but with the grounded
+    # levelers on it, like capture, cannot reach BHM 0.36 — the levelers clamp it. Activate together with the
+    # graded-leveler redesign, not before. See material_capture_frac above.
     material_heir_by_status: bool = False
     # R-103e — LEGITIMACY EXEMPTS THE NOBLE FROM LEVELING. The load-bearing device (Flannery ch.16 "how to turn
     # rank into stratification"; Friedman: a legitimated lineage's holding is "his by right… entitled to tribute",
