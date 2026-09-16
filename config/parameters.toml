@@ -2925,7 +2925,7 @@ type  = "float"
 # facet. durable yield per unit meat taken (sets UNITS only)
 
 [material_capture_frac]
-value = 0.0
+value = 0.15
 owner = "DemographyConfig"
 type  = "float"
 # PARKED at 0.0 (egalitarian neutral) DELIBERATELY, R-106 Addendum 84: enable_material_capture runs the
@@ -2959,7 +2959,7 @@ type  = "str"
 # cross-tab, LITERATURE.md]. Default OFF ⇒ material dissolves at death (bit-exact).
 
 [material_heir_by_status]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # primogeniture → whole estate to the ELDEST surviving child (concentrates; the extensive-agri pattern)
@@ -3087,7 +3087,7 @@ type  = "float"
 # per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
 
 [leveling_tolerance]
-value = 0.0
+value = 1.0
 owner = "DemographyConfig"
 type  = "float"
 # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum
@@ -3248,7 +3248,7 @@ type  = "float"
 # actual religion ids.
 
 [feast_tolerance]
-value = 0.0
+value = 1.5
 owner = "DemographyConfig"
 type  = "float"
 # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding

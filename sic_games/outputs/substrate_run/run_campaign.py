@@ -175,7 +175,7 @@ PATCHSZ   = int(os.environ.get("C_PATCH", "0"))          # R-103i CIRCUMSCRIPTIO
                                                           # smaller patch = bounded arable land the population
                                                           # cannot disperse out of. SELF-VERIFYING: meta's
                                                           # habitable_cells reports the realised bounded area.
-HEIRSTAT  = os.environ.get("C_HEIRSTAT", "0") == "1"     # R-103e primogeniture heir = highest-CRED child (rank+estate together)
+HEIRSTAT  = os.environ.get("C_HEIRSTAT", "1") == "1"     # R-103e primogeniture heir = highest-CRED child (rank+estate together); ADOPTED canon-on (R-106 Add.87), C_HEIRSTAT=0 ablates
 NOBLEXEMPT = os.environ.get("C_NOBLEXEMPT", "0") == "1"  # R-103e legitimate nobles EXEMPT from wealth-leveling (Flannery ch.16)
 SEDFERT   = os.environ.get("C_SEDFERT", "1") == "1"      # sedentism->fertility boost. DEFAULT ON = bit-exact with
                                                           # every prior campaign. Exposed as an ablation knob for
@@ -190,9 +190,17 @@ BAND_SPLIT = 45                                           # village = a band gro
 # 83-yr arm (correlation time ~22.6 yr on the log-linear estimator, D14) since R-88 found the lag itself does not
 # govern the observed dynamics — band churn does — so the exact alpha is no longer the load-bearing choice here.
 ELITE_KW = dict(
+    # R-106 Addendum 87 (2026-09-16): ADOPTED graded-leveler stratification. `material_capture_frac` is the
+    # aggrandizer skim of the group hide pool — GROUNDED at 0.15, the gumsa "a thigh from every animal" surplus
+    # rate (= lineage_tribute_frac; no Hayden-specific % exists, so the one documented tribal-extraction fraction
+    # is the analog). `leveling_tolerance`/`feast_tolerance` are the tolerance bands (Addendum 86) that turn the
+    # near-bang-bang levelers into a graded dial; lt1.0/ft1.5 lands the whole-pop material Gini at BHM 2009's 0.36
+    # (0.363 temperate / 0.372 savanna, marker #14 PASS) with e0, frac_child, tier-11 stratification and pop intact.
     enable_material_capture=True, material_hide_frac=0.07, material_decay=0.002, aggrandizer_frac=0.15,
+    material_capture_frac=0.15,
     enable_leader_share=True, leader_share_frac=0.20,
-    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8,
+    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8, leveling_tolerance=1.0,
+    feast_tolerance=1.5,
     enable_leader_office=True, office_grievance_gain=0.05,
     enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=LEGITTHR, legit_decay=0.02,
     enable_delegitimation=DELEGIT, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,

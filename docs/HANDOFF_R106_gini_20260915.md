@@ -1,10 +1,12 @@
 # Handoff — R-106 ladder-miss arc (2026-09-15 20:29 EDT)
 
-> **UPDATE 2026-09-15 (Add.86, origin/main @ 7d715e6):** the graded-leveler mechanism below is now BUILT + calibrated.
-> `leveling_tolerance` + `feast_tolerance` (both default 0.0, bit-exact OFF) reach material Gini 0.367 in BOTH biomes
-> at `lt1.0 / ft1.5` with tier-11 intact and the feast kept on. NOT adopted — canon unchanged. The remaining work is
-> the ADOPTION path, gated on GROUNDING `material_capture_frac` (Hayden aggrandizer-skim anchor) then re-calibrating,
-> then the full CTB suite. Do NOT rebuild the mechanism; see RESULTS Add.86 + memory `project_sic_games_material_gini`.
+> **UPDATE 2026-09-16 (Add.87 — ADOPTED):** the graded-leveler stack is now CANONICAL and marker #14 (wealth Gini)
+> PASSES. Canon carries `material_capture_frac = 0.15` (grounded to the gumsa "thigh from every animal" rate),
+> `material_heir_by_status = True`, `leveling_tolerance = 1.0`, `feast_tolerance = 1.5` → material Gini 0.363/0.372
+> (temperate/savanna), tier-11 + lower tiers intact. Full CTB suite green (churn was 3/1740, all resolved). The
+> canonical baseline is now a stratified 0.36-Gini world. This tier-10 arc is CLOSED. Only open lead: the
+> cohesion-budget band (Add.22) may move tier-5 band size (untested). See RESULTS Add.86–87 + memory
+> `project_sic_games_material_gini`. The earlier "NOT adopted" note is superseded.
 
 This note points the next session at the graded-leveler arc, the live frontier. It is a map, not the record:
 the formal record is `docs/RESULTS.md` (Addenda 76–85) and the git history; the working state is in the assistant

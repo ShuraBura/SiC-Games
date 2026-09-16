@@ -5,7 +5,7 @@
 # config/mechanisms.toml + config/parameters.toml; edit by regenerating, not by hand, so the
 # base and the difference stay separable.
 #
-# generated 2026-09-09
+# generated 2026-09-16
 
 [meta]
 name = "full_campaign"
@@ -225,6 +225,7 @@ exogamy_degree = "lineage"
 exogamy_relatedness = 0.125
 family_maturity_months = 180
 feast_every = 12
+feast_tolerance = 1.5
 fecundability = 0.12
 forage_cap_hours = 100.0
 fusion_search_radius = 25.0
@@ -256,6 +257,7 @@ legit_rel_multiplier = 2.0
 legit_threshold = 0.15
 leveling_share = 0.8
 leveling_strength = 0.79
+leveling_tolerance = 1.0
 lh_eta_juvenile_exponent = 3.0
 lh_eta_min = 0.1
 lineage_branch_rate = 0.05
@@ -272,9 +274,9 @@ mate_choice_strength = 5.0
 mate_search_max_radius = 15
 mate_search_min_eligible = 15
 mate_within_band_id = false
-material_capture_frac = 0.0
+material_capture_frac = 0.15
 material_decay = 0.002
-material_heir_by_status = false
+material_heir_by_status = true
 material_hide_frac = 0.07
 material_inheritance_rule = "primogeniture"
 material_invulnerability_min = 0.0

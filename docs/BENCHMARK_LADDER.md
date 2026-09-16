@@ -75,7 +75,7 @@ read it as "has no dedicated CTB file", not as "has never been checked against a
 | 7 | **Kin & lineage** — descent, exogamy, genome | 7 | 7 | 1 | **none at forager scale** (#6 retired 2026-08-07; #5 anchor withdrawn) | #5 not scoreable, ~~#6 retired~~ |
 | 8 | **Connubium** — between-band mating networks | 2 | 2 | **0** | White 2017 (MVP), Wobst 1974 (MES 79–332) | #4 connubium 15/25 |
 | 9 | **Settlement** — sedentism, villages, budding, agriculture | 10 | 9 | **0** | Alvard 2009 (50–250), Alberti 2014 (127 / 158), Hamilton 2007 (165), Bandy 2004 (fission rate), Johnson (rank-size) | #3 ✓ 46/52, #8 ✓, #12, #13, **#17 fission ceiling — MISSES** |
-| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**) | #11 status→RS, **#14 wealth — 0.162 vs 0.36** |
+| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**) | #11 status→RS, **#14 wealth — PASS: 0.363/0.372 vs 0.36 (R-106 Add.87, ADOPTED)** |
 | 11 | **Stratification** — morph, rank, the inequality gate | 4 | 4 | **0** | Hayden 1995 Fig. 6, Smith & Codding 2021 (r = 0.881) | #9 hierarchy 2 of 3 |
 | 12 | **Elite** — leveling, legitimacy, tribute, nobility | 9 | 9 | 1 | EA "true-elite few %" — **undocumented** | #7 not scored (no band in `docs/`) |
 
@@ -174,9 +174,11 @@ near-bang-bang shape in the two levelers (Boehm sanction + feast): each pulls ma
 tolerated band, so any nonzero strength pins the material Gini at ~0.2 (Add.84). Add.86 builds two tolerance-band
 knobs (`leveling_tolerance`, `feast_tolerance`, both default 0.0 ⇒ bit-exact OFF). With the concentrators on, both
 bands open (`lt 1.0 / ft 1.5`) reach material Gini **0.367 in both biomes**, guardrails and tier-11 stratification
-intact, feast kept on. **NOT adopted** — canon unchanged; adoption is gated on grounding the aggrandizer-skim
-magnitude (`material_capture_frac`) and re-calibrating. So #14 is now a MOVABLE, calibrated miss, not a structural
-limit like tier-5 band size.
+intact, feast kept on. **ADOPTED into canon (R-106 Add.87, 2026-09-16):** the aggrandizer skim was grounded to the
+gumsa "thigh from every animal" rate (`material_capture_frac = 0.15`), the bands re-calibrated (landing robust to the
+capture magnitude), and the four values written into the canonical stack — material Gini now **0.363/0.372, marker
+#14 PASS**. Full-suite churn was 3/1740 (two config-reference regens + one single-seed CTB made seed-robust), all
+resolved. The canonical baseline is now a stratified 0.36-Gini world.
 
 ---
 
