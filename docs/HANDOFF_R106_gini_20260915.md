@@ -4,9 +4,13 @@
 > PASSES. Canon carries `material_capture_frac = 0.15` (grounded to the gumsa "thigh from every animal" rate),
 > `material_heir_by_status = True`, `leveling_tolerance = 1.0`, `feast_tolerance = 1.5` → material Gini 0.363/0.372
 > (temperate/savanna), tier-11 + lower tiers intact. Full CTB suite green (churn was 3/1740, all resolved). The
-> canonical baseline is now a stratified 0.36-Gini world. This tier-10 arc is CLOSED. Only open lead: the
-> cohesion-budget band (Add.22) may move tier-5 band size (untested). See RESULTS Add.86–87 + memory
+> canonical baseline is now a stratified 0.36-Gini world. This tier-10 arc is CLOSED. See RESULTS Add.86–87 + memory
 > `project_sic_games_material_gini`. The earlier "NOT adopted" note is superseded.
+>
+> **UPDATE 2026-09-16 (Add.88):** the bonus lead — a graded cohesion band for tier-5 band size — is now TESTED and
+> FALSIFIED on the adopted canon: bands sit at 0.30/0.55 of their fission cap and savanna already runs de-saturated
+> cohesion (5%) yet is no bigger, so the tolerance-band pattern does NOT transfer to a packing-limited benchmark.
+> No open leads from this arc remain.
 
 This note points the next session at the graded-leveler arc, the live frontier. It is a map, not the record:
 the formal record is `docs/RESULTS.md` (Addenda 76–85) and the git history; the working state is in the assistant

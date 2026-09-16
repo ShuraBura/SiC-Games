@@ -8555,6 +8555,31 @@ Harnesses: `scratchpad/bp_gini_ground.py` (+ `bp_gini_ground.png`), `bp_coloniz_
 **Still open.** The bonus hypothesis is untested: the band-cohesion budget (Addendum 22) is the same near-bang-bang
 class, so a tolerance-band fix there may move the tier-5 band-size miss.
 
+## Addendum 88 — The tolerance-band pattern does NOT transfer to tier-5 band size: the bonus hypothesis is falsified on the adopted canon (2026-09-16, R-106)
+
+**The hypothesis.** Addenda 85–86 noted that the band-cohesion budget (Addendum 22) is the same near-bang-bang class
+as the levelers, and suggested a tolerance-band (graded cohesion, `leaky-assabiyah`) fix there might move the tier-5
+band-size miss (`band_med_adults` 10.5 vs Hill 2011's 28.2). This addendum checks it — and it does not hold.
+
+**Why it fails — the binding constraint is different.** The tier-10 levelers were genuinely CLAMPED (relaxing the
+clamp worked). The tier-5 cohesion cap is NOT the binding constraint, re-confirmed on the newly adopted canon
+(`scratchpad/bp_bandsize.py`, low-noise 3-world panel per biome):
+- Bands sit FAR below their own fission threshold: median `size / split_thr` = **0.30 temperate / 0.55 savanna**.
+  Bands use a third to a half of the growth permission they already have. Raising the cap (what de-saturation does)
+  when bands fill 30% of it changes nothing.
+- The SAVANNA NATURAL CONTROL is decisive: savanna cohesion is already UNSATURATED (**5%** of band-records at the
+  cap, vs temperate's **59%**), yet its bands are the SAME size (`band_med_adults` 10.5 in both). The biome that
+  already runs "de-saturated" is not bigger — so a graded/leaky cohesion band cannot be the band-size lever.
+
+This is exactly Addendum 80's finding, and it survives the Addendum-87 canon change (the more-stratified canon did
+not move band size or the below-cap gap). The band-size gap remains the STRUCTURAL packing limit (a tier-1/2 spatial
++ food-economy equilibrium), not a saturating-budget defect — not fixable at tier 5, and not by the tolerance-band
+pattern. `scratchpad/bp_bandsize_add87.png`.
+
+**Deliverable.** The bonus hypothesis is closed (negative). No mechanism built; canon unchanged. The tolerance band
+is the right fix for a CLAMPED benchmark (tier-10) and the wrong tool for a PACKING-LIMITED one (tier-5); the
+difference is whether the mechanism's cap actually binds.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
