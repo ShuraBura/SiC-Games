@@ -1,0 +1,9 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+Traceback (most recent call last):
+  File "<string>", line 15, in <module>
+    print(clim, {k: round(st.mean([x for x in v if x==x]),3) for k,v in vals.items()})
+                          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\statistics.py", line 177, in mean
+    raise StatisticsError('mean requires at least one data point')
+statistics.StatisticsError: mean requires at least one data point

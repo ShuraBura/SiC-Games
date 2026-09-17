@@ -3403,6 +3403,19 @@ class TerrainWorld(mesa.Model):
         # R-82 markers read defensively: a diagnostic must never crash on a partially-populated agent
         # (synthetic stand-ins in tests, or an agent built before a later stage's attributes existed).
         _mat = [getattr(a, "material", 0.0) for a in pop]
+        # R-106 Add.91 (marker #1): the PERSON-WEIGHTED mean adults-per-CELL — Hill's 28.2 statistic on the model's
+        # co-residence unit. Σ_c(adults_c · people_c) / Σ_c people_c. Inlined (not a helper) so it survives being
+        # called with the class as `self` in the marker CTBs. See Add.89.
+        _cell_ad: dict = {}
+        _thr = self._AGE_CHILD_YR * MONTHS_PER_YEAR
+        for a in pop:
+            _p = getattr(a, "pos", None)
+            if _p is None:
+                continue
+            _a0, _n0 = _cell_ad.get(_p, (0, 0))
+            _cell_ad[_p] = (_a0 + (1 if a.age >= _thr else 0), _n0 + 1)
+        _cell_tot = sum(_n for _, _n in _cell_ad.values())
+        _band_exp_ad = (sum(_a * _n for _a, _n in _cell_ad.values()) / _cell_tot) if _cell_tot else nan
         _aggr = [getattr(a, "aggrandizer", 0.0) for a in pop]
         _cells = {getattr(a, "pos", None) for a in pop} - {None}
         _dens = (n / (len(_cells) * _CELL_KM2)) if _cells else nan
@@ -3423,6 +3436,11 @@ class TerrainWorld(mesa.Model):
             "frac_paired_adult_f": (len(paired_f) / len(adult_f)) if adult_f else nan,
             "mean_wives_married_m": (_st.mean(married_m) if married_m else nan),
             "frac_polygynous_m": (sum(1 for w in married_m if w > 1) / len(married_m)) if married_m else nan,
+            # R-106 Add.91 — marker #10's BHM/Marlowe-COMPARABLE denominator. Marlowe (The Hadza, verified): "about
+            # 4% of MEN have 2 wives" — the denominator is ALL adult men, not the MARRIED men `frac_polygynous_m`
+            # uses. The gap between them IS the male marriage rate, which drifts between arms, so the married-men
+            # version is not comparable across runs. `wives` is the wife-count over all adult males. Score #10 here.
+            "frac_polygynous_all_m": (sum(1 for w in wives if w > 1) / len(wives)) if wives else nan,
             # Table 13.1 covariates — compare against mother alive 0.98 / father alive 0.95 / divorced 0.14
             "n_risk_0_9": nr,
             "frac_motherless": (md / nr) if nr else nan,
@@ -3444,6 +3462,13 @@ class TerrainWorld(mesa.Model):
                                            if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR]),
             "material_top10_share_adults": _top_share([getattr(a, "material", 0.0) for a in pop
                                                        if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR], 0.10),
+            # R-106 Add.91 — the BHM/Hill-COMPARABLE band-size statistic (marker #1). Hill 2011's 28.2 is the
+            # PERSON-WEIGHTED "mean experienced" adult size on a RESIDENTIAL group; the model's co-residence unit is
+            # the CELL (the leveling coalition is `by_cell`, consumption is per-cell), NOT `band_id` (a ~8-cell
+            # affiliation). So the comparable statistic is the person-weighted mean of adults-per-cell:
+            # Σ(adults_c · people_c) / Σ(people_c). Add.89 measured 33 temperate / 23 savanna ≈ Hill 28.2. Score #1
+            # here, not on the median-over-`band_id` `band_med_adults`.
+            "band_experienced_adults": _band_exp_ad,
             "wealth_gini": _gini([getattr(a, "wealth", 0.0) for a in pop]),
             "corr_cred_material": _corr([getattr(a, "cred", 1.0) for a in pop], _mat),
             # capture must key on the AGGRANDIZER trait, not inherited cred (R-82 spec fix)

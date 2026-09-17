@@ -379,7 +379,7 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         juv_frac=round(sum(1 for x in ages if x < 180) / pop, 3) if pop else 0,   # <15 yr (dependency proxy)
         mean_age_yr=round(statistics.mean(ages) / 12.0, 1) if pop else 0,
         n_bands=len(sizes), band_med=statistics.median(szv) if szv else 0, band_max=max(szv) if szv else 0,
-        band_med_adults=statistics.median(_aszv) if _aszv else 0,   # vs Hill 2011's 28.2 ADULTS
+        band_med_adults=statistics.median(_aszv) if _aszv else 0,   # median over band_id — NOT the #1 marker (Add.89)
         band_max_adults=max(_aszv) if _aszv else 0,
         # RENAMED from n_villages/village_med/village_max (R-106, 2026-08-04). These count BANDS with more
         # than `BAND_SPLIT` members — a social unit of any spatial extent — NOT settlements. `settle_med`
@@ -500,7 +500,12 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     _rlo = (sum(1 for v in _raw if v < _hi) / len(_raw)) if _raw else 0.0
     row.update(
         # REPRODUCTION / MATING — the channel that drives every dynastic marker downstream
-        frac_polygynous_m=round(_dg.get("frac_polygynous_m", 0.0), 4),   # Marlowe (Hadza) ~0.04
+        frac_polygynous_m=round(_dg.get("frac_polygynous_m", 0.0), 4),   # ÷ MARRIED men — NOT the #10 marker
+        # R-106 Add.91: the #10 marker — Marlowe's "4% of MEN" is ÷ ALL adult men. Score polygyny against THIS.
+        frac_polygynous_all_m=round(_dg.get("frac_polygynous_all_m", 0.0), 4),   # Marlowe (Hadza) ~0.04, ÷ all men
+        # R-106 Add.91: the #1 marker — Hill's 28.2 is PERSON-WEIGHTED mean adults on the CELL (co-residence unit),
+        # not the median over band_id (`band_med_adults` above). Score band size against THIS. (Add.89.)
+        band_experienced_adults=round(_dg.get("band_experienced_adults", 0.0), 2),
         mean_wives_married_m=round(_dg.get("mean_wives_married_m", 0.0), 3),
         frac_paired_adult_f=round(_dg.get("frac_paired_adult_f", 0.0), 3),
         # DEMOGRAPHIC ENGINE — a marker read on a steeply growing population means something

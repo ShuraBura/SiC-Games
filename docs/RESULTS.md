@@ -8675,6 +8675,28 @@ mean-experienced per cell) and #10 polygyny (`frac_polygynous_m` divides by marr
 addendum fixes #14; #1 and #10 are the remaining instrument-hygiene backlog. `scratchpad/bp_gini_adults.png`,
 `bp_gini_prepost.png`.
 
+## Addendum 91 — Instrument hygiene: the #1 and #10 marker code now computes the corrected statistic (2026-09-17, R-106)
+
+Add.90's audit left two marker instruments computing the wrong statistic in code even though the docs had diagnosed
+them. This addendum fixes both. Diagnostic-only — the additions are new output fields; the simulation is untouched.
+
+- **#1 band size.** Added `band_experienced_adults` to `_demog_markers` and the campaign row: the PERSON-WEIGHTED
+  mean adults per CELL (Hill's statistic on the model's co-residence unit; Add.89), Σ_c(adults_c·people_c)/Σ_c
+  people_c. On canon it reads **33.3 temperate / 22.9 savanna** — confirming Add.89 at the instrument level (≈ Hill
+  28.2). `band_med_adults` (median over `band_id`) is kept for continuity but is no longer the marker.
+- **#10 polygyny.** Added `frac_polygynous_all_m` — the fraction of ALL adult men with >1 wife, Marlowe's
+  denominator (his "4% of MEN"), not the married-men denominator `frac_polygynous_m` uses. On canon it reads
+  **0.022 temperate / 0.029 savanna** vs Marlowe's ~0.04 (model slightly low, ~0.6–0.7×, and now comparable across
+  arms because it no longer moves with the marriage rate). `frac_polygynous_m` (÷ married men) is kept but is not
+  the marker.
+
+Both definitions are pinned by CTBs (`test_marker_diagnostics_ctb.py`). With Add.89 (band), Add.90 (material) and
+this, the ladder's three audited markers now score against the right statistic; #1 is no-deficit, #10 is a mild
+shortfall, and #14 remains the open one (adults 0.16–0.22 vs 0.36).
+
+**Canon unchanged.** No config or dynamics changed. The remaining live decision is the #14 re-calibration (place the
+ADULTS material Gini at 0.36, or accept partial progress). `scratchpad/bp_markerfix_check.log`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

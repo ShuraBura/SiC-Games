@@ -131,6 +131,33 @@ def test_material_gini_adults_is_the_BHM_comparable_statistic_and_excludes_child
         "excluding zero-holding children lowers the Gini relative to the all-ages marker"
 
 
+def test_band_experienced_adults_is_person_weighted_over_cells_not_median_over_bands():
+    """R-106 Add.91 (marker #1) — Hill's 28.2 is the PERSON-WEIGHTED mean adults on the CELL (co-residence unit).
+    For each individual, count adults sharing its cell, averaged over individuals: Σ(adults_c·people_c)/Σ(people_c).
+    Constructed: cell A holds 3 adults, cell B holds 1 adult → (3·3 + 1·1)/4 = 2.5, NOT the median-over-cells (which
+    would be 3)."""
+    a = [_Agent(0.0) for _ in range(3)]
+    for x in a:
+        x.pos = (0, 0)
+    b = _Agent(0.0); b.pos = (1, 1)
+    m = TerrainWorld._demog_markers(TerrainWorld, a + [b])
+    assert m["band_experienced_adults"] == pytest.approx((3 * 3 + 1 * 1) / 4)   # 2.5
+
+
+def test_frac_polygynous_all_m_divides_by_all_adult_men_not_married_men():
+    """R-106 Add.91 (marker #10) — Marlowe's '4% of MEN have 2 wives' is ÷ ALL adult men, not ÷ married men.
+    Constructed: 8 unmarried men, 1 monogamist, 1 bigamist. ÷all-men = 1/10 = 0.1 (the anchor's denominator);
+    ÷married-men = 1/2 = 0.5 (the old marker). The gap is the male marriage rate."""
+    men = []
+    for _ in range(8):
+        x = _Agent(0.0, sex="male"); x._wives = set(); men.append(x)
+    mono = _Agent(0.0, sex="male"); mono._wives = {object()}
+    big = _Agent(0.0, sex="male"); big._wives = {object(), object()}
+    m = TerrainWorld._demog_markers(TerrainWorld, men + [mono, big])
+    assert m["frac_polygynous_all_m"] == pytest.approx(0.1), "must divide by all adult men"
+    assert m["frac_polygynous_m"] == pytest.approx(0.5), "the old marker divides by married men"
+
+
 def test_a_measured_gini_of_0_162_is_a_real_spread_not_an_empty_economy():
     """The other way #14 could be an artefact: if almost nobody held material, `_gini` returns 0.0 by
     construction and a near-zero reading would mean 'no economy' rather than 'equal economy'. 0.162 is not
