@@ -3416,6 +3416,20 @@ class TerrainWorld(mesa.Model):
             _cell_ad[_p] = (_a0 + (1 if a.age >= _thr else 0), _n0 + 1)
         _cell_tot = sum(_n for _, _n in _cell_ad.values())
         _band_exp_ad = (sum(_a * _n for _a, _n in _cell_ad.values()) / _cell_tot) if _cell_tot else nan
+        # R-106 Add.93 (marker #17): the FACE-TO-FACE community size = max over occupied cells of the population
+        # within Chebyshev radius 1 (a 3x3 = 900 km2 neighborhood). Alberti's 158 scalar-stress ceiling is a
+        # FACE-TO-FACE community bound; the old `settle_max` (exact-cell) UNDER-counts a multi-cell village and the
+        # union-find cluster OVER-counts (it merges the whole packing blob). This is the honest bracket. On current
+        # canon it reads ~155 temperate / ~200 savanna — AT Alberti 158 / Yanomamö ~200, below Alvard's 250 (Add.93).
+        _ctot = {c: _n for c, (_a, _n) in _cell_ad.items()}
+        _comm_max = 0
+        for (cx, cy) in _ctot:
+            s = 0
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    s += _ctot.get((cx + dx, cy + dy), 0)
+            if s > _comm_max:
+                _comm_max = s
         _aggr = [getattr(a, "aggrandizer", 0.0) for a in pop]
         _cells = {getattr(a, "pos", None) for a in pop} - {None}
         _dens = (n / (len(_cells) * _CELL_KM2)) if _cells else nan
@@ -3469,6 +3483,7 @@ class TerrainWorld(mesa.Model):
             # Σ(adults_c · people_c) / Σ(people_c). Add.89 measured 33 temperate / 23 savanna ≈ Hill 28.2. Score #1
             # here, not on the median-over-`band_id` `band_med_adults`.
             "band_experienced_adults": _band_exp_ad,
+            "settle_community_max": _comm_max,   # R-106 Add.93 (marker #17): face-to-face community (3x3 window) max
             "wealth_gini": _gini([getattr(a, "wealth", 0.0) for a in pop]),
             "corr_cred_material": _corr([getattr(a, "cred", 1.0) for a in pop], _mat),
             # capture must key on the AGGRANDIZER trait, not inherited cred (R-82 spec fix)

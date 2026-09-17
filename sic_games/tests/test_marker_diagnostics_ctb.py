@@ -158,6 +158,22 @@ def test_frac_polygynous_all_m_divides_by_all_adult_men_not_married_men():
     assert m["frac_polygynous_m"] == pytest.approx(0.5), "the old marker divides by married men"
 
 
+def test_settle_community_max_is_the_densest_3x3_window_not_a_single_cell():
+    """R-106 Add.93 (marker #17) — Alberti's 158 is a FACE-TO-FACE community ceiling. `settle_community_max` is the
+    max population within a 3x3 (Chebyshev-1) neighborhood, NOT a single cell (which under-counts a multi-cell
+    village) nor the whole connected blob (which over-counts under the packing paradox). Constructed: 10 people on
+    cell (5,5) and 6 on the adjacent (6,6) → the 3x3 window at (5,5) sees both = 16; a far cell (50,50) with 3 is
+    its own window."""
+    def at(x, y, k):
+        out = []
+        for _ in range(k):
+            a = _Agent(0.0); a.pos = (x, y); out.append(a)
+        return out
+    pop = at(5, 5, 10) + at(6, 6, 6) + at(50, 50, 3)
+    m = TerrainWorld._demog_markers(TerrainWorld, pop)
+    assert m["settle_community_max"] == 16, "the densest 3x3 window merges (5,5) and its neighbour (6,6): 10+6"
+
+
 def test_a_measured_gini_of_0_162_is_a_real_spread_not_an_empty_economy():
     """The other way #14 could be an artefact: if almost nobody held material, `_gini` returns 0.0 by
     construction and a near-zero reading would mean 'no economy' rather than 'equal economy'. 0.162 is not

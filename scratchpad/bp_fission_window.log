@@ -1,0 +1,6 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | densest local community (window-max) vs Alberti 158 / Alvard 250 ==
+  max 3x3 (r=1) 155   max 5x5 (r=2) 308   pop 1256
+== SAVANNA | densest local community (window-max) vs Alberti 158 / Alvard 250 ==
+  max 3x3 (r=1) 200   max 5x5 (r=2) 324   pop 1087

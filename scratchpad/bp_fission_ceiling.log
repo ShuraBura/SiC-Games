@@ -1,0 +1,10 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE (current canon) | anchor: community ceiling ~158, ethnographic max ~250 ==
+  settlements() exact-cell : max 92  med 32  n 22  frac_resident 0.70
+  settlement_clusters()    : cluster_max 882  cluster_med 565  n_clusters 2
+  bigband_max (band_id)    : 179   | pop 1256
+== SAVANNA (current canon) | anchor: community ceiling ~158, ethnographic max ~250 ==
+  settlements() exact-cell : max 116  med 36  n 14  frac_resident 0.56
+  settlement_clusters()    : cluster_max 703  cluster_med 420  n_clusters 3
+  bigband_max (band_id)    : 337   | pop 1087

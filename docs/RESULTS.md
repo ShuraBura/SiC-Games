@@ -8738,6 +8738,45 @@ concentrators, guardrails and tier-11 intact. The recurring lesson, earned five 
 statistic and unit before believing a miss OR a pass.** Harnesses `scratchpad/bp_gini_adults_{sweep,bands,finetune}.py`
 (+ `bp_gini_adults_bands.png`).
 
+## Addendum 93 — #17 fission ceiling re-audited: the recorded over-run was STALE and wrong-scale; on current canon the face-to-face community sits AT the ceiling (2026-09-17, R-106)
+
+Marker #17 (`settle_max` should not persist past Alberti 2014's 158, never past Alvard's 250) was recorded as a MISS
+(median `settle_max` 220 over 52 trajectories). Its own note flagged those 52 as a SCREEN predating the R-105/R-106
+fixes and "needs a proper campaign before the miss is sized." This audit re-measures on current canon and finds the
+miss does not survive.
+
+**The anchor is a FACE-TO-FACE community ceiling (verified).** Alberti 2014: P(critical scalar stress) = 0.99 at
+community size N≈158; Yanomamö villages fission at ~200; Alvard's ethnographic max ~250. The unit is a co-resident,
+face-to-face community.
+
+**The verdict is unit-sensitive — the same class as band size (Add.89).** On current canon (low-noise 3-world panel,
+`scratchpad/bp_fission_ceiling.py`, `bp_fission_window.py`):
+
+| unit | temperate | savanna | note |
+|---|---|---|---|
+| exact-cell `settle_max` (the old marker) | 92 | 116 | UNDER-counts — fragments a multi-cell village (`settlements()` counts only agents on the exact site cell) |
+| band_id | 179 | 337 | a dispersed ~8-cell affiliation, not face-to-face |
+| union-find cluster | 882 | 703 | OVER-counts — the packing-paradox blob (2–3 contiguous mega-clusters) |
+| **face-to-face 3×3 window (900 km²)** | **155** | **200** | AT Alberti 158 / Yanomamö ~200, below Alvard 250 |
+
+On the FACE-TO-FACE community unit the model's densest community is 155 temperate / 200 savanna — sitting AT the
+scalar-stress ceiling, which is exactly where a fissioning population should be (communities grow to the ceiling then
+split; the model's `village_fission_threshold` is 150). **No over-run.** The recorded 220 was (a) stale pre-fix data
+and (b) measured on the exact-cell unit, which now reads 92/116 anyway.
+
+**The cluster-scale "over-run" is the packing paradox, not a fission defect.** The union-find measure (700–880) is
+large only because the population agglomerates into 2–3 contiguous mega-clusters — the adaptive equilibrium already
+diagnosed (Addenda 77–79), where forcing dispersal CRASHED temperate e₀. It is not distinct 158-communities failing
+to fission.
+
+**Marker fixed.** `_demog_markers` now emits `settle_community_max` (the 3×3-window face-to-face community max), the
+campaign carries it, and a CTB pins the definition. Score #17 against it, not the exact-cell `settle_max`.
+
+**Deliverable.** #17 re-scored: NOT a miss on current canon — the face-to-face community sits at the fission ceiling
+(155/200 vs 158/≤250). Diagnosis only; canonical unchanged. This is the sixth marker this arc where the recorded
+verdict turned on the statistic, the unit, or stale data (band size, polygyny, lineage, wealth Gini ×2, and now
+fission ceiling). Harnesses `scratchpad/bp_fission_ceiling.py`, `bp_fission_window.py` (+ `bp_fission_ceiling.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

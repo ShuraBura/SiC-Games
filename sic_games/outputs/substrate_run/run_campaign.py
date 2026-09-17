@@ -510,6 +510,9 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         # R-106 Add.91: the #1 marker — Hill's 28.2 is PERSON-WEIGHTED mean adults on the CELL (co-residence unit),
         # not the median over band_id (`band_med_adults` above). Score band size against THIS. (Add.89.)
         band_experienced_adults=round(_dg.get("band_experienced_adults", 0.0), 2),
+        # R-106 Add.93: the #17 marker — FACE-TO-FACE community (3x3 window) max vs Alberti 158 / Alvard 250. The
+        # exact-cell `settle_max` under-counts multi-cell villages; this is the honest community bracket.
+        settle_community_max=_dg.get("settle_community_max", 0),
         mean_wives_married_m=round(_dg.get("mean_wives_married_m", 0.0), 3),
         frac_paired_adult_f=round(_dg.get("frac_paired_adult_f", 0.0), 3),
         # DEMOGRAPHIC ENGINE — a marker read on a steeply growing population means something

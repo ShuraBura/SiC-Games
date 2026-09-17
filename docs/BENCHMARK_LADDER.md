@@ -170,7 +170,9 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 **Tiers 9–12 still wait.** Of the markers once called surviving failures: **tier-5 band size was never a real
 deficit** (Add.89, marker mis-specification); **#14 wealth is now MET** on the corrected marker (`material_gini_adults`
 ≈ 0.36 both biomes, R-106 Add.90→92, after re-calibrating the bands to the adults statistic); and **#17 fission
-ceiling** remains the one quoted miss. The lesson —
+ceiling is NOT a miss** either (R-106 Add.93): its recorded over-run was stale pre-fix data on the exact-cell unit;
+on current canon the face-to-face community (3×3 window) sits AT the ceiling (155 temp / 200 sav vs Alberti 158 /
+≤250), and the cluster-scale over-run is the packing-paradox blob, not a fission defect. The lesson —
 proven three times this arc (band size, #14, and the earlier polygyny/lineage cases) — is: **check a marker's
 STATISTIC and UNIT before believing a miss or building a fix.** Instrument-hygiene backlog: #1 and #10 code still
 compute the wrong statistic (see Add.90).
