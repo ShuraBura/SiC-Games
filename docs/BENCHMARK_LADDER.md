@@ -77,7 +77,7 @@ read it as "has no dedicated CTB file", not as "has never been checked against a
 | 7 | **Kin & lineage** — descent, exogamy, genome | 7 | 7 | 1 | **none at forager scale** (#6 retired 2026-08-07; #5 anchor withdrawn) | #5 not scoreable, ~~#6 retired~~ |
 | 8 | **Connubium** — between-band mating networks | 2 | 2 | **0** | White 2017 (MVP), Wobst 1974 (MES 79–332) | #4 connubium 15/25 |
 | 9 | **Settlement** — sedentism, villages, budding, agriculture | 10 | 9 | **0** | Alvard 2009 (50–250), Alberti 2014 (127 / 158), Hamilton 2007 (165), Bandy 2004 (fission rate), Johnson (rank-size) | #3 ✓ 46/52, #8 ✓, #12, #13, **#17 fission ceiling — MISSES** |
-| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**, age-adjusted ADULTS) | #11 status→RS, **#14 wealth — OPEN on the corrected statistic: ADULTS Gini 0.16–0.22 vs 0.36 (R-106 Add.90). Add.87's 0.36 "pass" was the child-inflated ALL-AGES figure; concentrators adopted, gave partial adult concentration** |
+| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**, age-adjusted ADULTS) | #11 status→RS, **#14 wealth — MET on the corrected marker: `material_gini_adults` 0.386 temp / 0.357 sav ≈ 0.36 (R-106 Add.92). Bands re-calibrated to the ADULTS statistic (lt3.0/ft4.0); tier-11 intact, corr(cred,mat) +0.26/+0.16** |
 | 11 | **Stratification** — morph, rank, the inequality gate | 4 | 4 | **0** | Hayden 1995 Fig. 6, Smith & Codding 2021 (r = 0.881) | #9 hierarchy 2 of 3 |
 | 12 | **Elite** — leveling, legitimacy, tribute, nobility | 9 | 9 | 1 | EA "true-elite few %" — **undocumented** | #7 not scored (no band in `docs/`) |
 
@@ -168,9 +168,9 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 **Tier 8 (connubium) is next**, then 9.
 
 **Tiers 9–12 still wait.** Of the markers once called surviving failures: **tier-5 band size was never a real
-deficit** (Add.89, marker mis-specification); **#14 wealth is OPEN on the corrected statistic** — Add.87 adopted
-grounded concentrators and passed the ALL-AGES Gini, but Add.90's audit showed the BHM-comparable ADULTS Gini is
-0.16–0.22 vs 0.36 (partial progress, not a pass); and **#17 fission ceiling** remains a quoted miss. The lesson —
+deficit** (Add.89, marker mis-specification); **#14 wealth is now MET** on the corrected marker (`material_gini_adults`
+≈ 0.36 both biomes, R-106 Add.90→92, after re-calibrating the bands to the adults statistic); and **#17 fission
+ceiling** remains the one quoted miss. The lesson —
 proven three times this arc (band size, #14, and the earlier polygyny/lineage cases) — is: **check a marker's
 STATISTIC and UNIT before believing a miss or building a fix.** Instrument-hygiene backlog: #1 and #10 code still
 compute the wrong statistic (see Add.90).
@@ -184,10 +184,13 @@ intact, feast kept on. **ADOPTED into canon (R-106 Add.87, 2026-09-16):** the ag
 gumsa "thigh from every animal" rate (`material_capture_frac = 0.15`), the bands re-calibrated, and the four values
 written into the canonical stack. Full-suite churn was 3/1740, all resolved; the canonical baseline is now a
 stratified world. **CORRECTION (R-106 Add.90):** that 0.363/0.372 is the ALL-AGES material Gini, but BHM's 0.36 is
-age-adjusted over ADULTS. On the comparable ADULTS statistic the adopted canon reads **0.16–0.22 — still ~2× below
-0.36**, so the "#14 PASS" is RETRACTED. The concentrators gave real but PARTIAL adult concentration (adults 0.13–0.14
-→ 0.16–0.22); the all-ages jump to 0.36 was largely child-inflation. #14 stays OPEN on the corrected marker
-(`material_gini_adults`); whether to re-calibrate the concentrators to put ADULTS at 0.36 is a separate decision.
+age-adjusted over ADULTS. On the comparable ADULTS statistic the adopted canon read **0.16–0.22**, so the first
+"#14 PASS" was RETRACTED. **RESOLVED (R-106 Add.92):** the band width is the lever (the capture skim plateaus); at
+grounded concentrators, widening the bands to `leveling_tolerance = 3.0`, `feast_tolerance = 4.0` lands
+`material_gini_adults` at **0.386 temperate / 0.357 savanna ≈ 0.36**, biome-invariant, with tier-11 stratification
+(66–69%), e₀, frac_child and pop intact, and corr(cred,material) improved to +0.26/+0.16. RE-ADOPTED into canon; full
+suite 1743 passed / 0 failed. **#14 is CLOSED on the corrected marker.** (The all-ages `material_gini` is now ~0.53,
+child-inflated and deprecated.)
 
 ---
 

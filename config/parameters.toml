@@ -3087,7 +3087,7 @@ type  = "float"
 # per-step rate at unit relative excess (excess = local norm), so 0.79 reproduces that.
 
 [leveling_tolerance]
-value = 1.0
+value = 3.0
 owner = "DemographyConfig"
 type  = "float"
 # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum
@@ -3248,7 +3248,7 @@ type  = "float"
 # actual religion ids.
 
 [feast_tolerance]
-value = 1.5
+value = 4.0
 owner = "DemographyConfig"
 type  = "float"
 # R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding

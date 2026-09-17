@@ -1,0 +1,12 @@
+== TEMPERATE | grounded cap0.15/ag0.15/heir; fine-tune bands | TARGET adults 0.36 + tier-11 intact ==
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  lt2.5/ft3.5  adults 0.364+/-0.016  <==0.36 (all 0.52) | cred_gini 0.33 corr(cr,mat) +0.21 pct_strat 85% | e0 31.8 fc 0.36 pop 1229
+  lt3.0/ft3.5  adults 0.380+/-0.012  <==0.36 (all 0.53) | cred_gini 0.33 corr(cr,mat) +0.20 pct_strat 78% | e0 34.9 fc 0.38 pop 1337
+  lt3.0/ft4.0  adults 0.386+/-0.013  <==0.36 (all 0.52) | cred_gini 0.33 corr(cr,mat) +0.26 pct_strat 69% | e0 33.5 fc 0.36 pop 1256
+  lt2.5/ft4.0  adults 0.364+/-0.013  <==0.36 (all 0.52) | cred_gini 0.35 corr(cr,mat) +0.18 pct_strat 68% | e0 33.3 fc 0.38 pop 1367
+== SAVANNA | grounded cap0.15/ag0.15/heir; fine-tune bands | TARGET adults 0.36 + tier-11 intact ==
+  lt2.5/ft3.5  adults 0.329+/-0.021 (all 0.51) | cred_gini 0.28 corr(cr,mat) +0.19 pct_strat 54% | e0 24.5 fc 0.39 pop 908
+  lt3.0/ft3.5  adults 0.343+/-0.027  <==0.36 (all 0.54) | cred_gini 0.29 corr(cr,mat) +0.17 pct_strat 64% | e0 25.8 fc 0.43 pop 1122
+  lt3.0/ft4.0  adults 0.357+/-0.008  <==0.36 (all 0.54) | cred_gini 0.29 corr(cr,mat) +0.16 pct_strat 66% | e0 25.8 fc 0.41 pop 1087
+  lt2.5/ft4.0  adults 0.326+/-0.018 (all 0.51) | cred_gini 0.29 corr(cr,mat) +0.17 pct_strat 55% | e0 27.7 fc 0.41 pop 995

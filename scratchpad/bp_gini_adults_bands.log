@@ -1,0 +1,12 @@
+== TEMPERATE | grounded cap 0.15 / ag 0.15 + heir; widen bands | TARGET adults 0.36 | guardrail e0<=37 ==
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  lt1.0/ft1.5  adults 0.216+/-0.019  (all-ages 0.363) | e0 34.5  frac_child 0.36  pct_strat 60%  pop 1289
+  lt1.5/ft2.0  adults 0.276+/-0.011  (all-ages 0.432) | e0 37.4  !!e0>37  frac_child 0.36  pct_strat 73%  pop 1435
+  lt2.0/ft3.0  adults 0.341+/-0.017  <== ~0.36  (all-ages 0.484) | e0 32.3  frac_child 0.37  pct_strat 62%  pop 1347
+  lt3.0/ft4.0  adults 0.386+/-0.013  <== ~0.36  (all-ages 0.524) | e0 33.5  frac_child 0.36  pct_strat 69%  pop 1256
+== SAVANNA | grounded cap 0.15 / ag 0.15 + heir; widen bands | TARGET adults 0.36 | guardrail e0<=37 ==
+  lt1.0/ft1.5  adults 0.160+/-0.013  (all-ages 0.372) | e0 28.0  frac_child 0.44  pct_strat 62%  pop 1089
+  lt1.5/ft2.0  adults 0.250+/-0.021  (all-ages 0.426) | e0 28.0  frac_child 0.36  pct_strat 83%  pop 914
+  lt2.0/ft3.0  adults 0.313+/-0.025  (all-ages 0.496) | e0 27.7  frac_child 0.41  pct_strat 57%  pop 1098
+  lt3.0/ft4.0  adults 0.357+/-0.008  <== ~0.36  (all-ages 0.542) | e0 25.8  frac_child 0.41  pct_strat 66%  pop 1087

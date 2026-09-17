@@ -190,17 +190,21 @@ BAND_SPLIT = 45                                           # village = a band gro
 # 83-yr arm (correlation time ~22.6 yr on the log-linear estimator, D14) since R-88 found the lag itself does not
 # govern the observed dynamics — band churn does — so the exact alpha is no longer the load-bearing choice here.
 ELITE_KW = dict(
-    # R-106 Addendum 87 (2026-09-16): ADOPTED graded-leveler stratification. `material_capture_frac` is the
-    # aggrandizer skim of the group hide pool — GROUNDED at 0.15, the gumsa "a thigh from every animal" surplus
-    # rate (= lineage_tribute_frac; no Hayden-specific % exists, so the one documented tribal-extraction fraction
-    # is the analog). `leveling_tolerance`/`feast_tolerance` are the tolerance bands (Addendum 86) that turn the
-    # near-bang-bang levelers into a graded dial; lt1.0/ft1.5 lands the whole-pop material Gini at BHM 2009's 0.36
-    # (0.363 temperate / 0.372 savanna, marker #14 PASS) with e0, frac_child, tier-11 stratification and pop intact.
+    # R-106 Addendum 87/92: ADOPTED graded-leveler stratification. `material_capture_frac` is the aggrandizer skim
+    # of the group hide pool — GROUNDED at 0.15, the gumsa "a thigh from every animal" surplus rate (= the
+    # lineage_tribute_frac analog; no Hayden-specific % exists). `leveling_tolerance`/`feast_tolerance` are the
+    # tolerance bands (Add.86) that turn the near-bang-bang levelers into a graded dial.
+    # RE-CALIBRATED to the CORRECT marker (Add.92, 2026-09-17): Add.87 fit lt1.0/ft1.5 to the ALL-AGES material
+    # Gini, but that is child-inflated; BHM 0.36 is age-adjusted over ADULTS (`material_gini_adults`, Add.90). On the
+    # adults statistic lt1.0/ft1.5 gave only ~0.22. The band width is the lever (the capture skim plateaus). lt3.0/
+    # ft4.0 lands `material_gini_adults` at 0.386 temperate / 0.357 savanna ≈ 0.36, biome-invariant, with e0
+    # (33.5/25.8), frac_child, pop and tier-11 stratification (pct_strat 69%/66%) all intact, and corr(cred,material)
+    # improved to +0.26/+0.16 (the Add.82 coupling). #14 CLOSED on the corrected marker.
     enable_material_capture=True, material_hide_frac=0.07, material_decay=0.002, aggrandizer_frac=0.15,
     material_capture_frac=0.15,
     enable_leader_share=True, leader_share_frac=0.20,
-    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8, leveling_tolerance=1.0,
-    feast_tolerance=1.5,
+    enable_leveling=True, leveling_strength=0.79, leveling_share=0.8, leveling_tolerance=3.0,
+    feast_tolerance=4.0,
     enable_leader_office=True, office_grievance_gain=0.05,
     enable_legitimacy=True, legit_feast_frac=0.25, legit_cred_gain=10.0, legit_threshold=LEGITTHR, legit_decay=0.02,
     enable_delegitimation=DELEGIT, resent_alpha=0.001, resent_threshold=0.5, resent_privilege_ref=10.0,

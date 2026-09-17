@@ -8697,6 +8697,47 @@ shortfall, and #14 remains the open one (adults 0.16–0.22 vs 0.36).
 **Canon unchanged.** No config or dynamics changed. The remaining live decision is the #14 re-calibration (place the
 ADULTS material Gini at 0.36, or accept partial progress). `scratchpad/bp_markerfix_check.log`.
 
+## Addendum 92 — #14 CLOSED on the corrected marker: re-calibrated the bands to the ADULTS Gini and re-adopted (2026-09-17, R-106)
+
+Add.90 corrected marker #14 to `material_gini_adults` and showed the adopted canon (Add.87, bands lt1.0/ft1.5) sat at
+0.16–0.22 vs BHM 0.36 — Add.87 had fit the child-inflated all-ages figure. This addendum re-calibrates to the
+corrected marker and re-adopts.
+
+**The lever is the band WIDTH, not the capture skim.** Sweeping the concentrators against `material_gini_adults`
+(`scratchpad/bp_gini_adults_sweep.py`): raising `material_capture_frac` from the grounded 0.15 to 0.75 (5×, well past
+grounded) moves temperate adults-Gini only 0.22 → 0.24 — the skim is leveled away. Reducing `aggrandizer_frac`
+does not help either. Widening the tolerance bands is what moves it, confirming the graded-leveler thesis on the
+corrected statistic.
+
+**Adults-0.36 has a grounded, biome-invariant, guardrail-safe landing** (`bp_gini_adults_bands.py`,
+`bp_gini_adults_finetune.py`). Holding the grounded concentrators (capture 0.15, aggrandizer 0.15, heir-by-status),
+widening the bands to **`leveling_tolerance = 3.0`, `feast_tolerance = 4.0`** lands `material_gini_adults` at:
+
+| biome | adults Gini | corr(cred,material) | pct_strat (tier-11) | e₀ | frac_child |
+|---|---|---|---|---|---|
+| temperate | 0.386 | +0.26 | 69% | 33.5 | 0.36 |
+| savanna | 0.357 | +0.16 | 66% | 25.8 | 0.41 |
+
+Both biomes within ±0.03 of 0.36 (savanna spot-on). The tier-11 validation (required because a leveler change touches
+the egalitarian↔stratified morph) is clean: pct_strat 66–69% ≈ the Add.87 canon's 60–66% (stratification intact, not
+inflated), cred_gini 0.29–0.33, and corr(cred,material) IMPROVES to +0.26/+0.16 — the Add.82 status→material coupling
+that was the arc's original concern. Guardrails (e₀, frac_child, pop) all hold.
+
+**Adopted into canon.** `run_campaign.py` ELITE_KW: `leveling_tolerance 1.0 → 3.0`, `feast_tolerance 1.5 → 4.0`
+(capture and heir unchanged from Add.87). Configs regenerated. **#14 is CLOSED on the corrected marker
+(`material_gini_adults` ≈ 0.36, both biomes).** The all-ages `material_gini` is now ~0.53 — child-inflated and
+deprecated (Add.90); it is not the marker.
+
+**Verification.** Full CTB suite: **1743 passed, 0 failed** — a clean rebaseline (no test asserted the band values or
+the all-ages Gini; the runspec/colonizing fixes from Add.87 held). `test_runconfig_sync` passes.
+
+**Arc summary (Add.86–92).** The graded-leveler mechanism (Add.86) was adopted (Add.87), but the adoption was scored
+on the wrong statistic; a systematic marker audit (Add.89 band size, Add.90 material, Add.91 instrument fixes) caught
+it; re-calibrating to the corrected marker (this addendum) closes #14 properly — at wider bands, with grounded
+concentrators, guardrails and tier-11 intact. The recurring lesson, earned five times this arc: **check a marker's
+statistic and unit before believing a miss OR a pass.** Harnesses `scratchpad/bp_gini_adults_{sweep,bands,finetune}.py`
+(+ `bp_gini_adults_bands.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
