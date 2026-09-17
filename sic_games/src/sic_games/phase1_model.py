@@ -3434,6 +3434,16 @@ class TerrainWorld(mesa.Model):
             "material_mean": _st.mean(_mat),
             "material_gini": _gini(_mat),
             "material_top10_share": _top_share(_mat, 0.10),
+            # R-106 Addendum 90 — the BHM-COMPARABLE material Gini. Marker #14's anchor (BHM 2009, 0.36) is an
+            # AGE-ADJUSTED Gini over ADULT wealth-holders; `material_gini` above runs over the WHOLE population, and
+            # children (who hold ~0) INFLATE it. Add.87 calibrated the all-ages figure to 0.36, but on this
+            # adults-only statistic the model reads ~0.16-0.22 — the real #14 miss is not closed. Adults = non-children
+            # (age >= AGE_CHILD), i.e. the wealth-holding population. (Age-adjustment, BHM's quadratic-in-age step, is
+            # a further refinement not applied here; it lowers a Gini, so it would only widen the gap.)
+            "material_gini_adults": _gini([getattr(a, "material", 0.0) for a in pop
+                                           if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR]),
+            "material_top10_share_adults": _top_share([getattr(a, "material", 0.0) for a in pop
+                                                       if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR], 0.10),
             "wealth_gini": _gini([getattr(a, "wealth", 0.0) for a in pop]),
             "corr_cred_material": _corr([getattr(a, "cred", 1.0) for a in pop], _mat),
             # capture must key on the AGGRANDIZER trait, not inherited cred (R-82 spec fix)

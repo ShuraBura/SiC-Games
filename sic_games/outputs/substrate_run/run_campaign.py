@@ -643,7 +643,11 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         operational_sex_ratio=round(_dg.get("operational_sex_ratio", 0.0), 3),
         # WEALTH CONCENTRATION — the direct test of "does material accrue to the elite"
         material_gini=round(_dg.get("material_gini", 0.0), 4),
+        # R-106 Add.90: the BHM-COMPARABLE Gini (adults only). BHM 0.36 is age-adjusted over adult wealth-holders;
+        # the all-ages `material_gini` is child-inflated. THIS is the one to score marker #14 against.
+        material_gini_adults=round(_dg.get("material_gini_adults", 0.0), 4),
         material_top10_share=round(_dg.get("material_top10_share", 0.0), 4),
+        material_top10_share_adults=round(_dg.get("material_top10_share_adults", 0.0), 4),
         wealth_gini=round(_dg.get("wealth_gini", 0.0), 4),
         corr_cred_material=round(_dg.get("corr_cred_material", 0.0), 4),
         # TWO densities, because they answer different questions and only one is scoreable against the

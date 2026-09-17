@@ -117,6 +117,20 @@ def test_including_children_pushes_the_gini_UP_which_is_away_from_the_reported_m
     assert gs == sorted(gs)
 
 
+def test_material_gini_adults_is_the_BHM_comparable_statistic_and_excludes_children():
+    """R-106 Add.90 — marker #14's anchor (BHM 2009, 0.36) is age-adjusted over ADULT wealth-holders, so the
+    comparable model statistic is `material_gini_adults` (the Gini over non-children only), NOT the child-inflated
+    all-ages `material_gini`. This is the field #14 must be scored against; on the adopted canon it reads ~0.16-0.22
+    (still ~2x below 0.36), while the all-ages figure Add.87 calibrated reads 0.36 through the child fraction."""
+    adults = [_Agent(m) for m in (0.0, 1.0, 2.0, 3.0, 4.0)]   # all age 30 ≥ AGE_CHILD_YR
+    kids = [_Agent(0.0, age_yr=5) for _ in range(20)]          # all age 5 < AGE_CHILD_YR, hold nothing
+    m = TerrainWorld._demog_markers(TerrainWorld, adults + kids)
+    assert m["material_gini_adults"] == pytest.approx(_gini([a.material for a in adults])), \
+        "material_gini_adults must be the Gini over the adult (non-child) sub-population only"
+    assert m["material_gini_adults"] < m["material_gini"], \
+        "excluding zero-holding children lowers the Gini relative to the all-ages marker"
+
+
 def test_a_measured_gini_of_0_162_is_a_real_spread_not_an_empty_economy():
     """The other way #14 could be an artefact: if almost nobody held material, `_gini` returns 0.0 by
     construction and a near-zero reading would mean 'no economy' rather than 'equal economy'. 0.162 is not

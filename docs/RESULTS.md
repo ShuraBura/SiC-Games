@@ -8624,6 +8624,57 @@ canonical unchanged. Harnesses `scratchpad/bp_bandsize_experienced.py`, `bp_band
 `bp_bandsize_experienced.png`, `bp_bandsize_unit.png`); the catchment and agglomeration sweeps that led here are
 `bp_bandsize_catchment.py`, `bp_bandsize_aggl.py`.
 
+## Addendum 90 — Marker audit CORRECTS #14: it was scored on the wrong statistic; the adopted Add.87 fix passes the child-inflated ALL-AGES Gini, not the BHM-comparable ADULTS one, which is still ~2× low (2026-09-16, R-106)
+
+**This corrects Addendum 87's headline.** A systematic statistic/unit audit of the ladder markers (the method that
+re-scored tier-5 in Add.89) found that `material_gini` (#14) is computed over the WHOLE population, while its anchor
+— BHM 2009's 0.36 — is age-adjusted over ADULT wealth-holders. Children hold ~nothing, so their inclusion INFLATES
+the Gini. Add.87 calibrated the ALL-AGES figure to 0.36; on the BHM-comparable ADULTS statistic the model is far
+lower, so the "#14 PASS" is spurious.
+
+**Measured (adopted canon, low-noise 3-world panel, `scratchpad/bp_gini_adults.py`).**
+
+| | all-ages Gini (the marker) | ADULTS-only Gini (BHM-comparable) |
+|---|---|---|
+| temperate | 0.363 | **0.216** |
+| savanna | 0.372 | **0.160** |
+
+Adult zero-holders are 0% (every adult holds some durable goods), so the all-ages inflation is entirely the child
+fraction (0.36–0.44). On the adults statistic the model is 0.16–0.22 vs BHM 0.36 — still ~2× below, essentially the
+original Add.82 miss.
+
+**Did Add.87's concentrators help the ADULT distribution at all? Partially (`bp_gini_adults_prepost.py`).**
+
+| | adults Gini pre-Add.87 | adults Gini adopted |
+|---|---|---|
+| temperate | 0.141 | 0.216 |
+| savanna | 0.128 | 0.160 |
+
+So the grounded concentrators (capture 0.15, `heir_by_status`, the graded bands) DID raise adult material
+concentration (~0.13 → ~0.19 mean), real but partial progress — they did not reach the anchor. The dramatic
+all-ages jump (0.17 → 0.36) was mostly the concentration widening the gap between a concentrated few and the
+zero-holding many (children included).
+
+**Correction to the record.** Add.87's claim that marker #14 PASSES at 0.36 is RETRACTED: it passed the
+child-inflated all-ages figure. On the correct statistic #14 remains OPEN (adults 0.16–0.22 vs 0.36). The
+methodological caveat travels with it: BHM's 0.36 is also age-ADJUSTED (a quadratic in age), which lowers a Gini, so
+the model's comparable figure would be lower still — the miss is if anything understated.
+
+**The marker is fixed.** `_demog_markers` now also emits `material_gini_adults` / `material_top10_share_adults`
+(non-children, age ≥ `AGE_CHILD_YR`), the campaign carries them (`run_campaign.py`), and a CTB pins the definition
+(`test_marker_diagnostics_ctb.py::…material_gini_adults…`). Score #14 against `material_gini_adults`.
+
+**Canon UNCHANGED from Add.87.** The concentrators stay (they are grounded and give partial, real adult
+concentration); this addendum corrects the SCORING, not the mechanism. The open question — whether to re-calibrate
+the concentrators to place the ADULTS Gini at 0.36 (a stronger concentration than the all-ages calibration required),
+or to accept partial progress — is deferred as a separate decision.
+
+**Meta-finding.** The audit also confirmed two marker instruments still compute the wrong statistic in code even
+where the docs had diagnosed it: #1 band size (`band_med_adults` = median over `band_id`; Add.89 says
+mean-experienced per cell) and #10 polygyny (`frac_polygynous_m` divides by married men, not all men). This
+addendum fixes #14; #1 and #10 are the remaining instrument-hygiene backlog. `scratchpad/bp_gini_adults.png`,
+`bp_gini_prepost.png`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

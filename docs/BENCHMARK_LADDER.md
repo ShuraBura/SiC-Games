@@ -77,7 +77,7 @@ read it as "has no dedicated CTB file", not as "has never been checked against a
 | 7 | **Kin & lineage** — descent, exogamy, genome | 7 | 7 | 1 | **none at forager scale** (#6 retired 2026-08-07; #5 anchor withdrawn) | #5 not scoreable, ~~#6 retired~~ |
 | 8 | **Connubium** — between-band mating networks | 2 | 2 | **0** | White 2017 (MVP), Wobst 1974 (MES 79–332) | #4 connubium 15/25 |
 | 9 | **Settlement** — sedentism, villages, budding, agriculture | 10 | 9 | **0** | Alvard 2009 (50–250), Alberti 2014 (127 / 158), Hamilton 2007 (165), Bandy 2004 (fission rate), Johnson (rank-size) | #3 ✓ 46/52, #8 ✓, #12, #13, **#17 fission ceiling — MISSES** |
-| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**) | #11 status→RS, **#14 wealth — PASS: 0.363/0.372 vs 0.36 (R-106 Add.87, ADOPTED)** |
+| 10 | **Surplus & material** — wealth, status, obligation | 6 | 4 | **0** | BHM 2009 Table S5 (HG material Gini **0.36**, age-adjusted ADULTS) | #11 status→RS, **#14 wealth — OPEN on the corrected statistic: ADULTS Gini 0.16–0.22 vs 0.36 (R-106 Add.90). Add.87's 0.36 "pass" was the child-inflated ALL-AGES figure; concentrators adopted, gave partial adult concentration** |
 | 11 | **Stratification** — morph, rank, the inequality gate | 4 | 4 | **0** | Hayden 1995 Fig. 6, Smith & Codding 2021 (r = 0.881) | #9 hierarchy 2 of 3 |
 | 12 | **Elite** — leveling, legitimacy, tribute, nobility | 9 | 9 | 1 | EA "true-elite few %" — **undocumented** | #7 not scored (no band in `docs/`) |
 
@@ -167,10 +167,13 @@ verified against their PDFs; one retracted; one corrected on the paper's arrival
 
 **Tier 8 (connubium) is next**, then 9.
 
-**Tiers 9–12 still wait.** Of the markers once called surviving failures, **#14 wealth is now CLOSED** (adopted,
-R-106 Add.87) and **tier-5 band size was never a real deficit** (Add.89, a marker mis-specification). The remaining
-quoted miss is **#17 fission ceiling** — CTB'd on 2026-08-07 and held — but *diagnosing* it means looking down the
-ladder, and tier 5 has just shown what that produces: check the marker's statistic and unit before the mechanism.
+**Tiers 9–12 still wait.** Of the markers once called surviving failures: **tier-5 band size was never a real
+deficit** (Add.89, marker mis-specification); **#14 wealth is OPEN on the corrected statistic** — Add.87 adopted
+grounded concentrators and passed the ALL-AGES Gini, but Add.90's audit showed the BHM-comparable ADULTS Gini is
+0.16–0.22 vs 0.36 (partial progress, not a pass); and **#17 fission ceiling** remains a quoted miss. The lesson —
+proven three times this arc (band size, #14, and the earlier polygyny/lineage cases) — is: **check a marker's
+STATISTIC and UNIT before believing a miss or building a fix.** Instrument-hygiene backlog: #1 and #10 code still
+compute the wrong statistic (see Add.90).
 
 **UPDATE — #14 wealth has a built, calibrated fix (R-106 Add.82–86, 2026-09-15).** The miss decomposes to a
 near-bang-bang shape in the two levelers (Boehm sanction + feast): each pulls material to the cell/band mean with no
@@ -178,10 +181,13 @@ tolerated band, so any nonzero strength pins the material Gini at ~0.2 (Add.84).
 knobs (`leveling_tolerance`, `feast_tolerance`, both default 0.0 ⇒ bit-exact OFF). With the concentrators on, both
 bands open (`lt 1.0 / ft 1.5`) reach material Gini **0.367 in both biomes**, guardrails and tier-11 stratification
 intact, feast kept on. **ADOPTED into canon (R-106 Add.87, 2026-09-16):** the aggrandizer skim was grounded to the
-gumsa "thigh from every animal" rate (`material_capture_frac = 0.15`), the bands re-calibrated (landing robust to the
-capture magnitude), and the four values written into the canonical stack — material Gini now **0.363/0.372, marker
-#14 PASS**. Full-suite churn was 3/1740 (two config-reference regens + one single-seed CTB made seed-robust), all
-resolved. The canonical baseline is now a stratified 0.36-Gini world.
+gumsa "thigh from every animal" rate (`material_capture_frac = 0.15`), the bands re-calibrated, and the four values
+written into the canonical stack. Full-suite churn was 3/1740, all resolved; the canonical baseline is now a
+stratified world. **CORRECTION (R-106 Add.90):** that 0.363/0.372 is the ALL-AGES material Gini, but BHM's 0.36 is
+age-adjusted over ADULTS. On the comparable ADULTS statistic the adopted canon reads **0.16–0.22 — still ~2× below
+0.36**, so the "#14 PASS" is RETRACTED. The concentrators gave real but PARTIAL adult concentration (adults 0.13–0.14
+→ 0.16–0.22); the all-ages jump to 0.36 was largely child-inflation. #14 stays OPEN on the corrected marker
+(`material_gini_adults`); whether to re-calibrate the concentrators to put ADULTS at 0.36 is a separate decision.
 
 ---
 

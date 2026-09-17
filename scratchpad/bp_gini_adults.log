@@ -1,0 +1,5 @@
+#14 MATERIAL GINI STATISTIC CHECK | ADOPTED canon | 800 steps | worlds [0, 1, 2] | BHM 0.36 (age-adjusted adults)
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate | ALL-AGES gini 0.363+/-0.005 (the marker, calibrated to 0.36) | ADULTS-ONLY gini 0.216+/-0.019 (BHM-comparable) | frac_child 0.36  adult zero-holders 0%
+  savanna   | ALL-AGES gini 0.372+/-0.002 (the marker, calibrated to 0.36) | ADULTS-ONLY gini 0.160+/-0.013 (BHM-comparable) | frac_child 0.44  adult zero-holders 0%

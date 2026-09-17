@@ -1,0 +1,6 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+  temperate pre-Add.87 | all-ages 0.174 | ADULTS 0.141+/-0.037  (BHM 0.36)
+  temperate adopted    | all-ages 0.363 | ADULTS 0.216+/-0.019  (BHM 0.36)
+  savanna   pre-Add.87 | all-ages 0.175 | ADULTS 0.128+/-0.041  (BHM 0.36)
+  savanna   adopted    | all-ages 0.372 | ADULTS 0.160+/-0.013  (BHM 0.36)
