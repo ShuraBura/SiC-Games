@@ -1,0 +1,8 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | #12 zipf ≈ −1 (Zipf), #13 primacy ≈ 1 (no primate centre) ==
+  CLEAN village partition : zipf -1.19  primacy 1.19  n_villages 23
+  (ref) settlements() panel: zipf -1.06  primacy 1.10
+== SAVANNA | #12 zipf ≈ −1 (Zipf), #13 primacy ≈ 1 (no primate centre) ==
+  CLEAN village partition : zipf -1.48  primacy 1.30  n_villages 14
+  (ref) settlements() panel: zipf -1.39  primacy 1.22

@@ -191,6 +191,25 @@ def test_village_sizes_partition_by_nearest_site_no_double_count():
     assert v["village_med"] == 8, "median([12, 5]) = 8.5 → int → 8; the (80,80) trio is beyond r, not a resident"
 
 
+def test_village_ranksize_and_primacy_are_over_the_clean_partition():
+    """R-106 Add.96 (markers #12/#13) — rank-size slope and primacy computed over the nearest-site village
+    distribution, not the contaminated settlements() panel. Constructed 3 villages of 40/20/10 at well-separated
+    sites: primacy = 40/20 = 2.0; zipf = OLS slope of ln(size) vs ln(rank) < 0."""
+    from types import SimpleNamespace
+    import numpy as np
+    def at(x, y, k):
+        return [SimpleNamespace(pos=(x, y)) for _ in range(k)]
+    stub = SimpleNamespace(
+        _settlement_sites=[(5, 5), (25, 25), (55, 55)],
+        agent_list=at(5, 5, 40) + at(25, 25, 20) + at(55, 55, 10),
+        _demog=SimpleNamespace(settle_radius=2))
+    v = TerrainWorld.village_sizes(stub)
+    assert v["village_primate"] == pytest.approx(2.0), f"largest/2nd = 40/20 = 2.0: {v}"
+    assert v["village_zipf"] < 0, "rank-size slope is negative (size falls with rank)"
+    assert v["village_zipf"] == pytest.approx(
+        float(np.polyfit(np.log([1, 2, 3]), np.log([40, 20, 10]), 1)[0]), abs=0.01)
+
+
 def test_a_measured_gini_of_0_162_is_a_real_spread_not_an_empty_economy():
     """The other way #14 could be an artefact: if almost nobody held material, `_gini` returns 0.0 by
     construction and a near-zero reading would mean 'no economy' rather than 'equal economy'. 0.162 is not

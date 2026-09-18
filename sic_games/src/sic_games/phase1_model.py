@@ -4860,8 +4860,16 @@ class TerrainWorld(mesa.Model):
             return {}
         import numpy as np
         total = len(self.agent_list)
+        # R-106 Add.96 (markers #12/#13): rank-size slope and primacy over the CLEAN village distribution — the
+        # counterpart the settlement-contamination note asked for. #12 zipf_slope = OLS of ln(size) vs ln(rank),
+        # ≈ −1 for Zipf. #13 primate_ratio = largest ÷ 2nd, ≈1 = no primate centre. Both were PROVISIONAL because
+        # `settlements()` computes them over the double-counting overlapping-window panel.
+        primate = round(sizes[0] / sizes[1], 2) if len(sizes) > 1 else None
+        zipf = (round(float(np.polyfit(np.log(np.arange(1, len(sizes) + 1)),
+                                       np.log(np.asarray(sizes, float)), 1)[0]), 2) if len(sizes) >= 3 else None)
         return dict(n_villages=len(sizes), village_med=int(np.median(sizes)), village_max=sizes[0],
-                    resident_frac=round(sum(sizes) / total, 3) if total else 0.0)
+                    resident_frac=round(sum(sizes) / total, 3) if total else 0.0,
+                    village_zipf=zipf, village_primate=primate)
 
     def settlement_health(self) -> dict:
         """Soil (B1 depletion) and hardship (emergent-abandonment memory) state across settlement sites. {} when

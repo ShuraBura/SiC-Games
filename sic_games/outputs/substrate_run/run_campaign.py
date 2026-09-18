@@ -438,6 +438,9 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         # R-106 Add.95: the #3 marker — village size by nearest-site partition vs Alvard 50-250. `settle_med` above
         # (exact-cell) fragments a multi-cell village and under-reads; score #3 against `village_med`.
         village_med=vs.get("village_med", 0), village_max=vs.get("village_max", 0), n_villages=vs.get("n_villages", 0),
+        # R-106 Add.96: #12 rank-size slope (≈−1 Zipf) and #13 primacy (≈1 no primate centre), over the CLEAN village
+        # partition. Score #12/#13 against these, not the contaminated `zipf_slope`/`primate_ratio` from settlements().
+        village_zipf=vs.get("village_zipf"), village_primate=vs.get("village_primate"),
         bud_events=getattr(w, "bud_events", 0),   # CUMULATIVE fissions -> the realised rate, scored against
         #                                            Bandy's 2-5e-3 per large-village-year
         primate_ratio=st.get("primate_ratio"), zipf_slope=st.get("zipf_slope"),

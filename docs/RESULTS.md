@@ -8840,6 +8840,32 @@ status is resolved by the clean partition. Diagnosis only; canonical unchanged. 
 turned on the measurement (here, the settlement partition: exact-cell fragments, blob over-merges, Voronoi is clean).
 `scratchpad/bp_village_size.py` (+ `bp_village_size.png`).
 
+## Addendum 96 — #12 rank-size and #13 primacy re-derived over the clean village partition: both largely met (2026-09-17, R-106)
+
+Markers #12 (`zipf_slope` ≈ −1) and #13 (`primate_ratio` ≈ 1) were PROVISIONAL for the same reason as #3 — they were
+computed by `settlements()` over the double-counting overlapping-window panel. Add.95's `village_sizes()`
+(nearest-site partition) gives the clean village distribution; this re-derives both over it.
+
+Measured (current canon, 3-world panel, `scratchpad/bp_ranksize.py`):
+
+| | #12 zipf (≈ −1) | #13 primacy (≈ 1) | n_villages |
+|---|---|---|---|
+| temperate (clean) | −1.19 | 1.19 | 23 |
+| savanna (clean) | −1.48 | 1.30 | 14 |
+| (ref) `settlements()` panel | −1.06 / −1.39 | 1.10 / 1.22 | — |
+
+**Both largely MET.** #13 primacy is 1.19 / 1.30 ≈ 1 in both biomes — the largest village is only ~1.2–1.3× the
+second, i.e. NO primate centre, the flat settlement system a mobile-forager world should have. #12 zipf is −1.19
+temperate (near Zipf's −1) and −1.48 savanna (a bit steep, expected for a small 14-village system). Note the clean
+values closely track the contaminated panel — slopes and ratios are scale-robust, so the double-count barely moved
+them (unlike the LEVEL markers #3/#17, which it distorted badly).
+
+**Marker fixed.** `village_sizes()` now also returns `village_zipf` / `village_primate`; the campaign carries them; a
+CTB pins the definitions. Score #12/#13 against these, not the `settlements()`-panel `zipf_slope`/`primate_ratio`.
+
+**Deliverable.** #12/#13 largely met on the clean partition; the last of the three settlement-contamination
+provisionals (#3/#12/#13) is cleared. Diagnosis only; canonical unchanged. `scratchpad/bp_ranksize.py`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
