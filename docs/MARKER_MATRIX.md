@@ -33,7 +33,7 @@ validated, however long it ran.
 |---|---|---|---|---|---|
 | 1 | band size | `band_experienced_adults` (was `band_med`) | **28.2 ADULTS** (Hill 2011, 32 societies) — the PERSON-WEIGHTED "mean experienced" adult size on a RESIDENTIAL group | Hill et al. 2011 `[VERIFIED, PDF read]`; ~~Johnson~~ | **NO DEFICIT — RE-SCORED (R-106 Add.89) + INSTRUMENT FIXED (Add.91, 2026-09-17).** The old "FAILS 16/16 at 0.42×" used the MEDIAN over `band_id` — wrong statistic AND wrong unit. The marker now emits `band_experienced_adults` (person-weighted mean adults per CELL) = **33.3 / 22.9 ≈ 28.2**, inside the per-society range ~12–40 |
 | 2 | ~~settlement size~~ | ~~`settle_med`~~ | **RETIRED 2026-08-06** | Bar-Yosef 1998: PDF filed, read, and confirmed by the supervisor to be maps and burial sites — no village-population figure exists in the text to find | **Retired at zero cost to coverage:** it was a second, unverifiable band on the *same field* as #3, whose band is verified. Nothing was being measured here that #3 does not measure |
-| 3 | village size | `settle_med` | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **PROVISIONAL — THE FIELD IS CONTAMINATED (2026-08-16).** The prior "46/52 arms PASS, median of arm medians 97.5" was read off a settlement list that double-counts people ~20×. See the settlement-overlap note below. |
+| 3 | village size | `village_med` (was `settle_med`) | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **LARGELY MET — clean partition (R-106 Add.95).** The exact-cell `settle_med` fragments a multi-cell village (~32, under) and the union-find cluster over-merges the packing blob (~500, over). The NEAREST-SITE (Voronoi) partition — each agent counted once, no double-count — gives `village_med` **74 savanna (IN 50–250) / 44 temperate (just below the 50 floor)**, max 142/210. Resolves the double-count contamination. |
 | 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
 | 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
@@ -233,6 +233,13 @@ place others in his debt … he constructs a following whose production may be h
 ---
 
 ## THE SETTLEMENT LIST DOUBLE-COUNTS PEOPLE ~20× — markers #3, #12, #13 are provisional (2026-08-16)
+
+**UPDATE (R-106 Add.95, 2026-09-17): #3 is RESOLVED by a nearest-site (Voronoi) partition** (`village_sizes()`) —
+each agent assigned once to its nearest settlement site within the catchment radius, so no window-overlap
+double-count and no blob-merge. `village_med` 74 savanna / 44 temperate ≈ Alvard 50–250. **#12 (zipf) and #13
+(primacy) can use the same clean village list** (rank-size over `village_sizes` rather than the overlapping-window
+settlement panel) — not yet wired. The `_maintain_settlements` persistence logic below is unchanged (a behavioural
+knob, deliberately left alone); the fix is a pure measurement layer.
 
 **The defect.** `_maintain_settlements` counts every person inside a site's `(2·settle_radius+1)` window —
 `settle_radius = 2`, so **25 cells = 2,500 km²** — and its own docstring warns the windows **overlap** whenever

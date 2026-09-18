@@ -1,0 +1,8 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | Alvard village 50-250 | nearest-site (Voronoi, within catchment r) partition ==
+  village_med 44  village_max 142  n_villages 23  frac_resident 0.99
+  (ref) exact-cell settle_med 32  | pop 1256
+== SAVANNA | Alvard village 50-250 | nearest-site (Voronoi, within catchment r) partition ==
+  village_med 74  village_max 210  n_villages 14  frac_resident 0.96
+  (ref) exact-cell settle_med 36  | pop 1087

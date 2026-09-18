@@ -8808,6 +8808,38 @@ against it, not the age-confounded `status_rs_r`.
 arc whose verdict turned on the statistic, the unit, or stale data — here, age-control (the missing control that made
 a real 0.15 look like 0.11). `scratchpad/bp_status_rs.py` (+ `bp_status_rs.png`).
 
+## Addendum 95 — #3 village size on a clean partition lands at/near Alvard 50–250; the contamination is resolved (2026-09-17, R-106)
+
+Marker #3 (village size, Alvard 2009 verified 50–250) was PROVISIONAL — "the settlement list double-counts ~20×."
+The two existing measures both mis-read: `settlements()` counts agents on the EXACT site cell (fragments a
+multi-cell village → `settle_med` ~32, under the 50 floor), and `settlement_clusters()` union-finds within
+2·settle_radius (merges the packing blob → ~500, over 250). Neither is a village.
+
+**Clean measure — nearest-site (Voronoi) partition.** Each agent is assigned to its NEAREST settlement site within
+the catchment radius; a village is one site's residents. No double-count (each agent counts once), no blob-merge.
+On current canon (`scratchpad/bp_village_size.py`):
+
+| | village_med | village_max | n_villages | frac_resident |
+|---|---|---|---|---|
+| temperate | 44 | 142 | 23 | 0.99 |
+| savanna | 74 | 210 | 14 | 0.96 |
+| Alvard | **50–250** | | | |
+
+Savanna's median village (74) is INSIDE Alvard's 50–250; temperate (44) is just below the 50 floor, with max 142
+well in range — the distribution straddles the band, against Alvard's soft "50 or so up to 250." This is a large
+improvement over the fragmented exact-cell 32/36 and, crucially, **the nearest-site partition RESOLVES the #3/#12/#13
+double-count contamination** — it assigns each agent once, so it is neither the inflated overlapping-window count nor
+the fragmented exact-cell count.
+
+**Marker fixed.** Added `village_sizes()` (the nearest-site partition) to the model; the campaign carries
+`village_med` / `village_max` / `n_villages`; a CTB pins the definition. Score #3 against `village_med`, not the
+exact-cell `settle_med`.
+
+**Deliverable.** #3 largely MET — savanna in range, temperate marginally below the floor; the provisional/contaminated
+status is resolved by the clean partition. Diagnosis only; canonical unchanged. Eighth marker this arc whose verdict
+turned on the measurement (here, the settlement partition: exact-cell fragments, blob over-merges, Voronoi is clean).
+`scratchpad/bp_village_size.py` (+ `bp_village_size.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -4832,6 +4832,37 @@ class TerrainWorld(mesa.Model):
         return dict(n_clusters=len(sizes), cluster_med=int(np.median(sizes)), cluster_max=sizes[0],
                     cluster_min=sizes[-1], resident_frac=round(sum(sizes) / total, 3) if total else 0.0)
 
+    def village_sizes(self) -> dict:
+        """R-106 Add.95 (marker #3) — village sizes by NEAREST-SITE (Voronoi) partition.
+
+        `settlements()` counts agents on the EXACT site cell (fragments a multi-cell village → settle_med ~32,
+        under Alvard's 50-250), and `settlement_clusters()` union-finds within 2·settle_radius (merges the whole
+        packing blob → ~500, over 250). Neither is a village. Here each agent is assigned to its NEAREST settlement
+        site (within `settle_radius`), so villages partition the population with NO double-count and NO blob-merge —
+        the clean measure for Alvard's 50-250. On current canon village_med ~44 temperate / ~74 savanna. Pure
+        observer; reads `_settlement_sites` / `agent_list`, writes nothing."""
+        sites = list(self._settlement_sites)
+        if not sites:
+            return {}
+        r = int(getattr(self._demog, "settle_radius", 2))
+        vsize = {s: 0 for s in sites}
+        for a in self.agent_list:
+            ax, ay = a.pos
+            best = None
+            for (sx, sy) in sites:
+                d = max(abs(ax - sx), abs(ay - sy))
+                if best is None or d < best[0]:
+                    best = (d, (sx, sy))
+            if best is not None and best[0] <= r:
+                vsize[best[1]] += 1
+        sizes = sorted((n for n in vsize.values() if n > 0), reverse=True)
+        if not sizes:
+            return {}
+        import numpy as np
+        total = len(self.agent_list)
+        return dict(n_villages=len(sizes), village_med=int(np.median(sizes)), village_max=sizes[0],
+                    resident_frac=round(sum(sizes) / total, 3) if total else 0.0)
+
     def settlement_health(self) -> dict:
         """Soil (B1 depletion) and hardship (emergent-abandonment memory) state across settlement sites. {} when
         neither dict carries anything — the flags are off, or no site has existed long enough to accumulate

@@ -283,6 +283,7 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
     male_rs = [getattr(a, "_n_fathered", 0) for a in al if a.sex == "male" and a.age >= menarche]
     # --- settlement hierarchy --------------------------------------------------
     st = w.settlements()
+    vs = w.village_sizes()   # R-106 Add.95: the #3 marker — nearest-site (Voronoi) village partition (clean, no double-count)
     # --- mating network + instability + leadership -----------------------------
     con = last_con                                    # most-recent non-empty gathering reach (seasonal → sampled every step)
     ins = w.instability()
@@ -434,6 +435,9 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         lineages_per_band=dyn.get("lineages_per_band", 0), dom_lineage_share=dyn.get("dom_lineage_share", 0),
         # settlement hierarchy
         n_settle=st.get("n", 0), settle_med=st.get("median", 0), settle_max=st.get("max", 0),
+        # R-106 Add.95: the #3 marker — village size by nearest-site partition vs Alvard 50-250. `settle_med` above
+        # (exact-cell) fragments a multi-cell village and under-reads; score #3 against `village_med`.
+        village_med=vs.get("village_med", 0), village_max=vs.get("village_max", 0), n_villages=vs.get("n_villages", 0),
         bud_events=getattr(w, "bud_events", 0),   # CUMULATIVE fissions -> the realised rate, scored against
         #                                            Bandy's 2-5e-3 per large-village-year
         primate_ratio=st.get("primate_ratio"), zipf_slope=st.get("zipf_slope"),

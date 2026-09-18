@@ -174,6 +174,23 @@ def test_settle_community_max_is_the_densest_3x3_window_not_a_single_cell():
     assert m["settle_community_max"] == 16, "the densest 3x3 window merges (5,5) and its neighbour (6,6): 10+6"
 
 
+def test_village_sizes_partition_by_nearest_site_no_double_count():
+    """R-106 Add.95 (marker #3) — village size by NEAREST-SITE (Voronoi) partition, within the catchment radius.
+    Each agent counts once toward its nearest site; the exact-cell `settle_med` fragments a multi-cell village.
+    Constructed: sites at (10,10) and (30,30), r=2. 8 agents on (10,10), 4 on (11,11) [within r of site A], 5 on
+    (30,30), and 3 at (80,80) [beyond r of any site → not a resident]. Village A = 8+4 = 12, village B = 5."""
+    from types import SimpleNamespace
+    def at(x, y, k):
+        return [SimpleNamespace(pos=(x, y)) for _ in range(k)]
+    stub = SimpleNamespace(
+        _settlement_sites=[(10, 10), (30, 30)],
+        agent_list=at(10, 10, 8) + at(11, 11, 4) + at(30, 30, 5) + at(80, 80, 3),
+        _demog=SimpleNamespace(settle_radius=2))
+    v = TerrainWorld.village_sizes(stub)
+    assert v["n_villages"] == 2 and v["village_max"] == 12, f"village A=12 (8+4), B=5: {v}"
+    assert v["village_med"] == 8, "median([12, 5]) = 8.5 → int → 8; the (80,80) trio is beyond r, not a resident"
+
+
 def test_a_measured_gini_of_0_162_is_a_real_spread_not_an_empty_economy():
     """The other way #14 could be an artefact: if almost nobody held material, `_gini` returns 0.0 by
     construction and a near-zero reading would mean 'no economy' rather than 'equal economy'. 0.162 is not
