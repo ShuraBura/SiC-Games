@@ -9181,6 +9181,70 @@ coincidence.
 Diagnosis only; canonical model unchanged. `scratchpad/bp_rs_channel.py`, `bp_rs_driver.py`, `bp_rs_ablate.py`,
 `bp_rs_confound.py` (+ `bp_rs_channel.png`).
 
+## Addendum 103 — #17 resolved: the marker is a WINDOW, not a partition, and it straddles ~3 villages. On the village unit only MONTANE genuinely over-runs (2026-09-18, R-106)
+
+Addendum 101 established that #17's over-run is a property of the canonical world, not the run horizon, and left the
+mechanism open. It is the UNIT — again — and this time the fault is in the instrument Addendum 93 itself introduced.
+
+**`settle_community_max` is a window, and a window is not a partition.** Add.93 chose a 3×3 (900 km²) window as a
+compromise: the exact cell under-counts a multi-cell village, union-find over-merges the packing blob. But a window
+can cover parts of several neighbouring communities and report their SUM as one. Measured directly at canonical
+scale (`scratchpad/bp_fission_straddle.py`, n=3000, patch=40): the densest 3×3 window on temperate holds **307
+people who belong to 3.0 distinct villages and 40.7 distinct `band_id`s**, and the largest single coherent social
+unit inside it is only **69 people** (savanna: 207 people spanning 1.7 villages / 44.7 bands, largest band 36).
+The window is not a community.
+
+The signature is visible in the canonical trajectories without any new run — the window-to-village ratio tracks how
+the landscape is packed:
+
+| world | occupied cells | villages | cells/village | land use | window ÷ village |
+|---|---|---|---|---|---|
+| temperate | 207 | 42 | 4.9 | 13% | **1.33** |
+| savanna | 43 | 11.6 | 3.7 | 3% | 1.01 |
+| montane | 212 | 21.7 | 9.8 | 15% | 1.05 |
+
+Straddling needs villages that are both SMALL and ADJACENT. Temperate has small villages packed at 13% land use, so
+a 9-cell window spans ~1.3 of them. Savanna's villages are small but far apart (3% land use), montane's are large
+(9.8 cells), and in both the window sits inside one village and the two measures agree.
+
+**On the unit the anchor actually uses, the picture changes.** `LITERATURE.md`'s own Alberti entry states it:
+*"Alberti's N≈127 is village/settlement scale, 4–6× our bands (25–45)"*. So the comparable unit is the VILLAGE — and
+`village_max` (the nearest-site Voronoi partition added in Add.95, where each agent is counted exactly once) is
+already carried in every canonical trajectory:
+
+| unit | temperate | savanna | montane |
+|---|---|---|---|
+| exact cell (one camp) | 114.5 | 100.9 | 102.6 |
+| **VILLAGE (Voronoi partition — Alberti's unit)** | **192.5** | **154.1** | **288.0** |
+| 3×3 window (the Add.93 marker) | 255.7 | 155.1 | 301.6 |
+| `band_id` (dispersed affiliation, ~8 cells) | 439.0 | 403.8 | 1079.8 |
+
+**Verdict on the village unit: savanna 154.1 sits on Alberti's 158; temperate 192.5 is past the scalar-stress
+threshold but comfortably under Alvard's 250 ceiling (Alberti says communities should not persist FAR past 158, and
+1.2× is not far); montane 288.0 genuinely exceeds 250.** So the "temperate and montane over-run" of Add.100/101
+reduces to montane alone, and temperate's apparent breach was the window summing three villages.
+
+**Montane's over-run looks terrain-driven and is NOT explained away.** It is the mountainous world, where the project
+already established that mountains act as movement FRICTION rather than barriers (~6.7× move cost for a peak). Its
+villages are spatially the LARGEST (9.8 cells each) at the LOWEST per-cell density (0.10 vs temperate's 0.15) —
+the shape of elongated valley settlements into which population is funnelled. Plausible, and untested; stated as a
+hypothesis, not a result.
+
+**Instrument consequence.** `settle_community_max` should NOT be the #17 marker. Score #17 against `village_max`,
+which is both a proper partition (no double counting, no straddling) and the settlement scale Alberti measures.
+`settle_community_max` stays as a diagnostic but carries a warning that it is a window.
+
+**The reusable lesson, as a sharpening of binding rule 2 (UNIT): a WINDOW IS NOT A PARTITION.** Any "largest local
+group" measure built from a sliding window will over-count wherever the groups it is meant to separate sit closer
+than the window is wide — and the error is invisible in the number itself, because it scales with how packed the
+landscape is, not with anything about the groups. Prefer a partition (every individual assigned exactly once). This
+is the third time the arc has been bitten by a spatial unit (band_id vs cell, Add.89; settlement double-count,
+Add.95; window vs partition, here).
+
+**Deliverable.** #17 is diagnosed and largely dissolved: it was a window artifact on temperate, and it is a genuine
+over-run only on montane, on a marker that should be `village_max`. Diagnosis only; canonical model unchanged.
+`scratchpad/bp_fission_straddle.py` (+ `bp_fission_unit.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

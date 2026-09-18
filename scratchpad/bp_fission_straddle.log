@@ -1,0 +1,18 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE (n=3000, patch=40, 800 steps) ==
+  densest 3x3 window holds        307 people
+  ... spanning                    3.0 distinct villages
+  ... largest single village in it   203 people
+  ... spanning                    40.7 distinct band_ids
+  ... largest single band in it       69 people
+  pop 5955  sites 90  occupied cells 375
+
+== SAVANNA (n=3000, patch=40, 800 steps) ==
+  densest 3x3 window holds        207 people
+  ... spanning                    1.7 distinct villages
+  ... largest single village in it   181 people
+  ... spanning                    44.7 distinct band_ids
+  ... largest single band in it       36 people
+  pop 3937  sites 48  occupied cells 321
+
