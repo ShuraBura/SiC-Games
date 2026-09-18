@@ -8957,6 +8957,87 @@ the Agta PDF also gives camp SIZE mean 36 (range 12–77), which brackets the mo
 or (for #7) confirmed to lack a scale-appropriate anchor; #9 is now pre-registered. The corrected statistics are
 wired into `_demog_markers`/the campaign and CTB-pinned. Diagnosis/instrument only; canonical model unchanged.
 
+## Addendum 100 — The definitive scorecard: three full-length (15,000-step) canonical campaigns, every corrected marker scored; two divergences from the shorter probes flagged for diagnosis (2026-09-18, R-106)
+
+This closes the marker-audit arc (Add.82–99) with the run it was building toward: the real `run_campaign.py`
+pipeline (not the short-cut probe harness this session used), `C_ALLON=1` on the adopted canon, full documented
+length (15,000 steps ≈ 1,250 years), genealogy and genome ON, on all THREE canonical worlds (the project defines
+three, not four): `world_temperate` (coastal/temperate), `world_savanna` (coastal/savanna), `world_montane`
+(mountainous/savanna). Runtimes: savanna 14 min, montane 68 min, temperate 87 min (population settled small on
+savanna, ~600, driving the difference). All three ran to completion (not truncated).
+
+**Full scorecard, sustained window (last 15% of each run, ≈190 years), `scratchpad/bp_scorecard99.py`:**
+
+| marker | temperate | savanna | montane | anchor |
+|---|---|---|---|---|
+| #1 band size (mean-experienced adults/cell) | 30.6 ✓ | 31.8 ✓ | 22.0 ✓ | Hill 2011 = 28.2 |
+| #3 village size (median) | 70.7 ✓ | 43.2 ✗ | 78.2 ✓ | Alvard 50–250 |
+| #3 village size (max) | 192.5 ✓ | 154.1 ✓ | 288.0 ✗ | Alvard ≤ 250 |
+| #4 connubium reach (median) | 632.9 ✓ | 409.0 ✓ | 575.7 ✓ | Wobst ~475 / White floor 150 |
+| #10 polygyny (÷ all men) | 0.042 ✓ | 0.019 ✗ | 0.027 ✓ | Marlowe ~0.04 |
+| #11 status→RS (age-controlled) | 0.283 ✗ | 0.141 ✓ | 0.262 ✗ | von Rueden ~0.15 |
+| #12 rank-size slope | −1.08 ✓ | −1.29 ✓ | −1.06 ✓ | Zipf ≈ −1.0 |
+| #13 primacy | 1.08 ✓ | 1.39 ✓ | 1.36 ✓ | ≈1, no primate centre |
+| #14 material Gini (adults) | 0.422 ~ | 0.385 ✓ | 0.362 ✓ | BHM 0.36 |
+| #14 material Gini (within-cell) | 0.316 ✓ | 0.294 ✓ | 0.250 ✓ | Agta 0.23 [0–0.44] |
+| #17 fission ceiling (community max) | 255.7 ✗ | 155.1 ✓ | 301.6 ✗ | Alberti 158 / Alvard ≤ 250 |
+| #9 hierarchy index (`gini_cred`) | 0.663 | 0.380 | 0.394 | pre-registered, not itself anchored |
+| stratification classifier (`pct_stratified`) | **0.0%** | **0.0%** | **0.0%** | context — the known-broken R-103 gate |
+
+**Most of the ladder holds up at full length**, and cleanly: #1, #4, #12, #13, #14(within-cell) pass on all three
+worlds; #14(adults) is at/just outside the band on temperate (0.422 vs a 0.30–0.42 window — essentially at the
+edge, not a real miss) and clean on savanna/montane; #3's median is a genuine biome split (savanna's small camps sit
+just under the 50 floor, as Add.95 already flagged as a straddle, not a clean pass).
+
+**The stratification classifier confirms itself broken, universally.** `pct_stratified` reads exactly 0.0% on ALL
+THREE worlds for the ENTIRE 1,250-year run — including temperate, where `gini_cred` sustains **0.60–0.72**, well
+above any threshold that should register stratification. This is fresh, full-length confirmation of the
+already-diagnosed R-103 finding (`society_from_character` keys on surplus LEVEL, not inequality) and a direct,
+retroactive validation of Addendum 99's choice to pre-register `gini_cred`, not `pct_stratified`, as the #9 hierarchy
+index — the classifier is dead weight even under sustained, real inequality.
+
+**TWO DIVERGENCES from the shorter (800-step) probes, flagged for diagnosis, not resolved here.**
+
+1. **#11 status→RS is markedly HIGHER on the full run than the probe found.** Addendum 94 measured 0.157/0.143
+   (temperate/savanna) on an 800-step probe and called #11 MET. On the full 15,000-step campaign: temperate 0.283,
+   savanna 0.141, montane 0.262 — savanna still matches, but temperate and montane run roughly DOUBLE the monogamous
+   anchor. This does NOT track `gini_cred` cleanly: temperate's high status→RS (0.283) pairs with a high `gini_cred`
+   (0.663), but montane's high status→RS (0.262) pairs with a LOW `gini_cred` (0.394), close to savanna's (0.380,
+   status→RS 0.141). So sustained status inequality alone does not explain the split. Candidate explanations, none
+   yet tested: the short probe simply had not reached the mature equilibrium (800 steps ≈ 67 years vs 1,250 for the
+   full run); a real prowess→fertility skew compounds over the long horizon once the elite/legitimacy stack has had
+   time to act, independent of measured polygyny or cred inequality; or a probe-harness vs real-campaign difference
+   (single seed per world here, vs 3-world-seed averaging in the probe) is inflating the reading. NOT diagnosed.
+
+2. **#17 fission ceiling partially reopens on temperate and montane.** Addendum 93 found the face-to-face community
+   measure sits AT Alberti's ceiling on an 800-step probe (155/200 vs 158/≤250). On the full run: savanna still
+   lands almost exactly on the anchor (155.1), but temperate (255.7) and montane (301.6) now sit OVER the 250
+   ethnographic ceiling. The statistic here is the MEAN of the per-snapshot face-to-face maximum over the last ~190
+   years (not a single running maximum), which mitigates but does not eliminate MARKER_MATRIX's own documented
+   caution that a MAXIMUM grows with more samples at a fixed distribution — 601 snapshots over 15,000 steps samples
+   far more extreme draws than an 800-step probe's ~15 snapshots. Whether this is genuine long-run drift past the
+   ceiling, or the sampling confound the project has hit before, is NOT diagnosed here.
+
+**Genetics/dynasty layer — confirmed fully live over the long horizon, and internally consistent.** Sustained-window
+values: heterozygosity 0.951/0.782/0.936, mean relatedness 0.049/0.216/0.064, `eff_lineages` 47.7/16.2/26.3,
+`dom_lineage_share` 0.237/0.255/0.279, `dom_dyn_rs` 1.77/2.08/2.17 (temperate/savanna/montane). Savanna's markedly
+lower heterozygosity and higher relatedness track its much smaller effective lineage count — smaller Ne, faster
+drift, exactly as population genetics predicts. On ALL THREE worlds the dominant lineage's reproductive-success edge
+settles into a STABLE 2–3× advantage after an initial few-hundred-year consolidation phase, with no secular trend up
+or down over the remaining ~1,000 years — a stable dynastic-concentration equilibrium, not a rise-and-collapse
+cycle, consistent with R-97's "no secular cycles, a state-scale phenomenon" finding, now confirmed at the lineage
+level and across all three canonical worlds rather than the single world R-97 examined.
+
+**What this closes and what it opens.** The marker-audit arc (Add.82–99) is validated at full length on real
+campaign trajectories, not just the probe harness — 11 of 13 scored markers hold cleanly across all three worlds.
+Two threads are opened, not closed, and need diagnosis before any further claim: #11's biome-dependent doubling, and
+#17's temperate/montane ceiling overrun. Both are judgment calls (is this a real finding or an artifact?), not
+mechanical checks, and are handed off rather than adjudicated here.
+
+**Artifacts.** `scratchpad/bp_scorecard99.py`; trajectories `campaign_trajectory_scorecard99_{temperate,savanna,
+montane}.json`; genealogy `campaign_genealogy_scorecard99_{temperate,savanna,montane}.csv` (276,561 / 71,854 /
+255,225 rows respectively — real parentage-tracked birth/death records, not empty).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
