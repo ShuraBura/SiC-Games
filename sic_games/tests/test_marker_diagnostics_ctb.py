@@ -131,6 +131,22 @@ def test_material_gini_adults_is_the_BHM_comparable_statistic_and_excludes_child
         "excluding zero-holding children lowers the Gini relative to the all-ages marker"
 
 
+def test_material_gini_within_cell_is_the_median_of_per_cell_adult_ginis():
+    """R-106 Add.98 (#14 within-camp cross-check vs Agta 0.23) — the median over cells (≥2 adults) of the adult
+    material Gini. Constructed: cell A holds adults with material [0,1,2,3,4] (Gini 0.4), cell B holds [1,1] (Gini 0),
+    and a lone adult on cell C (excluded, <2). Median of [0.4, 0.0] = 0.2."""
+    a = [_Agent(m) for m in (0.0, 1.0, 2.0, 3.0, 4.0)]
+    for x in a:
+        x.pos = (1, 1)
+    b = [_Agent(1.0), _Agent(1.0)]
+    for x in b:
+        x.pos = (2, 2)
+    lone = _Agent(9.0); lone.pos = (3, 3)
+    m = TerrainWorld._demog_markers(TerrainWorld, a + b + [lone])
+    assert m["material_gini_within_cell"] == pytest.approx(0.2), \
+        "median of per-cell adult Ginis [cellA 0.4, cellB 0.0]; the lone adult (cell C, <2) is excluded"
+
+
 def test_band_experienced_adults_is_person_weighted_over_cells_not_median_over_bands():
     """R-106 Add.91 (marker #1) — Hill's 28.2 is the PERSON-WEIGHTED mean adults on the CELL (co-residence unit).
     For each individual, count adults sharing its cell, averaged over individuals: Σ(adults_c·people_c)/Σ(people_c).

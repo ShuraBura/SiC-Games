@@ -8897,6 +8897,44 @@ realized median and White 150 as the viability floor.
 Diagnosis only; canonical unchanged. Ninth marker this arc whose verdict turned on the anchor/statistic/unit — here,
 comparing an equilibrium median to a minimum-viable floor. `scratchpad/bp_connubium.py`.
 
+## Addendum 98 — Literature-anchor search for #5 and #7: #5 re-anchored to lineage DYNAMICS (loosely consistent), #7 has no scale-appropriate anchor; bonus #14 within-camp cross-check (2026-09-18, R-106)
+
+The two remaining un-scoreable markers (#5 lineage-size Gini, #7 nobility share) were searched against the
+literature. The clean, scale-appropriate anchors largely DO NOT EXIST — which is why the corpus withdrew/never-filed
+them — but the search produced one re-anchor and one bonus cross-check. All numbers are WEB-VERIFIED from the PMC
+full text; the PDFs should be filed and run through `verify_anchor.py` before these are treated as hard anchors.
+
+**#7 nobility share — no anchor found; stays unscored.** The Ethnographic Atlas (var 66 class stratification, var 38
+hereditary aristocracy) classifies SOCIETIES by type (228 "dual/hereditary aristocracy"), not the WITHIN-society
+population fraction that is elite — the quantity `ascribed_frac` (~3.6–7.8%) measures. Betzig's *Despotism and
+Differential Reproduction* is STATE-scale reproductive skew (3+ administrative levels), not an elite population
+fraction — wrong scale for a forager-chiefdom model. The ~3.6–7.8% band has no findable source; #7 remains unscored
+(a data gap, not a model defect).
+
+**#5 lineage-size Gini — retired; re-anchored to lineage DYNAMICS (Guyon et al. 2024, *Nat Comms*).** Foragers lack
+unilineal descent groups, so a forager lineage-size Gini does not exist; the genetics sources (Yan/Zerjal) are
+state/continental scale (already retired at #6). No within-population lineage-size Gini is reported anywhere. The
+scale-appropriate replacement is the patrilineal-segmentary DYNAMICS: Guyon et al. give EMPIRICAL per-generation
+descent-group **extinction [0.16, 30]%** and **successful-group growth [0.12, 2.5]** (Supplementary Tables 1–2).
+CAVEAT: the range is BROAD (a 200× extinction span) and its sources skew DYNASTIC (Chinese imperial lineages, the
+Uí Néill "~20% of males") — the same scale caution as #6 — so this is a CONSISTENCY SCREEN, not a tight target.
+Measured (`scratchpad/bp_lineage_agta.py`, lineage sizes snapshotted a generation apart): survivor growth **1.36×/gen
+— INSIDE [0.12, 2.5]** ✓; extinction **36–39%/gen — just above the 30% upper bound** (defensible: small high-mortality
+forager lineages turn over faster than dynasties). Loosely consistent. RECOMMENDATION: retire the size-Gini #5 as
+un-anchorable; score the lineage layer as a dynamics screen against Guyon.
+
+**Bonus — #14 within-camp cross-check (Agta; Page et al.).** Agta foragers' WITHIN-CAMP material Gini is mean **0.23
+(range 0–0.44, age-corrected household goods; 11 camps, Table 1)**. This is a FINER-unit companion to #14's
+society-scale BHM 0.36. The model's within-CELL adult material Gini (the cell = the co-residence camp) reads **0.28
+temperate / 0.26 savanna — inside Agta's range, near its mean**. So #14 now validates at TWO scales: society-level
+(`material_gini_adults` 0.386 ≈ BHM 0.36, Add.92) and within-camp (`material_gini_within_cell` 0.27 ≈ Agta 0.23).
+Marker `material_gini_within_cell` added to `_demog_markers` + the campaign + a CTB.
+
+**Deliverable.** #5 re-anchored to a lineage-dynamics screen (loosely consistent); #7 confirmed un-anchorable at the
+model's scale (data gap); #14 gains a within-camp forager cross-check that it passes. Candidate anchors: Guyon et al.
+2024 (`Nat Comms`, PMC11043392), Page et al. Agta (PMC10237286) — WEB-VERIFIED, PDFs to be filed. Diagnosis only;
+canonical unchanged. `scratchpad/bp_lineage_agta.py`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

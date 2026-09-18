@@ -3416,6 +3416,17 @@ class TerrainWorld(mesa.Model):
             _cell_ad[_p] = (_a0 + (1 if a.age >= _thr else 0), _n0 + 1)
         _cell_tot = sum(_n for _, _n in _cell_ad.values())
         _band_exp_ad = (sum(_a * _n for _a, _n in _cell_ad.values()) / _cell_tot) if _cell_tot else nan
+        # R-106 Add.98 (#14 cross-check): WITHIN-CELL adult material Gini — the median over cells (≥2 adults) of the
+        # adult material Gini. Anchor: Agta foragers (Page et al.) WITHIN-CAMP material Gini mean 0.23 (range
+        # 0-0.44, age-corrected household goods). This is a FINER-unit companion to `material_gini_adults` (which is
+        # society-scale, ~BHM 0.36): the cell is the co-residence unit (a camp), so it validates the material
+        # distribution at the within-camp scale. On current canon it reads ~0.27 (in the Agta range, near its mean).
+        _cell_mat: dict = {}
+        for a in pop:
+            if a.age >= _thr:
+                _cell_mat.setdefault(getattr(a, "pos", None), []).append(getattr(a, "material", 0.0))
+        _cg = [_gini(v) for p, v in _cell_mat.items() if p is not None and len(v) >= 2]
+        _within_cell_mat_gini = _st.median(_cg) if _cg else nan
         # R-106 Add.93 (marker #17): the FACE-TO-FACE community size = max over occupied cells of the population
         # within Chebyshev radius 1 (a 3x3 = 900 km2 neighborhood). Alberti's 158 scalar-stress ceiling is a
         # FACE-TO-FACE community bound; the old `settle_max` (exact-cell) UNDER-counts a multi-cell village and the
@@ -3474,6 +3485,7 @@ class TerrainWorld(mesa.Model):
             # a further refinement not applied here; it lowers a Gini, so it would only widen the gap.)
             "material_gini_adults": _gini([getattr(a, "material", 0.0) for a in pop
                                            if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR]),
+            "material_gini_within_cell": _within_cell_mat_gini,   # R-106 Add.98: Agta within-camp cross-check (0.23)
             "material_top10_share_adults": _top_share([getattr(a, "material", 0.0) for a in pop
                                                        if a.age >= self._AGE_CHILD_YR * MONTHS_PER_YEAR], 0.10),
             # R-106 Add.91 — the BHM/Hill-COMPARABLE band-size statistic (marker #1). Hill 2011's 28.2 is the

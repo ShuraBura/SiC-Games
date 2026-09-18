@@ -1,0 +1,8 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE ==
+  (A) lineage extinction/gen 36.3%  (Guyon [0.16-30]%)   survivor growth/gen 1.36x  (Guyon [0.12-2.5])   n_lineages 264->168
+  (B) within-CELL adult material Gini (median) 0.280  (Agta within-camp 0.23 [0-0.44])
+== SAVANNA ==
+  (A) lineage extinction/gen 38.8%  (Guyon [0.16-30]%)   survivor growth/gen 1.36x  (Guyon [0.12-2.5])   n_lineages 213->131
+  (B) within-CELL adult material Gini (median) 0.263  (Agta within-camp 0.23 [0-0.44])
