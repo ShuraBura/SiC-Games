@@ -1,0 +1,16 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | n_males~415 ==
+  partial(prowess, offspring | age)                 = +0.157+/-0.063   <- THE MARKER
+  partial(prowess, offspring | age, intake_ema)     = +0.118+/-0.075
+  partial(prowess, offspring | age, intake, wealth) = +0.123+/-0.079
+  corr(prowess, intake_ema)                         = +0.629
+  partial(intake_ema, offspring | age)              = +0.109
+
+== SAVANNA | n_males~340 ==
+  partial(prowess, offspring | age)                 = +0.143+/-0.050   <- THE MARKER
+  partial(prowess, offspring | age, intake_ema)     = +0.124+/-0.077
+  partial(prowess, offspring | age, intake, wealth) = +0.125+/-0.078
+  corr(prowess, intake_ema)                         = +0.681
+  partial(intake_ema, offspring | age)              = +0.080
+

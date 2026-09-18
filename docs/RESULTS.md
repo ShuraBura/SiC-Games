@@ -9116,6 +9116,71 @@ this lesson for #4 connubium ("density-dependent — do not score it pooled"); i
 markers reopen as genuine misses on canon (#11, #17) and need to be scored against a stated density. Diagnosis only;
 canonical model unchanged. `scratchpad/bp_horizon_check.py`, `bp_density_sensitivity.py` (+ `.png`).
 
+## Addendum 102 — #11 status→RS is produced by the WRONG CHANNEL: it survives ablation of both mate choice and polygyny, so it is not comparable to von Rueden's anchor (2026-09-18, R-106)
+
+Addendum 101 reopened #11 as a canonical miss (temperate 0.283, montane 0.262 vs von Rueden's monogamous 0.15).
+The anomaly that made it worth chasing: the model carries polygyny at **0.042** — right at Marlowe's monogamous
+forager ~4% — yet a status→RS nearly double von Rueden's CROSS-SYSTEM polygynous 0.19. Monogamous-level polygyny
+should not carry a polygynous-level skew. This addendum finds the channel, and the answer is that there isn't one.
+
+**Correlation found nothing.** Cross-world, `male_rs_gini` is 0.593/0.585/0.560 — the AMOUNT of male reproductive
+skew is effectively IDENTICAL across all three worlds. Only its ALIGNMENT with prowess differs (0.283/0.141/0.262).
+The extensive margin is refuted outright: `frac_never_partnered_30` = 0.000/0.001/0.000, so essentially every man
+partners, and savanna has MORE unpaired adult men (0.172) with the LOWEST status→RS. Within-world, across 601
+snapshots after dropping the founder transient, NOTHING tracks status→RS: the best candidate (`male_rs_gini`,
+|r|=0.23) vanishes under first-differencing, and mating-pool size — which ranked perfectly cross-world
+(633/409/576) — has |r|=0.08 within-world. The cross-world ranking was an n=3 coincidence.
+
+**Ablation settled it, and the result is a double negative** (`scratchpad/bp_rs_ablate.py`; comparative, so the
+probe harness is legitimate per Add.101 — the arm ORDERING transfers even though absolute values are probe-regime):
+
+| arm | status→RS | polygyny |
+|---|---|---|
+| canon (`mate_choice_strength` = 5.0) | 0.157 ± 0.063 | 0.013 |
+| **m = 0 — status-weighted mate choice OFF** | **0.112 ± 0.008** | 0.013 |
+| m = 1 / m = 2 | 0.142 / 0.156 | — |
+| **`max_wives` = 1 — polygyny ELIMINATED** | **0.171 ± 0.039** | 0.000 |
+| `polygyny_rate` = 0 | 0.171 ± 0.039 | 0.000 |
+
+Turning status-weighted mate choice completely off barely moves the marker. Eliminating polygyny entirely does not
+lower it — it nudges UP. Within noise, neither knob matters. **The two channels von Rueden's anchor actually
+describes — mate choice and polygyny — do not produce the model's status→RS.**
+
+**What does produce it is a lifetime-condition autocorrelation, not a mating advantage.** `prowess` is a slowly
+decaying EMA of RELATIVE MEAT INTAKE, and `_n_fathered` is a lifetime integral. Among men of the same age, both
+integrate the same underlying foraging luck, so they correlate with no status-mediated mating step anywhere in the
+causal path. Controlling the CURRENT condition proxy (`_intake_ema`) moves the marker 0.157 → 0.118 (temperate) and
+0.143 → 0.124 (savanna) — a real but partial reduction, inside the ±0.06–0.08 noise; adding wealth changes nothing
+further. Note `corr(prowess, intake_ema)` = 0.63/0.68, so the two are strongly related but not identical: prowess
+encodes the LIFETIME history that a current-snapshot intake control cannot remove. CONFIDENCE: the two ablations are
+FIRM; the precise identity of the ~0.12 residual is INFERRED, not proven.
+
+**This is corroborated by what the project already knew.** `LITERATURE.md`'s von Rueden entry records that the model
+**lacks the status→partner-fertility ("wife quality") channel** — "a noted future enrichment" — and that under strict
+monogamy the skew is ≈+0.03. So the model cannot generate von Rueden's effect through von Rueden's mechanism, and
+the measurement confirms it does not. It also retro-explains R-77's failed prediction: R-77 expected status→RS to
+collapse to ≈+0.019 once excess polygyny was corrected. It did not collapse (0.14–0.28) because the skew was never
+polygyny-carried in the first place.
+
+**CONSEQUENCE: #11 is NOT COMPARABLE, not "met" and not "missed."** von Rueden & Jaeggi's 0.15/0.19 is explicitly a
+MATING/FERTILITY-channel association. The model's number is produced by a different causal path. Where the two
+agree — savanna's 0.141 against 0.15 — the agreement is coincidence, and Addendum 94's "MET" was doubly wrong: wrong
+world (Add.101) and wrong channel (here). Scoring the model against this anchor is a category error until either
+(a) the marker is redefined to isolate the mating channel — e.g. correlate prowess with the NUMBER OF DISTINCT
+PARTNERS, or with offspring among men matched on cumulative condition — or (b) the missing status→partner-fertility
+channel is built, at which point the anchor becomes applicable.
+
+**A seventh entry for the marker-audit checklist: the CHANNEL.** The arc has now caught markers compared on the
+wrong statistic, unit, data freshness, anchor, conditioning, and world. This one is compared on the wrong CAUSAL
+PATH: the number can match the anchor while being generated by a mechanism the anchor is not about. The test is an
+ablation — remove the mechanism the anchor names, and see whether the marker moves. If it does not, the match is
+coincidence.
+
+**Deliverable.** #11's anomaly is diagnosed. It is a channel mismatch, not a calibration error, so no knob fixes it —
+`mate_choice_strength` = 5.0 is not the culprit and retuning it would be tuning to a number, not a mechanism.
+Diagnosis only; canonical model unchanged. `scratchpad/bp_rs_channel.py`, `bp_rs_driver.py`, `bp_rs_ablate.py`,
+`bp_rs_confound.py` (+ `bp_rs_channel.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -1,0 +1,11 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+#11 ABLATION | temperate | 800 steps | worlds [0, 1, 2] | anchor: von Rueden monogamous ~0.15
+(probe harness => ABSOLUTE values are the probe regime; the ARM ORDERING is the result)
+
+  canon (m=5.0)          status->RS +0.157+/-0.063   male_RS_gini 0.598   polygyny 0.013   pop 1256
+  m=0 (no status wt)     status->RS +0.112+/-0.008   male_RS_gini 0.623   polygyny 0.013   pop 1348
+  m=1                    status->RS +0.142+/-0.048   male_RS_gini 0.588   polygyny 0.015   pop 1231
+  m=2                    status->RS +0.156+/-0.043   male_RS_gini 0.610   polygyny 0.008   pop 1188
+  m=5, max_wives=1       status->RS +0.171+/-0.039   male_RS_gini 0.593   polygyny 0.000   pop 1290
+  m=5, polygyny_rate=0   status->RS +0.171+/-0.039   male_RS_gini 0.593   polygyny 0.000   pop 1290
