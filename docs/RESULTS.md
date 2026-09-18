@@ -9038,6 +9038,84 @@ mechanical checks, and are handed off rather than adjudicated here.
 montane}.json`; genealogy `campaign_genealogy_scorecard99_{temperate,savanna,montane}.csv` (276,561 / 71,854 /
 255,225 rows respectively — real parentage-tracked birth/death records, not empty).
 
+## Addendum 101 — The Add.100 divergences diagnosed: the probe harness builds a DIFFERENT WORLD than canon, and several markers are density-sensitive. #14 is robust and its adoption stands; #11 and #17 genuinely reopen (2026-09-18, R-106)
+
+Addendum 100 left two threads open: #11 status→RS and #17 fission ceiling disagreed between the Add.86–99 probe
+harness (800 steps) and the full canonical campaign. Two candidates: the time HORIZON, or the HARNESS. They are
+separable, and the answer is unambiguous.
+
+**It is NOT the horizon.** Read the campaign's own trajectory AT step 800 — the probe's exact horizon — and it
+already disagrees: temperate #11 reads **0.305 at step 800** against the probe's published 0.157 (95% apart, same
+step count); temperate #17 reads 224 at step 800 against the probe's 155. The divergence exists before any long-run
+evolution. `scratchpad/bp_horizon_check.py`.
+
+**It IS the harness — the two build different worlds.** The probe (`bp_savanna_probe.build`) constructs its
+capacity field with patch `(20, 20, 24)`; the canonical campaign uses `(X0=30, Y0=30, PATCH=40)`. Same `BURN`
+(75,000), different productive region. Measured consequence, from identical founder counts: **600 founders reach
+pop ≈1,270 in the probe world but only 471 in the campaign world.** The campaign is additionally
+FOUNDER-PATH-DEPENDENT — 600 founders settle at 471, 3,000 founders settle at 3,832, and the two do not converge on
+one carrying capacity (plausibly the agglomeration/settlement mechanics: a large founding population forms
+settlements that raise effective capacity, a small one never does). Controlled test: running the CAMPAIGN pipeline
+at the probe's 600 founders returns temperate #11 to **0.133**, the probe's regime, versus 0.305 at 3,000.
+
+**Marker sensitivity across an ~8× population range (temperate; probe-600f / campaign-600f / campaign-3000f@800 /
+campaign-3000f-late), `scratchpad/bp_density_sensitivity.py`:**
+
+| marker | values | max/min | verdict |
+|---|---|---|---|
+| #14 material Gini (adults) | 0.386 / 0.387 / 0.403 / 0.422 | **1.09×** | ROBUST |
+| #14 Gini (within-cell) | 0.280 / — / 0.296 / 0.316 | **1.13×** | ROBUST |
+| #1 band experienced adults | 33.3 / 45.0 / 29.4 / 30.6 | 1.53× | sensitive |
+| #3 village median | 44.0 / 67.5 / 67.3 / 70.7 | 1.61× | sensitive |
+| #17 community max | 155 / 205 / 224 / 256 | 1.65× | sensitive |
+| #11 status→RS (age-ctrl) | 0.157 / 0.133 / 0.305 / 0.283 | 2.29× | sensitive |
+| #9 `gini_cred` | — / 0.276 / 0.428 / 0.663 | 2.40× | sensitive |
+| #10 polygyny (÷ all men) | 0.022 / 0.013 / 0.022 / 0.042 | 3.23× | sensitive |
+
+**THE ADOPTED CANONICAL CHANGE IS SAFE.** #14 — the only thing this session wrote into canon (Add.87/92, the
+graded-leveler stack) — is the single most ROBUST marker measured, varying 1.09× across an 8× population range, at
+both the society and within-camp scale. The adoption stands on its own merits and does not depend on the harness.
+
+**WHICH NUMBER IS AUTHORITATIVE: the campaign.** `tools/gen_runconfig.py` derives `parameters.toml` by RUNNING the
+campaign with `C_ALLON=1`, and `test_runconfig_sync.py`'s FIDELITY check defines canon as "what a canonical run
+actually uses." The probe was a legitimate low-noise convenience instrument, never the canonical world. So for
+ABSOLUTE marker values scored against ethnographic anchors, the campaign number stands.
+
+**Crucially, this does NOT invalidate the arc's COMPARATIVE findings.** Ablations and knob sweeps ran both arms
+inside the same harness, so the harness cancels: "the tolerance band is the lever and the capture skim plateaus"
+(Add.92), "cohesion de-saturation is falsified by the savanna control" (Add.88), "the leveling band alone saturates
+because the feast is a second ceiling" (Add.86) — all stand. What does not transfer is an ABSOLUTE value scored
+against an anchor.
+
+**Consequences, marker by marker (scored on Add.100's canonical campaign):**
+- **#14 — STANDS.** Robust; adoption safe.
+- **#1 band size — SURVIVES.** Campaign 30.6/31.8/22.0 all inside the Hill band; Add.89's "no deficit" holds, with
+  different numbers.
+- **#3 village size — SURVIVES with the biomes swapped.** Campaign 70.7 temp / 43.2 sav / 78.2 montane; the probe
+  had temperate below the floor and savanna inside, the campaign has the reverse. "Largely met, a biome straddle"
+  holds; the per-biome attribution in Add.95 does not.
+- **#12/#13, #4 — SURVIVE.** All pass on the campaign.
+- **#11 status→RS — REOPENS as a genuine MISS.** Canonical temperate 0.283 and montane 0.262 against von Rueden's
+  monogamous 0.15 — roughly 2×. Addendum 94's "MET" was measured on a non-canonical, lower-density world. Savanna
+  (0.141) still matches. The marker is strongly density-sensitive, so per MARKER_MATRIX's own standing rule for #4
+  it must be scored at a stated density, not pooled.
+- **#17 fission ceiling — PARTIALLY REOPENS.** Canonical temperate 255.7 and montane 301.6 exceed Alvard's 250
+  ceiling; savanna (155.1) sits on Alberti's 158. Addendum 93's "at the ceiling" was likewise non-canonical. NOTE:
+  Addendum 100 offered a "max grows with sample size" caveat for this — that caveat is WITHDRAWN as inapplicable.
+  Both measurements are means of per-snapshot maxima, comparable in expectation; the difference is the world, not
+  the sampling.
+
+**The meta-lesson, and a sixth entry for the marker-audit checklist.** The audit arc repeatedly caught markers
+compared in the wrong statistic, unit, or conditioning. This is the same bug class turned on the audit's own
+instrument: **check the WORLD the measurement was taken in.** A convenience harness that builds a different
+capacity field does not yield transferable absolute values, however low-noise it is. MARKER_MATRIX already carried
+this lesson for #4 connubium ("density-dependent — do not score it pooled"); it simply was not applied to #11, #17,
+#1 and #3.
+
+**Deliverable.** The Add.100 threads are diagnosed, not merely flagged. The canonical adoption is verified safe. Two
+markers reopen as genuine misses on canon (#11, #17) and need to be scored against a stated density. Diagnosis only;
+canonical model unchanged. `scratchpad/bp_horizon_check.py`, `bp_density_sensitivity.py` (+ `.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
