@@ -8935,6 +8935,28 @@ model's scale (data gap); #14 gains a within-camp forager cross-check that it pa
 2024 (`Nat Comms`, PMC11043392), Page et al. Agta (PMC10237286) — WEB-VERIFIED, PDFs to be filed. Diagnosis only;
 canonical unchanged. `scratchpad/bp_lineage_agta.py`.
 
+## Addendum 99 — #9 hierarchy index pre-registered (`gini_cred`); the two Add.98 anchors filed + verified (2026-09-18, R-106)
+
+Two closeout actions on the marker-audit arc.
+
+**#9 — pre-registered the hierarchy index.** The T-7 ordering ("structure range > productivity range", Smith &
+Codding) was unstable because it averaged three proxies and *which* one violated moved between runs — a verdict
+chosen after the fact. Resolved by pre-registering **`gini_cred` as THE hierarchy index** (the T-7 verdict is its
+ordering, decided ex ante), dropping the #5-tainted `lineage_size_gini` proxy (rank-key-vs-patriline, anchor
+withdrawn), and keeping `pct_stratified` as a corroborating secondary. Wired in `battery5_worldset.py` and
+`battery6_long.py` (an `INDEX = "gini_cred"` pre-registration, tagged in the log and the verdict dict).
+
+**Anchors filed + verified.** The two Add.98 candidate anchors are now FILED and mechanically verified:
+- `literature/PMC11043392.pdf` (Guyon et al. 2024) — `verify_anchor.py` confirms "[0.16; 30]% per generation" and
+  "[0.12; 2.5] per generation" verbatim.
+- `literature/PMC10237286.pdf` (Page et al., Agta) — `verify_anchor.py` confirms "mean of 0.23 (SD = 0.12)" verbatim.
+Both registered in the `verify_anchor.py` registry; the full registry re-runs clean (no UNVERIFIED/UNSOURCED). Bonus:
+the Agta PDF also gives camp SIZE mean 36 (range 12–77), which brackets the model's `village_med` 44/74 (#3).
+
+**Where the ladder stands after the audit arc (Add.82–99).** Every scoreable marker is met, re-scored, re-anchored,
+or (for #7) confirmed to lack a scale-appropriate anchor; #9 is now pre-registered. The corrected statistics are
+wired into `_demog_markers`/the campaign and CTB-pinned. Diagnosis/instrument only; canonical model unchanged.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

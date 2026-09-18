@@ -142,6 +142,17 @@ REGISTRY = [
     ("Hayden 1995 Fig. 6 - transegalitarian density bands",
      "hayden1995.pdf",
      None),   # a FIGURE: the bands were read off the page image, which no text search can confirm
+    # R-106 Add.98/99 anchors, filed 2026-09-18 from EuropePMC (open access). #5 re-anchor + #14 within-camp
+    # cross-check. Both VERIFIED verbatim below.
+    ("Guyon et al. 2024 (Nat Comms, #5) - patrilineal descent-group extinction range [0.16; 30]%/gen (Supp. Table 1)",
+     "PMC11043392.pdf",
+     r"\[0\.16; 30\]% per generation"),
+    ("Guyon et al. 2024 (Nat Comms, #5) - successful-group growth range [0.12; 2.5]/gen (Supp. Table 2)",
+     "PMC11043392.pdf",
+     r"\[0\.12; 2\.5\] per generation"),
+    ("Page et al. Agta (#14 within-camp) - camp wealth Gini mean 0.23 (SD 0.12), range 0-0.44",
+     "PMC10237286.pdf",
+     r"mean of 0\.23 \(SD = 0\.12\)"),
 ]
 
 _TAGS = {"VERIFIED": "[VERIFIED    ]", "INTERPRETIVE": "[INTERPRETIVE]",

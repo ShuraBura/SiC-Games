@@ -239,13 +239,20 @@ def stage_s4(R):
     prod = ["flat_boreal", "flat_temperate", "flat_tropical"]        # productivity axis, structure held
     struct = ["flat_temperate", "hilly_temperate", "coastal_temperate"]  # structure axis, productivity held
     log("\n    T-7 (Smith & Codding: structure 0.37 vs productivity 0.04)")
+    # R-106 Add.99: `gini_cred` is the PRE-REGISTERED hierarchy index — the T-7 verdict is its ordering, decided
+    # ex ante so the reading is not chosen after the fact (MARKER_MATRIX #9). `lineage_size_gini` is DROPPED as a
+    # proxy: it is the #5-tainted rank-key-vs-patriline measure (its anchor was withdrawn and its unit is
+    # ambiguous). `pct_stratified` is kept as a CORROBORATING secondary, not the verdict.
+    INDEX = "gini_cred"
     t7 = {}
-    for key in ("pct_stratified", "lineage_size_gini", "gini_cred"):
+    for key in (INDEX, "pct_stratified"):
         p, s = rng(prod, key), rng(struct, key)
         holds = (p is not None and s is not None and s > p)
         t7[key] = dict(productivity_range=p, structure_range=s, ordering_holds=holds)
+        tag = "  [PRE-REGISTERED INDEX]" if key == INDEX else "  (secondary)"
         log(f"      {key:20s} productivity {p} vs structure {s} -> "
-            f"{'HOLDS' if holds else 'VIOLATED/inconclusive'}")
+            f"{'HOLDS' if holds else 'VIOLATED/inconclusive'}{tag}")
+    t7["index"] = INDEX; t7["verdict"] = t7[INDEX]["ordering_holds"]
     R["S4_t7"] = t7
 
     # Bandy fission rate, now that the campaign records bud_events

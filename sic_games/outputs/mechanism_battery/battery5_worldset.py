@@ -192,13 +192,18 @@ def main():
 
     log("\n=== T-7 HEALTH TEST — structure must move hierarchy more than productivity does ===")
     log("    (Smith & Codding 2021: Resource structure 0.37 vs NPP productivity 0.04)")
+    # R-106 Add.99: `gini_cred` is the PRE-REGISTERED hierarchy index (the T-7 verdict), decided ex ante so it is
+    # not chosen after the fact (MARKER_MATRIX #9). `lineage_size_gini` DROPPED (the #5-tainted rank-key measure,
+    # anchor withdrawn); `pct_stratified` kept as a corroborating secondary.
+    INDEX = "gini_cred"
     verdicts = {}
-    for key in ("pct_stratified", "gini_cred", "lineage_size_gini"):
+    for key in (INDEX, "pct_stratified"):
         p_rng, s_rng = rng("P", key), rng("S", key)
         ok = (p_rng is not None and s_rng is not None and s_rng > p_rng)
         verdicts[key] = dict(productivity_range=p_rng, structure_range=s_rng, ordering_holds=ok)
+        tag = "  [PRE-REGISTERED INDEX]" if key == INDEX else "  (secondary)"
         log(f"  {key:20s} productivity-range {p_rng}  structure-range {s_rng}  -> "
-            f"{'ORDERING HOLDS' if ok else '*** ORDERING VIOLATED / inconclusive ***'}")
+            f"{'ORDERING HOLDS' if ok else '*** ORDERING VIOLATED / inconclusive ***'}{tag}")
 
     log("\n=== BENCHMARK SCORECARD (per arm, vs documented targets) ===")
     score = {}

@@ -39,7 +39,7 @@ validated, however long it ran.
 | 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
 | 7 | nobility share | `ascribed_frac` | *no scale-appropriate anchor found* | ~~EA "true-elite few %"~~ | **NOT SCORED — anchor search failed (R-106 Add.98).** The EA classifies SOCIETIES by class type (not the within-society elite population fraction); Betzig is STATE-scale despotism. The ~3.6–7.8% band has no findable source. A data gap, not a model defect. |
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
-| 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
+| 9 | hierarchy ordering | T-7 on `gini_cred` (pre-registered index) | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | **PRE-REGISTERED (R-106 Add.99).** `gini_cred` is now THE hierarchy index (verdict decided ex ante, not chosen after the fact); `lineage_size_gini` DROPPED as a proxy (the #5-tainted rank-key measure, anchor withdrawn); `pct_stratified` kept as a corroborating secondary. batteries 5/6 updated. |
 | 10 | **polygyny** | `frac_polygynous_all_m` (was `frac_polygynous_m`) | **~0.04 OF ALL MEN** | Marlowe, *The Hadza* — **VERIFIED VERBATIM 2026-08-07**: *"about 4% of men have 2 wives at any given time, but never more than two wives"* | **INSTRUMENT FIXED (R-106 Add.91, 2026-09-17).** The old `frac_polygynous_m` divided by MARRIED men (moved with the marriage rate between arms). The marker now emits `frac_polygynous_all_m` (÷ ALL adult men, Marlowe's denominator) = **0.022 / 0.029** vs ~0.04 — a mild shortfall (~0.6–0.7×), now comparable across arms. ("Never >2 wives" is still unchecked — the diagnostic reports no maximum.) |
 | 11 | **status → RS** | `status_rs_r_partial` (was `status_rs_r`) | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | **MET — 0.157 temp / 0.143 sav on the AGE-CONTROLLED statistic (R-106 Add.94).** von Rueden's r is age-controlled; the raw `status_rs_r` pools all repro-age males (young zeros) and under-reads at ~0.11. Age-partialled = 0.15 = the monogamous anchor; polygyny-inflation (R-77's old +0.170) is gone |
 | 12 | **rank-size slope** | `village_zipf` (was `zipf_slope`) | ≈ −1.0 (Zipf) | Johnson rank-size | **LARGELY MET (R-106 Add.96).** Re-derived over the CLEAN nearest-site village partition: **−1.19 temp** (near Zipf's −1) / −1.48 sav (steep, a small 14-village system). Close to the contaminated panel (−1.06/−1.39) — slopes are scale-robust. |
@@ -184,9 +184,12 @@ floor); the old failure was near-dead-world pollution + scoring a median against
 came from somewhere and was never filed. File the Ethnographic Atlas source with its numbers and this marker
 starts scoring automatically.
 
-**#9 the T-7 ordering is unstable.** It holds on 2 of 3 hierarchy proxies, but *which* proxy violates has moved
-between runs (`gini_cred` once, `lineage_size_gini` the next). Pre-register one proxy as *the* hierarchy index
-before scoring, or the verdict is chosen after the fact.
+**#9 the T-7 ordering — PRE-REGISTERED (R-106 Add.99).** It used to hold on 2 of 3 proxies with *which* one violated
+moving between runs (`gini_cred` once, `lineage_size_gini` the next) — a verdict chosen after the fact. RESOLVED by
+pre-registering **`gini_cred` as THE hierarchy index** (the T-7 verdict is its ordering, `structure_range >
+productivity_range`), decided ex ante. `lineage_size_gini` is DROPPED (the #5-tainted rank-key-vs-patriline measure,
+anchor withdrawn); `pct_stratified` stays as a corroborating secondary. Wired in `battery5_worldset.py` +
+`battery6_long.py`.
 
 **#11 status→RS — RE-MEASURED, MET (R-106 Add.94, 2026-09-17).** R-77 established the old +0.170 was an artefact of
 6× excess polygyny. On the full-length run with polygyny corrected, the raw `status_rs_r` reads ~0.11 — but that
