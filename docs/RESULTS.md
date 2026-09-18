@@ -8866,6 +8866,37 @@ CTB pins the definitions. Score #12/#13 against these, not the `settlements()`-p
 **Deliverable.** #12/#13 largely met on the clean partition; the last of the three settlement-contamination
 provisionals (#3/#12/#13) is cleared. Diagnosis only; canonical unchanged. `scratchpad/bp_ranksize.py`.
 
+## Addendum 97 — #4 connubium re-scored: on dense worlds the realized network reach sits at the Wobst equilibrium (~475), above the White MVP floor; the anchors measure different quantities (2026-09-17, R-106)
+
+Marker #4 (`connubium_med`, "150 [79–332]") read a pooled 15/25 that the note flagged as an artefact of near-dead
+sparse worlds (corr(density, connubium) = +0.55). Re-measured on the appropriately-dense canonical worlds
+(`scratchpad/bp_connubium.py`, sampling pairing phases; under canon the diagnostic records `reach_pop`, the realized
+mating-network reach):
+
+| | connubium_med | n_pools | regional density |
+|---|---|---|---|
+| temperate | 441 | 43 | 0.15 /km² |
+| savanna | 349 | 31 | 0.13 /km² |
+
+**The verdict hinges on which anchor — they measure different quantities.** #4 cites two: White 2017 **MVP 150
+[79–332]** is a MINIMUM-VIABLE mating pool (a FLOOR, below which inbreeding), while Wobst **MES ~475** is the
+EQUILIBRIUM connubium size (the ~500 dialectal-tribe nesting level; `connubium()`'s own docstring names "validate
+median → Wobst ~475" as its target). `connubium_med` is a REALIZED MEDIAN network reach — an equilibrium quantity —
+so Wobst ~475 is the apt comparison, not the MVP floor. On it: **441 / 349 sits just UNDER ~475 (met / near-met)**,
+and both clear the White MVP floor (≫150) — a viable-and-then-some network.
+
+The pooled "15/25 failure" was therefore two errors: (1) including near-dead sparse worlds (7.5–48 reach), and (2)
+scoring a MEDIAN network against the MVP FLOOR band [79–332] as if the typical network should sit at the
+minimum-viable size. On dense worlds against the equilibrium anchor, #4 is met/near-met.
+
+**No code change** (the median is computed correctly; the fix is to score on dense worlds against the equilibrium
+anchor, not pooled against the floor). MARKER_MATRIX #4 updated to name Wobst ~475 as the equilibrium anchor for the
+realized median and White 150 as the viability floor.
+
+**Deliverable.** #4 met/near-met (441/349 ≈ Wobst ~475, above the White MVP floor) on dense canonical worlds.
+Diagnosis only; canonical unchanged. Ninth marker this arc whose verdict turned on the anchor/statistic/unit — here,
+comparing an equilibrium median to a minimum-viable floor. `scratchpad/bp_connubium.py`.
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

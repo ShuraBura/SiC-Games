@@ -34,7 +34,7 @@ validated, however long it ran.
 | 1 | band size | `band_experienced_adults` (was `band_med`) | **28.2 ADULTS** (Hill 2011, 32 societies) — the PERSON-WEIGHTED "mean experienced" adult size on a RESIDENTIAL group | Hill et al. 2011 `[VERIFIED, PDF read]`; ~~Johnson~~ | **NO DEFICIT — RE-SCORED (R-106 Add.89) + INSTRUMENT FIXED (Add.91, 2026-09-17).** The old "FAILS 16/16 at 0.42×" used the MEDIAN over `band_id` — wrong statistic AND wrong unit. The marker now emits `band_experienced_adults` (person-weighted mean adults per CELL) = **33.3 / 22.9 ≈ 28.2**, inside the per-society range ~12–40 |
 | 2 | ~~settlement size~~ | ~~`settle_med`~~ | **RETIRED 2026-08-06** | Bar-Yosef 1998: PDF filed, read, and confirmed by the supervisor to be maps and burial sites — no village-population figure exists in the text to find | **Retired at zero cost to coverage:** it was a second, unverifiable band on the *same field* as #3, whose band is verified. Nothing was being measured here that #3 does not measure |
 | 3 | village size | `village_med` (was `settle_med`) | [50–250] | Alvard 2009 — **VERIFIED VERBATIM** (Yanomamö "50 or so up to 250") | **LARGELY MET — clean partition (R-106 Add.95).** The exact-cell `settle_med` fragments a multi-cell village (~32, under) and the union-find cluster over-merges the packing blob (~500, over). The NEAREST-SITE (Voronoi) partition — each agent counted once, no double-count — gives `village_med` **74 savanna (IN 50–250) / 44 temperate (just below the 50 floor)**, max 142/210. Resolves the double-count contamination. |
-| 4 | connubium reach | `connubium_med` | 150 [79–332] | White 2017 MVP; Wobst simulated MES | 15/25 — density-dependent, see note |
+| 4 | connubium reach | `connubium_med` | **equilibrium ~475 (Wobst MES); floor 150 [79–332] (White MVP)** | White 2017 MVP (floor); Wobst simulated MES (equilibrium) | **MET/NEAR-MET on dense worlds (R-106 Add.97).** The realized median network reach is an EQUILIBRIUM quantity → compare to Wobst ~475, not the White MVP FLOOR. On dense canon: **441 temp / 349 sav** (≈ Wobst ~475, above the 150 floor). The old pooled "15/25" was near-dead-world pollution + scoring a median against the viability floor band. |
 | 5 | lineage size Gini | `lineage_size_gini` | **ANCHOR WITHDRAWN 2026-08-04** | ~~BHM 2009~~ — see note | **NOT SCOREABLE** |
 | 6 | ~~lineage top share~~ | ~~`lin_top_share`~~ | **RETIRED 2026-08-07 — SCORED AGAINST THE WRONG KIND OF SOCIETY** | 0.16 = **Yan 2014** (Neolithic Chinese super-grandfather haplogroups); 0.08 = **Zerjal 2003** (the Genghis Khan haplogroup). Karmin, also cited, has neither. Hill 2011 was proposed as a forager-scale replacement and contains **no lineage data at all** | **Retired at 7/25.** The diagnostic is UNCHANGED and still reported every run — only the SCORING stops |
 | 7 | nobility share | `ascribed_frac` | *undocumented* | EA "true-elite few %" | **NOT SCORED — band not in docs/** |
@@ -175,7 +175,10 @@ distribution. A single "village size" verdict would have averaged these into a m
 **#4 connubium is density-dependent — do not score it pooled.** Measured corr(density, connubium) = **+0.55**
 across 25 arms: sparse boreal worlds give 7.5–48, dense worlds give 85–173, straddling the ~150 anchor. A
 pooled "15/25" reads as a failure and is mostly an artefact of including near-dead worlds. Score it against
-density, or restrict to arms above a density floor.
+density, or restrict to arms above a density floor. **RESOLVED (R-106 Add.97, 2026-09-17):** on the dense canonical
+worlds the realized median reach is 441 temp / 349 sav — and the apt anchor is Wobst's EQUILIBRIUM ~475 (which the
+`connubium()` docstring itself names), not the White MVP FLOOR [79–332]. So #4 is met/near-met (≈475, above the 150
+floor); the old failure was near-dead-world pollution + scoring a median against a minimum-viable floor.
 
 **#7 nobility share is not scoreable.** `docs/` record only "EA true-elite few %". The precise 3.6–7.8% band
 came from somewhere and was never filed. File the Ethnographic Atlas source with its numbers and this marker

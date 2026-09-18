@@ -1,0 +1,6 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | White MVP 150 [79-332] ==
+  connubium_med 441  mean 457  n_pools 43  | pop 1256  regional_density 0.1475/km2
+== SAVANNA | White MVP 150 [79-332] ==
+  connubium_med 349  mean 335  n_pools 31  | pop 1087  regional_density 0.1255/km2
