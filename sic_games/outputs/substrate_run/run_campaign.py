@@ -685,8 +685,21 @@ def snapshot(w, step, menarche, prev_leaders, last_con):
         _sy = sum((v - _my) ** 2 for v in _y) ** 0.5
         row["status_rs_r"] = (round(sum((a - _mx) * (b - _my) for a, b in zip(_x, _y)) / (_sx * _sy), 4)
                               if _sx > 0 and _sy > 0 else None)
+        # R-106 Add.94: the von-Rueden-COMPARABLE statistic. `status_rs_r` above pools ALL repro-age males, so a
+        # 15-yr-old with 0 cumulative offspring dilutes it toward 0; von Rueden's r is AGE-CONTROLLED. This is the
+        # age-PARTIALLED corr(prowess, offspring | age). On current canon it reads ~0.15 = the monogamous anchor
+        # (the raw marker under-reads at ~0.11). Score #11 against this one.
+        _ag = [float(a.age) for a in _m]
+        def _pc(u, v):
+            n = len(u); mu = sum(u) / n; mv = sum(v) / n
+            su = sum((t - mu) ** 2 for t in u) ** 0.5; sv = sum((t - mv) ** 2 for t in v) ** 0.5
+            return (sum((t - mu) * (s - mv) for t, s in zip(u, v)) / (su * sv)) if su > 0 and sv > 0 else 0.0
+        _rxy, _rxz, _ryz = _pc(_x, _y), _pc(_x, _ag), _pc(_y, _ag)
+        _den = ((1 - _rxz ** 2) * (1 - _ryz ** 2)) ** 0.5
+        row["status_rs_r_partial"] = round((_rxy - _rxz * _ryz) / _den, 4) if _den > 0 else None
     else:
         row["status_rs_r"] = None
+        row["status_rs_r_partial"] = None
     if step % GENEVERY == 0 and GENOME:
         g = w.genetics(sample_pairs=1500)
         row["heterozygosity"] = round(g.get("heterozygosity", 0.0), 4)

@@ -1,0 +1,8 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+== TEMPERATE | anchor: monogamous r~0.15, cross-system 0.19; model should sit ~0.13-0.15 ==
+  r_all (marker, all repro males) +0.106+/-0.052   r_mature (age>=40) +0.178+/-0.097   r_partial (age-controlled) +0.157+/-0.063
+  n_males 415  n_mature 149  mean_offspring 2.49
+== SAVANNA | anchor: monogamous r~0.15, cross-system 0.19; model should sit ~0.13-0.15 ==
+  r_all (marker, all repro males) +0.112+/-0.032   r_mature (age>=40) +0.139+/-0.071   r_partial (age-controlled) +0.143+/-0.050
+  n_males 340  n_mature 122  mean_offspring 3.24

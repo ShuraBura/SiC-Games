@@ -8777,6 +8777,37 @@ campaign carries it, and a CTB pins the definition. Score #17 against it, not th
 verdict turned on the statistic, the unit, or stale data (band size, polygyny, lineage, wealth Gini ×2, and now
 fission ceiling). Harnesses `scratchpad/bp_fission_ceiling.py`, `bp_fission_window.py` (+ `bp_fission_ceiling.png`).
 
+## Addendum 94 — #11 status→RS re-measured: MET on the age-controlled statistic (0.15 = von Rueden monogamous); the raw marker under-reads (2026-09-17, R-106)
+
+Marker #11 (`status_rs_r` = corr(prowess, offspring | male), anchor von Rueden & Jaeggi 2016: monogamous r≈0.15,
+cross-system 0.19) was left "re-measuring — old +0.170 was a 6× polygyny artefact (R-77)." This re-measures it on
+current canon (polygyny now corrected, Add.91) and audits its statistic.
+
+**The raw marker under-reads because it is not age-controlled.** von Rueden's r is an AGE-CONTROLLED association;
+`status_rs_r` pools ALL reproductive-age males (age ≥ 15), so young men with 0 cumulative offspring dilute it toward
+0. On the full-length 3-world panel (`scratchpad/bp_status_rs.py`):
+
+| statistic | temperate | savanna |
+|---|---|---|
+| r_all (the raw marker, all repro males) | +0.106 | +0.112 |
+| r_mature (age ≥ 40) | +0.178 | +0.139 |
+| **r_partial (age-controlled — von-Rueden-comparable)** | **+0.157** | **+0.143** |
+
+On the age-controlled statistic the model is **0.157 / 0.143 ≈ 0.15 = the von Rueden MONOGAMOUS anchor.** #11 is MET.
+
+**This confirms R-77's diagnosis.** The old +0.170 was polygyny-inflated; with polygyny corrected, status→RS lands
+at the MONOGAMOUS 0.15, not the polygyny-inflated cross-system 0.19 — exactly what the LITERATURE entry predicted for
+a monogamy-dominant family model ("SHOULD sit ≈0.13–0.15"). The earlier "expectation ≈+0.019" was wrong: it assumed
+the skew is purely polygyny-carried, but a real prowess→fertility skew survives at low polygyny (high-prowess men get
+more mating access), and it is monogamy-appropriate in size.
+
+**Marker fixed.** `run_campaign.py` now also emits `status_rs_r_partial` (the age-partialled correlation). Score #11
+against it, not the age-confounded `status_rs_r`.
+
+**Deliverable.** #11 MET (age-controlled 0.15). Diagnosis only; canonical unchanged. This is the SEVENTH marker this
+arc whose verdict turned on the statistic, the unit, or stale data — here, age-control (the missing control that made
+a real 0.15 look like 0.11). `scratchpad/bp_status_rs.py` (+ `bp_status_rs.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -41,7 +41,7 @@ validated, however long it ran.
 | 8 | fission rate | `bud_events` | 2–5×10⁻³ /large-village-yr | Bandy 2004 (3 events, largest village each phase) | 5.6×10⁻³ ✓ |
 | 9 | hierarchy ordering | T-7 | structure range > productivity range | Smith & Codding 2021 — **VERIFIED VERBATIM** (r = 0.881, n = 89) | 2 of 3 proxies — unstable |
 | 10 | **polygyny** | `frac_polygynous_all_m` (was `frac_polygynous_m`) | **~0.04 OF ALL MEN** | Marlowe, *The Hadza* — **VERIFIED VERBATIM 2026-08-07**: *"about 4% of men have 2 wives at any given time, but never more than two wives"* | **INSTRUMENT FIXED (R-106 Add.91, 2026-09-17).** The old `frac_polygynous_m` divided by MARRIED men (moved with the marriage rate between arms). The marker now emits `frac_polygynous_all_m` (÷ ALL adult men, Marlowe's denominator) = **0.022 / 0.029** vs ~0.04 — a mild shortfall (~0.6–0.7×), now comparable across arms. ("Never >2 wives" is still unchecked — the diagnostic reports no maximum.) |
-| 11 | **status → RS** | `status_rs_r` | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | re-measuring — old value was a polygyny artefact (R-77) |
+| 11 | **status → RS** | `status_rs_r_partial` (was `status_rs_r`) | 0.15 monogamous / 0.19 cross-system | von Rueden & Jaeggi | **MET — 0.157 temp / 0.143 sav on the AGE-CONTROLLED statistic (R-106 Add.94).** von Rueden's r is age-controlled; the raw `status_rs_r` pools all repro-age males (young zeros) and under-reads at ~0.11. Age-partialled = 0.15 = the monogamous anchor; polygyny-inflation (R-77's old +0.170) is gone |
 | 12 | **rank-size slope** | `zipf_slope` | ≈ −1.0 (Zipf) | Johnson rank-size | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** The clean-looking first read of −0.98 is a rank-size slope over ~20× phantom settlements. See the note below. |
 | 13 | **primacy** | `primate_ratio` | ≈1 = no primate centre | Johnson | **PROVISIONAL — SAME CONTAMINATION (2026-08-16).** Computed from the same settlement list. See the note below. |
 | 14 | **wealth concentration** | `material_gini_adults` (was `material_gini`) | HG **0.36** / hort 0.52 / pastoral 0.51 / agric 0.57 (BHM Table S5, material column, **age-adjusted ADULTS**) | BHM 2009 (T-5) | **MET — 0.386 temp / 0.357 sav ≈ 0.36 (R-106 Add.92).** Add.90 corrected the marker from the child-inflated ALL-AGES `material_gini`; Add.92 re-calibrated the graded-leveler bands (lt3.0/ft4.0) to the adults statistic. Biome-invariant, tier-11 intact (pct_strat 66–69%), corr(cred,mat) +0.26/+0.16. The all-ages figure is now ~0.53 (deprecated) |
@@ -185,9 +185,12 @@ starts scoring automatically.
 between runs (`gini_cred` once, `lineage_size_gini` the next). Pre-register one proxy as *the* hierarchy index
 before scoring, or the verdict is chosen after the fact.
 
-**#11 status→RS must be re-measured, not carried over.** R-77 established the old +0.170 was an artefact of 6×
-excess polygyny. With polygyny corrected the expectation was ~+0.019; a first short run reads 0.117. Needs a
-full-length run before it means anything.
+**#11 status→RS — RE-MEASURED, MET (R-106 Add.94, 2026-09-17).** R-77 established the old +0.170 was an artefact of
+6× excess polygyny. On the full-length run with polygyny corrected, the raw `status_rs_r` reads ~0.11 — but that
+pools all reproductive-age males (young men with 0 cumulative offspring), and von Rueden's r is AGE-CONTROLLED. The
+age-partialled correlation (`status_rs_r_partial`) is **0.157 temp / 0.143 sav = the monogamous anchor 0.15**. The
+"~+0.019 expectation" was wrong (it assumed a purely polygyny-carried skew); a real prowess→fertility skew survives
+at low polygyny and is monogamy-appropriate. Score #11 against the age-controlled statistic.
 
 **#4/#5 the AGE-STRUCTURE markers had a single upstream cause (R-106, 2026-07-30).** `median_age_yr` ~13 and
 `frac_motherless` 8–11% were not two failures but one: the fertility brake read a reserve level that cannot
