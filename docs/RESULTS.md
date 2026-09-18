@@ -9245,6 +9245,73 @@ Add.95; window vs partition, here).
 over-run only on montane, on a marker that should be `village_max`. Diagnosis only; canonical model unchanged.
 `scratchpad/bp_fission_straddle.py` (+ `bp_fission_unit.png`).
 
+## Addendum 104 — Montane's oversized "villages" are a SPARSE-SITE artifact, not a good spot with poor alternatives. #17 passes on true co-residence in every canonical world (2026-09-18, R-106)
+
+Addendum 103 left one genuine residual: montane's `village_max` of 288 exceeds Alvard's 250 on the village unit, and
+offered terrain funnelling as an untested hypothesis. The supervisor proposed a sharper one: montane concentrates
+because it holds a few good spots among unattractive alternatives. Both are testable from the canonical spatial
+dumps, which carry occupancy and forage on one grid, and **both are wrong.**
+
+**The montane resource landscape is nearly identical to temperate's** (`scratchpad/bp_montane_why.py`, end-state of
+the 15,000-step canonical runs):
+
+| metric | temperate | savanna | montane |
+|---|---|---|---|
+| forage Gini over habitable cells | 0.220 | 0.527 | **0.241** |
+| top-10% of cells hold | 20.3% | 46.1% | 22.6% |
+| mean forage, occupied ÷ empty | **1.41×** | 1.52× | **1.41×** |
+| empty habitable cells ≥ median occupied richness | 361 | 252 | 260 |
+| habitable forage left UNUSED | 82.9% | 95.8% | **82.5%** |
+| land use | 12.8% | 2.8% | 13.1% |
+
+Montane is NOT patchier than temperate (0.241 vs 0.220 — savanna at 0.527 is the patchy world). Its occupants sit on
+land exactly as much better than the alternatives as temperate's do (1.41× in both). And it leaves 82.5% of its
+forage unused with 260 good empty cells available, so "no attractive alternatives" is false. The good-spot
+hypothesis is refuted, and so is the movement-friction hypothesis as stated in Add.103 — friction would show as
+good empty land going unreached, and the empty-land figures match temperate almost exactly.
+
+**What actually differs is SETTLEMENT-SITE DENSITY:**
+
+| | temperate | savanna | montane |
+|---|---|---|---|
+| population | 3,115 | 608 | 2,313 |
+| occupied cells | 202 | 43 | 209 |
+| **settlement sites** | **47** | 12 | **23** |
+| occupied cells per site | 4.3 | 3.6 | **9.1** |
+| people per occupied cell | 15.4 | 14.1 | **11.1** |
+| cells clearing the 5×5 ≥40 site gate | 540 | 116 | 356 |
+| largest 5×5 window population | **441** | 156 | 365 |
+
+Montane carries the SAME occupied footprint as temperate (209 vs 202 cells) with HALF the settlement sites (23 vs
+47), at a LOWER per-cell density (11.1 vs 15.4), and its densest neighbourhood is SMALLER than temperate's (365 vs
+441). Each site's nearest-site catchment therefore sweeps 9.1 cells instead of 4.3, and `village_max` = 288 is one
+catchment aggregating roughly nine sparse camps spread over ~900 km² — not a dense community. Note the site gate is
+not binding in either world: 540 and 356 locations clear the 5×5 ≥40 criterion against 47 and 23 actual sites, so
+sites are ~12–15× rarer than eligible locations everywhere.
+
+**THE DECISIVE NUMBER: the largest genuinely co-resident group is 103 people in montane and 108 in temperate**
+(85 in savanna) — essentially identical across worlds and far below Alberti's 158. The cell is the model's
+co-residence unit (Add.89: the leveling coalition is built `by_cell`, consumption is shared per cell) and at 100 km²
+it is an UPPER BOUND on any single settlement's population. **So no canonical world produces a settlement that
+exceeds the scalar-stress ceiling in co-resident population. #17 PASSES on the correct unit, in all three worlds.**
+
+**What #17 actually was, end to end.** Every apparent over-run came from aggregating at a coarser unit than the
+anchor: the exact cell (103–115, passes) → the Voronoi catchment (192/154/288, inflated where sites are sparse) →
+the 3×3 window (256/155/302, straddles ~3 villages, Add.103) → `band_id` (439/404/1080, a dispersed affiliation).
+The measured "community" grew monotonically with the coarseness of the bookkeeping, and the anchor was never
+breached by anything people actually live in.
+
+**Remaining open, and now sharper.** Why does montane sustain only half as many settlement sites on the same
+footprint, when 356 locations clear the founding gate? The gate is not binding, so the constraint lies in the
+FOUNDING PROCESS (colonizing budding / emergent village founding) rather than in eligibility — plausibly the cost of
+moving a shed group across mountain terrain to reach a new site. That is a concrete, bounded question about the
+budding mechanism, and it is NOT tested here.
+
+**Deliverable.** #17 is closed as a marker question: it passes on co-residence in every canonical world, and the
+over-runs were an aggregation ladder. The montane site-sparsity finding is a genuine, separate observation about
+settlement founding under mountain terrain. Diagnosis only; canonical model unchanged. `scratchpad/bp_montane_why.py`
+(+ `bp_montane_why.png`).
+
 ---
 
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
