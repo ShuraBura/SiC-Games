@@ -1561,6 +1561,29 @@ class DemographyConfig(BaseModel):
     # it in as the OFF path). Default OFF ⇒ the occupancy/legacy path ⇒ bit-exact.
     enable_colonizing_budding: bool = False
     bud_spacing_village_target: float = Field(300.0, gt=0.0)  # V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED, Ames 2003]
+    # ── FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105, 2026-09-19) ─────────────────────────────────
+    # DIAGNOSED: a daughter village loses ~90% of its founders in ONE step and dies inside the 12-step
+    # `settle_release_steps` hysteresis. Measured, following founders by agent identity over exactly one step
+    # (temperate, capacity patch 40, four bud events): founders 61/57/40/65 → 53/56/22/62 LEFT, and **188 of
+    # the 193 that left (97%) landed EXACTLY on their family head's cell**. They do not die (alive 0.98) and
+    # they are not unpinned (measured 100% pinned to their own new site); a stride-1 diffusion cannot move the
+    # observed 6.2 cells, and the distances fall in discrete clusters — the signature of a teleport.
+    # THE CAUSE: the bloc above is a list of INDIVIDUALS ranked by kin affinity to the rival, and it is NOT
+    # closed under `_family_head`. The movement phase then does `_shift(agent, agent.pos, head.pos)` for every
+    # follower, at ANY distance (phase1_model, the F.3b co-movement block), so a follower whose head stayed
+    # behind is pulled straight back out of the daughter. Two correct mechanisms — kinship cleavage (Alvard) and
+    # nuclear-family co-movement (F.3b) — contradict each other.
+    # CONSEQUENCE: sites form at 6.4 and dissolve at 5.3 per 100 steps (median site lifetime 20 steps, 90% dead
+    # inside 100), so settlement count is pinned near 28 REGARDLESS of land — a treadmill, not a ceiling. The
+    # population then cannot track the resource base: it reaches 14.3% / 9.8% / 4.7% of carrying capacity as the
+    # food patch grows 256 → 560 → 1549 cells. Food never binds regionally, so there is no Malthusian pressure.
+    # ON ⇒ the bloc is assembled from whole HOUSEHOLDS (a `_family_head` root plus its followers) in the same
+    # kin-affinity rank order, and a follower whose head is not itself emigrating is left behind rather than
+    # taken and immediately retrieved. Ethnographically this is also the right unit: village fission moves
+    # households, not individuals (Bandy 2004; Chagnon's competing-headmen split takes families).
+    # Default OFF ⇒ the individual bloc ⇒ bit-exact. Applies to the COLONIZING path only (the legacy path does
+    # not build a ranked bloc). NOT ADOPTED — under evaluation, so `run_campaign.py` `_skip` must exclude it.
+    enable_bud_household_closure: bool = False
     # ── EMERGENT FISSION HAZARD (2026-07-27) ────────────────────────────────────────────────────────
     # Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. Bandy 2004 is explicit that the
     # threshold is not a constant — "if the cost of fissioning is low ... fissioning may be expected to occur

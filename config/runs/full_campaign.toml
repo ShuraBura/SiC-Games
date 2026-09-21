@@ -45,6 +45,7 @@ enable_biome_meat_frac = true
 enable_biome_seasonality = true
 enable_bonded_mating = true
 enable_bud_hazard = false
+enable_bud_household_closure = false
 enable_bud_requires_occupancy = false
 enable_bud_site_separation = false
 enable_capacity_scaled_grouping = true

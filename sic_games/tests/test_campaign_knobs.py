@@ -129,7 +129,15 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # ablatable instruments, so C_ALLON must not enable them by side effect.
                "enable_band_territory", "enable_fertility_restraint_gene",
                "enable_restraint_group_transmission", "enable_heritable_density_response",
-               "enable_sub_k_regulation", "enable_band_provisioning"}
+               "enable_sub_k_regulation", "enable_band_provisioning",
+               # FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105). Repairs a measured contradiction between two
+               # adopted mechanisms — budding cleaves the bloc by INDIVIDUAL kin affinity while F.3b co-movement
+               # teleports each follower to its family head at any distance, so 97% of the founders that leave a
+               # new site land exactly on their head's cell and the daughter dies inside the hysteresis. The
+               # repair works (founder retention 0.19 -> 0.84, site lifetime 20 -> 104 steps) but buys no
+               # measurable population or land use, and the village-size and e0 guardrails drift slightly the
+               # wrong way, so it is HELD dark pending the multi-seed replication.
+               "enable_bud_household_closure"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

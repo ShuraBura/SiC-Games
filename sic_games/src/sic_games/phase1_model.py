@@ -5658,6 +5658,9 @@ class TerrainWorld(mesa.Model):
         # density-scaled separation d(K)=clamp(round(sqrt(V_target/K_local)),1,3) cells. K_local is the cell's
         # Tallavaara carrying capacity (persons/cell). If the field has none, fall back to a fixed 2-cell sep.
         colonize = getattr(cfg, "enable_colonizing_budding", False)
+        # FAMILY-CLOSED BLOC (R-106 Add.105): emigrate whole households, so the F.3b co-movement block cannot
+        # retrieve a follower whose head stayed behind. See DemographyConfig for the measurement.
+        hh_closure = colonize and getattr(cfg, "enable_bud_household_closure", False)
         _Kf = getattr(getattr(hf, "_base", hf), "_K_persons", None) if colonize else None
         _Vt = cfg.bud_spacing_village_target if colonize else 0.0
         def _bud_sep(xx, yy):
@@ -5729,6 +5732,32 @@ class TerrainWorld(mesa.Model):
                                                          a.unique_id), reverse=True)
                 _bloc = min(len(village) // 2, max(cfg.settle_min_pool, len(village) - thr_base))
                 faction = _ranked[:_bloc]
+                if hh_closure:
+                    # FAMILY-CLOSED BLOC (see `enable_bud_household_closure`). `_ranked` is a list of
+                    # INDIVIDUALS, so the bloc splits households; the F.3b co-movement block then teleports
+                    # every follower to its head's cell at ANY distance and the daughter loses ~90% of its
+                    # founders in one step (measured: 97% of leavers land exactly on their head's cell).
+                    # Rebuild the bloc out of whole households, keeping the same kin-affinity order.
+                    _inv = {id(a) for a in village}
+                    _units: dict = {}
+                    for a in village:
+                        _h = self._family_head(a)
+                        if _h is not None and id(_h) not in _inv:
+                            continue          # head is outside the village → this follower would be retrieved
+                        _units.setdefault(id(_h) if _h is not None else id(a), []).append(a)
+                    _rank = {id(a): i for i, a in enumerate(_ranked)}
+                    _order = sorted(
+                        _units.values(),
+                        key=lambda u: (min(_rank.get(id(m), len(_rank)) for m in u),
+                                       min(m.unique_id for m in u)))
+                    _cap = len(village) // 2                       # the parent keeps a majority, as above
+                    faction = []
+                    for _u in _order:
+                        if len(faction) + len(_u) > _cap:
+                            continue                               # try the next, smaller household
+                        faction.extend(_u)
+                        if len(faction) >= _bloc:
+                            break
                 if len(faction) < cfg.settle_min_pool:
                     continue                                        # cannot seed a viable daughter → no bud
             # NEAREST open storable daughter site (its distance = the relocation cost that drives circumscription)

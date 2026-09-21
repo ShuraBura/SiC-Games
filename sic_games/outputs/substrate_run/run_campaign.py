@@ -992,6 +992,13 @@ def main():
             # Remove a line here when the supervisor adopts that mechanism.
             "enable_hunger_dispersal",
             "enable_founding_delay",
+            # FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105, 2026-09-19). Repairs a measured contradiction
+            # between two adopted mechanisms: budding cleaves the emigrant bloc by INDIVIDUAL kin affinity
+            # (Alvard), while F.3b co-movement teleports every follower to its family head at ANY distance —
+            # so a daughter village loses ~90% of its founders in ONE step (97% of leavers land exactly on
+            # their head's cell) and dies inside the 12-step hysteresis. UNDER EVALUATION, not adopted, so
+            # C_ALLON must not enable it by side effect (the leaky_assabiyah rule).
+            "enable_bud_household_closure",
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard

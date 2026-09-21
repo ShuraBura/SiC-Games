@@ -65,6 +65,11 @@ TYPES = {
     # COLONIZING BUDDING (R-106, 2026-09-03): buds FOUND daughters on empty rich land, density-scaled
     # spacing. Decides WHERE villages exist -> T. HELD pending per-biome validation (see run_campaign _skip).
     "enable_colonizing_budding": "T",
+    # FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105, 2026-09-19): the bud sheds whole HOUSEHOLDS
+    # instead of individuals, so F.3b co-movement cannot retrieve a follower whose family head stayed
+    # behind. Decides WHO relocates and therefore whether a daughter site survives -> T (territory /
+    # spatial structure), a pure rule change with no magnitude. HELD (see run_campaign _skip).
+    "enable_bud_household_closure": "T",
     # Settlement-nucleation runaway fixes (2026-08-12). All four act on the SETTLEMENT LIFECYCLE — where a
     # site may be founded, whether it can be held, and who counts as a member — so they are T (territory /
     # spatial-structure) rather than P (production). None carries a magnitude: each is a pure rule change.
@@ -318,6 +323,9 @@ PREREQ = {
     "enable_noble_leveling_exemption": ("enable_leveling", "enable_legitimacy"),
     "enable_lineage_split": ("enable_lineage_branching",),
     "enable_bud_hazard": ("enable_village_budding",),
+    # The household-closed bloc is built inside the COLONIZING path (the legacy path has no ranked
+    # bloc to close), which in turn needs village budding to exist at all.
+    "enable_bud_household_closure": ("enable_village_budding", "enable_colonizing_budding"),
     # R-106 band-autonomy arc (2026-09-08). Band territory needs villages with a stable band identity to pin to
     # (the `_village_band` map); group transmission copies the restraint gene's trait; the heritable
     # density-response replaces the density-fertility brake's exponent.
