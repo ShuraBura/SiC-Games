@@ -9314,4 +9314,129 @@ settlement founding under mountain terrain. Diagnosis only; canonical model unch
 
 ---
 
+## Addendum 105 — The population is NOT food-limited: it sits at 5–10% of carrying capacity and the fraction FALLS as the world grows. Settlement churn diagnosed to a contradiction between two adopted mechanisms; the repair works and is NOT adopted. Four cycle negatives re-read (2026-09-19, R-106)
+
+**The task.** The supervisor set the goal before any cycle layer: make Malthusian pressure work. Their definition,
+which governs this addendum: a population EXPANDS, and SPREADS while it expands, for as long as food remains; it
+CONTRACTS when food fails; and the contraction normally comes from an EXTERNAL constraint — a long drought or a
+catastrophe — not from an endogenous stall. Secular cycles are explicitly a later question.
+
+**HEADLINE 1 — the population is not food-limited, and it is not close.** Measured on the probe harness with the
+canonical config, capacity computed as Σ(cell yield)/BURN over food-bearing land:
+
+| capacity patch | food cells | carrying capacity | population | % of capacity | sites |
+|---|---|---|---|---|---|
+| 16 | 256 | 6,125 | 912 | **14.3%** | 11 |
+| 24 | 560 | 15,390 | 1,532 | **9.8%** | 24 |
+| 40 | 1,549 | 47,674 | 2,319 | **4.7%** | 28 |
+
+Food cells rise 6×, capacity 7.8×, population only 2.5× — **the fraction of capacity used FALLS as the world
+grows.** The three canonical worlds agree (temperate/savanna/montane, 3 seeds, patch 40): populations
+1,262/1,085/1,734 against stock capacities 13,611/23,890/24,498. This independently reproduces R-58's own July
+measurement of "3–4K agents = 6–8% of the 52K world carrying capacity". **The number has not moved in two months.**
+
+**It is not scarcity at any level.** Median per-agent intake is 1.98/2.35/3.23 × requirement and only 1–2% of
+agents sit below need. Villages hold 55 people (median) against a catchment food ceiling of 180 (p90 320, max
+382) — **~30% of their own ceiling**. Only 177 of 1,529 food cells (11.6%) lie inside any village catchment.
+A new RATE-vs-STOCK distinction was checked and dismissed as the general cause: `enable_forage_cap` limits a
+person to `forage_kcal × 100`, so a cell feeds anyone only above 750 kcal/hr, but 100%/57.9%/94.2% of food cells
+clear that — it binds in savanna alone (which carries the worst starvation share, 0.49).
+
+**HEADLINE 2 — Addendum 79's "the packing is an ADAPTIVE equilibrium" is REFUTED.** Using the model's own
+`_diag_pool` hook and counting the agglomeration bonus on BOTH sides, **96.6% of agents would eat 4.7× better one
+cell away** (n=3,768, 3 seeds; 85.6% would eat ≥2× better). A +17% co-location premium cannot pay for a 4.7×
+per-capita loss. The packing is imposed by the residence pin, not chosen.
+
+**HEADLINE 3 — settlement CHURN, and its cause.** Sites form at 6.4 and dissolve at 5.3 per 100 steps; **median
+site lifetime is 20 steps against a 12-step `settle_release_steps` hysteresis, and 90% are dead inside 100
+steps.** The stable ~28 sites is a treadmill, not a ceiling: founding is not blocked, ESTABLISHMENT is.
+
+Following founders by agent identity over exactly one step (temperate patch 40, four bud events): founders
+61/57/40/65 → 53/56/22/62 LEFT, and **188 of the 193 that left (97%) landed EXACTLY on their family head's cell.**
+They do not die (alive 0.98) and they are not unpinned (100% pinned to their own new site). The cause is a
+contradiction between two ADOPTED mechanisms: `_maintain_village_budding` cleaves the emigrant bloc by INDIVIDUAL
+genetic kinship (Alvard), so the bloc is not closed under `_family_head`; the F.3b co-movement block then runs
+`_shift(agent, agent.pos, head.pos)` for every follower **at any distance**, retrieving those whose head stayed
+behind. Five alternatives were tested and eliminated: stale `_nearest_map` (the movement phase rebuilds it),
+unpinned founders (measured 100% pinned), settlement scalar stress (a one-step pin RELEASE, ~25% person-weighted,
+not an eviction), long mobility stride (measured stride = 1 for 100% of agents), and `_do_gathering`
+(`enable_adaptive_connubium` takes that branch, so it never runs).
+
+**HEADLINE 4 — the repair works and is NOT ADOPTED.** `enable_bud_household_closure` (default OFF, bit-exact,
+in `run_campaign.py` `_skip`) assembles the bloc from whole households. Powered replication, **n=10 paired
+demographic seeds on a FIXED world** (the project's low-noise instrument — the world lottery dominates
+population/e0 noise), patch 40, 2000 steps:
+
+| | canon | closure | paired difference |
+|---|---|---|---|
+| settlement sites | 57.6 | 70.2 | **+12.6 ± 5.4 (+2.3 se)** |
+| population | 2,827 | 3,201 | +374 ± 225 (+1.7 se), n.s. |
+| frac of carrying capacity | 0.064 | 0.072 | +0.008 ± 0.005, n.s. |
+| village median (Bar-Yosef 40–150) | 46 | 40 | **−6 ± 3 (−2.3 se)** |
+| frac inside 40–150 | 0.55 | 0.49 | **−0.06 ± 0.03 (−2.0 se)** |
+| e0 (Aché 36.6) | 40.4 | 38.9 | **−1.5 ± 0.4 (−3.7 se)** |
+| starvation share | 0.20 | 0.25 | **+0.05 ± 0.01 (+3.8 se)** |
+
+The mechanism is repaired far outside noise (founder retention 0.19 → 0.84, site lifetime 20 → 104 steps,
+dissolutions 6.5 → 2.8 per 100 steps) and village count rises 22%. But **all four anchored guardrails degrade
+significantly** — it buys MORE, SMALLER, HUNGRIER villages. Not adopted. CAVEAT: the fixed world carries a canon
+e0 of 40.4, ABOVE the Aché anchor, so the LEVELS are not canon's position; the paired DIFFERENCES are valid
+because both arms share the world.
+
+**HEADLINE 5 — village count is not the lever either, and the regulator is DEMOGRAPHIC.** A 22% rise in villages
+moved capacity utilisation only 6.4% → 7.2%; reaching K needs ~14× the population. Every adult sits at the SAME
+**0.42 reserve fill** — the poorest decile included, so there is no starving underclass — on ~1.5× need, with the
+extraction cap never binding (0% of the poorest decile are cap-limited). Starvation is 25% of deaths and is
+carried by WORKING-AGE ADULTS (15–45: 44% of their own deaths, 36.4% of all starvation), not the juvenile tail,
+so `enable_band_provisioning` does not address it — consistent with Addendum 76's zero-sum finding.
+**So the causation runs the other way from how this arc assumed: the population is not small because there are
+few villages; there are few villages because the population is small.** The population is set by a demographic
+equilibrium at the condition margin, and the settlement pattern follows it. The only intervention that moved it
+materially was `enable_density_fertility` OFF (9.8% → 16% → 26.9% of capacity as radius and the brake were
+changed), at a real cost: e0 29.0 → 24.1, starvation 0.43 → 0.52.
+
+**RE-EXAMINATION OF THE CYCLE NEGATIVES.** `run_campaign.py` states that four searches for Malthusian and secular
+cycles ran "with the slow environmental driver switched off", and that the ENSO interannual, the regime telegraph,
+the caribou swing and the llanos flood "were built, unit-tested, and NEVER IN A RUN... which is why the no-cycles
+findings need the narrower reading." `C_CLIMATE` defaults to 0.
+- **R-67 / R-68 / R-71 / R-87d are not informative about MALTHUSIAN cycles.** All ran ~10× below the food
+  ceiling, outside the regime R-58 itself identified: the boom-bust is "latent in the anchored model" and
+  "activate[s] near regional carrying capacity".
+- **R-71 named the missing ingredient correctly and reached for a dead lever.** It concluded cycles "need
+  exogenous shocks (`enable_tier2_shock`, deliberately OFF to isolate endogeneity)". `_tier2_shock` multiplies
+  ONLY `_settlement_catchment_yield`, measured at **37.3 kcal against a tier-1 of 2.27e6** (ratio 1.8e-5), so a
+  halving drought would remove ~18 kcal from a 2,270,000 kcal cell. **The exogenous-shock hypothesis has never
+  been tested.** The live channel (`enable_interannual`, which rides tier-1) has never been in a run.
+- **R-58's roadmap implication is RETRACTED.** It attributed the failure to reach carrying capacity to scale and
+  named the SoA/numba re-architecture as "the genuine gate". The patch-size test refutes this: a bigger world
+  gives a SMALLER fraction of capacity (14.3% → 9.8% → 4.7%). A faster engine would have produced a bigger world
+  and a worse ratio. The gate is dynamics, not performance.
+- **R-97 SURVIVES and is untouched.** It concerns SECULAR cycles and synchronisation — villages revolt
+  independently, nothing couples their timing, independent oscillators sum flat — and its conclusion (cycles need
+  a superordinate polity) says nothing about Malthusian boom-bust.
+
+**MEASUREMENT CORRECTIONS MADE DURING THIS ARC**, all caught by measuring rather than by reasoning, and all of
+the project's recurring class: a mean over CELLS instead of PERSON-WEIGHTED (the ceiling reads 0.35 per cell but
+**0.75 person-weighted**, and 15% vs **59%** of the population sits AT the ceiling — the binding cells are exactly
+the crowded ones); the agglomeration base priced without its `cv_ref` kcal conversion (it is ALIVE — only tier-2
+is dead); reserve fill divided by `_reserve_full` without `agent.reserve_scale()`; a 150-step window read as a
+bud-gate deadlock when canon in fact fires 121.7 bud events per 400 steps; `enable_village_density_disease`
+asserted as "the de-facto Malthusian brake" on the strength of the skip-list, then measured INERT (pop 1,358 vs
+1,357); a 5×5 window mistaken for a village; and the tier-2 unit bug re-discovered without first grepping
+`docs/PARAMETERS.md`, where **Addendum 11 (2026-07-31) already records it** as "CEILING-DOMINATED, effectively
+dead" together with a 200,000× sweep showing the correction changes almost nothing.
+
+**Deliverable.** Diagnosis, one new default-OFF mechanism, and a re-reading of the record. Canonical model
+unchanged: `enable_bud_household_closure` is bit-exact OFF, excluded from `C_ALLON`, placed in BENCHMARK_LADDER
+Tier 9, classified `T` in `audit_flag_invariants.py`, and stated in `config/runs/full_campaign.toml`. Suite
+1,750 pass / 1 fail, the failure being an `OSError: [WinError 6]` inside `subprocess._make_inheritable` in shells
+without a valid stdin — verified environmental by re-running the same campaign with `stdin=subprocess.DEVNULL`
+(FIDELITY: 0 mismatches). OPEN, and the next target on this evidence: the population is regulated by births and
+deaths at the 0.42 condition margin, so the fertility side — `enable_density_fertility`, keyed to each village's
+LOCAL 9-cell catchment while the region stays empty — is where the population actually responds. Instruments:
+`scratchpad/bp_malthus_{diag,budgate,cliff,cliff2,scale,3world,ratecap,growth,patch,churn,daughter,founders,hhtest,replicate}.py`,
+`bp_malthus_fig.py` → `bp_malthus_unitbug.png`, `bp_fidelity_check.py`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
