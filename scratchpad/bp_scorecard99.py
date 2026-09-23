@@ -25,7 +25,9 @@ MARKERS = [
     ("#13 primacy", "village_primate", "~1 (no primate centre)", 1.0, 2.0),
     ("#14 material Gini (adults)", "material_gini_adults", "BHM 2009 HG = 0.36", 0.30, 0.42),
     ("#14 material Gini (within-cell)", "material_gini_within_cell", "Agta within-camp mean 0.23 [0-0.44]", 0.0, 0.44),
-    ("#17 fission ceiling (community max)", "settle_community_max", "Alberti 158 / Alvard <=250", None, 250),
+    # #17 re-scored on the exact-cell CO-RESIDENCE unit `settle_max` (R-106 Add.104 / MARKER_MATRIX #17). The old
+    # field `settle_community_max` is a 3x3 WINDOW that straddles ~3 villages (Add.103) — it was the error.
+    ("#17 fission ceiling (co-resident max)", "settle_max", "Alberti 158 / Alvard <=250", None, 250),
     ("#9 hierarchy index (gini_cred)", "gini_cred", "[PRE-REGISTERED, Add.99] not itself anchored", None, None),
     ("stratification classifier", "pct_stratified", "the R-103 known-broken gate (context only)", None, None),
 ]
@@ -63,6 +65,24 @@ def main():
             elif lo is not None:
                 hit = " OK" if m >= lo else " MISS"
             cells.append(f"{m:.3f}+/-{se:.3f}{hit}")
+        print(f"{label:42s} {cells[0]:>16s} {cells[1]:>16s} {cells[2]:>16s}   {anchor}")
+
+    # ── #18 / #19 (added 2026-09-23, R-106 Add.107). Scored on the PERIOD life table the campaign now writes
+    # to meta["period_life_table"] (second half of the run) — NOT a row's cumulative `realised_e0`. Anchors are
+    # Gurven & Kaplan 2007 Table 2 hunter-gatherer rows (verify_anchor.py). A trajectory written before
+    # 2026-09-23 has no period table and prints n/a — it cannot be scored on these rows.
+    metas = {w: json.load(open(p))["meta"] for w, p in WORLDS.items()}
+    for label, key, lo, hi, anchor in (
+            ("#18 life expectancy e0 (PERIOD)", "e0", 21.0, 37.0, "G&K 2007 forager band 21-37; Hiwi 27 (llanos)"),
+            ("#19 juvenile survival l(15) (PERIOD)", "surv_to_15", 0.45, 0.66, "G&K 2007 band 0.45-0.66; avg 0.57")):
+        cells = []
+        for w in WORLDS:
+            plt_ = metas[w].get("period_life_table")
+            if not plt_ or plt_.get(key) is None:
+                cells.append("n/a (pre-09-23)")
+                continue
+            v = plt_[key]
+            cells.append(f"{v:.3f}{' OK' if lo <= v <= hi else ' MISS'}")
         print(f"{label:42s} {cells[0]:>16s} {cells[1]:>16s} {cells[2]:>16s}   {anchor}")
 
     print()

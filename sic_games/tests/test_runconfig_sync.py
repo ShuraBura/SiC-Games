@@ -190,7 +190,16 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # selectable nor consequential to e0. Kept as ablatable instruments; reasons in run_campaign.py _skip.
                "enable_band_territory", "enable_fertility_restraint_gene",
                "enable_restraint_group_transmission", "enable_heritable_density_response",
-               "enable_sub_k_regulation", "enable_band_provisioning"}
+               "enable_sub_k_regulation", "enable_band_provisioning",
+               # R-106 Addenda 105-107 candidates, built + measured, held dark; reasons in run_campaign.py _skip:
+               #   bud_household_closure       repairs the bud/family-retrieval contradiction (Add.105)
+               #   density_fill_matched_radius corrects the fill numerator/denominator radius (Add.106)
+               #   bud_viable_site             rejects daughter sites whose catchment cannot feed the bloc (Add.107)
+               # (The first two were MISSING here when they were committed. This test is a subprocess test, and the
+               # failure was misread as the WinError 6 stdin artifact because it was re-run in a DIFFERENT shell
+               # from the one that reported it. Diagnose a test failure in the shell that produced it.)
+               "enable_bud_household_closure", "enable_density_fill_matched_radius",
+               "enable_bud_viable_site"}
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 
 

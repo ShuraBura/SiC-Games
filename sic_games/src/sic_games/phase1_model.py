@@ -5671,6 +5671,9 @@ class TerrainWorld(mesa.Model):
         # FAMILY-CLOSED BLOC (R-106 Add.105): emigrate whole households, so the F.3b co-movement block cannot
         # retrieve a follower whose head stayed behind. See DemographyConfig for the measurement.
         hh_closure = colonize and getattr(cfg, "enable_bud_household_closure", False)
+        # FOOD-VIABLE DAUGHTER SITE (R-106 Add.107): a daughter may only be founded where its catchment can feed the
+        # emigrant bloc. See DemographyConfig.enable_bud_viable_site for the measurement.
+        viable_site = colonize and getattr(cfg, "enable_bud_viable_site", False)
         _Kf = getattr(getattr(hf, "_base", hf), "_K_persons", None) if colonize else None
         _Vt = cfg.bud_spacing_village_target if colonize else 0.0
         def _bud_sep(xx, yy):
@@ -5781,6 +5784,7 @@ class TerrainWorld(mesa.Model):
             # 2·settle_radius+1 away, so the two catchments are DISJOINT and a daughter has to hold its own
             # pool to survive. Default OFF ⇒ `sep + 1` ⇒ bit-exact.
             best, bestd = None, R + 1
+            _bud_need = len(faction) * self._burn if viable_site else 0.0   # the bloc's monthly maintenance
             for yy in range(max(0, sy - R), min(H, sy + R + 1)):
                 for xx in range(max(0, sx - R), min(W, sx + R + 1)):
                     d = max(abs(xx - sx), abs(yy - sy))
@@ -5798,6 +5802,11 @@ class TerrainWorld(mesa.Model):
                         #             rule on, median nearest-neighbour spacing was still 1.0 cell and 94% of
                         #             the population stayed resident — the catchment overlap, and so the mutual
                         #             propping, survived untouched. A site must clear EVERY existing settlement.
+                    if viable_site and self._settlement_carrying_capacity((xx, yy)) < _bud_need:
+                        continue    # FOOD VIABILITY (see `enable_bud_viable_site`): the catchment cannot feed the
+                        #             emigrant bloc. The founding field (`aqf`, S_pot x storable) is non-zero over
+                        #             far more land than the harvest field, so without this check a daughter can be
+                        #             founded where there is no food at all (measured: 67% of temperate buds).
                     best, bestd = (xx, yy), d
             if best is None:
                 continue         # CIRCUMSCRIBED (no open site in reach) → no bud → village grows + stratifies (Bandy → morph)

@@ -70,6 +70,9 @@ TYPES = {
     # behind. Decides WHO relocates and therefore whether a daughter site survives -> T (territory /
     # spatial structure), a pure rule change with no magnitude. HELD (see run_campaign _skip).
     "enable_bud_household_closure": "T",
+    # FOOD-VIABLE DAUGHTER SITE (R-106 Add.107): rejects a daughter site whose catchment cannot feed the
+    # emigrant bloc. Decides WHERE villages exist -> T; a pure rule change, no magnitude.
+    "enable_bud_viable_site": "T",
     # Settlement-nucleation runaway fixes (2026-08-12). All four act on the SETTLEMENT LIFECYCLE — where a
     # site may be founded, whether it can be held, and who counts as a member — so they are T (territory /
     # spatial-structure) rather than P (production). None carries a magnitude: each is a pure rule change.
@@ -330,6 +333,7 @@ PREREQ = {
     # The household-closed bloc is built inside the COLONIZING path (the legacy path has no ranked
     # bloc to close), which in turn needs village budding to exist at all.
     "enable_bud_household_closure": ("enable_village_budding", "enable_colonizing_budding"),
+    "enable_bud_viable_site": ("enable_village_budding", "enable_colonizing_budding"),
     # R-106 band-autonomy arc (2026-09-08). Band territory needs villages with a stable band identity to pin to
     # (the `_village_band` map); group transmission copies the restraint gene's trait; the heritable
     # density-response replaces the density-fertility brake's exponent.

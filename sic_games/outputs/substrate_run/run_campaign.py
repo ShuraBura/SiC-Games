@@ -107,9 +107,13 @@ FLUSHEVERY = int(os.environ.get("C_FLUSHEVERY", "500"))  # genealogy CSV flush c
 TERR      = os.environ.get("C_TERR", "coastal")
 CLIM      = os.environ.get("C_CLIM", "temperate")
 TAG       = os.environ.get("C_TAG", "")
-# Step at which the raw life-table counters are snapshotted into meta, so a PERIOD life table over
-# (LT_SNAP_STEP, STEPS] can be computed offline. 0 ⇒ no snapshot (bit-exact; see the main loop).
-LT_SNAP_STEP = int(os.environ.get("C_LT_SNAP_STEP", "0"))
+# Step at which the raw life-table counters are snapshotted, so a PERIOD life table over (LT_SNAP_STEP, STEPS]
+# is computed at the end into meta["period_life_table"]. DEFAULT = the halfway step, because markers #18 (e0)
+# and #19 l(15) are scored on the PERIOD table — every row's `realised_e0` is CUMULATIVE from step 0 and carries
+# the founding transient (measured: 34.73 cumulative vs 37.08 period on one run). C_LT_SNAP_STEP=0 disables it.
+# A pure observer either way: it copies counters and calls `life_table`, no RNG and no state change.
+_lts_env = os.environ.get("C_LT_SNAP_STEP")
+LT_SNAP_STEP = int(_lts_env) if _lts_env is not None else STEPS // 2
 GENOME    = os.environ.get("C_GENOME", "1") == "1"
 GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream (off for long cycling runs → save disk/time)
 BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
@@ -1008,6 +1012,11 @@ def main():
             # CORRECTION under evaluation — it changes births in every run — so C_ALLON must not adopt it by side
             # effect (the leaky_assabiyah / density_reference rule).
             "enable_density_fill_matched_radius",
+            # FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107, 2026-09-23). Buds found daughters by S_pot and never
+            # check the harvest field, so 67% of temperate buds landed on land with NO food and 72.5% of all
+            # temperate starvation deaths were inside those villages. UNDER EVALUATION, so C_ALLON must not
+            # adopt it by side effect.
+            "enable_bud_viable_site",
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard
@@ -1620,6 +1629,22 @@ def main():
         _c = w.raw_demographic_counters()
         meta["life_table_final"] = {k: _c[k] for k in
                                     ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc")}
+        # MARKERS #18 e0 / #19 l(15): the PERIOD life table over (snapshot, end], by the model's own
+        # `life_table(since=...)`. This — not a row's cumulative `realised_e0` — is the scored statistic.
+        if "life_table_snap" in meta and hasattr(w, "life_table"):
+            try:
+                _plt = w.life_table(since=meta["life_table_snap"])
+                meta["period_life_table"] = dict(
+                    from_step=meta.get("life_table_snap_step"), to_step=step,
+                    e0=round(_plt["e0"], 3), e15=round(_plt["e15"], 3),
+                    surv_to_15=round(_plt["surv_to_15"], 4), surv_to_45=round(_plt["surv_to_45"], 4),
+                    starv_share=round(_plt["starv_share"], 4),
+                    deaths=_plt["deaths"], exposure_py=round(_plt["exposure_py"], 1))
+                log(f"  period life table (steps {meta.get('life_table_snap_step')}-{step}): "
+                    f"e0 {_plt['e0']:.2f}  l15 {_plt['surv_to_15']:.3f}  starvation share "
+                    f"{_plt['starv_share']:.3f}  [markers #18/#19]")
+            except Exception as _e:              # a diagnostic must never lose a finished run
+                log(f"  !! period life table failed ({_e}) — the run itself is unaffected")
         meta["fertility_final"] = {k: _c[k] for k in ("fert_births", "fert_exposure", "ibi_hist")}
         meta["fertility_final"].update(fert_factor_sum=_c["fert_factor_sum"],
                                        fert_factor_n=_c["fert_factor_n"],

@@ -597,6 +597,27 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
 - Realized: e₀ = 37, **e₁₅ = 38.5 remaining yr**, e₄₅ = 21.1, survival-to-15 = 0.66, survival 15→45 = 0.43, modal adult death = 71 (forest) / 78 (settled). Adult baseline ~1%/yr to age ~40, then Gompertz. Aché a1 ≈ half of other foragers (higher child survivorship).
 - **DENOMINATOR NOTE (R-106, 2026-08-13) — "survival 15→45 = 0.43" is `l(45)` FROM BIRTH, not conditional on reaching 15.** Fed these exact coefficients, the model's `life_table()` returns `l(15) = 0.66` (matching to 2 dp) and a CONDITIONAL 15→45 of **0.65**; `0.66 × 0.65 = 0.43` recovers the published figure. Scoring the conditional against 0.43 would mark a correct schedule as wrong by ~50%. `life_table()` therefore returns `surv_to_45` and `surv_15_to_45_cond` as separately named fields — compare **`surv_to_45`** against this 0.43. Same failure class as the four earlier "right number, wrong denominator" retractions.
 - Cross-HG: e₀ 21–37; modal adult death avg 72; adaptive lifespan 68–78.
+- **Table 2, ALL HUNTER-GATHERER ROWS (lifted 2026-09-23 for markers #18/#19; VERIFIED VERBATIM from the filed PDF
+  p.7 and registered in `tools/verify_anchor.py`, each row matched label-to-l15 so both numbers are proved to sit
+  in the same row):**
+
+  | population | biome | e₀ | l(15) | e₁₅ |
+  |---|---|---|---|---|
+  | Agta | Philippine forest / coast | 21 | 0.45 | 28.6 |
+  | Hiwi | **llanos savanna** (Venezuela) | 27 | 0.53 | 32.2 |
+  | Hadza | East-African savanna | 34 | 0.57 | 42.5 |
+  | !Kung | Kalahari arid savanna | 36 | 0.59 | 38.1 |
+  | Aché forest | tropical forest | 37 | 0.66 | 38.5 |
+  | *average hunter-gatherer* | | — | 0.57 | 37.7 |
+
+  **So the forager band is e₀ 21–37 and l(15) 0.45–0.66.** The table holds NO temperate forager — a temperate
+  model world can only be scored on the band. The model's savanna world carries the llanos, so the **Hiwi** row is
+  its biome match. NOT anchors: the acculturated rows (Aché reservation, !Kung 1963–74, Hiwi post-1960, Agta
+  transition/peasant, N. Territory Aborigines) and the forager-horticulturalists (Yanomamö, Tsimane, Machiguenga,
+  Gainj). The paper notes the Agta adult data are "circumspect at later ages" (p.330); that concerns adult ages,
+  not l(15).
+  **CORRECTS two prior usages:** Aché 37 was used as the TEMPERATE e₀ anchor (Add.73) — it is a tropical-forest
+  population and the forager CEILING, not a temperate value; and "savanna anchor 31" (Add.73) matches no row.
 
 **Use:** Siler coefficients FIXED as constants (M-1), converted per-month (÷12). G&K Table 2 is both-sexes; sex-specific + maternal-removed (M-3) fits to come from Hill & Hurtado.
 

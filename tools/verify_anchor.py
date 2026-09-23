@@ -153,6 +153,28 @@ REGISTRY = [
     ("Page et al. Agta (#14 within-camp) - camp wealth Gini mean 0.23 (SD 0.12), range 0-0.44",
      "PMC10237286.pdf",
      r"mean of 0\.23 \(SD = 0\.12\)"),
+    # ── #18 e0 and #19 l(15): Gurven & Kaplan 2007 Table 2, the HUNTER-GATHERER rows (R-106 Add.107). Each
+    # pattern pins the WHOLE row from the population label (which carries e0) through the l15 column, so a match
+    # proves both numbers AND that they sit in the same row. Acculturated groups (settled Ache/!Kung, Hiwi
+    # post-1960, Agta transition/peasant) are NOT forager anchors and are deliberately not registered.
+    ("Gurven & Kaplan 2007 Table 2 (#18/#19) - Agta e0=21, l15=0.45 (the forager FLOOR)",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"Agta \(e0=21\) 0\.961 1\.506 N/A 7\.57E-03 0\.040 0\.016 0\.063 17\.5 10\.9 44\.1 0\.45"),
+    ("Gurven & Kaplan 2007 Table 2 (#18/#19) - Hiwi (llanos savanna) e0=27, l15=0.53",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"Hiwi \(e0=27\) 0\.458 1\.390 0\.020 6\.32E-09 0\.251 0\.127 0\.374 2\.8 1\.9 5\.4 0\.53"),
+    ("Gurven & Kaplan 2007 Table 2 (#18/#19) - Hadza (East African savanna) e0=34, l15=0.57",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"Hadza \(e0=34\) 0\.351 0\.895 0\.011 6\.70E-06 0\.125 0\.078 0\.173 5\.5 4\.0 8\.9 0\.57"),
+    ("Gurven & Kaplan 2007 Table 2 (#18/#19) - !Kung (Kalahari) e0=36, l15=0.59",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"!Kung \(e0=36\) 0\.340 0\.913 0\.010 3\.31E-04 0\.077 0\.045 0\.110 9\.0 6\.3 15\.6 0\.59"),
+    ("Gurven & Kaplan 2007 Table 2 (#18/#19) - Ache forest e0=37, l15=0.66 (the forager CEILING)",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"Ache forest \(e0=37\) 0\.157 0\.721 0\.013 4\.80E-05 0\.103 0\.048 0\.158 6\.7 4\.4 14\.6 0\.66"),
+    ("Gurven & Kaplan 2007 Table 2 (#19) - AVERAGE hunter-gatherer l15=0.57",
+     "Gurven and Kaplan - 2007 - Longevity Among Hunter‐ Gatherers A Cross‐Cultural Examination.pdf",
+     r"Average hunter- gatherer 0\.422 1\.131 0\.013 1\.47E-04 0\.086 0\.051 0\.174 8\.1 4\.0 13\.6 0\.57"),
 ]
 
 _TAGS = {"VERIFIED": "[VERIFIED    ]", "INTERPRETIVE": "[INTERPRETIVE]",

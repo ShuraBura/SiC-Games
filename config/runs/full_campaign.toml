@@ -48,6 +48,7 @@ enable_bud_hazard = false
 enable_bud_household_closure = false
 enable_bud_requires_occupancy = false
 enable_bud_site_separation = false
+enable_bud_viable_site = false
 enable_capacity_scaled_grouping = true
 enable_caribou_swing = false
 enable_catchment_ceiling = true

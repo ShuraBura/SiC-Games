@@ -137,7 +137,14 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # repair works (founder retention 0.19 -> 0.84, site lifetime 20 -> 104 steps) but buys no
                # measurable population or land use, and the village-size and e0 guardrails drift slightly the
                # wrong way, so it is HELD dark pending the multi-seed replication.
-               "enable_bud_household_closure"}
+               "enable_bud_household_closure",
+               # DENSITY-FILL RADIUS MATCH (R-106 Addendum 106): a correction under evaluation, held dark. It
+               # lowers juvenile survival on every canonical world when adopted alone (Stage 2), so it waits for
+               # the fix to the starvation mechanism. (Missed from this list when the flag was added; the gap was
+               # hidden because this test is a subprocess test and fails for WinError 6 in some shells.)
+               "enable_density_fill_matched_radius",
+               # FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107): under evaluation, held dark.
+               "enable_bud_viable_site"}
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 
