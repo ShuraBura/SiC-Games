@@ -9439,4 +9439,70 @@ LOCAL 9-cell catchment while the region stays empty — is where the population 
 
 ---
 
+## Addendum 106 — The density-fertility fill has a numerator/denominator RADIUS MISMATCH; the fix is a real population lever but lowers e0 and juvenile survival on the canonical pipeline — NOT adopted. Stage 2 also shows canon's period e0 is 27.9 / 24.0 / 23.0 and MARKER_MATRIX has no e0 marker (2026-09-22, R-106)
+
+**The defect.** The density-fertility brake is `p_birth *= 1 − fill^6`, with
+`fill = people · burn / _settlement_carrying_capacity`. The denominator sums cell yield over
+`settle_catchment_radius` = 1 (the ANCHORED Vita-Finzi ~10 km catchment). The numerator summed people over
+`settle_radius` = 2, a 25-cell window. The numerator therefore spanned 2.78× the denominator's area. Measured at
+equilibrium (probe, temperate patch 40, 3 seeds, person-weighted): as-coded fill **0.623 → birth multiplier 0.76**;
+matched-radius fill **0.438 → 0.94**. The mismatch alone costs ~18 birth-points. It is the recurring hidden-
+denominator class: a ratio whose two sides are measured over different domains.
+
+**The fix.** `enable_density_fill_matched_radius` sums the people over the food radius. The anchored food radius
+is not touched. Default OFF, bit-exact, in `run_campaign.py` `_skip`, BENCHMARK_LADDER Tier 3, audit TYPE `N`
+(depends on `enable_density_fertility`), and stated in `config/runs/full_campaign.toml`.
+
+**Stage 1** (probe harness, world 0 fixed, 10 paired demographic seeds): population **+25%** (+2.4 se), land use
++28%, village size toward the Bar-Yosef centre; e0 −2.0 (−2.3 se), starvation +5 pts (+2.5 se). World 0 carries
+a canon e0 of 40.4, so it could not answer whether the cost crosses an anchor.
+
+**Stage 2** (the supervisor's protocol: real `run_campaign.py`, the three canonical worlds, 15,000 steps, planet
+fixed `C_WORLD_SEED=C_CLIM_SEED=0`, demographic seed 0/1/2 paired across arms, genome ON because `_kin_affinity`
+reads it). e0 comes from a **period** life table over steps 7,500–15,000. Every campaign row's `realised_e0` is
+CUMULATIVE from step 0 and carries the founding transient; on a smoke run the two differ by 2.3 years (34.73 vs
+37.08). A new read-only observer, `C_LT_SNAP_STEP`, snapshots the raw counters for this. The analysis calls the
+model's own `TerrainWorld.life_table` on the dumped counters. **Positive control:** the cumulative table rebuilt
+from the final counters reproduces every run's live `realised_e0` exactly (18/18).
+
+| world | e0 canon → fix | l(15) canon → fix | starvation share | population canon → fix |
+|---|---|---|---|---|
+| temperate | 27.91 → 26.33 (−1.58, −4.7 se) | 0.538 → 0.510 | 0.49 → 0.51 | 3,216 → 4,059 (+26%) |
+| savanna | 23.96 → 22.54 (−1.41, −1.9 se) | 0.427 → 0.411 | 0.58 → 0.61 | 916 → 907 (flat) |
+| montane | 23.03 → 21.90 (−1.13, −8.6 se) | 0.439 → 0.405 | 0.54 → 0.54 | 2,377 → 2,902 (+22%) |
+
+Per seed pair: e0 falls in **8/9** (savanna seed 2 is flat), survival to 15 falls in **9/9**, and population
+rises in 7/9. Village median rises on temperate (72 → 80) and montane (84 → 90), inside the Bar-Yosef 40–150 band.
+
+**Verdict: NOT ADOPTED.** The correction is real and the lever is real on two worlds, but it lowers juvenile
+survival on every world and pushes savanna and montane e0 toward 21, the floor of the forager range. The inflated
+fill was acting as an accidental preventive check and was partly MASKING the e0 gap. So the fix should be adopted
+only together with whatever addresses the crowding-mortality margin (Addendum 105), not by itself.
+
+**Anchoring, done by biome.** Gurven & Kaplan 2007 give a cross-forager e0 range of **21–37**, and the Aché forest
+values (e0 37, l15 0.66) are the TOP of it, since Aché `a1` is about half that of other foragers. Canon's period
+e0 on the canonical pipeline is **27.9 / 24.0 / 23.0**: inside the range, in its lower half. Against Addendum 73's
+point anchors (temperate 37, savanna 31) it is 9 years under in temperate and 7–8 years under in savanna/montane.
+Starvation is about **half of all deaths** on every canonical world (0.49 / 0.58 / 0.54). This is the crowding-
+mortality regulator of Addendum 105, now measured on the real pipeline.
+
+**Corrections to the record.**
+- **Addendum 79's "CALIBRATED — temperate e0 36.2 at anchor" is NARROWED.** It is a probe-harness value. On the
+  canonical pipeline at full length the period e0 is 27.9. Addendum 73 had already warned that "the diagnostic
+  harness misled", and Addendum 101's rule applies: absolute values do not transfer between harnesses.
+- **MARKER_MATRIX has no e0 marker.** So Addendum 100's "definitive scorecard, 11/13 pass" never scored e0 or
+  survival to 15, the two markers that fail most clearly on the canonical pipeline. One should be added, anchored
+  by biome as above and scored on a PERIOD table.
+- My own error in this arc, caught before recording: I first scored all three worlds against the Aché 36.6 value
+  and reported them as "9–13 years below anchor". That is the wrong anchor for savanna and montane, and Aché is
+  the top of the range for any world.
+
+**Deliverable.** A correction held dark, a period-life-table observer for the campaign, and a Stage-2 harness.
+The canonical model is unchanged. Instruments: `scratchpad/bp_malthus_fillradius.py`,
+`bp_malthus_replicate.py`, `bp_stage2_driver.py`, `bp_stage2_analyse.py`, `bp_stage2_fig.py` →
+`bp_stage2.png`. Runtime with 6 concurrent runs: temperate 134–190 min, montane 92–116, savanna 18–29, 306 min
+total.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
