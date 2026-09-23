@@ -60,6 +60,7 @@ enable_cred_status = true
 enable_delegitimation = true
 enable_density_disease = true
 enable_density_fertility = true
+enable_density_fill_matched_radius = false
 enable_density_reference = true
 enable_dependent_load = true
 enable_dynamic_bands = true

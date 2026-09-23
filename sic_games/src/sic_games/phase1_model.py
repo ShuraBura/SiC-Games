@@ -2960,7 +2960,17 @@ class TerrainWorld(mesa.Model):
             occ_c: dict = {}
             for _a in self.agent_list:
                 occ_c[_a.pos] = occ_c.get(_a.pos, 0) + 1
-            rad = cfg.settle_radius
+            # RADIUS OF THE FILL NUMERATOR. `fill = people·burn / catchment_ceiling` is a food-need/food-capacity
+            # ratio, so the people (numerator) and the food (denominator) must be summed over the SAME cells. The
+            # denominator `_settlement_carrying_capacity` sums over `settle_catchment_radius` (=1, the ANCHORED
+            # Vita-Finzi 10 km HG catchment); the numerator historically summed people over `settle_radius` (=2, a
+            # 5×5=25-cell window, provisional/unanchored) → the numerator spanned 2.78× the denominator's area and
+            # inflated the Malthusian signal (measured: person-weighted fill 0.62 as-coded vs 0.44 matched → an
+            # 18-pt birth cut, R-106 Add.106). `enable_density_fill_matched_radius` sums the people over the
+            # anchored food radius so the ratio is dimensionally consistent. Default OFF ⇒ settle_radius ⇒ bit-exact.
+            fill_rad = (cfg.settle_catchment_radius
+                        if getattr(cfg, "enable_density_fill_matched_radius", False)
+                        else cfg.settle_radius)
             for cell, n in occ_c.items():
                 food = tf.level(cell[0], cell[1])
                 _fill_cell[cell] = (n * self._burn / food) if food > 0.0 else 1.0
@@ -2968,7 +2978,7 @@ class TerrainWorld(mesa.Model):
                 sx, sy = site
                 cap = self._settlement_carrying_capacity(site)          # kcal/step the catchment sustains
                 vpop = sum(occ_c.get(((sx + dx) % N, (sy + dy) % N), 0)
-                           for dx in range(-rad, rad + 1) for dy in range(-rad, rad + 1))
+                           for dx in range(-fill_rad, fill_rad + 1) for dy in range(-fill_rad, fill_rad + 1))
                 _fill_village[site] = (vpop * self._burn / cap) if cap > 0.0 else 1.0
         self._dens_fert_fill_village = _fill_village    # diagnostic: last step's per-village fill fraction
         newborns: list[BaseAgent] = []

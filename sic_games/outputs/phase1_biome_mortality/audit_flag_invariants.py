@@ -135,6 +135,10 @@ TYPES = {
     # DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05): birth prob falls as the village nears its food
     # ceiling. A vital-rate modifier -> N.
     "enable_density_fertility": "N",
+    # DENSITY-FILL RADIUS MATCH (R-106 Add.106, 2026-09-21): counts the density-fertility fill numerator
+    # over the anchored food radius instead of settle_radius, correcting a need/capacity radius mismatch.
+    # A vital-rate modifier (it changes birth prob) -> N.
+    "enable_density_fill_matched_radius": "N",
     # FERTILITY RESTRAINT (R-106, 2026-09-08). The heritable birth-spacing gene multiplies the birth prob by
     # (1-restraint); the group-transmission engine copies the fittest band's norm; the heritable density-response
     # makes the density-brake exponent a per-mother trait. All three modulate the birth RATE -> type N.
@@ -332,6 +336,8 @@ PREREQ = {
     "enable_band_territory": ("enable_aggregation_sedentism", "enable_band_affiliation", "enable_village_identity"),
     "enable_restraint_group_transmission": ("enable_fertility_restraint_gene",),
     "enable_heritable_density_response": ("enable_density_fertility",),
+    # The radius-match correction only acts through the density-fertility fill, so it needs that on.
+    "enable_density_fill_matched_radius": ("enable_density_fertility",),
     "enable_sub_k_regulation": ("enable_aggregation_sedentism",),
     "enable_band_provisioning": ("enable_provisioning",),
     "enable_wealth_obligation": ("enable_material_capture",),

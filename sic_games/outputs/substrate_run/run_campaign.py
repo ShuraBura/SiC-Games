@@ -107,6 +107,9 @@ FLUSHEVERY = int(os.environ.get("C_FLUSHEVERY", "500"))  # genealogy CSV flush c
 TERR      = os.environ.get("C_TERR", "coastal")
 CLIM      = os.environ.get("C_CLIM", "temperate")
 TAG       = os.environ.get("C_TAG", "")
+# Step at which the raw life-table counters are snapshotted into meta, so a PERIOD life table over
+# (LT_SNAP_STEP, STEPS] can be computed offline. 0 ⇒ no snapshot (bit-exact; see the main loop).
+LT_SNAP_STEP = int(os.environ.get("C_LT_SNAP_STEP", "0"))
 GENOME    = os.environ.get("C_GENOME", "1") == "1"
 GENEALOG  = os.environ.get("C_GENEA", "1") == "1"        # genealogy CSV stream (off for long cycling runs → save disk/time)
 BUD       = os.environ.get("C_BUD", "0") == "1"          # village budding (Bandy 2004): large villages shed rival-led daughters
@@ -999,6 +1002,12 @@ def main():
             # their head's cell) and dies inside the 12-step hysteresis. UNDER EVALUATION, not adopted, so
             # C_ALLON must not enable it by side effect (the leaky_assabiyah rule).
             "enable_bud_household_closure",
+            # DENSITY-FILL RADIUS MATCH (R-106 Addendum 106, 2026-09-21). Corrects a numerator/denominator radius
+            # mismatch in the density-fertility fill (people over settle_radius=2, food over the anchored
+            # settle_catchment_radius=1), which inflates the Malthusian signal by ~18 birth points. A model
+            # CORRECTION under evaluation — it changes births in every run — so C_ALLON must not adopt it by side
+            # effect (the leaky_assabiyah / density_reference rule).
+            "enable_density_fill_matched_radius",
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard
@@ -1394,6 +1403,16 @@ def main():
         w.step()
         if not w.agent_list:
             log(f"[{step}] EXTINCT"); break
+        # PERIOD-LIFE-TABLE SNAPSHOT (R-106 Add.106, 2026-09-22). Every row's `realised_e0` comes from
+        # `w.life_table()` with no `since`, i.e. a CUMULATIVE table from step 0 that carries the founding
+        # transient. An absolute e0-vs-anchor verdict needs a PERIOD table over the equilibrium window. With
+        # C_LT_SNAP_STEP=k the raw counters are saved at step k, and `meta.life_table_final` minus this snapshot
+        # is the period table over (k, STEPS]. Pure observer — reads counters, changes nothing. Unset ⇒ no-op.
+        if step == LT_SNAP_STEP and hasattr(w, "raw_demographic_counters"):
+            _cs = w.raw_demographic_counters()
+            meta["life_table_snap"] = {k: list(_cs[k]) for k in
+                                       ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc")}
+            meta["life_table_snap_step"] = step
         cum_reversions += w.reversions_this_step
         c = w.connubium()
         if c:

@@ -626,6 +626,18 @@ class DemographyConfig(BaseModel):
     # / K-regulation; forager birth spacing lengthens with density). Default OFF ⇒ bit-exact.
     enable_density_fertility: bool = False
     density_fert_exponent: float = Field(6.0, gt=0.0)   # shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106, 2026-09-06 lever-sensitivity sweep): the e0-density frontier's best balance — e0 36.0 (at anchor) at the highest density of the high-e0 set. Lower values over-suppress density.
+    # DENSITY-FILL RADIUS MATCH (R-106 Addendum 106, 2026-09-21). The density-fertility fill is a food-need /
+    # food-capacity ratio: fill = people·burn / _settlement_carrying_capacity. The capacity (denominator) sums
+    # the cell yield over `settle_catchment_radius` (=1, the ANCHORED Vita-Finzi ~10 km HG catchment); the people
+    # (numerator) summed over `settle_radius` (=2, a 25-cell window, provisional/unanchored). The numerator thus
+    # spanned 2.78× the denominator's area and INFLATED the Malthusian stress signal. Measured at equilibrium
+    # (temperate patch 40, person-weighted): as-coded fill 0.623 → birth multiplier 0.76; matched fill 0.438 →
+    # 0.94, an 18-point birth suppression from the mismatch alone. This is the recurring hidden-denominator class:
+    # a ratio whose numerator and denominator are measured over different domains. ON ⇒ the people are summed over
+    # `settle_catchment_radius`, matching the food denominator; the anchored food radius is NOT touched. It is a
+    # CORRECTION under evaluation (it changes births in every run with density-fertility on), so it stays dark
+    # until the supervisor adopts it and `run_campaign.py` `_skip` must exclude it. Default OFF ⇒ bit-exact.
+    enable_density_fill_matched_radius: bool = False
     # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
     # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
     # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning
