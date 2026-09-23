@@ -9505,4 +9505,79 @@ total.
 
 ---
 
+## Addendum 107 — Starvation is found: in temperate, buds found daughter villages on land with NO food. A food-viable-site rule gives the largest gain of the arc there (e0 +4.6 yr, starvation 0.49 → 0.37) but lowers juvenile survival on savanna and montane — NOT adopted alone. Also: e0 and l(15) become scored markers #18/#19 (2026-09-23, R-106)
+
+**Markers #18 life expectancy and #19 juvenile survival.** `MARKER_MATRIX` had no e0 row, so Addendum 100's
+"definitive 11/13" never scored e0. Both rows now score the **PERIOD** life table over the second half of the run,
+which every campaign now writes to `meta.period_life_table` (the snapshot defaults to `STEPS // 2`;
+`C_LT_SNAP_STEP=0` disables it; verified a pure observer — trajectories identical with it on and off). Anchors are
+Gurven & Kaplan 2007 **Table 2**, all five hunter-gatherer rows, read verbatim from the filed PDF and registered in
+`tools/verify_anchor.py` (registry 31/31): Agta 21/0.45, **Hiwi (llanos savanna) 27/0.53**, Hadza 34/0.57,
+!Kung 36/0.59, Aché forest 37/0.66, hunter-gatherer average l(15) 0.57. So the band is **e0 21–37, l(15)
+0.45–0.66**. The table has no temperate forager. This corrects two earlier usages: Aché 37 is the tropical-forest
+CEILING and was wrongly used as the temperate anchor (Add.73, and my own first Stage-2 reading of Add.106); and
+Add.73's "savanna 31" matches no row. Canon: **#18 passes on all three worlds (27.9 / 24.0 / 23.0); #19 passes on
+temperate (0.538), fails on montane (0.439 ± 0.003), and is unresolved on savanna (0.427 ± 0.025).**
+
+**The crowding-mortality hypothesis (Add.105/106) is REFUTED on the canonical pipeline.** In the Stage-2 canon runs
+the occupancy where people starve is 0.51 / 0.34 / 0.87 of the occupancy the living experience — they die on
+EMPTIER cells, with intake near zero (0.03–0.13 of need) after an intake EMA of 1.6–3.8. The universal reserve fill
+of 0.42 is arithmetic: (reserve_full − BURN) / reserve_full = (130,000 − 75,000) / 130,000 = 0.4231. Agents fill to
+the Cahill-anchored cap every harvest and keep 0.47 months above the death floor after one month's burn. That body
+buffer is physiologically correct; the model puts the multi-month buffer in the GRANARY, which is banked only on
+storage-eligible cells, drawn only by the agents standing on that cell, and sized by that cell's current occupancy.
+INSTRUMENT NOTE: `starv_frac_acute` counts a death as acute only if the reserve was above 0.5 the step before;
+everyone lives at 0.42, so it reads ~0% although every death is a one-step fall. It is not usable on current canon.
+
+**Per-death probe** (real pipeline, steps 3000–6000, 12,514 / 3,446 / 12,324 deaths against a same-schedule living
+sample): **77 / 82 / 91% die on a cell with no stored food**; only 19 / 5 / 5% die beside a stocked granary. In
+TEMPERATE and MONTANE the dying stand on cells with **zero food** (median food per head 0.00, against 0.83 / 1.64
+for the living), in small groups, mostly without a family head. In SAVANNA it is a different failure: **children
+(median age 7) starving on a food-rich cell with the mother present** (73% on the same cell; 2.0× need per head;
+intake 0.08).
+
+**Bud-site probe.** Capacity is zero outside the food patch and depletion cannot reach zero (`B_FLOOR` 0.05), so
+zero food means off the patch. The daughter-site search tests founding potential (S_pot × storable) and never the
+harvest field. **Temperate: 67% of bud sites after step 1000 were founded OFF the food patch; those villages died
+in a median 13 steps (on-patch: 1,674); 88% of starvation deaths were off the patch and 72.5% of all starvation
+deaths were inside an off-patch bud village.** Montane: 72% of deaths off the patch, by mixed routes (42% bud
+villages). Savanna: not this mechanism (9% of buds off the patch).
+
+**The fix: `enable_bud_viable_site`.** A daughter site is rejected unless its catchment carrying capacity covers the
+emigrant bloc's monthly need (`len(faction) × burn`). No new number. Default OFF, bit-exact, held dark.
+
+| | Stage 1 (probe, world 0, n=10 paired) | Stage 2 temperate | Stage 2 savanna | Stage 2 montane |
+|---|---|---|---|---|
+| e0 (period) | 40.4 → 42.0 (+3.9 se) | **27.9 → 32.5 (+4.6, +23.6 se)** | 24.0 → 22.5 (−2.1 se) | 23.0 → 22.0 (−1.7 se) |
+| l(15) (period) | — | **0.538 → 0.593 (+9.4 se)** | 0.427 → 0.392 (−3.2 se) | 0.439 → 0.411 (−2.6 se) |
+| starvation share | 0.20 → 0.16 | **0.49 → 0.37** | 0.58 → 0.59 | 0.54 → 0.55 |
+| population | +21% | +58% | +40% | +25% |
+| village median | 46 → 45 | 72 → 94 | 68 → 77 | 84 → 96 |
+
+Stage 2 is the real pipeline at 15,000 steps, planet fixed, 3 paired demographic seeds. The canon arm was REUSED from
+Addendum 106; a re-run of canon savanna seed 0 reproduced the stored trajectory exactly (601/601 rows, identical
+life-table counters), which is the proof that reuse is valid. All 18 life-table positive controls pass.
+
+**Verdict: NOT ADOPTED ALONE.** The rule removes the dominant temperate cause of death — the largest gain found in
+this arc, a real improvement rather than a trade. But on savanna and montane, where that mechanism was minor, it adds
+people and lowers juvenile survival significantly, pushing the already-failing #19 further under. The likely cause,
+NOT yet measured: with no viable site the bud does not fire, people stay in the parent village, and the savanna child-
+provisioning failure worsens with more people on the same food. Adopt together with a fix for that mechanism.
+
+**Corrections to my own record.** (1) At Addendum 105 I reported the suite as "1,750 passed, 1 environmental
+failure". The failure was REAL: `test_the_files_describe_the_stack_the_supervisor_rule_asks_for` lacked the new held
+flag in its allowed-dark list. I re-ran it in a different shell, saw `WinError 6`, and misattributed it. Commits
+677f1d8 and 136c4a5 therefore carried a failing test; both allowed-dark lists (`test_campaign_knobs.py`,
+`test_runconfig_sync.py`) now carry all three held flags, and the full suite is **1,759 passed, 0 failed** in a
+background shell where subprocess tests run. A test failure must be diagnosed in the shell that reported it.
+(2) The scorecard scored #17 on `settle_community_max`, the field Addendum 104 showed was the error; it now uses
+`settle_max`.
+
+**Next.** The savanna/montane child-starvation mechanism: the mother's intake against her need, her giveable
+surplus, and whether the forage rate cap binds on her. Instruments: `scratchpad/bp_deathprobe{,_run,_analyse,_fig}.py`,
+`bp_budsite_{probe,run,analyse,fig}.py`, `bp_stage2_viable_fig.py` → `bp_deathprobe.png`, `bp_budsite.png`,
+`bp_stage2_viable.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
