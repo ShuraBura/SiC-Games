@@ -1610,8 +1610,10 @@ class DemographyConfig(BaseModel):
     # the same ceiling that caps a village's food) is at least the emigrant bloc's monthly maintenance
     # (`len(faction) × burn`). No new number: both sides are existing quantities. Ethnographically, fission moves
     # to land that can support the group (Bandy 2004). Colonizing path only; `_found_settlements_by_occupancy` is
-    # NOT changed (it was a minor route in the measurement). Default OFF ⇒ bit-exact. NOT ADOPTED — under
-    # evaluation, so `run_campaign.py` `_skip` must exclude it.
+    # NOT changed (it was a minor route in the measurement). Class default OFF ⇒ bit-exact for harnesses that
+    # build their own config. **ADOPTED (R-106 Addendum 108, 2026-09-24): removed from `run_campaign.py` `_skip`,
+    # so it is canonically ON.** Stage 2: temperate e0 27.9 -> 32.5, l15 .54 -> .59, e15 32.7 -> 36.7, starvation
+    # share .49 -> .37; no marker moves from pass to fail on any world.
     enable_bud_viable_site: bool = False
     # ── EMERGENT FISSION HAZARD (2026-07-27) ────────────────────────────────────────────────────────
     # Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. Bandy 2004 is explicit that the

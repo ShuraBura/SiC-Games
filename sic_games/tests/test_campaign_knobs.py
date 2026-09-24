@@ -142,9 +142,8 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # lowers juvenile survival on every canonical world when adopted alone (Stage 2), so it waits for
                # the fix to the starvation mechanism. (Missed from this list when the flag was added; the gap was
                # hidden because this test is a subprocess test and fails for WinError 6 in some shells.)
-               "enable_density_fill_matched_radius",
-               # FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107): under evaluation, held dark.
-               "enable_bud_viable_site"}
+               "enable_density_fill_matched_radius"}
+               # (enable_bud_viable_site was listed here while held; ADOPTED Addendum 108 -> canonically ON.)
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
 

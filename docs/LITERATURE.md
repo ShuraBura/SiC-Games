@@ -601,16 +601,18 @@ table in `sic_games/CLAUDE.md` (and PARAMETERS.md once the §6 split lands).
   p.7 and registered in `tools/verify_anchor.py`, each row matched label-to-l15 so both numbers are proved to sit
   in the same row):**
 
-  | population | biome | e₀ | l(15) | e₁₅ |
-  |---|---|---|---|---|
-  | Agta | Philippine forest / coast | 21 | 0.45 | 28.6 |
-  | Hiwi | **llanos savanna** (Venezuela) | 27 | 0.53 | 32.2 |
-  | Hadza | East-African savanna | 34 | 0.57 | 42.5 |
-  | !Kung | Kalahari arid savanna | 36 | 0.59 | 38.1 |
-  | Aché forest | tropical forest | 37 | 0.66 | 38.5 |
-  | *average hunter-gatherer* | | — | 0.57 | 37.7 |
+  | population | biome | e₀ | l(15) | l(45) | e₁₅ |
+  |---|---|---|---|---|---|
+  | Agta | Philippine forest / coast | 21 | 0.45 | 0.26 | 28.6 |
+  | Hiwi | **llanos savanna** (Venezuela) | 27 | 0.53 | 0.29 | 32.2 |
+  | Hadza | East-African savanna | 34 | 0.57 | 0.40 | 42.5 |
+  | !Kung | Kalahari arid savanna | 36 | 0.59 | 0.39 | 38.1 |
+  | Aché forest | tropical forest | 37 | 0.66 | 0.43 | 38.5 |
+  | *average hunter-gatherer* | | — | 0.57 | 0.36 | 37.7 |
 
-  **So the forager band is e₀ 21–37 and l(15) 0.45–0.66.** The table holds NO temperate forager — a temperate
+  **So the forager band is e₀ 21–37, l(15) 0.45–0.66, l(45) 0.26–0.43, e₁₅ 28.6–42.5.** (Added 2026-09-24: the
+  l(45) and e₁₅ columns, markers #20/#21, each proved in its row by `verify_anchor.py`. l(45) is survival FROM BIRTH,
+  per the denominator note above.) The table holds NO temperate forager — a temperate
   model world can only be scored on the band. The model's savanna world carries the llanos, so the **Hiwi** row is
   its biome match. NOT anchors: the acculturated rows (Aché reservation, !Kung 1963–74, Hiwi post-1960, Agta
   transition/peasant, N. Territory Aborigines) and the forager-horticulturalists (Yanomamö, Tsimane, Machiguenga,
@@ -796,6 +798,26 @@ filed locally (PDFs gitignored); each is anchored to the specific number lifted.
 ### Hill, K.R., Walker, R.S., Božičević, M., et al. (2011). "Co-Residence Patterns in Hunter-Gatherer Societies Show Unique Human Social Structure." *Science* 331(6022):1286–1289.
 **What was lifted — band composition (F.3 design target, §4.8.7):** across 32 present-day foraging societies, a residential band's adult members are **mostly NOT close kin** — primary kin (parents/offspring/siblings) are a minority; most co-residents are **distantly related or unrelated, linked through MARRIAGE** (affinal ties) and bilateral kinship. So a band = **multiple families + maturing/unrelated singles**, not an extended-kin clan. **How used:** the *validation target* for F.3 — pair-bonds + family co-movement should yield bands that are family-cored but multi-family and marriage-linked. (The current F.3a/b build produces nuclear-family-sized bands ~7; the multi-family ~25 band is the noted F.3c follow-on.) **Rejected:** the band-as-kin-group / lineage-clan model.
 **Citation tag:** [REFERENCE — band-composition target (§4.8.7); multi-family marriage-linked bands]
+
+### Marlowe, F.W. (2003). "A critical period for provisioning by Hadza men: Implications for pair bonding." *Evolution and Human Behavior* 24:217–229. FILED `literature/`. `[VERIFIED VERBATIM 2026-09-24 — tools/verify_anchor.py]`
+
+**What was lifted — the male share of a COUPLE's food by the age of the youngest child (Table 2, Hadza, daily kcal
+brought into camp):** married adults **50%** male; with offspring <8 yr **53%**; with offspring **<3 yr 58%**
+(n = 17 couples); with offspring **<1 yr 69%** (n = 6). Verbatim: *"Among those with an offspring under 3 years old,
+men accounted for 58% of daily Kcal, and 69% of daily Kcal among those with an offspring under 1 year old."* The
+extra male return comes *"not due to more meat, but to less widely shared foods, like honey."*
+**UNIT WARNING — read before using this number.** The 58% is the husband's share of the HOUSEHOLD'S PRODUCTION
+(food brought into camp by husband vs wife). It is NOT the share of a CHILD'S transfers that come from the father.
+`DemographyConfig.paternal_provision_frac`'s docstring says "calibrate so emergent male share of <3-yr provisioning
+≈ 58%" — that maps a production share onto a transfer share, the statistic/unit error the marker audit keeps
+catching (MARKER_MATRIX rules). Do NOT tune `paternal_provision_frac` to make the transfer diagnostic
+(`prov_young_paternal` / total) read 58%. What the source DOES support: fathers provision substantially during the
+critical period, so a paternal transfer of zero contradicts it.
+**Context (2026-09-24):** canon runs `paternal_provision_frac` = **0.0** (the class default; never set), while
+PARAMETERS gives 0.5 for forager societies and every `SOCIETY_PRESETS` entry sets 0.5 — config drift of the
+"validated in one stack, dead in another" class. Tier 3 draws only on the father's harvest OVERFLOW (food above his
+reserve cap, otherwise wasted), so by construction it cannot starve the father — unlike band provisioning, whose
+zero-sum shift was confirmed in Addendum 108.
 
 ### Marlowe, F.W. (2004). "Marital residence among foragers." *Current Anthropology* 45(2):277–284.
 **What was lifted — marriage system + residence (F.3a, §4.8.7):** foragers are predominantly **monogamous** (modest polygyny among high-status males, ~the von Rueden 4–11%), with **serial monogamy** (re-pairing after death/divorce) and **MULTILOCAL / flexible** post-marital residence (not rigidly patri- or matrilocal — the classic "patrilocal band" is overstated). **How used:** sets the F.3a model — **monogamy + serial re-pairing** (widow/divorce → re-pair), the chosen pair-bond model; polygyny deferred to a later knob; residence handled as nuclear-family co-residence (the unit co-locates) rather than a fixed patri/matri rule.

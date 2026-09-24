@@ -74,7 +74,11 @@ def main():
     metas = {w: json.load(open(p))["meta"] for w, p in WORLDS.items()}
     for label, key, lo, hi, anchor in (
             ("#18 life expectancy e0 (PERIOD)", "e0", 21.0, 37.0, "G&K 2007 forager band 21-37; Hiwi 27 (llanos)"),
-            ("#19 juvenile survival l(15) (PERIOD)", "surv_to_15", 0.45, 0.66, "G&K 2007 band 0.45-0.66; avg 0.57")):
+            ("#19 juvenile survival l(15) (PERIOD)", "surv_to_15", 0.45, 0.66, "G&K 2007 band 0.45-0.66; avg 0.57"),
+            # #20/#21 (2026-09-24): ADULT survival. e0 alone hid an adult crash (band provisioning lifted savanna e0
+            # while e15 fell below the forager floor), so #18 must never be read without #20.
+            ("#20 adult life expectancy e15 (PERIOD)", "e15", 28.6, 42.5, "G&K 2007 band 28.6-42.5; avg 37.7; Hiwi 32.2"),
+            ("#21 survival to 45 l(45) from birth (PERIOD)", "surv_to_45", 0.26, 0.43, "G&K 2007 band 0.26-0.43; avg 0.36")):
         cells = []
         for w in WORLDS:
             plt_ = metas[w].get("period_life_table")

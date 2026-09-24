@@ -1012,11 +1012,11 @@ def main():
             # CORRECTION under evaluation — it changes births in every run — so C_ALLON must not adopt it by side
             # effect (the leaky_assabiyah / density_reference rule).
             "enable_density_fill_matched_radius",
-            # FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107, 2026-09-23). Buds found daughters by S_pot and never
-            # check the harvest field, so 67% of temperate buds landed on land with NO food and 72.5% of all
-            # temperate starvation deaths were inside those villages. UNDER EVALUATION, so C_ALLON must not
-            # adopt it by side effect.
-            "enable_bud_viable_site",
+            # FOOD-VIABLE DAUGHTER SITE — ADOPTED (R-106 Addendum 108, 2026-09-24) and so REMOVED from this set ->
+            # canonically ON. Buds had founded 67% of temperate daughters on land with NO food, and 72.5% of all
+            # temperate starvation deaths were inside those villages. Stage 2 (real pipeline, 3 worlds): temperate
+            # reaches the forager average on l15 / e15 / l45 (0.59 / 36.7 / 0.37); no marker moves from pass to fail
+            # on any world. Savanna/montane juvenile survival still fails, slightly deeper, as it did in canon.
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard
