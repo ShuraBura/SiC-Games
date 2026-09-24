@@ -9580,4 +9580,73 @@ surplus, and whether the forage rate cap binds on her. Instruments: `scratchpad/
 
 ---
 
+## Addendum 108 — Why children starve, and band provisioning's zero-sum confirmed against an anchor. Food-viable daughter sites ADOPTED; band provisioning NOT. New adult markers #20 e15 and #21 l(45), because e0 hid an adult crash (2026-09-24, R-106)
+
+**How a child is fed in canon.** After its own small foraging share, a child draws on: tier 1, its mother's
+harvest OVERFLOW beyond topping up her own reserve; tier 2, her reserve above `provision_self_keep` × cap —
+**`provision_self_keep` = 1.0, so OFF**; tier 3, `paternal_provision_frac` × the father's overflow — **0.0, so
+OFF**; and band provisioning — **OFF** (Addendum 75, not adopted). PARAMETERS records `provision_self_keep` 1.0 as
+"OPEN / KEPT … band-level supersedes": it was left at 1.0 for a band provisioning that was never adopted. So a child
+eats only from its mother's overflow.
+
+**Child-starvation probe** (real pipeline, steps 3000–6000; 2,310 / 6,981 / 5,369 juvenile starvation deaths,
+savanna / montane / temperate, against a same-schedule sample of living juveniles). The mother is at her reserve
+cap — so has overflow to give — for **7% / 40% / 33%** of dying children against **99% / 99.7% / 99.6%** of living
+ones. Two routes: **orphans** (no feeding route at all) are **9% / 41% / 74%** of the dying against 2–3% of the
+living; and in savanna **59%** of juvenile starvation deaths are children whose mother is alive, has no overflow,
+and holds more than half a child-month of reserve above half her cap that she is not allowed to share.
+Underneath is a real food deficit: the dying children's mothers harvest **0.48 / 0.77 / 0.73** of their own need
+against **0.97 / 4.76 / 4.26** for living children's mothers. RETRACTED during the probe: I proposed the forage
+rate cap as a cause. It does not discriminate — 94% of living savanna mothers are rate-capped too and are fed,
+because meat and other streams are not subject to it.
+
+**Stage 2: band provisioning, alone and with food-viable sites** (real pipeline, 3 canonical worlds, 15,000 steps,
+planet fixed, 3 paired seeds; canon and viable arms reused). Band provisioning lifts l(15) into the forager band on
+every world, and the combination lifts e0 by +8.1 / +3.4 / +6.1 years. **But e0 misled.** It is dominated by child
+mortality, so saving children lifts it even while adults die more. Scored on the adult columns of Gurven & Kaplan
+Table 2 (e15 band 28.6–42.5; l(45) band 0.26–0.43):
+
+| world | arm | e15 | l(45) | l(15) |
+|---|---|---|---|---|
+| temperate | canon | 32.7 | 0.29 | 0.54 |
+| temperate | **viable site** | **36.7** | **0.37** | **0.59** |
+| temperate | both | 34.0 | 0.40 | **0.71 — over the 0.66 ceiling** |
+| savanna | canon | 35.3 | 0.25 | 0.43 |
+| savanna | band provisioning | **24.7 — under the 28.6 floor** | 0.20 | 0.57 |
+| savanna | both | **25.0 — under the floor** | 0.23 | 0.64 |
+| montane | canon | 31.6 | 0.22 | 0.44 |
+| montane | band provisioning | 29.5 | 0.27 | 0.56 |
+| montane | both | 27.9 — under the floor | 0.28 | 0.64 |
+
+**Addendum 76's zero-sum is confirmed on the real pipeline, against an anchor.** In savanna, band provisioning
+saves children but adult e15 falls from 35.3 to **24.7, below the lowest forager on record** (Agta 28.6), and the
+15–45 death rate doubles (0.0175 → 0.0348). The households that lose children have a real food deficit; sharing
+reassigns it and does not remove it. **Band provisioning is NOT adopted.** The viable-site rule alone puts temperate
+at the forager average on all three columns (0.59 / 36.7 / 0.37 against 0.57 / 37.7 / 0.36).
+
+**DECISION (supervisor, 2026-09-24): `enable_bud_viable_site` is ADOPTED** — removed from `run_campaign.py`
+`_skip` and from both allowed-dark test lists, so canonically ON; config regenerated. **New canon**, period table:
+
+| | e0 (#18) | l(15) (#19) | e15 (#20) | l(45) (#21) | starvation share |
+|---|---|---|---|---|---|
+| temperate | 32.5 ± 0.3 | 0.593 PASS | 36.7 ± 0.6 PASS | 0.367 ± 0.007 PASS | 0.37 |
+| savanna | 22.5 ± 1.1 | 0.392 ± 0.019 **FAIL** | 35.8 ± 0.8 PASS | 0.237 ± 0.016 unresolved | 0.59 |
+| montane | 22.0 ± 0.5 | 0.411 ± 0.011 **FAIL** | 32.3 ± 0.3 PASS | 0.216 ± 0.006 **FAIL** | 0.55 |
+
+Stated precisely: scored on the mean, adoption moves no marker from pass to fail. Scored with standard errors,
+savanna #19 moves from UNRESOLVED (0.427 ± 0.025, the floor inside 1 SE) to a clear FAIL (0.392 ± 0.019). The
+Addendum-106/107 canon trajectories are now STALE as a canon baseline; any future reuse must re-run canon.
+
+**New markers #20 adult life expectancy (e15) and #21 survival to 45 (l(45), from birth).** The registered
+Gurven & Kaplan patterns now match each hunter-gatherer row through the l(45) and e15 columns, so one match proves
+e0, l(15), l(45) and e15 sit in the same row (`verify_anchor.py`, 31/31). #18 must travel with #20: e0 is never to
+be scored alone. `LITERATURE.md` carries the l(45) column; the scorecard prints #18–#21 from
+`meta.period_life_table`.
+
+**Next arc: the savanna household supply gap.** Why do families stay where the mother gathers about half her
+need, when the living alongside them gather all of it? Instruments: `scratchpad/bp_childprobe{,_run,_analyse,_fig}.py`
+→ `bp_childprobe.png`; `bp_stage2_arms_fig.py` → `bp_stage2_arms.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
