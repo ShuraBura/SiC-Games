@@ -9697,4 +9697,45 @@ supply-gap probe** (`scratchpad/bp_supplyprobe{,_run}.py`). Figure: `bp_stage2_p
 
 ---
 
+## Addendum 110 — The supply gap is a granary ACCESS gap. A child starves on a step on which its family is one cell off the village granary. The move comes from a per-step pin release, then a free IFD choice. Diagnosis only; nothing changed (2026-09-24, R-106)
+
+**Probe 1** (real pipeline, new canon, seed 0, steps 3000–6000; mothers of 1,576 / 5,104 / 1,564 starving juveniles
+on savanna / montane / temperate, against a same-schedule sample of mothers of living juveniles). The starving
+child's mother stands on a cell with stored food in **9% / 2% / 56%** of deaths, against **100% / 68% / 100%** for
+living children. The nearest stored food is at most ONE cell away (median and p90 = 1 on savanna and montane).
+The granary is PER CELL: only the occupants of a cell bank their overflow into it, and only they draw from it. In
+savanna, 51% of living mothers harvest less than their need, and the stored food on their cell keeps 99% at their
+reserve cap. So in savanna the store, not the harvest, decides child survival.
+
+**Probe 2 — why the mother is off the granary.** Canon pins a village member (inside `settle_radius` 2) one cell
+toward its site each step. Two canon rules RELEASE the pin for ONE step as a coin flip:
+`enable_emergent_abandonment` (p = the site's remembered hardship; median 0.27 / 0.70 / 0.29 for the dying) and
+`enable_settlement_scalar_stress` (median p 0.11–0.23). A released member makes the ordinary IFD choice. Measured
+(observer only; probe 1 and probe 2 give identical population, e0 and deaths on all three worlds):
+
+| | savanna dying / living | montane dying / living | temperate dying / living |
+|---|---|---|---|
+| village mother released this step | **0.81** / 0.37 | 0.79 / 0.77 | 0.61 / 0.63 |
+| released mother's IFD move lands on stored food | **0.11 / 0.99** | **0.03 / 0.58** | **0.40 / 1.00** |
+| her band is present on the neighbouring stock | 0.82 / 0.91 | 0.73 / 0.75 | 0.64 / 0.64 |
+
+**Reading.** On every world, the child dies on a step on which its family is released and the free move takes it
+onto a cell with no stored food. Living families are also released (on montane and temperate just as often), but
+their move lands on stored food. CAUTION: the probe records only the death step. It does not show whether the family
+was off the granary for one step or for many steps. The run's own `starv_frac_acute` is 0.013 (savanna), so most
+starvation deaths are NOT one-step crashes, and a decline over several off-stock steps is likely. In savanna, the
+dying are also released twice as often (0.81 against 0.37). My hypothesis was
+that the IFD is blind to a store where the family's band is absent (`substrate.py:280`). That hypothesis is mostly
+REJECTED: the band is present on the neighbouring stock for 64–82% of the dying. So the IFD sees the store and still
+sometimes moves off it. The reason (the per-capita comparison on a crowded site, or the stochastic choice
+temperature) is NOT measured. Mobile families with no site are 20% of savanna deaths (relative risk 28).
+
+**What this means for the design.** The abandonment release is documented as a CHRONIC valve ("remembered hardship
+erodes the village's hold"). In canon it acts as a per-agent, per-step coin flip with p ~0.3–0.7, so a village
+member flickers on and off the pin, and each flicker can put a hungry family one cell from food that it cannot draw.
+The per-cell granary makes that one cell a cell without food. Candidate repairs are for the supervisor (below).
+Instruments: `scratchpad/bp_supplyprobe{,2}{,_run,_analyse,_fig}.py` → `bp_supplyprobe.png`, `bp_supplyprobe2.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
