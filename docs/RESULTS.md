@@ -9797,4 +9797,50 @@ outside those files + 65/65 inside them = clean.
 
 ---
 
+## Addendum 112 — Why the village granary overshoots temperate: STARVATION is the only thing that holds e0 inside the forager band. Without it, the model's other mortality gives e0 43–48. The main cause is a FILED, UNFIXED defect: the terrain-risk term scales the WHOLE a2, not the 10% accident share (2026-09-25, R-106)
+
+**The baseline.** Canon uses `ACHE_FOREST_NATURAL` — the Aché Siler with the contact-era warfare hazard removed —
+whose own life table is **e0 42.8, e15 45.0**, above the forager ceiling (e0 37). The design note on that constant
+says density disease "then regulates it DOWN to the realistic ~34–36". The only age-independent term that the world
+modulates is a2, through `_a2_mult` = risk × density × synergy.
+
+**Measured** (Add.111 Stage 2 trajectories, rows after step 7500, mean of 3 seeds; `a2_*_mean` are the model's own
+per-factor observers). The e0 column is a FIRST-ORDER estimate: the mean multiplier applied to the Siler, with no
+starvation.
+
+| world | arm | risk | density | synergy | a2 × total | starvation share | e0 with no starvation |
+|---|---|---|---|---|---|---|---|
+| temperate | canon | 0.54 | 1.03 | 1.46 | 0.80 | 0.33 | ~45.2 |
+| temperate | village granary | 0.54 | 1.05 | 1.44 | 0.81 | 0.18 | ~45.0 |
+| savanna | canon | 0.44 | 0.84 | 1.49 | 0.55 | 0.58 | ~48.4 |
+| savanna | village granary | 0.52 | 0.94 | 1.47 | 0.71 | 0.41 | ~46.3 |
+| montane | canon | 0.62 | 1.02 | 1.51 | 0.96 | 0.50 | ~43.3 |
+| montane | village granary | 0.59 | 1.13 | 1.47 | 0.97 | 0.28 | ~43.1 |
+
+**Reading.** On every world the total a2 multiplier is BELOW 1, so the non-starvation mortality runs BELOW the
+de-warfared Aché baseline, and its ceiling is e0 43–48. The density term does not regulate it down (it sits near 1:
+the populations live at 0.008–0.037/km², below the Binford reference 0.091 at which `enable_density_reference`
+normalises it to 1). So in canon, STARVATION — 33–58% of all deaths — is the only brake that holds e0 in the band.
+Any repair that reduces starvation lets e0 rise toward 43–48. The temperate overshoot is therefore NOT an artefact of
+the village granary; the granary only exposes it.
+
+**The dominant cause is the risk term, 0.44–0.62.** MODEL_SPEC §4.3.3 specifies terrain accidents as **≈10% of
+baseline a2** in average terrain, scaling with risk (Hill, Hurtado & Walker 2007: accidents ≈10% of HG deaths). The
+code (`risk_mult`) multiplies the WHOLE a2 by `risk_cell / mean land risk`, and settled people live on land that is
+safer than the land mean. So it removes about half of ALL age-independent mortality, not a part of a 10% share.
+**This defect is already on record:** commit `ae01ced` (2026-08-14) measured `risk_mult` 0.630 and wrote "RUNS
+BELOW 1.0 … Filed, not fixed." At that time the density term ran at 2.435 and hid it; the later density-reference
+repair normalised density to ~1 and removed the compensation. With the spec form `0.9 + 0.1 × risk ratio`, the same
+first-order estimate gives a no-starvation ceiling of **e0 38.2 / 39.4 / 36.7, e15 40.9 / 42.1 / 39.6** (temperate
+/ savanna / montane) — at the forager ceiling, before any starvation death is added.
+
+**Also noted, not diagnosed:** a starvation share of 33–58% is itself far from the forager record, where illness
+dominates and accidents are ~10%. No cause-of-death marker exists yet. The synergy term (~1.45) is the
+malnutrition × disease channel and is the one place where hunger already raises non-starvation mortality.
+
+**Proposal (for the supervisor).** A spec-conformant risk term as a held flag, tested in Stage 2 alone AND with the
+village granary. Instruments: this addendum's numbers come from the Stage-2 trajectories of Addendum 111.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
