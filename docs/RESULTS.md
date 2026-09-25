@@ -9649,4 +9649,52 @@ need, when the living alongside them gather all of it? Instruments: `scratchpad/
 
 ---
 
+## Addendum 109 — Fathers feed their children: `paternal_provision_frac` 0.0 → 0.5 is a CONFIG DRIFT repair, not a new mechanism. Montane child survival #19 moves FAIL → PASS; temperate improves on all four markers; savanna gains little and pays 1.1 years of adult e15. ADOPTED (2026-09-24, R-106)
+
+**The drift.** Addendum 108 found tier 3 of child feeding (the father's overflow) at 0.0 in canon. The documented
+forager value is 0.5: fathers give half their overflow to their own children. The flag `enable_paternity` was ON in
+canon, so paternity was known, but the share that used it was zero. This is the "validated in one stack, dead in
+another" bug class of the 2026-08-04 config audit. CAUTION recorded in the `demography.py` docstring: do not tune
+this value to Marlowe 2003's 58%, because that is a share of HOUSEHOLD PRODUCTION, not a share of a father's surplus.
+
+**Stage 2** (real pipeline, 3 canonical worlds, 15,000 steps, planet fixed, 3 paired seeds; the Addendum-108 canon
+(`viable`) arm reused and matched exactly by the positive control). Period life table, mean ± SE, per-seed values:
+
+| world | e0 (#18) | l(15) (#19) | e15 (#20) | l(45) (#21) | starvation share |
+|---|---|---|---|---|---|
+| temperate | 33.8 ± 0.3 (+1.2, 6.3 SE) | 0.618 ± 0.002 PASS (+0.025) | 36.8 ± 0.3 PASS (+0.2, n.s.) | 0.387 ± 0.005 PASS (+0.019) | 0.35 |
+| savanna | 23.4 ± 1.3 (+0.9, n.s.) | 0.422 ± 0.021 **FAIL** (+0.030, n.s.) | 34.7 ± 0.9 PASS (**−1.1, 6.2 SE**) | 0.244 ± 0.020 unresolved | 0.59 |
+| montane | 24.1 ± 0.2 (+2.1, 8.1 SE) | **0.462 ± 0.006 PASS** (+0.051; seeds .472/.464/.450) | 31.9 ± 0.7 PASS (−0.3, n.s.) | 0.241 ± 0.005 **FAIL** (+0.024) | 0.51 |
+
+**Reading.** In temperate and montane the fathers' food saves children and does not cost adults: the 15–45 death
+rate does not move (−0.8 SE and +0.8 SE). So this is not the zero-sum of band provisioning — a father on those
+worlds has a real surplus. Montane also grows (+360 people, +3.5 SE on villages). **Montane #19 passes, but
+narrowly:** the lowest seed is at 0.450, which is exactly the Agta floor. **Savanna is different.** Children gain a
+little (not significant), and the adult 15–45 death rate rises from 0.0167 to 0.0183 (+4.1 SE). A savanna father has
+little surplus, so a transfer to his children again moves deaths from children to adults. Savanna e15 stays inside
+the forager band. The hypothesis for the savanna cost (need-weighted cell shares) is NOT measured.
+
+**DECISION (supervisor, 2026-09-24): `paternal_provision_frac = 0.5` is ADOPTED.** Set in `emergent_village_demog()`
+(the canon builder), in `config/runs/full_campaign.toml`, and in the regenerated `config/parameters.toml`; the class
+default stays 0.0. The `viable` trajectories are now STALE as a canon baseline; the `pat` trajectories are the new
+canon, and a future reuse must re-run a control first.
+
+**Two tests failed after adoption; both are small-world lottery outcomes, not effects on the mechanism.** The
+positive control (0.0) reproduced each old PASS. (1) `test_pressure_mobility` — the intake-fertility gate binds on
+1.0% of fertile woman-steps at 0.0 but 0.36% at 0.5 in its 900-agent world, and then no birth in 300 steps falls
+into the reduced part of p_birth, so the two arms are identical. (2) `test_cohesion_headroom` (the Addendum-22
+blocker pin) — in the seed-0 world, median band surplus fell 0.64 → 0.44 and median assabiyah left its clamp
+(0.968). Over four seeds the mean median surplus is 0.665 (0.0) against 0.661 (0.5), and assabiyah stays at 1.000 on
+seeds 1–3: **the blocker is NOT removed.** Repair (supervisor decision): both tests pin `paternal_provision_frac=0.0`
+with the measurement in a comment. A finding recorded in passing: the pinned rule "every led band is at the clamp"
+already fails on seed 3 at 0.0, so it is exact only for the seed-0 world. Earlier in the same session 30 other
+tests failed while three probe runs used the machine in parallel; all 30 passed again with no probe running. The
+cause of that interference is NOT measured.
+
+**Scorecard after adoption.** Temperate passes #18–#21. Montane passes #18–#20 and fails #21. Savanna passes #18 and
+#20, fails #19, and #21 is unresolved. Savanna is now the one world that fails child survival. **Next: the savanna
+supply-gap probe** (`scratchpad/bp_supplyprobe{,_run}.py`). Figure: `bp_stage2_pat_fig.py` → `bp_stage2_pat.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

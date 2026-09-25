@@ -2222,9 +2222,14 @@ class DemographyConfig(BaseModel):
     lineage_reversion: float = Field(0.0, ge=0.0, le=1.0)    # ρ: mean-reversion of inherited lineage (homeostat)
     # B+ step 5: PATERNAL provisioning. A father gives `paternal_provision_frac` of his harvest OVERFLOW (above
     # his cap, otherwise wasted) to his OWN children, drawn against the child's RESIDUAL need AFTER the maternal
-    # tiers (RT-2: conserved, no double-feed) — so it bites only on the constrained-mother / ORPHAN cohort (the
-    # Marlowe critical-period target; calibrate so emergent male share of <3-yr provisioning ≈ 58%). 0 = pure B
-    # (no paternal feeding). Requires enable_paternity (the father-links).
+    # tiers (RT-2: conserved, no double-feed) — so it bites only on the constrained-mother / ORPHAN cohort. 0 = pure
+    # B (no paternal feeding). Requires enable_paternity (the father-links).
+    # CORRECTED 2026-09-24 (R-106 Addendum 109). This comment used to say "calibrate so emergent male share of <3-yr
+    # provisioning ≈ 58%" (Marlowe). Marlowe 2003's 58% is the husband's share of the COUPLE'S daily kcal brought
+    # into camp (household PRODUCTION), not the father's share of TRANSFERS to a child — tuning this value to make
+    # `prov_young_paternal / total` read 58% would score a production share as a transfer share. Do not.
+    # CANONICAL VALUE 0.5 — set in `emergent_village_demog()` (the documented forager value: PARAMETERS.md and every
+    # SOCIETY_PRESETS entry). The class default stays 0.0 so constructed-truth tests and other harnesses are bit-exact.
     paternal_provision_frac: float = Field(0.0, ge=0.0, le=1.0)
     # [R-80, NOT BUILT] A status→fertility provisioning channel (husband's overflow → wife's reproductive
     # reserve → shorter IBI) was prototyped and REVERTED: it is structurally inert. The transfer needs a husband

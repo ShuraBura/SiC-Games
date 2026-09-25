@@ -164,12 +164,20 @@ def test_fertility_and_mobility_intake_modes_are_independently_ablatable():
     300 steps, not 120, for the reason measured in `test_intake_fertility.test_on_changes_the_world`: the
     fertility gate binds on only 2.2% of fertile women by step 120 in this world and 13.1% by step 300, so at
     120 the comparison was decided by whether one of three gated women was drawn for a birth — a coin flip
-    that an unrelated 0.001 change in `divorce_rate` was enough to turn over."""
+    that an unrelated 0.001 change in `divorce_rate` was enough to turn over.
+
+    `paternal_provision_frac=0.0` in BOTH arms (R-106 Add.109). Canon now has fathers feed their children (0.5),
+    which makes the women of this small world better fed: measured (`scratchpad/bp_gatebind.py`), the gate binds on
+    1.0% of fertile woman-steps at 0.0 but only 0.36% at 0.5, and at 0.5 no birth in 300 steps falls into the
+    reduced part of p_birth, so the arms are identical. The gate is not dead; the test world lost its binding
+    condition. Pinning 0.0 keeps the positive control that this test needs."""
     import battery1_liveness as B1
     mobility_only, _, _ = B1.signature(dict(enable_productivity_mobility=True,
                                              mobility_pressure_source="intake",
-                                             enable_intake_fertility=False), steps=300, **WORLD)
+                                             enable_intake_fertility=False,
+                                             paternal_provision_frac=0.0), steps=300, **WORLD)
     both, _, _ = B1.signature(dict(enable_productivity_mobility=True,
                                     mobility_pressure_source="intake",
-                                    enable_intake_fertility=True), steps=300, **WORLD)
+                                    enable_intake_fertility=True,
+                                    paternal_provision_frac=0.0), steps=300, **WORLD)
     assert mobility_only != both

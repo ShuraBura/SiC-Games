@@ -39,10 +39,16 @@ _BATT = os.path.normpath(os.path.join(_HERE, "..", "outputs", "mechanism_battery
 if _BATT not in sys.path:
     sys.path.insert(0, _BATT)
 
+# `paternal_provision_frac=0.0` keeps the Addendum-22 test world (R-106 Add.109). Canon now has 0.5, and under 0.5
+# this ONE seed-0 world is an outlier: median surplus 0.64 -> 0.44, 24/44 bands above the fixed point, median
+# assabiyah 0.968. Over four seeds (`scratchpad/bp_cohesion_pat.py`) the fact is unchanged: mean median surplus
+# 0.665 (0.0) vs 0.661 (0.5), and median assabiyah is 1.000 on seeds 1-3 at 0.5. The blocker is NOT removed, so the
+# test keeps its world. Note also: "every led band pinned" already fails on seed 3 at 0.0 (1 band, raw 0.94), so
+# that rule is exact only for this world.
 STACK = dict(enable_emergent_band_size=True, enable_resource_directed_fusion=True,
              enable_dynamic_bands=True, enable_band_affiliation=True,
              enable_size_repulsion=True, enable_village_scaling=True,
-             enable_malnutrition_fission=True)
+             enable_malnutrition_fission=True, paternal_provision_frac=0.0)
 # 200 steps is chosen from the measurement above, not for convenience: assabiyah saturates by ~100 and the
 # leaderless minority is down to ~12% by 200. Going longer only makes the effect stronger.
 WORLD = dict(n=1200, patch=30, terr="coastal", clim="temperate")

@@ -3448,14 +3448,20 @@ type  = "float"
 # propagates).
 
 [paternal_provision_frac]
-value = 0.0
+value = 0.5
 owner = "DemographyConfig"
 type  = "float"
 # B+ step 5: PATERNAL provisioning. A father gives `paternal_provision_frac` of his harvest OVERFLOW
 # (above his cap, otherwise wasted) to his OWN children, drawn against the child's RESIDUAL need AFTER the
 # maternal tiers (RT-2: conserved, no double-feed) — so it bites only on the constrained-mother / ORPHAN
-# cohort (the Marlowe critical-period target; calibrate so emergent male share of <3-yr provisioning ≈
-# 58%). 0 = pure B (no paternal feeding). Requires enable_paternity (the father-links).
+# cohort. 0 = pure B (no paternal feeding). Requires enable_paternity (the father-links). CORRECTED
+# 2026-09-24 (R-106 Addendum 109). This comment used to say "calibrate so emergent male share of <3-yr
+# provisioning ≈ 58%" (Marlowe). Marlowe 2003's 58% is the husband's share of the COUPLE'S daily kcal
+# brought into camp (household PRODUCTION), not the father's share of TRANSFERS to a child — tuning this
+# value to make `prov_young_paternal / total` read 58% would score a production share as a transfer share.
+# Do not. CANONICAL VALUE 0.5 — set in `emergent_village_demog()` (the documented forager value:
+# PARAMETERS.md and every SOCIETY_PRESETS entry). The class default stays 0.0 so constructed-truth tests
+# and other harnesses are bit-exact.
 
 [assortative_strength]
 value = 0.0

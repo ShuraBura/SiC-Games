@@ -69,6 +69,16 @@ def realistic_forager_demog() -> DemographyConfig:
         enable_cred_renorm=True,
         enable_prowess_facet=True, prowess_decay=0.05, sex_division=1.0,
         enable_paternity=True, mate_choice_strength=5.0, patriline_weight=0.5, lineage_reversion=0.1,
+        # CANONICAL 2026-09-24 (R-106 Addendum 109): fathers feed their own children from their harvest OVERFLOW
+        # (food above their reserve cap, otherwise wasted). Canon had run the class default 0.0 — never set — while
+        # PARAMETERS.md gives 0.5 for forager societies and EVERY SOCIETY_PRESETS entry sets 0.5: config drift.
+        # Marlowe 2003 (VERIFIED, verify_anchor.py): men supply 58% of a couple's daily kcal with a child <3 yr,
+        # 69% with a child <1 yr — so paternal provisioning is real. That 58% is a HOUSEHOLD-PRODUCTION share, NOT a
+        # child-transfer share, so this value is the documented one, NOT tuned to 58%. Stage 2 (real pipeline, 3
+        # worlds, 3 paired seeds vs the viable-site canon): montane l15 .411 -> .462 (FAIL -> PASS, marginally);
+        # temperate l15 .593 -> .618, e0 +1.2; savanna l15 +.03 (ns) and adult e15 -1.1 yr, still in band. No marker
+        # moves pass -> fail. Adult death rates unchanged in temperate/montane: overflow-only, so not zero-sum.
+        paternal_provision_frac=0.5,
         # CANONICAL 2026-07-17: orphan-conditioned child mortality (Hill & Hurtado 1996 Tab. 13.1; R-74).
         # Losing a parent — not birth-spacing infanticide — is the dominant Aché child-killing channel
         # (Tab. 5.1: homicide/neglect 39.7% of 0–3 deaths, of which parental infanticide is only 5.3%; the
