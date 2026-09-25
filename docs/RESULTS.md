@@ -9689,7 +9689,8 @@ seeds 1–3: **the blocker is NOT removed.** Repair (supervisor decision): both 
 with the measurement in a comment. A finding recorded in passing: the pinned rule "every led band is at the clamp"
 already fails on seed 3 at 0.0, so it is exact only for the seed-0 world. Earlier in the same session 30 other
 tests failed while three probe runs used the machine in parallel; all 30 passed again with no probe running. The
-cause of that interference is NOT measured.
+cause of that interference is NOT measured. **CORRECTED in Addendum 111:** the parallel probes were NOT the cause.
+The same tests failed again with nothing running; the error is `WinError 6` in `subprocess._make_inheritable`.
 
 **Scorecard after adoption.** Temperate passes #18–#21. Montane passes #18–#20 and fails #21. Savanna passes #18 and
 #20, fails #19, and #21 is unresolved. Savanna is now the one world that fails child survival. **Next: the savanna
@@ -9735,6 +9736,64 @@ erodes the village's hold"). In canon it acts as a per-agent, per-step coin flip
 member flickers on and off the pin, and each flicker can put a hungry family one cell from food that it cannot draw.
 The per-cell granary makes that one cell a cell without food. Candidate repairs are for the supervisor (below).
 Instruments: `scratchpad/bp_supplyprobe{,2}{,_run,_analyse,_fig}.py` → `bp_supplyprobe.png`, `bp_supplyprobe2.png`.
+
+---
+
+## Addendum 111 — Two supply-gap repairs, tested alone. The VILLAGE GRANARY repairs savanna and montane on every marker and is NOT zero-sum, but it moves temperate OVER the forager ceiling: HELD. The STICKY PIN RELEASE makes things worse: REJECTED, kept dark (2026-09-25, R-106)
+
+**The repairs** (both default OFF, bit-exact; registered in `_skip`, BENCHMARK_LADDER, the audit tables, the run
+file and both allowed-dark lists; `test_supply_gap_repairs.py`, 6 tests):
+- `enable_village_granary` — every cell inside a settlement's radius banks into ONE store keyed by the site, capped
+  at `store_capacity_reserves × reserve_full ×` the village's members; ONE need-proportional (S.2 cred-weighted)
+  draw over all needy members, made after every cell has banked. This is the "collective band granary" that
+  MODEL_SPEC §4.5.11 specifies; it was per cell only because a band was assumed to live on one cell.
+- `enable_sticky_pin_release` — the same abandonment and scalar-stress release probabilities, drawn once per
+  household root and HELD for `pin_release_hold_steps` = 12 (PROVISIONAL), in place of a flip at each step.
+
+**Stage 2** (real pipeline, 3 canonical worlds, 15,000 steps, planet fixed, 3 paired seeds). The Addendum-109 canon
+(`pat`) was reused; the control re-run of savanna seed 0 with the new code reproduced all 601 trajectory rows and
+the life table exactly, so the new code is bit-exact OFF and the reuse is valid. Period table, arm means:
+
+| world | arm | e0 (#18) | l(15) (#19) | e15 (#20) | l(45) (#21) | adult 15–45 death rate | population |
+|---|---|---|---|---|---|---|---|
+| temperate | canon | 33.8 | 0.618 | 36.8 | 0.387 | 0.0157 | 5,154 |
+| temperate | village granary | **40.1 OVER** | **0.684 OVER** | 41.6 | **0.495 OVER** | 0.0108 | 5,831 |
+| temperate | sticky release | 31.6 | 0.589 | 35.5 | 0.350 | 0.0174 | 5,707 |
+| savanna | canon | 23.4 | 0.422 FAIL | 34.7 | 0.244 | 0.0183 | 1,229 |
+| savanna | village granary | 32.3 | **0.593 PASS** | 36.3 | **0.363 PASS** | 0.0163 | 3,202 |
+| savanna | sticky release | **20.8 UNDER** | 0.405 FAIL | **29.7** | 0.188 FAIL | 0.0251 | 845 |
+| montane | canon | 24.1 | 0.462 | 31.9 | 0.241 FAIL | 0.0219 | 3,327 |
+| montane | village granary | 34.0 | 0.622 | 36.8 | **0.386 PASS** | 0.0158 | 5,314 |
+| montane | sticky release | 26.3 | 0.511 | 32.1 | 0.268 PASS | 0.0218 | 2,862 |
+
+**Village granary.** Savanna #19 and #21 move FAIL → PASS, and montane #21 FAIL → PASS. The adult death rate FALLS on
+every world (−1.1 SE savanna, −3.4 SE montane, −11.2 SE temperate), so this is NOT the zero-sum of band provisioning
+(Addenda 76, 108): it makes stored food available that was there and out of reach. The population also spreads
+(savanna land use 5% → 15%, montane 19% → 26%), which is the direction that the Malthus arc asks for. But temperate
+goes OVER the forager ceiling on three markers (e0 40.1 > 37, l(15) 0.684 > 0.66, l(45) 0.495 > 0.43), with the
+starvation share falling from 0.35 to 0.18. No temperate forager is in Gurven & Kaplan Table 2, so the forager band
+is the only anchor; scored by the rule, three markers move PASS → FAIL. **DECISION (supervisor, 2026-09-25): HELD
+dark; diagnose the temperate overshoot first** — which brake stops binding when temperate starvation falls.
+
+**Sticky pin release.** Worse on savanna (e15 −5.0 yr, 12 SE; the adult death rate +38%; e0 under the band) and on
+temperate (all four markers down); better only on montane. The one-step flicker PROTECTED families: a released
+family returned to the site on the next step. A household released for a year stays off the granary. So Addendum
+110's reading ("the flicker leaves families off the granary") was half right: the harm is the per-cell granary, not
+the flicker. **DECISION (supervisor): REJECTED, kept dark as an ablatable instrument**, result in its docstring.
+
+Instruments: `scratchpad/bp_stage2_driver.py` (arms `vgran`, `sticky`, control `savanna:0`),
+`bp_stage2_analyse.py`, `bp_stage2_supply_fig.py` → `bp_stage2_supply.png`.
+
+**Test-harness finding (corrects Addendum 109).** The full suite failed 27 tests + 7 errors in five config files
+(`test_campaign_knobs`, `test_config_is_load_bearing`, `test_config_wiring_ctb`, `test_runconfig_sync`,
+`test_runspec_ctb`) with NO other run on the machine. The error is `OSError: [WinError 6] The handle is invalid` in
+`subprocess._make_inheritable`: pytest's default fd-level capture gives the child an invalid stdin handle on this
+Windows setup. A valid stdin (`< NUL`) alone does not fix it; `--capture=sys` does — the five files then pass
+(65/65). So the Addendum-109 attribution to parallel probe runs was wrong. Under the default capture the failure is
+INTERMITTENT (the same invocation passed the full suite on 2026-09-24); its trigger is NOT measured. Reliable
+invocation:
+`cmd /c "python -m pytest sic_games\tests --capture=sys < NUL"`. Suite result for this addendum: 1,734 passed
+outside those files + 65/65 inside them = clean.
 
 ---
 

@@ -1649,6 +1649,10 @@ class TerrainWorld(mesa.Model):
         # ACUTE FAMINE DISPERSAL: a starving settler breaks the residence pin THIS step (Colson 1979).
         hunger_flee_on = settle_on and getattr(self._demog, "enable_hunger_dispersal", False)
         hunger_flee_frac = self._demog.hunger_flee_reserve_frac if hunger_flee_on else 0.0
+        # STICKY PIN RELEASE: hold each household's release draw for pin_release_hold_steps (no per-step flicker).
+        sticky_on = (settle_on and (abandon_on or settle_ss_on)
+                     and getattr(self._demog, "enable_sticky_pin_release", False))
+        pin_hold = self._demog.pin_release_hold_steps if sticky_on else 0
         # CATCHMENT SPREAD: settled members pin to a HOME cell across the catchment (physical footprint spreads),
         # while the harvest regroups them at the site (food bit-exact). See `enable_village_catchment_spread`.
         spread_on = settle_on and getattr(self._demog, "enable_village_catchment_spread", False)
@@ -1749,7 +1753,27 @@ class TerrainWorld(mesa.Model):
                     site = self._nearest_settlement(agent.pos) if settle_on else None
             else:
                 site = self._nearest_settlement(agent.pos) if settle_on else None
-            if site is not None and abandon_on:
+            if site is not None and sticky_on:
+                # STICKY PIN RELEASE (see `enable_sticky_pin_release`): the abandonment and scalar-stress draws below
+                # are made ONCE per household root and the outcome is HELD for pin_release_hold_steps, instead of an
+                # independent flip every step. Same probabilities, same RNG stream (agent.random); no flicker.
+                if self.step_count >= getattr(agent, "_pin_hold_until", -1):
+                    rel = False
+                    if abandon_on:
+                        att = 1.0 - abandon_gain * self._settlement_hardship.get(site, 0.0)
+                        if att < 1.0 and agent.random.random() > att:
+                            rel = True
+                    if not rel and settle_ss_on:
+                        soc = self._cell_society.get(site) or self._band_society.get(agent._group.band_id)
+                        ss = size_repulsion(settle_pop.get(site, 0), self._demog.settlement_ss_gain,
+                                            self._demog.settlement_ss_midpoint, self._demog.settlement_ss_width, soc)
+                        if ss > 0.0 and agent.random.random() < ss:
+                            rel = True
+                    agent._pin_released = rel
+                    agent._pin_hold_until = self.step_count + pin_hold
+                if agent._pin_released:
+                    site = None
+            if site is not None and abandon_on and not sticky_on:
                 # EMERGENT ABANDONMENT: chronic REMEMBERED hardship erodes the village's hold. Released ⇒ this agent's
                 # ordinary IFD drive decides — it stays anyway if nowhere nearby is better, or drifts out if it is; the
                 # pool then drains below settle_min_pool and the settlement dissolves by the EXISTING rule → fallow →
@@ -1766,7 +1790,7 @@ class TerrainWorld(mesa.Model):
                 _rfrac = (agent.wealth - _flr) / (_cap - _flr) if _cap > _flr else 1.0
                 if _rfrac < hunger_flee_frac:
                     site = None
-            if site is not None and settle_ss_on:
+            if site is not None and settle_ss_on and not sticky_on:
                 # Johnson scalar stress: an over-crowded settlement repels this agent (prob rises with village pop,
                 # dissipated by the site's society). Repelled ⇒ fall through to normal diffusion (leave/don't join).
                 soc = self._cell_society.get(site) or self._band_society.get(agent._group.band_id)
@@ -1984,6 +2008,19 @@ class TerrainWorld(mesa.Model):
                 out[i] = sub[j]
             return out
 
+        # VILLAGE GRANARY (see `enable_village_granary`): every occupied cell inside a settlement's radius banks into
+        # and draws from ONE store keyed by the site; the draw is deferred until every cell has banked.
+        vgran_on = (settle_on and store_on and getattr(demog, "enable_village_granary", False)
+                    and bool(self._settlement_sites))
+        vkey: dict = {}                        # occupied cell → its village site
+        vmembers: dict = {}                    # site → village members this step (the granary cap's head-count)
+        village_draw: dict = {}                # site → the members who draw from it (filled in the loop)
+        if vgran_on:
+            for c, occ_c in occ_lists.items():
+                s = self._nearest_settlement(c)
+                if s is not None:
+                    vkey[c] = s
+                    vmembers[s] = vmembers.get(s, 0) + len(occ_c)
         for (cx, cy), occ in occ_lists.items():
             excl_mask = None
             if excl_on:
@@ -2135,13 +2172,25 @@ class TerrainWorld(mesa.Model):
             # S.1 collective band granary: bank the contribution (capped at band-scaled capacity), then DRAW it
             # down to top occupants toward their reserve caps in the lean season — the band lives off the store
             # through winter. S.1 draw is need-proportional (egalitarian); S.2 makes it cred-weighted (inequality).
-            if in_owz:
-                key = (cx, cy)
-                store = self._cell_store.get(key, 0.0) + cell_contrib
-                cap_cell = store_cap_mult * self._reserve_full * len(occ)     # granary cap scales with band size
-                if store > cap_cell:
-                    store = cap_cell
-                if store > 0.0:
+            vsite = vkey.get((cx, cy)) if vgran_on else None
+            if in_owz or vsite is not None:
+                if vsite is not None:
+                    # VILLAGE GRANARY: bank into the SITE's store, capped at the village's head-count capacity
+                    # (capping each deposit = capping the sum, since deposits are non-negative); the draw for
+                    # this cell's occupants is DEFERRED until every village cell has banked (below the loop).
+                    key = vsite
+                    store = self._cell_store.get(key, 0.0) + cell_contrib
+                    cap_cell = store_cap_mult * self._reserve_full * vmembers[key]
+                    if store > cap_cell:
+                        store = cap_cell
+                    village_draw.setdefault(key, []).extend(occ)
+                else:
+                    key = (cx, cy)
+                    store = self._cell_store.get(key, 0.0) + cell_contrib
+                    cap_cell = store_cap_mult * self._reserve_full * len(occ)     # granary cap scales with band size
+                    if store > cap_cell:
+                        store = cap_cell
+                if store > 0.0 and vsite is None:
                     needy = [(a, self._reserve_full * a.reserve_scale() - a.wealth) for a in occ]
                     needy = [(a, d) for a, d in needy if d > 0.0]
                     if needy:
@@ -2170,16 +2219,41 @@ class TerrainWorld(mesa.Model):
                                                         gini_min=self._demog.stratification_gini_min)
                     else:
                         target = society_from_character(density, surplus_frac)
-                    c0 = self._cell_settle.get(key, 0)
+                    mkey = (cx, cy)          # the society state stays PER CELL (under the village granary the store
+                    #                          key is the site; the cell's surplus then reads its village's granary)
+                    c0 = self._cell_settle.get(mkey, 0)
                     c = min(settle_T, c0 + 1) if target != "egalitarian_forager" else max(0, c0 - 1)
                     if c >= settle_T:
-                        self._cell_society[key] = target          # morph / escalate (complex→stratified)
-                        self._cell_settle[key] = c
+                        self._cell_society[mkey] = target          # morph / escalate (complex→stratified)
+                        self._cell_settle[mkey] = c
                     elif c <= 0:
-                        self._cell_society.pop(key, None)         # de-morph → egalitarian baseline
-                        self._cell_settle.pop(key, None)
+                        self._cell_society.pop(mkey, None)         # de-morph → egalitarian baseline
+                        self._cell_settle.pop(mkey, None)
                     else:
-                        self._cell_settle[key] = c                # hysteresis band: hold the current society
+                        self._cell_settle[mkey] = c                # hysteresis band: hold the current society
+        if vgran_on:
+            # VILLAGE GRANARY deferred draw: ONE allocation per village over ALL its needy members, after every cell
+            # has banked (no cell-order advantage). κ = the village band's society (else the site cell's), as the
+            # per-cell draw reads its occupants' society.
+            for key, members in village_draw.items():
+                store = self._cell_store.get(key, 0.0)
+                if store <= 0.0:
+                    continue
+                needy = [(a, self._reserve_full * a.reserve_scale() - a.wealth) for a in members]
+                needy = [(a, d) for a, d in needy if d > 0.0]
+                if not needy:
+                    continue
+                if band_society_on:
+                    vb = self._village_band.get(key, members[0]._group.band_id)
+                    kap_v = band_kappa.get(vb, kappa)
+                else:
+                    kap_v = SOCIETY_PRESETS[self._cell_society[key]]["kappa"] if key in self._cell_society else kappa
+                weights = [base_status(a, phi_eps) ** kap_v if a.strategy == "carbon" else 1.0 for a, _ in needy]
+                gives = allocate_store_draw(weights, [d for _, d in needy], store)
+                for (a, _), g in zip(needy, gives):
+                    a.wealth += g
+                    store -= g
+                self._cell_store[key] = store
         if morph_on and not band_society_on:
             # Abandoned settlements collapse: a morphed cell that is no longer occupied this step decays its
             # settle timer toward 0 and reverts to egalitarian (the band is gone / dispersed — sustained
@@ -2259,6 +2333,10 @@ class TerrainWorld(mesa.Model):
                 # surplus_frac ≈ 6-14 (gate inert). Share = cell_store · (band members on cell / total occ) ⇒ 0..1.
                 store_share = 0.0
                 for c in band_cells[bid]:
+                    vs = vkey.get(c) if vgran_on else None
+                    if vs is not None:          # VILLAGE GRANARY: the band's share of its village's ONE store
+                        store_share += self._cell_store.get(vs, 0.0) * (band_cell_n[(bid, c)] / vmembers[vs])
+                        continue
                     tot = len(occ_lists[c])
                     if tot > 0:
                         store_share += self._cell_store.get(c, 0.0) * (band_cell_n[(bid, c)] / tot)

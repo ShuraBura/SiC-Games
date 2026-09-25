@@ -198,7 +198,9 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # (The first two were MISSING here when they were committed. This test is a subprocess test, and the
                # failure was misread as the WinError 6 stdin artifact because it was re-run in a DIFFERENT shell
                # from the one that reported it. Diagnose a test failure in the shell that produced it.)
-               "enable_bud_household_closure", "enable_density_fill_matched_radius"}
+               "enable_bud_household_closure", "enable_density_fill_matched_radius",
+               #   village_granary / sticky_pin_release  the supply-gap repairs (Add.111), in Stage 2
+               "enable_village_granary", "enable_sticky_pin_release"}
                # (enable_bud_viable_site: ADOPTED Addendum 108 -> canonically ON, so no longer allowed dark.)
     assert off <= allowed, f"undocumented mechanisms dark in the canonical run: {sorted(off - allowed)}"
 

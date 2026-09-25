@@ -73,6 +73,12 @@ TYPES = {
     # FOOD-VIABLE DAUGHTER SITE (R-106 Add.107): rejects a daughter site whose catchment cannot feed the
     # emigrant bloc. Decides WHERE villages exist -> T; a pure rule change, no magnitude.
     "enable_bud_viable_site": "T",
+    # STICKY PIN RELEASE (R-106 Add.111): holds a household's pin-release draw for a year instead of a
+    # per-step flip. Decides WHERE members stand (on or off the site) -> T, like emergent_abandonment.
+    "enable_sticky_pin_release": "T",
+    # VILLAGE GRANARY (R-106 Add.111): one store per village, drawn by all members. It moves stored food
+    # between members -> X, like enable_storage and enable_store_anchor.
+    "enable_village_granary": "X",
     # Settlement-nucleation runaway fixes (2026-08-12). All four act on the SETTLEMENT LIFECYCLE — where a
     # site may be founded, whether it can be held, and who counts as a member — so they are T (territory /
     # spatial-structure) rather than P (production). None carries a magnitude: each is a pure rule change.
@@ -279,8 +285,9 @@ MAGNITUDE = {
     "enable_restraint_group_transmission": {"restraint_init": 0.3},
 }
 # Flags whose only prefix-matching parameter is legitimately 0 in the project — no magnitude is missing.
-# `enable_paternity` carries the `_father` link (R-74); `paternal_provision_frac` is 0.0 in EVERY preset, so a
-# zero default is the live value rather than a dead knob.
+# `enable_paternity` carries the `_father` link (R-74). Its prefix-matching gain `paternal_provision_frac` has a
+# class default of 0.0; canon sets 0.5 in `emergent_village_demog()` (R-106 Add.109), which the realistic preset
+# used here does not. The link itself is the mechanism this flag owns, so no magnitude is missing.
 MAGNITUDE_EXEMPT = {"enable_paternity"}
 
 # Known prerequisite chains: if a flag's prereq is not satisfied in the arm, "no change" is UNINFORMATIVE
@@ -334,6 +341,8 @@ PREREQ = {
     # bloc to close), which in turn needs village budding to exist at all.
     "enable_bud_household_closure": ("enable_village_budding", "enable_colonizing_budding"),
     "enable_bud_viable_site": ("enable_village_budding", "enable_colonizing_budding"),
+    "enable_village_granary": ("enable_aggregation_sedentism", "enable_storage"),
+    "enable_sticky_pin_release": ("enable_aggregation_sedentism", "enable_emergent_abandonment"),
     # R-106 band-autonomy arc (2026-09-08). Band territory needs villages with a stable band identity to pin to
     # (the `_village_band` map); group transmission copies the restraint gene's trait; the heritable
     # density-response replaces the density-fertility brake's exponent.

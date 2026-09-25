@@ -1017,6 +1017,13 @@ def main():
             # temperate starvation deaths were inside those villages. Stage 2 (real pipeline, 3 worlds): temperate
             # reaches the forager average on l15 / e15 / l45 (0.59 / 36.7 / 0.37); no marker moves from pass to fail
             # on any world. Savanna/montane juvenile survival still fails, slightly deeper, as it did in canon.
+            # SUPPLY-GAP REPAIRS under evaluation (R-106 Addendum 111, 2026-09-24). Addendum 110 found the mother of
+            # a starving child one cell off the village granary on all three worlds: the granary is per cell, and
+            # the per-step pin release (abandonment, scalar stress) puts families off it. Two separate repairs,
+            # each to be tested alone first: ONE granary per village, and a release that is HELD for a year.
+            # UNDER EVALUATION, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
+            "enable_village_granary",
+            "enable_sticky_pin_release",
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard

@@ -878,6 +878,22 @@ class DemographyConfig(BaseModel):
     store_capacity_reserves: float = Field(12.0, ge=0.0)        # store cap = this × reserve cap. reserve_full≈1.33 mo BURN ⇒ 12≈16 mo ≈ Halstead 1–2 yr granary (annual cycle + bad-year buffer). Old 3 (=4 mo) was far too low. [LIT-CALIBRATED, storage survey]
     storage_temp_threshold_c: float = Field(15.25)             # Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION]
     storage_decay: float = Field(0.0, ge=0.0, le=1.0)          # S.3 per-step spoilage/maintenance loss (0 = off). Realistic traditional ≈ 0.02/mo (~22%/yr; lit 10–30%/yr) [LIT-CALIBRATED when on]
+    # VILLAGE GRANARY (R-106 Add.111). MODEL_SPEC §4.5.11 S.1 specifies a COLLECTIVE BAND granary; it is stored per
+    # CELL because a band was assumed to live on one cell. A village spans every cell inside `settle_radius` of its
+    # site, and its members stand on different cells (the residence pin is released per step, Add.110). DIAGNOSED
+    # (Add.110, all three worlds): the mother of a starving child stands on a cell with NO stored food, one cell from
+    # the village's stocked site; per cell, only the occupants fill the store and only they draw it. ON ⇒ every cell
+    # inside a settlement's radius (`_nearest_settlement`) banks into, and draws from, ONE store keyed by the SITE:
+    # cap = store_capacity_reserves × reserve_full × the village's members this step, and the draw is ONE
+    # need-proportional (S.2 cred-weighted) allocation over all needy members, AFTER every cell has banked (no
+    # cell-order advantage). Banking still needs the contributor's own cell to be storable; the draw uses the site's
+    # storage gate. Cells outside every village keep the per-cell store. The IFD store anchor still reads the store
+    # at the site key (it pulls members toward the site; leaving the village forfeits it). Default OFF ⇒ bit-exact.
+    # Stage 2 (Add.111; 3 worlds, 3 paired seeds): savanna l15 0.42 → 0.59 and l45 0.24 → 0.36 (#19, #21 FAIL → PASS),
+    # montane l45 0.24 → 0.39 (#21 FAIL → PASS), adults gain on every world (NOT the band-provisioning zero-sum), pop
+    # +60–160%; BUT temperate goes OVER the forager ceiling (e0 40.1, l15 0.684, l45 0.495). HELD dark pending the
+    # diagnosis of the temperate overshoot (supervisor decision 2026-09-25).
+    enable_village_granary: bool = False
     # STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's
     # biome SEASONAL AMPLITUDE (Testart/Binford storability) instead of the constant-placeholder temperature — an
     # aseasonal biome (forest, amp 0.05) can't store → egalitarian; a seasonal biome (savanna 0.40, grass 0.60)
@@ -1156,6 +1172,20 @@ class DemographyConfig(BaseModel):
     enable_emergent_abandonment: bool = False
     settlement_memory_yr: float = Field(12.0, gt=0.0)       # the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range]
     abandon_hardship_gain: float = Field(1.0, ge=0.0)       # how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema)
+    # STICKY PIN RELEASE (R-106 Add.111). The abandonment valve above is documented as CHRONIC (village relocation
+    # every ~5–30 yr), but it is applied as an independent coin flip for EVERY settled root agent at EVERY step with
+    # p = hardship (measured Add.110: median p 0.27 / 0.70 / 0.29 for savanna / montane / temperate), and the
+    # settlement scalar-stress repulsion is a per-step flip as well. So members FLICKER on and off the pin, and a
+    # flicker can leave a hungry family one cell off the granary. ON ⇒ the SAME two release probabilities are drawn
+    # ONCE per household root and the outcome (pinned or released) is HELD for `pin_release_hold_steps`; the
+    # expected released fraction is unchanged, only the flicker is removed. Acute hunger dispersal stays per step
+    # (it is acute by design). Default OFF ⇒ bit-exact.
+    # REJECTED by Stage 2 (Add.111; 3 worlds, 3 paired seeds): savanna e15 −5.0 yr (adult 15–45 death rate +38%) and
+    # e0 20.8 UNDER the band; temperate worse on e0/l15/e15/l45; only montane gains. The one-step flicker PROTECTED
+    # families — it returned them to the site next step; a household released for a year stays off the granary.
+    # Kept dark as an ablatable instrument (supervisor decision 2026-09-25).
+    enable_sticky_pin_release: bool = False
+    pin_release_hold_steps: int = Field(12, ge=1)           # one year: the household's residence decision is seasonal/annual [PROVISIONAL — one annual cycle; not anchored]
     # ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor, LITERATURE.md — "the breakup into small
     # family groups which comb the region"). The residence pin holds a settled agent on its crowded site cell,
     # where it eats the CRASHING pooled share; the emergent-abandonment valve above releases it only on CHRONIC
