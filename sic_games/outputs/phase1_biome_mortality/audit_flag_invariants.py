@@ -135,6 +135,8 @@ TYPES = {
     "enable_metabolic_downreg": "N",
     "enable_life_history": "N", "enable_condition": "N", "enable_nutrition_synergy": "N",
     "enable_terrain_risk": "N", "enable_density_disease": "N", "enable_terrain_pathogen": "N",
+    # R-106 Add.113: restricts the terrain-risk factor to the accident share of a2 -> same type as terrain_risk.
+    "enable_risk_accident_share": "N",
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
     # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
     "enable_density_reference": "N",
@@ -342,6 +344,7 @@ PREREQ = {
     "enable_bud_household_closure": ("enable_village_budding", "enable_colonizing_budding"),
     "enable_bud_viable_site": ("enable_village_budding", "enable_colonizing_budding"),
     "enable_village_granary": ("enable_aggregation_sedentism", "enable_storage"),
+    "enable_risk_accident_share": ("enable_terrain_risk",),
     "enable_sticky_pin_release": ("enable_aggregation_sedentism", "enable_emergent_abandonment"),
     # R-106 band-autonomy arc (2026-09-08). Band territory needs villages with a stable band identity to pin to
     # (the `_village_band` map); group transmission copies the restraint gene's trait; the heritable

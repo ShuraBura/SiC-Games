@@ -6034,6 +6034,10 @@ class TerrainWorld(mesa.Model):
         _f_risk = _f_dens = _f_syn = 1.0
         if cfg.enable_terrain_risk:
             _f_risk = risk_mult(float(self._fields.risk[a.pos[1], a.pos[0]]), self._risk_ref, cfg.risk_cap)
+            if getattr(cfg, "enable_risk_accident_share", False):
+                # Only the ACCIDENT share of a2 scales with terrain risk (see `enable_risk_accident_share`).
+                _s = cfg.risk_accident_share
+                _f_risk = (1.0 - _s) + _s * _f_risk
             m *= _f_risk
         if cfg.enable_density_disease:
             # VILLAGE-SCALED (spread-invariant) disease for a settled agent: its density is the VILLAGE population

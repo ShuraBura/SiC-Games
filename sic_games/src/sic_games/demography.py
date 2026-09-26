@@ -701,6 +701,15 @@ class DemographyConfig(BaseModel):
 
     # --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) ---
     risk_cap: float = Field(3.0, ge=1.0)        # max terrain-risk multiplier (red-team M-2: pin the scale)
+    # TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10% of
+    # baseline a2 in average-risk terrain, scaling with risk (Hill, Hurtado & Walker 2007: accidents ≈10% of HG
+    # deaths). `risk_mult` instead multiplies the WHOLE a2 by risk_cell / mean land risk, and settled people live on
+    # land safer than the land mean, so it removed ~half of ALL age-independent mortality (measured 0.44–0.62,
+    # Add.112; first filed in ae01ced, 2026-08-14, when a density term of 2.4 hid it). ON ⇒ the risk factor is
+    # (1 − s) + s·risk_mult with s = risk_accident_share: only the accident share scales with terrain; the cap
+    # still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact.
+    enable_risk_accident_share: bool = False
+    risk_accident_share: float = Field(0.10, ge=0.0, le=1.0)   # accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED]
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
     dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
     # ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ────────────────────────────────────────

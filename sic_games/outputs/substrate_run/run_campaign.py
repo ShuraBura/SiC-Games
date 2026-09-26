@@ -1024,6 +1024,11 @@ def main():
             # UNDER EVALUATION, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
             "enable_village_granary",
             "enable_sticky_pin_release",
+            # TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Addendum 113). Corrects `risk_mult` to the MODEL_SPEC §4.3.3
+            # form (accidents ≈10% of a2) instead of scaling the whole a2 (measured 0.44–0.62, Add.112). A model
+            # CORRECTION under evaluation — it raises mortality in every run — so C_ALLON must not adopt it by side
+            # effect.
+            "enable_risk_accident_share",
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard
