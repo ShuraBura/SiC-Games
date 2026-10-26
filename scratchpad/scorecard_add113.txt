@@ -1,0 +1,33 @@
+runs: montane n=3 (steps 15000), savanna n=3 (steps 15000), temperate n=3 (steps 15000)
+
+marker                                                           montane                 savanna               temperate   anchor
+------------------------------------------------------------------------------------------------------------------------------------------------------
+#1 band size (mean-experienced adults/cell)           27.66 ±1.7     PASS       29.9 ±0.74    PASS      40.17 ±1.6    unres.   Hill 2011 = 28.2
+#3 village size (median)                              130.2 ±10      PASS      100.3 ±6.3     PASS      101.4 ±2.3     PASS   Alvard 2009 50-250
+#3 village size (max, Voronoi catchment)              545.8 ±60                305.1 ±3.9               349.8 ±30             not the ceiling test: see #17 (Add.104)
+#4 connubium reach (median)                           525.8 ±24      PASS      569.2 ±18      PASS        519 ±23      PASS   Wobst ~475; floor White MVP 150
+#5 lineages (count; dynamics per MARKER_MATRIX)       142.7 ±10                120.6 ±8.5               200.4 ±13             Guyon 2024 (per-gen rates)
+#7 nobility share                                   0.02246 ±0.0025          0.02293 ±0.00039         0.01361 ±0.0017         no documented band (rule 2)
+#8 bud events (cumulative; rate per MARKER_MATRIX)      39.87 ±8.9                 133 ±20                118.4 ±10             Bandy 2004 2-5e-3/large-village-yr
+#9 hierarchy index gini_cred                         0.3629 ±0.033            0.3616 ±0.012            0.5241 ±0.024          pre-registered ordering (T-7)
+#10 polygyny (of ALL men)                           0.02327 ±0.0016  PASS     0.0376 ±0.0036  PASS    0.03101 ±0.0028  PASS   Marlowe ~0.04
+#11 status->RS (age-controlled)                      0.2414 ±0.0042           0.1246 ±0.0064           0.2231 ±0.021          NOT COMPARABLE, wrong channel (Add.102)
+#12 rank-size slope                                  -0.909 ±0.01    PASS    -0.6631 ±0.061   PASS    -0.7921 ±0.048   PASS   Zipf ~ -1.0
+#13 primacy                                            1.56 ±0.37    PASS      1.404 ±0.076   PASS      1.221 ±0.096   PASS   ~1 (no primate centre)
+#14 material Gini (adults)                           0.3767 ±0.0023  PASS     0.3811 ±0.0026  PASS     0.4099 ±0.0024  PASS   BHM 2009 HG = 0.36
+#14 material Gini (within-cell)                      0.2775 ±0.0026  PASS     0.2981 ±0.0011  PASS     0.3089 ±0.0054  PASS   Agta within-camp 0.23 [0-0.44]
+#15 orphanhood (motherless)                          0.0324 ±0.00077         0.02902 ±0.00042         0.03258 ±0.00054        Aché ~0.02 (point, no band)
+#16 dependency ratio                                 0.7548 ±0.0017  PASS     0.7425 ±0.013   PASS     0.7054 ±0.0064  PASS   H&H 1996 T4.4: 0.598-0.899
+#16 share under 15                                   0.3513 ±0.0012  PASS     0.3445 ±0.0069  PASS     0.3259 ±0.0039  PASS   H&H 1996 T4.4: 0.287-0.454
+#16 sex ratio (m/f)                                   1.073 ±0.0085  PASS      1.052 ±0.0052  PASS      1.069 ±0.0043  PASS   H&H 1996 T4.4: 0.896-1.368
+#16 median age (yr)                                    23.5 ±0.11              24.12 ±0.53               25.3 ±0.31           reported with #16 (no band)
+#17 fission ceiling (co-resident max)                 102.7 ±10      PASS      119.4 ±1       PASS      232.5 ±19     unres.   Alberti 158 / Alvard <=250
+context: population                                    4357 ±2.3e+02            3223 ±2.1e+02            5660 ±1.7e+02        
+context: starvation share of deaths                  0.2151 ±0.0071           0.2891 ±0.0043           0.1456 ±0.014          
+context: land use fraction                            0.234 ±0.011            0.1528 ±0.014             0.228 ±0.014          
+#18 e0 (period)                                        30.8 ±0.16    PASS      30.34 ±0.45    PASS      34.25 ±0.44    PASS   G&K 2007 forager band 21-37
+#19 survival to 15 (period)                          0.5771 ±0.0016  PASS     0.5545 ±0.0047  PASS     0.6197 ±0.0028  PASS   G&K 2007 band 0.45-0.66
+#20 e15 (period)                                      34.78 ±0.28    PASS      35.85 ±0.44    PASS      37.31 ±0.55    PASS   G&K 2007 band 28.6-42.5
+#21 survival to 45 from birth (period)               0.3329 ±0.0037  PASS     0.3329 ±0.0086  PASS     0.3916 ±0.0086  PASS   G&K 2007 band 0.26-0.43
+
+wrote docs/evidence/scorecard_add113_canon.json

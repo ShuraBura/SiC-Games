@@ -1,0 +1,19 @@
+C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+  res = func(*args, **kwargs)
+MALTHUS DIAGNOSIS | temperate | 800 steps | seeds [0, 1, 2, 3, 4] (n=5 per arm)
+what breaks when the residence pin is released?
+
+Traceback (most recent call last):
+  File "C:\Users\syatom\Projects\SiC Games\scratchpad\bp_malthus_diag.py", line 128, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\syatom\Projects\SiC Games\scratchpad\bp_malthus_diag.py", line 112, in main
+    rows = [r for r in (run_one(clim, s, ov) for s in SEEDS) if r]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syatom\Projects\SiC Games\scratchpad\bp_malthus_diag.py", line 112, in <genexpr>
+    rows = [r for r in (run_one(clim, s, ov) for s in SEEDS) if r]
+                        ~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\syatom\Projects\SiC Games\scratchpad\bp_malthus_diag.py", line 58, in run_one
+    kids = [a for a in pop if a.age_yr < 15.0]
+                              ^^^^^^^^
+AttributeError: 'BaseAgent' object has no attribute 'age_yr'

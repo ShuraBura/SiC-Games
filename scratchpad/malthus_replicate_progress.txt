@@ -1,0 +1,22 @@
+[11:57:35] START | world 0 fixed | 10 demographic seeds | 2000 steps | patch 40
+[12:00:01]   seed 0 | canon              | sites   39 pop  2013 | 1/20 done | elapsed 2m ETA 46m
+[12:04:04]   seed 0 | viable site        | sites   79 pop  3803 | 2/20 done | elapsed 6m ETA 58m
+[12:08:55]   seed 1 | canon              | sites   70 pop  3452 | 3/20 done | elapsed 11m ETA 64m
+[12:14:28]   seed 1 | viable site        | sites   83 pop  3879 | 4/20 done | elapsed 17m ETA 68m
+[12:19:28]   seed 2 | canon              | sites   86 pop  3883 | 5/20 done | elapsed 22m ETA 66m
+[12:23:00]   seed 2 | viable site        | sites   64 pop  3406 | 6/20 done | elapsed 25m ETA 59m
+[12:25:19]   seed 3 | canon              | sites   38 pop  2155 | 7/20 done | elapsed 28m ETA 51m
+[12:28:01]   seed 3 | viable site        | sites   39 pop  2406 | 8/20 done | elapsed 30m ETA 46m
+[12:30:41]   seed 4 | canon              | sites   47 pop  2859 | 9/20 done | elapsed 33m ETA 40m
+[12:34:16]   seed 4 | viable site        | sites   79 pop  3828 | 10/20 done | elapsed 37m ETA 37m
+[12:36:30]   seed 5 | canon              | sites   39 pop  1952 | 11/20 done | elapsed 39m ETA 32m
+[12:39:14]   seed 5 | viable site        | sites   58 pop  2751 | 12/20 done | elapsed 42m ETA 28m
+[12:42:37]   seed 6 | canon              | sites   62 pop  2968 | 13/20 done | elapsed 45m ETA 24m
+[12:46:38]   seed 6 | viable site        | sites   70 pop  3744 | 14/20 done | elapsed 49m ETA 21m
+[12:50:03]   seed 7 | canon              | sites   71 pop  3496 | 15/20 done | elapsed 52m ETA 17m
+[12:54:04]   seed 7 | viable site        | sites   87 pop  4244 | 16/20 done | elapsed 56m ETA 14m
+[12:57:54]   seed 8 | canon              | sites   79 pop  3404 | 17/20 done | elapsed 60m ETA 11m
+[13:01:53]   seed 8 | viable site        | sites   67 pop  3715 | 18/20 done | elapsed 64m ETA 7m
+[13:04:07]   seed 9 | canon              | sites   45 pop  2089 | 19/20 done | elapsed 67m ETA 4m
+[13:06:49]   seed 9 | viable site        | sites   54 pop  2455 | 20/20 done | elapsed 69m ETA 0m
+[13:06:49] DONE — analysing

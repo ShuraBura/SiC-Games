@@ -1,0 +1,6 @@
+﻿seed 1 paternal 0.0: bands 42, led 41, led-but-loose 0 (raw of loose []); above fixed point 36/42; median assabiyah 1.000; median surplus 0.756; median raw 2.029; pop 1122
+seed 1 paternal 0.5: bands 47, led 47, led-but-loose 1 (raw of loose [0.948]); above fixed point 39/47; median assabiyah 1.000; median surplus 0.741; median raw 1.806; pop 1305
+seed 2 paternal 0.0: bands 35, led 35, led-but-loose 0 (raw of loose []); above fixed point 28/35; median assabiyah 1.000; median surplus 0.598; median raw 1.775; pop 963
+seed 2 paternal 0.5: bands 31, led 31, led-but-loose 0 (raw of loose []); above fixed point 28/31; median assabiyah 1.000; median surplus 0.703; median raw 1.737; pop 865
+seed 3 paternal 0.0: bands 39, led 39, led-but-loose 1 (raw of loose [0.94]); above fixed point 34/39; median assabiyah 1.000; median surplus 0.667; median raw 1.623; pop 1117
+seed 3 paternal 0.5: bands 38, led 37, led-but-loose 3 (raw of loose [0.471, 0.585, 0.918]); above fixed point 36/38; median assabiyah 1.000; median surplus 0.766; median raw 2.048; pop 1115

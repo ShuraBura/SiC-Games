@@ -1,0 +1,11 @@
+﻿python3.exe : C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: 
+FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+At line:1 char:343
++ ... SiC Games"; & "C:\Users\syatom\AppData\Local\Python\bin\python3.exe"  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\syatom...tional changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  res = func(*args, **kwargs)
+paternal 0.0: test comparison differs = True; gate binds on 691/68720 woman-steps = 0.0101; final pop 870
+paternal 0.5: test comparison differs = False; gate binds on 259/71550 woman-steps = 0.0036; final pop 980

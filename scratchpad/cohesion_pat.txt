@@ -1,0 +1,2 @@
+﻿paternal 0.0: bands 47, led 39, led-but-loose 0 (raw of loose []); above fixed point 39/47; median assabiyah 1.000; median surplus 0.639; median raw 1.633; pop 1210
+paternal 0.5: bands 44, led 38, led-but-loose 2 (raw of loose [0.761, 0.86]); above fixed point 24/44; median assabiyah 0.968; median surplus 0.435; median raw 1.561; pop 1114

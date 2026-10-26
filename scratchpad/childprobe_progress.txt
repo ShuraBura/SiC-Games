@@ -1,0 +1,7 @@
+[17:49:49] launch temperate  (6000 steps, recording from 3000)
+[17:49:49] launch montane  (6000 steps, recording from 3000)
+[17:49:49] launch savanna  (6000 steps, recording from 3000)
+[17:54:49] DONE   savanna  rc=0  5 min
+[18:15:49] DONE   montane  rc=0  26 min
+[18:25:09] DONE   temperate  rc=0  35 min
+[18:25:09] ALL FINISHED

@@ -1,0 +1,19 @@
+﻿.............................F..........................                 [100%]
+================================== FAILURES ===================================
+____ test_fertility_and_mobility_intake_modes_are_independently_ablatable _____
+sic_games\tests\test_pressure_mobility.py:175: in test_fertility_and_mobility_intake_modes_are_independently_ablatable
+    assert mobility_only != both
+E   AssertionError: assert {'births': 1010, 'bonds': 260, 'deaths': 930, 'final_pop': 980, ...} != {'births': 1010, 'bonds': 260, 'deaths': 930, 'final_pop': 980, ...}
+============================== warnings summary ===============================
+tests/test_pressure_mobility.py::test_off_is_bit_exact
+tests/test_pressure_mobility.py::test_npp_source_default_stays_bit_exact_with_new_fields_present
+tests/test_pressure_mobility.py::test_intake_source_changes_the_world
+tests/test_pressure_mobility.py::test_intake_ema_stays_live_without_fertility_flag
+tests/test_pressure_mobility.py::test_fertility_and_mobility_intake_modes_are_independently_ablatable
+  C:\Users\syatom\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\mesa\mesa_logging.py:112: FutureWarning: The use of the `seed` keyword argument is deprecated, use `rng` instead. No functional changes.
+    res = func(*args, **kwargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED sic_games\tests\test_pressure_mobility.py::test_fertility_and_mobility_intake_modes_are_independently_ablatable
+1 failed, 55 passed, 5 warnings in 76.64s (0:01:16)

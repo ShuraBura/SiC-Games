@@ -1,0 +1,6 @@
+﻿
+FAILED sic_games\tests\test_cohesion_headroom.py::test_every_band_with_a_leader_is_pinned_at_the_clamp
+FAILED sic_games\tests\test_cohesion_headroom.py::test_assabiyah_sits_above_its_own_fixed_point
+2 failed, 1758 passed, 1 xfailed, 328 warnings in 919.79s (0:15:19)
+
+
