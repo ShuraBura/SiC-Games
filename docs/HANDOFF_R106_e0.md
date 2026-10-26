@@ -1,5 +1,7 @@
 # Handoff — R-106 forager e0 arc (2026-09-10)
 
+> **HISTORICAL — a session handoff of 2026-09-10; the assistant-memory files it names are NOT in the repository (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 This note points the next session to the right files. It is a map, not the record: the formal record is
 `docs/RESULTS.md` (Addenda 72–75) and the git history; the working state is in the assistant memory files listed
 below.

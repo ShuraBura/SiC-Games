@@ -1,5 +1,7 @@
 # SiC Games — Connubium (emergent mating-network scale) Blueprint (v1.0, 2026-07-08)
 
+> **HISTORICAL — the connubium blueprint (2026-07-08); the adaptive connubium it specified is ON in canon (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 **Goal.** Make the ~500 regional mating network (Wobst 1974 "magic numbers" 25/500) **emerge** from an
 individual-level **exogamy rule** on the agents we already track, replacing the hard-coded spatial `aggregation_radius`
 that causes the "thousands pile up during the gathering" pathology. Success = the realized mating-network size is a

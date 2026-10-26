@@ -9887,4 +9887,73 @@ estimate and is now superseded by the measured pair. Figure: `scratchpad/bp_stag
 
 ---
 
+## Addendum 114 — Audit preparation: the FULL marker scorecard re-scored on the Add.113 canon, the side effects that adoption had outside #18–#21, and a machine audit of the documentation (2026-10-26, R-106)
+
+**Why.** The supervisor asked for the project to be prepared for an extensive external audit, with all documents
+correct. MARKER_MATRIX rule 5 says an absolute marker value is valid only on the canon it was measured on; rows #1–#17
+had last been scored on the Add.100 canon, before four adoptions (Add.108, 109, 113 ×2).
+
+**1. Full scorecard on the current canon** (new tool `tools/scorecard.py`; the nine `riskvg` Stage-2 runs of
+Add.113 = real pipeline, 3 worlds × 3 paired seeds, 15,000 steps; sustained window = last 15% of rows; #18–#21 =
+period life table; verdict at 1 SE over seeds). Evidence committed: `docs/evidence/scorecard_add113_canon.{json,png}`;
+the full table is now the "CURRENT SCORECARD" section at the top of MARKER_MATRIX. **Every banded marker PASSES on
+every world except two UNRESOLVED on temperate:** #1 band size 40.2 ± 1.6 (range ~12–40) and #17 fission ceiling
+232 ± 19 (≤ 250).
+
+**2. What the Add.113 adoption did OUTSIDE #18–#21** (same tool on the Add.109 canon, `scorecard_add109_canon.json`,
+and on the single-repair arms). Add.113's Stage 2 scored #18–#21 only, so these were not seen at the decision:
+- savanna #3 village max (Voronoi catchment) 209 → **305**; the granary-only arm gives 297, so the granary causes it.
+  Report-only: per Add.104 the ceiling is scored at #17 on the co-residence unit, where savanna is 119 (PASS).
+- montane #11 status→RS 0.195 → **0.241**; granary-only arm 0.239. Report-only: NOT COMPARABLE (Add.102).
+- #15 orphanhood (motherless) rose on all three worlds (savanna 0.017 → 0.029, temperate 0.024 → 0.033, montane
+  0.023 → 0.032) against the Aché point ~0.02. No band is documented, so no verdict; NOT diagnosed (a plausible
+  reading — more children survive to be orphaned — is not measured).
+- improved: #14 temperate unres. → PASS (0.417 → 0.410); #1 montane 21.3 → 27.7; #11 savanna unres. → 0.125.
+**Lesson recorded:** a Stage 2 for adoption must run the FULL scorecard, not only the markers it targets.
+
+**2b. The demography monitor and the spatial check on the same runs** (`demography_health`, `spatial_health`; the
+sustained window; share of rows out of band). In band everywhere: the age structure, e0, e15, e45, l(15), l(45), the
+modal adult death age, the age at first birth. OUT on every world: **`realised_tfr` 4.05 / 4.58 / 4.53 against the
+forager band [4.69, 8.03]** (100% of rows) and **m(5–15) 0.022 / 0.028 / 0.026 against the Aché ~0.01** (100%).
+Montane `realised_ibi_med` 32.3 months against [34.4, 49.4]. Orphanhood above the Aché points (motherless ~0.03 vs
+~0.02; fatherless ~0.08 vs ~0.05). **Instrument defect found:** the monitor still scores band size with
+`band_med_adults`, the statistic Add.89 retracted, so its band-size verdict (temperate/savanna 50–59 vs 28.2) is not
+evidence; marker #1 uses the corrected statistic. **The spatial paradox flag is TRUE on all nine runs**: occupied-cell
+density 0.12–0.16/km² above Binford's 0.091, regional density 0.021–0.036/km² below it — by the root CLAUDE.md rule
+the population is failing to disperse, not food-limited. None of these is diagnosed here. The whole state is
+summarised in the new `docs/MODEL_STATE.md`.
+
+**3. Documentation audit** (new tool `tools/doc_audit.py`, which changes nothing and prints a report):
+- **Parameters.** 9 PARAMETERS.md rows showed a class default where the canon builder sets another value
+  (`dens_delta` 1.0 → canon 3.0, `storage_decay` 0.05 → 0.02, `divorce_rate` 0 → 0.005, `polygyny_rate` 0.3 → 0.005,
+  `comove_footprint` 1 → 0, `settle_catchment_radius` 2 → 1, `genome_loci` 32 → 48, `mate_search_min_eligible`
+  3 → 15, `village_fission_threshold` 170 → 150). Corrected in place with a dated note each; the run file was right
+  in every case. **Two canon decisions have NO recorded reason** and are flagged for the audit: `comove_footprint = 0`
+  (set by `emergent_village_demog()`, commit 274d18d, against the realistic preset's documented "CANONICAL 1"), and
+  `village_fission_threshold = 150` against the 170 that PARAMETERS.md anchors on Bandy 2004 (the two readings of
+  Bandy are not reconciled).
+- **Coverage.** PARAMETERS.md has rows for 81 of 253 canonical parameters; 51 of 125 flags (29 ON in canon) were
+  named in no specification document. Remedy without new hand-written copies: a GENERATED `docs/REGISTRY.md` (every
+  flag and parameter: canon value, class default, charter type, ladder tier, provenance tag, the field's own source
+  comment) and `docs/RESULTS_INDEX.md` (every ledger entry with line and status words), both by `tools/gen_registry.py`
+  and held current by `tests/test_registry_sync.py`.
+- **Provenance.** Of 253 canonical parameters, **165 carry no provenance tag in their own source comment**, 38 are
+  PROVISIONAL, 14 ANCHORED, 8 VERIFIED (REGISTRY §2). Untagged is not the same as ungrounded — many are grounded in
+  PARAMETERS.md prose or RESULTS — but the code does not say so.
+- **Misattributed comments.** `gen_runconfig.py` attaches a preceding group comment to later fields ("channel note,
+  inherited"), so `config/mechanisms.toml` gave 10 flags another field's description. Two were source defects and are
+  fixed (comment-only, bit-exact): the R-103 gate's block sat above `enable_aggl_ceiling`, and the deleted
+  `enable_infanticide` note ran into `enable_energetic_fertility`'s own comment. 12 flags have no comment of their
+  own; the REGISTRY marks them.
+- **Paths.** 96 file references in live documents point at files that do not exist (70 in this append-only
+  ledger, mostly instruments of R-81…R-99 that lived outside the tracked tree, abbreviated blueprint names, or
+  memory files). Recorded, not rewritten; `tools/doc_audit.py --check paths` lists them. The instruments of
+  Add.105–113 were untracked in `scratchpad/` and are now committed (scripts, figures, small text results; the
+  112 MB of probe JSON and the logs are regenerable and stay out).
+- **Stale entry documents.** README (2026-06-05), INDEX (2026-07-18), `sic_games/CLAUDE.md`, `context/*` and the
+  root `SiC_Games_Fable_Audit_Guide.md` all described the June C-vs-Si project; corrected or bannered in this change.
+  The entry point for an auditor is now `docs/AUDIT_GUIDE.md`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

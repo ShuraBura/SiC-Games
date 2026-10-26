@@ -514,6 +514,7 @@ class DemographyConfig(BaseModel):
     # sex-SYMMETRIC (38% of male vs 41% of female infant deaths are homicide/neglect). The sex bias is at ages
     # 4-14 (28% F vs 6% M) and comes from grave accompaniment, not infanticide. R-74's `enable_orphan_mortality`
     # is the mechanism that actually carries this channel, and it is built, anchored and ON.
+
     # economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves
     # drain to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
     enable_energetic_fertility: bool = False
@@ -934,12 +935,6 @@ class DemographyConfig(BaseModel):
     # (montane salmon rivers) morph COMPLEX. SEPARATES survival-storage from complexity. Default OFF ⇒ bit-exact.
     morph_aquatic_gated: bool = False
     morph_aquatic_threshold: float = Field(0.15, ge=0.0, le=1.0)  # complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL]
-    # R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus
-    # (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence — Testart's own chain
-    # is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped the differentials step.
-    # Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45% stratified while having the
-    # LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality. When ON, a would-be stratified
-    # band must also show within-band cred concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact.
     # R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR
     # occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 carrying-capacity ceiling was gated on
     # `(cx,cy) in _settlement_sites`. So a NON-settlement cell got unbounded increasing returns: more crowding →
@@ -961,6 +956,14 @@ class DemographyConfig(BaseModel):
     # hazard (density_disease) still uses LOCAL per-cell density, correctly: contagion is a local quantity.
     # Default OFF => bit-exact.
     enable_society_regional_density: bool = False
+    # R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus
+    # (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence — Testart's own chain
+    # is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped the differentials step.
+    # Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45% stratified while having the
+    # LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality. When ON, a would-be stratified
+    # band must also show within-band cred concentration ≥ `stratification_gini_min`. Default OFF ⇒ bit-exact.
+    # (This block sat above `enable_aggl_ceiling` until 2026-10-26, so the generated config gave that flag the
+    # wrong description; moved during the audit preparation — a comment-only change.)
     enable_stratification_inequality_gate: bool = False
     # R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform
     # (0.29) and cannot separate a chiefdom from a rich-but-equal band. Stratification is a relation BETWEEN

@@ -1,5 +1,7 @@
 # DESIGN — Colonization + density-scaled village spacing (R-106, 2026-09-03)
 
+> **STATUS UPDATE 2026-10-26: BUILT AND CANONICAL.** The 'PROPOSED … not built' status line below is out of date. The design was built as `enable_colonizing_budding` and `enable_village_density_disease`; both are ON in canon (`config/runs/full_campaign.toml`; RESULTS Addenda 59–61, 'the settlement pair is adopted'). The document below is the design record.
+
 Status: PROPOSED (diagnosis complete; not built). Owner decision required before build.
 
 ## 1. The problem

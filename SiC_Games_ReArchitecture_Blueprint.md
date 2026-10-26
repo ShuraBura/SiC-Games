@@ -1,5 +1,7 @@
 # SiC Games — Performance Re-Architecture Blueprint (v1.0, 2026-07-07)
 
+> **HISTORICAL — the performance re-architecture blueprint (2026-07-07) (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 **Goal.** Make the model tractable at the Turchin secular-cycle target: **30K–50K agents × ~18,000 steps (1,500 yr)** — the natural carrying capacity of the 1M km² world (~52K agents @ 0.05/km², realistic HG density). Current cost is **~1 ms/agent, superlinear** at scale (32K agents → 128 s/step → a 1,500-yr run ≈ weeks). Target: **≤ ~10–50 µs/agent, linear** → ~50K agents in ~1 s/step → ~5 h/run (parallelizable across seeds).
 
 **Core principle.** SEPARATE *exact-fast* from *approximate*. Most of the step is embarrassingly parallel and can be vectorized/JIT'd **bit-exact**; the only inherently sequential piece (movement's within-step crowding feedback) can be kept exact via numba. **Pay a fidelity price only if the exact tiers are insufficient.** Validate every tier bit-exact (or bounded-divergence) against the current model at small N before scaling.

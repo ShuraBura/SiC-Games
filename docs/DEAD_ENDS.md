@@ -257,4 +257,32 @@ days total starvation, Cahill 1970) and step length is LOCKED at one month (ARCH
 
 ---
 
+## DE-23 — Index of the R-106 dead ends, 2026-08 → 2026-10 (appended 2026-10-26, audit preparation)
+
+DE-22 was the last entry written here; the arc after it recorded its dead ends only in RESULTS. This entry is a
+POINTER INDEX (one fact, one home: the reasoning stays in RESULTS). Kept-dark flags stay in the code as ablatable
+instruments; their canon state is in `docs/REGISTRY.md`.
+
+| direction | verdict | record |
+|---|---|---|
+| a subsistence floor as the cause of the young pyramid | FALSIFIED | RESULTS Add.55 |
+| food volatility as an e0 lever | FALSIFIED (a density-ceiling lever only) | Add.66 |
+| the birth brake and the fishery-bootstrap fixes | FALSIFIED | Add.67 |
+| an endogenous preventive check; a heritable fertility-restraint gene; band autonomy | self-cancels / not selectable / neither selectable nor consequential | Add.70, Add.71, Add.72 |
+| exogenous emigration as the e0 fix | a density-for-e0 trade, not adopted | Add.74–75 |
+| forced hunger dispersal (`enable_hunger_dispersal`) | FALSIFIED as adopted canon (crashes temperate e0); kept dark | Add.78 |
+| intake-driven mobility as a spatial lever | inert | Add.79 |
+| "the packing is an ADAPTIVE equilibrium" (Add.79's arc closure) | **REFUTED later** — the population is not food-limited, it sits at 5–10% of carrying capacity | Add.105 |
+| the cohesion de-saturation fix for band size | FALSIFIED by a natural control | Add.80 |
+| "band size is a structural packing limit" (Add.80) | **RETRACTED** — wrong statistic and unit; no deficit | Add.89 |
+| the tolerance-band pattern applied to band size | FALSIFIED | Add.88 |
+| #14 scored on the all-ages material Gini | wrong statistic, corrected | Add.90 → Add.92 |
+| #11 status→RS against von Rueden | NOT COMPARABLE (wrong channel) | Add.102 |
+| the density-fill radius-match correction alone | real lever, lowers juvenile survival; not adopted, kept dark | Add.106 |
+| band (alloparental) provisioning | zero-sum against the e15 anchor; NOT adopted, kept dark | Add.75 → Add.108 |
+| a pin release held for a year (`enable_sticky_pin_release`) | REJECTED (the one-step flicker protected families); kept dark | Add.111 |
+| the village granary ALONE; the risk correction ALONE | each fails a marker alone; adopted only TOGETHER | Add.111–113 |
+
+---
+
 *End of DEAD_ENDS — seeded 2026-06-05. Append-only; revive with a dated note.*

@@ -102,18 +102,8 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# `enable_infanticide` WAS HERE AND IS DELETED (2026-08-06). It was a declared flag that no line of code
-# ever read — three separate audits had to re-discover that and write "UNIMPLEMENTED STUB" next to it, and
-# `C_ALLON` had to carry a special case to skip it. A switch that does nothing is not documentation, it is
-# a standing invitation to believe the mechanism exists. THE SCIENCE IT ENCODED, KEPT: baseline
-# infanticide is ALREADY inside the Siler infant curve, which was fit to observed Aché deaths with
-# "infanticide KEPT". An explicit mechanism would only add CONDITIONAL infanticide, and Table 5.1 says
-# parental infanticide is 5.3% of Aché infant deaths while infancy is nearly sex-SYMMETRIC (38% of male vs
-# 41% of female infant deaths are homicide/neglect). The sex bias is at ages 4-14 (28% F vs 6% M) and
-# comes from grave accompaniment, not infanticide. R-74's `enable_orphan_mortality` is the mechanism that
-# actually carries this channel, and it is built, anchored and ON. economy-fix (Tier-0): births scale with
-# maternal reserve, capping the population BEFORE reserves drain to the starvation floor → realistic
-# equilibrium reserve (red-team 2b prerequisite)
+# economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves drain
+# to the starvation floor → realistic equilibrium reserve (red-team 2b prerequisite)
 
 [enable_intake_fertility]
 value = true
@@ -573,19 +563,13 @@ type  = "bool"
 value = true
 owner = "DemographyConfig"
 type  = "bool"
-# R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN
-# surplus (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence —
-# Testart's own chain is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped
-# the differentials step. Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45%
-# stratified while having the LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality.
-# When ON, a would-be stratified band must also show within-band cred concentration ≥
-# `stratification_gini_min`. Default OFF ⇒ bit-exact. R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP.
-# Point-mode agglomeration adds a SUPERLINEAR occupancy bonus (n**aggl_a - n) to ANY occupied cell, but
-# the R-63 carrying-capacity ceiling was gated on `(cx,cy) in _settlement_sites`. So a NON-settlement cell
-# got unbounded increasing returns: more crowding → superlinearly more food → more people. Diagnosed
-# R-104: a run sat at pop ~3000 for 1750 steps, then surplus_med saturated at 1.0 and pop went 3259→97551
-# with ZERO starvation at 61 agents/cell. ON ⇒ the ceiling also applies wherever the agglomeration bonus
-# is applied. Default OFF ⇒ bit-exact with every pre-R-105 result (which were all run with the gap open).
+# R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR
+# occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 carrying-capacity ceiling was gated
+# on `(cx,cy) in _settlement_sites`. So a NON-settlement cell got unbounded increasing returns: more
+# crowding → superlinearly more food → more people. Diagnosed R-104: a run sat at pop ~3000 for 1750
+# steps, then surplus_med saturated at 1.0 and pop went 3259→97551 with ZERO starvation at 61 agents/cell.
+# ON ⇒ the ceiling also applies wherever the agglomeration bonus is applied. Default OFF ⇒ bit-exact with
+# every pre-R-105 result (which were all run with the gap open).
 
 [enable_society_regional_density]
 value = true
@@ -608,18 +592,15 @@ type  = "bool"
 value = false
 owner = "DemographyConfig"
 type  = "bool"
-# (channel note, inherited) SOCIETY CLASSIFIER ON REGIONAL DENSITY (R-106, 2026-08-24). The morph
-# classifier asks "is this band packed past Binford's threshold?" -- and Binford's 0.091/km2 is a REGIONAL
-# figure (persons per 100 km2 of RANGE). The classifier was fed the band's members over its OCCUPIED
-# cells, which is a LOCAL density: a band crowded onto 1.9 cells reads 0.167/km2 = 1.8x packing =
-# STRATIFIED, while the same population over its true range is 0.025/km2 = 0.28x packing = egalitarian.
-# Because the model crowds everyone onto ~14% of the land (the packing paradox), EVERY band read as
-# packed, 57% came out stratified in a pure forager world, SEDENTISM_IBI_MONTHS gave chiefdoms a 14-month
-# refractory, and TFR ran ~10 against a 5-8 anchor. This is a UNITS error: local density fed to a
-# threshold defined regionally. When on, the classifier density = members / (habitable_km2 / n_bands) --
-# the band's fair share of the whole range, which equals the true regional density and is the scale
-# Binford's number means. The DISEASE hazard (density_disease) still uses LOCAL per-cell density,
-# correctly: contagion is a local quantity. Default OFF => bit-exact.
+# R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN
+# surplus (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of surplus, not affluence —
+# Testart's own chain is storage → wealth DIFFERENTIALS → heritable rank, and the level-only test skipped
+# the differentials step. Diagnosed 2026-07-22: a uniformly-affluent packed world (flat-tropical) read 45%
+# stratified while having the LOWEST cred-Gini of any arm (0.29) — the label ran OPPOSITE to inequality.
+# When ON, a would-be stratified band must also show within-band cred concentration ≥
+# `stratification_gini_min`. Default OFF ⇒ bit-exact. (This block sat above `enable_aggl_ceiling` until
+# 2026-10-26, so the generated config gave that flag the wrong description; moved during the audit
+# preparation — a comment-only change.)
 
 [enable_relational_stratification]
 value = true

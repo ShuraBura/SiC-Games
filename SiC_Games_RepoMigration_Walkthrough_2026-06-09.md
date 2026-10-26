@@ -1,5 +1,7 @@
 # Repo Migration Walkthrough — move SiC-Games off the Drive-synced path
 
+> **HISTORICAL — the repo-migration walkthrough of 2026-06-09 (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 **For:** Claude Code, to run **interactively with the supervisor** on the machine where the repo
 lives. **Not** a script to execute unattended.
 **Date:** 2026-06-09

@@ -453,6 +453,12 @@ Step-2 **pathogen field** reads real T/humidity rather than a `wateracc × NPP` 
   by Gurven & Kaplan 2007 cause-of-death. **Calibration:** set the (max-capped) risk multiplier so
   terrain accident-mortality ≈ **10% of baseline `a2`** in average-risk terrain, scaling with the `risk`
   field. Pins the risk *scale*, not just the mean (red-team M-2).
+  **[2026-10-26 note — CODE vs SPEC, resolved in canon.]** Until R-106 Add.113 the code (`risk_mult`) multiplied the
+  WHOLE a2 by `risk_cell / mean land risk`, not a 10% accident share; settled agents live on safer-than-mean land,
+  so the realised factor was 0.44–0.62 and removed about half of all age-independent mortality (RESULTS Add.112;
+  first filed in commit ae01ced, 2026-08-14). `enable_risk_accident_share` (s = `risk_accident_share` = 0.10)
+  implements the form specified here, `(1 − s) + s·risk_mult`; ADOPTED in canon together with the village granary
+  (Add.113). The flag's class default stays False, so pre-Add.113 runs reproduce bit-exactly.
 - **Density-disease `D` (`δ, ρ_half`):** the **free calibration lever** (endemic/zoonotic transmission;
   Dunn 1968 / Houldcroft & Underdown 2023 — modest, not crowd-epidemic). No external anchor — calibrated
   to the spatial equilibrium. `ρ` defined as **agents/km²** (red-team m-3), not raw cell occupancy.
@@ -976,6 +982,8 @@ domain = **Cobb–Douglas** `Π_f (c_f+ε)^{κ_{d,f}}` with equal within-domain 
   loop, calibratable to r≈0.19); the homeostat **bounds Gini(cred) 0.29 (ρ=0) → 0.25 (ρ=0.1)**; male **N_e
   stays healthy (~64–82)** → no small-N drift collapse (RT-4). m PROVISIONAL pending the full r≈0.19 calibration.
 
+- **[2026-10-26 note]** Canon value **0.5** since R-106 Add.109 (set in `emergent_village_demog()`; the class
+  default stays 0.0). Canon ran with 0.0 until then — a config drift; see Add.109 for the Stage-2 effect.
 - **Step 5 — B+ paternal provisioning (`paternal_provision_frac`):** a father gives that fraction of his harvest
   OVERFLOW (above his cap, otherwise wasted) to his OWN children, drawn against the child's **residual need
   AFTER the two maternal tiers** (RT-2: conserved like the mother's tier-1, no double-feed; child never filled
@@ -1145,6 +1153,14 @@ This is exactly Binford's overwintering logic. 4 unit tests (off ⇒ no store; a
 temperature-gated off in warm cells; the harsh-winter capacity lift). **Provisional:** `storable_fraction=0.5`
 (QSTOR exact % is in the Binford 2001 print volume, not web-accessible); the ET→model-temp mapping is a
 calibration point.
+
+**[2026-10-26 note — the granary's GRAIN.]** S.1 specifies a COLLECTIVE BAND granary, implemented per CELL
+because a band was assumed to occupy one cell. Villages span every cell within `settle_radius` of their site, and
+R-106 Add.110 found the mother of a starving child one cell off her village's stocked site. `enable_village_granary`
+(ADOPTED with the risk correction, Add.113) keys the store by the SITE for every cell inside a settlement's radius:
+cap = `store_capacity_reserves × reserve_full ×` village members; ONE need-proportional (S.2-weighted) draw over all
+needy members after every cell has banked. Cells outside every village keep the per-cell store. Canon
+`storable_fraction` is 0.7 and `storage_decay` 0.02/mo (PARAMETERS.md), not the provisional values above.
 
 **S.4 society morph (BUILT, per-cell; blueprint S.4).** The `society_from_character` hook is finally CALLED.
 Per-cell state (`_cell_society`/`_cell_settle`); the harvest loop reads `kappa_cell` (the cell's society κ:

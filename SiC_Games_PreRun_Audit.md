@@ -1,5 +1,7 @@
 # SiC Games — Pre-Run Audit (substrate scale run "A"), 2026-07-08
 
+> **HISTORICAL — the pre-run audit of substrate run A (2026-07-08) (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 **Purpose.** Before committing hours to the substrate scale run, confirm it is *valuable and not reliant on
 errors/typos*. Two gates: (1) diagnostics correctly wired; (2) re-check every constant for — incorrect lit read,
 memory-value-not-verified, bad code, unwired/off mechanism, placeholder due for update.

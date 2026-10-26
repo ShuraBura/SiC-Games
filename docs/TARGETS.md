@@ -1,5 +1,7 @@
 # SiC Games — Targets (TARGETS.md)
 
+> **Status review, 2026-10-26 (audit preparation).** The statuses below were last set between 2026-06-05 and 2026-08-07; none was re-assessed in the audit preparation. Later evidence: **T-4** (Aché child-mortality schedule) → MARKER_MATRIX #18–#21, which pass on all three canonical worlds against the Gurven & Kaplan forager band (RESULTS Add.113–114) — the band, not the Aché schedule itself; **T-5** → MARKER_MATRIX #14 (PASS, forager arm); **T-7** → MARKER_MATRIX #9 (pre-registered, not yet scored by `tools/scorecard.py`); **T-1 / T-9** → no new test.
+
 **Purpose:** The home for **emergent behaviours the project is shooting for** — qualitative
 phenomenology we hope the model produces — that are *not yet* formal predictions. This is the
 deliberate counterpart to HYPOTHESES.md: a place for generative ideas to live honestly,

@@ -225,6 +225,29 @@ further — the remaining gap is not explained by juvenile production. Code:
 `diag/intake-instrumentation`, `demog/intake-fertility-brake`. Methods: PARAMETERS §21.10; MECHANISMS §17.4b;
 falsified hypotheses: DEAD_ENDS DE-22.
 
+### R-106 calibration arc, Addenda 42–114 (2026-08 → 2026-10; appended 2026-10-26 for the audit)
+
+This section is a MAP by arc, not a list of every file. Each RESULTS addendum names its own instruments at its end.
+
+- **Where the instruments are.** `scratchpad/bp_<arc>_*.py` — one prefix per arc: `bp_agestruct*` (Add.81),
+  `bp_reach*` (Add.77), `bp_bandsize*` (Add.80, 88, 89), `bp_gini*` (Add.82–92), `bp_fission*` (Add.93, 103),
+  `bp_status_rs*` (Add.94), `bp_village_size*` (Add.95), `bp_ranksize` (Add.96), `bp_rs_*` (Add.102),
+  `bp_montane_why*` (Add.104), `bp_malthus_*` (Add.105–106), `bp_budsite_*`, `bp_deathprobe_*` (Add.107), `bp_childprobe_*` (Add.108), `bp_supplyprobe*`
+  (Add.109–110), `bp_stage2_*` (the Stage-2 driver and analysis of Add.106–113), `bp_gatebind`, `bp_cohesion_pat`
+  (Add.109 test diagnoses), `bp_scorecard99` (Add.100). Figures: `scratchpad/bp_*.png` (39 files). The
+  instruments of Add.105–113 were committed on 2026-10-26; before that they existed only on the working machine.
+- **What is NOT committed, and how to regenerate it.** Run outputs are git-ignored by design (`.gitignore`, R-106
+  2026-08-04): `sic_games/outputs/**/campaign_trajectory*.json` and the probe JSON in `scratchpad/` (~112 MB).
+  Regenerate a Stage-2 set with `scratchpad/bp_stage2_driver.py` (env `S2_ONLY_ARM`, `S2_CONTROL`; see its
+  docstring and `docs/AUDIT_GUIDE.md` §5); a probe with its `*_run.py` launcher.
+- **Committed compact evidence of the current canon:** `docs/evidence/scorecard_add113_canon.{json,png}` (all
+  markers, per run and per world) and `docs/evidence/scorecard_add109_canon.json` (the previous canon), produced by
+  `tools/scorecard.py` / `tools/scorecard_fig.py` from the nine Stage-2 runs of each canon.
+- **Audit tools (2026-10-26):** `tools/doc_audit.py` (doc ↔ code/config consistency), `tools/gen_registry.py`
+  (→ `docs/REGISTRY.md`, `docs/RESULTS_INDEX.md`), `tools/scorecard.py`, `tools/scorecard_fig.py`; earlier:
+  `tools/verify_anchor.py` (registered literature anchors), `tools/audit_provenance.py`, `tools/gen_runconfig.py`,
+  `tools/make_runconfig.py`.
+
 ---
 
 *End of ARTIFACTS — seeded 2026-05-29; reorg reconciliation 2026-06-05; MODEL_SPEC split 2026-06-06; Phase 1 artifacts 2026-06-13; Blueprint A gate 2026-06-14; resource-ecology + biome-mortality + scale-resolution arc (R-5…R-14) 2026-06-20; Carbon → emergent bands → full social stack (R-18…R-27) 2026-06-29.*

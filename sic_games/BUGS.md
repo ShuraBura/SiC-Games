@@ -1,5 +1,7 @@
 # Known bugs and discrepancies
 
+> **HISTORICAL — a Phase-0 (Stage 2, June 2026) known-issues ledger. Defects found since are recorded in `docs/RESULTS.md` (each as an addendum) (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+
 ## BUG-001 — Stage 2 pre-patch baseline parquet overwritten
 
 **Severity:** Data integrity (affects three-way comparison table only; no simulation correctness impact)

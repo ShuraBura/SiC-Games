@@ -1,6 +1,42 @@
 # SiC Games — Master Roadmap & Deferred Items
 
-**Last updated:** 2026-07-04 (EFC C1–C8 + GD-1 finite-resources arc documented — see the active-line table below).
+## CURRENT STATUS — 2026-10-26 (read this first; the sections below are the history of earlier stages)
+
+**Where the project is.** Phase 1 is the R-106 calibration arc (RESULTS Addenda 1–114, 2026-08 → 2026-10): make the
+demography, the settlement pattern and the society of a forager world reproduce the ethnographic record on three
+canonical worlds (temperate, savanna, montane), so that population can respond to food in a Malthusian way before any
+cycles layer is attempted. **Canon** = `config/runs/full_campaign.toml` (98 of 125 mechanisms ON); the last four
+adoptions are food-viable daughter sites (Add.108), fathers provisioning their children (Add.109), and the village
+granary + terrain risk as a 10% accident share, together (Add.113). **Scorecard** (MARKER_MATRIX, top section; RESULTS
+Add.114): every banded marker passes on every world except two unresolved on temperate (#1 band size, #17 fission
+ceiling). Branch `r106/add105-malthus-churn` holds Add.105–114 and is NOT yet merged or pushed.
+
+**Open threads, in the order of the benchmark ladder** (each points to its record):
+1. **Malthusian response (the arc's goal).** The population now spreads (savanna land use 5% → 15%), but Add.105's
+   finding (population at 5–10% of carrying capacity) has NOT been re-measured on the new canon, and CONTRACTION under
+   a shock (drought) has not been tested. Next step of the arc.
+2. **Replication on other planets.** Add.113 was tested on one planet (world/climate seed 0) with 3 demographic
+   seeds; the result is not yet replicated across world seeds (MARKER_MATRIX rule 3).
+3. **Temperate #1 and #17 unresolved** (40.2 ± 1.6 vs ≤ 40; 232 ± 19 vs ≤ 250).
+4. **#15 orphanhood rose** with the Add.113 adoption (savanna 0.017 → 0.029 vs the Aché point ~0.02); not diagnosed.
+5. **No cause-of-death marker.** Starvation is 15–29% of deaths in canon; the forager record says illness dominates.
+5b. **Demography monitor failures** (MODEL_STATE §3): TFR 4.0–4.6 below the forager band [4.69, 8.03] on every world;
+    m(5–15) 2–3× Aché; montane IBI 32 months (< 34.4); the monitor's band-size check still uses the retracted
+    `band_med_adults` statistic (instrument fix pending).
+5c. **The population does not disperse to its food:** the spatial paradox flag is TRUE on every world (MODEL_STATE §4).
+6. **#11 status→RS is NOT COMPARABLE** (Add.102): the model lacks the status → partner-fertility channel.
+7. **#5 lineage dynamics, #8 fission rate, #9 hierarchy ordering** are not computed by `tools/scorecard.py`.
+8. **Provenance debt.** 165 of 253 canonical parameters carry no provenance tag in their own source comment (REGISTRY
+   §2); two canon decisions have no recorded reason (`comove_footprint = 0`; `village_fission_threshold` 150 vs 170).
+9. **Known blockers kept as pinned facts:** the band-cohesion budget has no headroom (Add.22;
+   `test_cohesion_headroom.py`); the R-103 classifier history (MARKER_MATRIX, RESULTS R-103, Add.62).
+10. **Secular cycles** — four negatives so far, three from the subsistence base and one from the elite layer
+    (R-97); RESULTS Add.105 re-reads all four. The working conclusion is that cycles need state-scale / urban density.
+    Deferred until the Malthusian response is in place.
+
+---
+
+**Last updated (history sections below):** 2026-07-04 (EFC C1–C8 + GD-1 finite-resources arc documented — see the active-line table below).
 **Maintainer:** Claude Code updates this file at the end of every stage or directive.
 **Review protocol:** supervisor reviews this file at the start of every new stage conversation.
 

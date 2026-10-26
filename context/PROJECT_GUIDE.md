@@ -1,5 +1,7 @@
 # SiC Games — PROJECT GUIDE / FULL BRIEFING (START HERE)
 
+> **STALE — read `docs/AUDIT_GUIDE.md` instead (banner added 2026-10-26).** This briefing was last regenerated 2026-06-16 (Blueprint-A era) and describes the June C/Si project. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
+
 > **This is the single hand-off doc.** Read it (and `CANONICAL_FACTS.md` for the bleeding-edge status line) and you are current: what the project is, what is in the model **now**, what is in the **plan**, where every fact is **documented**, the invariants you must not break, a glossary, and how to plan a blueprint.
 >
 > **Derived / non-authoritative** (lives in `context/`, not the charter homes) — it explains and points; on any conflict the `docs/` homes win. **Current as of 2026-06-16.** Regenerate the §5–§6 inventories when the model materially changes; the live status line lives in `CANONICAL_FACTS.md`.

@@ -1,5 +1,7 @@
 # SiC Games — Full Simulation (ABM) Review Guide — LOCAL / CC (read-only)
 
+> **SUPERSEDED by `docs/AUDIT_GUIDE.md` (2026-10-26).** This guide was written 2026-06-11 for the June C/Si project; its project description, known-open list and document list are out of date. Its §0 principle (classify every finding as INCONSISTENCY / UNSUPPORTED CLAIM / DESIGN PREFERENCE) and its read-only review mode are carried into the new guide.
+
 **Auditor:** A Claude Code (CC) instance acting **strictly as a read-only reviewer** for this task.
 **You are reviewing, not building.** For the duration of this task you did not author this repository. Do not defend design choices — evaluate them. If you recognise code as your own prior work, review it as if a stranger wrote it.
 

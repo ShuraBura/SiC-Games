@@ -1,0 +1,160 @@
+
+=== 4. FRESHNESS — last commit touching each live document
+  2026-09-01 69ca7a4   CLAUDE.md
+  2026-07-08 8d1b7fb   docs\ARCHITECTURE.md
+  2026-07-30 b15017e   docs\ARTIFACTS.md
+  2026-09-26 ac452ae   docs\BENCHMARK_LADDER.md
+  2026-07-30 bd2740e   docs\DEAD_ENDS.md
+  2026-07-18 ba0f436   docs\DEFERRED_MECHANICS.md
+  2026-09-05 437b009   docs\DESIGN_colonization_spacing.md
+  2026-06-06 fe30750   docs\DOCS_CHARTER.md
+  2026-07-27 46eb0c9   docs\ELITE_STRATIFICATION_ROADMAP.md
+  2026-06-22 9efa907   docs\GLOSSARY.md
+  2026-09-11 7bc0c18   docs\HANDOFF_R106_e0.md
+  2026-09-16 29ab154   docs\HANDOFF_R106_gini_20260915.md
+  2026-07-21 dd1c68a   docs\HYPOTHESES.md
+  2026-07-18 b3b53a3   docs\INDEX.md
+  2026-09-24 7d683ee   docs\LITERATURE.md
+  2026-10-26 a999dc0   docs\MARKER_MATRIX.md
+  2026-08-07 d7d347b   docs\MECHANISM_CHARTER.md
+  2026-08-10 f73991c   docs\MECHANISMS.md
+  2026-09-05 437b009   docs\MODEL_SPEC.md
+  2026-08-10 ca7e989   docs\PARAMETERS.md
+  2026-10-26 a999dc0   docs\RESULTS.md
+  2026-07-21 dd1c68a   docs\ROADMAP.md
+  2026-06-16 1575c65   docs\SiC_Games_Game_Return_Rate_Table.md
+  2026-08-10 f73991c   docs\SiC_Games_Resource_Return_Rate_Table.md
+  2026-08-07 d7d347b   docs\TARGETS.md
+  2026-07-21 46880c6   docs\VERIFICATION_LOG.md
+  2026-06-05 4806574   README.md
+  2026-07-30 b15017e   sic_games\CLAUDE.md
+
+=== 1. PATHS — files named by live documents that do not exist
+  docs\ARTIFACTS.md: 12 missing
+      line 43: map_vector.json
+      line 43: outputs/[stage_label]_seed[N]/map_vector.json
+      line 84: Model/ROADMAP.md
+      line 84: Model/MODEL_SPEC.md
+      line 84: Model/ARTIFACTS.md
+      line 84: Model/INDEX.md
+      line 86: SiC_Games_DOCS_CHARTER.md
+      line 87: SiC_Games_TARGETS_seed.md
+      line 88: sic_games/LITERATURE.md
+      line 96: Model/HYPOTHESES.md
+      line 99: sic_games/LITERATURE.md
+      line 176: run_3i_band_risk_proto.py
+  docs\ELITE_STRATIFICATION_ROADMAP.md: 2 missing
+      line 104: campaign_trajectory_r104_ctrop_forage_s3.json
+      line 119: campaign_trajectory_fix.json
+  docs\HANDOFF_R106_e0.md: 3 missing
+      line 23: project_sic_games_emigration_e0.md
+      line 24: project_sic_games_band_autonomy.md
+      line 25: project_sic_games_mortality_metabolism.md
+  docs\HANDOFF_R106_gini_20260915.md: 5 missing
+      line 43: project_sic_games_material_gini.md
+      line 44: project_sic_games_packing_paradox.md
+      line 45: project_sic_games_bandsize_mean.md
+      line 46: project_sic_games_emigration_e0.md
+      line 115: _plot.py
+  docs\LITERATURE.md: 2 missing
+      line 321: SiC_Games_Forage_Return_Rate_Table.md
+      line 1276: alaintestart.com/UK/documents/storage.pdf
+  docs\RESULTS.md: 70 missing
+      line 600: assabiyah+leader−repulsion
+      line 1102: sic_games/src/sic_games/phase1_model.py:1093
+      line 1125: sic_games/src/sic_games/phase1_model.py:2108
+      line 2410: plots/r89_ascription_trap.png
+      line 2410: _zoom.png
+      line 2470: plots/r89_fix_validation.png
+      line 3007: diag_field.py
+      line 3088: diag_crowding.py
+      line 3091: diag_crowding_log.json
+      line 3185: diag_bands_travel.py
+      line 3185: diag_birth_cohort.py
+      line 3296: diag_calibrate_mobility.py
+      line 3296: diag_final_combined.py
+      line 3306: diag_crowding.py
+      line 3307: diag_calibrate_mobility.py
+      line 3397: diag_mobility_denominator.py
+      line 3470: diag_biome_sedentism.py
+      line 3566: diag_depletion_catchment.py
+      line 3646: diag_forage_cap.py
+      line 3646: diag_pop_suppressor.py
+      line 3646: diag_agglomeration_ablation.py
+      line 3647: diag_liveness_allon.py
+      line 3647: diag_all_on.py
+      line 3699: diag_tier2_scale.py
+      line 3775: score_paired.py
+      ... and 45 more
+  docs\ROADMAP.md: 2 missing
+      line 554: figures/plot_name.png
+      line 557: generate_figures.py
+  TOTAL missing references: 96
+
+=== 2. PARAMS — PARAMETERS.md bold values vs the canonical run file
+  line  314  dens_delta                         doc '**1.0** default; **δ≥4 regulates** (R-13)'                    canon 3.0
+  line  380  storage_decay                      doc '**0.05** (S.3)'                                               canon 0.02
+  line  387  divorce_rate                       doc 'False / 0 / **180**'                                          canon 0.005
+  line  388  polygyny_rate                      doc '**0.3 / 3** (realistic) / 0 / 1 (monogamy)'                   canon 0.005
+  line  406  comove_footprint                   doc '**1** (realistic/CANONICAL 2026-07-03) / 0 (default OFF)'     canon 0
+  line  518  settle_catchment_radius            doc '**2** cells'                                                  canon 1
+  line  608  genome_loci                        doc '**32**'                                                       canon 48
+  line  617  mate_search_min_eligible           doc '**3**'                                                        canon 15
+  line  667  village_fission_threshold          doc '**170**'                                                      canon 150
+  line  764  office_deposition_share            doc '**9/26 = 0.346**'                                             canon 0.34615384615384615
+  line  765  office_overreach_weight            doc '**19/29 = 0.655**'                                            canon 0.6551724137931034
+  rows checked: 82; agree: 71; DISAGREE: 11; canonical parameters never named in a PARAMETERS.md table row: 171 of 253
+
+=== 3. FLAGS — canonical mechanism flags no specification document names
+  flags: 125 (98 ON in canon); named in no spec doc: 51 (29 of them ON)
+      off  enable_band_provisioning
+      off  enable_band_territory
+      ON   enable_biome_seasonality
+      off  enable_bud_hazard
+      off  enable_bud_household_closure
+      off  enable_bud_requires_occupancy
+      off  enable_bud_site_separation
+      ON   enable_bud_viable_site
+      ON   enable_capacity_scaled_grouping
+      off  enable_climate_lottery
+      ON   enable_colonizing_budding
+      ON   enable_delegitimation
+      ON   enable_density_fertility
+      off  enable_density_fill_matched_radius
+      ON   enable_density_reference
+      ON   enable_dependent_load
+      off  enable_eccentricity_mean
+      ON   enable_emergent_village_founding
+      ON   enable_energetic_refractory
+      ON   enable_eta_weighted_shares
+      off  enable_exclusive_village_membership
+      off  enable_fertility_restraint_gene
+      off  enable_founding_delay
+      off  enable_heritable_density_response
+      off  enable_hunger_dispersal
+      off  enable_interannual
+      ON   enable_intercept_hunting
+      ON   enable_legitimacy
+      ON   enable_lineage_tribute
+      off  enable_llanos_flood
+      ON   enable_material_inheritance
+      ON   enable_need_weighted_shares
+      ON   enable_noble_leveling_exemption
+      off  enable_regime_shift
+      ON   enable_relational_stratification
+      off  enable_restraint_group_transmission
+      ON   enable_risk_accident_share
+      ON   enable_seasonality
+      ON   enable_society_regional_density
+      off  enable_sticky_pin_release
+      ON   enable_storable_founding
+      ON   enable_storage_seasonal_union
+      off  enable_stratification_inequality_gate
+      off  enable_sub_k_regulation
+      ON   enable_synergy_age_grade
+      off  enable_village_catchment_spread
+      ON   enable_village_density_disease
+      ON   enable_village_granary
+      ON   enable_village_identity
+      ON   enable_wealth_obligation
+      ON   enable_worked_land_yield

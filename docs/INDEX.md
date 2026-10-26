@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-07-18 (**MECHANISM_CHARTER.md adopted** — the operator discipline; now a 12th home). Prior: 2026-06-16 (unified **Resource Return-Rate Table** created — forage + game in one derived view; the game-only table retired to a stub). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`; its master agent contract is `sic_games/CLAUDE.md`.
+**Last updated:** 2026-10-26 (audit preparation: **`AUDIT_GUIDE.md`** is the entry point for an auditor; the registry below now lists every live document, including MARKER_MATRIX, BENCHMARK_LADDER, VERIFICATION_LOG and the generated REGISTRY / RESULTS_INDEX; a precedence rule is added; `context/` is marked stale). Prior: 2026-07-18 (MECHANISM_CHARTER.md adopted). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`.
 
 ---
 
@@ -24,6 +24,14 @@
 | How were literature values processed into resource-layer inputs; seasonal architecture | **MODEL_SPEC.md** | Resource-layer methodology record: formula, denominator rules, unanchored policy, seasonal signal architecture, star-mechanics seam, catastrophe seam stub |
 | Did we try X already, and why was it abandoned | **DEAD_ENDS.md** | Retired directions + the reason each was retired |
 | Which document owns this kind of fact | **INDEX.md** (this file) | The routing table itself |
+| **Auditing the project: where to start, what to read, how to run** | **AUDIT_GUIDE.md** | The auditor's entry point (2026-10-26) |
+| What works, what meets its benchmarks, what does not — now | **MODEL_STATE.md** | A dated snapshot of the canon's state (re-written at each adoption) |
+| Does the model reproduce the record? The current verdict per marker | **MARKER_MATRIX.md** (top: CURRENT SCORECARD) | Markers, bands, units, verdicts; evidence in `docs/evidence/` |
+| In which order are behaviours validated; which tier is a mechanism in | **BENCHMARK_LADDER.md** | The tier ladder and tier membership |
+| Is flag X ON in canon; what value does parameter Y have in canon | **REGISTRY.md** (GENERATED) → `config/runs/full_campaign.toml` | A derived view; the run file is the truth |
+| Which RESULTS entry is about X; what status does it have | **RESULTS_INDEX.md** (GENERATED) | A derived index of the append-only ledger |
+| Which constants and code checks were verified, when, against which source | **VERIFICATION_LOG.md** | The skip-list of verified items |
+| What does a symbol or abbreviation mean | **GLOSSARY.md** | Definitions |
 
 > **§6 status (2026-06-08):** the MODEL_SPEC split is **done** — ARCHITECTURE.md and MECHANISMS.md now exist as separate homes (see ARCHITECTURE §12.1-F; the original MODEL_SPEC v0.2 is archived at `archive/superseded/`). **PARAMETERS.md is now live** (extracted 2026-06-08) — route all parameter-value questions to **`docs/PARAMETERS.md`**. The interim locked-param tables in ROADMAP.md and CLAUDE.md have been replaced with pointers.
 
@@ -31,11 +39,15 @@
 
 ## Authoritative-home discipline (read before editing any doc)
 
-1. **One fact, one home.** A parameter's value lives in PARAMETERS.md (interim: CLAUDE.md table). ROADMAP, MECHANISMS, and blueprints *reference* it; they do not restate it.
+1. **One fact, one home.** A parameter's grounding and history live in PARAMETERS.md; its EXECUTED value is in the run file (rule 6). ROADMAP, MECHANISMS, and blueprints *reference* it; they do not restate it.
 2. **Pointers, not copies.** If document B needs a fact owned by document A, B writes "see A" — not the fact itself. Copies drift; pointers don't.
 3. **Update triggers are enforced in CLAUDE.md.** Each home has an update trigger, mirrored as a pointer-trigger in `sic_games/CLAUDE.md` so the coding agent maintains it. Add a doc → add its trigger in the same change.
 4. **Append, don't rewrite, the logs.** HYPOTHESES, RESULTS, DEAD_ENDS, TARGETS, and the ARCHITECTURE decisions-log (§12) are append-only. Supersede with a dated note; never silently delete.
 5. **Macro to micro.** ROADMAP = where the project is going; ARCHITECTURE/MECHANISMS = what every piece is. The rest is connective tissue (why, what was learned, where it lives, what was grounded, what failed).
+6. **Executable truth beats prose (added 2026-10-26).** What ran is decided by the code and
+   `config/runs/full_campaign.toml`; `config/*.toml` are generated from the code; the docs record grounding and
+   history. Order: code > run file > generated config > docs. Where a doc value disagrees with the run file, the doc
+   is the defect (`tools/doc_audit.py` finds them). PARAMETERS.md is the home of a value's GROUNDING and HISTORY.
 
 ---
 
@@ -58,6 +70,17 @@
 | SiC_Games_Resource_Return_Rate_Table.md | **live** (created 2026-06-16; derived view, forage + game) | Code | when any forage/game biome cell mean or std is anchored, updated, or unanchored policy changes |
 | SiC_Games_Game_Return_Rate_Table.md | **RETIRED 2026-06-16** → merged into the unified Resource table (stub redirect kept) | — | — |
 | DEFERRED_MECHANICS.md | **live** (created 2026-06-14; 7 entries: GD-1 through PL-1) | Code + supervisor | when a mechanic is deferred here, promoted to a blueprint, or its seam changes |
+| **AUDIT_GUIDE.md** | **live** (created 2026-10-26) | Code + supervisor | any change to canon, the doc map, or how to run/verify |
+| **MODEL_STATE.md** | **live snapshot** (2026-10-26, Add.113 canon) | Code | every adoption (re-score, then rewrite) |
+| MARKER_MATRIX.md | live (scorecard; CURRENT SCORECARD section re-scored 2026-10-26 on the Add.113 canon) | Code | every adoption (re-score with `tools/scorecard.py`) |
+| BENCHMARK_LADDER.md | live (adopted 2026-08-07) | Code + supervisor | a mechanism is added (tier membership) or a tier is re-scored |
+| REGISTRY.md / RESULTS_INDEX.md | **GENERATED** (`tools/gen_registry.py`; `tests/test_registry_sync.py`) | tool | regenerate after any flag/parameter/RESULTS change |
+| `docs/evidence/` | committed compact evidence (scorecard JSON + PNG) | Code | every re-score |
+| VERIFICATION_LOG.md | live | Code | a constant or code path is verified |
+| GLOSSARY.md | live (last edited 2026-06-22 — may lack recent terms) | Code | a new term enters the model |
+| ELITE_STRATIFICATION_ROADMAP.md | live working catalog (2026-07-27) | Code + supervisor | an elite-layer mechanism is built or re-benchmarked |
+| DESIGN_colonization_spacing.md | design record (2026-09-03); its design was BUILT and is ON in canon — see its status note | — | — |
+| HANDOFF_R106_e0.md / HANDOFF_R106_gini_20260915.md | HISTORICAL session handoffs (2026-09); they point to assistant-memory files that are NOT in the repo | — | — |
 
 *Also under `docs/`:* **DOCS_CHARTER.md** (the governance document this index implements). The former MODEL_SPEC v0.2 was split into ARCHITECTURE + MECHANISMS on 2026-06-06 and is archived at `archive/superseded/`. The new MODEL_SPEC.md is scoped to resource-layer methodology only and does not reconstitute v0.2.
 
@@ -102,6 +125,6 @@ SiC-Games/
 └── archive/             superseded docs, .bak litter, prior code snapshots (never hard-deleted)
 ```
 
-`context/` (non-canonical) — derived chat-bridge artifacts. **New chat: read `context/PROJECT_GUIDE.md` (the complete briefing — doc-map + current-model inventory + the plan + glossary) then `context/CANONICAL_FACTS.md` (live state) first.** Also `PENDING_CC.md` (pending-delta buffer, append-only). NON-AUTHORITATIVE; on any conflict, the eleven `docs/` homes win. See `context/README.md` and CLAUDE.md rules 14–15.
+`context/` (non-canonical, **STALE — last regenerated 2026-06-16**): derived chat-bridge briefings from the Blueprint-A era. They describe the June 2026 C/Si project and must NOT be used for orientation; read **`docs/AUDIT_GUIDE.md`** instead. Kept for history (nothing is hard-deleted); on any conflict the `docs/` homes win.
 
 *End of INDEX.*
