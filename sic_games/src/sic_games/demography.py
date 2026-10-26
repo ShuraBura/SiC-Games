@@ -707,7 +707,9 @@ class DemographyConfig(BaseModel):
     # land safer than the land mean, so it removed ~half of ALL age-independent mortality (measured 0.44–0.62,
     # Add.112; first filed in ae01ced, 2026-08-14, when a density term of 2.4 hid it). ON ⇒ the risk factor is
     # (1 − s) + s·risk_mult with s = risk_accident_share: only the accident share scales with terrain; the cap
-    # still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact.
+    # still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact. ALONE it lowers survival (it restores the
+    # missing mortality; montane l15 0.449 < 0.45). ADOPTED TOGETHER with `enable_village_granary` (Add.113,
+    # supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE. Canonically ON via C_ALLON; class default stays False.
     enable_risk_accident_share: bool = False
     risk_accident_share: float = Field(0.10, ge=0.0, le=1.0)   # accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED]
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
@@ -900,8 +902,10 @@ class DemographyConfig(BaseModel):
     # at the site key (it pulls members toward the site; leaving the village forfeits it). Default OFF ⇒ bit-exact.
     # Stage 2 (Add.111; 3 worlds, 3 paired seeds): savanna l15 0.42 → 0.59 and l45 0.24 → 0.36 (#19, #21 FAIL → PASS),
     # montane l45 0.24 → 0.39 (#21 FAIL → PASS), adults gain on every world (NOT the band-provisioning zero-sum), pop
-    # +60–160%; BUT temperate goes OVER the forager ceiling (e0 40.1, l15 0.684, l45 0.495). HELD dark pending the
-    # diagnosis of the temperate overshoot (supervisor decision 2026-09-25).
+    # +60–160%; BUT temperate goes OVER the forager ceiling (e0 40.1, l15 0.684, l45 0.495). The overshoot was the
+    # missing non-starvation mortality (Add.112), repaired by `enable_risk_accident_share`. ADOPTED TOGETHER with it
+    # (Add.113, supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE on the 3 worlds. Canonically ON via C_ALLON;
+    # the class default stays False.
     enable_village_granary: bool = False
     # STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's
     # biome SEASONAL AMPLITUDE (Testart/Binford storability) instead of the constant-placeholder temperature — an

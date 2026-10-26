@@ -9843,4 +9843,48 @@ village granary. Instruments: this addendum's numbers come from the Stage-2 traj
 
 ---
 
+## Addendum 113 — The spec risk term and the village granary, ADOPTED TOGETHER: all three worlds pass #18–#21 (12/12 at 1 SE, every seed inside the forager band). Neither is adoptable alone (2026-09-26, R-106)
+
+**The correction.** `enable_risk_accident_share`: the terrain-risk factor becomes `(1 − s) + s·risk_mult` with
+`s = risk_accident_share = 0.10` [ANCHORED — Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3], so only the accident
+share of a2 scales with terrain. `test_risk_accident_share.py` pins the bound [0.9, 1.2] when on, and pins the
+defect (mean factor < 0.9) when off.
+
+**Stage 2** (real pipeline, 3 canonical worlds, 15,000 steps, planet fixed, 3 paired seeds; the Addendum-109 canon
+reused; the savanna seed-0 control re-run reproduced all 601 rows and the life table exactly). Period table, mean ±
+SE; verdict at 1 SE against the forager band:
+
+| world | arm | e0 (#18) | l(15) (#19) | e15 (#20) | l(45) (#21) | starvation share | population |
+|---|---|---|---|---|---|---|---|
+| temperate | canon | 33.8 ± 0.3 | 0.618 | 36.8 | 0.387 | 0.35 | 5,154 |
+| temperate | risk alone | 29.5 | 0.561 | 33.7 | 0.312 | 0.28 | 5,093 |
+| temperate | granary alone (Add.111) | 40.1 OVER | 0.684 OVER | 41.6 | 0.495 OVER | 0.18 | 5,831 |
+| temperate | **both** | **34.2 ± 0.4** | **0.620 ± 0.003** | **37.3 ± 0.5** | **0.392 ± 0.009** | 0.15 | 5,624 |
+| savanna | canon | 23.4 ± 1.3 | 0.422 FAIL | 34.7 | 0.244 unres. | 0.59 | 1,229 |
+| savanna | risk alone | 22.9 | 0.429 FAIL | 32.5 | 0.229 | 0.49 | 787 |
+| savanna | **both** | **30.3 ± 0.4** | **0.554 ± 0.005** | **35.9 ± 0.4** | **0.333 ± 0.009** | 0.28 | 3,109 |
+| montane | canon | 24.1 ± 0.2 | 0.462 | 31.9 | 0.241 FAIL | 0.51 | 3,327 |
+| montane | risk alone | 22.8 | 0.449 FAIL | 30.1 | 0.216 FAIL | 0.44 | 3,447 |
+| montane | **both** | **30.8 ± 0.2** | **0.577 ± 0.002** | **34.8 ± 0.3** | **0.333 ± 0.004** | 0.21 | 4,257 |
+
+**Reading.** The two repairs need each other. The risk correction ALONE restores the non-starvation mortality that
+starvation was replacing (Add.112), so survival falls and montane l(15) goes under the floor. The granary ALONE
+removes the starvation that came from blocked access to stored food, and with no other brake temperate overshoots.
+TOGETHER: all 12 world × marker results pass at 1 SE, and every one of the 36 seed values is inside the band. The
+temperate world sits at the forager average (0.62 / 37.3 / 0.39 against 0.57 / 37.7 / 0.36); savanna l(15) 0.554 is
+near its biome point (Hiwi 0.53). The adult 15–45 death rate does not rise on any world, so this is not a zero-sum
+transfer. The starvation share falls from 0.35–0.59 to 0.15–0.28. The population grows and spreads (savanna 2.5×,
+land use 5% → 15%; montane +28%), which is the direction that the Malthus arc asks for.
+
+**DECISION (supervisor, 2026-09-26): both ADOPTED together.** Removed from `run_campaign.py` `_skip` and from both
+allowed-dark lists, set true in `full_campaign.toml`, config regenerated (both `value = true`); class defaults stay
+False. The `riskvg` Stage-2 trajectories are the NEW canon baseline; the `pat` ones are stale — any future reuse must
+re-run a control first. `enable_sticky_pin_release` stays dark (rejected, Add.111).
+
+**Open, not addressed here:** the starvation share (0.15–0.28) still has no cause-of-death marker to score against;
+the replication on other planets (world seeds) was not run; the no-starvation mortality ceiling was a first-order
+estimate and is now superseded by the measured pair. Figure: `scratchpad/bp_stage2_risk_fig.py` → `bp_stage2_risk.png`.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -1022,13 +1022,12 @@ def main():
             # the per-step pin release (abandonment, scalar stress) puts families off it. Two separate repairs,
             # each to be tested alone first: ONE granary per village, and a release that is HELD for a year.
             # UNDER EVALUATION, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
-            "enable_village_granary",
+            # The sticky release was REJECTED by Stage 2 (Add.111) and stays dark as an instrument.
             "enable_sticky_pin_release",
-            # TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Addendum 113). Corrects `risk_mult` to the MODEL_SPEC §4.3.3
-            # form (accidents ≈10% of a2) instead of scaling the whole a2 (measured 0.44–0.62, Add.112). A model
-            # CORRECTION under evaluation — it raises mortality in every run — so C_ALLON must not adopt it by side
-            # effect.
-            "enable_risk_accident_share",
+            # VILLAGE GRANARY + TERRAIN RISK AS AN ACCIDENT SHARE — ADOPTED TOGETHER (R-106 Addendum 113,
+            # 2026-09-26) and so REMOVED from this set -> canonically ON. Neither is adoptable alone: the granary
+            # alone overshoots temperate (e0 40.1), the risk correction alone drops montane l15 under the floor.
+            # Together (Stage 2, 3 worlds, 3 paired seeds): all 12 of #18-#21 pass at 1 SE, every seed in band.
             # VILLAGE CATCHMENT SPREAD candidate under evaluation (R-106, 2026-09-02). BUILT + CTB'd and it
             # fixes the over-clustering cleanly (peak single-cell occupancy stays ~70 at pop 5,000, vs 150-300
             # packed) by dispersing settled members across the village territory. BUT the density-disease hazard

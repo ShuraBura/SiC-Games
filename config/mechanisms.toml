@@ -311,7 +311,7 @@ type  = "bool"
 # motherless/absent-parent juveniles. Default OFF ⇒ no band pool ⇒ bit-exact.
 
 [enable_risk_accident_share]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10%
@@ -320,7 +320,10 @@ type  = "bool"
 # people live on land safer than the land mean, so it removed ~half of ALL age-independent mortality
 # (measured 0.44–0.62, Add.112; first filed in ae01ced, 2026-08-14, when a density term of 2.4 hid it). ON
 # ⇒ the risk factor is (1 − s) + s·risk_mult with s = risk_accident_share: only the accident share scales
-# with terrain; the cap still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact.
+# with terrain; the cap still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact. ALONE it
+# lowers survival (it restores the missing mortality; montane l15 0.449 < 0.45). ADOPTED TOGETHER with
+# `enable_village_granary` (Add.113, supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE. Canonically
+# ON via C_ALLON; class default stays False.
 
 [enable_density_reference]
 value = true
@@ -527,7 +530,7 @@ type  = "bool"
 # Testart distinction). Default OFF ⇒ scalar, bit-exact.
 
 [enable_village_granary]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # VILLAGE GRANARY (R-106 Add.111). MODEL_SPEC §4.5.11 S.1 specifies a COLLECTIVE BAND granary; it is
@@ -544,8 +547,10 @@ type  = "bool"
 # members toward the site; leaving the village forfeits it). Default OFF ⇒ bit-exact. Stage 2 (Add.111; 3
 # worlds, 3 paired seeds): savanna l15 0.42 → 0.59 and l45 0.24 → 0.36 (#19, #21 FAIL → PASS), montane l45
 # 0.24 → 0.39 (#21 FAIL → PASS), adults gain on every world (NOT the band-provisioning zero-sum), pop
-# +60–160%; BUT temperate goes OVER the forager ceiling (e0 40.1, l15 0.684, l45 0.495). HELD dark pending
-# the diagnosis of the temperate overshoot (supervisor decision 2026-09-25).
+# +60–160%; BUT temperate goes OVER the forager ceiling (e0 40.1, l15 0.684, l45 0.495). The overshoot was
+# the missing non-starvation mortality (Add.112), repaired by `enable_risk_accident_share`. ADOPTED
+# TOGETHER with it (Add.113, supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE on the 3 worlds.
+# Canonically ON via C_ALLON; the class default stays False.
 
 [enable_storage_seasonal_union]
 value = true

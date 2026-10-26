@@ -143,11 +143,9 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # the fix to the starvation mechanism. (Missed from this list when the flag was added; the gap was
                # hidden because this test is a subprocess test and fails for WinError 6 in some shells.)
                "enable_density_fill_matched_radius",
-               # SUPPLY-GAP REPAIRS (R-106 Addendum 111): one granary per village, and a pin release held for a
-               # year. Each is under evaluation in Stage 2 alone first, so both are held dark.
-               "enable_village_granary", "enable_sticky_pin_release",
-               # TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Addendum 113): a correction under evaluation, held dark.
-               "enable_risk_accident_share"}
+               # STICKY PIN RELEASE (R-106 Addendum 111): rejected by Stage 2, kept dark as an instrument.
+               "enable_sticky_pin_release"}
+               # (enable_village_granary + enable_risk_accident_share: ADOPTED together, Addendum 113 -> ON.)
                # (enable_bud_viable_site was listed here while held; ADOPTED Addendum 108 -> canonically ON.)
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
 
