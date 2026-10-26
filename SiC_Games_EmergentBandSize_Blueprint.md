@@ -1,6 +1,6 @@
 # SiC Games — Emergent Band Size Blueprint (v1.0, 2026-07-08)
 
-> **HISTORICAL — the emergent band-size blueprint (2026-07-08); see RESULTS R-72 and MARKER_MATRIX #1 for its outcome (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+> **HISTORICAL — the emergent band-size blueprint (2026-07-08); see RESULTS R-72 and MARKER_MATRIX #1 for its outcome (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `audit/2026-10-26/00_START_HERE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
 
 **Goal.** Make the ~25 co-residential band size **emerge** from grounded forces instead of being hardcoded
 (`band_base_tolerable=25`, `repulsion_midpoint=25`, tuned GRP scales). Success = band size is a *prediction* (~25 mean,

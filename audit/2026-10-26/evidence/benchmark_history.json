@@ -1,0 +1,4493 @@
+{
+ "snapshots": [
+  [
+   "Add.100",
+   "campaign_trajectory_scorecard99_{w}.json",
+   "2026-09-18"
+  ],
+  [
+   "Add.106",
+   "campaign_trajectory_s2_{w}_canon_s*.json",
+   "2026-09-22"
+  ],
+  [
+   "Add.108",
+   "campaign_trajectory_s2_{w}_viable_s*.json",
+   "2026-09-24"
+  ],
+  [
+   "Add.109",
+   "campaign_trajectory_s2_{w}_pat_s*.json",
+   "2026-09-24"
+  ],
+  [
+   "Add.113",
+   "campaign_trajectory_s2_{w}_riskvg_s*.json",
+   "2026-09-26"
+  ]
+ ],
+ "runs": {
+  "Add.100|temperate": 1,
+  "Add.100|savanna": 1,
+  "Add.100|montane": 1,
+  "Add.106|temperate": 3,
+  "Add.106|savanna": 3,
+  "Add.106|montane": 3,
+  "Add.108|temperate": 3,
+  "Add.108|savanna": 3,
+  "Add.108|montane": 3,
+  "Add.109|temperate": 3,
+  "Add.109|savanna": 3,
+  "Add.109|montane": 3,
+  "Add.113|temperate": 3,
+  "Add.113|savanna": 3,
+  "Add.113|montane": 3
+ },
+ "benchmarks": [
+  {
+   "id": "#1 band size (mean-experienced adults/cell)",
+   "field": "band_experienced_adults",
+   "source": "MARKER_MATRIX",
+   "anchor": "Hill 2011 = 28.2",
+   "lo": 12,
+   "hi": 40,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#3 village size (median)",
+   "field": "village_med",
+   "source": "MARKER_MATRIX",
+   "anchor": "Alvard 2009 50-250",
+   "lo": 50,
+   "hi": 250,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#3 village size (max, Voronoi catchment)",
+   "field": "village_max",
+   "source": "MARKER_MATRIX",
+   "anchor": "not the ceiling test: see #17 (Add.104)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#4 connubium reach (median)",
+   "field": "connubium_med",
+   "source": "MARKER_MATRIX",
+   "anchor": "Wobst ~475; floor White MVP 150",
+   "lo": 150,
+   "hi": null,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#5 lineages (count; dynamics per MARKER_MATRIX)",
+   "field": "n_lineages",
+   "source": "MARKER_MATRIX",
+   "anchor": "Guyon 2024 (per-gen rates)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#7 nobility share",
+   "field": "ascribed_frac",
+   "source": "MARKER_MATRIX",
+   "anchor": "no documented band (rule 2)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#8 bud events (cumulative; rate per MARKER_MATRIX)",
+   "field": "bud_events",
+   "source": "MARKER_MATRIX",
+   "anchor": "Bandy 2004 2-5e-3/large-village-yr",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#9 hierarchy index gini_cred",
+   "field": "gini_cred",
+   "source": "MARKER_MATRIX",
+   "anchor": "pre-registered ordering (T-7)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#10 polygyny (of ALL men)",
+   "field": "frac_polygynous_all_m",
+   "source": "MARKER_MATRIX",
+   "anchor": "Marlowe ~0.04",
+   "lo": 0.02,
+   "hi": 0.06,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#11 status->RS (age-controlled)",
+   "field": "status_rs_r_partial",
+   "source": "MARKER_MATRIX",
+   "anchor": "NOT COMPARABLE, wrong channel (Add.102)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#12 rank-size slope",
+   "field": "village_zipf",
+   "source": "MARKER_MATRIX",
+   "anchor": "Zipf ~ -1.0",
+   "lo": -1.5,
+   "hi": -0.6,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#13 primacy",
+   "field": "village_primate",
+   "source": "MARKER_MATRIX",
+   "anchor": "~1 (no primate centre)",
+   "lo": 1.0,
+   "hi": 2.0,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#14 material Gini (adults)",
+   "field": "material_gini_adults",
+   "source": "MARKER_MATRIX",
+   "anchor": "BHM 2009 HG = 0.36",
+   "lo": 0.3,
+   "hi": 0.42,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#14 material Gini (within-cell)",
+   "field": "material_gini_within_cell",
+   "source": "MARKER_MATRIX",
+   "anchor": "Agta within-camp 0.23 [0-0.44]",
+   "lo": 0.0,
+   "hi": 0.44,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#15 orphanhood (motherless)",
+   "field": "frac_motherless",
+   "source": "MARKER_MATRIX",
+   "anchor": "Ach\u00e9 ~0.02 (point, no band)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#16 dependency ratio",
+   "field": "dependency_ratio",
+   "source": "MARKER_MATRIX",
+   "anchor": "H&H 1996 T4.4: 0.598-0.899",
+   "lo": 0.598,
+   "hi": 0.899,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#16 share under 15",
+   "field": "frac_child",
+   "source": "MARKER_MATRIX",
+   "anchor": "H&H 1996 T4.4: 0.287-0.454",
+   "lo": 0.287,
+   "hi": 0.454,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#16 sex ratio (m/f)",
+   "field": "sex_ratio_m_f",
+   "source": "MARKER_MATRIX",
+   "anchor": "H&H 1996 T4.4: 0.896-1.368",
+   "lo": 0.896,
+   "hi": 1.368,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#16 median age (yr)",
+   "field": "median_age_yr",
+   "source": "MARKER_MATRIX",
+   "anchor": "reported with #16 (no band)",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "report-only / no band"
+  },
+  {
+   "id": "#17 fission ceiling (co-resident max)",
+   "field": "settle_max",
+   "source": "MARKER_MATRIX",
+   "anchor": "Alberti 158 / Alvard <=250",
+   "lo": null,
+   "hi": 250,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "#18 e0 (period)",
+   "field": "e0",
+   "source": "MARKER_MATRIX",
+   "anchor": "G&K 2007 forager band 21-37",
+   "lo": 21.0,
+   "hi": 37.0,
+   "kind": "period-LT",
+   "note": ""
+  },
+  {
+   "id": "#19 survival to 15 (period)",
+   "field": "surv_to_15",
+   "source": "MARKER_MATRIX",
+   "anchor": "G&K 2007 band 0.45-0.66",
+   "lo": 0.45,
+   "hi": 0.66,
+   "kind": "period-LT",
+   "note": ""
+  },
+  {
+   "id": "#20 e15 (period)",
+   "field": "e15",
+   "source": "MARKER_MATRIX",
+   "anchor": "G&K 2007 band 28.6-42.5",
+   "lo": 28.6,
+   "hi": 42.5,
+   "kind": "period-LT",
+   "note": ""
+  },
+  {
+   "id": "#21 survival to 45 from birth (period)",
+   "field": "surv_to_45",
+   "source": "MARKER_MATRIX",
+   "anchor": "G&K 2007 band 0.26-0.43",
+   "lo": 0.26,
+   "hi": 0.43,
+   "kind": "period-LT",
+   "note": ""
+  },
+  {
+   "id": "monitor: frac_child",
+   "field": "frac_child",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM] \u2014 %<15 = 28",
+   "lo": 0.287,
+   "hi": 0.454,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: dependency_ratio",
+   "field": "dependency_ratio",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM] \u2014 0.598 !Ku",
+   "lo": 0.598,
+   "hi": 0.899,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: sex_ratio_m_f",
+   "field": "sex_ratio_m_f",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM] \u2014 0.896 / 1",
+   "lo": 0.896,
+   "hi": 1.368,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: realised_e0",
+   "field": "realised_e0",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 cross-HG e0 range 21-37",
+   "lo": 21.0,
+   "hi": 37.0,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: e15",
+   "field": "e15",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 e15 = 38.5 REMAINING year",
+   "lo": 30.8,
+   "hi": 46.199999999999996,
+   "kind": "trajectory",
+   "note": "point 38.5 \u00b120% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: e45",
+   "field": "e45",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 e45 = 21.1 remaining year",
+   "lo": 15.825000000000001,
+   "hi": 26.375,
+   "kind": "trajectory",
+   "note": "point 21.1 \u00b125% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: surv_to_15",
+   "field": "surv_to_15",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 l(15) from birth",
+   "lo": 0.528,
+   "hi": 0.792,
+   "kind": "trajectory",
+   "note": "point 0.66 \u00b120% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: surv_to_45",
+   "field": "surv_to_45",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 l(45) FROM BIRTH, not con",
+   "lo": 0.3225,
+   "hi": 0.5375,
+   "kind": "trajectory",
+   "note": "point 0.43 \u00b125% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: modal_adult_death",
+   "field": "modal_adult_death",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 PDR 33(2) Table 2, Ach\u00e9 forest [VERIFIED] \u2014 adaptive lifespan 68-78; ",
+   "lo": 68.0,
+   "hi": 78.0,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: realised_tfr",
+   "field": "realised_tfr",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado 1996 Tables 8.1/8.2, forest/contact/reservation [VERIFIED] \u2014 TFR 8.03 fores",
+   "lo": 4.69,
+   "hi": 8.03,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: realised_ibi_med",
+   "field": "realised_ibi_med",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado 1996 Tables 8.1/8.2, forest/contact/reservation [VERIFIED] \u2014 IBI 37.6 / 49.",
+   "lo": 34.4,
+   "hi": 49.4,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: frac_motherless",
+   "field": "frac_motherless",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado Table 13.1 covariate \u2014 mother alive 0.98",
+   "lo": 0.01,
+   "hi": 0.03,
+   "kind": "trajectory",
+   "note": "point 0.02 \u00b150% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: frac_fatherless",
+   "field": "frac_fatherless",
+   "source": "demography_health",
+   "anchor": "Hill & Hurtado Table 13.1 covariate \u2014 father alive 0.95",
+   "lo": 0.025,
+   "hi": 0.07500000000000001,
+   "kind": "trajectory",
+   "note": "point 0.05 \u00b150% \u2014 a REPORTING threshold, not a calibration target"
+  },
+  {
+   "id": "monitor: band_med_adults",
+   "field": "band_med_adults",
+   "source": "demography_health",
+   "anchor": "Hill et al. 2011, 32 societies [VERIFIED, PDF read] \u2014 28.2 ADULTS, NOT all-ages",
+   "lo": null,
+   "hi": null,
+   "kind": "trajectory",
+   "note": "statistic retracted (RESULTS Add.89); marker #1 uses band_experienced_adults"
+  },
+  {
+   "id": "monitor: age_first_birth_yr",
+   "field": "age_first_birth_yr",
+   "source": "demography_health",
+   "anchor": "Walker et al. 2006 AJHB 18(3) Table 2, 15 forager societies [VERIFIED]",
+   "lo": 16.2,
+   "hi": 20.5,
+   "kind": "trajectory",
+   "note": ""
+  },
+  {
+   "id": "monitor: m_5_15",
+   "field": "m_5_15",
+   "source": "demography_health",
+   "anchor": "Gurven & Kaplan 2007 p.330 [VERIFIED VERBATIM] \u2014 hazard ~0.01/yr at age 10, cross-HG",
+   "lo": 0.005,
+   "hi": 0.015,
+   "kind": "trajectory",
+   "note": "point 0.01 \u00b150% \u2014 a REPORTING threshold, not a calibration target"
+  }
+ ],
+ "history": {
+  "#1 band size (mean-experienced adults/cell)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 30.647333333333332,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 31.75188888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 22.016333333333332,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 30.584222222222223,
+     "se": 0.03345022713634716,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 33.123999999999995,
+     "se": 1.9073387154117751,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.456444444444443,
+     "se": 1.4666671899550132,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 40.8422962962963,
+     "se": 2.177498608649877,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 31.068074074074072,
+     "se": 2.783487725690058,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.28762962962963,
+     "se": 1.0075536712992996,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 40.30422222222222,
+     "se": 1.7180956547911836,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 34.032444444444444,
+     "se": 2.2816853483349946,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 21.29111111111111,
+     "se": 0.8870852975350687,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 40.17433333333334,
+     "se": 1.6212986348524732,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 29.902296296296296,
+     "se": 0.7385203601522407,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 27.660037037037036,
+     "se": 1.666902531869953,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#3 village size (median)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 70.71111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 43.2,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 78.21111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 72.56296296296297,
+     "se": 1.8462990824303815,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 67.0037037037037,
+     "se": 12.43683685013045,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 83.87407407407407,
+     "se": 5.464183165674299,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 95.62592592592593,
+     "se": 2.3947931630002643,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 80.10740740740741,
+     "se": 9.385783692804814,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 98.67407407407407,
+     "se": 6.334913166613436,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 92.27777777777779,
+     "se": 3.7199329610314087,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 79.25555555555556,
+     "se": 8.044753933068518,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 99.1037037037037,
+     "se": 5.4430887704971,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 101.44074074074075,
+     "se": 2.263344818361497,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 100.34444444444443,
+     "se": 6.307964134539268,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 130.21481481481482,
+     "se": 10.413738024520642,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#3 village size (max, Voronoi catchment)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 192.5,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 154.06666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 287.9555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 200.07407407407408,
+     "se": 14.826142428633588,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 169.53703703703704,
+     "se": 9.536532169304868,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 293.22222222222223,
+     "se": 5.808167939618707,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 343.76296296296294,
+     "se": 39.737472510671225,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 263.2888888888889,
+     "se": 20.26934172566463,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 329.6148148148148,
+     "se": 2.471910786320595,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 335.1111111111111,
+     "se": 39.842957667825885,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 209.03703703703704,
+     "se": 40.66021823663462,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 447.55185185185184,
+     "se": 56.891496009897395,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 349.8259259259259,
+     "se": 30.22850719870693,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 305.10370370370373,
+     "se": 3.881083878419853,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 545.8222222222222,
+     "se": 59.96068396373724,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#4 connubium reach (median)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 632.9166666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 409.0111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 575.7444444444444,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 540.6185185185185,
+     "se": 46.32360635234445,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 544.2703703703704,
+     "se": 84.63215627559859,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 531.0111111111111,
+     "se": 22.366810407810263,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 538.3388888888888,
+     "se": 27.679448928837353,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 663.6962962962963,
+     "se": 73.07249587659585,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 652.5,
+     "se": 30.361249025473743,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 516.6703703703704,
+     "se": 47.148646421678265,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 496.9185185185185,
+     "se": 16.43079273593983,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 623.0833333333334,
+     "se": 21.882758118680044,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 518.9962962962964,
+     "se": 23.321875787779835,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 569.2166666666667,
+     "se": 17.86417979513995,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 525.812962962963,
+     "se": 24.012873847693445,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#5 lineages (count; dynamics per MARKER_MATRIX)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 112.72222222222223,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 25.68888888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 73.93333333333334,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 111.35185185185185,
+     "se": 2.4212054724131415,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 33.303703703703704,
+     "se": 4.310415815128993,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 75.82592592592593,
+     "se": 1.7826361084637825,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 174.64074074074074,
+     "se": 5.237807057435307,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 48.25925925925926,
+     "se": 3.701497491052624,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 97.21111111111111,
+     "se": 2.2384959677271827,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 174.12962962962962,
+     "se": 8.858513687195373,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 45.31111111111111,
+     "se": 10.810399276173294,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 103.6888888888889,
+     "se": 5.698353671710913,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 200.4074074074074,
+     "se": 12.815037998484685,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 120.62592592592593,
+     "se": 8.545598663392465,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 142.6925925925926,
+     "se": 10.007670583484677,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#7 nobility share": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.015166666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.015266666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.018966666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.017092592592592593,
+     "se": 0.0010680032777907295,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.020037037037037037,
+     "se": 0.005243963150127036,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.01838148148148148,
+     "se": 0.000722630463916359,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.01407037037037037,
+     "se": 0.0002316813951560507,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.01354074074074074,
+     "se": 0.0033519009613754533,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.019718518518518517,
+     "se": 0.0038834159019110184,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.012951851851851852,
+     "se": 0.002038965417206766,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.023103703703703703,
+     "se": 0.008782271079986052,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.025496296296296295,
+     "se": 0.005910095754251111,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.013611111111111112,
+     "se": 0.0017457650108909358,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.02292962962962963,
+     "se": 0.0003905432184623978,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.022455555555555555,
+     "se": 0.0024892939485203266,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#8 bud events (cumulative; rate per MARKER_MATRIX)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 1454.7,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 146.36666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 418.2111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 1609.7740740740742,
+     "se": 126.82026819574253,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 180.4185185185185,
+     "se": 53.36480257281119,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 394.4074074074074,
+     "se": 67.48832373735411,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 352.3222222222222,
+     "se": 124.47534652694934,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 120.22962962962963,
+     "se": 5.8489573244523445,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 92.05925925925926,
+     "se": 38.89427493566269,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 354.2,
+     "se": 100.46754466425563,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 149.92962962962963,
+     "se": 17.977018174371995,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 82.83703703703704,
+     "se": 41.98020566932003,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 118.37037037037037,
+     "se": 10.113146586598564,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 132.97777777777776,
+     "se": 20.254873924452685,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 39.86666666666667,
+     "se": 8.885443776824607,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#9 hierarchy index gini_cred": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.6625555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.3801111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.3940666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.6618296296296297,
+     "se": 0.04129496941897561,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.388,
+     "se": 0.013852507906824739,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.3536222222222222,
+     "se": 0.022712865047878218,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.5556296296296297,
+     "se": 0.033446452710304046,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.33861851851851854,
+     "se": 0.014105105653165764,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.29705185185185184,
+     "se": 0.007171391877037998,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.5751481481481482,
+     "se": 0.02803945363625117,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.333662962962963,
+     "se": 0.033357540798456854,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.33714814814814814,
+     "se": 0.011106520039146934,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.5240666666666667,
+     "se": 0.024463517811298175,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.36157407407407405,
+     "se": 0.012212907786357838,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.36294444444444446,
+     "se": 0.032501582740821044,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#10 polygyny (of ALL men)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.04238666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.018706666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.02719,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.032844074074074074,
+     "se": 0.0048664112199716105,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.03183777777777778,
+     "se": 0.008333699843792057,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.02197962962962963,
+     "se": 0.0026836190579673036,
+     "n": 3,
+     "verdict": "unres."
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.03145481481481482,
+     "se": 0.0018610923529550356,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.03698,
+     "se": 0.006961571974930657,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.029768148148148148,
+     "se": 0.0020600367903276457,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.02989851851851852,
+     "se": 0.005521437619696796,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.02931259259259259,
+     "se": 0.005003455856460072,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.028466666666666664,
+     "se": 0.0028268925340693358,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.031008888888888888,
+     "se": 0.0027720461608161362,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.0376,
+     "se": 0.00361700277211643,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.023268518518518518,
+     "se": 0.001638335164880146,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#11 status->RS (age-controlled)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.2833366666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.14064333333333334,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.2617588888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.3118122222222222,
+     "se": 0.014247539272051224,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.17281,
+     "se": 0.019668327812247824,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.2534122222222222,
+     "se": 0.004196404153430651,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.25367555555555554,
+     "se": 0.005660480319598305,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.14728,
+     "se": 0.016974048068122412,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.2025451851851852,
+     "se": 0.019092442155530475,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.2520614814814815,
+     "se": 0.020229746466836476,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.12834777777777778,
+     "se": 0.03245065742135572,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.19521777777777777,
+     "se": 0.02603855752106437,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.22312444444444446,
+     "se": 0.02145744542571484,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.12464740740740742,
+     "se": 0.00635031629209146,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.24140592592592594,
+     "se": 0.004227873135311109,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#12 rank-size slope": {
+   "Add.100": {
+    "temperate": {
+     "mean": -1.076111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": -1.2875555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": -1.0622222222222222,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": -1.0295555555555556,
+     "se": 0.029858583010984735,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": -1.2296296296296296,
+     "se": 0.042132962831105285,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": -1.0597407407407406,
+     "se": 0.012474885607454212,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": -0.8702222222222222,
+     "se": 0.030645121255921344,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": -1.074851851851852,
+     "se": 0.08780919112848744,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": -1.025962962962963,
+     "se": 0.02251678234047774,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": -0.8588518518518519,
+     "se": 0.023423927597390485,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": -1.142037037037037,
+     "se": 0.12955030377090235,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": -1.037925925925926,
+     "se": 0.05052540139926577,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": -0.7921481481481482,
+     "se": 0.048342669738246,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": -0.6631111111111111,
+     "se": 0.06088006829865897,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": -0.909,
+     "se": 0.010018706782649553,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#13 primacy": {
+   "Add.100": {
+    "temperate": {
+     "mean": 1.0804444444444445,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.3873333333333333,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.361888888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 1.1246666666666667,
+     "se": 0.04477892655451321,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.2355185185185185,
+     "se": 0.07931476941567867,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.3277037037037038,
+     "se": 0.08824172592819896,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 1.2446296296296298,
+     "se": 0.06333594319942047,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.575074074074074,
+     "se": 0.18048763774833046,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.229962962962963,
+     "se": 0.03604171870164424,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 1.2226296296296297,
+     "se": 0.05089270296774884,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.324851851851852,
+     "se": 0.14480681516220542,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.442962962962963,
+     "se": 0.12812677513909645,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 1.2205925925925927,
+     "se": 0.09622064692349482,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.4042962962962964,
+     "se": 0.07567379999370301,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.5596296296296297,
+     "se": 0.366575781852645,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#14 material Gini (adults)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.42241,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.3853,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3619411111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.4226581481481481,
+     "se": 0.0026176973147834363,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.3803359259259259,
+     "se": 0.011187828930876484,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.35681296296296294,
+     "se": 0.002903319041036768,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.41578814814814813,
+     "se": 0.007994474746637366,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 0.3571640740740741,
+     "se": 0.008697476203948154,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3385640740740741,
+     "se": 0.0031965179314600053,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.416907037037037,
+     "se": 0.004262811352968991,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 0.36833814814814814,
+     "se": 0.012147200804299428,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.34993592592592593,
+     "se": 0.0009016081502048196,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.4099088888888889,
+     "se": 0.002357489859196428,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3810848148148148,
+     "se": 0.002636606524367027,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.37667703703703703,
+     "se": 0.0022754981667145995,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#14 material Gini (within-cell)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.31579666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.29441222222222224,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.24973666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.31111555555555553,
+     "se": 0.00323161014282762,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.29177185185185184,
+     "se": 0.007380496496323002,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.24574370370370371,
+     "se": 0.0020413485348851883,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.31307814814814816,
+     "se": 0.0022662418205094737,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.27877962962962965,
+     "se": 0.008259732065855742,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.2468174074074074,
+     "se": 0.0034080862649038105,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.31436962962962967,
+     "se": 0.0017062080225419612,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.28392407407407405,
+     "se": 0.007820484979997043,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.25765037037037036,
+     "se": 0.004755025166569059,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.3088951851851852,
+     "se": 0.00535996346700488,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.29805481481481483,
+     "se": 0.0011170147482794579,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.2774737037037037,
+     "se": 0.0026002819041010916,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#15 orphanhood (motherless)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.017636666666666665,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.015663333333333335,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.014906666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.018997407407407407,
+     "se": 0.0006988695555629325,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.015667407407407408,
+     "se": 0.0006354093115003035,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.012624814814814814,
+     "se": 0.0011772738847547972,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.01925,
+     "se": 0.00060836859360014,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.015329629629629629,
+     "se": 0.0004704263600389313,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.010176296296296296,
+     "se": 0.00041430905013777237,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.024237037037037036,
+     "se": 0.0007614987748432638,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.016834074074074074,
+     "se": 0.0015867740825417035,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.0228,
+     "se": 0.00045850849627053123,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.03258185185185185,
+     "se": 0.000537340399630854,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 0.029023333333333335,
+     "se": 0.0004246601158476854,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 0.03239925925925926,
+     "se": 0.000767895240340226,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#16 dependency ratio": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.7791555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.7850555555555555,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8703888888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.7995074074074074,
+     "se": 0.010769187743925861,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8132592592592592,
+     "se": 0.025289767879449445,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8813814814814814,
+     "se": 0.006848911280917708,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.7212444444444445,
+     "se": 0.001184328394009022,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8291222222222222,
+     "se": 0.015589245264002825,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8652888888888889,
+     "se": 0.008860693708966317,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.7071111111111111,
+     "se": 0.0025334876496209717,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8027555555555556,
+     "se": 0.025684410252936534,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8368481481481481,
+     "se": 0.01406053978869659,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.7054037037037036,
+     "se": 0.006428250193380544,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.7424740740740741,
+     "se": 0.01277778475576839,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.7548074074074074,
+     "se": 0.0016993987478671594,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#16 share under 15": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.3615,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.36641111111111113,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.39524444444444445,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.37041851851851854,
+     "se": 0.004964090529732518,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3748185185185185,
+     "se": 0.011472465396639547,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.40032222222222225,
+     "se": 0.0031044836817160377,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.33417407407407407,
+     "se": 0.003030716096052168,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.37698888888888893,
+     "se": 0.007345455749278538,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3954185185185185,
+     "se": 0.003798864533266808,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.32610370370370373,
+     "se": 0.0014051687849254728,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3689444444444444,
+     "se": 0.0103777956221593,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3879111111111111,
+     "se": 0.005784124007572761,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.3258851851851852,
+     "se": 0.003945103405224621,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3444814814814815,
+     "se": 0.006930443169379972,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3513074074074074,
+     "se": 0.0012482305720669215,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#16 sex ratio (m/f)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 1.036011111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.1291111111111112,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0674,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 1.069151851851852,
+     "se": 0.016686992955054297,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.0928592592592592,
+     "se": 0.02119349357930456,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0811666666666666,
+     "se": 0.007875452825180715,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 1.0623037037037037,
+     "se": 0.0070530188888032795,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.069374074074074,
+     "se": 0.024258369505877276,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0538,
+     "se": 0.001366501043863723,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 1.0684111111111112,
+     "se": 0.01689712153147343,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.0779518518518518,
+     "se": 0.03852146979434454,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0576999999999999,
+     "se": 0.002692131500588487,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 1.0693666666666666,
+     "se": 0.004315580920702058,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.052437037037037,
+     "se": 0.005238486624253515,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0727037037037037,
+     "se": 0.008519842087191047,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#16 median age (yr)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 22.831888888888887,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 22.878444444444444,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 20.984222222222222,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 22.283185185185186,
+     "se": 0.31943495852797066,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 22.343962962962962,
+     "se": 0.7977098194859157,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 20.623444444444445,
+     "se": 0.22709388751099394,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 24.752666666666666,
+     "se": 0.2981759430338315,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 22.446666666666665,
+     "se": 0.47436369769984854,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 20.994888888888887,
+     "se": 0.18773521323413492,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 25.298296296296297,
+     "se": 0.1161726105664158,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 22.796333333333333,
+     "se": 0.6407773474877978,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 21.325518518518518,
+     "se": 0.40977543952360423,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 25.301555555555556,
+     "se": 0.30869132370919217,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 24.121333333333332,
+     "se": 0.5318218976915084,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 23.503703703703703,
+     "se": 0.10834819144706133,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "#17 fission ceiling (co-resident max)": {
+   "Add.100": {
+    "temperate": {
+     "mean": 114.53333333333333,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 100.91111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 102.56666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 116.48148148148148,
+     "se": 2.6788098006155243,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 104.39259259259259,
+     "se": 1.8642106123324855,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 89.22962962962963,
+     "se": 8.6445737716055,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 244.32222222222222,
+     "se": 38.31741591156583,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 108.94074074074075,
+     "se": 3.026265904106808,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 96.17777777777778,
+     "se": 7.145319916408147,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 229.82222222222222,
+     "se": 36.20047745405073,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 105.61111111111111,
+     "se": 6.923874721011594,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 94.67037037037038,
+     "se": 12.845482998724009,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 232.4962962962963,
+     "se": 19.37706562288613,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 119.38518518518518,
+     "se": 1.0027192110389418,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 102.67037037037038,
+     "se": 9.98548191668122,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#18 e0 (period)": {
+   "Add.106": {
+    "temperate": {
+     "mean": 27.912217839046203,
+     "se": 0.4802736214605267,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 23.9561120921812,
+     "se": 1.712411054056211,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 23.030351576866906,
+     "se": 0.24194317906273727,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 32.53802305393476,
+     "se": 0.322015145496967,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 22.45203996040152,
+     "se": 1.1123772533584189,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 21.961066598062924,
+     "se": 0.48187985272281403,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 33.752695072478694,
+     "se": 0.2676408112941703,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 23.39077824846715,
+     "se": 1.2837492077658874,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 24.0954189397767,
+     "se": 0.2172779147391752,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 34.24888696703989,
+     "se": 0.44344398715320316,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 30.33696732815984,
+     "se": 0.4491570275425504,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 30.795561293055847,
+     "se": 0.16312553085328335,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#19 survival to 15 (period)": {
+   "Add.106": {
+    "temperate": {
+     "mean": 0.538100777903017,
+     "se": 0.005685707107011449,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.4270207605292059,
+     "se": 0.02520287026545318,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "montane": {
+     "mean": 0.43933234298501594,
+     "se": 0.0026108300458421775,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.5929302245588937,
+     "se": 0.00036956371503645545,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.39185258050214916,
+     "se": 0.01912464836461913,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.4109796738368972,
+     "se": 0.010504371160687821,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.6183594008325008,
+     "se": 0.0018414624405932935,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.4219341046264195,
+     "se": 0.021143729204377595,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.46194488140840917,
+     "se": 0.006349276710169505,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.6197244835423688,
+     "se": 0.0028198295683723802,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.5544664957378851,
+     "se": 0.004729983028506947,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.5771495208999925,
+     "se": 0.0015718527957449364,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#20 e15 (period)": {
+   "Add.106": {
+    "temperate": {
+     "mean": 32.6488470174222,
+     "se": 0.5801727304971632,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 35.27041559099117,
+     "se": 1.2946626128487633,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 31.556770691979718,
+     "se": 0.4013917094821913,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 36.67990654688123,
+     "se": 0.5652758521058246,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 35.80135482693719,
+     "se": 0.7558745669520999,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 32.25243139464803,
+     "se": 0.33517804440223625,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 36.847043906622375,
+     "se": 0.3162733852598798,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 34.693709030289554,
+     "se": 0.9342673785765286,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 31.94841055414617,
+     "se": 0.6551710534174182,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 37.31495679015306,
+     "se": 0.5486548608847543,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 35.85313427158971,
+     "se": 0.4394793147207543,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 34.77840835815993,
+     "se": 0.27666004066673183,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "#21 survival to 45 from birth (period)": {
+   "Add.106": {
+    "temperate": {
+     "mean": 0.28558232352250196,
+     "se": 0.009104908228342297,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.2532150912972906,
+     "se": 0.026960922243734302,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "montane": {
+     "mean": 0.22372701587479363,
+     "se": 0.0047468316934749935,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.3673822694739423,
+     "se": 0.007044747782980911,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.23661375599696866,
+     "se": 0.015753777893101725,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.2164295945029527,
+     "se": 0.006086756058187395,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.38662037440926017,
+     "se": 0.0054516900354284435,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.24404438478661677,
+     "se": 0.019832751041757104,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "montane": {
+     "mean": 0.2409174069487238,
+     "se": 0.0049839467111264125,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.39158055843816564,
+     "se": 0.008597347310045658,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3329237858836707,
+     "se": 0.008588894250199135,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.332906805082204,
+     "se": 0.0037354837045604937,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: frac_child": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.3615,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.36641111111111113,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.39524444444444445,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.37041851851851854,
+     "se": 0.004964090529732518,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3748185185185185,
+     "se": 0.011472465396639547,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.40032222222222225,
+     "se": 0.0031044836817160377,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.33417407407407407,
+     "se": 0.003030716096052168,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.37698888888888893,
+     "se": 0.007345455749278538,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3954185185185185,
+     "se": 0.003798864533266808,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.32610370370370373,
+     "se": 0.0014051687849254728,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3689444444444444,
+     "se": 0.0103777956221593,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3879111111111111,
+     "se": 0.005784124007572761,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.3258851851851852,
+     "se": 0.003945103405224621,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3444814814814815,
+     "se": 0.006930443169379972,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3513074074074074,
+     "se": 0.0012482305720669215,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: dependency_ratio": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.7791555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.7850555555555555,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8703888888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.7995074074074074,
+     "se": 0.010769187743925861,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8132592592592592,
+     "se": 0.025289767879449445,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8813814814814814,
+     "se": 0.006848911280917708,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.7212444444444445,
+     "se": 0.001184328394009022,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8291222222222222,
+     "se": 0.015589245264002825,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8652888888888889,
+     "se": 0.008860693708966317,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.7071111111111111,
+     "se": 0.0025334876496209717,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.8027555555555556,
+     "se": 0.025684410252936534,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.8368481481481481,
+     "se": 0.01406053978869659,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.7054037037037036,
+     "se": 0.006428250193380544,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.7424740740740741,
+     "se": 0.01277778475576839,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.7548074074074074,
+     "se": 0.0016993987478671594,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: sex_ratio_m_f": {
+   "Add.100": {
+    "temperate": {
+     "mean": 1.036011111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.1291111111111112,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0674,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 1.069151851851852,
+     "se": 0.016686992955054297,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.0928592592592592,
+     "se": 0.02119349357930456,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0811666666666666,
+     "se": 0.007875452825180715,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 1.0623037037037037,
+     "se": 0.0070530188888032795,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.069374074074074,
+     "se": 0.024258369505877276,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0538,
+     "se": 0.001366501043863723,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 1.0684111111111112,
+     "se": 0.01689712153147343,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.0779518518518518,
+     "se": 0.03852146979434454,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0576999999999999,
+     "se": 0.002692131500588487,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 1.0693666666666666,
+     "se": 0.004315580920702058,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 1.052437037037037,
+     "se": 0.005238486624253515,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 1.0727037037037037,
+     "se": 0.008519842087191047,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: realised_e0": {
+   "Add.100": {
+    "temperate": {
+     "mean": 29.609666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 22.34111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 23.598666666666666,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 28.557518518518517,
+     "se": 0.6134889943818945,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 23.447333333333333,
+     "se": 1.406166403642368,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 23.791740740740742,
+     "se": 0.16063936468676795,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 33.31192592592593,
+     "se": 0.3744496171383207,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 22.491555555555557,
+     "se": 1.001844397863692,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 22.814185185185185,
+     "se": 0.38034452831541904,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 34.175703703703704,
+     "se": 0.39380812698307055,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 23.275222222222222,
+     "se": 1.0478585707824026,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 24.965037037037035,
+     "se": 0.2537727372961631,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 34.509,
+     "se": 0.3314915102972883,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 30.178,
+     "se": 0.1911550767687997,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 30.890444444444444,
+     "se": 0.14841692747843763,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: e15": {
+   "Add.100": {
+    "temperate": {
+     "mean": 34.147,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 34.141222222222225,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 32.137,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 33.21188888888889,
+     "se": 0.6731911963411847,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 34.650481481481485,
+     "se": 1.0501055587412682,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 32.114333333333335,
+     "se": 0.26293873388639,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 37.422222222222224,
+     "se": 0.48900172098631034,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 35.09462962962963,
+     "se": 0.823392763720359,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 32.45366666666666,
+     "se": 0.1508983933078151,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 37.18922222222222,
+     "se": 0.523648136032556,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 34.04951851851852,
+     "se": 0.8148183198577815,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 32.05622222222222,
+     "se": 0.5674078957545522,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 37.598444444444446,
+     "se": 0.41716802922689716,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 35.611666666666665,
+     "se": 0.10973600944788935,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 34.87985185185185,
+     "se": 0.2741593535992905,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: e45": {
+   "Add.100": {
+    "temperate": {
+     "mean": 20.511222222222223,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 19.605444444444444,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.83988888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 20.211703703703705,
+     "se": 0.19797645382434104,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 19.755703703703702,
+     "se": 0.43957684634302346,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.81848148148148,
+     "se": 0.05859269794437418,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 20.941,
+     "se": 0.17188017407101674,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 19.792074074074073,
+     "se": 0.2966489544811969,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.540407407407407,
+     "se": 0.043075698195552126,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 20.90462962962963,
+     "se": 0.1667293873752929,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 19.624962962962964,
+     "se": 0.19889296843874626,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.50422222222222,
+     "se": 0.18235825997037816,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 20.800444444444445,
+     "se": 0.10373424814728768,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 20.15848148148148,
+     "se": 0.04442709537929482,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 20.19348148148148,
+     "se": 0.038602561447952134,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: surv_to_15": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.559,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.4039777777777778,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.44735555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.5462740740740741,
+     "se": 0.006592807944880504,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.4222148148148149,
+     "se": 0.020862183809608678,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.4514740740740741,
+     "se": 0.0020595090442698714,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.599937037037037,
+     "se": 0.0020435015270568718,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3987111111111111,
+     "se": 0.015700971110958733,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.42854444444444445,
+     "se": 0.007581730260623636,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.6226555555555556,
+     "se": 0.002023392010050811,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.4253074074074074,
+     "se": 0.017406663892710734,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.4807222222222222,
+     "se": 0.0015413771833653151,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.6216481481481482,
+     "se": 0.0018443366025293047,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.5540962962962963,
+     "se": 0.00292864618039314,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.5780296296296296,
+     "se": 0.0005390638636640118,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: surv_to_45": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.31443333333333334,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.2278888888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.23262222222222223,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.296562962962963,
+     "se": 0.011203163745788598,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.24404444444444445,
+     "se": 0.021970623859080596,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.23487037037037037,
+     "se": 0.0030710002481285194,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.38105555555555554,
+     "se": 0.007473830888383026,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.23442222222222223,
+     "se": 0.01545464491286409,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.2275,
+     "se": 0.005215247509405671,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.3933407407407407,
+     "se": 0.008228817008251003,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.2400111111111111,
+     "se": 0.016548359112021092,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.2518037037037037,
+     "se": 0.005717500149200198,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.3966148148148148,
+     "se": 0.0063625231598965,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.3300370370370371,
+     "se": 0.002985371283602795,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.3349666666666667,
+     "se": 0.0036769944337520636,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: modal_adult_death": {
+   "Add.100": {
+    "temperate": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 75,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: realised_tfr": {
+   "Add.100": {
+    "temperate": {
+     "mean": 4.726588888888889,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 5.981444444444445,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 6.1369,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 4.928948148148148,
+     "se": 0.12025245124394876,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 5.864737037037037,
+     "se": 0.32976788758837533,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 6.047892592592593,
+     "se": 0.04937620815142545,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 4.21447037037037,
+     "se": 0.04661967225193566,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 6.183603703703704,
+     "se": 0.2702924197878797,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 6.297344444444445,
+     "se": 0.11099641654394383,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 4.086174074074074,
+     "se": 0.048967632012491914,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 5.876007407407408,
+     "se": 0.3569985834333076,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 5.688911111111111,
+     "se": 0.06120136500266397,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 4.047122222222222,
+     "se": 0.03049981380230547,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 4.578077777777778,
+     "se": 0.04094798014785709,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 4.532133333333333,
+     "se": 0.023360767822377452,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   }
+  },
+  "monitor: realised_ibi_med": {
+   "Add.100": {
+    "temperate": {
+     "mean": 31.0,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 30.0,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 33.0,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 30.581481481481482,
+     "se": 0.2999542717778,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 30.333333333333332,
+     "se": 0.3333333333333333,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 33.333333333333336,
+     "se": 0.3333333333333333,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 34.94074074074074,
+     "se": 1.2063844792021354,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 31.0,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 33.93333333333333,
+     "se": 0.06666666666666762,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 34.666666666666664,
+     "se": 0.6666666666666666,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "savanna": {
+     "mean": 30.666666666666668,
+     "se": 0.3333333333333333,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 34.0,
+     "se": 0.0,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 36.22222222222222,
+     "se": 0.4006168083848883,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 34.61851851851852,
+     "se": 0.2431221249226128,
+     "n": 3,
+     "verdict": "unres."
+    },
+    "montane": {
+     "mean": 32.333333333333336,
+     "se": 0.3333333333333333,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   }
+  },
+  "monitor: frac_motherless": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.017636666666666665,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.015663333333333335,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.014906666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.018997407407407407,
+     "se": 0.0006988695555629325,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.015667407407407408,
+     "se": 0.0006354093115003035,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.012624814814814814,
+     "se": 0.0011772738847547972,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.01925,
+     "se": 0.00060836859360014,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.015329629629629629,
+     "se": 0.0004704263600389313,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.010176296296296296,
+     "se": 0.00041430905013777237,
+     "n": 3,
+     "verdict": "unres."
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.024237037037037036,
+     "se": 0.0007614987748432638,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.016834074074074074,
+     "se": 0.0015867740825417035,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.0228,
+     "se": 0.00045850849627053123,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.03258185185185185,
+     "se": 0.000537340399630854,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.029023333333333335,
+     "se": 0.0004246601158476854,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.03239925925925926,
+     "se": 0.000767895240340226,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   }
+  },
+  "monitor: frac_fatherless": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.07249666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.06471777777777778,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.07208888888888888,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.07011814814814815,
+     "se": 0.0017941005671347277,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.06911925925925926,
+     "se": 0.0024820045606790946,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.07060999999999999,
+     "se": 0.001167059369533725,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.07221000000000001,
+     "se": 0.0006346694807490267,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.06516555555555556,
+     "se": 0.002771530085051521,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.07161740740740741,
+     "se": 0.001112593517285209,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.0723411111111111,
+     "se": 0.0009233790156725284,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 0.060695925925925924,
+     "se": 0.0019015504106740674,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 0.06610111111111111,
+     "se": 0.0009297039220719949,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.08444222222222222,
+     "se": 0.0013701312604206576,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.08425444444444444,
+     "se": 0.0017886929959456041,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.07863777777777778,
+     "se": 0.0005265099782545855,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   }
+  },
+  "monitor: band_med_adults": {
+   "Add.100": {
+    "temperate": {
+     "mean": 13.705555555555556,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 16.805555555555557,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 12.05,
+     "se": 0.0,
+     "n": 1,
+     "verdict": ""
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 14.066666666666666,
+     "se": 0.3977689839706629,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 15.024074074074074,
+     "se": 0.9234949569586842,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 12.675925925925926,
+     "se": 0.36909038078859757,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 27.901851851851852,
+     "se": 7.879141300096486,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 39.51481481481481,
+     "se": 12.507238370631942,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 14.35925925925926,
+     "se": 0.4986022988319938,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 22.085185185185185,
+     "se": 3.027897268001224,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 24.305555555555557,
+     "se": 8.123735102553562,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 16.11851851851852,
+     "se": 2.310947139244879,
+     "n": 3,
+     "verdict": ""
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 50.096296296296295,
+     "se": 14.910837999559531,
+     "n": 3,
+     "verdict": ""
+    },
+    "savanna": {
+     "mean": 58.93333333333334,
+     "se": 18.869179259467696,
+     "n": 3,
+     "verdict": ""
+    },
+    "montane": {
+     "mean": 24.085185185185185,
+     "se": 0.9403852492513924,
+     "n": 3,
+     "verdict": ""
+    }
+   }
+  },
+  "monitor: age_first_birth_yr": {
+   "Add.100": {
+    "temperate": {
+     "mean": 19.28511111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 18.84133333333333,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 18.084555555555553,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "PASS"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 19.034481481481482,
+     "se": 0.14424354024567712,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 18.799518518518518,
+     "se": 0.40362856419317866,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 18.074444444444445,
+     "se": 0.05907437594256957,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 19.738629629629628,
+     "se": 0.1816122846832607,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 18.300333333333334,
+     "se": 0.2877702272711744,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 17.931407407407406,
+     "se": 0.07963720032917274,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 19.769555555555556,
+     "se": 0.048503319643721184,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 18.769925925925925,
+     "se": 0.7082844321052734,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 18.37248148148148,
+     "se": 0.10319645122087075,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 19.912333333333333,
+     "se": 0.051069709479666076,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "savanna": {
+     "mean": 18.999074074074073,
+     "se": 0.06473892912119131,
+     "n": 3,
+     "verdict": "PASS"
+    },
+    "montane": {
+     "mean": 19.553925925925924,
+     "se": 0.023257578377574473,
+     "n": 3,
+     "verdict": "PASS"
+    }
+   }
+  },
+  "monitor: m_5_15": {
+   "Add.100": {
+    "temperate": {
+     "mean": 0.02771111111111111,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.04262666666666667,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.039023333333333333,
+     "se": 0.0,
+     "n": 1,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.106": {
+    "temperate": {
+     "mean": 0.029210740740740742,
+     "se": 0.0008751513292616133,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.04082259259259259,
+     "se": 0.002918965678284239,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.03891185185185185,
+     "se": 0.00018776389750730388,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.108": {
+    "temperate": {
+     "mean": 0.022792592592592593,
+     "se": 0.0002958243927241128,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.04388185185185185,
+     "se": 0.0022241851824098577,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.039705555555555556,
+     "se": 0.00124772731668026,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.109": {
+    "temperate": {
+     "mean": 0.019825185185185185,
+     "se": 0.0003338356297778753,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.03964666666666667,
+     "se": 0.0030181220144035194,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.034810370370370367,
+     "se": 0.00033074322922211003,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   },
+   "Add.113": {
+    "temperate": {
+     "mean": 0.02172111111111111,
+     "se": 0.0001796097736257494,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "savanna": {
+     "mean": 0.028106296296296296,
+     "se": 0.00039005134901661914,
+     "n": 3,
+     "verdict": "FAIL"
+    },
+    "montane": {
+     "mean": 0.026188148148148148,
+     "se": 9.602240250725318e-05,
+     "n": 3,
+     "verdict": "FAIL"
+    }
+   }
+  }
+ },
+ "category": {
+  "#1 band size (mean-experienced adults/cell)": "PARTLY NOW",
+  "#3 village size (median)": "HITS NOW",
+  "#3 village size (max, Voronoi catchment)": "NOT SCORED",
+  "#4 connubium reach (median)": "HITS NOW",
+  "#5 lineages (count; dynamics per MARKER_MATRIX)": "NOT SCORED",
+  "#7 nobility share": "NOT SCORED",
+  "#8 bud events (cumulative; rate per MARKER_MATRIX)": "NOT SCORED",
+  "#9 hierarchy index gini_cred": "NOT SCORED",
+  "#10 polygyny (of ALL men)": "HITS NOW",
+  "#11 status->RS (age-controlled)": "NOT SCORED",
+  "#12 rank-size slope": "HITS NOW",
+  "#13 primacy": "HITS NOW",
+  "#14 material Gini (adults)": "HITS NOW",
+  "#14 material Gini (within-cell)": "HITS NOW",
+  "#15 orphanhood (motherless)": "NOT SCORED",
+  "#16 dependency ratio": "HITS NOW",
+  "#16 share under 15": "HITS NOW",
+  "#16 sex ratio (m/f)": "HITS NOW",
+  "#16 median age (yr)": "NOT SCORED",
+  "#17 fission ceiling (co-resident max)": "PARTLY NOW",
+  "#18 e0 (period)": "HITS NOW",
+  "#19 survival to 15 (period)": "HITS NOW",
+  "#20 e15 (period)": "HITS NOW",
+  "#21 survival to 45 from birth (period)": "HITS NOW",
+  "monitor: frac_child": "HITS NOW",
+  "monitor: dependency_ratio": "HITS NOW",
+  "monitor: sex_ratio_m_f": "HITS NOW",
+  "monitor: realised_e0": "HITS NOW",
+  "monitor: e15": "HITS NOW",
+  "monitor: e45": "HITS NOW",
+  "monitor: surv_to_15": "HITS NOW",
+  "monitor: surv_to_45": "HITS NOW",
+  "monitor: modal_adult_death": "HITS NOW",
+  "monitor: realised_tfr": "MISSES NOW, HIT BEFORE",
+  "monitor: realised_ibi_med": "PARTLY NOW",
+  "monitor: frac_motherless": "PARTLY NOW",
+  "monitor: frac_fatherless": "MISSES NOW, HIT BEFORE",
+  "monitor: band_med_adults": "NOT SCORED",
+  "monitor: age_first_birth_yr": "HITS NOW",
+  "monitor: m_5_15": "NEVER HIT (in window)"
+ },
+ "rule": "per run, the mean over the sustained window (last 15% of rows); #18\u2013#21 from the period life table where the run\nhas a snapshot. Per world, mean \u00b1 SE over runs; PASS if the 1-SE interval is inside the band, FAIL if outside, unres.\notherwise (n=1 \u21d2 SE 0). Category over the snapshot history:\n  HITS NOW          PASS on all three worlds at Add.113\n  PARTLY NOW        PASS on 1\u20132 worlds at Add.113\n  MISSES NOW, HIT BEFORE   no world passes at Add.113, but some world passed in an earlier snapshot\n  NEVER HIT (in the measured window)   no world passed in any snapshot\nThe window is 2026-09-18 \u2192 2026-10-26; RESULTS may record passes on older canons (state that next to the table)."
+}

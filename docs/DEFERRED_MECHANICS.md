@@ -203,6 +203,11 @@ placeholders remain live.
 
 Each has a literature anchor and a seam; none is built. Ordered by how load-bearing it is for the current arc.
 
+> **[2026-10-26 note]** "none is built" was true on 2026-07-18 and is now STALE for three items: DM-F1 legitimacy
+> was built the same day (RESULTS R-86, `enable_legitimacy`), DM-F3 gumsa/gumlao switching as delegitimation (R-87,
+> `enable_delegitimation`), and a tribute rate (`enable_lineage_tribute`); all three are ON in canon. DM-F2, DM-F4
+> and DM-F5 remain unbuilt (`audit/2026-10-26/03_IMPLEMENTATION_STATUS.md`).
+
 ### DM-F1 — The LEGITIMACY channel (the `GroupVector.religion` stub)
 **Anchor:** Friedman's endogenous scenario in Flannery ch. 10 `[VERIFIED]` — hereditary rank is created by a
 reinterpretation of success ("they pleased the nats" → "they descend from higher nats"), after which the lineage

@@ -6,19 +6,18 @@ fertility, families, provisioning), an economy in kcal, storage, and an elite / 
 flag, and the canonical run is one configuration file. The model is calibrated against the ethnographic and
 archaeological record through a scored marker table.
 
-**Auditing or reviewing the project? Start at [`docs/AUDIT_GUIDE.md`](docs/AUDIT_GUIDE.md).**
+**Auditing or reviewing the project? Start at [`audit/2026-10-26/00_START_HERE.md`](audit/2026-10-26/00_START_HERE.md)** — the dated audit package (state, benchmarks, implementation status, map, how to verify).
 
 The project began (June 2026) as a comparison of two strategies, C (cooperative) and Si (individualist), on a
 Sugarscape world. That question (RESULTS R-1) is historical; the current work is the R-106 demographic and
-settlement calibration arc. See `docs/AUDIT_GUIDE.md` §1 for the history in one page.
+settlement calibration arc. See `audit/2026-10-26/00_START_HERE.md` for the history in one page.
 
 ## Where things are
 
 | You want… | Go to |
 |---|---|
-| **The auditor's entry point** — what to read, in which order, and how to run things | **[`docs/AUDIT_GUIDE.md`](docs/AUDIT_GUIDE.md)** |
+| **The audit package** — start here, state, benchmarks, implementation status, map, how to verify | **[`audit/2026-10-26/`](audit/2026-10-26/00_START_HERE.md)** |
 | The routing table: which document owns which kind of fact | [`docs/INDEX.md`](docs/INDEX.md) |
-| **What works, what meets its benchmarks, what does not** | **[`docs/MODEL_STATE.md`](docs/MODEL_STATE.md)** |
 | The current scorecard of the model against the record | [`docs/MARKER_MATRIX.md`](docs/MARKER_MATRIX.md) (top section) |
 | Every mechanism flag and parameter of the canonical run (generated) | [`docs/REGISTRY.md`](docs/REGISTRY.md) |
 | Every finding, append-only, and its index (generated) | [`docs/RESULTS.md`](docs/RESULTS.md) · [`docs/RESULTS_INDEX.md`](docs/RESULTS_INDEX.md) |
@@ -46,7 +45,7 @@ py -3 tools/scorecard.py --glob "campaign_trajectory_s2_*_riskvg_s*.json"
 ```
 
 The full-length (15,000-step) three-world runs that the scorecard uses are made by `scratchpad/bp_stage2_driver.py`;
-`docs/AUDIT_GUIDE.md` §5 gives the exact commands and the expected run times.
+`audit/2026-10-26/05_HOW_TO_RUN_AND_VERIFY.md` gives the exact commands and the expected run times.
 
 ## Conventions (short version)
 

@@ -1,6 +1,6 @@
 # SiC Games — Pre-Registered Hypotheses
 
-> **Status review, 2026-10-26 (audit preparation).** The statuses below were last set between 2026-06-08 and 2026-07-21; none was re-assessed in the audit preparation. Later evidence that bears on them: **H-CYCLES** → RESULTS Add.105 (the four cycle negatives re-read; the population is not food-limited); **§H1ii-RETEST** → still not run (the C/Si question is historical, see `docs/AUDIT_GUIDE.md` §1); **H-EMERGE-1** → the settlement arc (R-58…R-71, Add.52–61). An auditor should treat each OPEN status as 'not resolved in a dated entry', not as 'untested'.
+> **Status review, 2026-10-26 (audit preparation).** The statuses below were last set between 2026-06-08 and 2026-07-21; none was re-assessed in the audit preparation. Later evidence that bears on them: **H-CYCLES** → RESULTS Add.105 (the four cycle negatives re-read; the population is not food-limited); **§H1ii-RETEST** → still not run (the C/Si question is historical, see `audit/2026-10-26/00_START_HERE.md`); **H-EMERGE-1** → the settlement arc (R-58…R-71, Add.52–61). An auditor should treat each OPEN status as 'not resolved in a dated entry', not as 'untested'.
 
 **The ONE question:** "What did we predict *before looking*, and how did it resolve?" (charter §2, home 7).
 

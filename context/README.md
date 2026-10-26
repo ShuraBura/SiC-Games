@@ -1,6 +1,6 @@
 # context/ — Derived chat-bridge artifacts (NON-AUTHORITATIVE)
 
-> **STALE — read `docs/AUDIT_GUIDE.md` instead (banner added 2026-10-26).** The `context/` folder was last regenerated 2026-06-16. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
+> **STALE — read `audit/2026-10-26/00_START_HERE.md` instead (banner added 2026-10-26).** The `context/` folder was last regenerated 2026-06-16. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
 
 This directory is **derived and non-authoritative.** The eleven `docs/` homes are the sole source of truth for all project facts. On any conflict between files here and the `docs/` homes, **the homes win.** These files exist solely to bridge chat-to-chat context loss and to make uncommitted chat-side decisions *visibly pending* rather than laundered into apparent fact.
 

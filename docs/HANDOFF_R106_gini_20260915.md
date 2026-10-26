@@ -1,6 +1,6 @@
 # Handoff — R-106 ladder-miss arc (2026-09-15 20:29 EDT)
 
-> **HISTORICAL — a session handoff of 2026-09-15/16; the assistant-memory files it names are NOT in the repository (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+> **HISTORICAL — a session handoff of 2026-09-15/16; the assistant-memory files it names are NOT in the repository (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `audit/2026-10-26/00_START_HERE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
 
 > **UPDATE 2026-09-16 (Add.87 — ADOPTED):** the graded-leveler stack is now CANONICAL and marker #14 (wealth Gini)
 > PASSES. Canon carries `material_capture_frac = 0.15` (grounded to the gumsa "thigh from every animal" rate),

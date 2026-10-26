@@ -9956,4 +9956,36 @@ summarised in the new `docs/MODEL_STATE.md`.
 
 ---
 
+## Addendum 115 — The benchmark HISTORY across five canons: the last adoptions traded fertility for survival; m(5–15) has never been in band. The dated audit package `audit/2026-10-26/` (2026-10-26, R-106)
+
+**Why.** The supervisor asked for a dated audit folder that states what hits its benchmarks, what does not, and what
+has NEVER hit. "Never" needs history, so `tools/benchmark_history.py` scores every banded marker and every anchored
+demography-monitor entry, with one rule, on the five canons whose full-length runs are on disk: Add.100 (1 run per
+world), Add.106, Add.108, Add.109, Add.113 (3 paired seeds each; all 15,000 steps, planet seed 0). Output:
+`audit/2026-10-26/evidence/benchmark_history.{json,md}`; the categories are in `audit/2026-10-26/02_BENCHMARKS.md`.
+
+**Result.** 24 benchmarks hit on all three worlds now; 4 partly; 2 missed now but hit before; 1 never hit in the
+window; 9 are reported without a verdict.
+- **Fertility was traded for survival.** `realised_tfr` was inside the forager band [4.69, 8.03] on every world at
+  Add.100 and Add.106. Temperate fell below it at Add.108 (4.93 → 4.21, food-viable sites) and savanna and montane at
+  Add.113 (5.88 → 4.58, 5.69 → 4.53, the granary + risk pair) — the same adoptions that lifted l(15) and l(45) into
+  band. A density-dependent fertility response (`enable_density_fertility`, ON) to lower mortality at a stationary
+  population is a candidate reading; NOT measured.
+- **`frac_fatherless`** was ~0.07 on every world through Add.109 (range 0.025–0.075) and 0.08 at Add.113.
+- **m(5–15) has never been in band** in the window (0.020–0.044 against Aché ~0.010); it improved at Add.113 but is
+  still 2–3×. #19 passes because it is scored against the cross-forager band, not the Aché value.
+- **Newly hit at Add.113:** #19 and #21 on savanna and montane; the monitor's l(15) and l(45); #14 adults on
+  temperate. Birth intervals improved from short-everywhere (Add.100–106) to temperate-in-band.
+
+**Lesson (adds to Add.114's):** read benchmarks together and over time. A single-canon scorecard shows which
+benchmarks pass; only the history shows that a fix moved a benchmark out of band that had been in band.
+
+**Also in this change.** The first `docs/RESULTS_INDEX.md` listed only `## ` headings and so OMITTED the whole elite-layer
+arc R-82 … R-98 (written as `### `); fixed (176 entries). DEFERRED_MECHANICS' "none is built" for the Flannery items was
+stale for three of six (legitimacy R-86, delegitimation R-87, tribute); dated note added. The audit guide and the state
+document written earlier the same day moved into the dated package `audit/2026-10-26/` (00_START_HERE … 06, a generated
+`MAP_mechanisms_to_code.md` by `tools/gen_code_map.py`); `docs/AUDIT_GUIDE.md` and `docs/MODEL_STATE.md` are now stubs.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

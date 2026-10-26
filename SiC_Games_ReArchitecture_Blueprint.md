@@ -1,6 +1,6 @@
 # SiC Games — Performance Re-Architecture Blueprint (v1.0, 2026-07-07)
 
-> **HISTORICAL — the performance re-architecture blueprint (2026-07-07) (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+> **HISTORICAL — the performance re-architecture blueprint (2026-07-07) (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `audit/2026-10-26/00_START_HERE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
 
 **Goal.** Make the model tractable at the Turchin secular-cycle target: **30K–50K agents × ~18,000 steps (1,500 yr)** — the natural carrying capacity of the 1M km² world (~52K agents @ 0.05/km², realistic HG density). Current cost is **~1 ms/agent, superlinear** at scale (32K agents → 128 s/step → a 1,500-yr run ≈ weeks). Target: **≤ ~10–50 µs/agent, linear** → ~50K agents in ~1 s/step → ~5 h/run (parallelizable across seeds).
 

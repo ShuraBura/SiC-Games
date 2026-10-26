@@ -2,7 +2,7 @@
 
 **This is the entry point.** It does not contain project facts; it routes you to the document that does. Every kind of fact has exactly one authoritative home (the charter's **11 homes**). If you find the same fact in two documents, one is wrong — the authoritative home wins and the copy is a bug to be replaced with a pointer.
 
-**Last updated:** 2026-10-26 (audit preparation: **`AUDIT_GUIDE.md`** is the entry point for an auditor; the registry below now lists every live document, including MARKER_MATRIX, BENCHMARK_LADDER, VERIFICATION_LOG and the generated REGISTRY / RESULTS_INDEX; a precedence rule is added; `context/` is marked stale). Prior: 2026-07-18 (MECHANISM_CHARTER.md adopted). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`.
+**Last updated:** 2026-10-26 (audit preparation: **`audit/2026-10-26/00_START_HERE.md`** is the entry point for an auditor (the dated audit package); the registry below now lists every live document, including MARKER_MATRIX, BENCHMARK_LADDER, VERIFICATION_LOG and the generated REGISTRY / RESULTS_INDEX; a precedence rule is added; `context/` is marked stale). Prior: 2026-07-18 (MECHANISM_CHARTER.md adopted). All homes live under `docs/`. Governance: `docs/DOCS_CHARTER.md`. Code lives under `sic_games/`.
 
 ---
 
@@ -24,8 +24,7 @@
 | How were literature values processed into resource-layer inputs; seasonal architecture | **MODEL_SPEC.md** | Resource-layer methodology record: formula, denominator rules, unanchored policy, seasonal signal architecture, star-mechanics seam, catastrophe seam stub |
 | Did we try X already, and why was it abandoned | **DEAD_ENDS.md** | Retired directions + the reason each was retired |
 | Which document owns this kind of fact | **INDEX.md** (this file) | The routing table itself |
-| **Auditing the project: where to start, what to read, how to run** | **AUDIT_GUIDE.md** | The auditor's entry point (2026-10-26) |
-| What works, what meets its benchmarks, what does not — now | **MODEL_STATE.md** | A dated snapshot of the canon's state (re-written at each adoption) |
+| **Auditing the project; the state of the model; what works, what hits benchmarks, what is implemented; the map** | **`audit/<date>/00_START_HERE.md`** (current: `audit/2026-10-26/`) | A DATED audit package — a view of the homes, not a home |
 | Does the model reproduce the record? The current verdict per marker | **MARKER_MATRIX.md** (top: CURRENT SCORECARD) | Markers, bands, units, verdicts; evidence in `docs/evidence/` |
 | In which order are behaviours validated; which tier is a mechanism in | **BENCHMARK_LADDER.md** | The tier ladder and tier membership |
 | Is flag X ON in canon; what value does parameter Y have in canon | **REGISTRY.md** (GENERATED) → `config/runs/full_campaign.toml` | A derived view; the run file is the truth |
@@ -70,8 +69,8 @@
 | SiC_Games_Resource_Return_Rate_Table.md | **live** (created 2026-06-16; derived view, forage + game) | Code | when any forage/game biome cell mean or std is anchored, updated, or unanchored policy changes |
 | SiC_Games_Game_Return_Rate_Table.md | **RETIRED 2026-06-16** → merged into the unified Resource table (stub redirect kept) | — | — |
 | DEFERRED_MECHANICS.md | **live** (created 2026-06-14; 7 entries: GD-1 through PL-1) | Code + supervisor | when a mechanic is deferred here, promoted to a blueprint, or its seam changes |
-| **AUDIT_GUIDE.md** | **live** (created 2026-10-26) | Code + supervisor | any change to canon, the doc map, or how to run/verify |
-| **MODEL_STATE.md** | **live snapshot** (2026-10-26, Add.113 canon) | Code | every adoption (re-score, then rewrite) |
+| **`audit/2026-10-26/`** | **dated audit package** (00_START_HERE … 06, MAP_mechanisms_to_code, evidence/) | Code + supervisor | a NEW dated folder for a new audit; this one is frozen to its commit |
+| AUDIT_GUIDE.md / MODEL_STATE.md | stubs → the audit package | — | — |
 | MARKER_MATRIX.md | live (scorecard; CURRENT SCORECARD section re-scored 2026-10-26 on the Add.113 canon) | Code | every adoption (re-score with `tools/scorecard.py`) |
 | BENCHMARK_LADDER.md | live (adopted 2026-08-07) | Code + supervisor | a mechanism is added (tier membership) or a tier is re-scored |
 | REGISTRY.md / RESULTS_INDEX.md | **GENERATED** (`tools/gen_registry.py`; `tests/test_registry_sync.py`) | tool | regenerate after any flag/parameter/RESULTS change |
@@ -125,6 +124,6 @@ SiC-Games/
 └── archive/             superseded docs, .bak litter, prior code snapshots (never hard-deleted)
 ```
 
-`context/` (non-canonical, **STALE — last regenerated 2026-06-16**): derived chat-bridge briefings from the Blueprint-A era. They describe the June 2026 C/Si project and must NOT be used for orientation; read **`docs/AUDIT_GUIDE.md`** instead. Kept for history (nothing is hard-deleted); on any conflict the `docs/` homes win.
+`context/` (non-canonical, **STALE — last regenerated 2026-06-16**): derived chat-bridge briefings from the Blueprint-A era. They describe the June 2026 C/Si project and must NOT be used for orientation; read **`audit/2026-10-26/00_START_HERE.md`** instead. Kept for history (nothing is hard-deleted); on any conflict the `docs/` homes win.
 
 *End of INDEX.*

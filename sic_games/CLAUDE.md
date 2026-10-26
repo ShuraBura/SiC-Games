@@ -1,6 +1,6 @@
 # SiC Games — Claude Code Instructions
 
-> **STALE — read `docs/AUDIT_GUIDE.md` instead (banner added 2026-10-26).** This agent contract was written for the June 2026 project (C vs Si strategies on a Sugarscape world). Its 'What this project is' and 'File structure' sections no longer describe the model: the canonical model is `phase1_model.TerrainWorld` + `demography.DemographyConfig`, run by `sic_games/outputs/substrate_run/run_campaign.py` from `config/runs/full_campaign.toml`. The current working rules are the root `CLAUDE.md`. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
+> **STALE — read `audit/2026-10-26/00_START_HERE.md` instead (banner added 2026-10-26).** This agent contract was written for the June 2026 project (C vs Si strategies on a Sugarscape world). Its 'What this project is' and 'File structure' sections no longer describe the model: the canonical model is `phase1_model.TerrainWorld` + `demography.DemographyConfig`, run by `sic_games/outputs/substrate_run/run_campaign.py` from `config/runs/full_campaign.toml`. The current working rules are the root `CLAUDE.md`. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
 
 ## What this project is
 

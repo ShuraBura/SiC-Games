@@ -11,6 +11,8 @@ granary + terrain risk as a 10% accident share, together (Add.113). **Scorecard*
 Add.114): every banded marker passes on every world except two unresolved on temperate (#1 band size, #17 fission
 ceiling). Branch `r106/add105-malthus-churn` holds Add.105–114 and is NOT yet merged or pushed.
 
+**Full state for the audit:** `audit/2026-10-26/` (start at `00_START_HERE.md`).
+
 **Open threads, in the order of the benchmark ladder** (each points to its record):
 1. **Malthusian response (the arc's goal).** The population now spreads (savanna land use 5% → 15%), but Add.105's
    finding (population at 5–10% of carrying capacity) has NOT been re-measured on the new canon, and CONTRACTION under

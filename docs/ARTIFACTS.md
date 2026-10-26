@@ -239,7 +239,7 @@ This section is a MAP by arc, not a list of every file. Each RESULTS addendum na
 - **What is NOT committed, and how to regenerate it.** Run outputs are git-ignored by design (`.gitignore`, R-106
   2026-08-04): `sic_games/outputs/**/campaign_trajectory*.json` and the probe JSON in `scratchpad/` (~112 MB).
   Regenerate a Stage-2 set with `scratchpad/bp_stage2_driver.py` (env `S2_ONLY_ARM`, `S2_CONTROL`; see its
-  docstring and `docs/AUDIT_GUIDE.md` §5); a probe with its `*_run.py` launcher.
+  docstring and `audit/2026-10-26/05_HOW_TO_RUN_AND_VERIFY.md`); a probe with its `*_run.py` launcher.
 - **Committed compact evidence of the current canon:** `docs/evidence/scorecard_add113_canon.{json,png}` (all
   markers, per run and per world) and `docs/evidence/scorecard_add109_canon.json` (the previous canon), produced by
   `tools/scorecard.py` / `tools/scorecard_fig.py` from the nine Stage-2 runs of each canon.

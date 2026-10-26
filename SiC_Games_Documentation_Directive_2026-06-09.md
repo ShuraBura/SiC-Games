@@ -1,6 +1,6 @@
 # Documentation Directive — Terrain-Design Session (2026-06-09)
 
-> **HISTORICAL — a documentation directive of 2026-06-09 (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `docs/AUDIT_GUIDE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
+> **HISTORICAL — a documentation directive of 2026-06-09 (banner added 2026-10-26).** It records a directive or decision of its date and is not maintained. For the current state read `audit/2026-10-26/00_START_HERE.md`; for what was decided later, `docs/RESULTS_INDEX.md`.
 
 **For:** Claude Code
 **Type:** Documentation update only. No model code. No runs.

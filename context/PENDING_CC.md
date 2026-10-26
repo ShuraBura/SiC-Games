@@ -1,6 +1,6 @@
 # PENDING_CC — chat-side delta buffer (append-only, NON-AUTHORITATIVE)
 
-> **STALE — read `docs/AUDIT_GUIDE.md` instead (banner added 2026-10-26).** This pending-delta buffer was last written 2026-06-16. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
+> **STALE — read `audit/2026-10-26/00_START_HERE.md` instead (banner added 2026-10-26).** This pending-delta buffer was last written 2026-06-16. It is kept for history (nothing is hard-deleted). On any conflict, the `docs/` homes and the code win.
 
 > Append-only. Each entry is `[PENDING]` until CC drains it into its home-target (then `[DRAINED <date>]`, struck-through, never deleted). On conflict with a home, CC tags `[CONFLICT]` and surfaces to supervisor — never resolves unilaterally. The eleven `docs/` homes are the sole authority.
 
