@@ -193,7 +193,7 @@ You may report that a known item is WORSE than documented, or that its consequen
    §2); 12 flags have no comment of their own; two canon decisions have no recorded reason (`comove_footprint = 0`;
    `village_fission_threshold` 150 vs the 170 of PARAMETERS.md).
 8. **Pinned blockers:** the band-cohesion budget has no headroom (Add.22, `test_cohesion_headroom.py`).
-9. **96 broken file references** in live docs (70 in the append-only RESULTS) — listed by `tools/doc_audit.py`.
+9. **73 broken file references** in live docs (47 in the append-only RESULTS; 96 before the instruments were committed) — listed by `tools/doc_audit.py`.
 10. **Secular cycles:** four negatives (RESULTS Add.105 re-reads them); deferred.
 11. The C/Si question (R-1, H1(ii)) is historical and not re-tested on the Phase-1 substrate.
 

@@ -2,36 +2,36 @@
 === 4. FRESHNESS — last commit touching each live document
   2026-09-01 69ca7a4   CLAUDE.md
   2026-07-08 8d1b7fb   docs\ARCHITECTURE.md
-  2026-07-30 b15017e   docs\ARTIFACTS.md
-  untracked            docs\AUDIT_GUIDE.md
+  2026-10-26 a16677f   docs\ARTIFACTS.md
+  2026-10-26 a16677f   docs\AUDIT_GUIDE.md
   2026-09-26 ac452ae   docs\BENCHMARK_LADDER.md
-  2026-07-30 bd2740e   docs\DEAD_ENDS.md
+  2026-10-26 a16677f   docs\DEAD_ENDS.md
   2026-07-18 ba0f436   docs\DEFERRED_MECHANICS.md
-  2026-09-05 437b009   docs\DESIGN_colonization_spacing.md
+  2026-10-26 a16677f   docs\DESIGN_colonization_spacing.md
   2026-06-06 fe30750   docs\DOCS_CHARTER.md
   2026-07-27 46eb0c9   docs\ELITE_STRATIFICATION_ROADMAP.md
   2026-06-22 9efa907   docs\GLOSSARY.md
-  2026-09-11 7bc0c18   docs\HANDOFF_R106_e0.md
-  2026-09-16 29ab154   docs\HANDOFF_R106_gini_20260915.md
-  2026-07-21 dd1c68a   docs\HYPOTHESES.md
-  2026-07-18 b3b53a3   docs\INDEX.md
+  2026-10-26 a16677f   docs\HANDOFF_R106_e0.md
+  2026-10-26 a16677f   docs\HANDOFF_R106_gini_20260915.md
+  2026-10-26 a16677f   docs\HYPOTHESES.md
+  2026-10-26 a16677f   docs\INDEX.md
   2026-09-24 7d683ee   docs\LITERATURE.md
-  2026-10-26 a999dc0   docs\MARKER_MATRIX.md
+  2026-10-26 a16677f   docs\MARKER_MATRIX.md
   2026-08-07 d7d347b   docs\MECHANISM_CHARTER.md
   2026-08-10 f73991c   docs\MECHANISMS.md
-  2026-09-05 437b009   docs\MODEL_SPEC.md
-  untracked            docs\MODEL_STATE.md
-  2026-08-10 ca7e989   docs\PARAMETERS.md
-  untracked            docs\REGISTRY.md
-  2026-10-26 a999dc0   docs\RESULTS.md
-  untracked            docs\RESULTS_INDEX.md
-  2026-07-21 dd1c68a   docs\ROADMAP.md
+  2026-10-26 a16677f   docs\MODEL_SPEC.md
+  2026-10-26 a16677f   docs\MODEL_STATE.md
+  2026-10-26 a16677f   docs\PARAMETERS.md
+  2026-10-26 a16677f   docs\REGISTRY.md
+  2026-10-26 a16677f   docs\RESULTS.md
+  2026-10-26 a16677f   docs\RESULTS_INDEX.md
+  2026-10-26 a16677f   docs\ROADMAP.md
   2026-06-16 1575c65   docs\SiC_Games_Game_Return_Rate_Table.md
   2026-08-10 f73991c   docs\SiC_Games_Resource_Return_Rate_Table.md
-  2026-08-07 d7d347b   docs\TARGETS.md
+  2026-10-26 a16677f   docs\TARGETS.md
   2026-07-21 46880c6   docs\VERIFICATION_LOG.md
-  2026-06-05 4806574   README.md
-  2026-07-30 b15017e   sic_games\CLAUDE.md
+  2026-10-26 a16677f   README.md
+  2026-10-26 a16677f   sic_games\CLAUDE.md
 
 === 1. PATHS — files named by live documents that do not exist
   docs\ARTIFACTS.md: 12 missing
@@ -47,11 +47,6 @@
       line 96: Model/HYPOTHESES.md
       line 99: sic_games/LITERATURE.md
       line 176: run_3i_band_risk_proto.py
-  docs\AUDIT_GUIDE.md: 4 missing
-      line 104: doc_audit.py
-      line 104: gen_registry.py
-      line 105: scorecard.py
-      line 105: scorecard_fig.py
   docs\ELITE_STRATIFICATION_ROADMAP.md: 2 missing
       line 104: campaign_trajectory_r104_ctrop_forage_s3.json
       line 119: campaign_trajectory_fix.json
@@ -68,7 +63,7 @@
   docs\LITERATURE.md: 2 missing
       line 321: SiC_Games_Forage_Return_Rate_Table.md
       line 1276: alaintestart.com/UK/documents/storage.pdf
-  docs\RESULTS.md: 71 missing
+  docs\RESULTS.md: 47 missing
       line 600: assabiyah+leader−repulsion
       line 1102: sic_games/src/sic_games/phase1_model.py:1093
       line 1125: sic_games/src/sic_games/phase1_model.py:2108
@@ -94,11 +89,11 @@
       line 3647: diag_all_on.py
       line 3699: diag_tier2_scale.py
       line 3775: score_paired.py
-      ... and 46 more
+      ... and 22 more
   docs\ROADMAP.md: 2 missing
       line 590: figures/plot_name.png
       line 593: generate_figures.py
-  TOTAL missing references: 101
+  TOTAL missing references: 73
 
 === 2. PARAMS — PARAMETERS.md bold values vs the canonical run file
   rows checked: 81; agree: 81; DISAGREE: 0; canonical parameters never named in a PARAMETERS.md table row: 172 of 253

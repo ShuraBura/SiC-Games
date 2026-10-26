@@ -118,7 +118,7 @@ monitor should be updated (not done in the audit preparation).
 - Five config test files fail INTERMITTENTLY with `WinError 6` under pytest's default capture (a Windows stdin-handle
   artifact; `--capture=sys` avoids it — RESULTS Add.111).
 - 12 of the 15 PDFs behind the registered anchors are not in git (copyright); a clone cannot verify them.
-- 96 broken file references in live documents (70 in the append-only RESULTS ledger).
+- 73 broken file references in live documents (47 in the append-only RESULTS ledger; 96 before the 2026-10-26 commit of the instruments).
 - Provenance: 165 of 253 canonical parameters carry no provenance tag in their own source comment; 12 flags have no
   comment of their own; two canon decisions have no recorded reason (`comove_footprint = 0`;
   `village_fission_threshold` 150 vs 170) — REGISTRY.md, RESULTS Add.114.
