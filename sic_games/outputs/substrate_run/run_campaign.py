@@ -1024,6 +1024,12 @@ def main():
             # UNDER EVALUATION, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
             # The sticky release was REJECTED by Stage 2 (Add.111) and stays dark as an instrument.
             "enable_sticky_pin_release",
+            # MORTALITY-STRUCTURE FIXES from the external audit (R-106 Addendum 118, 2026-10-27): the 900-month
+            # lifespan cap, the constant body-condition signal, the regional-vs-local disease density, and the double
+            # η. Each changes mortality in every run and is UNDER EVALUATION in Stage 2 (single-fix arms first), so
+            # C_ALLON must not enable them by side effect.
+            "enable_lifespan_from_siler", "enable_condition_full_scale", "enable_density_common_window",
+            "enable_eta_once",
             # VILLAGE GRANARY + TERRAIN RISK AS AN ACCIDENT SHARE — ADOPTED TOGETHER (R-106 Addendum 113,
             # 2026-09-26) and so REMOVED from this set -> canonically ON. Neither is adoptable alone: the granary
             # alone overshoots temperate (e0 40.1), the risk correction alone drops montane l15 under the floor.

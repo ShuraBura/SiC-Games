@@ -435,6 +435,15 @@ class DemographyConfig(BaseModel):
     childhood_ratio_mf: float = Field(0.71, gt=0.0)
     adult_ratio_mf: float = Field(1.47, gt=0.0)
 
+    # LIFESPAN FROM SILER (R-106 Add.118; external audit F-05). The demographic death check kills every agent at
+    # `max_age` = `lifespan_months` = 900 [PLACEHOLDER], so the life table's age-75 bin gets m = 12/yr, l(76) = 0 and
+    # ~10% of births die at exactly 75 (measured, Add.116): `modal_adult_death` = 75 measured the placeholder, and
+    # e0/e15/e45 were truncated. ON ⇒ the demographic death check uses `siler_lifespan_cap_months` instead, so the
+    # Siler senescence term decides old-age death; `max_age` still anchors the elder efficiency decline (and the code
+    # already clamps η for agents past it). Default OFF ⇒ the 900-month cap ⇒ bit-exact.
+    enable_lifespan_from_siler: bool = False
+    siler_lifespan_cap_months: int = Field(1200, ge=1)   # 100 yr = the life table's last bin; Siler hazard ≈1/yr there [DESIGN]
+
     # --- fertility (Aché-anchored window; IBI/fecundability tuned in Step-1) ---
     menarche_months: int = Field(180, ge=0)        # 15 yr — fertility onset
     menopause_months: int = Field(504, ge=0)       # 42 yr — last-birth ceiling
@@ -681,6 +690,13 @@ class DemographyConfig(BaseModel):
     # synergy reads a slow EMA of nutritional status (`_condition`) instead of the instantaneous (bang-bang)
     # reserve — so sustained undernutrition potentiates DISEASE mortality (Pelletier), routing the seasonal
     # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
+    # CONDITION ON ITS FULL SCALE (R-106 Add.118; external audit, Add.116). `_condition` samples the reserve fill
+    # AFTER the month's burn, against the full reserve span, so even an agent eating 10× its need reads at most
+    # (cap − burn − floor)/(cap − floor): measured `condition_mean` = 0.321 on all three worlds, and the nutrition ×
+    # disease synergy became a constant ×1.47 on everyone's hazard. MODEL_SPEC §4.3.3 specifies the multiplier as 1 at
+    # full reserve rising to μ near the floor. ON ⇒ the post-burn fill is scaled by the MAXIMUM attainable post-burn
+    # fill (cap − this step's burn), so a fully fed agent reads 1.0 and a starving one 0. Default OFF ⇒ bit-exact.
+    enable_condition_full_scale: bool = False
     enable_condition: bool = False
     condition_alpha: float = 0.25   # EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag
     # Biome-Mortality S1: child-priority shortfall-sharing. The mother provisions her child's deficit not
@@ -712,6 +728,13 @@ class DemographyConfig(BaseModel):
     # missing mortality; montane l15 0.449 < 0.45). ADOPTED TOGETHER with `enable_village_granary` (Add.113,
     # supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE. Canonically ON via C_ALLON; class default stays False.
     enable_risk_accident_share: bool = False
+    # ONE DENSITY BASIS FOR DISEASE (R-106 Add.118; external audit F-04). Under `enable_village_density_disease` a
+    # SETTLED agent's density is its village's population over the (2·settle_radius+1)² cell territory (a regional
+    # density, ~2,500 km²), but a MOBILE agent's is its own cell's occupancy over 100 km² (a local density), and both
+    # are scored against the same reference `dens_rho_ref`. Measured: a 100-person village → ×0.77, a 10-person
+    # mobile camp → ×1.03. ON ⇒ a mobile agent's density is the people in the same-size window centred on its own
+    # cell, over the same area — one definition for everyone. Default OFF ⇒ bit-exact.
+    enable_density_common_window: bool = False
     risk_accident_share: float = Field(0.10, ge=0.0, le=1.0)   # accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED]
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
     dens_rho_half: float = Field(0.2, gt=0.0)   # density-disease half-saturation, agents/km² [FREE]
@@ -1350,6 +1373,12 @@ class DemographyConfig(BaseModel):
     # `enable_forage_cap` clips the FORAGE stream only, while the meat stream (game_meat_frac 0.55) is split
     # flat and uncapped. And in the crowded cells where agents actually die, S/n is far below the cap. The
     # cap binds in rich empty cells; the claim weight bites in the starving ones.
+
+    # η ONCE (R-106 Add.118; external audit F-01). With `enable_eta_weighted_shares` the claim already scales with η
+    # ("a person claims what they can actually harvest"), and the harvest line then multiplies the share by η AGAIN,
+    # so a juvenile's take scales as η² and the unconverted (1 − η)·share leaves the cell pool. ON (and only when the
+    # η-weighted claim is on) ⇒ intake = share for forage and meat; the pool is conserved. Default OFF ⇒ bit-exact.
+    enable_eta_once: bool = False
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on
     # their own. See MODEL_SPEC §4.8.5 and outputs/.../run_3h_tether_retirement.py.)

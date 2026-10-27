@@ -61,6 +61,19 @@ type  = "float"
 # (channel note, inherited) M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios
 # (childhood / adulthood)
 
+[siler_lifespan_cap_months]
+value = 1200
+owner = "DemographyConfig"
+type  = "int"
+# 100 yr = the life table's last bin; Siler hazard ≈1/yr there [DESIGN] — (channel note, inherited)
+# LIFESPAN FROM SILER (R-106 Add.118; external audit F-05). The demographic death check kills every agent
+# at `max_age` = `lifespan_months` = 900 [PLACEHOLDER], so the life table's age-75 bin gets m = 12/yr,
+# l(76) = 0 and ~10% of births die at exactly 75 (measured, Add.116): `modal_adult_death` = 75 measured
+# the placeholder, and e0/e15/e45 were truncated. ON ⇒ the demographic death check uses
+# `siler_lifespan_cap_months` instead, so the Siler senescence term decides old-age death; `max_age` still
+# anchors the elder efficiency decline (and the code already clamps η for agents past it). Default OFF ⇒
+# the 900-month cap ⇒ bit-exact.
+
 [menarche_months]
 value = 180
 owner = "DemographyConfig"
@@ -433,6 +446,13 @@ type  = "float"
 # synergy reads a slow EMA of nutritional status (`_condition`) instead of the instantaneous (bang-bang)
 # reserve — so sustained undernutrition potentiates DISEASE mortality (Pelletier), routing the seasonal
 # squeeze through graded disease rather than the hard starvation floor (R-8/R-10 critical-path fix).
+# CONDITION ON ITS FULL SCALE (R-106 Add.118; external audit, Add.116). `_condition` samples the reserve
+# fill AFTER the month's burn, against the full reserve span, so even an agent eating 10× its need reads
+# at most (cap − burn − floor)/(cap − floor): measured `condition_mean` = 0.321 on all three worlds, and
+# the nutrition × disease synergy became a constant ×1.47 on everyone's hazard. MODEL_SPEC §4.3.3
+# specifies the multiplier as 1 at full reserve rising to μ near the floor. ON ⇒ the post-burn fill is
+# scaled by the MAXIMUM attainable post-burn fill (cap − this step's burn), so a fully fed agent reads 1.0
+# and a starving one 0. Default OFF ⇒ bit-exact.
 
 [provision_self_keep]
 value = 1.0
@@ -471,48 +491,37 @@ value = 0.1
 owner = "DemographyConfig"
 type  = "float"
 # accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED] — (channel note,
-# inherited) TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain
-# accidents as ≈10% of baseline a2 in average-risk terrain, scaling with risk (Hill, Hurtado & Walker
-# 2007: accidents ≈10% of HG deaths). `risk_mult` instead multiplies the WHOLE a2 by risk_cell / mean land
-# risk, and settled people live on land safer than the land mean, so it removed ~half of ALL
-# age-independent mortality (measured 0.44–0.62, Add.112; first filed in ae01ced, 2026-08-14, when a
-# density term of 2.4 hid it). ON ⇒ the risk factor is (1 − s) + s·risk_mult with s = risk_accident_share:
-# only the accident share scales with terrain; the cap still bounds risk_mult. Default OFF ⇒ the whole-a2
-# form ⇒ bit-exact. ALONE it lowers survival (it restores the missing mortality; montane l15 0.449 <
-# 0.45). ADOPTED TOGETHER with `enable_village_granary` (Add.113, supervisor 2026-09-26): all 12 of
-# #18–#21 pass at 1 SE. Canonically ON via C_ALLON; class default stays False.
+# inherited) ONE DENSITY BASIS FOR DISEASE (R-106 Add.118; external audit F-04). Under
+# `enable_village_density_disease` a SETTLED agent's density is its village's population over the
+# (2·settle_radius+1)² cell territory (a regional density, ~2,500 km²), but a MOBILE agent's is its own
+# cell's occupancy over 100 km² (a local density), and both are scored against the same reference
+# `dens_rho_ref`. Measured: a 100-person village → ×0.77, a 10-person mobile camp → ×1.03. ON ⇒ a mobile
+# agent's density is the people in the same-size window centred on its own cell, over the same area — one
+# definition for everyone. Default OFF ⇒ bit-exact.
 
 [dens_delta]
 value = 3.0
 owner = "DemographyConfig"
 type  = "float"
-# density-disease max excess [FREE — calibrated] — (channel note, inherited) TERRAIN RISK AS AN ACCIDENT
-# SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10% of baseline a2 in
-# average-risk terrain, scaling with risk (Hill, Hurtado & Walker 2007: accidents ≈10% of HG deaths).
-# `risk_mult` instead multiplies the WHOLE a2 by risk_cell / mean land risk, and settled people live on
-# land safer than the land mean, so it removed ~half of ALL age-independent mortality (measured 0.44–0.62,
-# Add.112; first filed in ae01ced, 2026-08-14, when a density term of 2.4 hid it). ON ⇒ the risk factor is
-# (1 − s) + s·risk_mult with s = risk_accident_share: only the accident share scales with terrain; the cap
-# still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact. ALONE it lowers survival (it
-# restores the missing mortality; montane l15 0.449 < 0.45). ADOPTED TOGETHER with
-# `enable_village_granary` (Add.113, supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE. Canonically
-# ON via C_ALLON; class default stays False.
+# density-disease max excess [FREE — calibrated] — (channel note, inherited) ONE DENSITY BASIS FOR DISEASE
+# (R-106 Add.118; external audit F-04). Under `enable_village_density_disease` a SETTLED agent's density
+# is its village's population over the (2·settle_radius+1)² cell territory (a regional density, ~2,500
+# km²), but a MOBILE agent's is its own cell's occupancy over 100 km² (a local density), and both are
+# scored against the same reference `dens_rho_ref`. Measured: a 100-person village → ×0.77, a 10-person
+# mobile camp → ×1.03. ON ⇒ a mobile agent's density is the people in the same-size window centred on its
+# own cell, over the same area — one definition for everyone. Default OFF ⇒ bit-exact.
 
 [dens_rho_half]
 value = 0.2
 owner = "DemographyConfig"
 type  = "float"
-# density-disease half-saturation, agents/km² [FREE] — (channel note, inherited) TERRAIN RISK AS AN
-# ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10% of baseline a2 in
-# average-risk terrain, scaling with risk (Hill, Hurtado & Walker 2007: accidents ≈10% of HG deaths).
-# `risk_mult` instead multiplies the WHOLE a2 by risk_cell / mean land risk, and settled people live on
-# land safer than the land mean, so it removed ~half of ALL age-independent mortality (measured 0.44–0.62,
-# Add.112; first filed in ae01ced, 2026-08-14, when a density term of 2.4 hid it). ON ⇒ the risk factor is
-# (1 − s) + s·risk_mult with s = risk_accident_share: only the accident share scales with terrain; the cap
-# still bounds risk_mult. Default OFF ⇒ the whole-a2 form ⇒ bit-exact. ALONE it lowers survival (it
-# restores the missing mortality; montane l15 0.449 < 0.45). ADOPTED TOGETHER with
-# `enable_village_granary` (Add.113, supervisor 2026-09-26): all 12 of #18–#21 pass at 1 SE. Canonically
-# ON via C_ALLON; class default stays False.
+# density-disease half-saturation, agents/km² [FREE] — (channel note, inherited) ONE DENSITY BASIS FOR
+# DISEASE (R-106 Add.118; external audit F-04). Under `enable_village_density_disease` a SETTLED agent's
+# density is its village's population over the (2·settle_radius+1)² cell territory (a regional density,
+# ~2,500 km²), but a MOBILE agent's is its own cell's occupancy over 100 km² (a local density), and both
+# are scored against the same reference `dens_rho_ref`. Measured: a 100-person village → ×0.77, a
+# 10-person mobile camp → ×1.03. ON ⇒ a mobile agent's density is the people in the same-size window
+# centred on its own cell, over the same area — one definition for everyone. Default OFF ⇒ bit-exact.
 
 [dens_rho_ref]
 value = 0.091

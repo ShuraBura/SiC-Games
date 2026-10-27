@@ -1605,6 +1605,8 @@ class TerrainWorld(mesa.Model):
         # excess hazard that holds e15 at 16 against a forager anchor of ~35.
         need_w = self._demog is not None and getattr(self._demog, "enable_need_weighted_shares", False)
         eta_w = self._demog is not None and getattr(self._demog, "enable_eta_weighted_shares", False)
+        # η ONCE (Add.118): with an η-weighted claim the share already reflects capacity; do not apply η again
+        eta_once = eta_w and getattr(self._demog, "enable_eta_once", False)
 
         def _claim(occ_c):
             """Per-occupant claim weight, or None for the historical even split."""
@@ -2148,8 +2150,9 @@ class TerrainWorld(mesa.Model):
                 in_owz = store_on and self._fields.temperature[cy, cx] <= store_temp_thr   # overwintering zone (Binford ET)
             cell_contrib = 0.0
             for a, sh, m in zip(occ, shares, msh):
-                intake = a.eta() * sh          # C.1 graded production (η=1 if lh_config off; binary gate → graded)
-                a._meat_intake = a.eta() * m   # B+ step 2: per-agent meat intake → the prowess (reputation) signal
+                _eta_k = 1.0 if eta_once else a.eta()   # η ONCE (Add.118): the claim already carried η
+                intake = _eta_k * sh           # C.1 graded production (η=1 if lh_config off; binary gate → graded)
+                a._meat_intake = _eta_k * m    # B+ step 2: per-agent meat intake → the prowess (reputation) signal
                 a._last_intake = intake        # DIAGNOSTIC ONLY (no behaviour): the reserve cap below discards
                 #   surplus, so post-harvest wealth cannot reveal how far intake EXCEEDED burn. Measured: ~99%
                 #   of agents re-saturate at the cap every step, i.e. intake ≥ burn, with the excess invisible.
@@ -2572,6 +2575,11 @@ class TerrainWorld(mesa.Model):
         i_menarche = demog.menarche_months if intake_signal_on else 0
         # §4.6.7 metabolic down-regulation: under a draining reserve, burn falls toward a floor (Keys 1950).
         downreg_on = demog is not None and getattr(demog, "enable_metabolic_downreg", False)
+        # LIFESPAN FROM SILER (Add.118): the demographic death check uses its own cap, not max_age (0 = max_age)
+        life_cap = (demog.siler_lifespan_cap_months
+                    if demog is not None and getattr(demog, "enable_lifespan_from_siler", False) else 0)
+        # CONDITION ON ITS FULL SCALE (Add.118): scale the post-burn fill by the maximum attainable post-burn fill
+        cond_full = demog is not None and getattr(demog, "enable_condition_full_scale", False)
         dr_max = demog.metabolic_downreg_max if downreg_on else 0.0
         dr_span = demog.metabolic_downreg_span if downreg_on else 1.0
         dep_load = {}
@@ -2622,6 +2630,8 @@ class TerrainWorld(mesa.Model):
                 # branch read it, and both want the post-harvest value.
                 _rs = a.reserve_scale()
                 _lo = a.reserve_floor * _rs; _span = self._reserve_full * _rs - _lo
+                if cond_full:
+                    _span = self._reserve_full * _rs - _burn_a - _lo   # the best post-burn fill this step
                 _frac = (a.wealth - _lo) / _span if _span > 0 else 1.0
                 _frac = 0.0 if _frac < 0.0 else (1.0 if _frac > 1.0 else _frac)
                 a._condition = (1.0 - c_alpha) * a._condition + c_alpha * _frac
@@ -2670,7 +2680,7 @@ class TerrainWorld(mesa.Model):
                         self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
                         if om > 1.0:
                             self.deaths_orphan_this_step += 1   # diag: died while carrying an elevated kin hazard
-                    elif a.age >= a.max_age:              # hard lifespan cap (Siler-tail backstop; was DEAD CODE
+                    elif a.age >= (life_cap or a.max_age):   # hard lifespan cap (Siler-tail backstop; was DEAD CODE
                         a.alive = False                   # under demog — the elif below is only reached when
                         self.deaths_senesc_this_step += 1  # demog is None, so ancient agents slipped through to 1111)
                         self.lt_deaths[_lt_i] += 1; self.lt_deaths_f[_lt_i] += (a.sex == "female"); self.lt_deaths_senesc[_lt_i] += 1
@@ -6049,6 +6059,11 @@ class TerrainWorld(mesa.Model):
                     _rad = cfg.settle_radius
                     _area = ((2 * _rad + 1) ** 2) * _CELL_KM2
                     rho = self._village_pop(_site, occ_count) / _area
+                elif getattr(cfg, "enable_density_common_window", False):
+                    # ONE DENSITY BASIS (Add.118): a mobile agent's density over the SAME window size, centred on its
+                    # own cell (the same per-step-cached window sum as a village's), over the same area
+                    _rad = cfg.settle_radius
+                    rho = self._village_pop(a.pos, occ_count) / (((2 * _rad + 1) ** 2) * _CELL_KM2)
                 else:
                     rho = occ_count.get(a.pos, 1) / _CELL_KM2
             else:
