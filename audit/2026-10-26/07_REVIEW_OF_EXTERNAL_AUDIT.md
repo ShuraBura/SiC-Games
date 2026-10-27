@@ -29,7 +29,7 @@ package's own tools were fixed (§4).
 | **F-03.4** `enable_energetic_fertility` shadowed by intake fertility | **CONFIRMED** | `if intake_fertility … elif energetic_fertility` (`:3095-3102`); the code says "SUPERSEDES". An ON flag with no effect. |
 | **F-03.5** `aggregation_site_sep` computed and discarded | **CONFIRMED** | cost only, no behaviour (`:5205-5214`). |
 | **F-03.6** `rank_hierarchy_frac` + `asc_n` dead | **CONFIRMED for the parameter** | `asc_n` and `rank_frac` (`:2294-2302`) are never used — left over from R-98. The FLAG is live: R-99 (commit `a881ba5`) replaced it with a graded weight (`:5460`). |
-| **F-03.7** village tier-2 yield negligible ⇒ `tier2_shock`, soil depletion, alluvial renewal, worked-land yield act on ~nothing | **CONFIRMED by measurement** | `settle_tier2_yield = 40` × Σ S_pot over 9 cells. Measured (test world, canon value): tier-2 term 258 kcal/step vs the site cell's 6.0 × 10⁶ kcal/step = **4.3 × 10⁻⁵**. **Important for the Malthus goal:** the yield SHOCK that drought should act through barely touches food. The report's attribution to "known issue #13" and a "400,000" comment is FALSE (no such issue or comment). |
+| **F-03.7** village tier-2 yield negligible ⇒ `tier2_shock`, soil depletion, alluvial renewal, worked-land yield act on ~nothing | **CONFIRMED by measurement** | `settle_tier2_yield = 40` × Σ S_pot over 9 cells. Measured (test world, canon value): tier-2 term 258 kcal/step vs the site cell's 6.0 × 10⁶ kcal/step = **4.3 × 10⁻⁵**. The yield SHOCK, soil depletion, alluvial renewal and worked-land yield therefore barely touch food. **[Corrected the same evening:** this does NOT block a drought test — what binds at a village is the catchment ceiling (Σ of the 9 cell yields; measured median 6.7× need, binding at every occupied site), and the climate regime channel / `ClimateDriver` scales every cell yield, so a climate drought reaches village food. The drought test was run that way: RESULTS Add.117.**]** The report's attribution to "known issue #13" and a "400,000" comment is FALSE (no such issue or comment). |
 | **F-04** village density disease uses a 25-cell regional density against the same reference as a 1-cell local density | **CONFIRMED (numbers corrected)** | With canon δ = 3, ρ½ = 0.2, ρref = 0.091: a 100-person village → multiplier 0.77; a 10-person mobile camp → 1.03. Two density definitions (regional vs local) are scored against one reference. |
 | **F-05** `modal_adult_death = 75` is the 900-month lifespan cap | **CONFIRMED exactly** | Period table, temperate s0: exposure(75) = deaths(75) = 20,222 ⇒ m(75) = 12/yr, l(76) = 0, d(75) = 0.099 vs the natural peak ~0.013. ~10% of births die at exactly 75; e0/e15/e45 are truncated. |
 | **F-05a.1** planar distances on a toroidal grid in several methods | **CONFIRMED (spot check)** | `_do_connubium` clips `max(0, fx − r)` (`:5152`), movement wraps. Impact probably small (central capacity patch); not measured. |
@@ -92,9 +92,10 @@ monitor rows). Recorded in RESULTS Addendum 116.
 
 ## 6. Proposed fixes, in order of consequence (supervisor's decision; each behaviour change needs the staged test)
 
-1. **The food-shock channel (F-03.7):** the yield shock, soil and renewal act on a term 10⁻⁵ of the food supply — the
-   drought test of the Malthus goal cannot work until this is resolved (rescale `settle_tier2_yield` with an anchor, or
-   apply the shock to the cell yield).
+1. **The food-shock channel (F-03.7):** the yield shock, soil and renewal act on a term 10⁻⁵ of the food supply
+   (rescale `settle_tier2_yield` with an anchor, apply them to the binding catchment ceiling, or retire them). **[Corrected:
+   this does not block the drought test — a climate drought reaches the binding ceiling; the supervisor chose to run that
+   test first (Add.117).]**
 2. **Mortality structure:** the lifespan cap (F-05), the constant synergy (§2), the regional-vs-local density
    reference (F-04), and the double η (F-01) — all four shape e0, l(15), m(5–15) and therefore the Add.113 adoption,
    which was calibrated with them in place.

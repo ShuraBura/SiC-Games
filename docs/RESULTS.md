@@ -10023,4 +10023,54 @@ false`; `_store_at`/`_granary` code; "infant hunters".
 
 ---
 
+## Addendum 117 — Drought test on the canon: the population CONTRACTS in proportion to the drought and RECOVERS — but only through FERTILITY; starvation and the death rate do not rise. Also: the tier-2 yield was never in kcal scale, and the drought test was never blocked (2026-10-27, R-106)
+
+**Why.** The arc's goal (supervisor): population expands and spreads while food lasts and CONTRACTS on external shocks
+such as drought. Add.116's review flagged the yield shock as inert; the supervisor chose to test a drought first, with no
+model change.
+
+**Diagnosis first (corrects Add.116).** `settle_tier2_yield` = 40 multiplies `S_pot` = `aquatic_food`/cultivability,
+a 0–1 density since it was created (2026-07-03), so the tier-2 term has ALWAYS been ≲ 360 kcal/step — R-53's "~7× a
+village's need" cannot have been right. At village sites (test world, step 150, 14 occupied sites) the food that binds
+is the CATCHMENT CEILING (Σ of the 9 catchment cells' yields; median 6.7× the village's need); the agglomeration premium
+(median 5.5× need) is capped by it at every site, and tier-2 is 10⁻⁴ of need. So the yield shock, soil depletion,
+alluvial renewal and worked-land yield are inert (the confirmed defect stands), but a CLIMATE drought reaches village
+food, because `ClimateField.level` multiplies every cell's yield by the regime factor. Add.116's "the drought test cannot
+work until this is resolved" was WRONG and is corrected in `audit/2026-10-26/07_REVIEW_OF_EXTERNAL_AUDIT.md`.
+
+**Design.** The canon run, unchanged, with `ClimateDriver.pulse` (existing code) on the climate field: every cell yield
+×0.85 (the top of the C.3 regime band) or ×0.70 (the band's flagged catastrophe tail) for 30 years (steps 9,000–9,360),
+then normal; 12,000 steps; 3 canonical worlds × the 3 demographic seeds of the stored canon runs (Add.113 `riskvg`),
+which are the paired controls. **Control: all 18 runs are identical to their paired canon run, row for row, before the
+onset.** Instruments: `scratchpad/bp_drought{,_run,_analyse}.py` → `bp_drought.png`, `drought_summary.json`.
+
+**Result** (population ÷ paired control; 3 seeds each):
+
+| world | yield ×0.85: minimum | ×0.70: minimum | back to ≥ 0.95 of control |
+|---|---|---|---|
+| temperate | 0.87–0.88 (at the drought's end) | 0.75–0.76 | 24–37 yr after the end (×0.85); 41–47 yr (×0.70) |
+| savanna | 0.86–0.93 | 0.75–0.85 | 1–47 yr (×0.85); 28–39 yr (×0.70), one ×0.70 seed not within the 220-yr window by the 10-row criterion |
+| montane | 0.82–0.89 (in one seed the trough comes ~110 yr AFTER the drought) | 0.80–0.82 (same, one seed ~95 yr after) | 45–189 yr (×0.85); 70–151 yr (×0.70); then an overshoot above the control |
+
+**How it contracts — through births only.** Per 1,000 people per year, drought vs control during the drought window:
+births 23.9 vs 29.3 (temperate ×0.85), 18.3 vs 29.3 (temperate ×0.70), 23.0 vs 32.7 (savanna ×0.70), 24.0 vs 30.8
+(montane ×0.70). Deaths per 1,000 per year did NOT rise (27.9–32.0 vs 28.9–33.5; slightly lower, partly because fewer
+infants are born), and starvation deaths per logged step did not rise either. After the drought births rebound above the
+control (31–35 vs 29–33), which is the recovery. Land use falls during the drought (temperate 0.230 → 0.210 at ×0.70)
+and recovers; the number of villages hardly changes.
+
+**Reading.** The canon has a working MALTHUSIAN PREVENTIVE CHECK under a shock: the intake-based fertility brake
+(`enable_intake_fertility`, Ellison energetics) converts a yield cut into a proportional birth deficit, and the
+population tracks food down and back up. It has NO positive check under this shock: a 30% yield cut for 30 years does not
+raise mortality. Consistent with the population sitting well below its food limit (Add.105; the spatial paradox), the
+drought takes SURPLUS, not subsistence. Whether that is realistic is open: famines in the record raise mortality
+(children and the old first). Not measured here: age-specific mortality inside the drought window (the trajectory's
+mortality rows are cumulative — Add.116 F-07), and deeper or longer droughts.
+
+**Next (supervisor).** The confirmed mortality-structure defects of Add.116 (the lifespan cap, the constant synergy, the
+regional-vs-local density reference, the double η) bear directly on the missing positive check, because they set
+non-starvation mortality.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
