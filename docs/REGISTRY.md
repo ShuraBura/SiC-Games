@@ -10,396 +10,400 @@ X exchange · C culture · A affiliation · N hazard · H homeostat · O observe
 
 ## 1. Mechanism flags — 125 flags, 98 ON in canon, 27 OFF
 
-OFF in canon = held for evaluation, rejected but kept as an instrument, or an alternative form; the flag's own
-comment (first words below = the field's OWN source comment; full text at the field in `demography.py`)
-says which. `run_campaign.py` `_skip` lists the ones `C_ALLON` must not switch on.
+OFF in canon = held for evaluation, rejected but kept as an instrument, or an alternative form; the reason for
+each OFF flag is in `run_campaign.py` `_skip` (and `audit/2026-10-26/03_IMPLEMENTATION_STATUS.md` §2).
 
-| flag | canon | class default | type | ladder tier | description (first words of the provenance comment) |
-|---|---|---|---|---|---|
-| `enable_adaptive_connubium` | **ON** | False | A | 8 Connubium | Cut 2 — ADAPTIVE connubium: replace the fixed aggregation_radius with a per-seeker expanding-ring search that grows until ≥ m* eligible non-kin mates are in reach (or … |
-| `enable_aggl_ceiling` | **ON** | False | P | 9 Settlement | R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 … |
-| `enable_agglomeration` | **ON** | False | P | 9 Settlement | ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea: INCREASING RETURNS TO CO-LOCATION. Each cell's intensive … |
-| `enable_aggregation_sedentism` | **ON** | False | A | 5 Bands | ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson): settlements as MULTI-BAND coalescence — "the gathering that stops dispersing". Q1 … |
-| `enable_agriculture` | **ON** | False | P | 9 Settlement | AGRICULTURE TIER Layer A (blueprint …_AgricultureTier): add `cultivability` (EFC-derived, resource-agnostic) as a SECOND S_pot source → S_pot = max(aquatic_food, … |
-| `enable_alluvial_renewal` | **ON** | False | P | 1 Physical world | ALLUVIAL RENEWAL — soil renewal is TERRAIN-dependent, not uniform. The annual FLOOD re-deposits nutrient silt, so FLOODPLAIN farmland is renewed WHILE FARMED (the Nile … |
-| `enable_ascribed_mate_choice` | **ON** | False | C | 8 Connubium | Ascribed-status mate-choice (blueprint …_AscribedMateChoice): let cred (ascribed lineage) earn a mating advantage, SOCIETY-GATED (Boehm) — ≈0 egalitarian, rising … |
-| `enable_band_affiliation` | **ON** | False | A | 5 Bands | ⚠ UNIT WARNING on the "~25, Hill 2011" below (Addendum 28; propagated here 2026-08-06, Addendum 29). Hill et al. 2011's verified number is **28.2 ADULTS** per band (32 … |
-| `enable_band_family_knobs` | **ON** | False | A | 5 Bands | F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew, descent, heritability, paternal investment) instead of the … |
-| `enable_band_provisioning` | off | False | X | 2 Energetics | BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09, docs/RESULTS). THE DEFECT it fixes: the e0 deficit is a chronic STARVING TAIL of low-efficiency juveniles (~13-16 … |
-| `enable_band_territory` | off | False | T | 9 Settlement | ── BAND TERRITORY (band-autonomy economy; R-106 preventive-check arc). THE FINDING (Addendum 71): forager fertility restraint cannot become selectable in the current … |
-| `enable_biome_meat_cv` | **ON** | False | P | 2 Energetics | *(no own comment; inherited group comment:)* ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ──────────────────────────────── Until this date both … |
-| `enable_biome_meat_frac` | **ON** | False | P | 2 Energetics | ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ──────────────────────────────── Until this date both quantities above were SCALARS, so a … |
-| `enable_biome_seasonality` | **ON** | ? | — | 1 Physical world | PER-BIOME SEASONALITY (R-106, 2026-09-07). The scalar `a_seas` above is applied UNIFORMLY to every cell, so an aseasonal rainforest (real amplitude ~0.05) gets the same … |
-| `enable_bonded_mating` | **ON** | False | A | 6 Family | Claim ∝ `eta(a)` — a person claims what they can actually harvest. The module contract in substrate.py states shares are PRE-efficiency and the caller applies η when … |
-| `enable_bud_hazard` | off | False | A | 9 Settlement | ── EMERGENT FISSION HAZARD (2026-07-27) ──────────────────────────────────────────────────────── Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. … |
-| `enable_bud_household_closure` | off | False | T | 9 Settlement | ── FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105, 2026-09-19) ───────────────────────────────── DIAGNOSED: a daughter village loses ~90% of its founders in ONE step … |
-| `enable_bud_requires_occupancy` | off | False | T | 9 Settlement | ── BUD-FOUNDING BYPASS REMOVED: settlement founding is occupancy-gated for EVERY path (2026-08-12) ──── `_found_settlements_by_occupancy` already requires … |
-| `enable_bud_site_separation` | off | False | T | 9 Settlement | ── BUD SITE SEPARATION: a daughter village's catchment must not overlap its parent's (2026-08-12) ───── THE ASYMMETRY. `_maintain_settlements` holds a site while >= … |
-| `enable_bud_viable_site` | **ON** | False | T | 9 Settlement | ── FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107, 2026-09-23) ────────────────────────────────── DIAGNOSED on the real campaign pipeline (per-death and bud-site probes, … |
-| `enable_capacity_scaled_grouping` | **ON** | False | — | — | CAPACITY-SCALED GROUPING (R-106, 2026-08-22): cap the group size that earns an E.1/E.2 benefit at what the cell can actually feed (S/BURN). Without it the grouping … |
-| `enable_caribou_swing` | off | ? | — | 1 Physical world | ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── [St. John 2022 — thesis FILED AND READ 2026-08-06; verified verbatim] … |
-| `enable_catchment_ceiling` | **ON** | False | P | 9 Settlement | CATCHMENT CARRYING-CAPACITY CEILING (R-63): a settled village's TOTAL food (base forage + resource tier-2 + agglomeration social-returns) is capped at what its catchment … |
-| `enable_catchment_depletion` | **ON** | False | D | 1 Physical world | CATCHMENT-FORAGING DEPLETION (R-106, 2026-09-02). Diagnosed: the depletable stock `deplete_and_regrow` keys on where agents STAND (`occ_count`), but a settled village … |
-| `enable_climate_lottery` | off | ? | — | 1 Physical world | ── MASTER ─────────────────────────────────────────────────────────────────────────────────────── Draw the per-world parameters from `draw_world_climate()` (the orbital … |
-| `enable_colonizing_budding` | **ON** | False | T | 9 Settlement | COLONIZING BUDDING (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md). Diagnosed: the population sits at 2% of the terrain's carrying capacity — trapped, not … |
-| `enable_condition` | **ON** | False | N | 2 Energetics | Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease synergy reads a slow EMA of nutritional status (`_condition`) … |
-| `enable_cred_renorm` | **ON** | False | GAUGE | 10 Surplus & material | CRED RENORMALISATION (R-81) — per-step rescale of cred to population-mean 1. FIXES a latent homeostat defect: the inheritance reverts toward a FIXED 1.0 anchor (a … |
-| `enable_cred_status` | **ON** | False | C | 10 Surplus & material | Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait, when ON (else φ — preserves the Sugarscape contest tests). … |
-| `enable_delegitimation` | **ON** | False | C | 12 Elite | ── DM-F1 stage 2 / R-87: DELEGITIMATION — the gumsa → gumlao collapse ─────────────────────────────── NOT optional polish. R-86 built the ascription RATCHET and it works … |
-| `enable_density_disease` | **ON** | False | N | 3 Demography | *(no own comment; inherited group comment:)* --- modulator flags (Step-2; neutral/off in Step-1 calibration) --- |
-| `enable_density_fertility` | **ON** | False | N | 3 Demography | pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs ~1.2x maintenance) DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05, docs/RESULTS). The … |
-| `enable_density_fill_matched_radius` | off | False | N | 3 Demography | DENSITY-FILL RADIUS MATCH (R-106 Addendum 106, 2026-09-21). The density-fertility fill is a food-need / food-capacity ratio: fill = people·burn / … |
-| `enable_density_reference` | **ON** | False | N | 3 Demography | ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ──────────────────────────────────────── THE DEFECT. `a2_mult` multiplies three modulators into Siler's … |
-| `enable_dependent_load` | **ON** | False | N | 3 Demography | DEPENDENT LOAD (requires enable_intake_fertility). A mother's energy budget is not her own maintenance — she must also cover what her juveniles cannot produce. Counting … |
-| `enable_dynamic_bands` | **ON** | False | A | 5 Bands | F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at band_split_size, a band fissions only above its … |
-| `enable_eccentricity_mean` | off | ? | — | 1 Physical world | ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no … |
-| `enable_economic_defensibility` | **ON** | False | A | 9 Settlement | ── ECONOMIC DEFENSIBILITY / OWNED-PATCH (blueprint …_EconomicDefensibility; Dyson-Hudson & Smith 1978): the BETWEEN-band driver of concentration. Movement is Ideal FREE … |
-| `enable_emergent_abandonment` | **ON** | False | T | 9 Settlement | EMERGENT ABANDONMENT — a settlement's HOLD on its people is not permanent; it erodes when the village's REMEMBERED FORTUNES have been bad for a long time. There is NO … |
-| `enable_emergent_band_size` | **ON** | False | A | 5 Bands | EMERGENT BAND SIZE v3 (blueprint …_EmergentBandSize; R-72). Band size = the argmax of {risk-pooling − competition}, per the blueprint's original spec. Two coupled … |
-| `enable_emergent_village_founding` | **ON** | False | T | 9 Settlement | ── EMERGENT VILLAGE FOUNDING: one rule for every village (supervisor spec 2026-08-12) ───────────────── "They travel until they find a suitable place for a village that … |
-| `enable_energetic_fertility` | **ON** | False | N | 2 Energetics | economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves drain to the starvation floor → realistic equilibrium reserve (red-team … |
-| `enable_energetic_refractory` | **ON** | False | N | 3 Demography | ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ── WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 … |
-| `enable_eta_weighted_shares` | **ON** | False | P | 2 Energetics | Claim ∝ `consumption_factor(a)` — a person claims in proportion to what they need. [ANCHORED — Kaplan 2000, already the citation on `BaseAgent.consumption_factor`: human … |
-| `enable_exclusive_village_membership` | off | False | T | 9 Settlement | ── EXCLUSIVE VILLAGE MEMBERSHIP: settlement spacing becomes EMERGENT (2026-08-12) ───────────────────── THE SAME DEFECT, TREATED AT ITS CAUSE INSTEAD OF ITS GEOMETRY. … |
-| `enable_exogamy` | **ON** | False | A | 7 Kin & lineage | ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo instead of the blind spatial aggregation_radius. A … |
-| `enable_fertility_restraint_gene` | off | False | N | 3 Demography | ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries … |
-| `enable_forage_cap` | **ON** | False | P | 2 Energetics | PER-PERSON FORAGE CAP (the solitude fix): a forager can only WORK so much land — intake is capped at the biome return-rate × work hours (forage_kcal[cell] · … |
-| `enable_founding_delay` | off | False | T | 4 Movement | FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were founded in the FIRST 200 steps — the founders bunch and settle at t=0 and … |
-| `enable_game` | **ON** | False | P | 2 Energetics | Game/meat economy (the Carbon substrate; MODEL_SPEC §4.5.5, blueprint v2). The cell yield is split into a forage stream (household, shared at κ=0) and a meat stream … |
-| `enable_genealogy_log` | off | False | O | 7 Kin & lineage | CALIBRATED ~750 (≈0.01·BURN): a ~10 km residential move costs a human ~50–75 kcal/km × 10 km ≈ 500–750 kcal (locomotion energetics). This is BOTH the physical scale AND … |
-| `enable_genome` | **ON** | False | H | 7 Kin & lineage | ── Neutral-marker GENOME (population genetics: relatedness, inbreeding, effective pop size Nₑ, drift). A DIAGNOSTIC substrate, NOT the marriage rule — forager exogamy is … |
-| `enable_heritable_density_response` | off | False | N | 3 Demography | ── HERITABLE DENSITY-RESPONSE (the reaction-norm selectability test; R-106). The density-fertility brake (`enable_density_fertility`) is currently a FIXED exponent … |
-| `enable_hunger_dispersal` | off | False | T | 4 Movement | ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor, LITERATURE.md — "the breakup into small family groups which comb the region"). The residence pin holds … |
-| `enable_improved_land` | **ON** | False | P | 9 Settlement | IMPROVED-LAND (agriculture): cultivable land becomes DEFENSIBLE/claimable where it is actively WORKED — inside an active settlement's catchment — NOT merely fertile. … |
-| `enable_intake_fertility` | **ON** | False | N | 2 Energetics | INTAKE-based energetic fertility (supersedes the reserve-based branch above when ON). Measured 2026-07-30: the reserve-based version is INERT by construction. Burn is … |
-| `enable_interannual` | off | ? | — | 1 Physical world | ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── PERIOD 2-7 yr [Timmermann 2018, SYNTHESIS]: the union of EOF1 … |
-| `enable_intercept_hunting` | **ON** | ? | — | 1 Physical world | ── C.5 INTERCEPT HUNTING — late-dry-season game boost at water ────────────────────────────────── [Hawkes 1991] Hadza water-blind intercept ~745 vs encounter ~518 … |
-| `enable_landscape_packing` | **ON** | False | T | 4 Movement | horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary sits ~0.35–0.40. PROVISIONAL: within-band Gini runs below whole-population … |
-| `enable_leader_coherence` | **ON** | False | A | 5 Bands | (RETIRED 2026-07-01, DE-7: `season_aggregation` coupled tolerable_size to seasonal abundance → lean-season fission. Mis-signed (moderate lean should not fission) + inert … |
-| `enable_leader_office` | **ON** | False | A | 12 Elite | ── R-84 CHALLENGE-SUCCESSION: leadership as a TENURED OFFICE, and the two ways it is LOST ─────────── DEFECT this fixes: `band_leaders()` recomputes argmax(cred·prowess) … |
-| `enable_leader_share` | **ON** | False | X | 12 Elite | ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ────────────────────────────────────────── R-82's first working cut had capture with NO opposition and ran to … |
-| `enable_leaky_assabiyah` | off | False | A | 5 Bands | ── THE COHESION BUDGET HAS NO HEADROOM (R-106 Addendum 22) — two flagged candidates ────────────── MEASURED: `cohesion_frac = clamp01(assabiyah + leader − repulsion − … |
-| `enable_legitimacy` | **ON** | False | C | 12 Elite | ── DM-F1 / R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ──────────────── WHY THIS EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our … |
-| `enable_leveling` | **ON** | False | X | 12 Elite | *(no own comment; inherited group comment:)* ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ────────────────────────────────────────── R-82's first working cut had … |
-| `enable_life_history` | **ON** | False | N | 3 Demography | Newborn→adult LIFE-HISTORY transition (Kaplan 2000 cooperative breeding): when ON, the model auto-uses a MONTH-scaled LifeHistoryConfig (forage_age_min=180=15yr, … |
-| `enable_lineage_branching` | **ON** | False | H | 7 Kin & lineage | ⚠ THE "~7 LINEAGES/BAND, DOMINANT SHARE 0.38" TARGET CITED BELOW DOES NOT EXIST (retracted 2026-08-04, RESULTS Addendum 28; propagated to the point of use 2026-08-06, … |
-| `enable_lineage_split` | **ON** | False | A | 7 Kin & lineage | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
-| `enable_lineage_tribute` | **ON** | False | X | 12 Elite | R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE and cannot make a hereditary estate (R-103e benchmark: … |
-| `enable_llanos_flood` | off | ? | — | 1 Physical world | ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ─────────── [Sarmiento 2004 / Castello 2015] 0.15-0.45; both a failed flood and an … |
-| `enable_local_ascription` | **ON** | False | C | 7 Kin & lineage | ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among … |
-| `enable_malnutrition_fission` | off | False | A | 3 Demography | Resource-response redesign (blueprint …_ResourceResponse_Scoping): M2 — MALNUTRITION FISSION: a band losing members to REALIZED starvation adds a DISPERSIVE term that … |
-| `enable_marriage_aggregation` | **ON** | False | A | 5 Bands | Seasonal MARRIAGE-AGGREGATION ("the gathering"; blueprint …_MarriageAggregation): dispersed bands converge on abundant sites in the abundance window; unpaired adults … |
-| `enable_material_capture` | **ON** | False | C | 10 Surplus & material | ── ELITE LAYER, STAGE A (R-82): MATERIAL as a third capital cell ─────────────────────────────── The status vector is [cred (ascribed), prowess (achieved), MATERIAL … |
-| `enable_material_inheritance` | **ON** | False | X | 10 Surplus & material | R-103d MATERIAL INHERITANCE — bequeath durable capital at death, the missing 'bequeathing' step (Flannery ch.10: big men "had no way of bequeathing renown to their … |
-| `enable_metabolic_downreg` | **ON** | False | N | 3 Demography | slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze METABOLIC DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 … |
-| `enable_morph` | **ON** | False | A | 11 Stratification | ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable surplus for ~1 generation morphs egalitarian_forager → … |
-| `enable_need_weighted_shares` | **ON** | False | P | 2 Energetics | ── THE CLAIM WEIGHT ON THE CELL SPLIT (R-106, 2026-08-15) ──────────────────────────────────────────── THE DEFECT. `compute_harvest_shares` gives every occupant S/n at … |
-| `enable_noble_leveling_exemption` | **ON** | False | X | 12 Elite | R-103e — LEGITIMACY EXEMPTS THE NOBLE FROM LEVELING. The load-bearing device (Flannery ch.16 "how to turn rank into stratification"; Friedman: a legitimated lineage's … |
-| `enable_nutrition_synergy` | **ON** | False | N | 2 Energetics | *(no own comment; inherited group comment:)* VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole … |
-| `enable_orphan_mortality` | **ON** | False | N | 3 Demography | ── KIN/ORPHAN CHILD MORTALITY (Hill & Hurtado 1996 Table 13.1; MODEL_SPEC §4.6.4; R-74) ────────── SUPERSEDES `enable_infanticide` (below). Losing a parent — not … |
-| `enable_pair_bonds` | **ON** | False | A | 6 Family | `enable_band_risk` / `band_risk_penalty` / `band_risk_size` WERE HERE AND ARE DELETED (2026-08-06). F.2 band risk-dilution: a sub-band group loses the safety-in-numbers … |
-| `enable_paternity` | **ON** | False | H | 6 Family | B+ step 4: PATERNITY. At each IBI conception a father is assigned by prowess-weighted mate-choice — P(father=j) ∝ (prowess_j+ε)^mate_choice_strength among living adult … |
-| `enable_productivity_mobility` | **ON** | False | T | 4 Movement | *(no own comment; inherited group comment:)* PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales inversely with STATIC … |
-| `enable_provisioning` | **ON** | False | X | 2 Energetics | Resource-Ecology Phase C.2b: mother-linked provisioning. A mother's harvest that overflows her reserve cap (otherwise wasted) is redirected to her dependent children … |
-| `enable_prowess_facet` | **ON** | False | C | 10 Surplus & material | Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS facet (achieved) joins the contest weight multiplicatively … |
-| `enable_rank_hierarchy` | **ON** | False | C | 11 Stratification | ── LINEAGE SEGMENTATION (R-92) — the CORRECTED SHAPE of the above. Per-birth branching mints SINGLETONS, and a lineage of one usually leaves no descendants, so it adds a … |
-| `enable_regime_shift` | off | ? | — | 1 Physical world | ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ─────────── [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; excursion … |
-| `enable_relational_stratification` | **ON** | False | C | 11 Stratification | R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform (0.29) and cannot separate a chiefdom from a rich-but-equal … |
-| `enable_relative_legitimacy` | **ON** | False | C | 12 Elite | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
-| `enable_relative_resentment` | **ON** | False | C | 12 Elite | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
-| `enable_resentment_accumulator` | **ON** | False | C | 12 Elite | *(no own comment; inherited group comment:)* ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages … |
-| `enable_resource_directed_fusion` | **ON** | False | A | 5 Bands | F — RESOURCE-DIRECTED FUSION: a band below band_merge_size joins the RICHEST nearby neighbour (highest `_band_surplus`) instead of the NEAREST — starving remnants merge … |
-| `enable_resource_storability` | **ON** | False | P | 1 Physical world | RESOURCE-DEPENDENT STORABILITY (Testart 1982: it's the STORABLE seasonal resources — grain, nuts, dried fish — that enable sedentism, NOT perishable fresh forage/meat). … |
-| `enable_restraint_group_transmission` | off | False | N | 3 Demography | *(no own comment; inherited group comment:)* ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of `enable_band_territory`. (1) INDIVIDUAL … |
-| `enable_risk_accident_share` | **ON** | False | N | 3 Demography | TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10% of baseline a2 in average-risk terrain, scaling with risk (Hill, … |
-| `enable_seasonality` | **ON** | ? | — | 1 Physical world | ── C.1 SEASONALITY (validated: R-6 run_2d form) ───────────────────────────────────────────────── |
-| `enable_sedentism_fertility` | **ON** | False | N | 3 Demography | SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity — mobile foragers space births ~44 mo (carrying cost + prolonged … |
-| `enable_settlement_scalar_stress` | **ON** | False | A | 9 Settlement | SETTLEMENT SCALAR STRESS (Johnson 1982, dissipated by hierarchy) — the missing cost that caps VILLAGE size. The residence pin otherwise pulls every nearby agent into a … |
-| `enable_site_appraisal` | **ON** | False | T | 4 Movement | Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain `cost` field ∈[0.15,1], slope/elev-driven, water=1). … |
-| `enable_size_repulsion` | **ON** | False | A | 5 Bands | Social-Evolution Stage 1b: SIZE-DRIVEN REPULSION (Johnson 1982 scalar stress) — a DISPERSIVE counterweight to cohesion, rising with band size N via a logistic (Alberti … |
-| `enable_society_regional_density` | **ON** | False | A | 3 Demography | SOCIETY CLASSIFIER ON REGIONAL DENSITY (R-106, 2026-08-24). The morph classifier asks "is this band packed past Binford's threshold?" -- and Binford's 0.091/km2 is a … |
-| `enable_soil_depletion` | **ON** | False | D | 1 Physical world | AGRICULTURE TIER Layer B1 — SOIL DEPLETION (the bust driver fisheries lack). A FARM settlement (cultivability > aquatic at its site) degrades a per-site SOIL stock … |
-| `enable_standing` | **ON** | False | C | 10 Surplus & material | ── SOCIAL CAPITAL / STANDING — the village anchor with a REAL payoff (P6). Wiessner 1977 (!Kung *hxaro*): exchange partnerships need **≥1 yr of reciprocal gifting** … |
-| `enable_sticky_pin_release` | off | False | T | 9 Settlement | STICKY PIN RELEASE (R-106 Add.111). The abandonment valve above is documented as CHRONIC (village relocation every ~5–30 yr), but it is applied as an independent coin … |
-| `enable_storable_founding` | **ON** | False | T | 9 Settlement | ── FOUNDING ON STORABLE SURPLUS, AND YIELD ON WORKED LAND (R-106, 2026-08-15) ────────────────────── ONE DEFECT, TWO SYMPTOMS. `_s_pot_field()` = max(aquatic_food, … |
-| `enable_storage` | **ON** | False | X | 2 Energetics | ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982, Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp … |
-| `enable_storage_seasonal_union` | **ON** | False | X | 2 Energetics | STORAGE UNION GATE (R-106, 2026-09-07). The two gates above are EXCLUSIVE: the temperature gate (default) excludes a hot-but-seasonal savanna (mean 19.5 °C > 15.25), … |
-| `enable_store_anchor` | **ON** | False | X | 2 Energetics | ── STORE ANCHOR (P1). The cell granary is a REAL payoff (allocate_store_draw already prevents starvation) and is CELL-BOUND — leaving abandons it — but the mover never … |
-| `enable_stratification_inequality_gate` | off | False | C | 11 Stratification | R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of … |
-| `enable_sub_k_regulation` | off | False | N | 3 Demography | ── EXOGENOUS SUB-K REGULATION (R-106, Addendum 74 candidate). WHY: the model reaches realistic forager DENSITY but via the WRONG vital rates — the population packs … |
-| `enable_synergy_age_grade` | **ON** | False | N | 3 Demography | AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), … |
-| `enable_terrain_move_cost` | **ON** | False | T | 1 Physical world | *(no own comment; inherited group comment:)* Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain `cost` field … |
-| `enable_terrain_pathogen` | off | False | N | 3 Demography | *(no own comment; inherited group comment:)* VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole … |
-| `enable_terrain_risk` | **ON** | False | N | 1 Physical world | --- modulator flags (Step-2; neutral/off in Step-1 calibration) --- |
-| `enable_tier2_shock` | **ON** | False | F | 2 Energetics | LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews — NW Coast stable millennia); the real dispersal driver is a … |
-| `enable_village_budding` | **ON** | False | A | 9 Settlement | VILLAGE BUDDING (Bandy 2004; Chagnon 1975) — the ethnographic settlement-SPREAD/recovery mode. A village (band_id) grown past a scalar-stress FISSION THRESHOLD sheds its … |
-| `enable_village_catchment_spread` | off | False | T | 9 Settlement | VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02). Diagnosed: the over-clustering is NOT the agglomeration economy (already ceiling-bound, R-105) — it is the residence pin … |
-| `enable_village_density_disease` | **ON** | False | N | 1 Physical world | VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole density arc kept hitting: the density-disease … |
-| `enable_village_granary` | **ON** | False | X | 2 Energetics | VILLAGE GRANARY (R-106 Add.111). MODEL_SPEC §4.5.11 S.1 specifies a COLLECTIVE BAND granary; it is stored per CELL because a band was assumed to live on one cell. A … |
-| `enable_village_identity` | **ON** | False | T | 9 Settlement | ── VILLAGE IDENTITY: co-residence dissolves band identity (2026-08-12) ──────────────────────────────── THE GAP THIS FILLS. Birdsell's nesting is already filed in … |
-| `enable_village_resentment` | **ON** | False | C | 12 Elite | [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the … |
-| `enable_village_scaling` | **ON** | False | A | 9 Settlement | Stage 1 (village-nucleation arc) — SUPRA-BAND SCALING: band_split_size is normally a HARD cap (cohesion_frac clamped to [0,1] ⇒ tolerable ≤ band_split_size). Johnson … |
-| `enable_wealth_obligation` | **ON** | False | C | 10 Surplus & material | default OFF ⇒ bit-exact |
-| `enable_worked_land_yield` | **ON** | False | T | 9 Settlement | THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no … |
+**The description column is a HEURISTIC** — the comment lines nearest the field. `demography.py` writes a
+field's explanation above it, below it, or as a paragraph shared with its neighbours, so a description here can
+belong to a NEIGHBOUR (found by the 2026-10-26 external audit, F-09.3). **Read the comment at the `defined at`
+line before relying on it.** The provenance-tag counts in §2 are heuristic for the same reason.
+
+| flag | canon | class default | type | ladder tier | defined at | nearby source comment (heuristic) |
+|---|---|---|---|---|---|---|
+| `enable_adaptive_connubium` | **ON** | False | A | 8 Connubium | `demography.py:1922` | Cut 2 — ADAPTIVE connubium: replace the fixed aggregation_radius with a per-seeker expanding-ring search that grows until ≥ m* eligible non-kin mates are in reach (or … |
+| `enable_aggl_ceiling` | **ON** | False | P | 9 Settlement | `demography.py:945` | R-105 BUGFIX TOGGLE — the AGGLOMERATION CEILING GAP. Point-mode agglomeration adds a SUPERLINEAR occupancy bonus (n**aggl_a - n) to ANY occupied cell, but the R-63 … |
+| `enable_agglomeration` | **ON** | False | P | 9 Settlement | `demography.py:1299` | ── AGGLOMERATION ECONOMICS (the "grand unification" rework; blueprint …_AgglomerationEconomics). ONE idea: INCREASING RETURNS TO CO-LOCATION. Each cell's intensive … |
+| `enable_aggregation_sedentism` | **ON** | False | A | 5 Bands | `demography.py:1026` | ── AGGREGATION-SEDENTISM (blueprint …_AggregationSedentism; Mauss/Binford/Johnson): settlements as MULTI-BAND coalescence — "the gathering that stops dispersing". Q1 … |
+| `enable_agriculture` | **ON** | False | P | 9 Settlement | `demography.py:1155` | AGRICULTURE TIER Layer A (blueprint …_AgricultureTier): add `cultivability` (EFC-derived, resource-agnostic) as a SECOND S_pot source → S_pot = max(aquatic_food, … |
+| `enable_alluvial_renewal` | **ON** | False | P | 1 Physical world | `demography.py:1173` | ALLUVIAL RENEWAL — soil renewal is TERRAIN-dependent, not uniform. The annual FLOOD re-deposits nutrient silt, so FLOODPLAIN farmland is renewed WHILE FARMED (the Nile … |
+| `enable_ascribed_mate_choice` | **ON** | False | C | 8 Connubium | `demography.py:1778` | Ascribed-status mate-choice (blueprint …_AscribedMateChoice): let cred (ascribed lineage) earn a mating advantage, SOCIETY-GATED (Boehm) — ≈0 egalitarian, rising … |
+| `enable_band_affiliation` | **ON** | False | A | 5 Bands | `demography.py:1452` | ⚠ UNIT WARNING on the "~25, Hill 2011" below (Addendum 28; propagated here 2026-08-06, Addendum 29). Hill et al. 2011's verified number is **28.2 ADULTS** per band (32 … |
+| `enable_band_family_knobs` | **ON** | False | A | 5 Bands | `demography.py:1980` | F.3c-2b FAMILY-KNOB localization: reproduction reads the mother's BAND-society family knobs (mate-choice skew, descent, heritability, paternal investment) instead of the … |
+| `enable_band_provisioning` | off | False | X | 2 Energetics | `demography.py:700` | BAND (ALLOPARENTAL) PROVISIONING (R-106, 2026-09-09, docs/RESULTS). THE DEFECT it fixes: the e0 deficit is a chronic STARVING TAIL of low-efficiency juveniles (~13-16 … |
+| `enable_band_territory` | off | False | T | 9 Settlement | `demography.py:1230` | ── BAND TERRITORY (band-autonomy economy; R-106 preventive-check arc). THE FINDING (Addendum 71): forager fertility restraint cannot become selectable in the current … |
+| `enable_biome_meat_cv` | **ON** | False | P | 2 Energetics | `demography.py:798` | *(no own comment; inherited group comment:)* ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ──────────────────────────────── Until this date both … |
+| `enable_biome_meat_frac` | **ON** | False | P | 2 Energetics | `demography.py:797` | ── PER-BIOME two-stream economy (wired 2026-08-08; RESULTS Addendum 37) ──────────────────────────────── Until this date both quantities above were SCALARS, so a … |
+| `enable_biome_seasonality` | **ON** | False | — | 1 Physical world | `climate.py:361` | PER-BIOME SEASONALITY (R-106, 2026-09-07). The scalar `a_seas` above is applied UNIFORMLY to every cell, so an aseasonal rainforest (real amplitude ~0.05) gets the same … |
+| `enable_bonded_mating` | **ON** | False | A | 6 Family | `demography.py:1359` | WHEN BOTH ARE ON the weights MULTIPLY (claim what you can take, scaled to what you need). That is a THIRD condition with its own size, so it is reported as its own arm … |
+| `enable_bud_hazard` | off | False | A | 9 Settlement | `demography.py:1672` | ── EMERGENT FISSION HAZARD (2026-07-27) ──────────────────────────────────────────────────────── Fission is no longer a size THRESHOLD but a per-village-per-step HAZARD. … |
+| `enable_bud_household_closure` | off | False | T | 9 Settlement | `demography.py:1644` | ── FAMILY-CLOSED EMIGRANT BLOC (R-106 Addendum 105, 2026-09-19) ───────────────────────────────── DIAGNOSED: a daughter village loses ~90% of its founders in ONE step … |
+| `enable_bud_requires_occupancy` | off | False | T | 9 Settlement | `demography.py:873` | ── BUD-FOUNDING BYPASS REMOVED: settlement founding is occupancy-gated for EVERY path (2026-08-12) ──── `_found_settlements_by_occupancy` already requires … |
+| `enable_bud_site_separation` | off | False | T | 9 Settlement | `demography.py:833` | ── BUD SITE SEPARATION: a daughter village's catchment must not overlap its parent's (2026-08-12) ───── THE ASYMMETRY. `_maintain_settlements` holds a site while >= … |
+| `enable_bud_viable_site` | **ON** | False | T | 9 Settlement | `demography.py:1663` | ── FOOD-VIABLE DAUGHTER SITE (R-106 Addendum 107, 2026-09-23) ────────────────────────────────── DIAGNOSED on the real campaign pipeline (per-death and bud-site probes, … |
+| `enable_capacity_scaled_grouping` | **ON** | False | — | — | `config.py:153` | CAPACITY-SCALED GROUPING (R-106, 2026-08-22): cap the group size that earns an E.1/E.2 benefit at what the cell can actually feed (S/BURN). Without it the grouping … |
+| `enable_caribou_swing` | off | False | — | 1 Physical world | `climate.py:396` | ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── [St. John 2022 — thesis FILED AND READ 2026-08-06; verified verbatim] … |
+| `enable_catchment_ceiling` | **ON** | False | P | 9 Settlement | `demography.py:1105` | CATCHMENT CARRYING-CAPACITY CEILING (R-63): a settled village's TOTAL food (base forage + resource tier-2 + agglomeration social-returns) is capped at what its catchment … |
+| `enable_catchment_depletion` | **ON** | False | D | 1 Physical world | `demography.py:1117` | CATCHMENT-FORAGING DEPLETION (R-106, 2026-09-02). Diagnosed: the depletable stock `deplete_and_regrow` keys on where agents STAND (`occ_count`), but a settled village … |
+| `enable_climate_lottery` | off | False | — | 1 Physical world | `climate.py:343` | ── MASTER ─────────────────────────────────────────────────────────────────────────────────────── Draw the per-world parameters from `draw_world_climate()` (the orbital … |
+| `enable_colonizing_budding` | **ON** | False | T | 9 Settlement | `demography.py:1620` | COLONIZING BUDDING (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md). Diagnosed: the population sits at 2% of the terrain's carrying capacity — trapped, not … |
+| `enable_condition` | **ON** | False | N | 2 Energetics | `demography.py:684` | Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease synergy reads a slow EMA of nutritional status (`_condition`) … |
+| `enable_cred_renorm` | **ON** | False | GAUGE | 10 Surplus & material | `demography.py:2009` | CRED RENORMALISATION (R-81) — per-step rescale of cred to population-mean 1. FIXES a latent homeostat defect: the inheritance reverts toward a FIXED 1.0 anchor (a … |
+| `enable_cred_status` | **ON** | False | C | 10 Surplus & material | `demography.py:1994` | Carbon-on-substrate (Tier-1): meat/contest weight reads accumulated `cred` (status), not the `φ` trait, when ON (else φ — preserves the Sugarscape contest tests). … |
+| `enable_delegitimation` | **ON** | False | C | 12 Elite | `demography.py:2233` | ── DM-F1 stage 2 / R-87: DELEGITIMATION — the gumsa → gumlao collapse ─────────────────────────────── NOT optional polish. R-86 built the ascription RATCHET and it works … |
+| `enable_density_disease` | **ON** | False | N | 3 Demography | `demography.py:450` | *(no own comment; inherited group comment:)* --- modulator flags (Step-2; neutral/off in Step-1 calibration) --- |
+| `enable_density_fertility` | **ON** | False | N | 3 Demography | `demography.py:628` | DENSITY-DEPENDENT FERTILITY (R-106, 2026-09-05, docs/RESULTS). The intake-fertility brake reads the intake EMA, which RE-SATURATES (median 2.3x requirement even in a … |
+| `enable_density_fill_matched_radius` | off | False | N | 3 Demography | `demography.py:641` | DENSITY-FILL RADIUS MATCH (R-106 Addendum 106, 2026-09-21). The density-fertility fill is a food-need / food-capacity ratio: fill = people·burn / … |
+| `enable_density_reference` | **ON** | False | N | 3 Demography | `demography.py:742` | ── DENSITY-DISEASE REFERENCE NORMALISATION (R-106, 2026-08-13) ──────────────────────────────────────── THE DEFECT. `a2_mult` multiplies three modulators into Siler's … |
+| `enable_dependent_load` | **ON** | False | N | 3 Demography | `demography.py:565` | DEPENDENT LOAD (requires enable_intake_fertility). A mother's energy budget is not her own maintenance — she must also cover what her juveniles cannot produce. Counting … |
+| `enable_dynamic_bands` | **ON** | False | A | 5 Bands | `demography.py:1491` | F.3c-3 DYNAMIC fission/fusion + the ASSABIYAH seam (Ibn Khaldun group solidarity). Instead of a hard split at band_split_size, a band fissions only above its … |
+| `enable_eccentricity_mean` | off | False | — | 1 Physical world | `climate.py:365` | ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A scalar (>= 1) on the annual mean from orbital eccentricity. 1.0 = no … |
+| `enable_economic_defensibility` | **ON** | False | A | 9 Settlement | `demography.py:1005` | ── ECONOMIC DEFENSIBILITY / OWNED-PATCH (blueprint …_EconomicDefensibility; Dyson-Hudson & Smith 1978): the BETWEEN-band driver of concentration. Movement is Ideal FREE … |
+| `enable_emergent_abandonment` | **ON** | False | T | 9 Settlement | `demography.py:1188` | EMERGENT ABANDONMENT — a settlement's HOLD on its people is not permanent; it erodes when the village's REMEMBERED FORTUNES have been bad for a long time. There is NO … |
+| `enable_emergent_band_size` | **ON** | False | A | 5 Bands | `demography.py:1474` | EMERGENT BAND SIZE v3 (blueprint …_EmergentBandSize; R-72). Band size = the argmax of {risk-pooling − competition}, per the blueprint's original spec. Two coupled … |
+| `enable_emergent_village_founding` | **ON** | False | T | 9 Settlement | `demography.py:857` | ── EMERGENT VILLAGE FOUNDING: one rule for every village (supervisor spec 2026-08-12) ───────────────── "They travel until they find a suitable place for a village that … |
+| `enable_energetic_fertility` | **ON** | False | N | 2 Energetics | `demography.py:520` | economy-fix (Tier-0): births scale with maternal reserve, capping the population BEFORE reserves drain to the starvation floor → realistic equilibrium reserve (red-team … |
+| `enable_energetic_refractory` | **ON** | False | N | 3 Demography | `demography.py:609` | ── ENERGETIC REFRACTORY: energy modulates the LENGTH of lactational amenorrhea (R-106, 2026-08-14) ── WHY THIS AND NOT THE FECUNDABILITY BRAKE. RESULTS Addendum 42 … |
+| `enable_eta_weighted_shares` | **ON** | False | P | 2 Energetics | `demography.py:1336` | Claim ∝ `eta(a)` — a person claims what they can actually harvest. The module contract in substrate.py states shares are PRE-efficiency and the caller applies η when … |
+| `enable_exclusive_village_membership` | off | False | T | 9 Settlement | `demography.py:845` | ── EXCLUSIVE VILLAGE MEMBERSHIP: settlement spacing becomes EMERGENT (2026-08-12) ───────────────────── THE SAME DEFECT, TREATED AT ITS CAUSE INSTEAD OF ITS GEOMETRY. … |
+| `enable_exogamy` | **ON** | False | A | 7 Kin & lineage | `demography.py:1915` | ── CONNUBIUM: real individual-level EXOGAMY so the ~500 mating network (Wobst 1974) EMERGES from the kin-taboo instead of the blind spatial aggregation_radius. A … |
+| `enable_fertility_restraint_gene` | off | False | N | 3 Demography | `demography.py:1241` | ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of `enable_band_territory`. (1) INDIVIDUAL heritable gene: each woman carries … |
+| `enable_forage_cap` | **ON** | False | P | 2 Energetics | `demography.py:1313` | PER-PERSON FORAGE CAP (the solitude fix): a forager can only WORK so much land — intake is capped at the biome return-rate × work hours (forage_kcal[cell] · … |
+| `enable_founding_delay` | off | False | T | 4 Movement | `demography.py:1036` | FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were founded in the FIRST 200 steps — the founders bunch and settle at t=0 and … |
+| `enable_game` | **ON** | False | P | 2 Energetics | `demography.py:765` | Game/meat economy (the Carbon substrate; MODEL_SPEC §4.5.5, blueprint v2). The cell yield is split into a forage stream (household, shared at κ=0) and a meat stream … |
+| `enable_genealogy_log` | off | False | O | 7 Kin & lineage | `demography.py:1773` | CALIBRATED ~750 (≈0.01·BURN): a ~10 km residential move costs a human ~50–75 kcal/km × 10 km ≈ 500–750 kcal (locomotion energetics). This is BOTH the physical scale AND … |
+| `enable_genome` | **ON** | False | H | 7 Kin & lineage | `demography.py:1796` | ── Neutral-marker GENOME (population genetics: relatedness, inbreeding, effective pop size Nₑ, drift). A DIAGNOSTIC substrate, NOT the marriage rule — forager exogamy is … |
+| `enable_heritable_density_response` | off | False | N | 3 Demography | `demography.py:1256` | ── HERITABLE DENSITY-RESPONSE (the reaction-norm selectability test; R-106). The density-fertility brake (`enable_density_fertility`) is currently a FIXED exponent … |
+| `enable_hunger_dispersal` | off | False | T | 4 Movement | `demography.py:1215` | ACUTE FAMINE DISPERSAL (R-106, 2026-09-01; Colson 1979 M2 anchor, LITERATURE.md — "the breakup into small family groups which comb the region"). The residence pin holds … |
+| `enable_improved_land` | **ON** | False | P | 9 Settlement | `demography.py:1016` | IMPROVED-LAND (agriculture): cultivable land becomes DEFENSIBLE/claimable where it is actively WORKED — inside an active settlement's catchment — NOT merely fertile. … |
+| `enable_intake_fertility` | **ON** | False | N | 2 Energetics | `demography.py:530` | INTAKE-based energetic fertility (supersedes the reserve-based branch above when ON). Measured 2026-07-30: the reserve-based version is INERT by construction. Burn is … |
+| `enable_interannual` | off | False | — | 1 Physical world | `climate.py:376` | ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── PERIOD 2-7 yr [Timmermann 2018, SYNTHESIS]: the union of EOF1 … |
+| `enable_intercept_hunting` | **ON** | True | — | 1 Physical world | `climate.py:412` | ── C.5 INTERCEPT HUNTING — late-dry-season game boost at water ────────────────────────────────── [Hawkes 1991] Hadza water-blind intercept ~745 vs encounter ~518 … |
+| `enable_landscape_packing` | **ON** | False | T | 4 Movement | `demography.py:985` | PACKING MEASURE (R-61 fix): the morph "packed" test vs Binford 0.091/km². Default = a band's members / its footprint area (a band's density over its own range ~0.017 = a … |
+| `enable_leader_coherence` | **ON** | False | A | 5 Bands | `demography.py:1529` | (RETIRED 2026-07-01, DE-7: `season_aggregation` coupled tolerable_size to seasonal abundance → lean-season fission. Mis-signed (moderate lean should not fission) + inert … |
+| `enable_leader_office` | **ON** | False | A | 12 Elite | `demography.py:2165` | ── R-84 CHALLENGE-SUCCESSION: leadership as a TENURED OFFICE, and the two ways it is LOST ─────────── DEFECT this fixes: `band_leaders()` recomputes argmax(cred·prowess) … |
+| `enable_leader_share` | **ON** | False | X | 12 Elite | `demography.py:2124` | ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ────────────────────────────────────────── R-82's first working cut had capture with NO opposition and ran to … |
+| `enable_leaky_assabiyah` | off | False | A | 5 Bands | `demography.py:1513` | ── THE COHESION BUDGET HAS NO HEADROOM (R-106 Addendum 22) — two flagged candidates ────────────── MEASURED: `cohesion_frac = clamp01(assabiyah + leader − repulsion − … |
+| `enable_legitimacy` | **ON** | False | C | 12 Elite | `demography.py:2202` | ── DM-F1 / R-86: THE LEGITIMACY CHANNEL — how ACHIEVED success becomes ASCRIBED rank ──────────────── WHY THIS EXISTS. Flannery & Marcus 2012 ch.10 is blunt that our … |
+| `enable_leveling` | **ON** | False | X | 12 Elite | `demography.py:2126` | *(no own comment; inherited group comment:)* ── LEVELING — the counter-force [Boehm 1993 VERIFIED] ────────────────────────────────────────── R-82's first working cut had … |
+| `enable_life_history` | **ON** | False | N | 3 Demography | `demography.py:679` | Newborn→adult LIFE-HISTORY transition (Kaplan 2000 cooperative breeding): when ON, the model auto-uses a MONTH-scaled LifeHistoryConfig (forage_age_min=180=15yr, … |
+| `enable_lineage_branching` | **ON** | False | H | 7 Kin & lineage | `demography.py:1817` | ⚠ THE "~7 LINEAGES/BAND, DOMINANT SHARE 0.38" TARGET CITED BELOW DOES NOT EXIST (retracted 2026-08-04, RESULTS Addendum 28; propagated to the point of use 2026-08-06, … |
+| `enable_lineage_split` | **ON** | False | A | 7 Kin & lineage | `demography.py:1908` | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
+| `enable_lineage_tribute` | **ON** | False | X | 12 Elite | `demography.py:2076` | R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE and cannot make a hereditary estate (R-103e benchmark: … |
+| `enable_llanos_flood` | off | False | — | 1 Physical world | `climate.py:405` | ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ─────────── [Sarmiento 2004 / Castello 2015] 0.15-0.45; both a failed flood and an … |
+| `enable_local_ascription` | **ON** | False | C | 7 Kin & lineage | `demography.py:1898` | ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages per band, so one ranked lineage among … |
+| `enable_malnutrition_fission` | off | False | A | 3 Demography | `demography.py:1570` | Resource-response redesign (blueprint …_ResourceResponse_Scoping): M2 — MALNUTRITION FISSION: a band losing members to REALIZED starvation adds a DISPERSIVE term that … |
+| `enable_marriage_aggregation` | **ON** | False | A | 5 Bands | `demography.py:1786` | Seasonal MARRIAGE-AGGREGATION ("the gathering"; blueprint …_MarriageAggregation): dispersed bands converge on abundant sites in the abundance window; unpaired adults … |
+| `enable_material_capture` | **ON** | False | C | 10 Surplus & material | `demography.py:2028` | ── ELITE LAYER, STAGE A (R-82): MATERIAL as a third capital cell ─────────────────────────────── The status vector is [cred (ascribed), prowess (achieved), MATERIAL … |
+| `enable_material_inheritance` | **ON** | False | X | 10 Surplus & material | `demography.py:2047` | R-103d MATERIAL INHERITANCE — bequeath durable capital at death, the missing 'bequeathing' step (Flannery ch.10: big men "had no way of bequeathing renown to their … |
+| `enable_metabolic_downreg` | **ON** | False | N | 3 Demography | `demography.py:546` | METABOLIC DOWN-REGULATION under deficit (R-106, 2026-08-28; Keys 1950 Minnesota Starvation, LITERATURE.md; full doc MODEL_SPEC §4.6.7). The reserve is spent at a FLAT … |
+| `enable_morph` | **ON** | False | A | 11 Stratification | `demography.py:993` | ── S.4 society morph (PER-CELL): a cell that stays packed (≥ Binford packing) with a defendable storable surplus for ~1 generation morphs egalitarian_forager → … |
+| `enable_need_weighted_shares` | **ON** | False | P | 2 Energetics | `demography.py:1329` | ── THE CLAIM WEIGHT ON THE CELL SPLIT (R-106, 2026-08-15) ──────────────────────────────────────────── THE DEFECT. `compute_harvest_shares` gives every occupant S/n at … |
+| `enable_noble_leveling_exemption` | **ON** | False | X | 12 Elite | `demography.py:2065` | R-103e — LEGITIMACY EXEMPTS THE NOBLE FROM LEVELING. The load-bearing device (Flannery ch.16 "how to turn rank into stratification"; Friedman: a legitimated lineage's … |
+| `enable_nutrition_synergy` | **ON** | False | N | 2 Energetics | `demography.py:466` | *(no own comment; inherited group comment:)* VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole … |
+| `enable_orphan_mortality` | **ON** | False | N | 3 Demography | `demography.py:481` | ── KIN/ORPHAN CHILD MORTALITY (Hill & Hurtado 1996 Table 13.1; MODEL_SPEC §4.6.4; R-74) ────────── SUPERSEDES `enable_infanticide` (below). Losing a parent — not … |
+| `enable_pair_bonds` | **ON** | False | A | 6 Family | `demography.py:1389` | `enable_band_risk` / `band_risk_penalty` / `band_risk_size` WERE HERE AND ARE DELETED (2026-08-06). F.2 band risk-dilution: a sub-band group loses the safety-in-numbers … |
+| `enable_paternity` | **ON** | False | H | 6 Family | `demography.py:2265` | B+ step 4: PATERNITY. At each IBI conception a father is assigned by prowess-weighted mate-choice — P(father=j) ∝ (prowess_j+ε)^mate_choice_strength among living adult … |
+| `enable_productivity_mobility` | **ON** | False | T | 4 Movement | `demography.py:1940` | *(no own comment; inherited group comment:)* PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales inversely with STATIC … |
+| `enable_provisioning` | **ON** | False | X | 2 Energetics | `demography.py:673` | Resource-Ecology Phase C.2b: mother-linked provisioning. A mother's harvest that overflows her reserve cap (otherwise wasted) is redirected to her dependent children … |
+| `enable_prowess_facet` | **ON** | False | C | 10 Surplus & material | `demography.py:2246` | Cred-vector (B+ stage). `cred` is the LINEAGE facet (ascribed). When `enable_prowess_facet`, the PROWESS facet (achieved) joins the contest weight multiplicatively … |
+| `enable_rank_hierarchy` | **ON** | False | C | 11 Stratification | `demography.py:1890` | ── LINEAGE SEGMENTATION (R-92) — the CORRECTED SHAPE of the above. Per-birth branching mints SINGLETONS, and a lineage of one usually leaves no descendants, so it adds a … |
+| `enable_regime_shift` | off | False | — | 1 Physical world | `climate.py:385` | ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ─────────── [Wanner 2008] LIA global mean ~0.5 C => central +-10-15% CC; excursion … |
+| `enable_relational_stratification` | **ON** | False | C | 11 Stratification | `demography.py:974` | R-103 RELATIONAL STRATIFICATION (R-106, 2026-09-05, docs/RESULTS). The within-band gate above reads ~uniform (0.29) and cannot separate a chiefdom from a rich-but-equal … |
+| `enable_relative_legitimacy` | **ON** | False | C | 12 Elite | `demography.py:1906` | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
+| `enable_relative_resentment` | **ON** | False | C | 12 Elite | `demography.py:1904` | *(no own comment; inherited group comment:)* [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. … |
+| `enable_resentment_accumulator` | **ON** | False | C | 12 Elite | `demography.py:1899` | *(no own comment; inherited group comment:)* ⚠ [UNANCHORED — the derivation below is void. Addendum 28/29.] It read: "0.15 is ~1/7: the FILED Hill 2011 target is ~7 lineages … |
+| `enable_resource_directed_fusion` | **ON** | False | A | 5 Bands | `demography.py:1578` | F — RESOURCE-DIRECTED FUSION: a band below band_merge_size joins the RICHEST nearby neighbour (highest `_band_surplus`) instead of the NEAREST — starving remnants merge … |
+| `enable_resource_storability` | **ON** | False | P | 1 Physical world | `demography.py:889` | RESOURCE-DEPENDENT STORABILITY (Testart 1982: it's the STORABLE seasonal resources — grain, nuts, dried fish — that enable sedentism, NOT perishable fresh forage/meat). … |
+| `enable_restraint_group_transmission` | off | False | N | 3 Demography | `demography.py:1244` | *(no own comment; inherited group comment:)* ── FERTILITY RESTRAINT (the preventive check; R-106). Two channels, tested on top of `enable_band_territory`. (1) INDIVIDUAL … |
+| `enable_risk_accident_share` | **ON** | False | N | 3 Demography | `demography.py:714` | TERRAIN RISK AS AN ACCIDENT SHARE (R-106 Add.113). MODEL_SPEC §4.3.3 specifies terrain accidents as ≈10% of baseline a2 in average-risk terrain, scaling with risk (Hill, … |
+| `enable_seasonality` | **ON** | True | — | 1 Physical world | `climate.py:350` | ── C.1 SEASONALITY (validated: R-6 run_2d form) ───────────────────────────────────────────────── |
+| `enable_sedentism_fertility` | **ON** | False | N | 3 Demography | `demography.py:648` | SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity — mobile foragers space births ~44 mo (carrying cost + prolonged … |
+| `enable_settlement_scalar_stress` | **ON** | False | A | 9 Settlement | `demography.py:1137` | SETTLEMENT SCALAR STRESS (Johnson 1982, dissipated by hierarchy) — the missing cost that caps VILLAGE size. The residence pin otherwise pulls every nearby agent into a … |
+| `enable_site_appraisal` | **ON** | False | T | 4 Movement | `demography.py:1759` | Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain `cost` field ∈[0.15,1], slope/elev-driven, water=1). … |
+| `enable_size_repulsion` | **ON** | False | A | 5 Bands | `demography.py:1556` | Social-Evolution Stage 1b: SIZE-DRIVEN REPULSION (Johnson 1982 scalar stress) — a DISPERSIVE counterweight to cohesion, rising with band size N via a logistic (Alberti … |
+| `enable_society_regional_density` | **ON** | False | A | 3 Demography | `demography.py:958` | SOCIETY CLASSIFIER ON REGIONAL DENSITY (R-106, 2026-08-24). The morph classifier asks "is this band packed past Binford's threshold?" -- and Binford's 0.091/km2 is a … |
+| `enable_soil_depletion` | **ON** | False | D | 1 Physical world | `demography.py:1161` | AGRICULTURE TIER Layer B1 — SOIL DEPLETION (the bust driver fisheries lack). A FARM settlement (cultivability > aquatic at its site) degrades a per-site SOIL stock … |
+| `enable_standing` | **ON** | False | C | 10 Surplus & material | `demography.py:656` | ── SOCIAL CAPITAL / STANDING — the village anchor with a REAL payoff (P6). Wiessner 1977 (!Kung *hxaro*): exchange partnerships need **≥1 yr of reciprocal gifting** … |
+| `enable_sticky_pin_release` | off | False | T | 9 Settlement | `demography.py:1203` | STICKY PIN RELEASE (R-106 Add.111). The abandonment valve above is documented as CHRONIC (village relocation every ~5–30 yr), but it is applied as an independent coin … |
+| `enable_storable_founding` | **ON** | False | T | 9 Settlement | `demography.py:1068` | ── FOUNDING ON STORABLE SURPLUS, AND YIELD ON WORKED LAND (R-106, 2026-08-15) ────────────────────── ONE DEFECT, TWO SYMPTOMS. `_s_pot_field()` = max(aquatic_food, … |
+| `enable_storage` | **ON** | False | X | 2 Energetics | `demography.py:882` | ── Storage (delayed-return economy; the sedentism/inequality precursor — Testart 1982, Woodburn 1982, Binford 2001). FLAGGABLE. In the OVERWINTERING zone (cell mean temp … |
+| `enable_storage_seasonal_union` | **ON** | False | X | 2 Energetics | `demography.py:928` | STORAGE UNION GATE (R-106, 2026-09-07). The two gates above are EXCLUSIVE: the temperature gate (default) excludes a hot-but-seasonal savanna (mean 19.5 °C > 15.25), … |
+| `enable_store_anchor` | **ON** | False | X | 2 Energetics | `demography.py:666` | ── STORE ANCHOR (P1). The cell granary is a REAL payoff (allocate_store_draw already prevents starvation) and is CELL-BOUND — leaving abandons it — but the mover never … |
+| `enable_stratification_inequality_gate` | off | False | C | 11 Stratification | `demography.py:967` | R-103 STRATIFICATION-INEQUALITY GATE. The morph classifier calls a band "stratified" on high MEAN surplus (surplus_frac ≥ 0.7), but stratification is UNEQUAL control of … |
+| `enable_sub_k_regulation` | off | False | N | 3 Demography | `demography.py:1271` | ── EXOGENOUS SUB-K REGULATION (R-106, Addendum 74 candidate). WHY: the model reaches realistic forager DENSITY but via the WRONG vital rates — the population packs … |
+| `enable_synergy_age_grade` | **ON** | False | N | 3 Demography | `demography.py:753` | AGE-GRADED NUTRITION SYNERGY (R-106, 2026-09-05, docs/RESULTS). `mu_max` is Pelletier 1994 CHILD malnutrition-mortality data (RR mild 2.5 / moderate 4.6 / severe 8.4), … |
+| `enable_terrain_move_cost` | **ON** | False | T | 1 Physical world | `demography.py:1763` | *(no own comment; inherited group comment:)* Stage 1b — TERRAIN-DEPENDENT MOVEMENT COST: relocating burns energy scaled by terrain difficulty (the terrain `cost` field … |
+| `enable_terrain_pathogen` | off | False | N | 3 Demography | `demography.py:465` | *(no own comment; inherited group comment:)* VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole … |
+| `enable_terrain_risk` | **ON** | False | N | 1 Physical world | `demography.py:449` | --- modulator flags (Step-2; neutral/off in Step-1 calibration) --- |
+| `enable_tier2_shock` | **ON** | False | F | 2 Energetics | `demography.py:1148` | LAYER 2b core — SHOCK (a bad-run / drought year). Fisheries don't deplete-collapse (salmon self-renews — NW Coast stable millennia); the real dispersal driver is a … |
+| `enable_village_budding` | **ON** | False | A | 9 Settlement | `demography.py:1596` | VILLAGE BUDDING (Bandy 2004; Chagnon 1975) — the ethnographic settlement-SPREAD/recovery mode. A village (band_id) grown past a scalar-stress FISSION THRESHOLD sheds its … |
+| `enable_village_catchment_spread` | off | False | T | 9 Settlement | `demography.py:1129` | VILLAGE CATCHMENT SPREAD (R-106, 2026-09-02). Diagnosed: the over-clustering is NOT the agglomeration economy (already ceiling-bound, R-105) — it is the residence pin … |
+| `enable_village_density_disease` | **ON** | False | N | 1 Physical world | `demography.py:464` | VILLAGE-SCALED DENSITY DISEASE (R-106, 2026-09-03; docs/DESIGN_colonization_spacing.md, the keystone). THE DEFECT the whole density arc kept hitting: the density-disease … |
+| `enable_village_granary` | **ON** | False | X | 2 Energetics | `demography.py:910` | VILLAGE GRANARY (R-106 Add.111). MODEL_SPEC §4.5.11 S.1 specifies a COLLECTIVE BAND granary; it is stored per CELL because a band was assumed to live on one cell. A … |
+| `enable_village_identity` | **ON** | False | T | 9 Settlement | `demography.py:821` | ── VILLAGE IDENTITY: co-residence dissolves band identity (2026-08-12) ──────────────────────────────── THE GAP THIS FILLS. Birdsell's nesting is already filed in … |
+| `enable_village_resentment` | **ON** | False | C | 12 Elite | `demography.py:1903` | [Leach via Flannery ch.10, VERIFIED] hereditary inequality "lasted for a few generations, and then collapsed" => ~60-100 yr. Privilege scales it: twice the gap, half the … |
+| `enable_village_scaling` | **ON** | False | A | 9 Settlement | `demography.py:1587` | Stage 1 (village-nucleation arc) — SUPRA-BAND SCALING: band_split_size is normally a HARD cap (cohesion_frac clamped to [0,1] ⇒ tolerable ≤ band_split_size). Johnson … |
+| `enable_wealth_obligation` | **ON** | False | C | 10 Surplus & material | `demography.py:1741` | default OFF ⇒ bit-exact |
+| `enable_worked_land_yield` | **ON** | False | T | 9 Settlement | `demography.py:1086` | THE SECOND SYMPTOM: RETURNS ARE IMMEDIATE. `_settlement_catchment_yield` grants settle_tier2_yield x SUM(S_pot) over the WHOLE catchment the instant a site exists -- no … |
 
 ## 2. Parameters — 253 in the canonical run
 
-Provenance tag = the first recognised tag in the field's own comment (VERIFIED, ANCHORED, LIT-CALIBRATED, CALIBRATED, CALIBRATION, LOCKED, MEASURED, DESIGN, PROVISIONAL, PLACEHOLDER, FREE, UNANCHORED, BRACKETED, OPEN); a `*` = the tag comes from an inherited group comment, not the field's own. Counts: untagged 253.
+Provenance tag = the first recognised tag in the field's own comment (VERIFIED, ANCHORED, LIT-CALIBRATED, CALIBRATED, CALIBRATION, LOCKED, MEASURED, DESIGN, PROVISIONAL, PLACEHOLDER, FREE, UNANCHORED, BRACKETED, OPEN); a `*` = the tag comes from an inherited group comment, not the field's own. Counts: untagged 164, PROVISIONAL 39, ANCHORED 14, VERIFIED 8, UNANCHORED 6, DESIGN 6, CALIBRATED 4, FREE 4, LIT-CALIBRATED 3, DESIGN* 2, ANCHORED* 1, BRACKETED 1, CALIBRATION 1.
 A `≠` marks a canon value that differs from the class default (set by the canon builder or the run file).
 **`untagged` and `PROVISIONAL` values are open questions, not validated constants.**
 
-| parameter | canon | class default | owner | tag | provenance comment (first words) |
-|---|---|---|---|---|---|
-| `a2_cap` | 5 | 5 | DemographyConfig | untagged | cap on the a2_eff multiplier (red-team n-1) |
-| `a_seas` | 0.4 | ? | ClimateConfig | untagged | Peak-normalised seasonal amplitude A_seas = 1 - s_min. 0.40 = Hadza savanna [LIT, A_SEAS_EARTH]; it is the value every campaign has used. … |
-| `abandon_hardship_gain` | 1 | 1 | DemographyConfig | untagged | how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema) |
-| `adult_ratio_mf` | 1.47 | 1.47 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood) |
-| `aggl_alpha` | 1.15 | 1.15 | DemographyConfig | untagged | CATCHMENT logistic sharpness L(n)~n^α (falsified mode only) [PROVISIONAL] |
-| `aggl_attraction_weight` | 1 | 1 | DemographyConfig | untagged | PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales inversely with STATIC local … |
-| `aggl_beta` | 1.15 | 1.15 | DemographyConfig | untagged | POINT super-linear exponent: per-capita ∝ n^(β-1) (Bettencourt β≈1.15) [VERIFIED-anchored] |
-| `aggl_catchment_radius` | 1 | 1 | DemographyConfig | untagged | CATCHMENT pooling radius (falsified mode; Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored] |
-| `aggl_half` | 100 | 100 | DemographyConfig | untagged | CATCHMENT half-saturation n of L(n) (falsified mode only) [PROVISIONAL] |
-| `aggl_mode` | point | point | DemographyConfig | untagged | "point" (Bettencourt-correct) / "catchment" (falsified) |
-| `aggl_tier2` | 5 | 2 ≠ | DemographyConfig | untagged | intensification MULTIPLE: A_cell/R = tier2·S_pot·cv_ref — dimensionless (~1–5) [PROVISIONAL] |
-| `aggrandizer_frac` | 0.15 | 0 ≠ | DemographyConfig | untagged | WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an "ambitious, accumulative aggrandizer" — … |
-| `aggregation_period` | 12 | 12 | DemographyConfig | untagged | steps between gatherings (12 = annual) |
-| `aggregation_radius` | 8 | 8 | DemographyConfig | untagged | connubium/travel range: a band's site must be within this many cells (~80 km); isolated bands get no gathering (die — "se la vi") |
-| `aggregation_rank_homogamy` | 0 | 0 | DemographyConfig | untagged | 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient |
-| `aggregation_residence` | virilocal | virilocal | DemographyConfig | untagged | {virilocal (bride→groom), uxorilocal (groom→bride), flexible (smaller→larger band)} |
-| `aggregation_season_threshold` | 0.8 | 0.8 | DemographyConfig | untagged | gather only when ClimateField.season() ≥ this (abundance window); ignored on static fields |
-| `aggregation_site_sep` | 10 | 10 | DemographyConfig | untagged | min cell separation between aggregation sites (≈ one per region) |
-| `alluvial_renew_per_yr` | 3 | 3 | DemographyConfig | untagged | flood soil-restoration rate at wateracc=1 — restores ~97% of the deficit within a year ⇒ equilibrium soil ≈ 1 − deplete/renew ≈ 0.8 at full … |
-| `ascribed_mate_strength` | 1.5 | 0 ≠ | DemographyConfig | untagged | global scale `a` of the ascribed(cred) mating exponent; UNANCHORED |
-| `assabiyah_decay` | 0.02 | 0.02 | DemographyConfig | untagged | baseline solidarity decay per step (luxury/turnover erosion) |
-| `assabiyah_gain` | 0.05 | 0.05 | DemographyConfig | untagged | solidarity gained per step per unit band surplus |
-| `assortative_strength` | 0 | 0 | DemographyConfig | untagged | [R-80, NOT BUILT] A status→fertility provisioning channel (husband's overflow → wife's reproductive reserve → shorter IBI) was prototyped … |
-| `band_base_tolerable` | 25 | 25 | DemographyConfig | untagged | tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline) |
-| `band_cohesion` | 0.3 | 0 ≠ | DemographyConfig | untagged | cohesion-drive strength (pull toward band centroid); 0 = off |
-| `band_merge_size` | 10 | 10 | DemographyConfig | untagged | band fuses into the nearest band below this (hysteresis vs split) |
-| `band_provision_self_keep` | 0.5 | 0.5 | DemographyConfig | untagged | [PROVISIONAL] co-resident adults share surplus above this fraction of their cap to band juveniles |
-| `band_split_size` | 45 | 45 | DemographyConfig | untagged | band fissions above this (upper "community" rung / HARD cap) |
-| `between_band_gini_min` | 0.3 | 0.3 | DemographyConfig | untagged | regional between-band cred Gini for a stratified region. CALIBRATED (R-106, 2026-09-05): the model's between-band Gini climbs 0.13->0.33 as … |
-| `bonded_mate_radius` | 1 | 0 ≠ | DemographyConfig | untagged | F.2 mate-search RADIUS (Chebyshev). The band is a spatially-EXTENDED group: on the IFD substrate agents sit ~1 per 100 km² cell (Binford … |
-| `bud_hazard_b0` | -18.636 | -18.636 | DemographyConfig | untagged | SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress / size). Read from the filed PDF: slope 0.147 … |
-| `bud_hazard_b1` | 0.147 | 0.147 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress / … |
-| `bud_hazard_per_yr` | 0.005 | 0.005 | DemographyConfig | untagged | BASE RATE — Bandy 2004's own event counts. Three fission events, and in ALL THREE the village was the largest of its phase: Chiaramaya + … |
-| `bud_spacing_village_target` | 300 | 300 | DemographyConfig | untagged | V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED, Ames 2003] |
-| `bud_steps_per_year` | 12 | 12 | DemographyConfig | untagged | model calendar (2000 steps ≈ 167 yr) |
-| `bud_w_capital` | 1 | 1 | DemographyConfig | untagged | owned/improved land ⇒ stay (discourages) |
-| `bud_w_depletion` | 1 | 1 | DemographyConfig | untagged | MODIFIER WEIGHTS — Bandy names the DIRECTIONS ("factors favouring fissioning include resource depletion and a high level of internal … |
-| `bud_w_grievance` | 1 | 1 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── … |
-| `bud_w_integration` | 1 | 1 | DemographyConfig | untagged | complex/stratified ⇒ stay (Bandy's branch 2) |
-| `bud_w_mate_competition` | 1 | 1 | DemographyConfig | untagged | ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── Bandy's factors FAVOURING fission are … |
-| `bud_w_rivalry` | 1 | 1 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── … |
-| `caribou_amp` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
-| `caribou_period` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
-| `caribou_phase` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
-| `catchment_ceiling_mult` | 1 | 1 | DemographyConfig | untagged | ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity |
-| `cell_area_km2` | 100 | 100 | SubstrateConfig | untagged | §1 spatial scale: 1 cell = 100 km² (10×10 km) |
-| `childhood_ratio_mf` | 0.71 | 0.71 | DemographyConfig | untagged | M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood) |
-| `cohesion_leader_weight` | 1 | 1 | DemographyConfig | untagged | (2) LEADER WEIGHT. Even an ungraded assabiyah leaves the leader term (0.41–1.64, median 0.78) ADDED on top, which re-saturates the sum on … |
-| `comove_anticipate` | False | False | DemographyConfig | untagged | CENTRAL-PLACE FORAGING fixes (blueprint …_CoMovementCentralPlace; R-41): family co-movement snaps the whole family onto the mother's … |
-| `comove_footprint` | 0 | 0 | DemographyConfig | untagged | (ii) followers scatter to lowest-occupancy cells within this Chebyshev radius of the head (0 = exact snap); a dispersed camp |
-| `comove_footprint_max` | 3 | 3 | DemographyConfig | untagged | cap on the scaled footprint radius |
-| `comove_footprint_scaled` | True | False ≠ | DemographyConfig | untagged | (ii-scaled) the footprint = the biome-scaled MONTHLY RANGE on the uniform grid: the 10 km cell = forest monthly range → forest k≈0 (tight … |
-| `comove_provision_exclude` | False | False | DemographyConfig | untagged | (iii) JUVENILE followers (age<forage_age_min) take NO forage share (central-place: children are provisioned, not self-extracting) → don't … |
-| `condition_alpha` | 0.25 | 0.25 | DemographyConfig | untagged | EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag |
-| `contest_exponent` | 1.5 | 0 ≠ | SubstrateConfig | untagged | κ: 0 = even split (scramble); 1 = Cred-weighted contest (C) |
-| `cred_inherit_sigma` | 0.1 | 0 ≠ | DemographyConfig | untagged | lineage-copy noise at birth; 0 = exact inheritance |
-| `cred_seed_sigma` | 0.5 | 0 ≠ | DemographyConfig | untagged | founder log-status spread; 0 = uniform (no hierarchy) |
-| `cv_safe` | 0.037 | 0.037 | DemographyConfig | untagged | cv_safe: the ONE fitted scale. Composite of risk-aversion and per-capita crowding cost, neither independently anchored, so it is calibrated … |
-| `defensibility_claim_dwell` | 6 | 6 | DemographyConfig | untagged | steps a band must lead-occupy a claimable cell before it OWNS it (bootstrapping toehold) |
-| `defensibility_claim_min` | 3 | 3 | DemographyConfig | untagged | min owner members present to build/hold a claim (a family; below → the claim decays) |
-| `defensibility_exclusion` | 0.2 | 0.2 | DemographyConfig | untagged | OUTSIDER's perceived per-capita on an OWNED cell × this (shadow of defence → routed away) [PROVISIONAL] |
-| `defensibility_min` | 0.15 | 0.15 | DemographyConfig | untagged | D_min: min aquatic_food/S_pot for a cell to be CLAIMABLE (dense+predictable) [PROVISIONAL] |
-| `defensibility_tether` | 6 | 6 | DemographyConfig | untagged | OWNER member's perceived per-capita on ITS band's owned cell × this (delayed-return tether → concentrate) [PROVISIONAL] |
-| `dens_delta` | 3 | 1 ≠ | DemographyConfig | untagged | density-disease max excess [FREE — calibrated] |
-| `dens_response_init` | 6 | 6 | DemographyConfig | untagged | [PROVISIONAL] founder exponent (= the calibrated density_fert_exponent; R-106 candidate) |
-| `dens_response_mut_sigma` | 0.1 | 0.1 | DemographyConfig | untagged | [PROVISIONAL] per-birth mean-preserving lognormal mutation of the exponent (R-106 candidate) |
-| `dens_rho_half` | 0.2 | 0.2 | DemographyConfig | untagged | density-disease half-saturation, agents/km² [FREE] |
-| `dens_rho_ref` | 0.091 | 0.091 | DemographyConfig | untagged | agents/km² at which density_mult == 1 [ANCHORED, Binford 2001] |
-| `density_fert_exponent` | 6 | 6 | DemographyConfig | untagged | shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106, 2026-09-06 lever-sensitivity sweep): … |
-| `divorce_rate` | 0.005 | 0 ≠ | DemographyConfig | untagged | PER-STEP bond dissolution probability, applied in `_do_divorce` every step on all pairing paths (R-78 — it previously sat inside the … |
-| `enabled` | True | True | SubstrateConfig | untagged | *(no own comment; inherited group comment:)* (from the SubstrateConfig docstring) enabled=False (default) preserves the one-agent-per-cell … |
-| `exogamy_degree` | lineage | lineage | DemographyConfig | untagged | {"nuclear" (parents/sibs), "lineage" (+patriclan), "cousin" (+genome r>r*)} |
-| `exogamy_relatedness` | 0.125 | 0.125 | DemographyConfig | untagged | r* first-cousin threshold for the "cousin" degree (needs enable_genome) |
-| `family_maturity_months` | 180 | 180 | DemographyConfig | untagged | child detaches from the family unit at this age (~15 yr) |
-| `feast_every` | 12 | 12 | DemographyConfig | untagged | ── WEALTH → OBLIGATION → PRODUCTION (2026-07-27) ─────────────────────────────────────────── TYPE **C (Conversion)** · UNIT **agent pair** … |
-| `feast_tolerance` | 4 | 0 ≠ | DemographyConfig | untagged | R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding leveler. The feast debits … |
-| `fecundability` | 0.12 | 0.12 | DemographyConfig | untagged | monthly birth prob past refractory [FREE] |
-| `forage_cap_hours` | 100 | 100 | DemographyConfig | untagged | foraging work-hours/period; cap = forage_kcal·hours (~1.6× BURN at hours=100) [PROVISIONAL — Hadza time-budget] |
-| `fusion_search_radius` | 25 | 25 | DemographyConfig | untagged | cells; locality bound for the richest-neighbour search |
-| `game_meat_cv` | 0.73 | 0 ≠ | DemographyConfig | untagged | G.3 stochastic meat returns (the Carbon-stage core variance; MODEL_SPEC §4.5.5 / Carbon scoping). The cell meat pool is a mean-preserving … |
-| `game_meat_frac` | 0.55 | 0 ≠ | DemographyConfig | untagged | *(no own comment; inherited group comment:)* Game/meat economy (the Carbon substrate; MODEL_SPEC §4.5.5, blueprint v2). The cell yield is split … |
-| `genome_loci` | 48 | 32 ≠ | DemographyConfig | untagged | number of neutral loci (relatedness resolution ~1/L) |
-| `genome_mutation` | 0 | 0 | DemographyConfig | untagged | per-locus per-birth mutation prob (0 = pure drift / infinite-allele) |
-| `group_mate_floor` | 0.2 | 0.3 ≠ | SubstrateConfig | untagged | cell-value multiplier for a LONE agent (g=1) |
-| `group_mate_min` | 15 | 0 ≠ | SubstrateConfig | untagged | E.2 mating-access drive: being below a minimum viable band (the ~25 connubium, Wobst 1974) is actively bad (no mates) — a lone agent's cell … |
-| `group_safety_max` | 8 | 0 ≠ | SubstrateConfig | untagged | Emergent bands (E.1): a SATURATING grouping benefit (risk dilution / many-eyes) multiplies a cell's value by 1 + group_safety_max·(1 − … |
-| `group_safety_scale` | 15 | 8 ≠ | SubstrateConfig | untagged | g_s: group size at which safety is ~63% saturated |
-| `homogenize_cred` | False | False | DemographyConfig | untagged | ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is internally homogeneous in status … |
-| `homogenize_prowess` | False | False | DemographyConfig | untagged | Full band-as-unit lump: ALSO flatten the achieved PROWESS facet within the band (applied after the prowess EMA each step). With … |
-| `hunger_flee_reserve_frac` | 0.35 | 0.35 | DemographyConfig | untagged | reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5] |
-| `ibi_refractory_months` | 30 | 30 | DemographyConfig | untagged | lactational refractory [FREE — calibrate to IBI~37] |
-| `intake_ema_alpha` | 0.04 | 0.04 | DemographyConfig | untagged | half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr: |
-| `intake_fert_hi` | 1.2 | 1.2 | DemographyConfig | untagged | + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM; |
-| `intake_fert_lo` | 1 | 1 | DemographyConfig | untagged | [PROVISIONAL — a BRACKET ENDPOINT awaiting its sweep, not a fitted value. Hill & Hurtado 1996 Table 8.2: 49.4/34.4 = the full filed span of … |
-| `interannual_amp` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── … |
-| `interannual_period` | 0 | ? | ClimateConfig | untagged | steps (yr x 12); 0 = off |
-| `interannual_phase` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── … |
-| `k_cell` | 0 | 0 | SubstrateConfig | untagged | hard occupancy ceiling; 0 = unlimited (∞); 1 = recovery regime |
-| `leader_coherence_gain` | 2 | 0 ≠ | DemographyConfig | untagged | UNANCHORED magnitude (red-team: bracket/sweep, don't fit) |
-| `leader_share_frac` | 0.2 | 0 ≠ | DemographyConfig | untagged | share of the BAND's per-step durable output taken as managerial right |
-| `legit_cred_gain` | 10 | 0 ≠ | DemographyConfig | untagged | per-step heritable-cred boost to a legitimated lineage's members |
-| `legit_decay` | 0.02 | 0.02 | DemographyConfig | untagged | legitimacy fades without renewal (~1/0.02 = 50-step memory) |
-| `legit_feast_frac` | 0.25 | 0 ≠ | DemographyConfig | untagged | share of a lineage's material spent on sacrifices/feasts each step |
-| `legit_rel_multiplier` | 2 | 2 | DemographyConfig | untagged | cross at this MULTIPLE of an average lineage's share |
-| `legit_threshold` | 0.15 | 0.5 ≠ | DemographyConfig | untagged | above this share of the band's feasting, the lineage is "descended from higher nats" |
-| `leveling_share` | 0.8 | 0 ≠ | DemographyConfig | untagged | fraction of the excess disgorged when sanctioned [DESIGN] |
-| `leveling_strength` | 0.79 | 0 ≠ | DemographyConfig | untagged | ANCHOR [Boehm 1993, VERIFIED]: "Ousting or ostracizing the individual or removing him from a leadership role involved **38 of the 48 … |
-| `leveling_tolerance` | 3 | 0 ≠ | DemographyConfig | untagged | R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum 84 found the coalition levels every … |
-| `lh_eta_juvenile_exponent` | 3 | 3 | DemographyConfig | untagged | PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig .eta_juvenile_exponent` — see config.py). 1.0 = the … |
-| `lh_eta_min` | 0.1 | 0.1 | DemographyConfig | untagged | PASSTHROUGH to the auto-built LifeHistoryConfig.eta_min (juvenile foraging efficiency at birth). ADOPTED CANONICAL 0.10 (R-106, 2026-09-04, … |
-| `lineage_branch_rate` | 0.05 | 0 ≠ | DemographyConfig | untagged | per-BIRTH prob the child founds a new named line |
-| `lineage_reversion` | 0.1 | 0 ≠ | DemographyConfig | untagged | ρ: mean-reversion of inherited lineage (homeostat) |
-| `lineage_split_min_segment` | 8 | 8 | DemographyConfig | untagged | both halves must reach this, else the split is skipped |
-| `lineage_split_rate` | 3e-05 | 0 ≠ | DemographyConfig | untagged | per-MEMBER per-step hazard (lineage hazard = rate·n) |
-| `lineage_tribute_frac` | 0.15 | 0.15 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE … |
-| `llanos_flood_amp` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ─────────── … |
-| `lottery_a_earth_biome` | savanna | ? | ClimateConfig | untagged | Which biome's Earth reference amplitude the obliquity draw is scaled against (A_SEAS_EARTH). The world is a mix of biomes and `a_seas` is a … |
-| `malnutrition_ema_alpha` | 0.3 | 0.3 | DemographyConfig | untagged | smoothing of the per-band starvation-rate signal |
-| `malnutrition_fission_gain` | 0 | 0 | DemographyConfig | untagged | max dispersion (subtracted from cohesion); UNANCHORED |
-| `malnutrition_starv_rate` | 0.05 | 0.05 | DemographyConfig | untagged | per-capita recent-starvation rate (EMA) at which the pressure SATURATES |
-| `mate_choice_strength` | 5 | 0 ≠ | DemographyConfig | untagged | m; 0 = random paternity (the drift-control twin) |
-| `mate_search_max_radius` | 15 | 15 | DemographyConfig | untagged | travel cap on the marriage search (~150 km); isolated seekers past it stay unpaired |
-| `mate_search_min_eligible` | 15 | 3 ≠ | DemographyConfig | untagged | m*: eligible-mate famine-safety margin (the connubium's cv_safe) |
-| `mate_within_band_id` | False | False | DemographyConfig | untagged | PERF (re-arch Tier 0): pool mates by SOCIAL band_id (fission-capped ~25–45) instead of the SPATIAL bands() clump. Fixes the O(clump²) … |
-| `material_capture_frac` | 0.15 | 0 ≠ | DemographyConfig | untagged | PARKED at 0.0 (egalitarian neutral) DELIBERATELY, R-106 Addendum 84: enable_material_capture runs the hide economy (every hunter accrues … |
-| `material_decay` | 0.002 | 0 ≠ | DemographyConfig | untagged | per-step depreciation of the durable stock (0 = imperishable) |
-| `material_heir_by_status` | True | False ≠ | DemographyConfig | untagged | primogeniture → whole estate to the ELDEST surviving child (concentrates; the extensive-agri pattern) partible_equal → split equally among … |
-| `material_hide_frac` | 0.07 | 0 ≠ | DemographyConfig | untagged | SOURCE = GAME, not the granary (supervisor correction, R-82b). Durable goods in a forager economy are the BYPRODUCT OF HUNTING — hides, … |
-| `material_inheritance_rule` | primogeniture | primogeniture | DemographyConfig | untagged | none/primogeniture/partible_equal/patrilineal_sons |
-| `material_invulnerability_min` | 0 | 0 | DemographyConfig | untagged | WHEN capture is possible — the ABUNDANCE + INVULNERABILITY gate. [Hayden 1995 Fig. 6, p.77 VERIFIED] the top trait row is "Resource … |
-| `material_unit_value` | 1 | 1 | DemographyConfig | untagged | VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a CONSTANT per unit here. Stage E … |
-| `maternal_mortality_per_birth` | 0 | 0 | DemographyConfig | untagged | approach (ii): maternal mortality is FOLDED INTO the all-cause female Siler → explicit term 0. Set > 0 only with a maternal-removed female … |
-| `max_wives` | 3 | 1 ≠ | DemographyConfig | untagged | cap on wives per male (1 = monogamy even if rate>0) |
-| `mean_factor` | 1 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A … |
-| `menarche_months` | 180 | 180 | DemographyConfig | untagged | --- fertility (Aché-anchored window; IBI/fecundability tuned in Step-1) --- 15 yr — fertility onset |
-| `menopause_months` | 504 | 504 | DemographyConfig | untagged | 42 yr — last-birth ceiling |
-| `metabolic_downreg_max` | 0.4 | 0.4 | DemographyConfig | untagged | Keys total BMR drop at ~25% wt loss; bracket [0.25 adaptive-only, 0.40 total] |
-| `metabolic_downreg_span` | 0.5 | 0.5 | DemographyConfig | untagged | full down-reg reached at ~half reserve depletion (Keys ~25% wt loss) |
-| `mobility_base_radius` | 1 | 1 | DemographyConfig | untagged | stride at/above npp_ref |
-| `mobility_exponent` | 1 | 1 | DemographyConfig | untagged | Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket) |
-| `mobility_intake_floor` | 0.15 | 0.15 | DemographyConfig | untagged | maintenance anchor `intake_fert_lo` already carries (§21.10) rather than inventing a new number denom floor so a near-starving ratio … |
-| `mobility_intake_ref` | 1 | 1 | DemographyConfig | untagged | ratio at/above which stride=base; reuses the |
-| `mobility_max_radius` | 6 | 6 | DemographyConfig | untagged | cap on stride (bounds cost + jump-over risk); PROVISIONAL |
-| `mobility_npp_floor` | 50 | 50 | DemographyConfig | untagged | denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL |
-| `mobility_npp_ref` | 900 | 900 | DemographyConfig | untagged | forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL |
-| `mobility_pressure_source` | npp | npp | DemographyConfig | untagged | PRESSURE-AWARE MOBILITY (R-106 Addendum 6, 2026-07-31): the NPP-driven stride above is STATIC/geographic — a cell packed with 40+ occupants … |
-| `morph_aquatic_gated` | False | False | DemographyConfig | untagged | SEASONAL-AQUATIC-GLUT MORPH (blueprint …_StorabilityGatedMorph v3; R-46/R-47): the ANTHROPOLOGICALLY CORRECT driver of forager complexity … |
-| `morph_aquatic_threshold` | 0.15 | 0.15 | DemographyConfig | untagged | complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL] |
-| `morph_npp_floor` | 500 | 500 | DemographyConfig | untagged | AND a PRODUCTIVE setting: mean(npp_gm2) ≥ this — the true-desert(≈400) vs river-desert/Nile(≳550) distinguisher [PROVISIONAL, from R-47 … |
-| `morph_settle_steps` | 60 | 300 ≠ | DemographyConfig | untagged | T: sustained-settlement steps to morph (~1 generation; Bocquet-Appel) |
-| `move_cost_flat` | 0 | 0 | SubstrateConfig | untagged | flat energy cost per move; 0 = free (recovery) |
-| `move_cost_kcal` | 750 | 0 ≠ | DemographyConfig | untagged | kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest]. |
-| `movement_mode` | diffusion | legacy ≠ | SubstrateConfig | untagged | legacy=vision-v cardinal arms; diffusion=von-Neumann r=1 |
-| `mu_max` | 2.5 | 2.5 | DemographyConfig | untagged | nutrition-synergy max (Pelletier 1994, CHILD data — mild RR 2.5) [PROVISIONAL] |
-| `noble_exemption_frac` | 1 | 1 | DemographyConfig | untagged | 1.0 = full waiver of the wealth-grievance for nobles |
-| `obligation_grant_frac` | 0.1 | 0.1 | DemographyConfig | untagged | share of the creditor's stock per grant |
-| `obligation_min_ratio` | 2 | 2 | DemographyConfig | untagged | creditor needs this multiple of band-mean |
-| `obligation_premium` | 1.2 | 1.2 | DemographyConfig | untagged | claim per unit granted (>1 = the gift binds) |
-| `obligation_return_frac` | 0.25 | 0.25 | DemographyConfig | untagged | share of a debtor's output redirected |
-| `office_challenge_margin` | 0.25 | 0.25 | DemographyConfig | untagged | challenger must exceed the incumbent's merit by this factor [DESIGN] |
-| `office_deposition_share` | 0.346154 | 0.346154 | DemographyConfig | untagged | 0.346 = Boehm deposition 9 / (9 deposition + 17 desertion) |
-| `office_grievance_gain` | 0.05 | 1 ≠ | DemographyConfig | untagged | per-step sanction hazard at unit grievance [DESIGN — calibrated on tenure] |
-| `office_overreach_weight` | 0.655172 | 0.655172 | DemographyConfig | untagged | 0.655 = Boehm (14 dominating + 5 monopolizing) / 29 leadership motivations |
-| `orphan_e_mult` | 1.499 | 1.499 | DemographyConfig | untagged | The Aché reference value, kept for documentation + the Table 13.1 arithmetic check. NOT used by the model (which normalises endogenously). … |
-| `orphan_infant_mother_lethal` | True | True | DemographyConfig | untagged | "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our sample" — an unweaned infant cannot … |
-| `orphan_max_age_years` | 9 | 9 | DemographyConfig | untagged | Table 13.1's window is ages 0–9 |
-| `orphan_mult_divorced` | 2.97 | 2.97 | DemographyConfig | untagged | exp(1.0892) [LIT]; both parents alive but unbonded |
-| `orphan_mult_father_dead` | 3.05 | 3.05 | DemographyConfig | untagged | exp(1.1146) [LIT] |
-| `orphan_mult_mother_dead` | 5.09 | 5.09 | DemographyConfig | untagged | exp(1.6277) [LIT — Hill & Hurtado Tab. 13.1] |
-| `orphan_normalize` | True | True | DemographyConfig | untagged | DOUBLE-COUNT GUARD — normalise by E[mult] over the population's OWN children (`_orphan_e_mult_live`). The Siler a1 was fit to OBSERVED Aché … |
-| `paternal_provision_frac` | 0.5 | 0 ≠ | DemographyConfig | untagged | B+ step 5: PATERNAL provisioning. A father gives `paternal_provision_frac` of his harvest OVERFLOW (above his cap, otherwise wasted) to his … |
-| `pathogen_cap` | 3 | 3 | DemographyConfig | untagged | symmetric cap [1/cap, cap] on pathogen_mult |
-| `pathogen_gamma` | 0 | 0 | DemographyConfig | untagged | Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2. BRACKETED strength (NPP exponent); 0 = OFF/flat. … |
-| `pathogen_npp_ref` | 0 | 0 | DemographyConfig | untagged | reference NPP (Aché-forest biome); 0 → model uses terrain mean |
-| `patriline_weight` | 0.5 | 0.5 | DemographyConfig | untagged | father vs mother weight in lineage inheritance |
-| `phi_epsilon` | 1e-06 | 1e-06 | SubstrateConfig | untagged | contest denominator guard (φ+ε) |
-| `pin_release_hold_steps` | 12 | 12 | DemographyConfig | untagged | one year: the household's residence decision is seasonal/annual [PROVISIONAL — one annual cycle; not anchored] |
-| `polygyny_attrition` | 0.02 | 0 ≠ | DemographyConfig | untagged | POLYGYNY ATTRITION (R-76) — the stock's missing OUTFLOW. `polygyny_rate` gates only whether a married male is CONSIDERED; once considered … |
-| `polygyny_rate` | 0.005 | 0 ≠ | DemographyConfig | untagged | F.3a MODEST POLYGYNY (von Rueden & Jaeggi 2016: polygyny is the MAIN status→RS amplifier; ~4-11% of forager marriages). polygyny_rate>0: … |
-| `provision_self_keep` | 1 | 1 | DemographyConfig | untagged | Biome-Mortality S1: child-priority shortfall-sharing. The mother provisions her child's deficit not only from wasted overflow (C.2b) but … |
-| `prowess_decay` | 0.05 | 0 ≠ | DemographyConfig | untagged | B+ step 2: prowess GROWTH. Prowess is a decaying EMA of the agent's RELATIVE meat intake (reputation, not instantaneous return — Smith … |
-| `rank_hierarchy_frac` | 0.15 | 0.15 | DemographyConfig | untagged | ascribed head-count share that counts as "ranked" |
-| `refractory_stretch_max` | 1.436 | 1.436 | DemographyConfig | untagged | x base refractory at zero energy surplus |
-| `regime_amp` | 0 | ? | ClimateConfig | untagged | *(no own comment; inherited group comment:)* ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ─────────── … |
-| `regime_duration` | 0 | ? | ClimateConfig | untagged | mean excursion length in steps; P(end) = 1/duration |
-| `regime_recurrence` | 0 | ? | ClimateConfig | untagged | mean onset spacing in steps; P(onset) = 1/recurrence |
-| `repulsion_gain` | 0.3 | 0 ≠ | DemographyConfig | untagged | max repulsion (subtracted from cohesion_frac). ANCHORED value = 1.0 (Alberti P); village stack uses 0.3 |
-| `repulsion_midpoint` | 25 | 25 | DemographyConfig | untagged | band size at half-max repulsion (≈ Wobst-minimal band). Alberti's own midpoint is 126.9 = the VILLAGE rung; under enable_emergent_band_size … |
-| `repulsion_width` | 6 | 6 | DemographyConfig | untagged | logistic steepness in band-size units. ANCHORED value = 6.80 (= 1/b1, Alberti 2014); village stack validated at 6.0 |
-| `resent_alpha` | 0.001 | 0.004 ≠ | DemographyConfig | untagged | EMA weight on privilege; 1/240 ≈ a 20-yr generational memory |
-| `resent_effect_threshold` | 0.8 | 0.8 | DemographyConfig | untagged | sustained effect size that triggers reversion (Cohen "large") |
-| `resent_privilege_ref` | 10 | 1 ≠ | DemographyConfig | untagged | cred-advantage ratio treated as unit privilege [DESIGN] |
-| `resent_threshold` | 0.5 | 0.5 | DemographyConfig | untagged | accumulated resentment that triggers the gumlao reversion |
-| `resent_years_to_revolt` | 80 | 80 | DemographyConfig | untagged | yr to revolt at UNIT privilege (effect size 1.0); |
-| `restraint_init` | 0 | 0 | DemographyConfig | untagged | [PROVISIONAL] founder restraint; 0 ⇒ restraint must EVOLVE from nothing (R-106 candidate, no lit anchor) |
-| `restraint_mutation_sigma` | 0.02 | 0.02 | DemographyConfig | untagged | [PROVISIONAL] per-birth Gaussian mutation of the heritable restraint gene (R-106 candidate) |
-| `restraint_transmission_period` | 60 | 60 | DemographyConfig | untagged | [PROVISIONAL] steps between payoff-biased social-learning events (R-106 candidate) |
-| `restraint_transmission_rate` | 0.1 | 0.1 | DemographyConfig | untagged | [PROVISIONAL] fraction of agents who copy the fittest band's restraint each event (R-106 candidate) |
-| `risk_accident_share` | 0.1 | 0.1 | DemographyConfig | untagged | accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED] |
-| `risk_cap` | 3 | 3 | DemographyConfig | untagged | --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) --- max terrain-risk multiplier (red-team M-2: pin the scale) |
-| `settle_catchment_radius` | 1 | 2 ≠ | DemographyConfig | untagged | LAYER 2 — residence ≠ foraging (Binford collectors). A settlement of ~dozens is « one 100 km² cell, so settled members RESIDE on the single … |
-| `settle_founding_delay_steps` | 180 | 180 | DemographyConfig | untagged | *(no own comment; inherited group comment:)* FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were … |
-| `settle_min_pool` | 40 | 40 | DemographyConfig | untagged | min people to found/hold a settlement — minimum-viable-hamlet threshold (Bar-Yosef 1998: Natufian settlements range small ~dozens → medium … |
-| `settle_persist_threshold` | 0.3 | 0.3 | DemographyConfig | untagged | site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL] |
-| `settle_radius` | 2 | 2 | DemographyConfig | untagged | Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells) |
-| `settle_release_steps` | 12 | 12 | DemographyConfig | untagged | hysteresis: steps a settlement survives below settle_min_pool before it dissolves |
-| `settle_tier2_yield` | 40 | 40 | DemographyConfig | untagged | intensive tier-2 yield per unit S_pot per catchment cell, unlocked by settlement (gated) [PROVISIONAL — sweep] |
-| `settlement_cohesion` | 1.5 | 1.5 | DemographyConfig | untagged | (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation) |
-| `settlement_memory_yr` | 12 | 12 | DemographyConfig | untagged | the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range] |
-| `settlement_ss_gain` | 1 | 1 | DemographyConfig | untagged | max repel probability for an egalitarian over-crowded village |
-| `settlement_ss_midpoint` | 150 | 150 | DemographyConfig | untagged | village pop at half-max repulsion (Bar-Yosef egalitarian upper bound) |
-| `settlement_ss_width` | 50 | 50 | DemographyConfig | untagged | logistic width (Alberti 2014 shape) |
-| `sex_division` | 1 | 0 ≠ | DemographyConfig | untagged | B+ step 3: sex-divided PRODUCTION (men hunt → meat, women gather → forage). Tunes the prowess SIGNAL only (male prowess from … |
-| `shock_cv` | 0.6 | 0.6 | DemographyConfig | untagged | inter-annual tier-2 yield CV (salmon-run anchored) [PROVISIONAL — sweep] |
-| `shock_rho` | 0 | 0 | DemographyConfig | untagged | AR(1) persistence: 0 = IID single bad years; →1 = multi-year good/bad REGIMES (ENSO/PDO/drought). Storage matters most at high ρ (must … |
-| `siler_a1` | 0.1611 | 0.157 ≠ | DemographyConfig | untagged | --- mortality: Siler, FIXED from Gurven & Kaplan 2007 (both-sexes; M-1) --- |
-| `siler_a2` | 0.00813 | 0.013 ≠ | DemographyConfig | untagged | zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every parameter at its declared bounds and discovered … |
-| `siler_a3` | 3.781e-05 | 4.8e-05 ≠ | DemographyConfig | untagged | *(no own comment; inherited group comment:)* zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every … |
-| `siler_b1` | 0.6775 | 0.721 ≠ | DemographyConfig | untagged | DIVISOR in the Siler cumulative hazard, (a1/b1)(1-exp(-b1*t)): |
-| `siler_b3` | 0.1025 | 0.103 ≠ | DemographyConfig | untagged | DIVISOR in (a3/b3)(exp(b3*t)-1); same finding as siler_b1 |
-| `site_gain` | 0.3 | 0 ≠ | DemographyConfig | untagged | central-place bonus magnitude (× BURN × normalized suitability); UNANCHORED (sweep) |
-| `site_lambda` | 1 | 1 | DemographyConfig | untagged | cost-distance decay of catchment contribution; UNANCHORED |
-| `site_radius` | 2 | 2 | DemographyConfig | untagged | catchment radius (Vita-Finzi 5–10 km ≈ 1–2 cells) [VERIFIED-anchored] |
-| `soil_carry_per_cell` | 8 | 8 | DemographyConfig | untagged | persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL] |
-| `soil_deplete_frac` | 0.6 | 0.6 | DemographyConfig | untagged | per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL] |
-| `soil_regrow_per_yr` | 0.045 | 0.045 | DemographyConfig | untagged | slow fallow soil recovery (~1/0.045 ≈ 22 yr) — Boserup FOREST-FALLOW: a parcel is cropped 1–2 yr then fallowed 20–25 yr (Conklin) … |
-| `srb_male` | 0.512 | 0.512 | DemographyConfig | untagged | secondary sex ratio (anchored ~105:100) |
-| `standing_floor` | 0.15 | 0.15 | DemographyConfig | untagged | newcomer baseline (never 0 — kin/lineage reputation travels) |
-| `standing_leave_penalty` | 0.4 | 0.4 | DemographyConfig | untagged | fraction of standing RETAINED on leaving your community |
-| `standing_tenure_rate` | 0.083 | 0.083 | DemographyConfig | untagged | saturating accrual/step; 1/12 ⇒ ~63% after 1 yr (Wiessner "≥1 yr to firm") |
-| `storable_fraction` | 0.7 | 0.7 | DemographyConfig | untagged | fraction of overflow that is storable — lit ~0.5–0.8 (strongly-seasonal storers live mostly off stores; grain 50–70% stored) … |
-| `storage_decay` | 0.02 | 0 ≠ | DemographyConfig | untagged | S.3 per-step spoilage/maintenance loss (0 = off). Realistic traditional ≈ 0.02/mo (~22%/yr; lit 10–30%/yr) [LIT-CALIBRATED when on] |
-| `storage_seasonality_gated` | False | False | DemographyConfig | untagged | STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's biome SEASONAL AMPLITUDE … |
-| `storage_seasonality_threshold` | 0.25 | 0.25 | DemographyConfig | untagged | storage viable where biome amp ≥ this (above forest 0.05, below savanna 0.40) [PROVISIONAL] |
-| `storage_temp_threshold_c` | 15.25 | 15.25 | DemographyConfig | untagged | Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION] |
-| `store_anchor_gain` | 1 | 1 | DemographyConfig | untagged | weight on the perceived per-capita granary buffer |
-| `store_anchor_horizon` | 24 | 24 | DemographyConfig | untagged | steps over which the stock is amortised into a per-step value (~2 yr) |
-| `store_capacity_reserves` | 12 | 12 | DemographyConfig | untagged | store cap = this × reserve cap. reserve_full≈1.33 mo BURN ⇒ 12≈16 mo ≈ Halstead 1–2 yr granary (annual cycle + bad-year buffer). Old 3 (=4 … |
-| `strat_top_quantile` | 0.75 | 0.75 | DemographyConfig | untagged | a band must sit above this quantile of per-band mean cred to be a chiefly centre (top quarter) |
-| `stratification_gini_min` | 0.4 | 0.4 | DemographyConfig | untagged | BHM 2009 Table 2 α-weighted Gini: forager 0.25, |
-| `sub_k_by_emigration` | False | False | DemographyConfig | untagged | SUB-K MODE. The birth-hold above raises e0 but, being a fertility-only lever, OVER-AGES the pyramid (juv_frac falls below the forager … |
-| `sub_k_emigration_rate` | 0.25 | 0.25 | DemographyConfig | untagged | [PROVISIONAL] fraction of the over-target excess that emigrates per step |
-| `sub_k_sharpness` | 20 | 20 | DemographyConfig | untagged | [PROVISIONAL] logistic steepness of the birth hold around the target fill |
-| `sub_k_target_fill` | 0.3 | 0.3 | DemographyConfig | untagged | [PROVISIONAL] village fill (pop/catchment-K) the population is held below; below the ~0.43 food margin |
-| `succession_dissolve` | False | False | DemographyConfig | untagged | SUCCESSION ON THE HOLDER'S DEATH — two regimes [Sahlins 1972:209, VERIFIED]. The Nootka chief "is an officeholder in a lineage (house … |
-| `synergy_mu_max_adult` | 1.3 | 1.3 | DemographyConfig | untagged | adult malnutrition-mortality synergy [ANCHORED, community-dwelling >50 HR 1.14-1.29] |
-| `village_bud_min_faction` | 0 | 0 | DemographyConfig | untagged | minimum rival-bloc share to carry a fission. |
-| `village_bud_search_radius` | 8 | 8 | DemographyConfig | untagged | WAS 0.25, which silently disabled budding: measured, a 475-person village held 126 lineages with the largest at 8.2%, so no bloc could ever … |
-| `village_circumscription_gain` | 0.6 | 0.6 | DemographyConfig | untagged | the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ … |
-| `village_fission_threshold` | 150 | 170 ≠ | DemographyConfig | untagged | BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index 157–186); =Alberti N≈127–158 / … |
-| `village_gain` | 5 | 0 ≠ | DemographyConfig | untagged | headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep) |
-| `village_identity_months` | 180 | 180 | DemographyConfig | untagged | = menarche_months; NOT an independent number |
-| `wife_quality_strength` | 0 | 0 | DemographyConfig | untagged | WIFE QUALITY (R-77) — the missing status→RS channel for a MONOGAMY-DOMINANT system. von Rueden & Jaeggi, "Men's status and reproductive … |
+| parameter | canon | class default | owner | tag (heuristic) | defined at | nearby source comment (heuristic) |
+|---|---|---|---|---|---|---|
+| `a2_cap` | 5 | 5 | DemographyConfig | untagged | `demography.py:755` | cap on the a2_eff multiplier (red-team n-1) |
+| `a_seas` | 0.4 | 0.4 | ClimateConfig | untagged | `climate.py:353` | Peak-normalised seasonal amplitude A_seas = 1 - s_min. 0.40 = Hadza savanna [LIT, A_SEAS_EARTH]; it is the value every campaign has used. … |
+| `abandon_hardship_gain` | 1 | 1 | DemographyConfig | untagged | `demography.py:1190` | how strongly chronic remembered hardship erodes the residence pin (1 ⇒ attachment = 1 − hardship_ema) |
+| `adult_ratio_mf` | 1.47 | 1.47 | DemographyConfig | untagged | `demography.py:436` | *(no own comment; inherited group comment:)* M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood) |
+| `aggl_alpha` | 1.15 | 1.15 | DemographyConfig | PROVISIONAL | `demography.py:1302` | CATCHMENT logistic sharpness L(n)~n^α (falsified mode only) [PROVISIONAL] |
+| `aggl_attraction_weight` | 1 | 1 | DemographyConfig | PROVISIONAL | `demography.py:1939` | PRODUCTIVITY-SCALED MOBILITY (blueprint …_ProductivityScaledMobility): the diffusion step STRIDE scales inversely with STATIC local … |
+| `aggl_beta` | 1.15 | 1.15 | DemographyConfig | VERIFIED | `demography.py:1301` | POINT super-linear exponent: per-capita ∝ n^(β-1) (Bettencourt β≈1.15) [VERIFIED-anchored] |
+| `aggl_catchment_radius` | 1 | 1 | DemographyConfig | VERIFIED | `demography.py:1305` | CATCHMENT pooling radius (falsified mode; Vita-Finzi 5–10 km ≈ radius 1) [VERIFIED-anchored] |
+| `aggl_half` | 100 | 100 | DemographyConfig | PROVISIONAL | `demography.py:1303` | CATCHMENT half-saturation n of L(n) (falsified mode only) [PROVISIONAL] |
+| `aggl_mode` | point | point | DemographyConfig | untagged | `demography.py:1300` | "point" (Bettencourt-correct) / "catchment" (falsified) |
+| `aggl_tier2` | 5 | 2 ≠ | DemographyConfig | PROVISIONAL | `demography.py:1304` | intensification MULTIPLE: A_cell/R = tier2·S_pot·cv_ref — dimensionless (~1–5) [PROVISIONAL] |
+| `aggrandizer_frac` | 0.15 | 0 ≠ | DemographyConfig | VERIFIED | `demography.py:2085` | WHO captures — the AGGRANDIZER trait, NOT inherited status. [Hayden 1995 VERIFIED] The captor is an "ambitious, accumulative aggrandizer" — … |
+| `aggregation_period` | 12 | 12 | DemographyConfig | untagged | `demography.py:1787` | steps between gatherings (12 = annual) |
+| `aggregation_radius` | 8 | 8 | DemographyConfig | untagged | `demography.py:1789` | connubium/travel range: a band's site must be within this many cells (~80 km); isolated bands get no gathering (die — "se la vi") |
+| `aggregation_rank_homogamy` | 0 | 0 | DemographyConfig | untagged | `demography.py:1792` | 0 = directional only; >0 = like-cred assortment (rank homogamy) preserves the lineage gradient |
+| `aggregation_residence` | virilocal | virilocal | DemographyConfig | untagged | `demography.py:1791` | {virilocal (bride→groom), uxorilocal (groom→bride), flexible (smaller→larger band)} |
+| `aggregation_season_threshold` | 0.8 | 0.8 | DemographyConfig | untagged | `demography.py:1788` | gather only when ClimateField.season() ≥ this (abundance window); ignored on static fields |
+| `aggregation_site_sep` | 10 | 10 | DemographyConfig | untagged | `demography.py:1790` | min cell separation between aggregation sites (≈ one per region) |
+| `alluvial_renew_per_yr` | 3 | 3 | DemographyConfig | PROVISIONAL | `demography.py:1174` | flood soil-restoration rate at wateracc=1 — restores ~97% of the deficit within a year ⇒ equilibrium soil ≈ 1 − deplete/renew ≈ 0.8 at full … |
+| `ascribed_mate_strength` | 1.5 | 0 ≠ | DemographyConfig | UNANCHORED | `demography.py:1779` | global scale `a` of the ascribed(cred) mating exponent; UNANCHORED |
+| `assabiyah_decay` | 0.02 | 0.02 | DemographyConfig | untagged | `demography.py:1494` | baseline solidarity decay per step (luxury/turnover erosion) |
+| `assabiyah_gain` | 0.05 | 0.05 | DemographyConfig | untagged | `demography.py:1493` | solidarity gained per step per unit band surplus |
+| `assortative_strength` | 0 | 0 | DemographyConfig | untagged | `demography.py:2292` | [R-80, NOT BUILT] A status→fertility provisioning channel (husband's overflow → wife's reproductive reserve → shorter IBI) was prototyped … |
+| `band_base_tolerable` | 25 | 25 | DemographyConfig | untagged | `demography.py:1492` | tolerable size at assabiyah=0 (Birdsell/Wobst ~25 baseline) |
+| `band_cohesion` | 0.3 | 0 ≠ | DemographyConfig | untagged | `demography.py:1453` | cohesion-drive strength (pull toward band centroid); 0 = off |
+| `band_merge_size` | 10 | 10 | DemographyConfig | untagged | `demography.py:1455` | band fuses into the nearest band below this (hysteresis vs split) |
+| `band_provision_self_keep` | 0.5 | 0.5 | DemographyConfig | PROVISIONAL | `demography.py:701` | [PROVISIONAL] co-resident adults share surplus above this fraction of their cap to band juveniles |
+| `band_split_size` | 45 | 45 | DemographyConfig | untagged | `demography.py:1454` | band fissions above this (upper "community" rung / HARD cap) |
+| `between_band_gini_min` | 0.3 | 0.3 | DemographyConfig | CALIBRATED | `demography.py:975` | regional between-band cred Gini for a stratified region. CALIBRATED (R-106, 2026-09-05): the model's between-band Gini climbs 0.13->0.33 as … |
+| `bonded_mate_radius` | 1 | 0 ≠ | DemographyConfig | untagged | `demography.py:1364` | F.2 mate-search RADIUS (Chebyshev). The band is a spatially-EXTENDED group: on the IFD substrate agents sit ~1 per 100 km² cell (Binford … |
+| `bud_hazard_b0` | -18.636 | -18.636 | DemographyConfig | ANCHORED | `demography.py:1676` | SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress / size). Read from the filed PDF: slope 0.147 … |
+| `bud_hazard_b1` | 0.147 | 0.147 | DemographyConfig | ANCHORED* | `demography.py:1677` | *(no own comment; inherited group comment:)* SIZE TERM — Alberti 2014 (PLoS ONE 9(3):e91510) fitted logistic for P(critical scalar stress / … |
+| `bud_hazard_per_yr` | 0.005 | 0.005 | DemographyConfig | ANCHORED | `demography.py:1683` | BASE RATE — Bandy 2004's own event counts. Three fission events, and in ALL THREE the village was the largest of its phase: Chiaramaya + … |
+| `bud_spacing_village_target` | 300 | 300 | DemographyConfig | ANCHORED | `demography.py:1621` | V_target in the density-scaled spacing d=√(V/K_local); NW Coast village midpoint (250–1500) [ANCHORED, Ames 2003] |
+| `bud_steps_per_year` | 12 | 12 | DemographyConfig | untagged | `demography.py:1684` | model calendar (2000 steps ≈ 167 yr) |
+| `bud_w_capital` | 1 | 1 | DemographyConfig | untagged | `demography.py:1692` | owned/improved land ⇒ stay (discourages) |
+| `bud_w_depletion` | 1 | 1 | DemographyConfig | DESIGN | `demography.py:1691` | MODIFIER WEIGHTS — Bandy names the DIRECTIONS ("factors favouring fissioning include resource depletion and a high level of internal … |
+| `bud_w_grievance` | 1 | 1 | DemographyConfig | DESIGN* | `demography.py:1714` | *(no own comment; inherited group comment:)* ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── … |
+| `bud_w_integration` | 1 | 1 | DemographyConfig | untagged | `demography.py:1693` | complex/stratified ⇒ stay (Bandy's branch 2) |
+| `bud_w_mate_competition` | 1 | 1 | DemographyConfig | DESIGN | `demography.py:1712` | ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── Bandy's factors FAVOURING fission are … |
+| `bud_w_rivalry` | 1 | 1 | DemographyConfig | DESIGN* | `demography.py:1713` | *(no own comment; inherited group comment:)* ── POLARIZATION (2026-07-27) ─────────────────────────────────────────────────────────────── … |
+| `caribou_amp` | 0 | 0 | ClimateConfig | untagged | `climate.py:397` | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
+| `caribou_period` | 0 | 0 | ClimateConfig | untagged | `climate.py:398` | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
+| `caribou_phase` | 0 | 0 | ClimateConfig | untagged | `climate.py:399` | *(no own comment; inherited group comment:)* ── C.4b CARIBOU HERD SWING — quasi-periodic meat depression on GRASS_STEPPE only ──────────────── … |
+| `catchment_ceiling_mult` | 1 | 1 | DemographyConfig | untagged | `demography.py:1106` | ceiling = this × Σ(sustainable cell yield over the catchment); 1.0 = the land's own capacity |
+| `cell_area_km2` | 100 | 100 | SubstrateConfig | untagged | `config.py:134` | §1 spatial scale: 1 cell = 100 km² (10×10 km) |
+| `childhood_ratio_mf` | 0.71 | 0.71 | DemographyConfig | untagged | `demography.py:435` | M-3 sex split (Hill & Hurtado 1996): male:female mortality-risk ratios (childhood / adulthood) |
+| `cohesion_leader_weight` | 1 | 1 | DemographyConfig | untagged | `demography.py:1517` | (2) LEADER WEIGHT. Even an ungraded assabiyah leaves the leader term (0.41–1.64, median 0.78) ADDED on top, which re-saturates the sum on … |
+| `comove_anticipate` | False | False | DemographyConfig | untagged | `demography.py:1965` | CENTRAL-PLACE FORAGING fixes (blueprint …_CoMovementCentralPlace; R-41): family co-movement snaps the whole family onto the mother's … |
+| `comove_footprint` | 0 | 0 | DemographyConfig | untagged | `demography.py:1966` | (ii) followers scatter to lowest-occupancy cells within this Chebyshev radius of the head (0 = exact snap); a dispersed camp |
+| `comove_footprint_max` | 3 | 3 | DemographyConfig | untagged | `demography.py:1972` | cap on the scaled footprint radius |
+| `comove_footprint_scaled` | True | False ≠ | DemographyConfig | untagged | `demography.py:1971` | (ii-scaled) the footprint = the biome-scaled MONTHLY RANGE on the uniform grid: the 10 km cell = forest monthly range → forest k≈0 (tight … |
+| `comove_provision_exclude` | False | False | DemographyConfig | untagged | `demography.py:1973` | (iii) JUVENILE followers (age<forage_age_min) take NO forage share (central-place: children are provisioned, not self-extracting) → don't … |
+| `condition_alpha` | 0.25 | 0.25 | DemographyConfig | untagged | `demography.py:685` | EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag |
+| `contest_exponent` | 1.5 | 0 ≠ | SubstrateConfig | untagged | `config.py:137` | κ: 0 = even split (scramble); 1 = Cred-weighted contest (C) |
+| `cred_inherit_sigma` | 0.1 | 0 ≠ | DemographyConfig | untagged | `demography.py:1996` | lineage-copy noise at birth; 0 = exact inheritance |
+| `cred_seed_sigma` | 0.5 | 0 ≠ | DemographyConfig | untagged | `demography.py:1995` | founder log-status spread; 0 = uniform (no hierarchy) |
+| `cv_safe` | 0.037 | 0.037 | DemographyConfig | CALIBRATED | `demography.py:1484` | cv_safe: the ONE fitted scale. Composite of risk-aversion and per-capita crowding cost, neither independently anchored, so it is calibrated … |
+| `defensibility_claim_dwell` | 6 | 6 | DemographyConfig | untagged | `demography.py:1007` | steps a band must lead-occupy a claimable cell before it OWNS it (bootstrapping toehold) |
+| `defensibility_claim_min` | 3 | 3 | DemographyConfig | untagged | `demography.py:1008` | min owner members present to build/hold a claim (a family; below → the claim decays) |
+| `defensibility_exclusion` | 0.2 | 0.2 | DemographyConfig | PROVISIONAL | `demography.py:1009` | OUTSIDER's perceived per-capita on an OWNED cell × this (shadow of defence → routed away) [PROVISIONAL] |
+| `defensibility_min` | 0.15 | 0.15 | DemographyConfig | PROVISIONAL | `demography.py:1006` | D_min: min aquatic_food/S_pot for a cell to be CLAIMABLE (dense+predictable) [PROVISIONAL] |
+| `defensibility_tether` | 6 | 6 | DemographyConfig | PROVISIONAL | `demography.py:1010` | OWNER member's perceived per-capita on ITS band's owned cell × this (delayed-return tether → concentrate) [PROVISIONAL] |
+| `dens_delta` | 3 | 1 ≠ | DemographyConfig | FREE | `demography.py:716` | density-disease max excess [FREE — calibrated] |
+| `dens_response_init` | 6 | 6 | DemographyConfig | PROVISIONAL | `demography.py:1257` | [PROVISIONAL] founder exponent (= the calibrated density_fert_exponent; R-106 candidate) |
+| `dens_response_mut_sigma` | 0.1 | 0.1 | DemographyConfig | PROVISIONAL | `demography.py:1258` | [PROVISIONAL] per-birth mean-preserving lognormal mutation of the exponent (R-106 candidate) |
+| `dens_rho_half` | 0.2 | 0.2 | DemographyConfig | FREE | `demography.py:717` | density-disease half-saturation, agents/km² [FREE] |
+| `dens_rho_ref` | 0.091 | 0.091 | DemographyConfig | ANCHORED | `demography.py:743` | agents/km² at which density_mult == 1 [ANCHORED, Binford 2001] |
+| `density_fert_exponent` | 6 | 6 | DemographyConfig | CALIBRATED | `demography.py:629` | shape of the fill→fertility brake; higher = bites only near carrying capacity. CALIBRATED 6.0 (R-106, 2026-09-06 lever-sensitivity sweep): … |
+| `divorce_rate` | 0.005 | 0 ≠ | DemographyConfig | CALIBRATED | `demography.py:1401` | PER-STEP bond dissolution probability, applied in `_do_divorce` every step on all pairing paths (R-78 — it previously sat inside the … |
+| `enabled` | True | True | SubstrateConfig | untagged | `config.py:100` | *(no own comment; inherited group comment:)* (from the SubstrateConfig docstring) enabled=False (default) preserves the one-agent-per-cell … |
+| `exogamy_degree` | lineage | lineage | DemographyConfig | untagged | `demography.py:1916` | {"nuclear" (parents/sibs), "lineage" (+patriclan), "cousin" (+genome r>r*)} |
+| `exogamy_relatedness` | 0.125 | 0.125 | DemographyConfig | untagged | `demography.py:1917` | r* first-cousin threshold for the "cousin" degree (needs enable_genome) |
+| `family_maturity_months` | 180 | 180 | DemographyConfig | untagged | `demography.py:1402` | child detaches from the family unit at this age (~15 yr) |
+| `feast_every` | 12 | 12 | DemographyConfig | VERIFIED | `demography.py:1740` | ── WEALTH → OBLIGATION → PRODUCTION (2026-07-27) ─────────────────────────────────────────── TYPE **C (Conversion)** · UNIT **agent pair** … |
+| `feast_tolerance` | 4 | 0 ≠ | DemographyConfig | PROVISIONAL | `demography.py:2214` | R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the feast, the SECOND binding leveler. The feast debits … |
+| `fecundability` | 0.12 | 0.12 | DemographyConfig | FREE | `demography.py:442` | monthly birth prob past refractory [FREE] |
+| `forage_cap_hours` | 100 | 100 | DemographyConfig | PROVISIONAL | `demography.py:1314` | foraging work-hours/period; cap = forage_kcal·hours (~1.6× BURN at hours=100) [PROVISIONAL — Hadza time-budget] |
+| `fusion_search_radius` | 25 | 25 | DemographyConfig | untagged | `demography.py:1579` | cells; locality bound for the richest-neighbour search |
+| `game_meat_cv` | 0.73 | 0 ≠ | DemographyConfig | untagged | `demography.py:777` | G.3 stochastic meat returns (the Carbon-stage core variance; MODEL_SPEC §4.5.5 / Carbon scoping). The cell meat pool is a mean-preserving … |
+| `game_meat_frac` | 0.55 | 0 ≠ | DemographyConfig | untagged | `demography.py:766` | *(no own comment; inherited group comment:)* Game/meat economy (the Carbon substrate; MODEL_SPEC §4.5.5, blueprint v2). The cell yield is split … |
+| `genome_loci` | 48 | 32 ≠ | DemographyConfig | untagged | `demography.py:1797` | number of neutral loci (relatedness resolution ~1/L) |
+| `genome_mutation` | 0 | 0 | DemographyConfig | untagged | `demography.py:1798` | per-locus per-birth mutation prob (0 = pure drift / infinite-allele) |
+| `group_mate_floor` | 0.2 | 0.3 ≠ | SubstrateConfig | untagged | `config.py:148` | cell-value multiplier for a LONE agent (g=1) |
+| `group_mate_min` | 15 | 0 ≠ | SubstrateConfig | untagged | `config.py:147` | E.2 mating-access drive: being below a minimum viable band (the ~25 connubium, Wobst 1974) is actively bad (no mates) — a lone agent's cell … |
+| `group_safety_max` | 8 | 0 ≠ | SubstrateConfig | untagged | `config.py:143` | Emergent bands (E.1): a SATURATING grouping benefit (risk dilution / many-eyes) multiplies a cell's value by 1 + group_safety_max·(1 − … |
+| `group_safety_scale` | 15 | 8 ≠ | SubstrateConfig | untagged | `config.py:144` | g_s: group size at which safety is ~63% saturated |
+| `homogenize_cred` | False | False | DemographyConfig | untagged | `demography.py:1985` | ABLATION (lumping experiment): each step, flatten every agent's cred to its BAND (cell) mean → the band is internally homogeneous in status … |
+| `homogenize_prowess` | False | False | DemographyConfig | untagged | `demography.py:1989` | Full band-as-unit lump: ALSO flatten the achieved PROWESS facet within the band (applied after the prowess EMA each step). With … |
+| `hunger_flee_reserve_frac` | 0.35 | 0.35 | DemographyConfig | untagged | `demography.py:1216` | reserve fill fraction below which a settled agent breaks the pin to forage; bracket [0.3, 0.5] |
+| `ibi_refractory_months` | 30 | 30 | DemographyConfig | FREE | `demography.py:441` | lactational refractory [FREE — calibrate to IBI~37] |
+| `intake_ema_alpha` | 0.04 | 0.04 | DemographyConfig | untagged | `demography.py:531` | half-life = ln2/-ln(1-a) ~ 17 steps ~ 1.4 yr: slow enough that one bad month does not stop births, fast enough to track a multi-year squeeze |
+| `intake_fert_hi` | 1.2 | 1.2 | DemographyConfig | untagged | `demography.py:618` | + the lactation increment (~+500 kcal/d on ~2500, FAO/IOM; pregnancy is ~+285 ⇒ +11%, lactation ~+20%, so full reproductive capacity needs … |
+| `intake_fert_lo` | 1 | 1 | DemographyConfig | untagged | `demography.py:617` | intake = maintenance ⇒ no surplus for gestation/lactation |
+| `interannual_amp` | 0 | 0 | ClimateConfig | untagged | `climate.py:377` | *(no own comment; inherited group comment:)* ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── … |
+| `interannual_period` | 0 | 0 | ClimateConfig | untagged | `climate.py:378` | steps (yr x 12); 0 = off |
+| `interannual_phase` | 0 | 0 | ClimateConfig | untagged | `climate.py:379` | *(no own comment; inherited group comment:)* ── C.2b INTERANNUAL / ENSO — a one-sided depression on a 2-7 yr clock ─────────────────────────── … |
+| `k_cell` | 0 | 0 | SubstrateConfig | untagged | `config.py:135` | hard occupancy ceiling; 0 = unlimited (∞); 1 = recovery regime |
+| `leader_coherence_gain` | 2 | 0 ≠ | DemographyConfig | UNANCHORED | `demography.py:1530` | UNANCHORED magnitude (red-team: bracket/sweep, don't fit) |
+| `leader_share_frac` | 0.2 | 0 ≠ | DemographyConfig | untagged | `demography.py:2125` | share of the BAND's per-step durable output taken as managerial right |
+| `legit_cred_gain` | 10 | 0 ≠ | DemographyConfig | untagged | `demography.py:2217` | per-step heritable-cred boost to a legitimated lineage's members |
+| `legit_decay` | 0.02 | 0.02 | DemographyConfig | untagged | `demography.py:2215` | legitimacy fades without renewal (~1/0.02 = 50-step memory) |
+| `legit_feast_frac` | 0.25 | 0 ≠ | DemographyConfig | untagged | `demography.py:2203` | share of a lineage's material spent on sacrifices/feasts each step |
+| `legit_rel_multiplier` | 2 | 2 | DemographyConfig | untagged | `demography.py:1907` | cross at this MULTIPLE of an average lineage's share |
+| `legit_threshold` | 0.15 | 0.5 ≠ | DemographyConfig | untagged | `demography.py:2216` | above this share of the band's feasting, the lineage is "descended from higher nats" |
+| `leveling_share` | 0.8 | 0 ≠ | DemographyConfig | DESIGN | `demography.py:2134` | fraction of the excess disgorged when sanctioned [DESIGN] |
+| `leveling_strength` | 0.79 | 0 ≠ | DemographyConfig | VERIFIED | `demography.py:2133` | ANCHOR [Boehm 1993, VERIFIED]: "Ousting or ostracizing the individual or removing him from a leadership role involved **38 of the 48 … |
+| `leveling_tolerance` | 3 | 0 ≠ | DemographyConfig | PROVISIONAL | `demography.py:2144` | R-106 Addendum 86 [PROVISIONAL, GRADED-LEVELER ARC]: the TOLERANCE BAND on the Boehm sanction. Addendum 84 found the coalition levels every … |
+| `lh_eta_juvenile_exponent` | 3 | 3 | DemographyConfig | untagged | `demography.py:573` | PASSTHROUGH to the auto-built LifeHistoryConfig (the value's HOME is `LifeHistoryConfig .eta_juvenile_exponent` — see config.py). 1.0 = the … |
+| `lh_eta_min` | 0.1 | 0.1 | DemographyConfig | untagged | `demography.py:579` | PASSTHROUGH to the auto-built LifeHistoryConfig.eta_min (juvenile foraging efficiency at birth). ADOPTED CANONICAL 0.10 (R-106, 2026-09-04, … |
+| `lineage_branch_rate` | 0.05 | 0 ≠ | DemographyConfig | untagged | `demography.py:1818` | per-BIRTH prob the child founds a new named line |
+| `lineage_reversion` | 0.1 | 0 ≠ | DemographyConfig | untagged | `demography.py:2268` | ρ: mean-reversion of inherited lineage (homeostat) |
+| `lineage_split_min_segment` | 8 | 8 | DemographyConfig | untagged | `demography.py:1910` | both halves must reach this, else the split is skipped |
+| `lineage_split_rate` | 3e-05 | 0 ≠ | DemographyConfig | untagged | `demography.py:1909` | per-MEMBER per-step hazard (lineage hazard = rate·n) |
+| `lineage_tribute_frac` | 0.15 | 0.15 | DemographyConfig | untagged | `demography.py:2077` | *(no own comment; inherited group comment:)* R-103f — PER-LINEAGE (CHIEFLY) TRIBUTE. The office levy (`leader_share`) fills a rotating OFFICE … |
+| `llanos_flood_amp` | 0 | 0 | ClimateConfig | untagged | `climate.py:406` | *(no own comment; inherited group comment:)* ── C.4c LLANOS FLOOD — TWO-SIDED forage depression on GRASS_LLANOS, on the ENSO clock ─────────── … |
+| `lottery_a_earth_biome` | savanna | savanna | ClimateConfig | untagged | `climate.py:347` | Which biome's Earth reference amplitude the obliquity draw is scaled against (A_SEAS_EARTH). The world is a mix of biomes and `a_seas` is a … |
+| `malnutrition_ema_alpha` | 0.3 | 0.3 | DemographyConfig | untagged | `demography.py:1573` | smoothing of the per-band starvation-rate signal |
+| `malnutrition_fission_gain` | 0 | 0 | DemographyConfig | UNANCHORED | `demography.py:1571` | max dispersion (subtracted from cohesion); UNANCHORED |
+| `malnutrition_starv_rate` | 0.05 | 0.05 | DemographyConfig | untagged | `demography.py:1572` | per-capita recent-starvation rate (EMA) at which the pressure SATURATES |
+| `mate_choice_strength` | 5 | 0 ≠ | DemographyConfig | untagged | `demography.py:2266` | m; 0 = random paternity (the drift-control twin) |
+| `mate_search_max_radius` | 15 | 15 | DemographyConfig | untagged | `demography.py:1923` | travel cap on the marriage search (~150 km); isolated seekers past it stay unpaired |
+| `mate_search_min_eligible` | 15 | 3 ≠ | DemographyConfig | untagged | `demography.py:1918` | m*: eligible-mate famine-safety margin (the connubium's cv_safe) |
+| `mate_within_band_id` | False | False | DemographyConfig | untagged | `demography.py:1394` | PERF (re-arch Tier 0): pool mates by SOCIAL band_id (fission-capped ~25–45) instead of the SPATIAL bands() clump. Fixes the O(clump²) … |
+| `material_capture_frac` | 0.15 | 0 ≠ | DemographyConfig | untagged | `demography.py:2041` | PARKED at 0.0 (egalitarian neutral) DELIBERATELY, R-106 Addendum 84: enable_material_capture runs the hide economy (every hunter accrues … |
+| `material_decay` | 0.002 | 0 ≠ | DemographyConfig | untagged | `demography.py:2042` | per-step depreciation of the durable stock (0 = imperishable) |
+| `material_heir_by_status` | True | False ≠ | DemographyConfig | untagged | `demography.py:2058` | R-103e — HEIR COUPLED TO STATUS. Estate+rank should pass TOGETHER (Flannery ch.16 chiefly primogeniture), not to a random child. ON ⇒ … |
+| `material_hide_frac` | 0.07 | 0 ≠ | DemographyConfig | untagged | `demography.py:2034` | SOURCE = GAME, not the granary (supervisor correction, R-82b). Durable goods in a forager economy are the BYPRODUCT OF HUNTING — hides, … |
+| `material_inheritance_rule` | primogeniture | primogeniture | DemographyConfig | untagged | `demography.py:2048` | none/primogeniture/partible_equal/patrilineal_sons primogeniture → whole estate to the ELDEST surviving child (concentrates; the … |
+| `material_invulnerability_min` | 0 | 0 | DemographyConfig | VERIFIED | `demography.py:2091` | WHEN capture is possible — the ABUNDANCE + INVULNERABILITY gate. [Hayden 1995 Fig. 6, p.77 VERIFIED] the top trait row is "Resource … |
+| `material_unit_value` | 1 | 1 | DemographyConfig | untagged | `demography.py:2241` | VALUE HOOK (the supervisor's market insight, deliberately deferred): material's worth is treated as a CONSTANT per unit here. Stage E … |
+| `maternal_mortality_per_birth` | 0 | 0 | DemographyConfig | untagged | `demography.py:446` | approach (ii): maternal mortality is FOLDED INTO the all-cause female Siler → explicit term 0. Set > 0 only with a maternal-removed female … |
+| `max_wives` | 3 | 1 ≠ | DemographyConfig | untagged | `demography.py:1410` | cap on wives per male (1 = monogamy even if rate>0) |
+| `mean_factor` | 1 | 1 | ClimateConfig | untagged | `climate.py:366` | *(no own comment; inherited group comment:)* ── C.2a ECCENTRICITY annual-mean brightening ──────────────────────────────────────────────────── A … |
+| `menarche_months` | 180 | 180 | DemographyConfig | untagged | `demography.py:439` | --- fertility (Aché-anchored window; IBI/fecundability tuned in Step-1) --- 15 yr — fertility onset |
+| `menopause_months` | 504 | 504 | DemographyConfig | untagged | `demography.py:440` | 42 yr — last-birth ceiling |
+| `metabolic_downreg_max` | 0.4 | 0.4 | DemographyConfig | untagged | `demography.py:547` | Keys total BMR drop at ~25% wt loss; bracket [0.25 adaptive-only, 0.40 total] |
+| `metabolic_downreg_span` | 0.5 | 0.5 | DemographyConfig | untagged | `demography.py:548` | full down-reg reached at ~half reserve depletion (Keys ~25% wt loss) |
+| `mobility_base_radius` | 1 | 1 | DemographyConfig | untagged | `demography.py:1941` | stride at/above npp_ref |
+| `mobility_exponent` | 1 | 1 | DemographyConfig | PROVISIONAL | `demography.py:1945` | Kelly/Binford slope; 1.0 = strict ∝1/NPP; PROVISIONAL (bracket) |
+| `mobility_intake_floor` | 0.15 | 0.15 | DemographyConfig | untagged | `demography.py:1959` | denom floor so a near-starving ratio doesn't → ∞ range |
+| `mobility_intake_ref` | 1 | 1 | DemographyConfig | untagged | `demography.py:1957` | ratio at/above which stride=base; reuses the maintenance anchor `intake_fert_lo` already carries (§21.10) rather than inventing a new number |
+| `mobility_max_radius` | 6 | 6 | DemographyConfig | PROVISIONAL | `demography.py:1942` | cap on stride (bounds cost + jump-over risk); PROVISIONAL |
+| `mobility_npp_floor` | 50 | 50 | DemographyConfig | PROVISIONAL | `demography.py:1944` | denom floor so hyper-arid cells don't → ∞ range; PROVISIONAL |
+| `mobility_npp_ref` | 900 | 900 | DemographyConfig | PROVISIONAL | `demography.py:1943` | forager-median NPP g/m²/yr (Tallavaara); r=base at/above; PROVISIONAL |
+| `mobility_pressure_source` | npp | npp | DemographyConfig | untagged | `demography.py:1956` | PRESSURE-AWARE MOBILITY (R-106 Addendum 6, 2026-07-31): the NPP-driven stride above is STATIC/geographic — a cell packed with 40+ occupants … |
+| `morph_aquatic_gated` | False | False | DemographyConfig | untagged | `demography.py:936` | SEASONAL-AQUATIC-GLUT MORPH (blueprint …_StorabilityGatedMorph v3; R-46/R-47): the ANTHROPOLOGICALLY CORRECT driver of forager complexity … |
+| `morph_aquatic_threshold` | 0.15 | 0.15 | DemographyConfig | PROVISIONAL | `demography.py:937` | complex needs seasonal aquatic glut mean(wateracc×seas_amp) ≥ this [PROVISIONAL] |
+| `morph_npp_floor` | 500 | 500 | DemographyConfig | PROVISIONAL | `demography.py:986` | AND a PRODUCTIVE setting: mean(npp_gm2) ≥ this — the true-desert(≈400) vs river-desert/Nile(≳550) distinguisher [PROVISIONAL, from R-47 … |
+| `morph_settle_steps` | 60 | 300 ≠ | DemographyConfig | untagged | `demography.py:994` | T: sustained-settlement steps to morph (~1 generation; Bocquet-Appel) |
+| `move_cost_flat` | 0 | 0 | SubstrateConfig | untagged | `config.py:138` | flat energy cost per move; 0 = free (recovery) |
+| `move_cost_kcal` | 750 | 0 ≠ | DemographyConfig | untagged | `demography.py:1764` | kcal to traverse a max-cost (cost=1) cell; realized = ·cost[dest]. |
+| `movement_mode` | diffusion | legacy ≠ | SubstrateConfig | untagged | `config.py:136` | legacy=vision-v cardinal arms; diffusion=von-Neumann r=1 |
+| `mu_max` | 2.5 | 2.5 | DemographyConfig | PROVISIONAL | `demography.py:744` | nutrition-synergy max (Pelletier 1994, CHILD data — mild RR 2.5) [PROVISIONAL] |
+| `noble_exemption_frac` | 1 | 1 | DemographyConfig | untagged | `demography.py:2066` | 1.0 = full waiver of the wealth-grievance for nobles |
+| `obligation_grant_frac` | 0.1 | 0.1 | DemographyConfig | untagged | `demography.py:1742` | share of the creditor's stock per grant |
+| `obligation_min_ratio` | 2 | 2 | DemographyConfig | untagged | `demography.py:1745` | creditor needs this multiple of band-mean |
+| `obligation_premium` | 1.2 | 1.2 | DemographyConfig | untagged | `demography.py:1744` | claim per unit granted (>1 = the gift binds) |
+| `obligation_return_frac` | 0.25 | 0.25 | DemographyConfig | untagged | `demography.py:1743` | share of a debtor's output redirected |
+| `office_challenge_margin` | 0.25 | 0.25 | DemographyConfig | DESIGN | `demography.py:2166` | challenger must exceed the incumbent's merit by this factor [DESIGN] |
+| `office_deposition_share` | 0.346154 | 0.346154 | DemographyConfig | untagged | `demography.py:2167` | 0.346 = Boehm deposition 9 / (9 deposition + 17 desertion) |
+| `office_grievance_gain` | 0.05 | 1 ≠ | DemographyConfig | DESIGN | `demography.py:2169` | per-step sanction hazard at unit grievance [DESIGN — calibrated on tenure] |
+| `office_overreach_weight` | 0.655172 | 0.655172 | DemographyConfig | untagged | `demography.py:2168` | 0.655 = Boehm (14 dominating + 5 monopolizing) / 29 leadership motivations |
+| `orphan_e_mult` | 1.499 | 1.499 | DemographyConfig | untagged | `demography.py:503` | The Aché reference value, kept for documentation + the Table 13.1 arithmetic check. NOT used by the model (which normalises endogenously). … |
+| `orphan_infant_mother_lethal` | True | True | DemographyConfig | untagged | `demography.py:506` | "Mother's death in the first year of a child's life leads to mortality in 100% of the cases in our sample" — an unweaned infant cannot … |
+| `orphan_max_age_years` | 9 | 9 | DemographyConfig | untagged | `demography.py:485` | Table 13.1's window is ages 0–9 |
+| `orphan_mult_divorced` | 2.97 | 2.97 | DemographyConfig | untagged | `demography.py:484` | exp(1.0892) [LIT]; both parents alive but unbonded |
+| `orphan_mult_father_dead` | 3.05 | 3.05 | DemographyConfig | untagged | `demography.py:483` | exp(1.1146) [LIT] |
+| `orphan_mult_mother_dead` | 5.09 | 5.09 | DemographyConfig | untagged | `demography.py:482` | exp(1.6277) [LIT — Hill & Hurtado Tab. 13.1] |
+| `orphan_normalize` | True | True | DemographyConfig | untagged | `demography.py:497` | DOUBLE-COUNT GUARD — normalise by E[mult] over the population's OWN children (`_orphan_e_mult_live`). The Siler a1 was fit to OBSERVED Aché … |
+| `paternal_provision_frac` | 0.5 | 0 ≠ | DemographyConfig | untagged | `demography.py:2279` | B+ step 5: PATERNAL provisioning. A father gives `paternal_provision_frac` of his harvest OVERFLOW (above his cap, otherwise wasted) to his … |
+| `pathogen_cap` | 3 | 3 | DemographyConfig | untagged | `demography.py:758` | symmetric cap [1/cap, cap] on pathogen_mult |
+| `pathogen_gamma` | 0 | 0 | DemographyConfig | BRACKETED | `demography.py:757` | Biome-Mortality S2 pathogen channel (Cashdan 2014; §4.6.3) — biome disease-ecology on a2. BRACKETED strength (NPP exponent); 0 = OFF/flat. … |
+| `pathogen_npp_ref` | 0 | 0 | DemographyConfig | untagged | `demography.py:759` | reference NPP (Aché-forest biome); 0 → model uses terrain mean |
+| `patriline_weight` | 0.5 | 0.5 | DemographyConfig | untagged | `demography.py:2267` | father vs mother weight in lineage inheritance |
+| `phi_epsilon` | 1e-06 | 1e-06 | SubstrateConfig | untagged | `config.py:139` | contest denominator guard (φ+ε) |
+| `pin_release_hold_steps` | 12 | 12 | DemographyConfig | PROVISIONAL | `demography.py:1204` | one year: the household's residence decision is seasonal/annual [PROVISIONAL — one annual cycle; not anchored] |
+| `polygyny_attrition` | 0.02 | 0 ≠ | DemographyConfig | untagged | `demography.py:1423` | POLYGYNY ATTRITION (R-76) — the stock's missing OUTFLOW. `polygyny_rate` gates only whether a married male is CONSIDERED; once considered … |
+| `polygyny_rate` | 0.005 | 0 ≠ | DemographyConfig | untagged | `demography.py:1409` | F.3a MODEST POLYGYNY (von Rueden & Jaeggi 2016: polygyny is the MAIN status→RS amplifier; ~4-11% of forager marriages). polygyny_rate>0: … |
+| `provision_self_keep` | 1 | 1 | DemographyConfig | untagged | `demography.py:691` | Biome-Mortality S1: child-priority shortfall-sharing. The mother provisions her child's deficit not only from wasted overflow (C.2b) but … |
+| `prowess_decay` | 0.05 | 0 ≠ | DemographyConfig | untagged | `demography.py:2251` | B+ step 2: prowess GROWTH. Prowess is a decaying EMA of the agent's RELATIVE meat intake (reputation, not instantaneous return — Smith … |
+| `rank_hierarchy_frac` | 0.15 | 0.15 | DemographyConfig | untagged | `demography.py:1891` | ascribed head-count share that counts as "ranked" |
+| `refractory_stretch_max` | 1.436 | 1.436 | DemographyConfig | PROVISIONAL | `demography.py:610` | x base refractory at zero energy surplus [PROVISIONAL — a BRACKET ENDPOINT awaiting its sweep, not a fitted value. Hill & Hurtado 1996 … |
+| `regime_amp` | 0 | 0 | ClimateConfig | untagged | `climate.py:386` | *(no own comment; inherited group comment:)* ── C.3 REGIME SHIFT — a two-state telegraph, a sustained PLATEAU rather than a wiggle ─────────── … |
+| `regime_duration` | 0 | 0 | ClimateConfig | untagged | `climate.py:387` | mean excursion length in steps; P(end) = 1/duration |
+| `regime_recurrence` | 0 | 0 | ClimateConfig | untagged | `climate.py:388` | mean onset spacing in steps; P(onset) = 1/recurrence |
+| `repulsion_gain` | 0.3 | 0 ≠ | DemographyConfig | ANCHORED | `demography.py:1557` | max repulsion (subtracted from cohesion_frac). ANCHORED value = 1.0 (Alberti P); village stack uses 0.3 |
+| `repulsion_midpoint` | 25 | 25 | DemographyConfig | untagged | `demography.py:1558` | band size at half-max repulsion (≈ Wobst-minimal band). Alberti's own midpoint is 126.9 = the VILLAGE rung; under enable_emergent_band_size … |
+| `repulsion_width` | 6 | 6 | DemographyConfig | ANCHORED | `demography.py:1559` | logistic steepness in band-size units. ANCHORED value = 6.80 (= 1/b1, Alberti 2014); village stack validated at 6.0 |
+| `resent_alpha` | 0.001 | 0.004 ≠ | DemographyConfig | untagged | `demography.py:2234` | EMA weight on privilege; 1/240 ≈ a 20-yr generational memory |
+| `resent_effect_threshold` | 0.8 | 0.8 | DemographyConfig | untagged | `demography.py:1905` | sustained effect size that triggers reversion (Cohen "large") |
+| `resent_privilege_ref` | 10 | 1 ≠ | DemographyConfig | DESIGN | `demography.py:2236` | cred-advantage ratio treated as unit privilege [DESIGN] |
+| `resent_threshold` | 0.5 | 0.5 | DemographyConfig | untagged | `demography.py:2235` | accumulated resentment that triggers the gumlao reversion |
+| `resent_years_to_revolt` | 80 | 80 | DemographyConfig | untagged | `demography.py:1900` | yr to revolt at UNIT privilege (effect size 1.0); |
+| `restraint_init` | 0 | 0 | DemographyConfig | PROVISIONAL | `demography.py:1242` | [PROVISIONAL] founder restraint; 0 ⇒ restraint must EVOLVE from nothing (R-106 candidate, no lit anchor) |
+| `restraint_mutation_sigma` | 0.02 | 0.02 | DemographyConfig | PROVISIONAL | `demography.py:1243` | [PROVISIONAL] per-birth Gaussian mutation of the heritable restraint gene (R-106 candidate) |
+| `restraint_transmission_period` | 60 | 60 | DemographyConfig | PROVISIONAL | `demography.py:1245` | [PROVISIONAL] steps between payoff-biased social-learning events (R-106 candidate) |
+| `restraint_transmission_rate` | 0.1 | 0.1 | DemographyConfig | PROVISIONAL | `demography.py:1246` | [PROVISIONAL] fraction of agents who copy the fittest band's restraint each event (R-106 candidate) |
+| `risk_accident_share` | 0.1 | 0.1 | DemographyConfig | ANCHORED | `demography.py:715` | accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED] |
+| `risk_cap` | 3 | 3 | DemographyConfig | untagged | `demography.py:704` | --- Step-2 a2-modulator parameters (values + citations: MODEL_SPEC §4.3.3) --- max terrain-risk multiplier (red-team M-2: pin the scale) |
+| `settle_catchment_radius` | 1 | 2 ≠ | DemographyConfig | PROVISIONAL | `demography.py:1097` | LAYER 2 — residence ≠ foraging (Binford collectors). A settlement of ~dozens is « one 100 km² cell, so settled members RESIDE on the single … |
+| `settle_founding_delay_steps` | 180 | 180 | DemographyConfig | untagged | `demography.py:1037` | *(no own comment; inherited group comment:)* FOUNDING DELAY (R-106, 2026-09-01). Diagnosed: 78% of the villages alive at equilibrium were … |
+| `settle_min_pool` | 40 | 40 | DemographyConfig | ANCHORED | `demography.py:1027` | min people to found/hold a settlement — minimum-viable-hamlet threshold (Bar-Yosef 1998: Natufian settlements range small ~dozens → medium … |
+| `settle_persist_threshold` | 0.3 | 0.3 | DemographyConfig | PROVISIONAL | `demography.py:1087` | site aquatic_food/S_pot ≥ this = a persistent-abundant (storable) settlement site [PROVISIONAL] |
+| `settle_radius` | 2 | 2 | DemographyConfig | untagged | `demography.py:1088` | Chebyshev radius of the settlement cluster (membership + hold) — a day's logistical range (~1–2 cells) |
+| `settle_release_steps` | 12 | 12 | DemographyConfig | untagged | `demography.py:1090` | hysteresis: steps a settlement survives below settle_min_pool before it dissolves |
+| `settle_tier2_yield` | 40 | 40 | DemographyConfig | PROVISIONAL | `demography.py:1098` | intensive tier-2 yield per unit S_pot per catchment cell, unlocked by settlement (gated) [PROVISIONAL — sweep] |
+| `settlement_cohesion` | 1.5 | 1.5 | DemographyConfig | untagged | `demography.py:1089` | (Layer 1 soft hold — SUPERSEDED by the Layer 2 residence pin below; kept for ablation) |
+| `settlement_memory_yr` | 12 | 12 | DemographyConfig | ANCHORED | `demography.py:1189` | the village's memory window for its remembered fortunes — sets the relocation interval into the ethnographic ~5–30 yr band [ANCHORED-range] |
+| `settlement_ss_gain` | 1 | 1 | DemographyConfig | untagged | `demography.py:1138` | max repel probability for an egalitarian over-crowded village |
+| `settlement_ss_midpoint` | 150 | 150 | DemographyConfig | untagged | `demography.py:1139` | village pop at half-max repulsion (Bar-Yosef egalitarian upper bound) |
+| `settlement_ss_width` | 50 | 50 | DemographyConfig | untagged | `demography.py:1140` | logistic width (Alberti 2014 shape) |
+| `sex_division` | 1 | 0 ≠ | DemographyConfig | untagged | `demography.py:2257` | B+ step 3: sex-divided PRODUCTION (men hunt → meat, women gather → forage). Tunes the prowess SIGNAL only (male prowess from … |
+| `shock_cv` | 0.6 | 0.6 | DemographyConfig | PROVISIONAL | `demography.py:1149` | inter-annual tier-2 yield CV (salmon-run anchored) [PROVISIONAL — sweep] |
+| `shock_rho` | 0 | 0 | DemographyConfig | PROVISIONAL | `demography.py:1150` | AR(1) persistence: 0 = IID single bad years; →1 = multi-year good/bad REGIMES (ENSO/PDO/drought). Storage matters most at high ρ (must … |
+| `siler_a1` | 0.1611 | 0.157 ≠ | DemographyConfig | untagged | `demography.py:427` | --- mortality: Siler, FIXED from Gurven & Kaplan 2007 (both-sexes; M-1) --- |
+| `siler_a2` | 0.00813 | 0.013 ≠ | DemographyConfig | untagged | `demography.py:431` | *(no own comment; inherited group comment:)* zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every … |
+| `siler_a3` | 3.781e-05 | 4.8e-05 ≠ | DemographyConfig | untagged | `demography.py:432` | *(no own comment; inherited group comment:)* zero is not a slow decay, it is a crash. Found by the stress battery (S2), which ran every … |
+| `siler_b1` | 0.6775 | 0.721 ≠ | DemographyConfig | untagged | `demography.py:428` | DIVISOR in the Siler cumulative hazard, (a1/b1)(1-exp(-b1*t)): zero is not a slow decay, it is a crash. Found by the stress battery (S2), … |
+| `siler_b3` | 0.1025 | 0.103 ≠ | DemographyConfig | untagged | `demography.py:433` | DIVISOR in (a3/b3)(exp(b3*t)-1); same finding as siler_b1 |
+| `site_gain` | 0.3 | 0 ≠ | DemographyConfig | UNANCHORED | `demography.py:1760` | central-place bonus magnitude (× BURN × normalized suitability); UNANCHORED (sweep) |
+| `site_lambda` | 1 | 1 | DemographyConfig | UNANCHORED | `demography.py:1762` | cost-distance decay of catchment contribution; UNANCHORED |
+| `site_radius` | 2 | 2 | DemographyConfig | VERIFIED | `demography.py:1761` | catchment radius (Vita-Finzi 5–10 km ≈ 1–2 cells) [VERIFIED-anchored] |
+| `soil_carry_per_cell` | 8 | 8 | DemographyConfig | PROVISIONAL | `demography.py:1164` | persons/catchment-cell that = pressure 1.0 (farming carrying density) [PROVISIONAL] |
+| `soil_deplete_frac` | 0.6 | 0.6 | DemographyConfig | PROVISIONAL | `demography.py:1163` | per-YEAR soil exhaustion at pressure=1 (PROGRESSIVE while farmed — no equilibrium; swidden) [PROVISIONAL] |
+| `soil_regrow_per_yr` | 0.045 | 0.045 | DemographyConfig | ANCHORED | `demography.py:1162` | slow fallow soil recovery (~1/0.045 ≈ 22 yr) — Boserup FOREST-FALLOW: a parcel is cropped 1–2 yr then fallowed 20–25 yr (Conklin) … |
+| `srb_male` | 0.512 | 0.512 | DemographyConfig | untagged | `demography.py:443` | secondary sex ratio (anchored ~105:100) |
+| `standing_floor` | 0.15 | 0.15 | DemographyConfig | untagged | `demography.py:659` | newcomer baseline (never 0 — kin/lineage reputation travels) |
+| `standing_leave_penalty` | 0.4 | 0.4 | DemographyConfig | untagged | `demography.py:658` | fraction of standing RETAINED on leaving your community |
+| `standing_tenure_rate` | 0.083 | 0.083 | DemographyConfig | untagged | `demography.py:657` | saturating accrual/step; 1/12 ⇒ ~63% after 1 yr (Wiessner "≥1 yr to firm") |
+| `storable_fraction` | 0.7 | 0.7 | DemographyConfig | LIT-CALIBRATED | `demography.py:883` | fraction of overflow that is storable — lit ~0.5–0.8 (strongly-seasonal storers live mostly off stores; grain 50–70% stored) … |
+| `storage_decay` | 0.02 | 0 ≠ | DemographyConfig | LIT-CALIBRATED | `demography.py:892` | S.3 per-step spoilage/maintenance loss (0 = off). Realistic traditional ≈ 0.02/mo (~22%/yr; lit 10–30%/yr) [LIT-CALIBRATED when on] |
+| `storage_seasonality_gated` | False | False | DemographyConfig | untagged | `demography.py:915` | STORABILITY-GATED MORPH (blueprint …_StorabilityGatedMorph; R-45): gate the overwintering STORE on the cell's biome SEASONAL AMPLITUDE … |
+| `storage_seasonality_threshold` | 0.25 | 0.25 | DemographyConfig | PROVISIONAL | `demography.py:916` | storage viable where biome amp ≥ this (above forest 0.05, below savanna 0.40) [PROVISIONAL] |
+| `storage_temp_threshold_c` | 15.25 | 15.25 | DemographyConfig | CALIBRATION | `demography.py:891` | Binford ET 15.25 °C → model mean-temp proxy [CALIBRATION] |
+| `store_anchor_gain` | 1 | 1 | DemographyConfig | untagged | `demography.py:667` | weight on the perceived per-capita granary buffer |
+| `store_anchor_horizon` | 24 | 24 | DemographyConfig | untagged | `demography.py:668` | steps over which the stock is amortised into a per-step value (~2 yr) |
+| `store_capacity_reserves` | 12 | 12 | DemographyConfig | LIT-CALIBRATED | `demography.py:890` | store cap = this × reserve cap. reserve_full≈1.33 mo BURN ⇒ 12≈16 mo ≈ Halstead 1–2 yr granary (annual cycle + bad-year buffer). Old 3 (=4 … |
+| `strat_top_quantile` | 0.75 | 0.75 | DemographyConfig | untagged | `demography.py:976` | a band must sit above this quantile of per-band mean cred to be a chiefly centre (top quarter) |
+| `stratification_gini_min` | 0.4 | 0.4 | DemographyConfig | PROVISIONAL | `demography.py:977` | BHM 2009 Table 2 α-weighted Gini: forager 0.25, horticultural 0.27, agricultural/pastoral ~0.45–0.57 → the egalitarian↔stratified boundary … |
+| `sub_k_by_emigration` | False | False | DemographyConfig | untagged | `demography.py:1281` | SUB-K MODE. The birth-hold above raises e0 but, being a fertility-only lever, OVER-AGES the pyramid (juv_frac falls below the forager … |
+| `sub_k_emigration_rate` | 0.25 | 0.25 | DemographyConfig | PROVISIONAL | `demography.py:1282` | [PROVISIONAL] fraction of the over-target excess that emigrates per step |
+| `sub_k_sharpness` | 20 | 20 | DemographyConfig | PROVISIONAL | `demography.py:1273` | [PROVISIONAL] logistic steepness of the birth hold around the target fill |
+| `sub_k_target_fill` | 0.3 | 0.3 | DemographyConfig | PROVISIONAL | `demography.py:1272` | [PROVISIONAL] village fill (pop/catchment-K) the population is held below; below the ~0.43 food margin |
+| `succession_dissolve` | False | False | DemographyConfig | VERIFIED | `demography.py:2176` | SUCCESSION ON THE HOLDER'S DEATH — two regimes [Sahlins 1972:209, VERIFIED]. The Nootka chief "is an officeholder in a lineage (house … |
+| `synergy_mu_max_adult` | 1.3 | 1.3 | DemographyConfig | ANCHORED | `demography.py:754` | adult malnutrition-mortality synergy [ANCHORED, community-dwelling >50 HR 1.14-1.29] |
+| `village_bud_min_faction` | 0 | 0 | DemographyConfig | ANCHORED | `demography.py:1598` | minimum rival-bloc share to carry a fission. WAS 0.25, which silently disabled budding: measured, a 475-person village held 126 lineages … |
+| `village_bud_search_radius` | 8 | 8 | DemographyConfig | untagged | `demography.py:1607` | cells searched for an open daughter site; beyond it ⇒ CIRCUMSCRIBED (no bud → the village grows + stratifies). ~a day's relocation range |
+| `village_circumscription_gain` | 0.6 | 0.6 | DemographyConfig | ANCHORED | `demography.py:1746` | the fission threshold RISES with relocation cost: eff_thr = base·(1 + gain·d_nearest_open/R). Bandy: 170 open → ~277 when circumscribed ⇒ … |
+| `village_fission_threshold` | 150 | 170 ≠ | DemographyConfig | ANCHORED | `demography.py:1597` | BASE (open-landscape) fission threshold — Bandy 2004 Early Chiripa ~170 (villages fissioned at pop-index 157–186); =Alberti N≈127–158 / … |
+| `village_gain` | 5 | 0 ≠ | DemographyConfig | UNANCHORED | `demography.py:1588` | headroom multiplier on net-payoff-above-saturation; UNANCHORED (sweep) |
+| `village_identity_months` | 180 | 180 | DemographyConfig | untagged | `demography.py:822` | = menarche_months; NOT an independent number |
+| `wife_quality_strength` | 0 | 0 | DemographyConfig | untagged | `demography.py:1438` | WIFE QUALITY (R-77) — the missing status→RS channel for a MONOGAMY-DOMINANT system. von Rueden & Jaeggi, "Men's status and reproductive … |

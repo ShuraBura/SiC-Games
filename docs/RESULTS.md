@@ -9988,4 +9988,39 @@ document written earlier the same day moved into the dated package `audit/2026-1
 
 ---
 
+## Addendum 116 — The external audit, verified: real defects in the model (double η, a 12× revolt clock, a food-shock channel 10⁻⁵ of the food supply, a lifespan-cap artifact, a constant synergy, dead ON flags), real defects in the audit tools, and a set of false claims (2026-10-26, R-106)
+
+**The audit.** An external audit of commit `07c1ef7` wrote `audit/2026-10-26/sic_games_audit_2026_10_26.md`. Every
+finding was verified against the code and the run outputs: `audit/2026-10-26/07_REVIEW_OF_EXTERNAL_AUDIT.md` (verdict
+per finding, with the evidence). No model code was changed.
+
+**Confirmed model defects** (each measured or read in code): (1) **F-03.7** the village tier-2 yield is 4.3 × 10⁻⁵ of
+its site cell's yield (258 vs 6.0 × 10⁶ kcal/step), so `enable_tier2_shock`, soil depletion, alluvial renewal and
+worked-land yield act on almost nothing — the drought-shock channel of the Malthus goal barely touches food;
+(2) **F-05** `modal_adult_death` = 75 is the 900-month lifespan cap (m(75) = 12/yr, l(76) = 0, ~10% of births die at
+exactly 75) — its "pass" is not evidence, and e0/e15/e45 are truncated; (3) **the body-condition signal is constant**
+(`condition_mean` = 0.321 on every world), so the nutrition × disease synergy is a fixed ×1.47 on everyone's hazard;
+(4) **F-01** juvenile efficiency η is applied twice under `enable_eta_weighted_shares`; (5) **F-04** village density
+disease scores a 25-cell regional density against the same reference as a 1-cell local one (village of 100 → ×0.77,
+mobile camp of 10 → ×1.03); (6) **F-02** the revolt accumulator runs monthly with a time in years — 12× too fast;
+(7) **F-06** `legit_frac_pop` and `mean/max_resentment` are always 0 (key mismatches; resentment 0.0 through 1,235
+revolts); (8) **F-03** ON flags with no effect in canon: `enable_ascribed_mate_choice`, `enable_marriage_aggregation`,
+`enable_energetic_fertility`, the mate-choice part of `enable_band_family_knobs`, `rank_hierarchy_frac`,
+`aggregation_site_sep`; (9) **F-11.1** canon runs `comove_footprint_scaled = true`, the variant R-43 FALSIFIED, which
+bypasses `comove_footprint`; (10) **F-11.2** `CarbonConfig` (κ 1.5 in the campaign, 2.0 in `config/`) is absent from the
+run file. Items (1)–(5) shape e0, l(15) and m(5–15), so the Add.113 adoption was calibrated on top of them.
+
+**Confirmed defects in the audit tools, fixed:** the provenance-tag regex in `gen_registry.py` (a literal "b" for a
+word boundary, from a shell edit; the committed REGISTRY said 253 untagged), `ClimateConfig` missing from its class
+defaults, and descriptions attributed to neighbouring fields (now labelled heuristic, with each field's definition
+line). `doc_audit.py` skips boolean/string rows, so "0 disagreements" held for numeric rows only; four stale rows exist.
+
+**Refuted claims** (do not act on them): scorecard bands [30, 42] / rows #6–#8 that do not exist; `load_addendum`;
+an `add110_vgran` snapshot; `enable_paternity_tracking`; an early-terminated run; canon `enable_colonizing_budding =
+false`; `_store_at`/`_granary` code; "infant hunters".
+
+**Also found in the review:** R-99 … R-105 have no entries in this ledger (they exist as commits only).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

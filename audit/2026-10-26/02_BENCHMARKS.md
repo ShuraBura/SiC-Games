@@ -22,7 +22,7 @@ Marker table: **#3** village size (median) · **#4** connubium reach · **#10** 
 **#13** primacy · **#14** material Gini (adults and within-camp) · **#16** dependency ratio, share under 15, sex ratio ·
 **#18** e0 · **#19** survival to 15 · **#20** e15 · **#21** survival to 45.
 Monitor: frac_child · dependency_ratio · sex_ratio_m_f · realised_e0 · e15 · e45 · surv_to_15 · surv_to_45 ·
-modal_adult_death · age_first_birth_yr.
+modal_adult_death · age_first_birth_yr. **[Corrected after the external audit: `modal_adult_death` = 75 is an artifact of the 900-month lifespan cap — m(75) = 12/yr, l(76) = 0, ~10% of births die at exactly 75 (F-05, verified). Its "pass" is not evidence. The monitor rows (TFR, IBI, m(5–15), orphanhood) are cumulative from step 0, not period values (F-07, verified); for m(5–15) the period value agrees within 5%.]**
 **Newly hit at Add.113** (failed on some world in every earlier canon): #19 and #21 (savanna and montane), the
 monitor's surv_to_15 and surv_to_45, and #14 adults on temperate (was 0.42 at the band edge).
 

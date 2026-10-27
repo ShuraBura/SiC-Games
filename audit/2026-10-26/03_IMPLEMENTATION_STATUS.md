@@ -9,7 +9,7 @@ channels that the Earth-baseline climate leaves off.
 
 **Totals:** 125 flags — **98 ON** in canon, **27 OFF** (21 held by `_skip`, 6 climate-variability channels). Every
 flag is read by model code (`MAP_mechanisms_to_code.md`: no flag without a read site). Parameters: 253 in the canonical
-run; 14 ANCHORED, 8 VERIFIED, 38 PROVISIONAL, 165 without a tag in their own source comment (REGISTRY §2).
+run; 14 ANCHORED, 8 VERIFIED, 39 PROVISIONAL, 164 without a tag in their own source comment (REGISTRY §2; a heuristic count — comments in the source are not reliably attached to one field).
 
 ---
 

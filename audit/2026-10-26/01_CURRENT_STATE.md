@@ -28,7 +28,7 @@ last 15% of rows; #18–#21 from the period life table (steps 7,500–15,000). C
 | area | what works | evidence |
 |---|---|---|
 | Age structure | dependency ratio, share under 15, sex ratio in the Hill & Hurtado band on every world, in every canon since Add.100 | `02_BENCHMARKS.md`; MARKER_MATRIX #16 |
-| Mortality schedule | period e0 34.2 / 30.3 / 30.8, l(15) 0.62 / 0.55 / 0.58, e15 37.3 / 35.9 / 34.8, l(45) 0.39 / 0.33 / 0.33 — all inside the Gurven & Kaplan forager band; modal adult death age 75, e45 in band | #18–#21; RESULTS Add.113 |
+| Mortality schedule | period e0 34.2 / 30.3 / 30.8, l(15) 0.62 / 0.55 / 0.58, e15 37.3 / 35.9 / 34.8, l(45) 0.39 / 0.33 / 0.33 — all inside the Gurven & Kaplan forager band; e45 in band. **[Corrected after the external audit: the "modal adult death 75" is an ARTIFACT of the 900-month lifespan cap (F-05, verified) — not evidence.]** | #18–#21; RESULTS Add.113 |
 | Not a zero-sum fix | the Add.113 pair lowered child AND adult death rates on every world (unlike band provisioning, Add.108) | RESULTS Add.113 |
 | Settlement system | village size (median 101 / 100 / 130), rank-size slope (−0.79 / −0.66 / −0.91), primacy (1.2–1.6), connubium reach (519–569) | #3, #4, #12, #13 |
 | Family | polygyny 2–4% of men (Marlowe ~4%); age at first birth in band | #10; monitor |
@@ -59,7 +59,7 @@ last 15% of rows; #18–#21 from the period life table (steps 7,500–15,000). C
 - **Determinism:** every control re-run of the arc (Add.108–113) reproduced the stored canon trajectory row for row
   (601 rows, identical life tables).
 - Configuration ↔ code sync (`test_runconfig_sync.py`); registries ↔ sources sync (`test_registry_sync.py`);
-  PARAMETERS.md values agree with the run file (0 disagreements, `tools/doc_audit.py`).
+  PARAMETERS.md NUMERIC values agree with the run file (0 numeric disagreements, `tools/doc_audit.py`). **[Corrected after the external audit: the tool skips boolean, string and multi-name rows; at least four such rows are stale — `comove_footprint_scaled`, `enable_condition`, `ascribed_mate_strength`, `aggregation_site_sep` (F-10, verified).]**
 - Literature anchors: 32/32 registered anchors verify against their PDFs on the supervisor's machine.
 - Every mechanism flag is read by model code (no dead switches by text search, `MAP_mechanisms_to_code.md`).
 
@@ -69,7 +69,7 @@ last 15% of rows; #18–#21 from the period life table (steps 7,500–15,000). C
 - 12 of the 15 PDFs behind the registered anchors are not in the public repository (copyright); they are committed on
   a LOCAL branch on the supervisor's machine only. Ask the supervisor.
 - 73 broken file references in live documents (47 in the append-only RESULTS ledger) — `tools/doc_audit.py`.
-- Provenance: 165 of 253 canonical parameters carry no provenance tag in their own source comment; 12 flags have no
+- Provenance: 164 of 253 canonical parameters carry no provenance tag in their own source comment (a heuristic count, see REGISTRY §2); 12 flags have no
   comment of their own; two canon values have no recorded reason (`comove_footprint = 0`;
   `village_fission_threshold` 150 against the documented 170).
 - The demography monitor still scores band size with `band_med_adults`, the statistic RESULTS Add.89 retracted.

@@ -72,6 +72,9 @@ def comment_blocks(path: Path) -> dict:
     return out
 
 
+DEFLINE: dict = {}          # field -> "file.py:line" of its definition (filled by own_comments)
+
+
 def own_comments() -> dict:
     """field -> its OWN comment lines from the source: the contiguous `#` lines directly above the field (stopping at a
     blank line or code) plus its inline comment. Unlike config/*.toml, a field never inherits a neighbour's block
@@ -90,13 +93,34 @@ def own_comments() -> dict:
                 if not (isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)):
                     continue
                 name, ln = node.target.id, node.lineno - 1
-                block, j = [], ln - 1
+                DEFLINE.setdefault(name, f"{src}:{node.lineno}")
+                # the comment block ABOVE the field, but not the previous field's trailing continuation lines
+                above, j = [], ln - 1
                 while j >= 0 and lines[j].strip().startswith("#"):
-                    block.insert(0, lines[j].strip().lstrip("#").strip())
+                    above.insert(0, lines[j])
                     j -= 1
+                if j >= 0 and lines[j].strip() and not lines[j].strip().startswith("#"):
+                    # the line before the block is code (a field): its indented `#   ` lines belong to it
+                    k = 0
+                    while k < len(above) and _is_continuation(above[k]):
+                        k += 1
+                    above = above[k:]
+                block = [x.strip().lstrip("#").strip() for x in above]
+                # the field's own trailing continuation lines BELOW it (`#   ...`, indented after the hash)
+                below, j = [], ln + 1
+                while j < len(lines) and _is_continuation(lines[j]):
+                    below.append(lines[j].strip().lstrip("#").strip())
+                    j += 1
                 inline = lines[ln].split("#", 1)[1].strip() if "#" in lines[ln] else ""
-                out.setdefault(name, block + ([inline] if inline else []))
+                out.setdefault(name, block + ([inline] if inline else []) + below)
     return out
+
+
+def _is_continuation(line: str) -> bool:
+    """A trailing explanation of the field above it: `#` followed by 2+ spaces (`#   Claim ∝ ...`). Fixed 2026-10-26
+    after the external audit (F-09.3) found 11 fields showing the previous field's trailing text."""
+    s = line.strip()
+    return s.startswith("#  ") and not s.startswith("#  ─") and len(s) > 3
 
 
 def describe(own_lines, toml_lines, n=170):
@@ -118,7 +142,9 @@ def first_sentence(lines, n=170):
 def tag_of(lines):
     txt = " ".join(lines)
     for t in TAGS:
-        if re.search(r"\[" + re.escape(t) + r"b", txt) or re.search(r"b" + re.escape(t) + r"b", txt):
+        # word boundaries (a 2026-10-26 shell edit had turned these into a literal "b", so every parameter read
+        # "untagged"; found by the external audit, F-09)
+        if re.search(r"\[" + re.escape(t) + r"\b", txt) or re.search(r"\b" + re.escape(t) + r"\b", txt):
             return t
     return "untagged"
 
@@ -149,9 +175,9 @@ def ladder_tiers() -> dict:
 
 
 def class_defaults() -> dict:
-    from sic_games import demography, config as cfgmod
+    from sic_games import demography, config as cfgmod, climate   # climate: ClimateConfig (audit F-09.2)
     out = {}
-    for mod in (demography, cfgmod):
+    for mod in (demography, cfgmod, climate):
         for name in dir(mod):
             cls = getattr(mod, name)
             fields = getattr(cls, "model_fields", None)
@@ -187,14 +213,17 @@ def build_registry() -> str:
     mech = run["mechanisms"]
     on = sum(bool(v) for v in mech.values())
     L += [f"## 1. Mechanism flags — {len(mech)} flags, {on} ON in canon, {len(mech) - on} OFF", "",
-          "OFF in canon = held for evaluation, rejected but kept as an instrument, or an alternative form; the flag's own",
-          "comment (first words below = the field's OWN source comment; full text at the field in `demography.py`)",
-          "says which. `run_campaign.py` `_skip` lists the ones `C_ALLON` must not switch on.", "",
-          "| flag | canon | class default | type | ladder tier | description (first words of the provenance comment) |",
-          "|---|---|---|---|---|---|"]
+          "OFF in canon = held for evaluation, rejected but kept as an instrument, or an alternative form; the reason for",
+          "each OFF flag is in `run_campaign.py` `_skip` (and `audit/2026-10-26/03_IMPLEMENTATION_STATUS.md` §2).", "",
+          "**The description column is a HEURISTIC** — the comment lines nearest the field. `demography.py` writes a",
+          "field's explanation above it, below it, or as a paragraph shared with its neighbours, so a description here can",
+          "belong to a NEIGHBOUR (found by the 2026-10-26 external audit, F-09.3). **Read the comment at the `defined at`",
+          "line before relying on it.** The provenance-tag counts in §2 are heuristic for the same reason.", "",
+          "| flag | canon | class default | type | ladder tier | defined at | nearby source comment (heuristic) |",
+          "|---|---|---|---|---|---|---|"]
     for f in sorted(mech):
         L.append(f"| `{f}` | {'**ON**' if mech[f] else 'off'} | {fmt(defaults.get(f, '?'))} | {types.get(f, '—')} | "
-                 f"{tiers.get(f, '—')} | {describe(own.get(f), mech_c.get(f, []))} |")
+                 f"{tiers.get(f, '—')} | `{DEFLINE.get(f, '?')}` | {describe(own.get(f), mech_c.get(f, []))} |")
     params = run["parameters"]
     counts = {}
     rows = []
@@ -207,15 +236,16 @@ def build_registry() -> str:
         owner = par_meta.get(p, {}).get("owner", "?")
         d = defaults.get(p, "?")
         diff = "" if (d == "?" or fmt(d) == fmt(params[p])) else " ≠"
-        rows.append(f"| `{p}` | {fmt(params[p])} | {fmt(d)}{diff} | {owner} | {t} | {describe(lines, par_c.get(p, []), 140)} |")
+        rows.append(f"| `{p}` | {fmt(params[p])} | {fmt(d)}{diff} | {owner} | {t} | `{DEFLINE.get(p, '?')}` | "
+                    f"{describe(lines, par_c.get(p, []), 140)} |")
     L += ["", f"## 2. Parameters — {len(params)} in the canonical run", "",
           "Provenance tag = the first recognised tag in the field's own comment (" + ", ".join(TAGS) + "); a `*` = the tag "
           "comes from an inherited group comment, not the field's own. Counts: " +
           ", ".join(f"{k} {v}" for k, v in sorted(counts.items(), key=lambda kv: -kv[1])) + ".",
           "A `≠` marks a canon value that differs from the class default (set by the canon builder or the run file).",
           "**`untagged` and `PROVISIONAL` values are open questions, not validated constants.**", "",
-          "| parameter | canon | class default | owner | tag | provenance comment (first words) |",
-          "|---|---|---|---|---|---|"] + rows
+          "| parameter | canon | class default | owner | tag (heuristic) | defined at | nearby source comment (heuristic) |",
+          "|---|---|---|---|---|---|---|"] + rows
     return "\n".join(L) + "\n"
 
 

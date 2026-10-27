@@ -28,7 +28,7 @@ ceiling). Branch `r106/add105-malthus-churn` holds Add.105–114 and is NOT yet 
 5c. **The population does not disperse to its food:** the spatial paradox flag is TRUE on every world (MODEL_STATE §4).
 6. **#11 status→RS is NOT COMPARABLE** (Add.102): the model lacks the status → partner-fertility channel.
 7. **#5 lineage dynamics, #8 fission rate, #9 hierarchy ordering** are not computed by `tools/scorecard.py`.
-8. **Provenance debt.** 165 of 253 canonical parameters carry no provenance tag in their own source comment (REGISTRY
+8. **Provenance debt.** 164 of 253 canonical parameters carry no provenance tag in their own source comment (a heuristic count, see REGISTRY §2) (REGISTRY
    §2); two canon decisions have no recorded reason (`comove_footprint = 0`; `village_fission_threshold` 150 vs 170).
 9. **Known blockers kept as pinned facts:** the band-cohesion budget has no headroom (Add.22;
    `test_cohesion_headroom.py`); the R-103 classifier history (MARKER_MATRIX, RESULTS R-103, Add.62).

@@ -185,3 +185,4 @@
 | 9846 | Addendum 113 | ADOPTED | Addendum 113 — The spec risk term and the village granary, ADOPTED TOGETHER: all three worlds pass #18–#21 (12/12 at 1 SE, every seed inside the forager band). Neither is adoptable alone (2026-09-26,  |
 | 9890 | Addendum 114 |  | Addendum 114 — Audit preparation: the FULL marker scorecard re-scored on the Add.113 canon, the side effects that adoption had outside #18–#21, and a machine audit of the documentation (2026-10-26, R- |
 | 9959 | Addendum 115 |  | Addendum 115 — The benchmark HISTORY across five canons: the last adoptions traded fertility for survival; m(5–15) has never been in band. The dated audit package `audit/2026-10-26/` (2026-10-26, R-10 |
+| 9991 | Addendum 116 | ARTIFACT | Addendum 116 — The external audit, verified: real defects in the model (double η, a 12× revolt clock, a food-shock channel 10⁻⁵ of the food supply, a lifespan-cap artifact, a constant synergy, dead ON |

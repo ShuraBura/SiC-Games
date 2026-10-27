@@ -26,7 +26,7 @@ not report its existence as a discovery.
 
 **Instruments and documentation**
 14. The demography monitor scores band size with `band_med_adults`, the statistic Add.89 retracted.
-15. Provenance: 165 of 253 parameters have no tag in their own comment; 12 flags have no own comment; two canon values
+15. Provenance: 164 of 253 parameters have no tag in their own comment (heuristic count); 12 flags have no own comment; two canon values
     have no recorded reason (`comove_footprint = 0`; `village_fission_threshold` 150 vs the documented 170).
 16. `config/*.toml` gives a field without its own comment a neighbour's block (10 flags were affected; 2 fixed in source).
 17. 73 broken file references in live documents (47 in the append-only RESULTS).
