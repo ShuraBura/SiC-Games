@@ -10218,4 +10218,62 @@ double η inside it.
 
 ---
 
+## Addendum 120 — Why the condition fix overshoots: the canon runs the DE-WARFARED Siler (e0 42.7), the constant ×1.47 synergy was what pulled it down to the forager range, and a second defect — the orphan normalisation pooled over ages 0–9 — cuts infant mortality by a third. Diagnosis only (2026-10-28, R-106)
+
+**Why.** The supervisor adopted three of the four Add.118 fixes and asked for a re-calibration of
+`enable_condition_full_scale`: find the term that absorbed the constant ×1.47 and look for a grounded value.
+
+**Instrument.** Period NON-starvation death rate by age (Stage-2 counters, steps 7,500–15,000; exposure counters are
+person-MONTHS) divided by the Siler rate of the same age band (`scratchpad/bp_add119_hazard_by_age.py`). **Control:** the
+model's own `life_table` on the same counters gives the stored e0 of every run. **A first pass compared against the Aché
+TOTAL schedule (a2 = 0.013) and found every age 25–40% BELOW it — wrong reference:** `config/runs/full_campaign.toml`
+sets the de-warfared `ACHE_FOREST_NATURAL` (a2 = 0.00813, e0 42.7; PARAMETERS.md "De-warfared Siler", OPT-IN for biome
+runs, R-15). Against the schedule the canon really uses (figure):
+
+| ages | canon (Add.113) | four fixes (Add.119) | cause |
+|---|---|---|---|
+| 0–1, 1–2 | ×0.72–0.85 | ×0.68–0.74 | the orphan normalisation (below) |
+| 5–10, 10–15 | **×1.77–2.29** | ×0.94–1.30 | canon: `mu_max` 2.5 at the constant condition 0.32 ⇒ ×2.0 on every child's a2 |
+| 15–75 | ×0.99–1.26 | ×0.93–1.12 | canon: adult synergy 1.3 at condition 0.32 ⇒ ×1.2 |
+
+The per-factor observers agree: with the fix, mean condition is 0.99 and the synergy 1.006 on every world; the a2
+multiplier is 1.01 (temperate), 0.91 (savanna), 1.10 (montane) — the modulators are neutral.
+
+**Finding 1 — the regulator that was not there.** The design (PARAMETERS.md; MODEL_SPEC §4.6.1) is: de-warfared Siler
+(e0 42.7) "regulated DOWN to ~34–36" by density-disease. Since `enable_density_reference` (Binford reference) the density
+term is ×1.03–1.13, near neutral. The work of regulating down was done by the constant synergy — a defect. With the
+defect fixed nothing regulates down, so the hazard IS the de-warfared schedule, and e0 rises toward it.
+
+**Finding 2 — a second defect: the orphan normalisation is pooled over ages.** `_orphan_mult` divides the Hill & Hurtado
+multiplier by `E` = its mean over ALL children aged 0–9 with known parents (`_orphan_e_mult_live`, R-74). Infants rarely
+have a dead parent; older children often do. So an infant with living parents gets `1/E`. **Measured** in a probe world
+with the canonical DemographyConfig merged (`scratchpad/bp_add119_orphan_e.py`, temperate, 900 founders, steps 300–700):
+`E` = 1.655 [1.43, 1.89]; the mean multiplier over infants is **0.658**; over all children 0–9 it is 1.000 (control). This
+matches the campaign infant ratios (0.68–0.75). The normalisation keeps the MEAN MULTIPLIER at 1, but the Siler hazard is
+concentrated in infancy, so it removes child deaths instead of redistributing them — the opposite of its stated purpose
+("redistribute, not add"). It is in the canon since R-74 and in every arm.
+
+**Estimate** (static: the measured period tables with the 0–2 non-starvation hazard divided by 0.66, everything else as
+measured; the rebuild reproduces each stored e0 unchanged). No feedback on population or density is included.
+
+| world | canon e0 / l15 | canon, infants corrected | four fixes | four fixes, infants corrected |
+|---|---|---|---|---|
+| temperate | 34.25 / 0.620 | 31.8 / 0.575 | 39.9 / 0.708 | **37.3 / 0.660** |
+| savanna | 30.34 / 0.555 | 28.2 / 0.514 | 35.5 / 0.654 | **33.2 / 0.610** |
+| montane | 30.80 / 0.577 | 28.5 / 0.534 | 35.3 / 0.667 | **32.9 / 0.622** |
+
+**Reading.** The Add.113 canon passed #18–#21 with two compensating defects: the constant synergy doubled mortality at
+5–15 (which is why m(5–15) never passed, Add.115), and the pooled orphan normalisation cut infant mortality by a third.
+With both corrected, the estimate puts all three worlds inside or at the top edge of the forager band (temperate at the
+Aché anchor 36.6–37), with no new number. The correct normalisation is BY AGE: divide by the mean multiplier of the
+children of the same age, so the mean hazard at every age equals the schedule and the channel only redistributes.
+
+**Next (supervisor).** Build `enable_orphan_norm_by_age` (held), then a Stage 2 arm with it and
+`enable_condition_full_scale` together on top of the adopted three — as the granary and the risk share were adopted as a
+pair (Add.113).
+
+![Add.120](evidence/add120_hazard_vs_schedule.png)
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

@@ -189,3 +189,4 @@
 | 10026 | Addendum 117 |  | Addendum 117 — Drought test on the canon: the population CONTRACTS in proportion to the drought and RECOVERS — but only through FERTILITY; starvation and the death rate do not rise. Also: the tier-2 y |
 | 10076 | Addendum 118 |  | Addendum 118 — The four audit mortality fixes, Stage 2: the lifespan cap, the density window and the double η are CORRECTNESS fixes with small effects; the FULL-SCALE CONDITION fix is the large one —  |
 | 10152 | Addendum 119 |  | Addendum 119 — The four fixes together, and the drought test on them: the effects are SUPER-ADDITIVE in the harsh biomes, temperate and montane go over the forager band, and the drought now gives a FL |
+| 10221 | Addendum 120 | DIAGNOSIS ONLY | Addendum 120 — Why the condition fix overshoots: the canon runs the DE-WARFARED Siler (e0 42.7), the constant ×1.47 synergy was what pulled it down to the forager range, and a second defect — the orph |
