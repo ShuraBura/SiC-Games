@@ -504,6 +504,14 @@ class DemographyConfig(BaseModel):
     # mean gives **−2.4%** — i.e. exactly compositional: WHO dies is orphan-graded, HOW MANY stays
     # fertility-pinned. Same split R-16/R-18 established for the Cred hierarchy.
     orphan_normalize: bool = True
+    # NORMALISE BY AGE (R-106 Add.120). The pooled divisor above is the mean over ALL children aged 0–9, but the
+    # orphan share rises with age (an infant rarely has a dead parent), so an infant with living parents gets 1/E
+    # (measured E = 1.655 ⇒ ×0.66) where the Siler a1 hazard is largest: the channel REMOVES child deaths instead of
+    # redistributing them (infant non-starvation hazard 0.68–0.75 of the schedule in every Stage-2 arm, Add.120).
+    # Table 13.1's effects are age-proportional, so the honest divisor is the mean multiplier of the children of the
+    # SAME year of age: then the mean hazard at every age is the schedule's. ON ⇒ that divisor (the pooled one if the
+    # year is empty). Default OFF ⇒ the pooled divisor ⇒ bit-exact.
+    enable_orphan_norm_by_age: bool = False
     # The Aché reference value, kept for documentation + the Table 13.1 arithmetic check. NOT used by the
     # model (which normalises endogenously). E[mult] at Tab. 13.1's own means (mother alive 0.98, father
     # alive 0.95, divorced 0.14 | both living):

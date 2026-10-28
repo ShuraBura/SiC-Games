@@ -1030,6 +1030,10 @@ def main():
             # C_ALLON must not enable them by side effect.
             "enable_lifespan_from_siler", "enable_condition_full_scale", "enable_density_common_window",
             "enable_eta_once",
+            # ORPHAN NORMALISATION BY AGE (R-106 Addendum 120): the pooled divisor gives infants with living parents
+            # x0.66 of the schedule hazard. A correction under evaluation (with condition_full_scale), so C_ALLON
+            # must not enable it by side effect.
+            "enable_orphan_norm_by_age",
             # VILLAGE GRANARY + TERRAIN RISK AS AN ACCIDENT SHARE — ADOPTED TOGETHER (R-106 Addendum 113,
             # 2026-09-26) and so REMOVED from this set -> canonically ON. Neither is adoptable alone: the granary
             # alone overshoots temperate (e0 40.1), the risk correction alone drops montane l15 under the floor.

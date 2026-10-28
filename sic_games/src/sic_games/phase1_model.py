@@ -344,6 +344,7 @@ class TerrainWorld(mesa.Model):
         self._site_cache = None                                   # Stage 1c catchment site-suitability field (central-place appraisal; absent ⇒ off)
         self._orphan_e_cache = None                               # R-74: endogenous E[mult] divisor (per-step cache)
         self._orphan_e_step = -1
+        self._orphan_e_age_cache: dict = {}                       # Add.120: the same divisor per YEAR of age
         self._cv_cache = None                                     # emergent-band-size: per-cell foraging-return CV (biome σ/μ) for risk-pooling optimum
         self._band_opt_cache = None                               # emergent-band-size v3: per-cell risk-pooling optimum band g*(CV) — drives movement aggregation
         self._connubium_sizes: list[int] = []                     # CONNUBIUM diag: distinct-adult size of each mating pool that produced ≥1 marriage (last pairing phase)
@@ -1167,7 +1168,12 @@ class TerrainWorld(mesa.Model):
         if divorced:
             mult *= cfg.orphan_mult_divorced
         if cfg.orphan_normalize:
-            mult /= self._orphan_e_mult_live()
+            if getattr(cfg, "enable_orphan_norm_by_age", False):
+                # Add.120: divide by the mean of the children of the SAME year of age (pooled if that year is empty)
+                _pooled = self._orphan_e_mult_live()          # fills the per-age cache in the same pass
+                mult /= self._orphan_e_age_cache.get(int(a.age // MONTHS_PER_YEAR), _pooled)
+            else:
+                mult /= self._orphan_e_mult_live()
         return mult
 
     def _orphan_e_mult_live(self) -> float:
@@ -1189,6 +1195,7 @@ class TerrainWorld(mesa.Model):
             return self._orphan_e_cache
         cfg = self._demog
         tot = n = 0.0
+        by_age: dict = {}                                  # Add.120: {year of age: [sum of mult, count]}
         maxm = cfg.orphan_max_age_years * MONTHS_PER_YEAR
         for a in self.agent_list:
             if a.age > maxm:
@@ -1204,7 +1211,10 @@ class TerrainWorld(mesa.Model):
             if divorced:
                 m *= cfg.orphan_mult_divorced
             tot += m; n += 1.0
+            _s = by_age.setdefault(int(a.age // MONTHS_PER_YEAR), [0.0, 0.0])
+            _s[0] += m; _s[1] += 1.0
         e = (tot / n) if n > 0 else 1.0
+        self._orphan_e_age_cache = {y: s / c for y, (s, c) in by_age.items()}
         self._orphan_e_cache = e
         self._orphan_e_step = self.step_count
         return e

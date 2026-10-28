@@ -114,6 +114,7 @@ enable_need_weighted_shares = true
 enable_noble_leveling_exemption = true
 enable_nutrition_synergy = true
 enable_orphan_mortality = true
+enable_orphan_norm_by_age = false
 enable_pair_bonds = true
 enable_paternity = true
 enable_productivity_mobility = true

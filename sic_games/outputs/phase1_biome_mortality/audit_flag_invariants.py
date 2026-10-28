@@ -139,7 +139,7 @@ TYPES = {
     "enable_risk_accident_share": "N",
     # R-106 Add.118 mortality-structure fixes: lifespan cap, condition scale, one density basis -> N (hazard);
     # η once corrects the harvest conversion -> P, like the η-weighted claim it completes.
-    "enable_lifespan_from_siler": "N", "enable_condition_full_scale": "N", "enable_density_common_window": "N",
+    "enable_lifespan_from_siler": "N", "enable_orphan_norm_by_age": "N", "enable_condition_full_scale": "N", "enable_density_common_window": "N",
     "enable_eta_once": "P",
     # Re-references density_mult so the anchor density returns 1.0 -- the invariant risk_mult and
     # pathogen_mult already hold. Same type as the term it corrects: it modulates the a2 hazard.
@@ -350,6 +350,7 @@ PREREQ = {
     "enable_village_granary": ("enable_aggregation_sedentism", "enable_storage"),
     "enable_risk_accident_share": ("enable_terrain_risk",),
     "enable_condition_full_scale": ("enable_condition",),
+    "enable_orphan_norm_by_age": ("enable_orphan_mortality",),
     "enable_density_common_window": ("enable_density_disease", "enable_village_density_disease"),
     "enable_eta_once": ("enable_eta_weighted_shares",),
     "enable_sticky_pin_release": ("enable_aggregation_sedentism", "enable_emergent_abandonment"),

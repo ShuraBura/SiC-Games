@@ -147,7 +147,9 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                "enable_sticky_pin_release",
                # MORTALITY-STRUCTURE FIXES (R-106 Addendum 118): under evaluation in Stage 2, held dark.
                "enable_lifespan_from_siler", "enable_condition_full_scale", "enable_density_common_window",
-               "enable_eta_once"}
+               "enable_eta_once",
+               # ORPHAN NORMALISATION BY AGE (R-106 Addendum 120): under evaluation, held dark.
+               "enable_orphan_norm_by_age"}
                # (enable_village_granary + enable_risk_accident_share: ADOPTED together, Addendum 113 -> ON.)
                # (enable_bud_viable_site was listed here while held; ADOPTED Addendum 108 -> canonically ON.)
     assert off <= allowed, f"C_ALLON left undocumented mechanisms dark: {sorted(off - allowed)}"
