@@ -187,3 +187,4 @@
 | 9959 | Addendum 115 |  | Addendum 115 — The benchmark HISTORY across five canons: the last adoptions traded fertility for survival; m(5–15) has never been in band. The dated audit package `audit/2026-10-26/` (2026-10-26, R-10 |
 | 9991 | Addendum 116 | ARTIFACT | Addendum 116 — The external audit, verified: real defects in the model (double η, a 12× revolt clock, a food-shock channel 10⁻⁵ of the food supply, a lifespan-cap artifact, a constant synergy, dead ON |
 | 10026 | Addendum 117 |  | Addendum 117 — Drought test on the canon: the population CONTRACTS in proportion to the drought and RECOVERS — but only through FERTILITY; starvation and the death rate do not rise. Also: the tier-2 y |
+| 10076 | Addendum 118 |  | Addendum 118 — The four audit mortality fixes, Stage 2: the lifespan cap, the density window and the double η are CORRECTNESS fixes with small effects; the FULL-SCALE CONDITION fix is the large one —  |

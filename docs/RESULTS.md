@@ -10073,4 +10073,80 @@ non-starvation mortality.
 
 ---
 
+## Addendum 118 — The four audit mortality fixes, Stage 2: the lifespan cap, the density window and the double η are CORRECTNESS fixes with small effects; the FULL-SCALE CONDITION fix is the large one — child mortality falls 25–40%, m(5–15) comes nearest to the Aché anchor of any canon, and the temperate world goes OVER the forager band (2026-10-27, R-106)
+
+**Why.** Add.116 confirmed four defects in the mortality structure (external audit F-01, F-04, F-05 and the constant
+condition). Add.117 showed that the canon has no positive check under a drought. The supervisor chose to build the four
+fixes as four held flags and to test them in one Stage 2.
+
+**Build** (commit `28e2345`; all default OFF, in `_skip`, in both allowed-dark lists, in the audit TYPES/PREREQ, the
+BENCHMARK_LADDER and `full_campaign.toml`; tests `test_mortality_structure_fixes.py`, 7 pass; full suite 1,787 pass):
+
+| flag | defect (Add.116) | what it does |
+|---|---|---|
+| `enable_lifespan_from_siler` | F-05: the death check kills everyone at `max_age` = 900 months (75 yr) [PLACEHOLDER] | the check uses `siler_lifespan_cap_months` = 1200 (100 yr); old age is then killed by the Siler hazard |
+| `enable_condition_full_scale` | `condition_mean` = 0.321 on every world, so the nutrition × disease synergy is a constant ×1.47 | condition is scaled by the best post-burn fill that the agent can reach, so a fed agent reads ~1 |
+| `enable_density_common_window` | F-04: a mobile agent's disease density is regional, a settled agent's is local | both use the village window `(2·settle_radius+1)²` |
+| `enable_eta_once` | F-01: with η-weighted claims, η is applied again at the harvest | the harvest uses η = 1 when the claim already carries η |
+
+**Design.** Each flag alone on the Add.113 canon (`riskvg`), 3 canonical worlds × demographic seeds 0, 1, 2, 15,000
+steps, period life table after step 7,500 (`C_LT_SNAP_STEP`), paired by seed against the stored canon runs. 37 runs,
+0 failed, 909 min at 12 concurrent. **Controls:** (1) the savanna canon re-run on the new code is identical to the stored
+canon run, row for row (601 rows, 0 differences, equal life tables); (2) each arm's run file has only its own flag on;
+(3) the offline life table reproduces each run's live e0. Instruments: `scratchpad/bp_stage2_analyse.py`
+(`S2_BASE=riskvg`), `tools/scorecard.py` → `docs/evidence/scorecard_add118_{riskvg,life,cond,dwin,eta1}.json`,
+`scratchpad/bp_add118_fig.py` → `docs/evidence/add118_mortality_fixes.png`.
+
+**Result — period life table, mean of 3 seeds (paired difference vs canon in SE; * = ≥ 2 SE):**
+
+| world | marker (band) | canon | life | cond | dwin | eta1 |
+|---|---|---|---|---|---|---|
+| temperate | #18 e0 (21–37) | 34.25 | 35.59 (+3.0*) | **38.68 (+5.8*) OVER** | 34.45 | 34.61 |
+| | #19 l15 (0.45–0.66) | 0.620 | 0.622 | **0.698 (+19.8*) OVER** | 0.621 | 0.624 |
+| | #20 e15 (28.6–42.5) | 37.31 | 39.28 (+4.8*) | 38.62 | 37.54 | 37.59 |
+| | #21 l45 (0.26–0.43) | 0.392 | 0.407 (+2.1*) | **0.462 (+4.6*) OVER** | 0.396 | 0.398 |
+| | m(5–15) (Aché ~0.010) | 0.0220 | 0.0215 | **0.0130** | 0.0216 | 0.0215 |
+| savanna | #18 e0 | 30.34 | 30.09 | 32.03 (+2.8*) | 30.76 | 30.84 |
+| | #19 l15 | 0.554 | 0.545 | 0.599 (+12.2*) | 0.560 | 0.579 (+2.7*) |
+| | #20 e15 | 35.85 | 36.18 | 35.49 | 36.17 | 34.67 (−2.5*) |
+| | m(5–15) | 0.0282 | 0.0293 | **0.0222** | 0.0274 | 0.0263 |
+| montane | #18 e0 | 30.80 | 31.30 (+2.6*) | 33.62 (+4.7*) | 30.76 | 31.06 |
+| | #19 l15 | 0.577 | 0.576 | 0.646 (+19.1*) | 0.577 | 0.585 (+10.2*) |
+| | #21 l45 | 0.333 | 0.334 | 0.372 (+3.5*) | 0.332 | 0.335 |
+| | m(5–15) | 0.0263 | 0.0267 | **0.0180** | 0.0264 | 0.0258 |
+
+**Per fix.**
+
+1. **`life` — the 75-year artifact is gone.** In canon 15–19% of all adult deaths fall at exactly age 75 and none after
+   it; with the fix 2% fall at 75, 13–16% fall after it, and the tail ends near 95. The adult death curve is now a smooth
+   Siler shape with its peak at 71–75 (one montane seed has no clear peak). e0 rises a little where adults live long
+   (temperate +1.3, montane +0.5); savanna does not change. All of #18–#21 stay in band.
+2. **`cond` — the large one.** With condition on its full scale, a fed agent no longer carries the ×1.47 synergy, and only
+   the badly fed carry extra hazard. The death rate at ages 1–15 falls 31% (temperate, −23 SE), 15% (savanna) and 24%
+   (montane); m(5–15), which no canon has put in band (Add.115), falls to 0.013 in temperate (Aché ~0.010). Adult
+   mortality at 15–45 does not change, so this is not a zero-sum transfer. The starvation SHARE of deaths rises (savanna
+   +3.8 SE, montane +3.5 SE) because the other deaths fall. Population rises (temperate +7%, montane +19%, both ~1.9 SE).
+   **Cost: temperate goes over the forager band on #18, #19 and #21** (the band has no temperate forager; its upper edge
+   is the Aché). Reading: the canon's child mortality was calibrated with the constant ×1.47 inside it, so the fix
+   removes a hidden calibration term. Most important for the arc: with a constant condition the synergy CANNOT respond to
+   food, so the positive check that Add.117 did not find could not exist; with this fix it can.
+3. **`dwin` — neutral.** No life-table marker moves by 1 SE; montane gains 2 villages (+3.4 SE). The defect was real but
+   the regional and local densities were close on these worlds.
+4. **`eta1` — small, with a shift.** Child survival rises in savanna and montane (l15 +0.024, +0.007) and savanna adult
+   mortality at 15–45 rises (+2.4 SE), so in savanna part of the gain is a transfer from adults to children (the Add.76
+   pattern). Population +17% (savanna) and +16% (montane), ~1.7 SE; land use rises. All of #18–#21 stay in band.
+
+**Other markers** (full scorecard). Only the band-size and fission markers change verdict, and the paired differences
+show that these are noise at the band edges, not effects: temperate #1 band size goes "unresolved" → FAIL under `life`
+(43.2; paired +3.1 ± 3.1) and `eta1` (44.2; paired +4.0 ± 2.1); temperate #17 goes "unresolved" → PASS under `cond`
+and `dwin` (paired −26 ± 24, −33 ± 28). `cond` puts temperate #14 adult Gini at 0.420, "unresolved" (canon 0.410 PASS).
+Every other banded marker keeps its verdict in every arm.
+
+**Not done here:** the four flags together (interactions are not measured), and the drought test with the fixes on —
+the question that the arc asks (does a positive check appear?).
+
+![Add.118](evidence/add118_mortality_fixes.png)
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
