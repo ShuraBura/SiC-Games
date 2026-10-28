@@ -96,7 +96,7 @@ def main():
     print("POSITIVE CONTROL — cumulative e0 rebuilt from the dumped counters vs the campaign's live value")
     bad = 0
     for f in files:
-        m = re.search(r"campaign_trajectory_s2_(\w+?)_(canon|fix|viable|bandprov|both|pat|vgran|sticky|risk|riskvg|life|cond|dwin|eta1|all4)_s(\d+)\.json$", os.path.basename(f))
+        m = re.search(r"campaign_trajectory_s2_(\w+?)_(canon|fix|viable|bandprov|both|pat|vgran|sticky|risk|riskvg|life|cond|dwin|eta1|all4|three)_s(\d+)\.json$", os.path.basename(f))
         tag = os.path.basename(f)
         r, err = load(f)
         if r is None:
