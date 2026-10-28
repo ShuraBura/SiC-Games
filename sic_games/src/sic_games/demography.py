@@ -441,6 +441,9 @@ class DemographyConfig(BaseModel):
     # e0/e15/e45 were truncated. ON ⇒ the demographic death check uses `siler_lifespan_cap_months` instead, so the
     # Siler senescence term decides old-age death; `max_age` still anchors the elder efficiency decline (and the code
     # already clamps η for agents past it). Default OFF ⇒ the 900-month cap ⇒ bit-exact.
+    # ADOPTED (R-106 Addendum 121, supervisor 2026-10-28) together with the other two of lifespan_from_siler /
+    # density_common_window / eta_once: every banded marker passes on 3 worlds. Canonically ON via C_ALLON; class
+    # default stays False.
     enable_lifespan_from_siler: bool = False
     siler_lifespan_cap_months: int = Field(1200, ge=1)   # 100 yr = the life table's last bin; Siler hazard ≈1/yr there [DESIGN]
 
@@ -742,6 +745,9 @@ class DemographyConfig(BaseModel):
     # are scored against the same reference `dens_rho_ref`. Measured: a 100-person village → ×0.77, a 10-person
     # mobile camp → ×1.03. ON ⇒ a mobile agent's density is the people in the same-size window centred on its own
     # cell, over the same area — one definition for everyone. Default OFF ⇒ bit-exact.
+    # ADOPTED (R-106 Addendum 121, supervisor 2026-10-28) together with the other two of lifespan_from_siler /
+    # density_common_window / eta_once: every banded marker passes on 3 worlds. Canonically ON via C_ALLON; class
+    # default stays False.
     enable_density_common_window: bool = False
     risk_accident_share: float = Field(0.10, ge=0.0, le=1.0)   # accidents ≈10% of HG deaths (Hill, Hurtado & Walker 2007; MODEL_SPEC §4.3.3) [ANCHORED]
     dens_delta: float = Field(1.0, ge=0.0)      # density-disease max excess [FREE — calibrated]
@@ -1386,6 +1392,9 @@ class DemographyConfig(BaseModel):
     # ("a person claims what they can actually harvest"), and the harvest line then multiplies the share by η AGAIN,
     # so a juvenile's take scales as η² and the unconverted (1 − η)·share leaves the cell pool. ON (and only when the
     # η-weighted claim is on) ⇒ intake = share for forage and meat; the pool is conserved. Default OFF ⇒ bit-exact.
+    # ADOPTED (R-106 Addendum 121, supervisor 2026-10-28) together with the other two of lifespan_from_siler /
+    # density_common_window / eta_once: every banded marker passes on 3 worlds. Canonically ON via C_ALLON; class
+    # default stays False.
     enable_eta_once: bool = False
     # (storage_tether_reserves RETIRED 2026-06-29 — the band-aid that froze stocked bands in place to force packing;
     # superseded by the emergent-bands grouping drives + bonded mating, which reach packing and fire the morph on

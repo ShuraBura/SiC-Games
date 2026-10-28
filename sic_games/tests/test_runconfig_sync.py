@@ -201,9 +201,9 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                "enable_bud_household_closure", "enable_density_fill_matched_radius",
                #   sticky_pin_release  rejected by Stage 2 (Add.111), kept dark as an instrument
                "enable_sticky_pin_release",
-               #   the four mortality-structure fixes (Add.118), in Stage 2
-               "enable_lifespan_from_siler", "enable_condition_full_scale", "enable_density_common_window",
-               "enable_eta_once",
+               #   condition_full_scale  (Add.118), in Stage 2 as a pair with orphan_norm_by_age
+               #   (lifespan_from_siler, density_common_window, eta_once: ADOPTED, Add.121 -> canonically ON)
+               "enable_condition_full_scale",
                #   orphan_norm_by_age  the per-age orphan divisor (Add.120), in Stage 2
                "enable_orphan_norm_by_age"}
                # (village_granary + risk_accident_share: ADOPTED together, Addendum 113 -> canonically ON.)

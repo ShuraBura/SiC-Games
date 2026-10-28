@@ -190,3 +190,4 @@
 | 10076 | Addendum 118 |  | Addendum 118 — The four audit mortality fixes, Stage 2: the lifespan cap, the density window and the double η are CORRECTNESS fixes with small effects; the FULL-SCALE CONDITION fix is the large one —  |
 | 10152 | Addendum 119 |  | Addendum 119 — The four fixes together, and the drought test on them: the effects are SUPER-ADDITIVE in the harsh biomes, temperate and montane go over the forager band, and the drought now gives a FL |
 | 10221 | Addendum 120 | DIAGNOSIS ONLY | Addendum 120 — Why the condition fix overshoots: the canon runs the DE-WARFARED Siler (e0 42.7), the constant ×1.47 synergy was what pulled it down to the forager range, and a second defect — the orph |
+| 10279 | Addendum 121 | ADOPTED, PASSES, ARTIFACT | Addendum 121 — ADOPTED: `lifespan_from_siler` + `density_common_window` + `eta_once`. Together every banded marker passes on all three worlds; the age-75 artifact is gone, and its removal shows that s |

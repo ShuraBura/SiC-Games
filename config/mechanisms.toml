@@ -13,7 +13,7 @@
 
 
 [enable_lifespan_from_siler]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # LIFESPAN FROM SILER (R-106 Add.118; external audit F-05). The demographic death check kills every agent
@@ -22,7 +22,9 @@ type  = "bool"
 # the placeholder, and e0/e15/e45 were truncated. ON ⇒ the demographic death check uses
 # `siler_lifespan_cap_months` instead, so the Siler senescence term decides old-age death; `max_age` still
 # anchors the elder efficiency decline (and the code already clamps η for agents past it). Default OFF ⇒
-# the 900-month cap ⇒ bit-exact.
+# the 900-month cap ⇒ bit-exact. ADOPTED (R-106 Addendum 121, supervisor 2026-10-28) together with the
+# other two of lifespan_from_siler / density_common_window / eta_once: every banded marker passes on 3
+# worlds. Canonically ON via C_ALLON; class default stays False.
 
 [enable_terrain_risk]
 value = true
@@ -363,7 +365,7 @@ type  = "bool"
 # ON via C_ALLON; class default stays False.
 
 [enable_density_common_window]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # ONE DENSITY BASIS FOR DISEASE (R-106 Add.118; external audit F-04). Under
@@ -372,7 +374,9 @@ type  = "bool"
 # cell's occupancy over 100 km² (a local density), and both are scored against the same reference
 # `dens_rho_ref`. Measured: a 100-person village → ×0.77, a 10-person mobile camp → ×1.03. ON ⇒ a mobile
 # agent's density is the people in the same-size window centred on its own cell, over the same area — one
-# definition for everyone. Default OFF ⇒ bit-exact.
+# definition for everyone. Default OFF ⇒ bit-exact. ADOPTED (R-106 Addendum 121, supervisor 2026-10-28)
+# together with the other two of lifespan_from_siler / density_common_window / eta_once: every banded
+# marker passes on 3 worlds. Canonically ON via C_ALLON; class default stays False.
 
 [enable_density_reference]
 value = true
@@ -1105,14 +1109,16 @@ type  = "bool"
 # adult share rises ~1.30×.
 
 [enable_eta_once]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # η ONCE (R-106 Add.118; external audit F-01). With `enable_eta_weighted_shares` the claim already scales
 # with η ("a person claims what they can actually harvest"), and the harvest line then multiplies the
 # share by η AGAIN, so a juvenile's take scales as η² and the unconverted (1 − η)·share leaves the cell
 # pool. ON (and only when the η-weighted claim is on) ⇒ intake = share for forage and meat; the pool is
-# conserved. Default OFF ⇒ bit-exact.
+# conserved. Default OFF ⇒ bit-exact. ADOPTED (R-106 Addendum 121, supervisor 2026-10-28) together with
+# the other two of lifespan_from_siler / density_common_window / eta_once: every banded marker passes on 3
+# worlds. Canonically ON via C_ALLON; class default stays False.
 
 [enable_bonded_mating]
 value = true

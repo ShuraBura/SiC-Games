@@ -10276,4 +10276,42 @@ pair (Add.113).
 
 ---
 
+## Addendum 121 — ADOPTED: `lifespan_from_siler` + `density_common_window` + `eta_once`. Together every banded marker passes on all three worlds; the age-75 artifact is gone, and its removal shows that savanna and montane have no old-age mode of adult death (2026-10-28, R-106)
+
+**Why.** Supervisor decision after Add.119: adopt the three fixes that keep every world in band alone, and re-calibrate
+the full-scale condition separately. The three had been tested only one at a time, and Add.119 showed that the fixes
+interact, so the exact adopted stack was run as one Stage-2 arm before adoption.
+
+**Design.** Arm `three` = the Add.113 canon + `enable_lifespan_from_siler`, `enable_density_common_window`,
+`enable_eta_once`; 3 worlds × seeds 0, 1, 2, 15,000 steps, period life table after 7,500 (9 runs, 305 min, 0 failed;
+code `7211a2c`, the tree differed only in scratchpad progress files). Paired against the Add.118 canon runs (`riskvg`).
+**Control:** the offline life table reproduces every run's live e0. Evidence: `docs/evidence/scorecard_add118_three.json`.
+
+**Result** (period life table, mean of 3 seeds, paired difference vs canon):
+
+| world | #18 e0 (21–37) | #19 l15 (0.45–0.66) | #20 e15 | #21 l45 | death rate 1–15 | population |
+|---|---|---|---|---|---|---|
+| temperate | 34.25 → 35.12 (+1.5 SE) | 0.620 → 0.620 | 37.3 → 38.7 (+2.1 SE) | 0.392 → 0.396 | no change | no change |
+| savanna | 30.34 → 31.39 (+1.3 SE) | 0.554 → 0.578 (+3.0 SE) | 35.9 → 35.7 | 0.333 → 0.333 | −8% (2.8 SE) | +15% (1.2 SE) |
+| montane | 30.80 → 31.73 (+16 SE) | 0.577 → 0.591 (+3.9 SE) | 34.8 → 35.3 (+3.2 SE) | 0.333 → 0.337 | −5% (4.6 SE) | +11% (0.9 SE) |
+
+All #18–#21 PASS on every world, and so does every other banded marker: Add.113's two temperate "unresolved" (#1 band
+size 40.2 → 38.2, #17 fission ceiling 232 → 194) are now PASS. The effects are close to the sum of the single-fix effects
+of Add.118 (no harmful interaction among these three). The full re-scored table is the CURRENT SCORECARD in
+`docs/MARKER_MATRIX.md`.
+
+**Newly visible — the modal adult death age.** In every canon run before this adoption the life-table death density
+(l(x)·q(x), x ≥ 15) peaked at exactly 75: the 900-month cap (Add.116 F-05). With the cap gone it peaks at 72–74 in
+temperate (Aché 71; the Siler schedule gives 71) but has NO old-age peak in savanna and montane: the density at ages
+15–19 is as high as at ~70, because young-adult mortality there (starvation 29% / 22% of deaths) is high. The artifact had
+hidden this. It is a monitor anchor, not a MARKER_MATRIX marker; it is recorded here as an open deviation.
+
+**Adoption** (the Add.113 procedure): the three flags are removed from `_skip` in `run_campaign.py` and from both
+allowed-dark test lists, set `true` in `config/runs/full_campaign.toml`; the config files are regenerated; class
+defaults stay False; each field carries an ADOPTED note; the MARKER_MATRIX CURRENT SCORECARD is regenerated from the
+evidence file; `audit/2026-10-26/00_START_HERE.md` has a pointer to the changed canon. `enable_condition_full_scale`
+and `enable_orphan_norm_by_age` stay held; they are evaluated as a pair next (Add.120).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
