@@ -49,15 +49,19 @@ def window_stats(tr, a, b):
                 reserve=st.mean(r.get("mean_reserve", 0) for r in rows))
 
 
+# DR_ARM: analyse the drought runs of a Stage-2 arm against that arm's Stage-2 runs (Add.118); default = the canon.
+ARM = os.environ.get("DR_ARM", "")
+CTL = ARM or "riskvg"
+SUF = f"_{ARM}" if ARM else ""
 summary = {}
 fig, axes = plt.subplots(2, 3, figsize=(17, 8.5), sharex=True)
 cols = {"ctl": "#4a6fa5", "085": "#e0a01f", "070": "#c0392b"}
 for j, w in enumerate(W):
-    ctl = {s: load(os.path.join(OUT, f"campaign_trajectory_s2_{w}_riskvg_s{s}.json")) for s in (0, 1, 2)}
+    ctl = {s: load(os.path.join(OUT, f"campaign_trajectory_s2_{w}_{CTL}_s{s}.json")) for s in (0, 1, 2)}
     for m in MULTS:
         runs = {}
         for s in (0, 1, 2):
-            p = os.path.join(OUT, f"campaign_trajectory_dr_{w}_m{m}_s{s}.json")
+            p = os.path.join(OUT, f"campaign_trajectory_dr_{ARM + '_' if ARM else ''}{w}_m{m}_s{s}.json")
             if os.path.exists(p):
                 runs[s] = load(p)
         if not runs:
@@ -103,11 +107,11 @@ for j, w in enumerate(W):
     axes[1, j].set_xlabel("step (month); grey = the 30-year drought")
 axes[0, 0].legend(fontsize=8)
 axes[1, 0].legend(fontsize=8)
-fig.suptitle("R-106 Add.117 — drought test on the canon: all cell yields ×0.85 or ×0.70 for 30 years (steps 9000–9360), "
+fig.suptitle(f"R-106 Add.117/118 — drought test on {ARM or 'the canon'}: all cell yields ×0.85 or ×0.70 for 30 years (steps 9000–9360), "
              "then normal; paired against the canon runs of the same seeds", fontsize=10)
 fig.tight_layout(rect=(0, 0, 1, 0.95))
-fig.savefig(os.path.join(ROOT, "scratchpad", "bp_drought.png"), dpi=105)
-json.dump(summary, open(os.path.join(ROOT, "scratchpad", "drought_summary.json"), "w", encoding="utf-8"), indent=1,
+fig.savefig(os.path.join(ROOT, "scratchpad", f"bp_drought{SUF}.png"), dpi=105)
+json.dump(summary, open(os.path.join(ROOT, "scratchpad", f"drought_summary{SUF}.json"), "w", encoding="utf-8"), indent=1,
           default=str)
 for k, v in summary.items():
     print(f"\n== {k}: control identical before onset: {v['control_identical_before_onset']}")
