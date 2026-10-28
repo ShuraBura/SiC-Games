@@ -188,3 +188,4 @@
 | 9991 | Addendum 116 | ARTIFACT | Addendum 116 — The external audit, verified: real defects in the model (double η, a 12× revolt clock, a food-shock channel 10⁻⁵ of the food supply, a lifespan-cap artifact, a constant synergy, dead ON |
 | 10026 | Addendum 117 |  | Addendum 117 — Drought test on the canon: the population CONTRACTS in proportion to the drought and RECOVERS — but only through FERTILITY; starvation and the death rate do not rise. Also: the tier-2 y |
 | 10076 | Addendum 118 |  | Addendum 118 — The four audit mortality fixes, Stage 2: the lifespan cap, the density window and the double η are CORRECTNESS fixes with small effects; the FULL-SCALE CONDITION fix is the large one —  |
+| 10152 | Addendum 119 |  | Addendum 119 — The four fixes together, and the drought test on them: the effects are SUPER-ADDITIVE in the harsh biomes, temperate and montane go over the forager band, and the drought now gives a FL |

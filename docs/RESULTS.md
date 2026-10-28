@@ -10149,4 +10149,73 @@ the question that the arc asks (does a positive check appear?).
 
 ---
 
+## Addendum 119 — The four fixes together, and the drought test on them: the effects are SUPER-ADDITIVE in the harsh biomes, temperate and montane go over the forager band, and the drought now gives a FLAT-TO-RISING crude death rate instead of a falling one — a weak positive check; births still carry ≥ 77% of the contraction (2026-10-28, R-106)
+
+**Why.** Add.118 tested each fix alone. The supervisor chose to test the four together and to run the Add.117 drought on
+them in the same batch, before any adoption decision.
+
+**Design.** Arm `all4` = the Add.113 canon + `enable_lifespan_from_siler`, `enable_condition_full_scale`,
+`enable_density_common_window`, `enable_eta_once`; 3 worlds × seeds 0, 1, 2, 15,000 steps, period life table after step
+7,500 (9 runs, 638 min). Drought: the Add.117 design unchanged (`ClimateDriver.pulse`, all cell yields ×0.85 or ×0.70 for
+steps 9,000–9,360), on `all4`, 12,000 steps, paired with the `all4` Stage-2 runs of the same seeds (18 runs; scripts take
+`DR_ARM`/`DR_EXTRA_ON`, commit `f508655`). 27 runs, 0 failed. **Controls:** every drought run is identical to its paired
+`all4` run, row for row, before the onset (18/18); the offline life table reproduces each run's live e0. The runs logged
+"working tree dirty at 3c5ba23": the uncommitted files were scratchpad drivers and progress files only, no model code,
+and all 27 runs share that tree. Evidence: `docs/evidence/scorecard_add118_all4.json`,
+`docs/evidence/add118_drought_all4_vs_canon.png`, `scratchpad/drought_summary{,_all4}.json`.
+
+**Result 1 — the four together (period, mean of 3 seeds; paired difference vs canon):**
+
+| world | e0 (21–37) | l15 (0.45–0.66) | l45 (0.26–0.43) | death rate 1–15 | death rate 15–45 | population |
+|---|---|---|---|---|---|---|
+| temperate | 34.25 → **39.87 FAIL** (+5.6, 5.4 SE) | 0.620 → **0.708 FAIL** | 0.392 → **0.466 FAIL** | −33% | no change | +8% |
+| savanna | 30.34 → 35.49 PASS (+5.2, 4.4 SE) | 0.554 → 0.654 unresolved | 0.333 → 0.393 | −32% | no change | +25% |
+| montane | 30.80 → 35.25 PASS (+4.5, 10 SE) | 0.577 → **0.667 FAIL** | 0.333 → 0.386 | −31% | no change | +35% |
+
+The sum of the single-fix e0 effects (Add.118) is +6.3 (temperate), +2.4 (savanna), +3.6 (montane); the combined effect is
++5.6, +5.2, +4.5. So the fixes add up in temperate and INTERACT upward in savanna (2×) and montane. Other markers: #20 e15
+passes everywhere; temperate #1 band size 42.5 FAIL and temperate #14 adult Gini 0.421 unresolved (both were single-fix
+noise in Add.118); every other banded marker keeps its verdict.
+
+**Result 2 — the drought on `all4` vs on the canon** (drought − control over the drought window, per 1000 per year,
+mean ± SE over 3 seeds):
+
+| world, depth | births: canon | births: all4 | deaths: canon | deaths: all4 | minimum pop ratio: canon → all4 |
+|---|---|---|---|---|---|
+| temperate ×0.85 | −5.4 ± 0.2 | −4.3 ± 0.5 | −0.9 ± 0.3 | −0.1 ± 0.2 | 0.87–0.88 → 0.87–0.91 |
+| temperate ×0.70 | −11.0 ± 0.4 | −9.1 ± 0.9 | −1.0 ± 0.3 | +0.5 ± 0.5 | 0.75–0.76 → 0.74–0.79 |
+| savanna ×0.85 | −4.9 ± 0.6 | −3.4 ± 0.4 | −1.7 ± 0.6 | **+1.1 ± 0.5** | 0.86–0.93 → 0.86–0.87 |
+| savanna ×0.70 | −9.8 ± 0.5 | −8.7 ± 0.5 | −2.6 ± 1.1 | +0.2 ± 0.9 | 0.75–0.85 → 0.76–0.81 |
+| montane ×0.85 | −3.8 ± 0.1 | −2.7 ± 0.1 | −0.3 ± 0.5 | −0.3 ± 0.4 | 0.82–0.89 → 0.90–0.92 |
+| montane ×0.70 | −6.8 ± 0.1 | −5.2 ± 0.5 | −0.7 ± 0.7 | +1.3 ± 1.0 | 0.80–0.82 → 0.81–0.83 |
+
+Starvation deaths per step do not rise under the drought in either arm. Recovery to 0.95 of control: `all4` recovers
+within the 220-year window in 18/18 runs (canon 17/18), on average earlier in montane ×0.85. Late troughs (100+ years
+after the drought) occur in both arms in montane; on `all4` they are shallow (0.90–0.92).
+
+**Reading.**
+1. **A weak positive check appears.** In the canon the crude death rate FALLS under the drought (in 6/6 cells; fewer
+   births means fewer infants at risk). With the four fixes it is flat or rises (positive in 4/6 cells, +0.2 to +1.3 per
+   1000 per year; ≥ 2 SE in one). The change of response, all4 − canon, is +0.8 to +2.8 per 1000 per year in 5/6 cells. The
+   mechanism is the synergy: with `enable_condition_full_scale`, condition responds to food, so the badly fed carry the
+   extra disease hazard. Starvation itself does not rise.
+2. **It is small against fertility.** Births still carry ≥ 77% of the deficit in every cell. The fertility brake is a
+   little weaker on `all4` (the cut in births is 11–30% smaller), because the population that meets the drought is
+   younger and better fed.
+3. **Instrument limit.** These are CRUDE rates: a fall in births lowers the crude death rate by itself, so the true
+   age-specific mortality rise is larger than the crude numbers show, in BOTH arms. The trajectory's `m_*` rows are
+   cumulative and rounded to 10⁻⁴, too coarse to difference over a 30-year window. An exact measure needs a period life
+   table over steps 9,000–9,360 (`C_LT_SNAP_STEP=9000`, runs stopped at 9,360, drought and control).
+4. **Why the check stays weak.** Add.105: the population sits far below its food ceiling, so a 30% yield cut takes
+   surplus, not subsistence. The fixes make mortality ABLE to respond to food; the drought does not push most people to
+   the point where it must.
+
+**Adoption is open (supervisor).** All four fixes are confirmed defects (Add.116). Together they put temperate and
+montane over the forager band, because the canon's juvenile hazard was calibrated with the constant ×1.47 synergy and the
+double η inside it.
+
+![Add.119](evidence/add118_drought_all4_vs_canon.png)
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

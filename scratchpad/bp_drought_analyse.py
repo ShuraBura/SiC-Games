@@ -125,4 +125,4 @@ for k, v in summary.items():
         print(f"   {wn:8s} pop {f(d,'pop'):7.0f} vs {f(c,'pop'):7.0f} | deaths/1000/yr {f(d,'deaths_py'):5.1f} vs {f(c,'deaths_py'):5.1f}"
               f" | births/1000/yr {f(d,'births_py'):5.1f} vs {f(c,'births_py'):5.1f} | starv/step {f(d,'starv_step'):5.1f} vs {f(c,'starv_step'):5.1f}"
               f" | land {f(d,'land_use'):.3f} vs {f(c,'land_use'):.3f} | villages {f(d,'villages'):4.1f} vs {f(c,'villages'):4.1f}")
-print("\nwrote scratchpad/bp_drought.png and drought_summary.json")
+print(f"\nwrote scratchpad/bp_drought{SUF}.png and drought_summary{SUF}.json")
