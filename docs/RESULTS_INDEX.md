@@ -193,3 +193,4 @@
 | 10279 | Addendum 121 | ADOPTED, PASSES, ARTIFACT | Addendum 121 — ADOPTED: `lifespan_from_siler` + `density_common_window` + `eta_once`. Together every banded marker passes on all three worlds; the age-75 artifact is gone, and its removal shows that s |
 | 10317 | Addendum 122 |  | Addendum 122 — The pair `condition_full_scale` + `orphan_norm_by_age` on the Add.121 canon: the hazard now equals its schedule at EVERY age on every world; m(5–15) falls to 0.0115 (Aché ~0.010); savan |
 | 10374 | Addendum 123 |  | Addendum 123 — Design of "the regulator", first step: the stationary identity shows there is no demographic evidence for a missing regulator. The TFR band [4.69, 8.03] is a GROWTH-PHASE band (Add.115' |
+| 10425 | Addendum 124 | ADOPTED | Addendum 124 — ADOPTED: the pair `condition_full_scale` + `orphan_norm_by_age`; TFR is re-scored by the stationary iso-growth identity, which then flags the documented late-first-birth defect in savan |

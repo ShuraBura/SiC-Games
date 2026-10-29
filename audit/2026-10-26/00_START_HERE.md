@@ -17,12 +17,14 @@ disagree, report it as a finding — and the home, or the code, is what ran.
 > package as audited are commit `07c1ef7`; later corrections in the package are marked "[Corrected after the external
 > audit]".
 
-> **AFTER THE AUDIT — the canon changed (2026-10-28).** The files of this package still describe the Add.113 canon.
+> **AFTER THE AUDIT — the canon changed (2026-10-28, 2026-10-29).** The files of this package still describe the Add.113 canon.
 > Since then (RESULTS Addenda 117–121): a drought test (Add.117); the four mortality fixes from the audit tested alone
 > and together, with a drought test (Add.118–119); a diagnosis of why the condition fix overshoots, which found a
-> second defect, the pooled orphan divisor (Add.120); and the ADOPTION of `lifespan_from_siler`,
-> `density_common_window` and `eta_once` (Add.121). **For the current verdicts read the CURRENT SCORECARD in
-> `docs/MARKER_MATRIX.md`** (every banded marker passes on 3 worlds), not `02_BENCHMARKS.md`.
+> second defect, the pooled orphan divisor (Add.120); the ADOPTION of `lifespan_from_siler`,
+> `density_common_window` and `eta_once` (Add.121); the pair `condition_full_scale` + `orphan_norm_by_age` (Add.122);
+> the stationary identity, which showed the TFR band is of growing populations (Add.123); and the ADOPTION of the pair
+> with TFR re-scored by the identity (Add.124, 2026-10-29). **For the current verdicts read the CURRENT SCORECARD in
+> `docs/MARKER_MATRIX.md`**, not `02_BENCHMARKS.md`.
 
 ---
 

@@ -1024,17 +1024,10 @@ def main():
             # UNDER EVALUATION, so C_ALLON must not enable them by side effect (the leaky_assabiyah rule).
             # The sticky release was REJECTED by Stage 2 (Add.111) and stays dark as an instrument.
             "enable_sticky_pin_release",
-            # MORTALITY-STRUCTURE FIXES from the external audit (R-106 Addendum 118, 2026-10-27). THREE ADOPTED
-            # (Addendum 121, 2026-10-28) and so REMOVED from this set -> canonically ON: lifespan_from_siler,
-            # density_common_window, eta_once (together, 3 worlds x 3 paired seeds: every banded marker PASSES).
-            # The full-scale body condition stays held: alone it puts temperate over the forager band, because the
-            # pooled orphan divisor below hides a third of infant deaths (Addendum 120); it is evaluated as a PAIR
-            # with the per-age divisor.
-            "enable_condition_full_scale",
-            # ORPHAN NORMALISATION BY AGE (R-106 Addendum 120): the pooled divisor gives infants with living parents
-            # x0.66 of the schedule hazard. A correction under evaluation (with condition_full_scale), so C_ALLON
-            # must not enable it by side effect.
-            "enable_orphan_norm_by_age",
+            # MORTALITY-STRUCTURE FIXES from the external audit (R-106 Addenda 118-124) — ALL ADOPTED and so REMOVED
+            # from this set -> canonically ON: lifespan_from_siler, density_common_window, eta_once (Addendum 121);
+            # condition_full_scale + orphan_norm_by_age as a PAIR (Addendum 124): with both, the non-starvation
+            # hazard equals its Siler schedule at every age on every world (Addendum 122).
             # VILLAGE GRANARY + TERRAIN RISK AS AN ACCIDENT SHARE — ADOPTED TOGETHER (R-106 Addendum 113,
             # 2026-09-26) and so REMOVED from this set -> canonically ON. Neither is adoptable alone: the granary
             # alone overshoots temperate (e0 40.1), the risk correction alone drops montane l15 under the floor.

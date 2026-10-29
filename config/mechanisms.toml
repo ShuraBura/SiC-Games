@@ -113,7 +113,7 @@ type  = "bool"
 # age-PROPORTIONAL (no significant age interaction).
 
 [enable_orphan_norm_by_age]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # NORMALISE BY AGE (R-106 Add.120). The pooled divisor above is the mean over ALL children aged 0–9, but
@@ -123,6 +123,9 @@ type  = "bool"
 # Stage-2 arm, Add.120). Table 13.1's effects are age-proportional, so the honest divisor is the mean
 # multiplier of the children of the SAME year of age: then the mean hazard at every age is the schedule's.
 # ON ⇒ that divisor (the pooled one if the year is empty). Default OFF ⇒ the pooled divisor ⇒ bit-exact.
+# ADOPTED (R-106 Addendum 124, supervisor 2026-10-29) as a PAIR with the other of condition_full_scale /
+# orphan_norm_by_age: with both, the hazard equals its schedule at every age (Add.122). Canonically ON via
+# C_ALLON; class default stays False.
 
 [enable_energetic_fertility]
 value = true
@@ -304,7 +307,7 @@ type  = "bool"
 # penalty.
 
 [enable_condition_full_scale]
-value = false
+value = true
 owner = "DemographyConfig"
 type  = "bool"
 # Biome-Mortality S0: lagged body-condition / immune-competence signal. When ON, the nutrition×disease
@@ -317,7 +320,9 @@ type  = "bool"
 # the nutrition × disease synergy became a constant ×1.47 on everyone's hazard. MODEL_SPEC §4.3.3
 # specifies the multiplier as 1 at full reserve rising to μ near the floor. ON ⇒ the post-burn fill is
 # scaled by the MAXIMUM attainable post-burn fill (cap − this step's burn), so a fully fed agent reads 1.0
-# and a starving one 0. Default OFF ⇒ bit-exact.
+# and a starving one 0. Default OFF ⇒ bit-exact. ADOPTED (R-106 Addendum 124, supervisor 2026-10-29) as a
+# PAIR with the other of condition_full_scale / orphan_norm_by_age: with both, the hazard equals its
+# schedule at every age (Add.122). Canonically ON via C_ALLON; class default stays False.
 
 [enable_condition]
 value = true
@@ -333,7 +338,10 @@ type  = "bool"
 # 0.321 on all three worlds, and the nutrition × disease synergy became a constant ×1.47 on everyone's
 # hazard. MODEL_SPEC §4.3.3 specifies the multiplier as 1 at full reserve rising to μ near the floor. ON ⇒
 # the post-burn fill is scaled by the MAXIMUM attainable post-burn fill (cap − this step's burn), so a
-# fully fed agent reads 1.0 and a starving one 0. Default OFF ⇒ bit-exact.
+# fully fed agent reads 1.0 and a starving one 0. Default OFF ⇒ bit-exact. ADOPTED (R-106 Addendum 124,
+# supervisor 2026-10-29) as a PAIR with the other of condition_full_scale / orphan_norm_by_age: with both,
+# the hazard equals its schedule at every age (Add.122). Canonically ON via C_ALLON; class default stays
+# False.
 
 [enable_band_provisioning]
 value = false

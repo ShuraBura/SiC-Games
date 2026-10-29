@@ -83,10 +83,11 @@ def test_the_implied_generation_length_separates_the_two_explanations():
 
 
 def _healthy():
-    """A row sitting inside every filed band. Values chosen as band midpoints / published anchors."""
+    """A row sitting inside every filed band. Values chosen as band midpoints / published anchors. TFR 3.4 with
+    r = 0 is the stationary TFR for l15 = 0.66 (the iso-growth identity, Add.124)."""
     return {"frac_child": 0.37, "dependency_ratio": 0.75, "sex_ratio_m_f": 1.1,
             "realised_e0": 30.0, "e15": 38.5, "e45": 21.1, "surv_to_15": 0.66, "surv_to_45": 0.43,
-            "modal_adult_death": 72.0, "realised_tfr": 6.5, "realised_ibi_med": 40.0,
+            "modal_adult_death": 72.0, "realised_tfr": 3.4, "r_pct_yr": 0.0, "realised_ibi_med": 40.0,
             "frac_motherless": 0.02, "frac_fatherless": 0.05, "band_med_adults": 28.2}
 
 
@@ -106,7 +107,7 @@ def test_the_bands_match_the_filed_values():
     assert DEMOG_ANCHORS["frac_child"][1:3] == (0.287, 0.454)          # Hill & Hurtado T4.4
     assert DEMOG_ANCHORS["dependency_ratio"][1:3] == (0.598, 0.899)    # 0.598 !Kung .. 0.899 Aché
     assert DEMOG_ANCHORS["sex_ratio_m_f"][1:3] == (0.896, 1.368)
-    assert DEMOG_ANCHORS["realised_tfr"][1:3] == (4.69, 8.03)          # Hill & Hurtado T8.1/8.2
+    assert DEMOG_ANCHORS["realised_tfr"][:2] == ("isogrowth", 0.5)     # scored by the identity (Add.124)
     assert DEMOG_ANCHORS["realised_ibi_med"][1:3] == (34.4, 49.4)
     assert DEMOG_ANCHORS["realised_e0"][1:3] == (21.0, 37.0)           # G&K cross-HG range
     assert DEMOG_ANCHORS["modal_adult_death"][1:3] == (68.0, 78.0)     # G&K adaptive lifespan
@@ -141,7 +142,7 @@ def test_a_healthy_row_passes_everything():
 
 
 @pytest.mark.parametrize("marker,bad_value", [
-    ("frac_child", 0.60), ("dependency_ratio", 1.5), ("realised_tfr", 10.5),
+    ("frac_child", 0.60), ("dependency_ratio", 1.5),
     ("realised_ibi_med", 22.0), ("realised_e0", 17.7), ("modal_adult_death", 22.0),
 ])
 def test_each_band_actually_rejects_a_value_outside_it(marker, bad_value):
@@ -171,7 +172,7 @@ def test_the_gate_trips_on_a_skewed_age_structure_and_says_so():
 def test_the_gate_watches_only_the_age_structure():
     """A fertility or mortality miss must NOT trip the structural gate — that would make it fire constantly
     and stop meaning anything. Only the age composition gates the markers above."""
-    row = _healthy(); row["realised_tfr"] = 10.5
+    row = _healthy(); row["realised_ibi_med"] = 22.0
     h = demography_health(row)
     assert h["structure_ok"] is True and h["n_out"] == 1
     assert set(DEMOG_GATE) == {"frac_child", "dependency_ratio"}
@@ -211,3 +212,18 @@ def test_the_banner_names_the_worst_offenders():
     b = demography_health(row)["banner"]
     assert "frac_child" in b and "band_med_adults" in b
     assert "in band" in b
+
+
+def test_tfr_is_scored_by_the_stationary_identity_not_by_the_growing_populations_band():
+    """Add.124. The Aché forest TFR 8.03 at l15 0.66 implies r = +3.2 %/yr: a row that claims r = 0 with it is
+    INCONSISTENT. GK07's own stationary case (TFR 4.069, l15 0.55, r = 0) passes; so does a stationary TFR of 3.4 at
+    l15 0.66, which the old band [4.69, 8.03] would have failed. A row without r is NO-DATA, never PASS."""
+    def verdict(tfr, l15, r):
+        row = _healthy(); row.update(realised_tfr=tfr, surv_to_15=l15, r_pct_yr=r)
+        return next(x for x in demography_health(row)["verdicts"] if x["marker"] == "realised_tfr")["verdict"]
+    assert verdict(8.03, 0.66, 0.0) == "OUT-OF-BAND"
+    assert verdict(8.03, 0.66, 3.15) == "PASS"
+    assert verdict(4.069, 0.55, 0.0) == "PASS"
+    assert verdict(3.4, 0.66, 0.0) == "PASS"
+    row = _healthy(); del row["r_pct_yr"]
+    assert next(x for x in demography_health(row)["verdicts"] if x["marker"] == "realised_tfr")["verdict"] == "NO-DATA"

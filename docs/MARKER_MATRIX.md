@@ -4,59 +4,60 @@
 ethnographic and archaeological record. A run that does not carry these numbers cannot be said to have been
 validated, however long it ran.
 
-## CURRENT SCORECARD — canon as of R-106 Addendum 121 (re-scored 2026-10-28)
+## CURRENT SCORECARD — canon as of R-106 Addendum 124 (re-scored 2026-10-29)
 
 **Read this table for the CURRENT verdicts.** The per-row "status" texts in the matrix below are each marker's
 HISTORY (the dated reasoning that set its band, unit and statistic); several of their numbers were measured on
-earlier canons and are superseded by this table. Evidence (committed): `docs/evidence/scorecard_add118_three.json`;
-previous canon for comparison: `docs/evidence/scorecard_add113_canon.json` (`scorecard_add118_riskvg.json` is the same
-canon re-scored from the Add.118 Stage 2). Re-score after any adoption with `tools/scorecard.py` (rule 5 below: absolute
-values are valid only on the canon they were measured on).
+earlier canons and are superseded by this table. Evidence (committed): `docs/evidence/scorecard_add122_pair.json`;
+previous canons: `scorecard_add118_three.json` (Add.121), `scorecard_add113_canon.json` (Add.113). Re-score after any
+adoption with `tools/scorecard.py` (rule 5 below: absolute values are valid only on the canon they were measured on).
 
-**Runs:** the nine Stage-2 runs of the adopted Add.121 canon (`three` arm = the Add.113 canon + `lifespan_from_siler`,
-`density_common_window`, `eta_once`) — real `run_campaign.py` pipeline, 3 canonical worlds × 3 paired demographic seeds,
-planet fixed (world/climate seed 0), 15,000 steps. **Method:** per run, the mean over the sustained window (last 15% of
-rows); #18–#21 from the PERIOD life table (step 7,500 → 15,000); per world, mean ± SE over the 3 seeds; verdict at 1 SE
-— **PASS** = the interval inside the band, **FAIL** = outside, **unres.** = straddles an edge; no verdict = no documented
-band, or the marker is report-only (#3 max: the ceiling is scored at #17 on the co-residence unit, Add.104; #11: NOT
-COMPARABLE, wrong channel, Add.102; #5/#8/#9: need a per-generation / per-village-year / cross-world computation that this
-table does not make).
+**Runs:** the nine Stage-2 runs of the adopted Add.124 canon (`pair` arm = the Add.121 canon + `condition_full_scale` +
+`orphan_norm_by_age`) — real `run_campaign.py` pipeline, 3 canonical worlds × 3 paired demographic seeds, planet fixed
+(world/climate seed 0), 15,000 steps. **Method:** per run, the mean over the sustained window (last 15% of rows); #18–#21
+from the PERIOD life table (step 7,500 → 15,000); per world, mean ± SE over the 3 seeds; verdict at 1 SE — **PASS** = the
+interval inside the band, **FAIL** = outside, **unres.** = straddles an edge; no verdict = no documented band, or the
+marker is report-only (#3 max: the ceiling is scored at #17 on the co-residence unit, Add.104; #11: NOT COMPARABLE, wrong
+channel, Add.102; #5/#8/#9: need a per-generation / per-village-year / cross-world computation that this table does not
+make).
 
 | marker | temperate | savanna | montane |
 |---|---|---|---|
-| #1 band size (mean-experienced adults/cell) | 38.2 ± 1.64 **PASS** | 29.5 ± 0.5 **PASS** | 29.1 ± 1.67 **PASS** |
-| #3 village size (median) | 97 ± 0.484 **PASS** | 121 ± 7.12 **PASS** | 127 ± 3.32 **PASS** |
-| #3 village size (max, Voronoi catchment) | 321 ± 20.6 | 342 ± 6.34 | 619 ± 77.8 |
-| #4 connubium reach (median) | 549 ± 19 **PASS** | 647 ± 28.9 **PASS** | 592 ± 9.48 **PASS** |
-| #5 lineages (count; dynamics per MARKER_MATRIX) | 201 ± 6.72 | 132 ± 5.79 | 166 ± 6.43 |
-| #7 nobility share | 0.0149 ± 0.00218 | 0.0134 ± 0.00201 | 0.0236 ± 0.00191 |
-| #8 bud events (cumulative; rate per MARKER_MATRIX) | 145 ± 16.9 | 146 ± 12.1 | 68.5 ± 18.9 |
-| #9 hierarchy index gini_cred | 0.521 ± 0.00569 | 0.375 ± 0.0108 | 0.331 ± 0.0128 |
-| #10 polygyny (of ALL men) | 0.0389 ± 0.00231 **PASS** | 0.0469 ± 0.00267 **PASS** | 0.0306 ± 0.00171 **PASS** |
-| #11 status->RS (age-controlled) | 0.209 ± 0.0287 | 0.108 ± 0.00527 | 0.233 ± 0.00815 |
-| #12 rank-size slope | -0.815 ± 0.0254 **PASS** | -0.658 ± 0.00458 **PASS** | -0.911 ± 0.055 **PASS** |
-| #13 primacy | 1.16 ± 0.0764 **PASS** | 1.42 ± 0.0581 **PASS** | 1.58 ± 0.348 **PASS** |
-| #14 material Gini (adults) | 0.415 ± 0.00472 **PASS** | 0.376 ± 0.0035 **PASS** | 0.375 ± 0.00143 **PASS** |
-| #14 material Gini (within-cell) | 0.312 ± 0.00313 **PASS** | 0.292 ± 0.00354 **PASS** | 0.283 ± 0.00167 **PASS** |
-| #15 orphanhood (motherless) | 0.0318 ± 0.000674 | 0.0313 ± 0.000346 | 0.0331 ± 0.00058 |
-| #16 dependency ratio | 0.736 ± 0.0028 **PASS** | 0.775 ± 0.00323 **PASS** | 0.777 ± 0.00609 **PASS** |
-| #16 share under 15 | 0.318 ± 0.00284 **PASS** | 0.342 ± 0.0027 **PASS** | 0.346 ± 0.00459 **PASS** |
-| #16 sex ratio (m/f) | 1.05 ± 0.00459 **PASS** | 1.03 ± 0.00715 **PASS** | 1.06 ± 0.00529 **PASS** |
-| #16 median age (yr) | 26.1 ± 0.239 | 24.3 ± 0.233 | 23.9 ± 0.431 |
-| #17 fission ceiling (co-resident max) | 194 ± 17.8 **PASS** | 131 ± 2.01 **PASS** | 124 ± 12.3 **PASS** |
-| #18 e0 (period) | 35.1 ± 0.314 **PASS** | 31.4 ± 0.484 **PASS** | 31.7 ± 0.139 **PASS** |
-| #19 survival to 15 (period) | 0.62 ± 0.00335 **PASS** | 0.578 ± 0.0051 **PASS** | 0.591 ± 0.00194 **PASS** |
-| #20 e15 (period) | 38.7 ± 0.267 **PASS** | 35.7 ± 0.45 **PASS** | 35.3 ± 0.335 **PASS** |
-| #21 survival to 45 from birth (period) | 0.396 ± 0.00483 **PASS** | 0.333 ± 0.00813 **PASS** | 0.337 ± 0.00229 **PASS** |
+| #1 band size (mean-experienced adults/cell) | 41 ± 1.58 **unres.** | 30.2 ± 1.58 **PASS** | 33.4 ± 0.858 **PASS** |
+| #3 village size (median) | 104 ± 4.5 **PASS** | 112 ± 1.87 **PASS** | 126 ± 4.11 **PASS** |
+| #3 village size (max, Voronoi catchment) | 334 ± 28.9 | 321 ± 12.4 | 670 ± 47.4 |
+| #4 connubium reach (median) | 529 ± 13.7 **PASS** | 523 ± 25.1 **PASS** | 537 ± 23 **PASS** |
+| #5 lineages (count; dynamics per MARKER_MATRIX) | 216 ± 13.4 | 144 ± 2.37 | 174 ± 19.2 |
+| #7 nobility share | 0.0129 ± 0.000829 | 0.015 ± 0.00228 | 0.0292 ± 0.000779 |
+| #8 bud events (cumulative; rate per MARKER_MATRIX) | 99.2 ± 1.75 | 145 ± 13.3 | 63.8 ± 10.3 |
+| #9 hierarchy index gini_cred | 0.522 ± 0.0108 | 0.386 ± 0.00556 | 0.361 ± 0.0054 |
+| #10 polygyny (of ALL men) | 0.0369 ± 0.00326 **PASS** | 0.0341 ± 0.00294 **PASS** | 0.0244 ± 0.00198 **PASS** |
+| #11 status->RS (age-controlled) | 0.225 ± 0.00906 | 0.106 ± 0.00998 | 0.226 ± 0.00702 |
+| #12 rank-size slope | -0.769 ± 0.0384 **PASS** | -0.652 ± 0.0544 **unres.** | -0.992 ± 0.061 **PASS** |
+| #13 primacy | 1.14 ± 0.0671 **PASS** | 1.31 ± 0.0319 **PASS** | 1.42 ± 0.148 **PASS** |
+| #14 material Gini (adults) | 0.418 ± 0.00179 **PASS** | 0.38 ± 0.00165 **PASS** | 0.384 ± 0.00261 **PASS** |
+| #14 material Gini (within-cell) | 0.312 ± 0.00143 **PASS** | 0.296 ± 0.00192 **PASS** | 0.29 ± 0.00431 **PASS** |
+| #15 orphanhood (motherless) | 0.0294 ± 0.00052 | 0.0287 ± 0.000879 | 0.0297 ± 0.000296 |
+| #16 dependency ratio | 0.695 ± 0.0054 **PASS** | 0.729 ± 0.004 **PASS** | 0.726 ± 0.00609 **PASS** |
+| #16 share under 15 | 0.295 ± 0.00369 **PASS** | 0.318 ± 0.00193 **PASS** | 0.319 ± 0.00595 **PASS** |
+| #16 sex ratio (m/f) | 1.06 ± 0.00771 **PASS** | 1.06 ± 0.00842 **PASS** | 1.07 ± 0.00719 **PASS** |
+| #16 median age (yr) | 27.6 ± 0.304 | 25.8 ± 0.129 | 25.7 ± 0.493 |
+| #17 fission ceiling (co-resident max) | 223 ± 25.9 **PASS** | 125 ± 2.58 **PASS** | 125 ± 17.2 **PASS** |
+| #18 e0 (period) | 37.5 ± 0.452 **FAIL** | 33.6 ± 0.199 **PASS** | 33.9 ± 0.476 **PASS** |
+| #19 survival to 15 (period) | 0.662 ± 0.00116 **FAIL** | 0.615 ± 0.00295 **PASS** | 0.63 ± 0.00301 **PASS** |
+| #20 e15 (period) | 39.8 ± 0.778 **PASS** | 37.2 ± 0.107 **PASS** | 36.6 ± 0.581 **PASS** |
+| #21 survival to 45 from birth (period) | 0.437 ± 0.00941 **unres.** | 0.375 ± 0.00305 **PASS** | 0.377 ± 0.00857 **PASS** |
 
-Context: population: 5.67e+03 / 3.57e+03 / 4.91e+03 · starvation share of deaths: 0.148 / 0.285 / 0.219 · land use fraction: 0.235 / 0.182 / 0.254.
+Context: population: 6.03e+03 / 3.81e+03 / 5.19e+03 · starvation share of deaths: 0.171 / 0.291 / 0.243 · land use fraction: 0.254 / 0.191 / 0.26.
 
-**Summary.** EVERY banded marker PASSES on every world (Add.113 left two unresolved on temperate, #1 band size and #17
-fission ceiling; both pass now). The adoption raised e0 by 0.9–1.1 yr and savanna/montane l15 by 0.01–0.02 (all within
-band) and removed the age-75 death spike (`modal_adult_death` is no longer the 900-month placeholder). **Known
-compensating defects still in this canon (Add.120):** the constant synergy (×2 on ages 5–15, why m(5–15) never passes)
-and the pooled orphan divisor (infants ×0.66). Fixing either alone moves #18/#19 out of band; they are under evaluation
-as a pair.
+**Summary.** With the five mortality fixes of Addenda 118–124 the non-starvation hazard equals its Siler schedule (the
+de-warfared Aché, e0 42.7, MODEL_SPEC §4.6.1) at every age on every world, and starvation is the only addition.
+Savanna and montane pass #18–#21. **Temperate FAILS #18 and #19 by a small margin** (e0 37.45 against the band's top
+37; l15 0.662 against 0.66) and #21 is unresolved: the band's top edge is the Aché TOTAL schedule (contact-era warfare
+included) while the model runs the de-warfared schedule by design — the expected result in a well-fed world, recorded
+by the supervisor's decision (Add.123 option A, Add.124). Also changed: temperate #1 band size 41.0 unres. (Add.121:
+38.2 PASS), savanna #12 rank-size unres. m(5–15), which no earlier canon passed, is 0.0115 in temperate (Aché ~0.010).
+TFR is no longer scored against the growth-phase band [4.69, 8.03] but by the stationary iso-growth identity (Add.124).
 
 ---
 

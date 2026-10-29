@@ -454,7 +454,9 @@ type  = "float"
 # the nutrition × disease synergy became a constant ×1.47 on everyone's hazard. MODEL_SPEC §4.3.3
 # specifies the multiplier as 1 at full reserve rising to μ near the floor. ON ⇒ the post-burn fill is
 # scaled by the MAXIMUM attainable post-burn fill (cap − this step's burn), so a fully fed agent reads 1.0
-# and a starving one 0. Default OFF ⇒ bit-exact.
+# and a starving one 0. Default OFF ⇒ bit-exact. ADOPTED (R-106 Addendum 124, supervisor 2026-10-29) as a
+# PAIR with the other of condition_full_scale / orphan_norm_by_age: with both, the hazard equals its
+# schedule at every age (Add.122). Canonically ON via C_ALLON; class default stays False.
 
 [provision_self_keep]
 value = 1.0

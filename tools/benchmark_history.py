@@ -63,6 +63,10 @@ def benchmarks():
         if spec[0] == "band":
             _, lo, hi, src = spec
             note = ""
+        elif spec[0] == "isogrowth":
+            _, tol, src = spec
+            lo = hi = None
+            note = f"scored by the stationary iso-growth identity (|r_pred - r| <= {tol} %/yr), not a band (Add.124)"
         else:
             _, a, tol, src = spec
             lo, hi = a * (1 - tol), a * (1 + tol)

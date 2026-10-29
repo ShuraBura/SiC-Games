@@ -101,7 +101,7 @@ ACHE_FOREST = SilerParams(a1=0.157, b1=0.721, a2=0.013, a3=4.80e-5, b3=0.103)
 # project's retractions were a real number read against the wrong denominator, so the names carry the unit.
 _GK07 = "Gurven & Kaplan 2007 PDR 33(2) Table 2, Aché forest [VERIFIED]"
 _HH44 = "Hill & Hurtado 1996 Table 4.4 p.141, 3 forager populations [VERIFIED VERBATIM]"
-_HH8 = "Hill & Hurtado 1996 Tables 8.1/8.2, forest/contact/reservation [VERIFIED]"
+_HH8 = "Hill & Hurtado 1996 Table 8.2, comparative: Aché / !Kung / Yanomamö [VERIFIED]"
 DEMOG_ANCHORS: dict[str, tuple] = {
     # ---- age structure: the GATE. If these are out of band, everything above them is provisional. ----
     "frac_child": ("band", 0.287, 0.454, _HH44 + " — %<15 = 28.7 !Kung / 45.4 Yanomamö / 41.9 Aché"),
@@ -116,7 +116,13 @@ DEMOG_ANCHORS: dict[str, tuple] = {
     "surv_to_45": ("point", 0.43, 0.25, _GK07 + " — l(45) FROM BIRTH, not conditional on reaching 15"),
     "modal_adult_death": ("band", 68.0, 78.0, _GK07 + " — adaptive lifespan 68-78; cross-HG modal avg 72"),
     # ---- fertility ----
-    "realised_tfr": ("band", 4.69, 8.03, _HH8 + " — TFR 8.03 forest / 4.69 contact / 6.86 reservation"),
+    # TFR IS SCORED BY THE STATIONARY IDENTITY, NOT BY A BAND (R-106 Addendum 124). The three published TFRs are of
+    # GROWING populations (the identity gives r = +3.2 %/yr for the Aché forest TFR 8.03 at l15 0.66, +0.7 for the
+    # !Kung 4.69), so they are not the TFR of a stationary population: inside the l15 band 0.45–0.66 a stationary
+    # population must have TFR 3.3–5.0 (Add.123). The check: the r that TFR and l15 imply must be within `tol`
+    # %/yr of the measured r (`isogrowth_check`). The published values stay in the source string as comparanda.
+    "realised_tfr": ("isogrowth", 0.5, _HH8 + " — TFR 8.03 / 4.69 / 6.86 (growing populations); scored by the "
+                                          "Gurven & Kaplan 2007 iso-growth identity"),
     "realised_ibi_med": ("band", 34.4, 49.4, _HH8 + " — IBI 37.6 / 49.4 / 34.4 months"),
     # ---- family ----
     "frac_motherless": ("point", 0.02, 0.50, "Hill & Hurtado Table 13.1 covariate — mother alive 0.98"),
@@ -311,6 +317,17 @@ def demography_health(row: dict) -> dict:
             verdicts.append({"marker": key, "value": v, "lo": lo, "hi": hi, "src": src,
                              "verdict": "PASS" if ok else "OUT-OF-BAND",
                              "ratio": (v / lo if v < lo else (v / hi if v > hi else 1.0))})
+        elif spec[0] == "isogrowth":
+            # Add.124: consistency of TFR with this row's own l15 and growth rate, not a band.
+            _, tol, src = spec
+            c = isogrowth_check(v, row.get("surv_to_15"), row.get("r_pct_yr"))
+            if c["consistent"] is None:
+                verdicts.append({"marker": key, "value": v, "verdict": "NO-DATA", "src": src})
+                continue
+            verdicts.append({"marker": key, "value": v, "src": src, "tol": tol,
+                             "r_predicted_pct": c["r_predicted_pct"], "r_measured_pct": c["r_measured_pct"],
+                             "verdict": ("PASS" if abs(c["r_predicted_pct"] - c["r_measured_pct"]) <= tol
+                                         else "OUT-OF-BAND")})
         else:
             _, anchor, tol, src = spec
             ratio = (v / anchor) if anchor else float("nan")
@@ -514,6 +531,9 @@ class DemographyConfig(BaseModel):
     # Table 13.1's effects are age-proportional, so the honest divisor is the mean multiplier of the children of the
     # SAME year of age: then the mean hazard at every age is the schedule's. ON ⇒ that divisor (the pooled one if the
     # year is empty). Default OFF ⇒ the pooled divisor ⇒ bit-exact.
+    # ADOPTED (R-106 Addendum 124, supervisor 2026-10-29) as a PAIR with the other of condition_full_scale /
+    # orphan_norm_by_age: with both, the hazard equals its schedule at every age (Add.122). Canonically ON via
+    # C_ALLON; class default stays False.
     enable_orphan_norm_by_age: bool = False
     # The Aché reference value, kept for documentation + the Table 13.1 arithmetic check. NOT used by the
     # model (which normalises endogenously). E[mult] at Tab. 13.1's own means (mother alive 0.98, father
@@ -707,6 +727,9 @@ class DemographyConfig(BaseModel):
     # disease synergy became a constant ×1.47 on everyone's hazard. MODEL_SPEC §4.3.3 specifies the multiplier as 1 at
     # full reserve rising to μ near the floor. ON ⇒ the post-burn fill is scaled by the MAXIMUM attainable post-burn
     # fill (cap − this step's burn), so a fully fed agent reads 1.0 and a starving one 0. Default OFF ⇒ bit-exact.
+    # ADOPTED (R-106 Addendum 124, supervisor 2026-10-29) as a PAIR with the other of condition_full_scale /
+    # orphan_norm_by_age: with both, the hazard equals its schedule at every age (Add.122). Canonically ON via
+    # C_ALLON; class default stays False.
     enable_condition_full_scale: bool = False
     enable_condition: bool = False
     condition_alpha: float = 0.25   # EMA rate; half-life ≈ ln2/−ln(1−α) ≈ 2.4 steps (months) of immune lag

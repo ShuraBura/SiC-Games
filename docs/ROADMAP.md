@@ -22,7 +22,7 @@ ceiling). Branch `r106/add105-malthus-churn` holds Add.105–114 and is NOT yet 
 3. **Temperate #1 and #17 unresolved** (40.2 ± 1.6 vs ≤ 40; 232 ± 19 vs ≤ 250).
 4. **#15 orphanhood rose** with the Add.113 adoption (savanna 0.017 → 0.029 vs the Aché point ~0.02); not diagnosed.
 5. **No cause-of-death marker.** Starvation is 15–29% of deaths in canon; the forager record says illness dominates.
-5b. **Demography monitor failures** (MODEL_STATE §3): TFR 4.0–4.6 below the forager band [4.69, 8.03] on every world;
+5b. **Demography monitor failures** (MODEL_STATE §3): TFR 4.0–4.6 below the forager band [4.69, 8.03] on every world [RE-SCORED, RESULTS Add.123/124: that band is of GROWING populations; TFR is now scored by the stationary iso-growth identity];
     m(5–15) 2–3× Aché; montane IBI 32 months (< 34.4); the monitor's band-size check still uses the retracted
     `band_med_adults` statistic (instrument fix pending).
 5c. **The population does not disperse to its food:** the spatial paradox flag is TRUE on every world (MODEL_STATE §4).

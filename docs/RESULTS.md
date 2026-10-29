@@ -10422,4 +10422,51 @@ l25 = 0.9973·l15 − 0.0422, r = ln R0 / 28):
 
 ---
 
+## Addendum 124 — ADOPTED: the pair `condition_full_scale` + `orphan_norm_by_age`; TFR is re-scored by the stationary iso-growth identity, which then flags the documented late-first-birth defect in savanna and montane (2026-10-29, R-106)
+
+**Why.** Supervisor decision on Add.123, option A: score TFR by the stationary identity instead of the growth-phase
+band, record the temperate edge as the expected result of a de-warfared schedule in a well-fed world, and adopt the
+pair. Evidence for the pair: Add.122 (Stage 2, 3 worlds × 3 paired seeds, control identical to the adopted canon).
+
+**Re-score of TFR** (`demography.DEMOG_ANCHORS`, `demography_health`):
+- `realised_tfr` is scored by a new anchor kind `isogrowth`: PASS when the r that TFR and the row's l15 imply
+  (`isogrowth_check`, Gurven & Kaplan 2007 endnote 5, T = 28 yr) is within 0.5 %/yr of the row's measured r; NO-DATA
+  when r or l15 is missing. The tolerance is the one `isogrowth_check` already used. The published TFRs stay in the
+  source string as comparanda.
+- **Label corrected:** `_HH8` said "Tables 8.1/8.2, forest/contact/reservation"; `tools/verify_anchor.py` verified the
+  source row as Table 8.2, COMPARATIVE: Aché 8.03 / !Kung 4.69 / Yanomamö 6.86 (and IBI 37.6 / 49.4 / 34.4). The band was
+  three different populations, all growing.
+- `tools/benchmark_history.py` reads the new kind (report-only, with a note). Tests: the pinned value now pins the new kind,
+  the TFR entry left the band negative-control list, the gate test uses the IBI band; a new test pins the identity verdicts (Aché TFR 8.03 at r = 0 is
+  OUT-OF-BAND, at r = 3.15 PASS; GK07's stationary case PASS; TFR 3.4 at l15 0.66 PASS; no r ⇒ NO-DATA).
+- ROADMAP item 5b annotated.
+
+**Positive control on real data — the identity check is not a free pass.** On the last row of each stored Stage-2 run
+the identity predicts r = +0.39 … +0.67 %/yr against a measured −0.01 … +0.04:
+
+| canon | temperate | savanna | montane |
+|---|---|---|---|
+| Add.113 (`riskvg`) | 3/3 PASS | 3/3 PASS | 0/3 (pred − meas 0.52–0.60) |
+| Add.121 (`three`) | 3/3 PASS | 0/3 (0.54–0.57) | 0/3 (0.58–0.63) |
+| Add.124 (`pair`) | 3/3 PASS | 1/3 (0.49–0.53) | 0/3 (0.53–0.58) |
+
+The model's TFR is 0.4–0.6 above the stationary value for its l15. The function's docstring names the cause: the model's
+age at first birth is 22–25 yr against a forager 16.2–20.5 (Walker 2006), so its generation is longer than the
+identity's 28 yr. This is a known defect, now visible as a scored miss. The tolerance is NOT widened.
+
+**Adoption** (the Add.113/121 steps): both flags removed from `_skip` and from both allowed-dark test lists, set `true`
+in `config/runs/full_campaign.toml`, config regenerated, class defaults stay False, ADOPTED notes on both fields,
+MARKER_MATRIX CURRENT SCORECARD regenerated from `docs/evidence/scorecard_add122_pair.json`, audit start page updated.
+
+**The canon now** (MARKER_MATRIX): the non-starvation hazard is the de-warfared Siler schedule at every age on every
+world; savanna and montane pass #18–#21; temperate FAILS #18 (37.45 vs 37) and #19 (0.662 vs 0.66) by a small margin,
+#21 unresolved — recorded, by decision, as the expected result. m(5–15) is 0.0115 / 0.0163 / 0.0150 (Aché ~0.010).
+
+**Open, in order of the earlier queue:** the drought test on this canon (the synergy is now live, Add.119); the late age
+at first birth (now a scored miss through TFR); the savanna/montane young-adult mortality behind the missing old-age
+mode (Add.121; partly restored by the pair); the remaining audit items (revolt clock F-02, observers F-06, dead flags
+F-03, stale docs, CarbonConfig, R-99…R-105 ledger entries).
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*
