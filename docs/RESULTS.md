@@ -10314,4 +10314,61 @@ and `enable_orphan_norm_by_age` stay held; they are evaluated as a pair next (Ad
 
 ---
 
+## Addendum 122 — The pair `condition_full_scale` + `orphan_norm_by_age` on the Add.121 canon: the hazard now equals its schedule at EVERY age on every world; m(5–15) falls to 0.0115 (Aché ~0.010); savanna and montane pass #18–#21; temperate ends 0.45 yr and 0.002 over the band's top edge (2026-10-28, R-106)
+
+**Why.** Add.120 found two compensating defects in the canon's mortality: the constant synergy (×2 on ages 5–15) and
+the pooled orphan divisor (infants ×0.66). The supervisor chose to re-calibrate the condition fix; Add.120 proposed to
+test it as a pair with the per-age divisor (`enable_orphan_norm_by_age`, built in `9e9d5e5`), as the granary and the
+risk share were adopted as a pair (Add.113).
+
+**Design.** Arm `pair` = the Add.121 canon + the two flags; 3 worlds × seeds 0, 1, 2, 15,000 steps, period life table
+after 7,500 (code `44ea9d5`; the tree differed only in the progress file that the driver writes before it launches).
+Paired against the Add.121 confirmation runs (`three`). 10 runs, 341 min, 0 failed. **Controls:** (1) the savanna canon
+re-run on the new code is identical to the stored `three` run, row for row (601 rows, 0 differences, equal life tables) —
+so the new code with the flag off is bit-exact, and the adopted canon is the `three` arm; (2) the offline life table
+reproduces every run's live e0. Evidence: `docs/evidence/scorecard_add122_pair.json`, `docs/evidence/add122_pair.png`.
+
+**Result 1 — the mechanism.** The non-starvation hazard divided by the schedule the canon uses (de-warfared Aché Siler):
+
+| ages | canon (Add.121) | pair |
+|---|---|---|
+| 0–1 | ×0.72–0.74 | ×1.04–1.05 |
+| 5–10 / 10–15 | ×1.87–2.26 | ×0.93–1.08 |
+| 15–75 | ×0.98–1.27 | ×0.93–1.08 |
+
+The hazard is now the schedule at every age on every world; the modulators are neutral (the population is well fed,
+Add.105), and starvation (17–29% of deaths) is the only addition.
+
+**Result 2 — the markers** (period; mean of 3 seeds; paired difference vs canon):
+
+| world | #18 e0 (21–37) | #19 l15 (0.45–0.66) | #20 e15 | #21 l45 (0.26–0.43) | m(5–15) (Aché ~0.010) | modal adult death |
+|---|---|---|---|---|---|---|
+| temperate | 35.12 → **37.45 FAIL** (+3.2 SE) | 0.620 → **0.662 FAIL** | 38.7 → 39.8 | 0.396 → 0.437 unres. | 0.0217 → **0.0115** | 72–74 → 73–74 |
+| savanna | 31.39 → 33.60 PASS | 0.578 → 0.615 PASS | 35.7 → 37.2 | 0.333 → 0.375 PASS | 0.0264 → 0.0163 | 15–16 → **74–75** |
+| montane | 31.73 → 33.91 PASS | 0.591 → 0.630 PASS | 35.3 → 36.6 | 0.337 → 0.377 PASS | 0.0249 → 0.0150 | 15–19 → 72, 75, 15 |
+
+The Add.120 static estimate predicted temperate 37.3 / 0.660, savanna 33.2 / 0.61, montane 32.9 / 0.62 — the
+measurement agrees within 0.15–1.0 yr. Child mortality falls 23–27% on every world; adult mortality does not rise.
+Other markers: temperate #1 band size 38.2 PASS → 41.0 unres.; savanna #12 rank-size −0.66 PASS → −0.65 unres.; every
+other banded marker keeps its verdict.
+
+**Reading.**
+1. Both flags are corrections of confirmed defects, and together they do what the spec says: Siler hazard at every
+   age, orphan effects redistributed within each age, and a synergy that responds to condition (Add.119 drought: the
+   only positive-check signal the model has).
+2. The marker that never passed in any canon, m(5–15), comes to 0.0115 in temperate against the Aché ~0.010. The
+   modal adult death age returns to the old ages in savanna and in 2 of 3 montane seeds (Add.121's open deviation).
+3. The temperate overshoot is small (0.45 yr on e0; 0.002 on l15; both just over 1 SE) and it has a clear cause: the
+   canon uses the DE-WARFARED schedule (e0 42.7), and with the defects gone nothing but starvation pulls it down. The
+   band's top edge is the Aché TOTAL schedule (36.6–37), which includes contact-era warfare; G&K's table has no
+   temperate forager. Whether a temperate world should sit at the de-warfared Aché minus starvation, or whether a
+   regulator is missing (the density-disease term that the design meant to do this work is neutral since its Binford
+   reference), is a design question, not a calibration of these two flags.
+
+**Adoption is open (supervisor).**
+
+![Add.122](evidence/add122_pair.png)
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

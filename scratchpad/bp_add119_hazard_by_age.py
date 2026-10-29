@@ -21,7 +21,7 @@ K = ("lt_exposure", "lt_deaths", "lt_deaths_starv", "lt_deaths_senesc")
 print("non-starvation period m(x) / Siler m(x); mean of 3 seeds")
 print("Siler m:", " ".join(f"{lo}-{hi}:{siler_m(lo, hi):.4f}" for lo, hi in BANDS))
 for w in ("temperate", "savanna", "montane"):
-    for arm in ("riskvg", "cond", "all4"):
+    for arm in os.environ.get("ARMS", "riskvg,cond,all4").split(","):
         rows = []
         for p in sorted(glob.glob(f"{OUT}/campaign_trajectory_s2_{w}_{arm}_s*.json")):
             m = json.load(open(p, encoding="utf-8"))["meta"]
