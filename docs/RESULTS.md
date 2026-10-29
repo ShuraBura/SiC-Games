@@ -10371,4 +10371,55 @@ other banded marker keeps its verdict.
 
 ---
 
+## Addendum 123 — Design of "the regulator", first step: the stationary identity shows there is no demographic evidence for a missing regulator. The TFR band [4.69, 8.03] is a GROWTH-PHASE band (Add.115's "fertility traded for survival" is the identity, not a defect); what remains is temperate e0 0.45 yr over a band edge that is the Aché TOTAL schedule. Diagnosis and options only (2026-10-28, R-106)
+
+**Why.** After Add.122 the supervisor held the pair (`condition_full_scale` + `orphan_norm_by_age`) and asked for the
+design of the regulator that should pull the de-warfared schedule (e0 42.7) down to the forager range, so that every
+marker passes at adoption.
+
+**What the spec assigned.** MODEL_SPEC §4.6.1 / R-15: density-disease regulates the de-warfared schedule down to
+~34–36. R-16 / R-17 then showed that at a stationary equilibrium (r = 0) e0 is set by whichever check does the
+regulating: with density-disease as the regulator and fixed fertility, e0 is fertility-pinned (~28 at Aché fertility);
+with the fertility brake as the regulator (`enable_intake_fertility`, the canon now), mortality is the schedule plus
+starvation and TFR adjusts. Measured now: the density term is ×0.95–1.10 (local density 0.12–0.15/km², reference
+Binford 0.091/km², `dens_delta` 3.0 [FREE, "calibration pending"]); the pair's hazard is the schedule at every age
+(Add.122).
+
+**The identity** (`demography.isogrowth_check`; Gurven & Kaplan 2007 endnote 5: R0 = TFR·(1 − srb)·l25,
+l25 = 0.9973·l15 − 0.0422, r = ln R0 / 28):
+
+| case | TFR | l15 | r from the identity | note |
+|---|---|---|---|---|
+| Aché forest (H&H) | 8.03 | 0.66 | **+3.15 %/yr** | the TFR band's upper end: a fast-GROWING population |
+| !Kung (Howell) | 4.7 | 0.58 | +0.74 %/yr | the band's lower end is also above stationary |
+| stationary, l15 = 0.45 / 0.55 / 0.62 / 0.66 | 5.04 / 4.05 / 3.56 / 3.33 | — | 0 | TFR ≥ 4.69 at r = 0 needs l15 ≤ 0.48 |
+| canon Add.121 temperate | 4.05 | 0.620 | +0.46 | measured r +0.05 %/yr |
+| pair temperate / savanna / montane | 3.76 / 4.14 / 4.11 | 0.662 / 0.615 / 0.630 | +0.45 / +0.51 / +0.58 | measured +0.06 / +0.03 / +0.05 |
+
+**Findings.**
+1. **The TFR band is a growth-phase band** — the same regime mismatch as the Aché e0 = 37 in R-16. A stationary
+   population inside the l15 band (0.45–0.66) must have TFR 3.3–5.0. Add.115's "fertility was traded for survival" is
+   the identity at work, not a defect; scoring `realised_tfr` against [4.69, 8.03] is a marker with the wrong regime
+   (the "audit a marker before believing it" class).
+2. **The model is close to the identity.** Its TFR is 0.4–0.5 above the stationary value for its l15, so the identity
+   predicts r ≈ +0.5 %/yr against a measured +0.05. The documented late age at first birth (22–25 yr against 16.2–20.5,
+   `isogrowth_check` docstring) lengthens the generation and explains a gap of this sign.
+3. **No demographic marker asks for more equilibrium mortality** except temperate #18/#19 under the pair, which are
+   0.45 yr and 0.002 over a top edge that is the Aché TOTAL schedule (36.5–37, contact-era warfare included) — while
+   the model runs the DE-WARFARED schedule by design (§4.6.1). G&K's table has no temperate forager.
+
+**Options for the supervisor.**
+- **A. Re-score, then adopt the pair.** Make `realised_tfr` a stationary-consistency check (the identity, which the
+  monitor already computes) instead of the Aché growth band; record the temperate edge as the expected consequence of
+  a de-warfared schedule in a well-fed world. No model change.
+- **B. Calibrate the spec's regulator once.** `dens_delta` is FREE with calibration pending. A Stage-1 sweep on the
+  pair canon (δ ∈ {3, 4.5, 6, 9}), pre-registered criteria: #18–#21 PASS on all worlds, m(5–15) and modal adult death
+  not worse, the identity consistent. Estimated need: about +5–10% on temperate a2 (from the Siler table: +20% on a2 ≈
+  −2.2 yr of e0). Risk: tuning a free knob to a band edge.
+- **C. The biome pathogen channel** (Cashdan 2014, §4.6.2–3, `enable_terrain_pathogen`, OFF): a grounded world-level
+  difference, but a temperate world gets a LOWER pathogen load than the tropical reference — the wrong direction for
+  the temperate edge. Not a fix for this miss.
+
+---
+
 *End of RESULTS — seeded 2026-06-05 (R-1 routed from former hypothesis H1(ii)). Append-only.*

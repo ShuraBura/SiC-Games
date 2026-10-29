@@ -192,3 +192,4 @@
 | 10221 | Addendum 120 | DIAGNOSIS ONLY | Addendum 120 — Why the condition fix overshoots: the canon runs the DE-WARFARED Siler (e0 42.7), the constant ×1.47 synergy was what pulled it down to the forager range, and a second defect — the orph |
 | 10279 | Addendum 121 | ADOPTED, PASSES, ARTIFACT | Addendum 121 — ADOPTED: `lifespan_from_siler` + `density_common_window` + `eta_once`. Together every banded marker passes on all three worlds; the age-75 artifact is gone, and its removal shows that s |
 | 10317 | Addendum 122 |  | Addendum 122 — The pair `condition_full_scale` + `orphan_norm_by_age` on the Add.121 canon: the hazard now equals its schedule at EVERY age on every world; m(5–15) falls to 0.0115 (Aché ~0.010); savan |
+| 10374 | Addendum 123 |  | Addendum 123 — Design of "the regulator", first step: the stationary identity shows there is no demographic evidence for a missing regulator. The TFR band [4.69, 8.03] is a GROWTH-PHASE band (Add.115' |
