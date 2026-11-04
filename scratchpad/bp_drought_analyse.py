@@ -29,6 +29,15 @@ def load(path):
     return json.load(open(path, encoding="utf-8"))["traj"]
 
 
+# The monitor's summary of a row, NOT model state. Add.124 re-scored TFR after the stored `pair` runs, so these columns
+# differ between a new run and its stored control although the simulation is identical. Everything else must match.
+MONITOR_ONLY = ("demog_in_band", "demog_scored")
+
+
+def strip(r):
+    return None if r is None else {k: v for k, v in r.items() if k not in MONITOR_ONLY}
+
+
 def by_step(traj):
     return {r["step"]: r for r in traj}
 
@@ -70,7 +79,8 @@ for j, w in enumerate(W):
         for s, tr in runs.items():
             c = by_step(ctl[s])
             pre = [r for r in tr if r["step"] < ONSET]
-            same = all(json.dumps(r, sort_keys=True) == json.dumps(c.get(r["step"]), sort_keys=True) for r in pre)
+            same = all(json.dumps(strip(r), sort_keys=True) == json.dumps(strip(c.get(r["step"])), sort_keys=True)
+                       for r in pre)
             ctl_ok.append(same)
             steps = [r["step"] for r in tr if r["step"] in c]
             ratio = np.array([by_step(tr)[t]["pop"] / c[t]["pop"] for t in steps])

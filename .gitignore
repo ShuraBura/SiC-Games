@@ -18,3 +18,6 @@ __pycache__/
 # every test run, so committing them would put a file in config/runs/ that nobody discussed — which is exactly
 # what the "a run is a file you discussed first" rule exists to prevent.
 config/runs/ctb_*.toml
+
+# Progress files of the drivers: rewritten at launch, so tracking them marks every run dirty (R-106 Add.125).
+scratchpad/*_progress.txt
