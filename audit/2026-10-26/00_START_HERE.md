@@ -23,7 +23,8 @@ disagree, report it as a finding — and the home, or the code, is what ran.
 > second defect, the pooled orphan divisor (Add.120); the ADOPTION of `lifespan_from_siler`,
 > `density_common_window` and `eta_once` (Add.121); the pair `condition_full_scale` + `orphan_norm_by_age` (Add.122);
 > the stationary identity, which showed the TFR band is of growing populations (Add.123); and the ADOPTION of the pair
-> with TFR re-scored by the identity (Add.124, 2026-10-29). **For the current verdicts read the CURRENT SCORECARD in
+> with TFR re-scored by the identity (Add.124, 2026-10-29); and the drought test on that canon, which
+> corrects Add.119 (Add.125, 2026-11-04). **For the current verdicts read the CURRENT SCORECARD in
 > `docs/MARKER_MATRIX.md`**, not `02_BENCHMARKS.md`.
 
 ---
