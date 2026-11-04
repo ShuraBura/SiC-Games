@@ -195,3 +195,4 @@
 | 10374 | Addendum 123 |  | Addendum 123 — Design of "the regulator", first step: the stationary identity shows there is no demographic evidence for a missing regulator. The TFR band [4.69, 8.03] is a GROWTH-PHASE band (Add.115' |
 | 10425 | Addendum 124 | ADOPTED | Addendum 124 — ADOPTED: the pair `condition_full_scale` + `orphan_norm_by_age`; TFR is re-scored by the stationary iso-growth identity, which then flags the documented late-first-birth defect in savan |
 | 10472 | Addendum 125 | RETRACTED | Addendum 125 — The drought test on the Add.124 canon, with exact age-specific mortality: the population contracts and recovers, but births carry all of it; mortality moves −1% to +6%, the condition si |
+| 10568 | Addendum 126 |  | Addendum 126 — The anchor for the drought response: real populations answer a food shock with DEATHS as well as births, the model answers with births alone, and its birth response is about ten times t |
