@@ -152,6 +152,7 @@ enable_terrain_risk = true
 enable_tier2_shock = true
 enable_village_budding = true
 enable_village_catchment_spread = false
+enable_village_ceiling = false
 enable_village_density_disease = true
 enable_village_granary = true
 enable_village_identity = true

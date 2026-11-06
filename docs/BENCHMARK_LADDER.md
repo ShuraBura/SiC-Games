@@ -113,7 +113,7 @@ on, because the ladder is about prerequisites rather than about subject matter.
   `alluvial_renewal`, `resource_storability`, `catchment_depletion`, `village_density_disease`
 - **2 Energetics** — `game`, `biome_meat_frac`, `biome_meat_cv`, `forage_cap`, `provisioning`, `band_provisioning`,
   `nutrition_synergy`, `condition`, `store_anchor`, `storage`, `storage_seasonal_union`, `tier2_shock`,
-  `energetic_fertility`, `intake_fertility`, `need_weighted_shares`, `eta_weighted_shares`, `village_granary`, `condition_full_scale`, `eta_once`
+  `energetic_fertility`, `intake_fertility`, `need_weighted_shares`, `eta_weighted_shares`, `village_granary`, `condition_full_scale`, `eta_once`, `village_ceiling`
 - **3 Demography** — `orphan_mortality`, `density_disease`, `density_reference`, `society_regional_density`, `terrain_pathogen`, `dependent_load`, `synergy_age_grade`, `density_fertility`,
   `sedentism_fertility`, `energetic_refractory`, `life_history`, `malnutrition_fission`, `metabolic_downreg`,
   `fertility_restraint_gene`, `restraint_group_transmission`, `heritable_density_response`, `sub_k_regulation`,

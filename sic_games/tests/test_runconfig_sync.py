@@ -199,6 +199,8 @@ def test_the_files_describe_the_stack_the_supervisor_rule_asks_for():
                # failure was misread as the WinError 6 stdin artifact because it was re-run in a DIFFERENT shell
                # from the one that reported it. Diagnose a test failure in the shell that produced it.)
                "enable_bud_household_closure", "enable_density_fill_matched_radius",
+               #   village_ceiling     a correction under evaluation (Add.128)
+               "enable_village_ceiling",
                #   sticky_pin_release  rejected by Stage 2 (Add.111), kept dark as an instrument
                "enable_sticky_pin_release"}
                # (the five mortality-structure fixes, Addenda 118-124: ADOPTED -> canonically ON.)

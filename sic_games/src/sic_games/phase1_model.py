@@ -2027,18 +2027,17 @@ class TerrainWorld(mesa.Model):
         vkey: dict = {}                        # occupied cell → its village site
         vmembers: dict = {}                    # site → village members this step (the granary cap's head-count)
         village_draw: dict = {}                # site → the members who draw from it (filled in the loop)
-        if vgran_on:
+        vceil_on = (settle_on and ceiling_on and getattr(demog, "enable_village_ceiling", False)
+                    and bool(self._settlement_sites))
+        if vgran_on or vceil_on:
             for c, occ_c in occ_lists.items():
                 s = self._nearest_settlement(c)
                 if s is not None:
                     vkey[c] = s
                     vmembers[s] = vmembers.get(s, 0) + len(occ_c)
-        for (cx, cy), occ in occ_lists.items():
-            excl_mask = None
-            if excl_on:
-                excl_mask = [(a.is_juvenile() and self._family_head(a) is not None) for a in occ]
-                if not any(excl_mask):
-                    excl_mask = None
+        def _cell_pool(cx, cy, no):
+            """The food pool of one occupied cell, after the per-cell ceiling. This function reads state and draws no
+            RNG, so `enable_village_ceiling` can call it before the harvest loop."""
             S = tf.level(cx, cy)
             if settle_on and (cx, cy) in self._settlement_sites:
                 # Layer 2 catchment tier-2 (2b: × yearly shock; B1: × per-site soil — farms degrade it, fisheries stay 1)
@@ -2047,7 +2046,6 @@ class TerrainWorld(mesa.Model):
             if aggl_on and aggl_R is not None:
                 # AGGLOMERATION: REALIZED intensive output added to the cell pool, matching the movement-perceived
                 # per-capita → increasing returns are real, no over-subscription death.
-                no = len(occ)
                 if aggl_mode == "point":
                     S += float(aggl_R[cy, cx]) * (no ** aggl_a - no)         # premium O(n)-baseline = A_cell·(n^β-n) → split n → A_cell·(n^(β-1)-1) each
                 else:
@@ -2060,6 +2058,31 @@ class TerrainWorld(mesa.Model):
                 aggl_on and aggl_R is not None and getattr(self._demog, "enable_aggl_ceiling", False))
             if ceiling_on and _cap_here:
                 S = min(S, self._settlement_carrying_capacity((cx, cy)))         # R-63: a village can't out-produce its catchment
+            return S
+
+        # VILLAGE CEILING (see `enable_village_ceiling`, Add.128): the ceiling above applies cell by cell, and each
+        # cell has its own overlapping 9-cell sum, so a village of 7-10 cells collects several ceilings. Here the
+        # pools of one village are scaled pro rata, so that their sum does not exceed the ceiling at the site.
+        vpool: dict = {}                       # occupied village cell → its pool before the scale
+        vscale: dict = {}                      # site → the pro-rata scale of its village
+        if vceil_on:
+            vsum: dict = {}
+            for c, occ_c in occ_lists.items():
+                s = vkey.get(c)
+                if s is not None:
+                    v = _cell_pool(c[0], c[1], len(occ_c))
+                    vpool[c] = v
+                    vsum[s] = vsum.get(s, 0.0) + v
+            for s, tot in vsum.items():
+                cap_s = self._settlement_carrying_capacity(s)
+                vscale[s] = cap_s / tot if tot > cap_s else 1.0
+        for (cx, cy), occ in occ_lists.items():
+            excl_mask = None
+            if excl_on:
+                excl_mask = [(a.is_juvenile() and self._family_head(a) is not None) for a in occ]
+                if not any(excl_mask):
+                    excl_mask = None
+            S = vpool[(cx, cy)] * vscale[vkey[(cx, cy)]] if (cx, cy) in vpool else _cell_pool(cx, cy, len(occ))
             if self._diag_pool is not None:      # DIAGNOSTIC ONLY (no behaviour): S after every bonus + the
                 self._diag_pool[(cx, cy)] = (S, len(occ))   # ceiling, vs occupancy — is dS/dn super- or sub-linear?
             # S.4: the CURRENT society sets the contest exponent (egalitarian κ=0 … stratified κ=2) for this step's

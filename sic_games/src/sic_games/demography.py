@@ -679,6 +679,14 @@ class DemographyConfig(BaseModel):
     # CORRECTION under evaluation (it changes births in every run with density-fertility on), so it stays dark
     # until the supervisor adopts it and `run_campaign.py` `_skip` must exclude it. Default OFF ⇒ bit-exact.
     enable_density_fill_matched_radius: bool = False
+    # VILLAGE CEILING (R-106 Add.128, 2026-11-06). `_settlement_carrying_capacity` states that a village's total food
+    # is capped at the catchment sum, but the harvest applies `S = min(S, cap)` cell by cell, and each occupied cell has
+    # its own overlapping 9-cell sum. So a village of 7-10 cells collected 1.7-3.6 × the ceiling that the brake reads
+    # (Add.128). ON ⇒ the pools of one village are scaled pro rata, so that their sum does not exceed the ceiling at
+    # the site. No new parameter. The perceived food that agents read in movement does not change. It is a CORRECTION
+    # under evaluation (Stage A of Add.128), so it stays dark, and `run_campaign.py` `_skip` must exclude it.
+    # Default OFF ⇒ bit-exact.
+    enable_village_ceiling: bool = False
     # SEDENTISM fertility (Neolithic Demographic Transition): birth-spacing SHORTENS with sedentism/complexity —
     # mobile foragers space births ~44 mo (carrying cost + prolonged lactational amenorrhea on a low-fat mobile diet;
     # !Kung, Howell), sedentary/complex/farming ~24-30 mo (no carrying cost + storable weaning foods → earlier weaning

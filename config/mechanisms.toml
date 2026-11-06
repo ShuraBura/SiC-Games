@@ -232,6 +232,16 @@ type  = "bool"
 # moves from DEATHS to BIRTHS (the NDT / K-regulation; forager birth spacing lengthens with density).
 # Default OFF ⇒ bit-exact.
 
+[enable_village_ceiling]
+value = false
+owner = "DemographyConfig"
+type  = "bool"
+# VILLAGE CEILING (R-106 Addendum 128, 2026-11-06). The harvest applies the catchment ceiling cell by cell,
+# and each occupied cell has its own overlapping 9-cell sum, so a village of 7-10 cells collected 1.7-3.6 ×
+# the ceiling that the density brake reads. ON ⇒ the pools of one village are scaled pro rata, so that their
+# sum does not exceed the ceiling at the site. No new parameter. A correction under evaluation (Stage A of
+# Add.128), held dark. Default OFF ⇒ bit-exact.
+
 [enable_density_fill_matched_radius]
 value = false
 owner = "DemographyConfig"

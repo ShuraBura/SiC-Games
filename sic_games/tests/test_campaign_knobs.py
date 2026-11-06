@@ -143,6 +143,8 @@ def test_c_allon_leaves_no_dark_mechanism_but_the_documented_four():
                # the fix to the starvation mechanism. (Missed from this list when the flag was added; the gap was
                # hidden because this test is a subprocess test and fails for WinError 6 in some shells.)
                "enable_density_fill_matched_radius",
+               # VILLAGE CEILING (R-106 Add.128): a correction under evaluation, held dark.
+               "enable_village_ceiling",
                # STICKY PIN RELEASE (R-106 Addendum 111): rejected by Stage 2, kept dark as an instrument.
                "enable_sticky_pin_release"}
                # (the five mortality-structure fixes, Addenda 118-124: ADOPTED -> canonically ON.)

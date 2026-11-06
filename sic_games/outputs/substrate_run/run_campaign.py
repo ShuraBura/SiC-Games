@@ -1012,6 +1012,10 @@ def main():
             # CORRECTION under evaluation — it changes births in every run — so C_ALLON must not adopt it by side
             # effect (the leaky_assabiyah / density_reference rule).
             "enable_density_fill_matched_radius",
+            # VILLAGE CEILING (R-106 Add.128). Scales the pools of a village so that their sum obeys the ceiling at
+            # the site. A correction under evaluation that cuts village food on every world, so C_ALLON must not
+            # adopt it by side effect.
+            "enable_village_ceiling",
             # FOOD-VIABLE DAUGHTER SITE — ADOPTED (R-106 Addendum 108, 2026-09-24) and so REMOVED from this set ->
             # canonically ON. Buds had founded 67% of temperate daughters on land with NO food, and 72.5% of all
             # temperate starvation deaths were inside those villages. Stage 2 (real pipeline, 3 worlds): temperate

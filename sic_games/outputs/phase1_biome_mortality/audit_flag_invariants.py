@@ -184,6 +184,7 @@ TYPES = {
     # "material stays flat" reading was void — the mechanisms under test were disabled.
     # Types per MECHANISM_CHARTER §3. The three marked PROVISIONAL are judgement calls made during
     # the retrofit and want the author's confirmation (§3.1 puts the declaration in the docstring).
+    "enable_village_ceiling": "P",                 # bounds field→agent extraction over a village: Σ pools ≤ ceiling
     "enable_aggl_ceiling": "P",                    # bounds field→agent extraction: Σ extracted ≤ availability
     "enable_legitimacy": "C",                      # achieved cred → ascribed rank (capital → capital)
     "enable_delegitimation": "C",                  # the reverse conversion (gumsa → gumlao)
@@ -330,6 +331,7 @@ PREREQ = {
     # RETROFIT 2026-07-26 — the elite arc's chains. Without these, every flag below reads "no change"
     # for want of a prerequisite and would be miscalled a spec bug.
     "enable_aggl_ceiling": ("enable_agglomeration", "enable_catchment_ceiling", "enable_aggregation_sedentism"),
+    "enable_village_ceiling": ("enable_catchment_ceiling", "enable_aggregation_sedentism"),
     "enable_legitimacy": ("enable_cred_status",),
     "enable_delegitimation": ("enable_legitimacy",),
     "enable_relative_legitimacy": ("enable_legitimacy",),

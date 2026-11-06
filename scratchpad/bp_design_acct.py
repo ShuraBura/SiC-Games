@@ -92,7 +92,7 @@ def _observe(self):
             rnc.append(v["need"] / c)
             rsc.append((ss + so) / c)
     rec = dict(step=self.step_count, pop=len(self.agent_list), n_v=len(V), heads=heads, need=need, intake=intake, cap=cap, sum25=sum25, S_site=S_site, S_oth=S_oth, lev_oth=lev_oth,
-               cells_med=med(cells), fill_med=med(fills), fill_pw=(fw / heads if heads else None), need_cap_med=med(rnc), sup_cap_med=med(rsc), mob=mob)
+               cells_med=med(cells), fill_med=med(fills), fill_pw=(fw / heads if heads else None), need_cap_med=med(rnc), sup_cap_med=med(rsc), sup_cap_max=(max(rsc) if rsc else None), sup_cap_over=sum(1 for x in rsc if x > 1.001), mob=mob)
     with open(OUT, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(rec) + "\n")
 
