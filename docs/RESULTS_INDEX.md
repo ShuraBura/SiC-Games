@@ -197,3 +197,4 @@
 | 10472 | Addendum 125 | RETRACTED | Addendum 125 — The drought test on the Add.124 canon, with exact age-specific mortality: the population contracts and recovers, but births carry all of it; mortality moves −1% to +6%, the condition si |
 | 10568 | Addendum 126 |  | Addendum 126 — The anchor for the drought response: real populations answer a food shock with DEATHS as well as births, the model answers with births alone, and its birth response is about ten times t |
 | 10651 | Addendum 127 | CORRECTED | Addendum 127 — The one-year harvest test: the gap survives on the anchor's own time scale for births and for children. Adults and starvation do respond, in the shock year, and Add.125's "no hidden ons |
+| 10726 | Addendum 128 |  | Addendum 128 — The brake reads a ceiling that the harvest does not obey: villages harvest 1.7–3.6 × the ceiling, the stores stay full under five years of ×0.70, and no food route to child mortality ca |

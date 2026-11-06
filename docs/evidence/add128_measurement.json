@@ -1,0 +1,164 @@
+{
+ "temperate": {
+  "m_ema_shockyear_control": 8.562910289784298,
+  "m_ema_p10_control": 1.3814831804979688,
+  "m_ema_change_070_pct": -3.857749845852987,
+  "W_fill_m_change_070_pct": 39.4733230894025,
+  "W_fd_m_change_070_pct": -78.53944527260582,
+  "W_raw_p50_change_070_pct": -19.990422695894672,
+  "W_f_int_m_change_070_pct": -0.663741763142911,
+  "W_ema_p50_control": 3.6856885608549694,
+  "W_f_int_control": 0.8709586096028291,
+  "W_unfed_control": 0.01673905080115524,
+  "W_unfed_070": 0.02157087723943392,
+  "store_control": 20.2419292474068,
+  "store_y5_year4": 20.158257315107885,
+  "sfull_control": 0.9495320589214225,
+  "v_sup_control": 4.355856292623044,
+  "v_sup_y5": 3.4883861263128337,
+  "child_mobile_control": 0.027667791483271215,
+  "starved_children_n": 65,
+  "starved_children_outside": 0.8769230769230769,
+  "starved_outside_no_mother": 0.7017543859649122,
+  "account": {
+   "site": 0.8196839973946632,
+   "other_yield": 0.6792186724348683,
+   "bonus": 1.1294469016190158,
+   "supply": 2.6283495714485476,
+   "intake": 2.3274830563729454,
+   "need": 0.4316956005335504,
+   "need_supply": 0.16424588465058415,
+   "sum25": 2.63353898241359,
+   "fill_pw": 1.2197798173693746,
+   "cells_med": 6.538461538461538,
+   "need_lean": 0.5625876541852652
+  },
+  "settled_starv_shockyear": {
+   "c": 35,
+   "y1": 73
+  },
+  "settled_starv_sph_lt1_y1": 0,
+  "ema_birth_response_per_10pct": {
+   "085": {
+    "1.4": -11.92,
+    "5": -4.8,
+    "10": -2.6,
+    "20": -1.35
+   },
+   "070": {
+    "1.4": -7.19,
+    "5": -2.9,
+    "10": -1.56,
+    "20": -0.81
+   }
+  }
+ },
+ "savanna": {
+  "m_ema_shockyear_control": 2.7699496599129927,
+  "m_ema_p10_control": 0.9114849073641812,
+  "m_ema_change_070_pct": -8.951389444993573,
+  "W_fill_m_change_070_pct": 41.40260089873864,
+  "W_fd_m_change_070_pct": -68.4568249158229,
+  "W_raw_p50_change_070_pct": -14.27553055069205,
+  "W_f_int_m_change_070_pct": -1.7258123833113315,
+  "W_ema_p50_control": 1.4351372675224066,
+  "W_f_int_control": 0.682385352434121,
+  "W_unfed_control": 0.014801846872039703,
+  "W_unfed_070": 0.01823946325358944,
+  "store_control": 17.41332538260155,
+  "store_y5_year4": 15.511881346581562,
+  "sfull_control": 0.5392746434941809,
+  "v_sup_control": 1.497517121765113,
+  "v_sup_y5": 1.1926239811085442,
+  "child_mobile_control": 0.04007328554988753,
+  "starved_children_n": 68,
+  "starved_children_outside": 0.8823529411764706,
+  "starved_outside_no_mother": 0.5666666666666667,
+  "account": {
+   "site": 0.5258702204389407,
+   "other_yield": 0.898529348334917,
+   "bonus": 0.3030774136436946,
+   "supply": 1.7274769824175524,
+   "intake": 0.9563933812127176,
+   "need": 0.5009811181901792,
+   "need_supply": 0.2900074057652977,
+   "sum25": 2.7649450078891413,
+   "fill_pw": 1.0239417293436694,
+   "cells_med": 8.26923076923077,
+   "need_lean": 0.6796290617657482
+  },
+  "settled_starv_shockyear": {
+   "c": 7,
+   "y1": 22
+  },
+  "settled_starv_sph_lt1_y1": 6,
+  "ema_birth_response_per_10pct": {
+   "085": {
+    "1.4": -9.43,
+    "5": -3.83,
+    "10": -2.08,
+    "20": -1.08
+   },
+   "070": {
+    "1.4": -7.25,
+    "5": -2.88,
+    "10": -1.55,
+    "20": -0.8
+   }
+  }
+ },
+ "montane": {
+  "m_ema_shockyear_control": 6.938707067779894,
+  "m_ema_p10_control": 2.108100509683946,
+  "m_ema_change_070_pct": -3.536664542679524,
+  "W_fill_m_change_070_pct": 38.08314631890997,
+  "W_fd_m_change_070_pct": -41.00265669363586,
+  "W_raw_p50_change_070_pct": -20.01880063553272,
+  "W_f_int_m_change_070_pct": -0.7786923654182987,
+  "W_ema_p50_control": 3.490663171839519,
+  "W_f_int_control": 0.9161123136530579,
+  "W_unfed_control": 0.010199897009687544,
+  "W_unfed_070": 0.015969656159815254,
+  "store_control": 19.44558554064145,
+  "store_y5_year4": 18.506671718765883,
+  "sfull_control": 0.7674195811409196,
+  "v_sup_control": 3.9151697376475485,
+  "v_sup_y5": 3.0498061966421783,
+  "child_mobile_control": 0.3331887507371162,
+  "starved_children_n": 159,
+  "starved_children_outside": 0.9559748427672956,
+  "starved_outside_no_mother": 0.5526315789473684,
+  "account": {
+   "site": 0.7428130082655426,
+   "other_yield": 1.222415234436151,
+   "bonus": 1.6060973207973461,
+   "supply": 3.57132556349904,
+   "intake": 3.178961224616746,
+   "need": 0.7076329000307348,
+   "need_supply": 0.19814292689054783,
+   "sum25": 2.9629857484181192,
+   "fill_pw": 2.3967229979798317,
+   "cells_med": 10.461538461538462,
+   "need_lean": 0.9080880408056846
+  },
+  "settled_starv_shockyear": {
+   "c": 9,
+   "y1": 36
+  },
+  "settled_starv_sph_lt1_y1": 0,
+  "ema_birth_response_per_10pct": {
+   "085": {
+    "1.4": -5.38,
+    "5": -2.16,
+    "10": -1.17,
+    "20": -0.61
+   },
+   "070": {
+    "1.4": -2.58,
+    "5": -1.09,
+    "10": -0.6,
+    "20": -0.31
+   }
+  }
+ }
+}
