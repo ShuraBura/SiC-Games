@@ -199,3 +199,4 @@
 | 10651 | Addendum 127 | CORRECTED | Addendum 127 — The one-year harvest test: the gap survives on the anchor's own time scale for births and for children. Adults and starvation do respond, in the shock year, and Add.125's "no hidden ons |
 | 10726 | Addendum 128 |  | Addendum 128 — The brake reads a ceiling that the harvest does not obey: villages harvest 1.7–3.6 × the ceiling, the stores stay full under five years of ×0.70, and no food route to child mortality ca |
 | 10832 | Addendum 129 |  | Addendum 129 — Stage A of Add.128: `enable_village_ceiling` makes the food account true and a food signal live, and children respond to a shock for the first time on two worlds; but A3 trips, montane  |
+| 10952 | Addendum 130 | ADOPTED | Addendum 130 — the per-village log: settled people starve beside a stocked store because the draw makes one status-weighted pass, in the canon as well as with `enable_village_ceiling`; on montane the  |
